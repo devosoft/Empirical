@@ -82,22 +82,22 @@ namespace emp {
     field_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
 
     // Identify the field that a specified bit is in.
-    static size_t FieldID(const size_t index) { return index >> FIELD_LOG2; }
+    [[nodiscard]] static size_t FieldID(const size_t index) { return index >> FIELD_LOG2; }
 
     // Identify the byte that a specified bit is in.
-    static size_t ByteID(const size_t index) { return index >> 3; }
+    [[nodiscard]] static size_t ByteID(const size_t index) { return index >> 3; }
 
     // Identify the position within a field where a specified bit is.
-    static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
+    [[nodiscard]] static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
 
     // Identify the position within a byte where a specified bit is.
-    static size_t BytePos(const size_t index) { return index & 7; }
+    [[nodiscard]] static size_t BytePos(const size_t index) { return index & 7; }
 
     // Identify which field a specified byte position would be in.
-    static size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
+    [[nodiscard]] static size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
 
     // Convert a byte position in BitVector to a byte position in the target field.
-    static size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
+    [[nodiscard]] static size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
     // Copy an array of bits into this BitSet (internal use only!)
     template <size_t IN_FIELDS, size_t COPY_FIELDS=NUM_FIELDS>
@@ -113,10 +113,12 @@ namespace emp {
     void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= END_MASK; }
 
     // Convert the bit_set to const bytes.
-    emp::Ptr<const unsigned char> BytePtr() const { return reinterpret_cast<const unsigned char*>(bit_set); }
+    [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const
+    { return reinterpret_cast<const unsigned char*>(bit_set); }
 
     // Convert the bit_set to bytes.
-    emp::Ptr<unsigned char> BytePtr() { return reinterpret_cast<unsigned char*>(bit_set); }
+    [[nodiscard]] emp::Ptr<unsigned char> BytePtr()
+    { return reinterpret_cast<unsigned char*>(bit_set); }
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size);
@@ -185,19 +187,19 @@ namespace emp {
     bool OK() const;
 
     /// How many bits are in this BitSet?
-    constexpr static size_t GetSize() { return NUM_BITS; }
+    [[nodiscard]] constexpr static size_t GetSize() { return NUM_BITS; }
 
     /// How many bytes are in this BitSet?
-    constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
+    [[nodiscard]] constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
 
     /// How many distinct values could be held in this bitset?
-    static constexpr double GetNumStates() { return emp::Pow2(NUM_BITS); }
+    [[nodiscard]] static constexpr double GetNumStates() { return emp::Pow2(NUM_BITS); }
 
     /// Retrieve the bit as a specified index.
-    bool Get(size_t index) const;
+    [[nodiscard]] bool Get(size_t index) const;
 
     /// A safe version of Get() for indexing out of range. Useful for representing collections.
-    bool Has(size_t index) const { return (index < NUM_BITS) ? Get(index) : false; }
+    [[nodiscard]] bool Has(size_t index) const { return (index < NUM_BITS) ? Get(index) : false; }
 
     /// Set the bit at a specified index.
     BitSet & Set(size_t index, bool value=true);
@@ -233,13 +235,13 @@ namespace emp {
     BitSet & Toggle(size_t start, size_t stop);
 
     /// Return true if ANY bits in the BitSet are one, else return false.
-    bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+    [[nodiscard]] bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
 
     /// Return true if NO bits in the BitSet are one, else return false.
-    bool None() const { return !Any(); }
+    [[nodiscard]] bool None() const { return !Any(); }
 
     /// Return true if ALL bits in the BitSet are one, else return false.
-    bool All() const { return (~(*this)).None(); }
+    [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitSet &  Randomize(Random & random);
@@ -281,12 +283,12 @@ namespace emp {
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
-    template <size_t T2> bool operator==(const BitSet<T2> & in) const;
-    template <size_t T2> bool operator!=(const BitSet<T2> & in) const { return !(*this == in); }
-    template <size_t T2> bool operator< (const BitSet<T2> & in) const;
-    template <size_t T2> bool operator> (const BitSet<T2> & in) const { return in < *this; }
-    template <size_t T2> bool operator<=(const BitSet<T2> & in) const { return !(in < *this); }
-    template <size_t T2> bool operator>=(const BitSet<T2> & in) const { return !(*this < in); }
+    template <size_t T2> [[nodiscard]] bool operator==(const BitSet<T2> & in) const;
+    template <size_t T2> [[nodiscard]] bool operator!=(const BitSet<T2> & in) const { return !(*this == in); }
+    template <size_t T2> [[nodiscard]] bool operator< (const BitSet<T2> & in) const;
+    template <size_t T2> [[nodiscard]] bool operator> (const BitSet<T2> & in) const { return in < *this; }
+    template <size_t T2> [[nodiscard]] bool operator<=(const BitSet<T2> & in) const { return !(in < *this); }
+    template <size_t T2> [[nodiscard]] bool operator>=(const BitSet<T2> & in) const { return !(*this < in); }
 
     /// Casting a BitSet to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
@@ -295,43 +297,43 @@ namespace emp {
     // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
 
     /// Retrive the byte at the specified byte index.
-    uint8_t GetByte(size_t index) const;
+    [[nodiscard]] uint8_t GetByte(size_t index) const;
 
     /// Get a read-only view into the internal array used by BitSet.
     /// @return Read-only span of BitSet's bytes.
-    std::span<const std::byte> GetBytes() const;
+    [[nodiscard]] std::span<const std::byte> GetBytes() const;
 
     /// Get a read-only pointer to the internal array used by BitVector.
     /// @return Read-only pointer to BitVector's bytes.
-    emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
+    [[nodiscard]] emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
 
     /// Get the overall value of this BitSet, using a uint encoding, but including all bits
     /// and returning the value as a double.
-    double GetValue() const;
+    [[nodiscard]] double GetValue() const;
 
     /// Get specified type at a given index (in steps of that type size)
-    template <typename T> T GetValueAtIndex(const size_t index) const;
+    template <typename T> [[nodiscard]] T GetValueAtIndex(const size_t index) const;
 
     /// Retrieve a 'size_t' chunk from the current bits at the specified index.
-    std::size_t GetSizeT(size_t index) const { return GetValueAtIndex<size_t>(index); }
+    [[nodiscard]] std::size_t GetSizeT(size_t index) const { return GetValueAtIndex<size_t>(index); }
 
     /// Retrieve the 8-bit uint from the specified uint index.
-    uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
+    [[nodiscard]] uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
 
     /// Retrieve the 16-bit uint from the specified uint index.
-    uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
+    [[nodiscard]] uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
 
     /// Retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
+    [[nodiscard]] uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
     
     /// Retrieve the 64-bit uint from the specified uint index.
-    uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
+    [[nodiscard]] uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
     /// By default, retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+    [[nodiscard]] uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
 
 
     /// Set specified type at a given index (in steps of that type size)
@@ -354,22 +356,22 @@ namespace emp {
 
 
     /// Get specified type starting at a given BIT position.
-    template <typename T> T GetValueAtBit(const size_t index) const;
+    template <typename T> [[nodiscard]] T GetValueAtBit(const size_t index) const;
 
     /// Retrieve the 8-bit uint from the specified uint index.
-    uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
+    [[nodiscard]] uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
 
     /// Retrieve the 16-bit uint from the specified uint index.
-    uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
+    [[nodiscard]] uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
 
     /// Retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
+    [[nodiscard]] uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
     
     /// Retrieve the 64-bit uint from the specified uint index.
-    uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
+    [[nodiscard]] uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
     /// By default, retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
+    [[nodiscard]] uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
 
 
     template <typename T> void SetValueAtBit(const size_t index, T value);
@@ -393,47 +395,47 @@ namespace emp {
     // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
 
     /// A simple hash function for bit vectors.
-    std::size_t Hash() const;
+    [[nodiscard]] std::size_t Hash() const;
 
     /// Count the number of ones in the BitVector.
-    size_t CountOnes() const;
+    [[nodiscard]] size_t CountOnes() const;
 
     /// Faster counting of ones for very sparse bit vectors.
-    size_t CountOnes_Sparse() const;
+    [[nodiscard]] size_t CountOnes_Sparse() const;
 
     /// Count the number of zeros in the BitVector.
-    size_t CountZeros() const { return GetSize() - CountOnes(); }
+    [[nodiscard]] size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Return the position of the first one; return -1 if no ones in vector.
-    int FindBit() const;
+    [[nodiscard]] int FindBit() const;
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitSet "bits" with:
     ///
     ///   for (int pos = bits.FindBit(); pos >= 0; pos = bits.FindBit(pos+1)) { ... }
     ///
-    int FindBit(const size_t start_pos) const;
+    [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// Find the most-significant set-bit.
-    int FindMaxOne() const;
+    [[nodiscard]] int FindMaxOne() const;
 
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
     int PopBit();
 
     /// Return positions of all ones.
-    emp::vector<size_t> GetOnes() const;
+    [[nodiscard]] emp::vector<size_t> GetOnes() const;
 
     /// Find the length of the longest continuous series of ones.
-    size_t LongestSegmentOnes() const;
+    [[nodiscard]] size_t LongestSegmentOnes() const;
 
 
     // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
 
     /// Convert a specified bit to a character.
-    char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
+    [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
     /// Convert this BitVector to a string.
-    std::string ToString() const;
+    [[nodiscard]] std::string ToString() const;
 
     /// Regular print function (from most significant bit to least)
     void Print(std::ostream & out=std::cout) const;
@@ -484,29 +486,29 @@ namespace emp {
     BitSet & EQU_SELF(const BitSet & set2);
 
     /// Perform a Boolean NOT on this BitSet and return the result.
-    BitSet NOT() const { return BitSet<NUM_BITS>(*this).NOT_SELF(); }
+    [[nodiscard]] BitSet NOT() const { return BitSet<NUM_BITS>(*this).NOT_SELF(); }
 
     /// Perform a Boolean AND with a second BitSet and return the result.
-    BitSet AND(const BitSet & in) const { return BitSet<NUM_BITS>(*this).AND_SELF(in); }
+    [[nodiscard]] BitSet AND(const BitSet & in) const { return BitSet<NUM_BITS>(*this).AND_SELF(in); }
 
     /// Perform a Boolean OR with a second BitSet and return the result.
-    BitSet OR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).OR_SELF(in); }
+    [[nodiscard]] BitSet OR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).OR_SELF(in); }
 
     /// Perform a Boolean NAND with a second BitSet and return the result.
-    BitSet NAND(const BitSet & in) const { return BitSet<NUM_BITS>(*this).NAND_SELF(in); }
+    [[nodiscard]] BitSet NAND(const BitSet & in) const { return BitSet<NUM_BITS>(*this).NAND_SELF(in); }
 
     /// Perform a Boolean NOR with a second BitSet and return the result.
-    BitSet NOR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).NOR_SELF(in); }
+    [[nodiscard]] BitSet NOR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).NOR_SELF(in); }
 
     /// Perform a Boolean XOR with a second BitSet and return the result.
-    BitSet XOR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).XOR_SELF(in); }
+    [[nodiscard]] BitSet XOR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).XOR_SELF(in); }
 
     /// Perform a Boolean EQU with a second BitSet and return the result.
     BitSet EQU(const BitSet & in) const { return BitSet<NUM_BITS>(*this).EQU_SELF(in); }
 
     /// Positive shifts go right and negative shifts go left (0 does nothing);
     /// return result.
-    BitSet SHIFT(const int shift_size) const;
+    [[nodiscard]] BitSet SHIFT(const int shift_size) const;
 
     /// Positive shifts go right and negative shifts go left (0 does nothing);
     /// store result here, and return this object.
@@ -516,11 +518,11 @@ namespace emp {
     BitSet & REVERSE_SELF();
 
     /// Reverse order of bits in the bitset.
-    BitSet REVERSE() const;
+    [[nodiscard]] BitSet REVERSE() const;
 
     /// Positive rotates go left and negative rotates go left (0 does nothing);
     /// return result.
-    BitSet ROTATE(const int rotate_size) const;
+    [[nodiscard]] BitSet ROTATE(const int rotate_size) const;
 
     /// Positive rotates go right and negative rotates go left (0 does nothing);
     /// store result here, and return this object.
@@ -537,7 +539,7 @@ namespace emp {
     /// Addition of two Bitsets.
     /// Wraps if it overflows.
     /// Returns result.
-    BitSet ADD(const BitSet & set2) const;
+    [[nodiscard]] BitSet ADD(const BitSet & set2) const;
 
     /// Addition of two Bitsets.
     /// Wraps if it overflows.
@@ -547,7 +549,7 @@ namespace emp {
     /// Subtraction of two Bitsets.
     /// Wraps around if it underflows.
     /// Returns result.
-    BitSet SUB(const BitSet & set2) const;
+    [[nodiscard]] BitSet SUB(const BitSet & set2) const;
 
     /// Subtraction of two Bitsets.
     /// Wraps if it underflows.
@@ -555,22 +557,22 @@ namespace emp {
     BitSet & SUB_SELF(const BitSet & set2);
     
     /// Operator bitwise NOT...
-    BitSet operator~() const { return NOT(); }
+    [[nodiscard]] BitSet operator~() const { return NOT(); }
 
     /// Operator bitwise AND...
-    BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
+    [[nodiscard]] BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
 
     /// Operator bitwise OR...
-    BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
+    [[nodiscard]] BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
 
     /// Operator bitwise XOR...
-    BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
+    [[nodiscard]] BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
 
     /// Operator shift left...
-    BitSet operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    [[nodiscard]] BitSet operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
 
     /// Operator shift right...
-    BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+    [[nodiscard]] BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
     /// Compound operator bitwise AND...
     BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
@@ -588,10 +590,10 @@ namespace emp {
     BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     /// Operator plus...
-    BitSet operator+(const BitSet & ar2) const { return ADD(ar2); }
+    [[nodiscard]] BitSet operator+(const BitSet & ar2) const { return ADD(ar2); }
 
     /// Operator minus...
-    BitSet operator-(const BitSet & ar2) const { return SUB(ar2); }
+    [[nodiscard]] BitSet operator-(const BitSet & ar2) const { return SUB(ar2); }
 
     /// Compound operator plus...
     const BitSet & operator+=(const BitSet & ar2) { return ADD_SELF(ar2); }
@@ -601,11 +603,11 @@ namespace emp {
 
     /// STL COMPATABILITY
     /// A set of functions to allow drop-in replacement with std::bitset.
-    constexpr static size_t size() { return NUM_BITS; }
-    inline bool all() const { return All(); }
-    inline bool any() const { return Any(); }
-    inline bool none() const { return !Any(); }
-    inline size_t count() const { return CountOnes(); }
+    [[nodiscard]] constexpr static size_t size() { return NUM_BITS; }
+    [[nodiscard]] inline bool all() const { return All(); }
+    [[nodiscard]] inline bool any() const { return Any(); }
+    [[nodiscard]] inline bool none() const { return !Any(); }
+    [[nodiscard]] inline size_t count() const { return CountOnes(); }
     inline BitSet & flip() { return Toggle(); }
     inline BitSet & flip(size_t pos) { return Toggle(pos); }
     inline BitSet & flip(size_t start, size_t stop) { return Toggle(start, stop); }
@@ -613,7 +615,7 @@ namespace emp {
     inline void reset(size_t id) { Set(id, false); }
     inline void set() { SetAll(); }
     inline void set(size_t id) { Set(id); }
-    inline bool test(size_t index) const { return Get(index); }
+    [[nodiscard]] inline bool test(size_t index) const { return Get(index); }
 
     template <class Archive>
     void serialize( Archive & ar )
