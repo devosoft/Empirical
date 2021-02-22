@@ -541,29 +541,29 @@ namespace emp {
 
 
     /// Perform a Boolean NOT on this BitVector and return the result.
-    BitVector NOT() const { return BitVector(*this).NOT_SELF(); }
+    [[nodiscard]] BitVector NOT() const { return BitVector(*this).NOT_SELF(); }
 
     /// Perform a Boolean AND on this BitVector and return the result.
-    BitVector AND(const BitVector & bv2) const { return BitVector(*this).AND_SELF(bv2); }
+    [[nodiscard]] BitVector AND(const BitVector & bv2) const { return BitVector(*this).AND_SELF(bv2); }
 
     /// Perform a Boolean OR on this BitVector and return the result.
-    BitVector OR(const BitVector & bv2) const { return BitVector(*this).OR_SELF(bv2); }
+    [[nodiscard]] BitVector OR(const BitVector & bv2) const { return BitVector(*this).OR_SELF(bv2); }
 
     /// Perform a Boolean NAND on this BitVector and return the result.
-    BitVector NAND(const BitVector & bv2) const { return BitVector(*this).NAND_SELF(bv2); }
+    [[nodiscard]] BitVector NAND(const BitVector & bv2) const { return BitVector(*this).NAND_SELF(bv2); }
 
     /// Perform a Boolean NOR on this BitVector and return the result.
-    BitVector NOR(const BitVector & bv2) const { return BitVector(*this).NOR_SELF(bv2); }
+    [[nodiscard]] BitVector NOR(const BitVector & bv2) const { return BitVector(*this).NOR_SELF(bv2); }
 
     /// Perform a Boolean XOR on this BitVector and return the result.
-    BitVector XOR(const BitVector & bv2) const { return BitVector(*this).XOR_SELF(bv2); }
+    [[nodiscard]] BitVector XOR(const BitVector & bv2) const { return BitVector(*this).XOR_SELF(bv2); }
 
     /// Perform a Boolean EQU on this BitVector and return the result.
-    BitVector EQU(const BitVector & bv2) const { return BitVector(*this).EQU_SELF(bv2); }
+    [[nodiscard]] BitVector EQU(const BitVector & bv2) const { return BitVector(*this).EQU_SELF(bv2); }
 
 
     /// Positive shifts go left and negative go right (0 does nothing); return result.
-    BitVector SHIFT(const int shift_size) const;
+    [[nodiscard]] BitVector SHIFT(const int shift_size) const;
 
     /// Positive shifts go left and negative go right; store result here, and return this object.
     BitVector & SHIFT_SELF(const int shift_size);
@@ -572,11 +572,11 @@ namespace emp {
     BitVector & REVERSE_SELF();
 
     /// Reverse order of bits in the bitset.
-    BitVector REVERSE() const;
+    [[nodiscard]] BitVector REVERSE() const;
 
     /// Positive rotates go left and negative rotates go left (0 does nothing);
     /// return result.
-    BitVector ROTATE(const int rotate_size) const;
+    [[nodiscard]] BitVector ROTATE(const int rotate_size) const;
 
     /// Positive rotates go right and negative rotates go left (0 does nothing);
     /// store result here, and return this object.
@@ -593,7 +593,7 @@ namespace emp {
     /// Addition of two BitVectors.
     /// Wraps if it overflows.
     /// Returns result.
-    BitVector ADD(const BitVector & set2) const;
+    [[nodiscard]] BitVector ADD(const BitVector & set2) const;
 
     /// Addition of two BitVectors.
     /// Wraps if it overflows.
@@ -603,7 +603,7 @@ namespace emp {
     /// Subtraction of two BitVectors.
     /// Wraps around if it underflows.
     /// Returns result.
-    BitVector SUB(const BitVector & set2) const;
+    [[nodiscard]] BitVector SUB(const BitVector & set2) const;
 
     /// Subtraction of two BitVectors.
     /// Wraps if it underflows.
