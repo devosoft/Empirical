@@ -1458,7 +1458,7 @@ namespace emp {
     Clear(index, index+type_bits);       // Clear out the bits where new value will go.
     BitSet<NUM_BITS> in_bits;            // Setup a bitset to place the new bits in.
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
-    in_bits << index;                    // Shift new bits into place.
+    in_bits <<= index;                    // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current BitSet.
 
     ClearExcessBits();
