@@ -203,19 +203,19 @@ namespace emp {
     // >>>>>>>>>>  Accessors  <<<<<<<<<< //
 
     /// How many bits do we currently have?
-    size_t GetSize() const { return num_bits; }
+    [[nodiscard]] size_t GetSize() const { return num_bits; }
 
     /// How many bytes are in this BitVector?
-    size_t GetNumBytes() const { return NumBytes(); }
+    [[nodiscard]] size_t GetNumBytes() const { return NumBytes(); }
 
     /// How many distinct values could be held in this BitVector?
-    double GetNumStates() const { return emp::Pow2(num_bits); }
+    [[nodiscard]] double GetNumStates() const { return emp::Pow2(num_bits); }
 
     /// Retrive the bit value from the specified index.
-    bool Get(size_t index) const;
+    [[nodiscard]] bool Get(size_t index) const;
 
     /// A safe version of Get() for indexing out of range. Useful for representing collections.
-    bool Has(size_t index) const { return (index < num_bits) ? Get(index) : false; }
+    [[nodiscard]] bool Has(size_t index) const { return (index < num_bits) ? Get(index) : false; }
 
     /// Update the bit value at the specified index.
     BitVector & Set(size_t index, bool value=true);
@@ -236,7 +236,7 @@ namespace emp {
     BitVector & Clear(const size_t start, const size_t stop);    
 
     /// Const index operator -- return the bit at the specified position.
-    bool operator[](size_t index) const { return Get(index); }
+    [[nodiscard]] bool operator[](size_t index) const { return Get(index); }
 
     /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
     BitProxy<BitVector> operator[](size_t index) { return BitProxy<BitVector>(*this, index); }
@@ -251,14 +251,14 @@ namespace emp {
     BitVector & Toggle(size_t start, size_t stop);
 
     /// Return true if ANY bits are set to 1, otherwise return false.
-    bool Any() const;
+    [[nodiscard]] bool Any() const;
 
     /// Return true if NO bits are set to 1, otherwise return false.
-    bool None() const { return !Any(); }
+    [[nodiscard]] bool None() const { return !Any(); }
 
     /// Return true if ALL bits are set to 1, otherwise return false.
     // @CAO: Can speed up by not duplicating the whole BitVector.
-    bool All() const { return (~(*this)).None(); }
+    [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits);
@@ -305,12 +305,12 @@ namespace emp {
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
-    bool operator==(const BitVector & in) const;
-    bool operator!=(const BitVector & in) const { return !(*this == in); }
-    bool operator< (const BitVector & in) const;
-    bool operator> (const BitVector & in) const { return in < *this; }
-    bool operator<=(const BitVector & in) const { return !(in < *this); }
-    bool operator>=(const BitVector & in) const { return !(*this < in); }
+    [[nodiscard]] bool operator==(const BitVector & in) const;
+    [[nodiscard]] bool operator!=(const BitVector & in) const { return !(*this == in); }
+    [[nodiscard]] bool operator< (const BitVector & in) const;
+    [[nodiscard]] bool operator> (const BitVector & in) const { return in < *this; }
+    [[nodiscard]] bool operator<=(const BitVector & in) const { return !(in < *this); }
+    [[nodiscard]] bool operator>=(const BitVector & in) const { return !(*this < in); }
 
 
     // >>>>>>>>>>  Conversion Operators  <<<<<<<<<< //
@@ -325,11 +325,11 @@ namespace emp {
     // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
 
     /// Retrive the byte at the specified byte index.
-    uint8_t GetByte(size_t index) const;
+    [[nodiscard]] uint8_t GetByte(size_t index) const;
 
     /// Get a read-only view into the internal array used by BitVector.
     /// @return Read-only span of BitVector's bytes.
-    std::span<const std::byte> GetBytes() const;
+    [[nodiscard]] std::span<const std::byte> GetBytes() const;
 
     /// Get a read-only pointer to the internal array used by BitVector.
     /// @return Read-only pointer to BitVector's bytes.
@@ -340,28 +340,29 @@ namespace emp {
 
     /// Get the overall value of this BitVector, using a uint encoding, but including all bits
     /// and returning the value as a double.
-    double GetValue() const;
+    [[nodiscard]] double GetValue() const;
 
     /// Return a span with all fields in order.
     std::span<field_t> FieldSpan() { return std::span<field_t>(bits.Raw(), NumFields()); }
 
     /// Get specified type at a given index (in steps of that type size)
-    template <typename T> T GetValueAtIndex(const size_t index) const;
+    template <typename T>
+    [[nodiscard]] T GetValueAtIndex(const size_t index) const;
 
     // Retrieve the 8-bit uint from the specified uint index.
-    uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
+    [[nodiscard]] uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
 
     // Retrieve the 16-bit uint from the specified uint index.
-    uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
+    [[nodiscard]] uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
 
     // Retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
+    [[nodiscard]] uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
     
     // Retrieve the 64-bit uint from the specified uint index.
-    uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
+    [[nodiscard]] uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
     // By default, retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+    [[nodiscard]] uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
 
 
     /// Set specified type at a given index (in steps of that type size)
@@ -384,22 +385,23 @@ namespace emp {
 
 
     /// Get specified type starting at a given BIT position.
-    template <typename T> T GetValueAtBit(const size_t index) const;
+    template <typename T>
+    [[nodiscard]] T GetValueAtBit(const size_t index) const;
 
     // Retrieve the 8-bit uint from the specified uint index.
-    uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
+    [[nodiscard]] uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
 
     // Retrieve the 16-bit uint from the specified uint index.
-    uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
+    [[nodiscard]] uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
 
     // Retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
+    [[nodiscard]] uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
     
     // Retrieve the 64-bit uint from the specified uint index.
-    uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
+    [[nodiscard]] uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
     // By default, retrieve the 32-bit uint from the specified uint index.
-    uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
+    [[nodiscard]] uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
 
 
     template <typename T> void SetValueAtBit(const size_t index, T value);
@@ -423,16 +425,16 @@ namespace emp {
     // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
 
     /// A simple hash function for bit vectors.
-    std::size_t Hash(size_t start_field=0) const;
+    [[nodiscard]] std::size_t Hash(size_t start_field=0) const;
 
     /// Count the number of ones in the BitVector.
-    size_t CountOnes() const;
+    [[nodiscard]] size_t CountOnes() const;
 
     /// Faster counting of ones for very sparse bit vectors.
-    size_t CountOnes_Sparse() const;
+    [[nodiscard]] size_t CountOnes_Sparse() const;
 
     /// Count the number of zeros in the BitVector.
-    size_t CountZeros() const { return GetSize() - CountOnes(); }
+    [[nodiscard]] size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Pop the last bit in the vector.
     /// @return value of the popped bit.
@@ -457,23 +459,23 @@ namespace emp {
     void Delete(const size_t index, const size_t num=1);
 
     /// Return the position of the first one; return -1 if no ones in vector.
-    int FindBit() const;
+    [[nodiscard]] int FindBit() const;
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
     ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
     ///
-    int FindBit(const size_t start_pos) const;
+    [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// Find the most-significant set-bit.
-    int FindMaxOne() const;
+    [[nodiscard]] int FindMaxOne() const;
 
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
     int PopBit();
 
     /// Return positions of all ones.
-    emp::vector<size_t> GetOnes() const;
+    [[nodiscard]] emp::vector<size_t> GetOnes() const;
 
     /// Find the length of the longest continuous series of ones.
     size_t LongestSegmentOnes() const;
@@ -610,22 +612,22 @@ namespace emp {
 
 
     /// Operator bitwise NOT...
-    BitVector operator~() const { return NOT(); }
+    [[nodiscard]] inline BitVector operator~() const { return NOT(); }
 
     /// Operator bitwise AND...
-    BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
+    [[nodiscard]] inline BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
 
     /// Operator bitwise OR...
-    BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
+    [[nodiscard]] inline BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
 
     /// Operator bitwise XOR...
-    BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
+    [[nodiscard]] inline BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
 
     /// Operator shift left...
-    inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    [[nodiscard]] inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
 
     /// Operator shift right...
-    inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+    [[nodiscard]] inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
     /// Compound operator bitwise AND...
     BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
@@ -645,11 +647,11 @@ namespace emp {
     // >>>>>>>>>>  Standard Library Compatability  <<<<<<<<<< //
     // A set of functions to allow drop-in replacement with std::bitset.
 
-    size_t size() const { return num_bits; }
+    [[nodiscard]] size_t size() const { return num_bits; }
     void resize(std::size_t new_size) { Resize(new_size); }
-    bool all() const { return All(); }
-    bool any() const { return Any(); }
-    bool none() const { return !Any(); }
+    [[nodiscard]] bool all() const { return All(); }
+    [[nodiscard]] bool any() const { return Any(); }
+    [[nodiscard]] bool none() const { return !Any(); }
     size_t count() const { return CountOnes(); }
     BitVector & flip() { return Toggle(); }
     BitVector & flip(size_t pos) { return Toggle(pos); }
@@ -658,7 +660,7 @@ namespace emp {
     void reset(size_t id) { Set(id, false); }
     void set() { SetAll(); }
     void set(size_t id) { Set(id); }
-    bool test(size_t index) const { return Get(index); }
+    [[nodiscard]] bool test(size_t index) const { return Get(index); }
   };
 
 
