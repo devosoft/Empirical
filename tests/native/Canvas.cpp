@@ -2,8 +2,9 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
-#include "emp/web/_NativeCanvas.hpp"
+#include "emp/web/Canvas.hpp"
 
+#ifdef EMP_NATIVE_SUPPORT
 
 TEST_CASE("Test Circle Locations", "[native]") {
 
@@ -164,6 +165,8 @@ TEST_CASE("Test CenterText Locations", "[native]") {
   canvas.CenterText(220, 440, "bottom middle");
   canvas.CenterText(420, 440, "bottom right");
   
-  canvas.SavePNG("centertext_location.png");
+  canvas.SavePNG("test_centertext_location.png");
 
 }
+
+#endif

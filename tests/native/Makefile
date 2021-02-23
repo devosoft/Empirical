@@ -1,7 +1,8 @@
-TEST_NAMES = CanvasShape Canvas
+TEST_NAMES = CanvasShape Canvas CanvasImages
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
+DISPLAY_ENV := ${DISPLAY}
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
 
 default: test
 
