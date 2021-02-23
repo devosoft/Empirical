@@ -474,7 +474,76 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   }
 }
 
+TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
+  constexpr size_t num_bits = 145;
+  constexpr size_t num_bytes = 19;
+  
+  emp::BitSet<num_bits> bv;
+  REQUIRE(bv.GetSize() == num_bits);
+  REQUIRE(bv.GetNumBytes() == num_bytes);
 
+  // All bytes should start out empty.
+  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bv.GetByte(i) == 0);
+
+  bv.SetByte(2, 11);
+  REQUIRE(bv.GetByte(2) == 11);
+
+  REQUIRE(bv.GetValue() == 720896.0);
+
+  bv.SetByte(5, 7);
+  REQUIRE(bv.GetByte(0) == 0);
+  REQUIRE(bv.GetByte(1) == 0);
+  REQUIRE(bv.GetByte(2) == 11);
+  REQUIRE(bv.GetByte(3) == 0);
+  REQUIRE(bv.GetByte(4) == 0);
+  REQUIRE(bv.GetByte(5) == 7);
+  REQUIRE(bv.GetByte(6) == 0);
+  REQUIRE(bv.CountOnes() == 6);
+
+  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bv.GetByte(i) == bv.GetUInt8(i));
+
+  REQUIRE(bv.GetUInt16(0) == 0);
+  REQUIRE(bv.GetUInt16(1) == 11);
+  REQUIRE(bv.GetUInt16(2) == 1792);
+  REQUIRE(bv.GetUInt16(3) == 0);
+
+  REQUIRE(bv.GetUInt32(0) == 720896);
+  REQUIRE(bv.GetUInt32(1) == 1792);
+  REQUIRE(bv.GetUInt32(2) == 0);
+
+  REQUIRE(bv.GetUInt64(0) == 7696582115328);
+  REQUIRE(bv.GetUInt64(1) == 0);
+
+  bv.SetUInt64(0, 12345678901234);
+  bv.SetUInt32(2, 2000000);
+  bv.SetUInt16(7, 7777);
+  bv.SetUInt8(17, 17);
+
+  REQUIRE(bv.GetUInt64(0) == 12345678901234);
+  REQUIRE(bv.GetUInt32(2) == 2000000);
+  REQUIRE(bv.GetUInt16(7) == 7777);
+  REQUIRE(bv.GetUInt8(17) == 17);
+
+  bv.Clear();
+  bv.SetUInt16AtBit(40, 40);
+
+  REQUIRE(bv.GetUInt16AtBit(40) == 40);
+
+  REQUIRE(bv.GetUInt8(5) == 40);
+  REQUIRE(bv.GetUInt8AtBit(40) == 40);
+  REQUIRE(bv.GetUInt32AtBit(40) == 40);
+  REQUIRE(bv.GetUInt64AtBit(40) == 40);
+
+  REQUIRE(bv.GetUInt16AtBit(38) == 160);
+  REQUIRE(bv.GetUInt16AtBit(39) == 80);
+  REQUIRE(bv.GetUInt16AtBit(41) == 20);
+  REQUIRE(bv.GetUInt16AtBit(42) == 10);
+
+  REQUIRE(bv.GetUInt8AtBit(38) == 160);
+  REQUIRE(bv.GetUInt8AtBit(37) == 64);
+  REQUIRE(bv.GetUInt8AtBit(36) == 128);
+  REQUIRE(bv.GetUInt8AtBit(35) == 0);
+}
 
       /////////////////////////////////////////////
      /////////////////////////////////////////////
