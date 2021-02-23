@@ -532,7 +532,50 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   REQUIRE(bv.GetUInt8AtBit(35) == 0);
 }
 
+TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 
+  emp::BitVector bv = "0001000100001110";
+
+  REQUIRE(bv.GetSize() == 16);
+  REQUIRE(bv.CountOnes() == 5);
+
+  // Make sure we can find all of the ones.
+  REQUIRE(bv.FindOne() == 3);
+  REQUIRE(bv.FindOne(4) == 7);
+  REQUIRE(bv.FindOne(5) == 7);
+  REQUIRE(bv.FindOne(6) == 7);
+  REQUIRE(bv.FindOne(7) == 7);
+  REQUIRE(bv.FindOne(8) == 12);
+  REQUIRE(bv.FindOne(13) == 13);
+  REQUIRE(bv.FindOne(14) == 14);
+  REQUIRE(bv.FindOne(15) == -1);
+
+  // Get all of the ones at once and make sure they're there.
+  emp::vector<size_t> ones = bv.GetOnes();
+  REQUIRE(ones.size() == 5);
+  REQUIRE(ones[0] == 3);
+  REQUIRE(ones[1] == 7);
+  REQUIRE(ones[2] == 12);
+  REQUIRE(ones[3] == 13);
+  REQUIRE(ones[4] == 14);
+
+  // Pop all ones, one at a time.
+  REQUIRE(bv.PopOne() == 3);
+  REQUIRE(bv.PopOne() == 7);
+  REQUIRE(bv.PopOne() == 12);
+  REQUIRE(bv.PopOne() == 13);
+  REQUIRE(bv.PopOne() == 14);
+  REQUIRE(bv.PopOne() == -1);
+  REQUIRE(bv.CountOnes() == 0);
+
+  // Try again with Find, this time with a random sequence of ones.
+  emp::Random random;
+  bv.Randomize(random);
+  size_t count = 0;
+  for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
+  REQUIRE(count == bv.CountOnes());
+
+}
 
       /////////////////////////////////////////////
      /////////////////////////////////////////////
@@ -706,16 +749,16 @@ TEST_CASE("Test BitVector", "[bits]")
 
 	// Find & Pop Bit
 	bv3.SetByte(0,74);
-	REQUIRE((bv3.PopBit() == 1));
+	REQUIRE((bv3.PopOne() == 1));
 	REQUIRE((bv3.CountOnes() == 2));
 	REQUIRE((bv3.GetByte(0) == 72));
-	REQUIRE((bv3.FindBit() == 3));
-	REQUIRE((bv3.FindBit(4) == 6));
-	bv3.PopBit();
-	bv3.PopBit();
-	REQUIRE((bv3.FindBit() == -1));
-	REQUIRE((bv3.FindBit(2) == -1));
-	REQUIRE((bv3.PopBit() == -1));
+	REQUIRE((bv3.FindOne() == 3));
+	REQUIRE((bv3.FindOne(4) == 6));
+	bv3.PopOne();
+	bv3.PopOne();
+	REQUIRE((bv3.FindOne() == -1));
+	REQUIRE((bv3.FindOne(2) == -1));
+	REQUIRE((bv3.PopOne() == -1));
 
 	// Get Ones
 	emp::vector<size_t> ones = bv3.GetOnes();
@@ -962,13 +1005,10 @@ TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
 	REQUIRE(bv_g.Get(2));
 	REQUIRE(bv_g.Get(3));
 
-  bv_g.PrintDebug();
 	bv_g.Delete(0);            // 0111
 	REQUIRE(bv_g.size() == 4);
 	REQUIRE(!bv_g.Get(0));
-  bv_g.PrintDebug();
 	bv_g.Delete(1, 2);         // 01
-  bv_g.PrintDebug();
 	REQUIRE(bv_g.size() == 2);
 	REQUIRE(bv_g.Get(1));
 
