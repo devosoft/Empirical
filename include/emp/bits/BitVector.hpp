@@ -142,6 +142,10 @@ namespace emp {
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
     BitVector(size_t in_num_bits=0, bool init_val=false);
 
+    /// Alias to explicitly capture literal ints for the first argument
+    /// (otherwise ambiguous conversion with char *)
+    BitVector(int in_num_bits, bool init_val=false) : BitVector((size_t) in_num_bits, init_val) {}
+
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in);
 
@@ -154,6 +158,9 @@ namespace emp {
 
     /// Constructor to generate a BitVector from a string of '0's and '1's.
     BitVector(const std::string & bitstring);
+
+    /// Constructor to generate a BitVector from a literal string of '0's and '1's.
+    BitVector(const char * bitstring) : BitVector(std::string(bitstring)) {}
 
     /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
     BitVector(size_t in_num_bits, Random & random);
