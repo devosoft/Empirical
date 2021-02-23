@@ -559,6 +559,9 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(ones[3] == 13);
   REQUIRE(ones[4] == 14);
 
+  // Try finding the length of the longest segment of ones.
+  REQUIRE(bv.LongestSegmentOnes() == 3);
+
   // Pop all ones, one at a time.
   REQUIRE(bv.PopOne() == 3);
   REQUIRE(bv.PopOne() == 7);
@@ -566,7 +569,16 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(bv.PopOne() == 13);
   REQUIRE(bv.PopOne() == 14);
   REQUIRE(bv.PopOne() == -1);
+
   REQUIRE(bv.CountOnes() == 0);
+  REQUIRE(bv.LongestSegmentOnes() == 0);
+
+  bv.SetAll();                             // 1111111111111111
+  REQUIRE(bv.LongestSegmentOnes() == 16);
+  bv[8] = 0;                               // 1111111101111111
+  REQUIRE(bv.LongestSegmentOnes() == 8);
+  bv[4] = 0;                               // 1111011101111111
+  REQUIRE(bv.LongestSegmentOnes() == 7);
 
   // Try again with Find, this time with a random sequence of ones.
   emp::Random random;
