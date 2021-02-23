@@ -16,7 +16,8 @@
 
 #include "_EmscriptenCanvasShape.hpp"
 
-#else // #ifdef __EMSCRIPTEN__
+// https://stackoverflow.com/questions/4102351/test-for-empty-macro-definition/4127073#4127073
+#elif __has_include(<SFML/Graphics.hpp>) && (!defined(EMP_HAS_X11) || (EMP_HAS_X11 == 1)) 
 
 #include "_NativeCanvasShape.hpp"
 
