@@ -543,6 +543,69 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
 /////////////////////////////////////////////
 
 
+TEST_CASE("X: Test functions that trigger size changes", "[bits]") {
+	emp::BitVector bv(10);
+  REQUIRE(bv.GetSize() == 10);
+  REQUIRE(bv.CountOnes() == 0);
+  REQUIRE(bv.CountZeros() == 10);
+
+	bv.Resize(1000);
+  REQUIRE(bv.GetSize() == 1000);
+  REQUIRE(bv.CountOnes() == 0);
+  REQUIRE(bv.CountZeros() == 1000);
+
+  bv.SetAll();
+  REQUIRE(bv.GetSize() == 1000);
+  REQUIRE(bv.CountOnes() == 1000);
+  REQUIRE(bv.CountZeros() == 0);
+
+  emp::Random random;
+  bv.Randomize(random);
+  REQUIRE(bv.CountOnes() == bv.CountOnes_Sparse());
+  size_t num_ones = bv.CountOnes();
+  size_t num_zeros = bv.CountZeros();
+  REQUIRE(num_ones > 425);
+  REQUIRE(num_zeros > 425);
+  REQUIRE(num_ones + num_zeros == 1000);
+
+  while (bv.GetSize()) {
+    if (bv.PopBack()) num_ones--;
+    else num_zeros--;
+  }
+
+  REQUIRE(num_ones == 0);
+  REQUIRE(num_zeros == 0);
+
+  for (size_t i = 0; i < 500; i++) {
+    bv.PushBack(0);
+    bv.PushBack(1);
+  }
+
+  REQUIRE(bv.GetSize() == 1000);
+  REQUIRE(bv.CountOnes() == 500);
+  REQUIRE(bv.CountZeros() == 500);
+
+  bv.Insert(250, 0, 500); // Insert 500 zeros at index 250.
+
+  REQUIRE(bv.GetSize() == 1500);
+  REQUIRE(bv.CountOnes() == 500);
+  REQUIRE(bv.CountZeros() == 1000);
+  for (size_t i = 250; i < 750; i++) REQUIRE(bv[i] == 0);
+
+  bv.Insert(1250, 1, 500); // Insert ones zeros at index 1250 (250 before end).
+
+  REQUIRE(bv.GetSize() == 2000);
+  REQUIRE(bv.CountOnes() == 1000);
+  REQUIRE(bv.CountZeros() == 1000);
+  for (size_t i = 1250; i < 1750; i++) REQUIRE(bv[i] == 1);
+
+  bv.Delete(500,550);   // Delete 250 zeros and 300 pairs of zeros and ones.
+
+  REQUIRE(bv.GetSize() == 1450);
+  REQUIRE(bv.CountOnes() == 850);
+  REQUIRE(bv.CountZeros() == 600);
+}
+
 TEST_CASE("Test BitVector", "[bits]")
 {
 
@@ -870,39 +933,42 @@ TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
 	// #endif
 
 	// Pop Back and Push Back
-	emp::BitVector bv_g(0);
-	bv_g.PushBack(true);
-	bv_g.PushBack(true);
-	bv_g.PushBack(false);
+	emp::BitVector bv_g(0);    // Empty BitVector
+	bv_g.PushBack(true);       // 1
+	bv_g.PushBack(true);       // 11
+	bv_g.PushBack(false);      // 110
 	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.Get(1));
-	REQUIRE(!bv_g.PopBack());
+	REQUIRE(!bv_g.PopBack());  // 11
 	REQUIRE(bv_g.size() == 2);
 
 	// Insert and Delete
-	bv_g.Insert(1, true);
+	bv_g.Insert(1, true);      // 111
 	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(bv_g.Get(2));
 	REQUIRE(bv_g.size() == 3);
 
-	bv_g.Insert(1, true);
+	bv_g.Insert(1, true);      // 1111
 	REQUIRE(bv_g.Get(3));
 	REQUIRE(bv_g.Get(2));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.size() == 4);
 
-	bv_g.Insert(1, false);
+	bv_g.Insert(1, false);     // 10111
 	REQUIRE(bv_g.Get(0));
 	REQUIRE(!bv_g.Get(1));
 	REQUIRE(bv_g.Get(2));
 	REQUIRE(bv_g.Get(3));
 
-	bv_g.Delete(0);
+  bv_g.PrintDebug();
+	bv_g.Delete(0);            // 0111
 	REQUIRE(bv_g.size() == 4);
 	REQUIRE(!bv_g.Get(0));
-	bv_g.Delete(1, 2);
+  bv_g.PrintDebug();
+	bv_g.Delete(1, 2);         // 01
+  bv_g.PrintDebug();
 	REQUIRE(bv_g.size() == 2);
 	REQUIRE(bv_g.Get(1));
 
