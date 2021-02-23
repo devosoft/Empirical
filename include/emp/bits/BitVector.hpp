@@ -112,8 +112,8 @@ namespace emp {
     // being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in);
 
-    // Move bits from one position in the genome to another; leave old positions unchanged.
-    void RawMove(const size_t from_start, const size_t from_stop, const size_t to);
+    // Copy bits from one position in the genome to another; leave old positions unchanged.
+    void RawCopy(const size_t from_start, const size_t from_stop, const size_t to);
 
     // Convert the bits to bytes.
     [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
@@ -681,17 +681,18 @@ namespace emp {
 
   // Move bits from one position in the genome to another; leave old positions unchanged.
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
-  void BitVector::RawMove(const size_t from_start, const size_t from_stop, const size_t to) {
+  void BitVector::RawCopy(const size_t from_start, const size_t from_stop, const size_t to) {
     emp_assert(from_start <= from_stop);  // Must move legal region.
     emp_assert(from_stop <= num_bits);    // Cannot move from past end.
     emp_assert(to <= num_bits);           // Must move to somewhere legal.
 
+    // If nothing to copy OR already in place, stop right there.
     if (from_start == from_stop || from_start == to) return;
 
     const size_t move_size = from_stop - from_start;    // How bit is the chunk to move?
     const size_t to_stop = Min(to+move_size, num_bits); // Where is the end to move it to?
     const int shift = (int) from_start - (int) to;      // How far will the moved piece shift?
-    thread_local BitVector move_bits(*this);            // Vector to hold moved bits.
+    BitVector move_bits(*this);                         // Vector to hold moved bits.
     move_bits.SHIFT_SELF(shift);                        // Put the moved bits in place.
     Clear(to, to_stop);                                 // Make room for the moved bits.
     move_bits.Clear(0, to);                             // Clear everything BEFORE moved bits.
@@ -1355,18 +1356,19 @@ namespace emp {
 
     if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
       num_bits = new_bits;
-      ClearExcessBits();                  // If there are extra bits, zero them out.
     }
 
     else {  // We must change the number of bitfields.  Resize & copy old info.
-      Ptr<field_t> old_bits = bits;
-      if (num_bits > 0) bits = NewArrayPtr<field_t>(NUM_FIELDS);
-      else bits = nullptr;
-      const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
-      for (size_t i = 0; i < min_fields; i++) bits[i] = old_bits[i];
-      for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
-      if (old_bits) old_bits.DeleteArray();
+      Ptr<field_t> old_bits = bits;                                       // Backup old ptr.
+      if (num_bits > 0) bits = NewArrayPtr<field_t>(NUM_FIELDS);          // Allocate new mem.
+      else bits = nullptr;                                                // (or null if no bits)
+      const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);     // Calc num fields to copy
+      for (size_t i = 0; i < min_fields; i++) bits[i] = old_bits[i];      // Copy fields
+      for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = FIELD_0; // Zero any excess fields
+      if (old_bits) old_bits.DeleteArray();                               // Cleanup old memory
     }
+
+    ClearExcessBits();     // If there are ones past the end, zero them out.
 
     return *this;
   }
@@ -1766,7 +1768,8 @@ namespace emp {
   /// @param index location to delete bit(s).
   /// @param num number of bits to delete, default 1.
   void BitVector::Delete(const size_t index, const size_t num) {
-    RawMove(index+num, num_bits, index);  // Shift positions AFTER delete into place.
+    emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
+    RawCopy(index+num, num_bits, index);  // Shift positions AFTER delete into place.
     Resize(num_bits - num);               // Crop off end bits.
   }
 
