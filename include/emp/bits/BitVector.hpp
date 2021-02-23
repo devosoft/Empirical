@@ -466,20 +466,32 @@ namespace emp {
     void Delete(const size_t index, const size_t num=1);
 
     /// Return the position of the first one; return -1 if no ones in vector.
-    [[nodiscard]] int FindBit() const;
+    [[nodiscard]] int FindOne() const;
+
+    /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
+    [[deprecated("Renamed to more acurate FindOne()")]]
+    [[nodiscard]] int FindBit() const { return FindOne(); }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
-    ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
+    ///   for (int pos = bv.FindOne(); pos >= 0; pos = bv.FindOne(pos+1)) { ... }
     ///
+    [[nodiscard]] int FindOne(const size_t start_pos) const;
+
+    /// Deprecated version of FindOne().
+    [[deprecated("Renamed to more acurate FindOne(start_pos)")]]
     [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// Find the most-significant set-bit.
     [[nodiscard]] int FindMaxOne() const;
 
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
-    int PopBit();
+    int PopOne();
+
+    /// Deprecated version of PopOne().
+    [[deprecated("Renamed to more acurate PopOne()")]]
+    int PopBit() { return PopOne(); }
 
     /// Return positions of all ones.
     [[nodiscard]] emp::vector<size_t> GetOnes() const;
@@ -1781,7 +1793,7 @@ namespace emp {
   }
 
   /// Return the position of the first one; return -1 if no ones in vector.
-  int BitVector::FindBit() const {
+  int BitVector::FindOne() const {
     const size_t NUM_FIELDS = NumFields();
     size_t field_id = 0;
     while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
@@ -1792,9 +1804,9 @@ namespace emp {
   /// Return the position of the first one after start_pos; return -1 if no ones in vector.
   /// You can loop through all 1-bit positions of a BitVector "bv" with:
   ///
-  ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
+  ///   for (int pos = bv.FindOne(); pos >= 0; pos = bv.FindOne(pos+1)) { ... }
 
-  int BitVector::FindBit(const size_t start_pos) const {
+  int BitVector::FindOne(const size_t start_pos) const {
     if (start_pos >= num_bits) return -1;            // If we're past the end, return fail.
     size_t field_id  = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
@@ -1840,8 +1852,8 @@ namespace emp {
   }
 
   /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
-  int BitVector::PopBit() {
-    const int out_bit = FindBit();
+  int BitVector::PopOne() {
+    const int out_bit = FindOne();
     if (out_bit >= 0) Clear((size_t) out_bit);
     return out_bit;
   }
