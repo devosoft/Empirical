@@ -51,6 +51,7 @@ cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 clean:
 	rm -f *.out
 	rm -f *.o
+	rm -f test_*.png
 	rm -f *.gcda
 	rm -f *.gcno
 	rm -f *.info

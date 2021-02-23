@@ -17,7 +17,7 @@ TEST_CASE("Test Circle Locations", "[native]") {
   canvas.Circle(230, 440, 20);
   canvas.Circle(440, 440, 20);
   
-  canvas.SavePNG("circle_location.png");
+  canvas.SavePNG("test_circle_location.png");
 
 }
 
@@ -32,7 +32,7 @@ TEST_CASE("Test Circle Locations By Point", "[native]") {
   canvas.Circle(emp::Point(250,460), 20);
   canvas.Circle(emp::Point(460,460), 20);
   
-  canvas.SavePNG("circle_location2.png");
+  canvas.SavePNG("test_circle_location2.png");
 
 }
 
@@ -49,8 +49,8 @@ TEST_CASE("Test Circle Colors", "[native]") {
   canvas.Circle(80, 120, 20, "red", "black");
   canvas.Circle(140, 120, 20, "yellow", "black");
   canvas.Circle(200, 120, 20, "blue", "black");
-  
-  canvas.SavePNG("circle_color.png");
+
+  canvas.SavePNG("test_circle_color.png");
 
 }
 
@@ -62,7 +62,8 @@ TEST_CASE("Test Circle Size", "[native]") {
   canvas.Circle(60, 65, 25);
   canvas.Circle(140, 40, 50);
   canvas.Circle(300, 15, 75);
-  canvas.SavePNG("circle_size.png");
+
+  canvas.SavePNG("test_circle_size.png");
 
 }
 
@@ -75,8 +76,7 @@ TEST_CASE("Test Circle Thickness", "[native]") {
   canvas.Circle(140, 40, 20, "white", "black", 5);
   canvas.Circle(200, 40, 20, "white", "black", 7);
 
-  
-  canvas.SavePNG("circle_thickness.png");
+  canvas.SavePNG("test_circle_thickness.png");
 
 }
 
@@ -90,8 +90,8 @@ TEST_CASE("Test Rectangle Locations", "[native]") {
   canvas.Rect(20, 440, 20, 30);
   canvas.Rect(230, 440, 20, 30);
   canvas.Rect(440, 440, 20, 30);
-  
-  canvas.SavePNG("rect_location.png");
+
+  canvas.SavePNG("test_rect_location.png");
 
 }
 
@@ -107,8 +107,8 @@ TEST_CASE("Test Rectangle Colors", "[native]") {
   canvas.Rect(160, 80, 20, 30, "red", "black");
   canvas.Rect(300, 80, 20, 30, "yellow", "black");
   canvas.Rect(440, 80, 20, 30, "blue", "black");
-  
-  canvas.SavePNG("rect_color.png");
+
+  canvas.SavePNG("test_rect_color.png");
 
 }
 
@@ -120,7 +120,8 @@ TEST_CASE("Test Rectangle Size/Thickness", "[native]") {
   canvas.Rect(60, 65, 30, 25, "white", "black", 3);
   canvas.Rect(140, 40, 55, 50, "white", "black", 5);
   canvas.Rect(300, 15, 80, 75, "white", "black", 7);
-  canvas.SavePNG("rect_size_thick.png");
+
+  canvas.SavePNG("test_rect_size.png");
 
 }
 
@@ -135,8 +136,8 @@ TEST_CASE("Test Text Locations", "[native]") {
   canvas.Text(20, 440, "bottom left");
   canvas.Text(220, 440, "bottom middle");
   canvas.Text(420, 440, "bottom right");
-  
-  canvas.SavePNG("text_location.png");
+
+  canvas.SavePNG("test_text_location.png");
 
 }
 
@@ -149,8 +150,8 @@ TEST_CASE("Test Text Color", "[native]") {
   canvas.Text(60, 120, "red", "red", "black", 20);
   canvas.Text(60, 160, "yellow", "yellow", "black", 20);
   canvas.Text(60, 200, "blue", "blue", "black", 20);
-  
-  canvas.SavePNG("text_color.png");
+
+  canvas.SavePNG("test_text_color.png");
 
 }
 
