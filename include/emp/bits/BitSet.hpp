@@ -96,7 +96,7 @@ namespace emp {
     // Identify which field a specified byte position would be in.
     [[nodiscard]] static size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
 
-    // Convert a byte position in BitVector to a byte position in the target field.
+    // Convert a byte position in BitSet to a byte position in the target field.
     [[nodiscard]] static size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
     // Copy an array of bits into this BitSet (internal use only!)
@@ -303,8 +303,8 @@ namespace emp {
     /// @return Read-only span of BitSet's bytes.
     [[nodiscard]] std::span<const std::byte> GetBytes() const;
 
-    /// Get a read-only pointer to the internal array used by BitVector.
-    /// @return Read-only pointer to BitVector's bytes.
+    /// Get a read-only pointer to the internal array used by BitSet.
+    /// @return Read-only pointer to BitSet's bytes.
     [[nodiscard]] emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
     /// Update the byte at the specified byte index.
@@ -397,13 +397,13 @@ namespace emp {
     /// A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash() const;
 
-    /// Count the number of ones in the BitVector.
+    /// Count the number of ones in the BitSet.
     [[nodiscard]] size_t CountOnes() const;
 
     /// Faster counting of ones for very sparse bit vectors.
     [[nodiscard]] size_t CountOnes_Sparse() const;
 
-    /// Count the number of zeros in the BitVector.
+    /// Count the number of zeros in the BitSet.
     [[nodiscard]] size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Return the position of the first one; return -1 if no ones in vector.
@@ -414,9 +414,9 @@ namespace emp {
     [[nodiscard]] int FindBit() const { return FindOne(); }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
-    /// You can loop through all 1-bit positions of a BitVector "bv" with:
+    /// You can loop through all 1-bit positions of a BitSet "bits" with:
     ///
-    ///   for (int pos = bv.FindOne(); pos >= 0; pos = bv.FindOne(pos+1)) { ... }
+    ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
     ///
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
@@ -446,11 +446,27 @@ namespace emp {
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
-    /// Convert this BitVector to a string.
+    /// Convert this BitSet to a string.
     [[nodiscard]] std::string ToString() const;
 
-    /// Regular print function (from most significant bit to least)
-    void Print(std::ostream & out=std::cout) const;
+    /// Convert this BitSet to a numerical string [index 0 on right]
+    [[nodiscard]] std::string ToBinaryString() const;
+
+    /// Convert this BitSet to a series of IDs
+    [[nodiscard]] std::string ToIDString(const std::string & spacer=" ") const;
+
+    /// Convert this BitSet to a series of IDs with ranges condensed.
+    [[nodiscard]] std::string ToRangeString(const std::string & spacer=",",
+                                            const std::string & ranger="-") const;
+
+    /// Regular print function (from least significant bit to most)
+    void Print(std::ostream & out=std::cout) const { out << ToString(); }
+
+    /// Numerical print function (from most significant bit to least)
+    void PrintBinary(std::ostream & out=std::cout) const { out << ToBinaryString(); }
+
+    /// Print from smallest bit position to largest.
+    void PrintArray(std::ostream & out=std::cout) const { out << ToString(); }
 
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
@@ -458,11 +474,8 @@ namespace emp {
     /// Print out details about the internals of the BitSet.
     void PrintDebug(std::ostream & out=std::cout) const;
 
-    /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
-    void PrintArray(std::ostream & out=std::cout) const;
-
     /// Print the locations of all one bits, using the provided spacer (default is a single space)
-    void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const;
+    void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
     /// Print the ones in a range format.  E.g., 2-5,7,10-15
     void PrintAsRange(std::ostream & out=std::cout,
@@ -1504,7 +1517,7 @@ namespace emp {
   }
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
-  /// Count the number of ones in the BitVector.
+  /// Count the number of ones in the BitSet.
   template <size_t NUM_BITS>
   size_t BitSet<NUM_BITS>::CountOnes() const { 
     size_t bit_count = 0;
@@ -1621,19 +1634,40 @@ namespace emp {
 
   // -------------------------  Print/String Functions  ------------------------- //
 
-  /// Convert this BitVector to a string.
+  /// Convert this BitSet to a vector string [0 index on left]
   template <size_t NUM_BITS>
   std::string BitSet<NUM_BITS>::ToString() const {
+    std::string out_string;
+    out_string.reserve(NUM_BITS);
+    for (size_t i = 0; i < NUM_BITS; ++i) out_string.push_back(GetAsChar(i));
+    return out_string;
+  }
+
+  /// Convert this BitSet to a numerical string [0 index on right]
+  template <size_t NUM_BITS>
+  std::string BitSet<NUM_BITS>::ToBinaryString() const {
     std::string out_string;
     out_string.reserve(NUM_BITS);
     for (size_t i = NUM_BITS; i > 0; --i) out_string.push_back(GetAsChar(i-1));
     return out_string;
   }
 
-  /// Regular print function (from most significant bit to least)
+  /// Convert this BitSet to a series of IDs
   template <size_t NUM_BITS>
-  void BitSet<NUM_BITS>::Print(std::ostream & out) const {
-    for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
+  std::string BitSet<NUM_BITS>::ToIDString(const std::string & spacer) const {
+    std::stringstream ss;
+    PrintOneIDs(ss, spacer);
+    return ss.str();
+  }
+
+  /// Convert this BitSet to a series of IDs with ranges condensed.
+  template <size_t NUM_BITS>
+  std::string BitSet<NUM_BITS>::ToRangeString(const std::string & spacer,
+                                       const std::string & ranger) const
+  {
+    std::stringstream ss;
+    PrintAsRange(ss, spacer, ranger);
+    return ss.str();
   }
 
   /// Print a space between each field (or other provided spacer)
@@ -1661,16 +1695,17 @@ namespace emp {
     out << "^" << std::endl;
   }
 
-  /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
-  template <size_t NUM_BITS>
-  void BitSet<NUM_BITS>::PrintArray(std::ostream & out) const {
-    for (size_t i = 0; i < NUM_BITS; i++) out << Get(i);
-  }
-
   /// Print the locations of all one bits, using the provided spacer (default is a single space)
   template <size_t NUM_BITS>
-  void BitSet<NUM_BITS>::PrintOneIDs(std::ostream & out, char spacer) const {
-    for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
+  void BitSet<NUM_BITS>::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
+    bool started = false;
+    for (size_t i = 0; i < NUM_BITS; i++) {
+      if (Get(i)) {
+        if (started) out << spacer;
+        out << i;
+        started = true;
+      }
+    }
   }
 
   /// Print the ones in a range format.  E.g., 2-5,7,10-15
