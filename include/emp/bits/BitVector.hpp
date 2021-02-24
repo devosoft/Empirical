@@ -503,22 +503,35 @@ namespace emp {
     // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
 
     /// Convert a specified bit to a character.
-    char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
+    [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
-    /// Convert this BitVector to a string.
-    std::string ToString() const;
+    /// Convert this BitVector to a vector string [index 0 on left]
+    [[nodiscard]] std::string ToString() const;
 
-    /// Regular print function (from most significant bit to least)
-    void Print(std::ostream & out=std::cout) const;
+    /// Convert this BitVector to a numerical string [index 0 on right]
+    [[nodiscard]] std::string ToBinaryString() const;
+
+    /// Convert this BitVector to a series of IDs
+    [[nodiscard]] std::string ToIDString(const std::string & spacer=" ") const;
+
+    /// Convert this BitVector to a series of IDs with ranges condensed.
+    [[nodiscard]] std::string ToRangeString(const std::string & spacer=",",
+                                            const std::string & ranger="-") const;
+
+    /// Regular print function (from least significant bit to most)
+    void Print(std::ostream & out=std::cout) const { out << ToString(); }
+
+    /// Numerical print function (from most significant bit to least)
+    void PrintBinary(std::ostream & out=std::cout) const { out << ToBinaryString(); }
+
+    /// Print from smallest bit position to largest.
+    void PrintArray(std::ostream & out=std::cout) const { out << ToString(); }
 
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
     /// Print out details about the internals of the BitVector.
     void PrintDebug(std::ostream & out=std::cout) const;
-
-    /// Print from smallest bit position to largest.
-    void PrintArray(std::ostream & out=std::cout) const;
 
     /// Print the positions of all one bits, spaces are the default separator.
     void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const;
@@ -1883,17 +1896,36 @@ namespace emp {
 
   // -------------------------  Printing and string conversion -------------------------
 
-  /// Convert this BitVector to a string.
+  /// Convert this BitVector to a vector string [0 index on left]
   std::string BitVector::ToString() const {
+    std::string out_string;
+    out_string.reserve(num_bits);
+    for (size_t i = 0; i < num_bits; ++i) out_string.push_back(GetAsChar(i));
+    return out_string;
+  }
+
+  /// Convert this BitVector to a numerical string [0 index on right]
+  std::string BitVector::ToBinaryString() const {
     std::string out_string;
     out_string.reserve(num_bits);
     for (size_t i = num_bits; i > 0; --i) out_string.push_back(GetAsChar(i-1));
     return out_string;
   }
 
-  /// Regular print function (from most significant bit to least)
-  void BitVector::Print(std::ostream & out) const {
-    for (size_t i = num_bits; i > 0; --i) out << Get(i-1);
+  /// Convert this BitVector to a series of IDs
+  std::string BitVector::ToIDString(const std::string & spacer) const {
+    std::stringstream ss;
+    PrintOneIDs(ss, spacer);
+    return ss.str();
+  }
+
+  /// Convert this BitVector to a series of IDs with ranges condensed.
+  std::string BitVector::ToRangeString(const std::string & spacer,
+                                       const std::string & ranger) const
+  {
+    std::stringstream ss;
+    PrintAsRange(ss, spacer, ranger);
+    return ss.str();
   }
 
   /// Print a space between each field (or other provided spacer)
@@ -1919,14 +1951,16 @@ namespace emp {
     out << "^" << std::endl;
   }
 
-  /// Print from smallest bit position to largest.
-  void BitVector::PrintArray(std::ostream & out) const {
-    for (size_t i = 0; i < num_bits; i++) out << Get(i);
-  }
-
   /// Print the positions of all one bits, spaces are the default separator.
   void BitVector::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
-    for (size_t i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
+    bool started = false;
+    for (size_t i = 0; i < num_bits; i++) {
+      if (Get(i)) {
+        if (started) out << spacer;
+        out << i;
+        started = true;
+      }
+    }
   }
 
   /// Print the ones in a range format.  E.g., 2-5,7,10-15
