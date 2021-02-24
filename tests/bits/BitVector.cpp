@@ -559,6 +559,9 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(ones[3] == 13);
   REQUIRE(ones[4] == 14);
 
+  // Identify the final one.
+  REQUIRE(bv.FindMaxOne() == 14);
+
   // Try finding the length of the longest segment of ones.
   REQUIRE(bv.LongestSegmentOnes() == 3);
 
@@ -572,6 +575,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 
   REQUIRE(bv.CountOnes() == 0);
   REQUIRE(bv.LongestSegmentOnes() == 0);
+  REQUIRE(bv.FindMaxOne() == -1);
 
   bv.SetAll();                             // 1111111111111111
   REQUIRE(bv.LongestSegmentOnes() == 16);
@@ -587,6 +591,32 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
   REQUIRE(count == bv.CountOnes());
 
+}
+
+TEST_CASE("8: Test printing and string functions.", "[bits]") {
+  emp::BitVector bv6("000111");
+
+  REQUIRE(bv6.ToString() == "000111");
+  REQUIRE(bv6.ToBinaryString() == "111000");
+  REQUIRE(bv6.ToIDString() == "3 4 5");
+  REQUIRE(bv6.ToIDString() == "3 4 5");
+  REQUIRE(bv6.ToRangeString() == "3-5");
+
+  emp::BitVector bv64("0001110000000000000100000000000001000110000001000001000100000001");
+
+  REQUIRE(bv64.ToString()       == "0001110000000000000100000000000001000110000001000001000100000001");
+  REQUIRE(bv64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
+  REQUIRE(bv64.ToIDString() == "3 4 5 19 33 37 38 45 51 55 63");
+  REQUIRE(bv64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
+  REQUIRE(bv64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
+
+  emp::BitVector bv65("00011110000000000001000000000000010001100000010000010001000000111");
+
+  REQUIRE(bv65.ToString()       == "00011110000000000001000000000000010001100000010000010001000000111");
+  REQUIRE(bv65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
+  REQUIRE(bv65.ToIDString()     == "3 4 5 6 19 33 37 38 45 51 55 62 63 64");
+  REQUIRE(bv65.ToIDString(",")  == "3,4,5,6,19,33,37,38,45,51,55,62,63,64");
+  REQUIRE(bv65.ToRangeString()  == "3-6,19,33,37-38,45,51,55,62-64");
 }
 
       /////////////////////////////////////////////
@@ -752,7 +782,7 @@ TEST_CASE("Test BitVector", "[bits]")
 
 	bv3.SetByte(0,130);
 	bv3.PrintOneIDs(ss);
-	REQUIRE((ss.str() == "1 7 "));
+	REQUIRE((ss.str() == "1 7"));
 	ss.str(std::string()); // clear ss
 
 	bv3.PrintArray(ss);
