@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2021.
  *
  *  @file SolveState.hpp
  *  @brief Used as part of a branching solver to keep track of the current state.
@@ -81,7 +81,7 @@ namespace emp {
 
     /// Get the ID of the next unknown item.
     int GetNextUnk(size_t prev_unk) const {
-      return unk_items.FindBit(prev_unk+1);
+      return unk_items.FindOne(prev_unk+1);
     }
 
     /// Mark a specific item as to be included.
