@@ -407,20 +407,32 @@ namespace emp {
     [[nodiscard]] size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Return the position of the first one; return -1 if no ones in vector.
-    [[nodiscard]] int FindBit() const;
+    [[nodiscard]] int FindOne() const;
+
+    /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
+    [[deprecated("Renamed to more acurate FindOne()")]]
+    [[nodiscard]] int FindBit() const { return FindOne(); }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
-    /// You can loop through all 1-bit positions of a BitSet "bits" with:
+    /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
-    ///   for (int pos = bits.FindBit(); pos >= 0; pos = bits.FindBit(pos+1)) { ... }
+    ///   for (int pos = bv.FindOne(); pos >= 0; pos = bv.FindOne(pos+1)) { ... }
     ///
+    [[nodiscard]] int FindOne(const size_t start_pos) const;
+
+    /// Deprecated version of FindOne().
+    [[deprecated("Renamed to more acurate FindOne(start_pos)")]]
     [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// Find the most-significant set-bit.
     [[nodiscard]] int FindMaxOne() const;
 
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
-    int PopBit();
+    int PopOne();
+
+    /// Deprecated version of PopOne().
+    [[deprecated("Renamed to more acurate PopOne()")]]
+    int PopBit() { return PopOne(); }
 
     /// Return positions of all ones.
     [[nodiscard]] emp::vector<size_t> GetOnes() const;
@@ -1520,7 +1532,7 @@ namespace emp {
 
     /// Return the index of the first one in the sequence; return -1 if no ones are available.
   template <size_t NUM_BITS>
-  int BitSet<NUM_BITS>::FindBit() const {
+  int BitSet<NUM_BITS>::FindOne() const {
     size_t field_id = 0;
     while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
@@ -1529,7 +1541,7 @@ namespace emp {
 
   /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
   template <size_t NUM_BITS>
-  int BitSet<NUM_BITS>::FindBit(const size_t start_pos) const {
+  int BitSet<NUM_BITS>::FindOne(const size_t start_pos) const {
     if (start_pos >= NUM_BITS) return -1;            // If we're past the end, return fail.
     size_t field_id  = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
@@ -1576,8 +1588,8 @@ namespace emp {
 
   /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
   template <size_t NUM_BITS>
-  int BitSet<NUM_BITS>::PopBit() {
-    const int out_bit = FindBit();
+  int BitSet<NUM_BITS>::PopOne() {
+    const int out_bit = FindOne();
     if (out_bit >= 0) Clear(out_bit);
     return out_bit;
   }
