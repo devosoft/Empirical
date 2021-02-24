@@ -131,7 +131,7 @@ namespace emp {
       }
       Ptr<re_charset> AsCharSet() override { return ToPtr(this); }
       size_t GetSize() const override { return char_set.CountOnes(); }
-      char First() const { return (char) char_set.FindBit(); }
+      char First() const { return (char) char_set.FindOne(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
         for (size_t i = 0; i < NUM_SYMBOLS; i++) if (char_set[i]) nfa.AddTransition(start, stop, i);
       }
