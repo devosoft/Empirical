@@ -606,6 +606,35 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(count == bs.CountOnes());
 
 }
+
+TEST_CASE("8: Test printing and string functions.", "[bits]") {
+  emp::BitSet<6> bs6("000111");
+
+  REQUIRE(bs6.ToString() == "000111");
+  REQUIRE(bs6.ToBinaryString() == "111000");
+  REQUIRE(bs6.ToIDString() == "3 4 5");
+  REQUIRE(bs6.ToIDString() == "3 4 5");
+  REQUIRE(bs6.ToRangeString() == "3-5");
+
+  emp::BitSet<64> bs64("0001110000000000000100000000000001000110000001000001000100000001");
+
+  REQUIRE(bs64.ToString()       == "0001110000000000000100000000000001000110000001000001000100000001");
+  REQUIRE(bs64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
+  REQUIRE(bs64.ToIDString() == "3 4 5 19 33 37 38 45 51 55 63");
+  REQUIRE(bs64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
+  REQUIRE(bs64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
+
+  emp::BitSet<65> bs65("00011110000000000001000000000000010001100000010000010001000000111");
+
+  REQUIRE(bs65.ToString()       == "00011110000000000001000000000000010001100000010000010001000000111");
+  REQUIRE(bs65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
+  REQUIRE(bs65.ToIDString()     == "3 4 5 6 19 33 37 38 45 51 55 62 63 64");
+  REQUIRE(bs65.ToIDString(",")  == "3,4,5,6,19,33,37,38,45,51,55,62,63,64");
+  REQUIRE(bs65.ToRangeString()  == "3-6,19,33,37-38,45,51,55,62-64");
+}
+
+
+
       /////////////////////////////////////////////
      /////////////////////////////////////////////
     /////////////////////////////////////////////
@@ -942,33 +971,6 @@ void test_import(){
   REQUIRE(bs20.count() == 10);
 }
 
-/**
- * Print
- */
-void test_print(){
-  emp::BitSet<8> bs8;
-  bs8.SetAll();
-  bs8.Set(1, false);
-
-  std::stringstream ss;
-  bs8.Print(ss);
-  REQUIRE(ss.str() == "11111101");
-  ss.str(std::string());
-
-  ss << bs8;
-  REQUIRE(ss.str() == "11111101");
-  ss.str(std::string());
-
-  bs8.PrintArray(ss);
-  REQUIRE(ss.str() == "10111111");
-  ss.str(std::string());
-
-  bs8.Clear();
-  bs8.Set(1, true);
-  bs8.Set(4, true);
-  bs8.PrintOneIDs(ss);
-  REQUIRE(ss.str() == "1 4 ");
-}
 
 
 TEST_CASE("Test BitSet", "[bits]")
@@ -991,7 +993,6 @@ TEST_CASE("Test BitSet", "[bits]")
   test_more_comparators();
   test_export();
   test_import();
-  test_print();
 }
 
 
