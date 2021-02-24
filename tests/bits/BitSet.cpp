@@ -545,6 +545,62 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   REQUIRE(bv.GetUInt8AtBit(35) == 0);
 }
 
+TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
+
+  emp::BitSet<16> bs = "0001000100001110";
+
+  REQUIRE(bs.GetSize() == 16);
+  REQUIRE(bs.CountOnes() == 5);
+
+  // Make sure we can find all of the ones.
+  REQUIRE(bs.FindOne() == 3);
+  REQUIRE(bs.FindOne(4) == 7);
+  REQUIRE(bs.FindOne(5) == 7);
+  REQUIRE(bs.FindOne(6) == 7);
+  REQUIRE(bs.FindOne(7) == 7);
+  REQUIRE(bs.FindOne(8) == 12);
+  REQUIRE(bs.FindOne(13) == 13);
+  REQUIRE(bs.FindOne(14) == 14);
+  REQUIRE(bs.FindOne(15) == -1);
+
+  // Get all of the ones at once and make sure they're there.
+  emp::vector<size_t> ones = bs.GetOnes();
+  REQUIRE(ones.size() == 5);
+  REQUIRE(ones[0] == 3);
+  REQUIRE(ones[1] == 7);
+  REQUIRE(ones[2] == 12);
+  REQUIRE(ones[3] == 13);
+  REQUIRE(ones[4] == 14);
+
+  // Try finding the length of the longest segment of ones.
+  REQUIRE(bs.LongestSegmentOnes() == 3);
+
+  // Pop all ones, one at a time.
+  REQUIRE(bs.PopOne() == 3);
+  REQUIRE(bs.PopOne() == 7);
+  REQUIRE(bs.PopOne() == 12);
+  REQUIRE(bs.PopOne() == 13);
+  REQUIRE(bs.PopOne() == 14);
+  REQUIRE(bs.PopOne() == -1);
+
+  REQUIRE(bs.CountOnes() == 0);
+  REQUIRE(bs.LongestSegmentOnes() == 0);
+
+  bs.SetAll();                             // 1111111111111111
+  REQUIRE(bs.LongestSegmentOnes() == 16);
+  bs[8] = 0;                               // 1111111101111111
+  REQUIRE(bs.LongestSegmentOnes() == 8);
+  bs[4] = 0;                               // 1111011101111111
+  REQUIRE(bs.LongestSegmentOnes() == 7);
+
+  // Try again with Find, this time with a random sequence of ones.
+  emp::Random random;
+  bs.Randomize(random);
+  size_t count = 0;
+  for (int i = bs.FindOne(); i != -1; i = bs.FindOne(i+1)) count++;
+  REQUIRE(count == bs.CountOnes());
+
+}
       /////////////////////////////////////////////
      /////////////////////////////////////////////
     /////////////////////////////////////////////
@@ -622,18 +678,18 @@ void test_flip(){
 }
 
 /**
- * FindBit and PopBit
+ * FindOne and PopOne
  */
 void test_find(){
   emp::BitSet<10> bs10;	// bs10 = 00 00000000
   bs10.flip(3);					// bs10 = 00 00001000
-  REQUIRE(bs10.FindBit() == 3);
-  bs10.PopBit();				// bs10 = 00 00000000
-  REQUIRE(bs10.PopBit() == -1);
+  REQUIRE(bs10.FindOne() == 3);
+  bs10.PopOne();				// bs10 = 00 00000000
+  REQUIRE(bs10.PopOne() == -1);
   bs10.flip(3);
   bs10.flip(1);
-  REQUIRE(bs10.FindBit(2) == 3);
-  REQUIRE(bs10.FindBit(4) == -1);
+  REQUIRE(bs10.FindOne(2) == 3);
+  REQUIRE(bs10.FindOne(4) == -1);
 }
 
 /**
@@ -745,7 +801,7 @@ void test_bitwise_xor(){
   bs4_1.SetByte(0,3);
   bs4 ^= bs4_1; 								// bs4 = 0001 ^ 0011 = 0010
   REQUIRE(bs4.GetByte(0) == 2); 	// 0010 = 2
-  bs4_1.PopBit(); 							// bs4_1 = 0010
+  bs4_1.PopOne(); 							// bs4_1 = 0010
   bs4 ^= bs4_1; 								// bs4 = 0010 ^ 0010 = 0000
   REQUIRE(bs4.GetByte(0) == 0);	// 0000 = 0
 }
