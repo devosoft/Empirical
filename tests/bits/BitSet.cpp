@@ -478,71 +478,71 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
   
-  emp::BitSet<num_bits> bv;
-  REQUIRE(bv.GetSize() == num_bits);
-  REQUIRE(bv.GetNumBytes() == num_bytes);
+  emp::BitSet<num_bits> bs;
+  REQUIRE(bs.GetSize() == num_bits);
+  REQUIRE(bs.GetNumBytes() == num_bytes);
 
   // All bytes should start out empty.
-  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bv.GetByte(i) == 0);
+  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bs.GetByte(i) == 0);
 
-  bv.SetByte(2, 11);
-  REQUIRE(bv.GetByte(2) == 11);
+  bs.SetByte(2, 11);
+  REQUIRE(bs.GetByte(2) == 11);
 
-  REQUIRE(bv.GetValue() == 720896.0);
+  REQUIRE(bs.GetValue() == 720896.0);
 
-  bv.SetByte(5, 7);
-  REQUIRE(bv.GetByte(0) == 0);
-  REQUIRE(bv.GetByte(1) == 0);
-  REQUIRE(bv.GetByte(2) == 11);
-  REQUIRE(bv.GetByte(3) == 0);
-  REQUIRE(bv.GetByte(4) == 0);
-  REQUIRE(bv.GetByte(5) == 7);
-  REQUIRE(bv.GetByte(6) == 0);
-  REQUIRE(bv.CountOnes() == 6);
+  bs.SetByte(5, 7);
+  REQUIRE(bs.GetByte(0) == 0);
+  REQUIRE(bs.GetByte(1) == 0);
+  REQUIRE(bs.GetByte(2) == 11);
+  REQUIRE(bs.GetByte(3) == 0);
+  REQUIRE(bs.GetByte(4) == 0);
+  REQUIRE(bs.GetByte(5) == 7);
+  REQUIRE(bs.GetByte(6) == 0);
+  REQUIRE(bs.CountOnes() == 6);
 
-  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bv.GetByte(i) == bv.GetUInt8(i));
+  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bs.GetByte(i) == bs.GetUInt8(i));
 
-  REQUIRE(bv.GetUInt16(0) == 0);
-  REQUIRE(bv.GetUInt16(1) == 11);
-  REQUIRE(bv.GetUInt16(2) == 1792);
-  REQUIRE(bv.GetUInt16(3) == 0);
+  REQUIRE(bs.GetUInt16(0) == 0);
+  REQUIRE(bs.GetUInt16(1) == 11);
+  REQUIRE(bs.GetUInt16(2) == 1792);
+  REQUIRE(bs.GetUInt16(3) == 0);
 
-  REQUIRE(bv.GetUInt32(0) == 720896);
-  REQUIRE(bv.GetUInt32(1) == 1792);
-  REQUIRE(bv.GetUInt32(2) == 0);
+  REQUIRE(bs.GetUInt32(0) == 720896);
+  REQUIRE(bs.GetUInt32(1) == 1792);
+  REQUIRE(bs.GetUInt32(2) == 0);
 
-  REQUIRE(bv.GetUInt64(0) == 7696582115328);
-  REQUIRE(bv.GetUInt64(1) == 0);
+  REQUIRE(bs.GetUInt64(0) == 7696582115328);
+  REQUIRE(bs.GetUInt64(1) == 0);
 
-  bv.SetUInt64(0, 12345678901234);
-  bv.SetUInt32(2, 2000000);
-  bv.SetUInt16(7, 7777);
-  bv.SetUInt8(17, 17);
+  bs.SetUInt64(0, 12345678901234);
+  bs.SetUInt32(2, 2000000);
+  bs.SetUInt16(7, 7777);
+  bs.SetUInt8(17, 17);
 
-  REQUIRE(bv.GetUInt64(0) == 12345678901234);
-  REQUIRE(bv.GetUInt32(2) == 2000000);
-  REQUIRE(bv.GetUInt16(7) == 7777);
-  REQUIRE(bv.GetUInt8(17) == 17);
+  REQUIRE(bs.GetUInt64(0) == 12345678901234);
+  REQUIRE(bs.GetUInt32(2) == 2000000);
+  REQUIRE(bs.GetUInt16(7) == 7777);
+  REQUIRE(bs.GetUInt8(17) == 17);
 
-  bv.Clear();
-  bv.SetUInt16AtBit(40, 40);
+  bs.Clear();
+  bs.SetUInt16AtBit(40, 40);
 
-  REQUIRE(bv.GetUInt16AtBit(40) == 40);
+  REQUIRE(bs.GetUInt16AtBit(40) == 40);
 
-  REQUIRE(bv.GetUInt8(5) == 40);
-  REQUIRE(bv.GetUInt8AtBit(40) == 40);
-  REQUIRE(bv.GetUInt32AtBit(40) == 40);
-  REQUIRE(bv.GetUInt64AtBit(40) == 40);
+  REQUIRE(bs.GetUInt8(5) == 40);
+  REQUIRE(bs.GetUInt8AtBit(40) == 40);
+  REQUIRE(bs.GetUInt32AtBit(40) == 40);
+  REQUIRE(bs.GetUInt64AtBit(40) == 40);
 
-  REQUIRE(bv.GetUInt16AtBit(38) == 160);
-  REQUIRE(bv.GetUInt16AtBit(39) == 80);
-  REQUIRE(bv.GetUInt16AtBit(41) == 20);
-  REQUIRE(bv.GetUInt16AtBit(42) == 10);
+  REQUIRE(bs.GetUInt16AtBit(38) == 160);
+  REQUIRE(bs.GetUInt16AtBit(39) == 80);
+  REQUIRE(bs.GetUInt16AtBit(41) == 20);
+  REQUIRE(bs.GetUInt16AtBit(42) == 10);
 
-  REQUIRE(bv.GetUInt8AtBit(38) == 160);
-  REQUIRE(bv.GetUInt8AtBit(37) == 64);
-  REQUIRE(bv.GetUInt8AtBit(36) == 128);
-  REQUIRE(bv.GetUInt8AtBit(35) == 0);
+  REQUIRE(bs.GetUInt8AtBit(38) == 160);
+  REQUIRE(bs.GetUInt8AtBit(37) == 64);
+  REQUIRE(bs.GetUInt8AtBit(36) == 128);
+  REQUIRE(bs.GetUInt8AtBit(35) == 0);
 }
 
 TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
@@ -575,6 +575,9 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   // Try finding the length of the longest segment of ones.
   REQUIRE(bs.LongestSegmentOnes() == 3);
 
+  // Identify the final one.
+  REQUIRE(bs.FindMaxOne() == 14);
+
   // Pop all ones, one at a time.
   REQUIRE(bs.PopOne() == 3);
   REQUIRE(bs.PopOne() == 7);
@@ -585,6 +588,8 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 
   REQUIRE(bs.CountOnes() == 0);
   REQUIRE(bs.LongestSegmentOnes() == 0);
+  REQUIRE(bs.FindMaxOne() == -1);
+
 
   bs.SetAll();                             // 1111111111111111
   REQUIRE(bs.LongestSegmentOnes() == 16);
