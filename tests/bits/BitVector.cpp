@@ -624,6 +624,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
   const emp::BitVector input2 = "00110011";
   const emp::BitVector input3 = "01010101";
 
+  // Test *_SELF() Boolean Logic operations.
   emp::BitVector bv(8);    REQUIRE(bv == emp::BitVector("00000000"));
   bv.NOT_SELF();           REQUIRE(bv == emp::BitVector("11111111"));
   bv.AND_SELF(input1);     REQUIRE(bv == emp::BitVector("00001111"));
@@ -655,6 +656,44 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
   bv.EQU_SELF(input1);     REQUIRE(bv == emp::BitVector("11000100"));
   bv.EQU_SELF(input2);     REQUIRE(bv == emp::BitVector("00001000"));
   bv.EQU_SELF(input3);     REQUIRE(bv == emp::BitVector("10100010"));
+
+  bv.NOT_SELF();           REQUIRE(bv == emp::BitVector("01011101"));
+
+  // Test regular Boolean Logic operations.
+  bv.Clear();                            REQUIRE(bv == emp::BitVector("00000000"));
+  emp::BitVector bv1 = bv.NOT();         REQUIRE(bv1 == emp::BitVector("11111111"));
+
+  bv1 = bv1.AND(input1);                 REQUIRE(bv1 == emp::BitVector("00001111"));
+  emp::BitVector bv2 = bv1.AND(input1);  REQUIRE(bv2 == emp::BitVector("00001111"));
+  emp::BitVector bv3 = bv2.AND(input2);  REQUIRE(bv3 == emp::BitVector("00000011"));
+  emp::BitVector bv4 = bv3.AND(input3);  REQUIRE(bv4 == emp::BitVector("00000001"));
+
+  bv1 = bv4.OR(input1);      REQUIRE(bv1 == emp::BitVector("00001111"));
+  bv2 = bv1.OR(input1);      REQUIRE(bv2 == emp::BitVector("00001111"));
+  bv3 = bv2.OR(input3);      REQUIRE(bv3 == emp::BitVector("01011111"));
+  bv4 = bv3.OR(input2);      REQUIRE(bv4 == emp::BitVector("01111111"));
+
+  bv1 = bv4.NAND(input1);    REQUIRE(bv1 == emp::BitVector("11110000"));
+  bv2 = bv1.NAND(input1);    REQUIRE(bv2 == emp::BitVector("11111111"));
+  bv3 = bv2.NAND(input2);    REQUIRE(bv3 == emp::BitVector("11001100"));
+  bv4 = bv3.NAND(input3);    REQUIRE(bv4 == emp::BitVector("10111011"));
+
+  bv1 = bv4.NOR(input1);     REQUIRE(bv1 == emp::BitVector("01000000"));
+  bv2 = bv1.NOR(input1);     REQUIRE(bv2 == emp::BitVector("10110000"));
+  bv3 = bv2.NOR(input2);     REQUIRE(bv3 == emp::BitVector("01001100"));
+  bv4 = bv3.NOR(input3);     REQUIRE(bv4 == emp::BitVector("10100010"));
+
+  bv1 = bv4.XOR(input1);     REQUIRE(bv1 == emp::BitVector("10101101"));
+  bv2 = bv1.XOR(input1);     REQUIRE(bv2 == emp::BitVector("10100010"));
+  bv3 = bv2.XOR(input2);     REQUIRE(bv3 == emp::BitVector("10010001"));
+  bv4 = bv3.XOR(input3);     REQUIRE(bv4 == emp::BitVector("11000100"));
+
+  bv1 = bv4.EQU(input1);     REQUIRE(bv1 == emp::BitVector("00110100"));
+  bv2 = bv1.EQU(input1);     REQUIRE(bv2 == emp::BitVector("11000100"));
+  bv3 = bv2.EQU(input2);     REQUIRE(bv3 == emp::BitVector("00001000"));
+  bv4 = bv3.EQU(input3);     REQUIRE(bv4 == emp::BitVector("10100010"));
+
+  bv = bv4.NOT();            REQUIRE(bv == emp::BitVector("01011101"));
 }
 
 
