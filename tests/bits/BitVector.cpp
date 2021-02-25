@@ -624,7 +624,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
   const emp::BitVector input2 = "00110011";
   const emp::BitVector input3 = "01010101";
 
-  // Test *_SELF() Boolean Logic operations.
+  // Test *_SELF() Boolean Logic functions.
   emp::BitVector bv(8);    REQUIRE(bv == emp::BitVector("00000000"));
   bv.NOT_SELF();           REQUIRE(bv == emp::BitVector("11111111"));
   bv.AND_SELF(input1);     REQUIRE(bv == emp::BitVector("00001111"));
@@ -659,7 +659,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
 
   bv.NOT_SELF();           REQUIRE(bv == emp::BitVector("01011101"));
 
-  // Test regular Boolean Logic operations.
+  // Test regular Boolean Logic functions.
   bv.Clear();                            REQUIRE(bv == emp::BitVector("00000000"));
   emp::BitVector bv1 = bv.NOT();         REQUIRE(bv1 == emp::BitVector("11111111"));
 
@@ -694,6 +694,63 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
   bv4 = bv3.EQU(input3);     REQUIRE(bv4 == emp::BitVector("10100010"));
 
   bv = bv4.NOT();            REQUIRE(bv == emp::BitVector("01011101"));
+
+
+  // Test Boolean Logic operators.
+  bv.Clear();               REQUIRE(bv == emp::BitVector("00000000"));
+  bv1 = ~bv;                REQUIRE(bv1 == emp::BitVector("11111111"));
+
+  bv1 = bv1 & input1;       REQUIRE(bv1 == emp::BitVector("00001111"));
+  bv2 = bv1 & input1;       REQUIRE(bv2 == emp::BitVector("00001111"));
+  bv3 = bv2 & input2;       REQUIRE(bv3 == emp::BitVector("00000011"));
+  bv4 = bv3 & input3;       REQUIRE(bv4 == emp::BitVector("00000001"));
+
+  bv1 = bv4 | input1;       REQUIRE(bv1 == emp::BitVector("00001111"));
+  bv2 = bv1 | input1;       REQUIRE(bv2 == emp::BitVector("00001111"));
+  bv3 = bv2 | input3;       REQUIRE(bv3 == emp::BitVector("01011111"));
+  bv4 = bv3 | input2;       REQUIRE(bv4 == emp::BitVector("01111111"));
+
+  bv1 = ~(bv4 & input1);    REQUIRE(bv1 == emp::BitVector("11110000"));
+  bv2 = ~(bv1 & input1);    REQUIRE(bv2 == emp::BitVector("11111111"));
+  bv3 = ~(bv2 & input2);    REQUIRE(bv3 == emp::BitVector("11001100"));
+  bv4 = ~(bv3 & input3);    REQUIRE(bv4 == emp::BitVector("10111011"));
+
+  bv1 = ~(bv4 | input1);    REQUIRE(bv1 == emp::BitVector("01000000"));
+  bv2 = ~(bv1 | input1);    REQUIRE(bv2 == emp::BitVector("10110000"));
+  bv3 = ~(bv2 | input2);    REQUIRE(bv3 == emp::BitVector("01001100"));
+  bv4 = ~(bv3 | input3);    REQUIRE(bv4 == emp::BitVector("10100010"));
+
+  bv1 = bv4 ^ input1;       REQUIRE(bv1 == emp::BitVector("10101101"));
+  bv2 = bv1 ^ input1;       REQUIRE(bv2 == emp::BitVector("10100010"));
+  bv3 = bv2 ^ input2;       REQUIRE(bv3 == emp::BitVector("10010001"));
+  bv4 = bv3 ^ input3;       REQUIRE(bv4 == emp::BitVector("11000100"));
+
+  bv1 = ~(bv4 ^ input1);    REQUIRE(bv1 == emp::BitVector("00110100"));
+  bv2 = ~(bv1 ^ input1);    REQUIRE(bv2 == emp::BitVector("11000100"));
+  bv3 = ~(bv2 ^ input2);    REQUIRE(bv3 == emp::BitVector("00001000"));
+  bv4 = ~(bv3 ^ input3);    REQUIRE(bv4 == emp::BitVector("10100010"));
+
+  bv = ~bv4;                REQUIRE(bv == emp::BitVector("01011101"));
+
+
+  // Test COMPOUND Boolean Logic operators.
+  bv = "11111111";    REQUIRE(bv == emp::BitVector("11111111"));
+
+  bv &= input1;       REQUIRE(bv == emp::BitVector("00001111"));
+  bv &= input1;       REQUIRE(bv == emp::BitVector("00001111"));
+  bv &= input2;       REQUIRE(bv == emp::BitVector("00000011"));
+  bv &= input3;       REQUIRE(bv == emp::BitVector("00000001"));
+
+  bv |= input1;       REQUIRE(bv == emp::BitVector("00001111"));
+  bv |= input1;       REQUIRE(bv == emp::BitVector("00001111"));
+  bv |= input3;       REQUIRE(bv == emp::BitVector("01011111"));
+  bv |= input2;       REQUIRE(bv == emp::BitVector("01111111"));
+
+  bv ^= input1;       REQUIRE(bv == emp::BitVector("01110000"));
+  bv ^= input1;       REQUIRE(bv == emp::BitVector("01111111"));
+  bv ^= input2;       REQUIRE(bv == emp::BitVector("01001100"));
+  bv ^= input3;       REQUIRE(bv == emp::BitVector("00011001"));
+
 }
 
 
