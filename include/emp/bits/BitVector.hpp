@@ -190,12 +190,15 @@ namespace emp {
     /// Move operator.
     BitVector & operator=(BitVector && in);
 
-    /// Assignement operator from a std::bitset.
+    /// Assignment operator from a std::bitset.
     template <size_t NUM_BITS>
     BitVector & operator=(const std::bitset<NUM_BITS> & bitset);
 
-    /// Assignement operator from a string of '0's and '1's.
+    /// Assignment operator from a string of '0's and '1's.
     BitVector & operator=(const std::string & bitstring);
+
+    /// Assignment operator from a literal string of '0's and '1's.
+    BitVector & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitVector without changing size.
     BitVector & Import( const BitVector & from_bv, const size_t from_bit=0 );
@@ -1101,7 +1104,7 @@ namespace emp {
     return *this;
   }
 
-  /// Assignement operator from a std::bitset.
+  /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS>
   BitVector & BitVector::operator=(const std::bitset<NUM_BITS> & bitset) {
     const size_t start_fields = NumFields();
@@ -1124,7 +1127,7 @@ namespace emp {
     return *this;
   }
 
-  /// Assignement operator from a string of '0's and '1's.
+  /// Assignment operator from a string of '0's and '1's.
   BitVector & BitVector::operator=(const std::string & bitstring) {
     const size_t start_fields = NumFields();
     num_bits = bitstring.size();
