@@ -633,6 +633,139 @@ TEST_CASE("8: Test printing and string functions.", "[bits]") {
   REQUIRE(bs65.ToRangeString()  == "3-6,19,33,37-38,45,51,55,62-64");
 }
 
+TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
+  const emp::BitSet<8> input1 = "00001111";
+  const emp::BitSet<8> input2 = "00110011";
+  const emp::BitSet<8> input3 = "01010101";
+
+  // Test *_SELF() Boolean Logic functions.
+  emp::BitSet<8> bs;       REQUIRE(bs == emp::BitSet<8>("00000000"));
+  bs.NOT_SELF();           REQUIRE(bs == emp::BitSet<8>("11111111"));
+  bs.AND_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs.AND_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs.AND_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("00000011"));
+  bs.AND_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("00000001"));
+
+  bs.OR_SELF(input1);      REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs.OR_SELF(input1);      REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs.OR_SELF(input3);      REQUIRE(bs == emp::BitSet<8>("01011111"));
+  bs.OR_SELF(input2);      REQUIRE(bs == emp::BitSet<8>("01111111"));
+
+  bs.NAND_SELF(input1);    REQUIRE(bs == emp::BitSet<8>("11110000"));
+  bs.NAND_SELF(input1);    REQUIRE(bs == emp::BitSet<8>("11111111"));
+  bs.NAND_SELF(input2);    REQUIRE(bs == emp::BitSet<8>("11001100"));
+  bs.NAND_SELF(input3);    REQUIRE(bs == emp::BitSet<8>("10111011"));
+
+  bs.NOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("01000000"));
+  bs.NOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("10110000"));
+  bs.NOR_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("01001100"));
+  bs.NOR_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("10100010"));
+
+  bs.XOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("10101101"));
+  bs.XOR_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("10100010"));
+  bs.XOR_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("10010001"));
+  bs.XOR_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("11000100"));
+
+  bs.EQU_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("00110100"));
+  bs.EQU_SELF(input1);     REQUIRE(bs == emp::BitSet<8>("11000100"));
+  bs.EQU_SELF(input2);     REQUIRE(bs == emp::BitSet<8>("00001000"));
+  bs.EQU_SELF(input3);     REQUIRE(bs == emp::BitSet<8>("10100010"));
+
+  bs.NOT_SELF();           REQUIRE(bs == emp::BitSet<8>("01011101"));
+
+  // Test regular Boolean Logic functions.
+  bs.Clear();                            REQUIRE(bs == emp::BitSet<8>("00000000"));
+  emp::BitSet<8> bs1 = bs.NOT();         REQUIRE(bs1 == emp::BitSet<8>("11111111"));
+
+  bs1 = bs1.AND(input1);                 REQUIRE(bs1 == emp::BitSet<8>("00001111"));
+  emp::BitSet<8> bs2 = bs1.AND(input1);  REQUIRE(bs2 == emp::BitSet<8>("00001111"));
+  emp::BitSet<8> bs3 = bs2.AND(input2);  REQUIRE(bs3 == emp::BitSet<8>("00000011"));
+  emp::BitSet<8> bs4 = bs3.AND(input3);  REQUIRE(bs4 == emp::BitSet<8>("00000001"));
+
+  bs1 = bs4.OR(input1);      REQUIRE(bs1 == emp::BitSet<8>("00001111"));
+  bs2 = bs1.OR(input1);      REQUIRE(bs2 == emp::BitSet<8>("00001111"));
+  bs3 = bs2.OR(input3);      REQUIRE(bs3 == emp::BitSet<8>("01011111"));
+  bs4 = bs3.OR(input2);      REQUIRE(bs4 == emp::BitSet<8>("01111111"));
+
+  bs1 = bs4.NAND(input1);    REQUIRE(bs1 == emp::BitSet<8>("11110000"));
+  bs2 = bs1.NAND(input1);    REQUIRE(bs2 == emp::BitSet<8>("11111111"));
+  bs3 = bs2.NAND(input2);    REQUIRE(bs3 == emp::BitSet<8>("11001100"));
+  bs4 = bs3.NAND(input3);    REQUIRE(bs4 == emp::BitSet<8>("10111011"));
+
+  bs1 = bs4.NOR(input1);     REQUIRE(bs1 == emp::BitSet<8>("01000000"));
+  bs2 = bs1.NOR(input1);     REQUIRE(bs2 == emp::BitSet<8>("10110000"));
+  bs3 = bs2.NOR(input2);     REQUIRE(bs3 == emp::BitSet<8>("01001100"));
+  bs4 = bs3.NOR(input3);     REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+
+  bs1 = bs4.XOR(input1);     REQUIRE(bs1 == emp::BitSet<8>("10101101"));
+  bs2 = bs1.XOR(input1);     REQUIRE(bs2 == emp::BitSet<8>("10100010"));
+  bs3 = bs2.XOR(input2);     REQUIRE(bs3 == emp::BitSet<8>("10010001"));
+  bs4 = bs3.XOR(input3);     REQUIRE(bs4 == emp::BitSet<8>("11000100"));
+
+  bs1 = bs4.EQU(input1);     REQUIRE(bs1 == emp::BitSet<8>("00110100"));
+  bs2 = bs1.EQU(input1);     REQUIRE(bs2 == emp::BitSet<8>("11000100"));
+  bs3 = bs2.EQU(input2);     REQUIRE(bs3 == emp::BitSet<8>("00001000"));
+  bs4 = bs3.EQU(input3);     REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+
+  bs = bs4.NOT();            REQUIRE(bs == emp::BitSet<8>("01011101"));
+
+
+  // Test Boolean Logic operators.
+  bs.Clear();               REQUIRE(bs == emp::BitSet<8>("00000000"));
+  bs1 = ~bs;                REQUIRE(bs1 == emp::BitSet<8>("11111111"));
+
+  bs1 = bs1 & input1;       REQUIRE(bs1 == emp::BitSet<8>("00001111"));
+  bs2 = bs1 & input1;       REQUIRE(bs2 == emp::BitSet<8>("00001111"));
+  bs3 = bs2 & input2;       REQUIRE(bs3 == emp::BitSet<8>("00000011"));
+  bs4 = bs3 & input3;       REQUIRE(bs4 == emp::BitSet<8>("00000001"));
+
+  bs1 = bs4 | input1;       REQUIRE(bs1 == emp::BitSet<8>("00001111"));
+  bs2 = bs1 | input1;       REQUIRE(bs2 == emp::BitSet<8>("00001111"));
+  bs3 = bs2 | input3;       REQUIRE(bs3 == emp::BitSet<8>("01011111"));
+  bs4 = bs3 | input2;       REQUIRE(bs4 == emp::BitSet<8>("01111111"));
+
+  bs1 = ~(bs4 & input1);    REQUIRE(bs1 == emp::BitSet<8>("11110000"));
+  bs2 = ~(bs1 & input1);    REQUIRE(bs2 == emp::BitSet<8>("11111111"));
+  bs3 = ~(bs2 & input2);    REQUIRE(bs3 == emp::BitSet<8>("11001100"));
+  bs4 = ~(bs3 & input3);    REQUIRE(bs4 == emp::BitSet<8>("10111011"));
+
+  bs1 = ~(bs4 | input1);    REQUIRE(bs1 == emp::BitSet<8>("01000000"));
+  bs2 = ~(bs1 | input1);    REQUIRE(bs2 == emp::BitSet<8>("10110000"));
+  bs3 = ~(bs2 | input2);    REQUIRE(bs3 == emp::BitSet<8>("01001100"));
+  bs4 = ~(bs3 | input3);    REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+
+  bs1 = bs4 ^ input1;       REQUIRE(bs1 == emp::BitSet<8>("10101101"));
+  bs2 = bs1 ^ input1;       REQUIRE(bs2 == emp::BitSet<8>("10100010"));
+  bs3 = bs2 ^ input2;       REQUIRE(bs3 == emp::BitSet<8>("10010001"));
+  bs4 = bs3 ^ input3;       REQUIRE(bs4 == emp::BitSet<8>("11000100"));
+
+  bs1 = ~(bs4 ^ input1);    REQUIRE(bs1 == emp::BitSet<8>("00110100"));
+  bs2 = ~(bs1 ^ input1);    REQUIRE(bs2 == emp::BitSet<8>("11000100"));
+  bs3 = ~(bs2 ^ input2);    REQUIRE(bs3 == emp::BitSet<8>("00001000"));
+  bs4 = ~(bs3 ^ input3);    REQUIRE(bs4 == emp::BitSet<8>("10100010"));
+
+  bs = ~bs4;                REQUIRE(bs == emp::BitSet<8>("01011101"));
+
+
+  // Test COMPOUND Boolean Logic operators.
+  bs = "11111111";    REQUIRE(bs == emp::BitSet<8>("11111111"));
+
+  bs &= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs &= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs &= input2;       REQUIRE(bs == emp::BitSet<8>("00000011"));
+  bs &= input3;       REQUIRE(bs == emp::BitSet<8>("00000001"));
+
+  bs |= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs |= input1;       REQUIRE(bs == emp::BitSet<8>("00001111"));
+  bs |= input3;       REQUIRE(bs == emp::BitSet<8>("01011111"));
+  bs |= input2;       REQUIRE(bs == emp::BitSet<8>("01111111"));
+
+  bs ^= input1;       REQUIRE(bs == emp::BitSet<8>("01110000"));
+  bs ^= input1;       REQUIRE(bs == emp::BitSet<8>("01111111"));
+  bs ^= input2;       REQUIRE(bs == emp::BitSet<8>("01001100"));
+  bs ^= input3;       REQUIRE(bs == emp::BitSet<8>("00011001"));
+
+}
 
 
       /////////////////////////////////////////////
