@@ -169,11 +169,14 @@ namespace emp {
     /// Assignment operator (no separate move opperator since no resources to move...)
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) { return Copy<NUM_FIELDS>(in_set.bit_set); }
 
-    /// Assignement operator from a std::bitset.
+    /// Assignment operator from a std::bitset.
     BitSet & operator=(const std::bitset<NUM_BITS> & bitset);
 
-    /// Assignement operator from a string of '0's and '1's.
+    /// Assignment operator from a string of '0's and '1's.
     BitSet & operator=(const std::string & bitstring);
+
+    /// Assignment operator from a literal string of '0's and '1's.
+    BitSet & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitSet of a different size.
     template <size_t FROM_BITS>
@@ -915,14 +918,14 @@ namespace emp {
     for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
   }
 
-    /// Assignement operator from a std::bitset.
+    /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::operator=(const std::bitset<NUM_BITS> & bitset) {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
   }
 
-  /// Assignement operator from a string of '0's and '1's.
+  /// Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::operator=(const std::string & bitstring) {
     emp_assert(bitstring.size() <= NUM_BITS);
