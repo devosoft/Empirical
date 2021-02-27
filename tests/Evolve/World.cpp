@@ -387,22 +387,46 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	CHECK(world.GetHeight() == 4);
 	CHECK(world.GetDepth() == 3);
 	CHECK(world.GetSize() == 5*4*3);
-
+	
 	int org1 = 5;
 
 	world.InjectAt(org1, 0);
 
+	// Test lower bounds
 	emp::WorldPosition neigh = world.GetRandomNeighborPos(0);
 	emp::vector<size_t> legal_neighbors = {1,5,6,20,21,25,26};
-
 	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
 
+	// Test middle of grid
 	neigh = world.GetRandomNeighborPos(26);
 	legal_neighbors = {0,1,2, 5,6,7,10,11,12,20, 21, 22, 25, 27, 30, 31, 32, 40, 41, 42, 45, 46, 47, 50, 51, 52};
-
 	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
 
+	// Test upper bounds
+	neigh = world.GetRandomNeighborPos(59);
+	legal_neighbors = {58, 54, 53, 39, 38, 34, 33};
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
+	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
+	
+
+	world.Inject(org1);
+	world.DoBirth(org1, 0);
+	world.DoDeath();
+
+	// test synchronous
+	world.Clear();
+	world.SetPopStruct_3DGrid(5,4,3, true);
+	world.InjectAt(org1, 0);
+	emp::WorldPosition pos = world.DoBirth(org1, 0);
+	legal_neighbors = {0, 1,5,6,20,21,25,26};
+	CHECK(emp::Has<size_t>(legal_neighbors, pos.GetIndex() ));
+	CHECK(pos.GetPopID() == 1);
+	CHECK(world.GetNumOrgs() == 1);	
+	world.Update();
+	CHECK(world.GetNumOrgs() == 1);	
+	world.Update();
+	CHECK(world.GetNumOrgs() == 0);	
 
 }
