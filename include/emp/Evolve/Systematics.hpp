@@ -410,10 +410,9 @@ namespace emp {
   public:
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
+  private:
     using hash_t = typename Ptr<taxon_t>::hash_t;
     using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
-
-  private:
 
     fun_calc_info_t calc_info_fun;
     Ptr<taxon_t> next_parent;
