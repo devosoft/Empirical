@@ -251,10 +251,22 @@ namespace emp {
     size_t GetUpdate() const { return update; }
 
     /// How many cells wide is the world? (assumes grids are active.)
-    size_t GetWidth() const { return pop_sizes[0]; }
+    size_t GetWidth() const { 
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "Grid"); 
+      return pop_sizes[0]; 
+    }
 
     /// How many cells tall is the world? (assumes grids are active.)
-    size_t GetHeight() const { return pop_sizes[1]; }
+    size_t GetHeight() const { 
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "Grid"); 
+      return pop_sizes[1]; 
+    }
+
+    /// How many cells deep is the world? (assumes 3d grids are active.)
+    size_t GetDepth() const { 
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "3DGrid"); 
+      return pop_sizes[2]; 
+    }
 
     /// Get the full population to analyze externally.
     const pop_t & GetFullPop() const { return pop; }
@@ -449,6 +461,10 @@ namespace emp {
     /// Set the population to be a grid of cells using the specified dimensions.  The third
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen=false);
+
+    /// Set the population to be a 3D grid of cells using the specified dimensions.  The third
+    /// argument determines if the generations should be synchronous (true) or not (false, default)
+    void SetPopStruct_3DGrid(size_t width, size_t height, size_t depth, bool synchronous_gen=false);
 
     /// Setup the population to automatically test for and trigger mutations.  By default, this
     /// occurs before deciding where an offspring should be placed. Note that this pre-placement
@@ -1100,6 +1116,153 @@ namespace emp {
     }
 
     SetAttribute("PopStruct", "Grid");
+    SetSynchronousSystematics(synchronous_gen);
+  }
+
+  template<typename ORG>
+  void World<ORG>::SetPopStruct_3DGrid(size_t width, size_t height, size_t depth, bool synchronous_gen) {
+    emp::vector<size_t> sizes = {width, height, depth};
+    Resize(sizes);
+    is_synchronous = synchronous_gen;
+    is_space_structured = true;
+    is_pheno_structured = false;
+
+    // -- Setup functions --
+    // Inject a random position in grid
+    fun_find_inject_pos = [this](Ptr<ORG> new_org) {
+      (void) new_org;
+      return WorldPosition(GetRandomCellID());
+    };
+
+    // neighbors are in 27-sized neighborhood.
+    fun_get_neighbor = [this](WorldPosition pos) {
+
+      emp_assert(random_ptr);
+      emp_assert(pop_sizes.size() == 3);
+
+      const int size_x = (int) pop_sizes[0];
+      const int size_y = (int) pop_sizes[1];
+      const int size_z = (int) pop_sizes[2];
+      const int id = (int) pos.GetIndex();
+
+      const int x_pos = (id%size_x);
+      const int y_pos = (id/size_x) % (size_y);
+      const int z_pos = (id/size_x) / (size_y);
+
+      emp_assert(z_pos < size_z);
+
+      int self_pos = 13;
+      int n_options = 26;
+      int rand_pos = 0;
+
+      if (z_pos > 0 && z_pos < size_z - 1 && y_pos > 0 && y_pos < size_y - 1 && x_pos > 0 && x_pos < size_x - 1){
+        // no edge problems to worry about
+        rand_pos = random_ptr->GetInt(n_options);
+        if (rand_pos >= self_pos) {
+          // skip central cell
+          rand_pos++;
+        }
+      } else {
+        std::set<int> non_options;
+        non_options.insert(self_pos);
+        if (z_pos == 0) {
+          for (int i = 0; i < 9; i++) {
+            non_options.insert(i);
+          }
+        } else if (z_pos == size_z - 1) {
+          for (int i = 18; i < 27; i++) {
+            non_options.insert(i);
+          }          
+        }
+       if (y_pos == 0) {
+          non_options.insert(0);
+          non_options.insert(1);
+          non_options.insert(2);
+          non_options.insert(9);
+          non_options.insert(10);
+          non_options.insert(11);
+          non_options.insert(18);
+          non_options.insert(19);
+          non_options.insert(20);
+        } else if (y_pos == size_y - 1) {
+          non_options.insert(6);
+          non_options.insert(7);
+          non_options.insert(8);
+          non_options.insert(15);
+          non_options.insert(16);
+          non_options.insert(17);
+          non_options.insert(24);
+          non_options.insert(25);
+          non_options.insert(26);
+        }
+       if (x_pos == 0) {         
+          non_options.insert(0);
+          non_options.insert(3);
+          non_options.insert(6);
+          non_options.insert(9);
+          non_options.insert(12);
+          non_options.insert(15);
+          non_options.insert(18);
+          non_options.insert(21);
+          non_options.insert(24);
+        } else if (x_pos == size_x - 1) {
+          non_options.insert(2);
+          non_options.insert(5);
+          non_options.insert(8);
+          non_options.insert(11);
+          non_options.insert(14);
+          non_options.insert(17);
+          non_options.insert(20);
+          non_options.insert(23);
+          non_options.insert(26);
+        }
+
+        emp::vector<int> options;
+        for (int i = 0; i < 27; i++) {
+          if (non_options.count(i) == 0) {
+            options.push_back(i);
+          }
+        }
+
+        int p = random_ptr->GetInt(options.size());
+        rand_pos = options[p];
+      }
+      
+      int rand_z = z_pos + rand_pos / 9 - 1;
+      int rand_y = y_pos + (rand_pos - (9 * (rand_pos / 9))) / 3 - 1;
+      int rand_x = x_pos + (rand_pos - (9 * (rand_pos / 9))) % 3 - 1;
+
+      const int neighbor_id = rand_z*size_y*size_x + rand_y*size_x + rand_x;
+
+      emp_assert(neighbor_id >= 0 && neighbor_id < size_x*size_y*size_z, neighbor_id, size_x*size_y*size_z);
+      emp_assert((int)pos.GetIndex() != neighbor_id);
+
+      return pos.SetIndex(neighbor_id);
+    };
+
+    fun_kill_org = [this](){
+      const size_t kill_id = GetRandomCellID();
+      RemoveOrgAt(kill_id);
+      return kill_id;
+    };
+
+    if (synchronous_gen) {
+      // Place births in a neighboring position in the new grid.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        emp_assert(new_org);                                    // New organism must exist.
+        WorldPosition next_pos = fun_get_neighbor(parent_pos);  // Place near parent.
+        return next_pos.SetPopID(1);                            // Adjust position to next pop and place..
+      };
+      SetAttribute("SynchronousGen", "True");
+    } else {
+      // Asynchronous: always go to a neighbor in current population.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
+      };
+      SetAttribute("SynchronousGen", "False");
+    }
+
+    SetAttribute("PopStruct", "3DGrid");
     SetSynchronousSystematics(synchronous_gen);
   }
 
