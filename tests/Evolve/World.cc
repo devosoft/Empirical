@@ -11,6 +11,7 @@
 #include "tools/BitSet.h"
 #include "tools/Random.h"
 #include "tools/string_utils.h"
+#include "tools/vector_utils.h"
 
 #include <sstream>
 #include <iostream>
@@ -375,5 +376,33 @@ TEST_CASE("Test fitness sharing", "[evo]")
   std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
   //   std::cout << std::endl;
+
+}
+
+TEST_CASE("Test 3D population structure", "[Evolve]")
+{
+	emp::World<int> world;
+	world.SetPopStruct_3DGrid(5,4,3);
+	CHECK(world.GetWidth() == 5);
+	CHECK(world.GetHeight() == 4);
+	CHECK(world.GetDepth() == 3);
+	CHECK(world.GetSize() == 5*4*3);
+
+	int org1 = 5;
+
+	world.InjectAt(org1, 0);
+
+	emp::WorldPosition neigh = world.GetRandomNeighborPos(0);
+	emp::vector<size_t> legal_neighbors = {1,5,6,20,21,25,26};
+
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
+	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
+
+	neigh = world.GetRandomNeighborPos(26);
+	legal_neighbors = {0,1,2, 5,6,7,10,11,12,20, 21, 22, 25, 27, 30, 31, 32, 40, 41, 42, 45, 46, 47, 50, 51, 52};
+
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
+	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
+
 
 }
