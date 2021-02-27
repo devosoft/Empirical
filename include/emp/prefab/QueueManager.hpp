@@ -6,13 +6,14 @@
  *  @file  queue-manager.h
  *  @brief A tool for processing multiple simulation runs onto a figure and table, displaying real-time statistics
  *  @note Status:
+ *  @author Juan Chavez and Emily Dolson
  */
 
 /// The goal of creating this tool is to alleviate the process of running multiple simulations of the same kind within
 /// a queue structure. A user is able to visually see the results of their simulations, and each run held within the queue
 /// runs subsequently after the other. Real-time statistics, that the user is able to display, are posted within a table as each run is carried out.
 /// Here is a link to a blogpost that describes this tool's inpsiration, purpose, and required instructions:
-/// (Link to blogpost)
+/// https://mmore500.com/waves/blog/queuemanager.html
 
 #pragma once
 
@@ -34,15 +35,11 @@ namespace emp {
 /// Information of each element within queue. This info represents the information required for each run to be processed.
 struct RunInfo {
     SettingConfig runinfo_config;
-
     size_t id;
-
     size_t cur_epoch;
-    size_t num_coop;
-    std::string num_defect;
 
     RunInfo(SettingConfig _config, size_t _id)
-        : runinfo_config(_config), id(_id), cur_epoch(0), num_coop(0), num_defect("") { ; }
+        : runinfo_config(_config), id(_id), cur_epoch(0) { ; }
 };
 
 /// Primary class that establishes queue for runs and processes them accordingly
@@ -53,15 +50,13 @@ class QueueManager {
     emp::web::Div display_div;
     std::string table_id;
     // ordered names of dependant headers with associated column #'s
-    emp::vector<std::pair<std::string, int>> ordered_names;
-    std::unordered_map<std::string, std::function<std::string()>> dependant_headers;
-    // for SimplePDWorld
+    // emp::vector<std::string> ordered_param_names;
+    emp::vector<std::string> ordered_metric_names;
+    emp::vector<std::function<std::string()>> metric_funs;
     size_t epoch_ = 0;
-    size_t coop_ = 0;
 
    public:
     void SetEpoch(size_t epoch) { epoch_ = epoch; }
-    void SetNumCoop(size_t coop) { coop_ = coop; }
 
     /// Default constructor
     QueueManager() = default;
@@ -124,9 +119,8 @@ class QueueManager {
 
         /* if adding more features after this point, keep in mind of where
         the col count will be */
-        for (auto& i : ordered_names) {
-            i.second = column_count;
-            result_tab.GetCell(0, column_count++).SetHeader() << i.first;
+        for (size_t i = 0; i < ordered_metric_names.size(); i++) {
+            result_tab.GetCell(0, column_count + i).SetHeader() << ordered_metric_names[i];
         }
 
         display_div << result_tab;
@@ -145,23 +139,13 @@ class QueueManager {
             my_table.GetCell(line_id, ++col_count) << (*p).AsString();
         }
 
-        for (int i = 0; i < dependant_headers.size(); i++) {
+        for (int i = 0; i < ordered_metric_names.size(); i++) {
             my_table.GetCell(line_id, ++col_count) << "Waiting...";  // world.GetE(); world.CountCoop(); (world.GetN() - world.CountCoop());
         }
 
         // Draw the new table.
         my_table.CellsCSS("border", "1px solid black");
         my_table.Redraw();
-    }
-
-    /// Run info in table is updated
-    void DivInfoTable(size_t id, size_t cur_epoch, size_t num_coop, std::string num_defect) {
-        emp::web::Table my_table = display_div.Find(table_id);
-        my_table.Freeze();
-        my_table.GetCell(id + 1, 5).ClearChildren() << cur_epoch;
-        my_table.GetCell(id + 1, 6).ClearChildren() << num_coop;
-        my_table.GetCell(id + 1, 7).ClearChildren() << num_defect;
-        my_table.Activate();
     }
 
     /// Calculations required for updating table
@@ -171,19 +155,21 @@ class QueueManager {
         RunInfo& current_run = FrontRun();
 
         current_run.cur_epoch = current_epoch;
-        current_run.num_coop = coop_;
+        emp::web::Table my_table = display_div.Find(table_id);
+        my_table.Freeze();
+        my_table.GetCell(id + 1, 5).ClearChildren() << current_epoch;
+
         // user function configuration
-        for (auto i : dependant_headers) {
-            if (i.first == "Num Defect") {
-                current_run.num_defect = (dependant_headers.begin()->second)();
+        for (int i = 0; i < metric_funs.size(); i++) {
+                my_table.GetCell(id + 1, 5 + i).ClearChildren() << metric_funs[i]();            
             }
-        }
+        // }
 
         if (current_epoch >= current_run.runinfo_config.GetValue<size_t>("E_value")) {  // Are we done with this run?
             RemoveRun();                                                                // Updates to the next run
         }
 
-        DivInfoTable(id, current_epoch, current_run.num_coop, current_run.num_defect);
+        my_table.Activate();
     }
 
     /// Creates area for user to input how many runs will be queued
@@ -191,8 +177,7 @@ class QueueManager {
         size_t num_runs = 10;
         emp::web::TextArea run_input([&num_runs](const std::string& str) {
             num_runs = emp::from_string<size_t>(str);
-        },
-                                     "run_count");
+        }, "run_count");
 
         run_input.SetText(emp::to_string(num_runs));
         display_div << run_input;
@@ -206,15 +191,15 @@ class QueueManager {
                 AddRun(queue_config);
                 DivButtonTable(run_id);
             }
-        },
-                                   "Queue", "queue_but");
+        }, "Queue", "queue_but");
         display_div << my_button;
     }
 
     /// Adds dependant variables to tables
     void AddDepVariable(std::function<std::string()> func, std::string header_name) {
-        ordered_names.push_back({header_name, 0});
-        dependant_headers.insert({header_name, func});
+        // ordered_param_names.push_back(header_name);
+        ordered_metric_names.insert(header_name);
+        metric_funs.insert(func);
     }
 };
 
