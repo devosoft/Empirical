@@ -83,25 +83,25 @@ int main() {
     std::function<std::string()> coop_func = []() { return std::to_string(world.CountCoop()); };
     std::function<std::string()> defect_func = []() { return std::to_string(run_list.FrontRun().runinfo_config.GetValue<size_t>("N") - world.CountCoop()); };
 
-    run_list.AddDepVariable(coop_func, "Num Coop");
-    run_list.AddDepVariable(defect_func, "Num Defect");
+    run_list.AddMetric(coop_func, "Num Coop");
+    run_list.AddMetric(defect_func, "Num Defect");
     doc << "<h2>Spatial Prisoner's Dillemma</h2>";
     auto canvas = doc.AddCanvas(world_size, world_size, "canvas");
     // canvas.On("click", CanvasClick);
-    auto& anim = doc.AddAnimation("anim_world", []() {
+    doc.AddAnimation("anim_world", []() {
         // if queue has runs
         if (!run_list.IsEmpty()) {
-            emp::RunInfo & run = run_list.FrontRun();  // Referencing current run
-            if (run.cur_epoch == 0) {                // Are we starting a new run?
+            emp::QueueManager::RunInfo & run = run_list.FrontRun();  // Referencing current run
+            if (run.GetEpoch() == 0) {                // Are we starting a new run?
                 world.Setup(run.runinfo_config.GetValue<double>("r"), run.runinfo_config.GetValue<double>("u"), run.runinfo_config.GetValue<size_t>("N"), run.runinfo_config.GetValue<size_t>("E"));
                 DrawCanvas();
             } 
-            run.cur_epoch += anim_step;
+            run.IncEpoch(anim_step);
         }
         world.Run(anim_step);
         DrawCanvas();
         if (!run_list.IsEmpty()) {
-            run_list.DivTableCalc();  //calculations for table
+            run_list.Update();  //calculations for table
         }
     });
 
@@ -158,7 +158,7 @@ int main() {
     doc << "<br>";
 
     doc << run_list.GetDiv();
-    run_list.DivAddTable(1, 8, "result_tab");
+    run_list.BuildTable();
 
     DrawCanvas();
 }
