@@ -75,6 +75,7 @@ namespace web {
         EM_ASM({
           var cname = UTF8ToString($0);
           var canvas = document.getElementById(cname);
+          emp_i.ctx = canvas.getContext('2d');
         }, id.c_str());
         #endif
       }
