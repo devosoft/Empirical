@@ -119,12 +119,6 @@ class SettingConfig {
                 if (i) ss << ',';
                 ss << values[i];
             }
-          }
-
-          // Otherwise do a direct conversion.
-          else {
-            values.push_back( emp::from_string<T>(cur_str) );
-          }
         }
 
         bool FromString(const std::string_view &input) override {

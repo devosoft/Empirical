@@ -37,6 +37,7 @@ struct RunInfo {
     SettingConfig runinfo_config;
     size_t id;
     size_t cur_epoch;
+    size_t epochs;
 
     RunInfo(SettingConfig _config, size_t _id)
         : runinfo_config(_config), id(_id), cur_epoch(0) { ; }
@@ -48,12 +49,16 @@ class QueueManager {
     SettingConfig queue_config;
     std::queue<RunInfo> runs;
     emp::web::Div display_div;
+    emp::web::TextArea run_input;
     std::string table_id;
+
     // ordered names of dependant headers with associated column #'s
     // emp::vector<std::string> ordered_param_names;
     emp::vector<std::string> ordered_metric_names;
     emp::vector<std::function<std::string()>> metric_funs;
+
     size_t epoch_ = 0;
+    size_t num_runs = 10;
 
    public:
     void SetEpoch(size_t epoch) { epoch_ = epoch; }
@@ -75,8 +80,9 @@ class QueueManager {
     }
 
     /// Adds run to queue with run info for paramters
-    void AddRun(SettingConfig other) {
+    void AddRun(SettingConfig other, size_t _epochs) {
         RunInfo new_run(other, runs.size());
+        new_run.epochs = _epochs;
         runs.push(new_run);
     }
 
@@ -117,6 +123,8 @@ class QueueManager {
             ++column_count;
         }
 
+        result_tab.GetCell(0, column_count).SetHeader() <<  "Epoch";
+        ++column_count;
         /* if adding more features after this point, keep in mind of where
         the col count will be */
         for (size_t i = 0; i < ordered_metric_names.size(); i++) {
@@ -135,12 +143,12 @@ class QueueManager {
         my_table.Rows(line_id + 1);
         int col_count = 0;
         my_table.GetCell(line_id, col_count) << run_id;
-        for (auto p : queue_config.GetSettingMapBase()) {
+        for (auto p : runs.back().runinfo_config.GetSettingMapBase()) {
             my_table.GetCell(line_id, ++col_count) << (*p).AsString();
         }
 
         for (int i = 0; i < ordered_metric_names.size(); i++) {
-            my_table.GetCell(line_id, ++col_count) << "Waiting...";  // world.GetE(); world.CountCoop(); (world.GetN() - world.CountCoop());
+            my_table.GetCell(line_id, ++col_count) << "Waiting..."; 
         }
 
         // Draw the new table.
@@ -151,44 +159,37 @@ class QueueManager {
     /// Calculations required for updating table
     void DivTableCalc() {
         size_t id = FrontRun().id;
-        size_t current_epoch = epoch_;
         RunInfo& current_run = FrontRun();
 
-        current_run.cur_epoch = current_epoch;
         emp::web::Table my_table = display_div.Find(table_id);
         my_table.Freeze();
-        my_table.GetCell(id + 1, 5).ClearChildren() << current_epoch;
+        my_table.GetCell(id + 1, 5).ClearChildren() << emp::to_string(current_run.cur_epoch);
 
         // user function configuration
         for (int i = 0; i < metric_funs.size(); i++) {
-                my_table.GetCell(id + 1, 5 + i).ClearChildren() << metric_funs[i]();            
-            }
-        // }
+            my_table.GetCell(id + 1, 6 + i).ClearChildren() << metric_funs[i]();            
+        }
 
-        if (current_epoch >= current_run.runinfo_config.GetValue<size_t>("E_value")) {  // Are we done with this run?
-            RemoveRun();                                                                // Updates to the next run
+
+        if (current_run.cur_epoch >= current_run.epochs) {  // Are we done with this run?
+            RemoveRun();                                    // Updates to the next run
         }
 
         my_table.Activate();
     }
 
-    /// Creates area for user to input how many runs will be queued
-    size_t DivAddTextArea() {
-        size_t num_runs = 10;
-        emp::web::TextArea run_input([&num_runs](const std::string& str) {
-            num_runs = emp::from_string<size_t>(str);
-        }, "run_count");
-
-        run_input.SetText(emp::to_string(num_runs));
-        display_div << run_input;
-        return num_runs;
-    }
 
     /// Creates queue button
-    void DivButton(size_t num_runs) {
-        emp::web::Button my_button([this, num_runs]() {
-            for (int run_id = 0; run_id < num_runs; run_id++) {
-                AddRun(queue_config);
+    void AddQueueButton(std::function<emp::SettingConfig()> get_conf, std::function<size_t()> get_epochs) {
+        run_input = emp::web::TextArea([this](const std::string & str){
+            this->num_runs = emp::from_string<size_t>(str);
+        }, "run_count");
+        run_input.SetText(emp::to_string(num_runs));
+        display_div << run_input;
+
+        emp::web::Button my_button([this, get_conf, get_epochs]() {
+            for (int run_id = 0; run_id < this->num_runs; run_id++) {
+                AddRun(get_conf(), get_epochs());
                 DivButtonTable(run_id);
             }
         }, "Queue", "queue_but");
@@ -198,8 +199,8 @@ class QueueManager {
     /// Adds dependant variables to tables
     void AddDepVariable(std::function<std::string()> func, std::string header_name) {
         // ordered_param_names.push_back(header_name);
-        ordered_metric_names.insert(header_name);
-        metric_funs.insert(func);
+        ordered_metric_names.push_back(header_name);
+        metric_funs.push_back(func);
     }
 };
 
