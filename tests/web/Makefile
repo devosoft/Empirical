@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element TextFeed js_utils visualizations JSWrap Widget
+TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element TextFeed js_utils visualizations JSWrap Widget QueueManager
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../include/ -I../../

@@ -38,13 +38,12 @@
  * 
  * Example:
  * 
- * int epochs = 0;
  * std::function<emp::SettingConfig()> get_setting_config = [](){
  *      emp::SettingConfig my_settings;
  *      my_settings.AddSetting<double>("my_param") = {.9};
  *      return my_settings;
  * };
- * std::function<int()> get_epochs = [&epochs](){return epochs;};
+ * std::function<int()> get_epochs = [](){return 50;}; // Always run for 50 epochs
  * 
  * emp::web::Document doc("emp_base");
  * my_queue_manager.AddQueueButton(get_setting_config, get_epochs); // Add button and text input
@@ -116,6 +115,8 @@ class QueueManager {
 
         /// @returns current epoch
         size_t GetEpoch() {return cur_epoch;}
+        /// @returns number of epochs to run for
+        size_t GetNEpochs() {return epochs;}
         /// Increment current epoch by @param x
         void IncEpoch(int x = 1) {cur_epoch += x;}
         /// @returns configuration for this run
@@ -266,12 +267,14 @@ class QueueManager {
         size_t id = FrontRun().id;
         RunInfo& current_run = FrontRun();
 
+        size_t n_settings = queue_config.GetSettingMapNames().size();
+
         display_table.Freeze();
-        display_table.GetCell(id + 1, 5).ClearChildren() << emp::to_string(current_run.cur_epoch);
+        display_table.GetCell(id + 1, n_settings+1).ClearChildren() << emp::to_string(current_run.cur_epoch);
 
         // user function configuration
         for (int i = 0; i < metric_funs.size(); i++) {
-            display_table.GetCell(id + 1, 6 + i).ClearChildren() << metric_funs[i]();            
+            display_table.GetCell(id + 1, n_settings + 2 + i).ClearChildren() << metric_funs[i]();            
         }
 
 
