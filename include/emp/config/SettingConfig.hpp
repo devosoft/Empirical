@@ -72,9 +72,9 @@ class SettingConfig {
             : SettingBase(_name, _desc, _flag, _arg), var_ptr(_var) { ; }
 
         emp::Ptr<SettingBase> Clone() const override {
-            auto si_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label);
-            si_ptr->value = this->value;
-            return si_ptr;
+            emp::Ptr<SettingInfo<T>> setting_info_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label);
+            setting_info_ptr->value = this->value;
+            return setting_info_ptr;
         }
 
         size_t GetSize() const override { return 1; }
