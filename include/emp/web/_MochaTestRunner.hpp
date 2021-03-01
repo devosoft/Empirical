@@ -154,7 +154,10 @@ namespace web {
         test_runners.begin(),
         test_runners.end(),
         [](TestRunner & runner) {
+          #ifdef __EMSCRIPTEN__
+          // Runner will only get marked as done if all the javascript stuff is actually happening
           emp_assert(runner.done);
+          #endif
           if (runner.test != nullptr) runner.test.Delete();
         }
       );

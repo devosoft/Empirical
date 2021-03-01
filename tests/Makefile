@@ -1,4 +1,4 @@
-TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matching math meta scholar testing tools
+TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matching math meta scholar testing tools web
 
 CXX = clang++
 #CXX := g++
@@ -34,7 +34,7 @@ cranky-%:
 cranky: $(addprefix cranky-, $(TEST_NAMES))
 
 test-web:
-	  cd web && make test
+	cd web && make test
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out

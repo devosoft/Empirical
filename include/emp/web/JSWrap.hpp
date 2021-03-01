@@ -45,13 +45,6 @@
 #include <tuple>
 #include <type_traits>
 
-#include <emscripten/emscripten.h>
-#include <emscripten/threading.h>
-#ifdef __EMSCRIPTEN_PTHREADS__
-#include <pthread.h>
-#endif //  __EMSCRIPTEN_PTHREADS__
-
-
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/tuple_struct.hpp"
@@ -96,7 +89,7 @@ namespace emp {
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
     char * tmp_var = (char *) MAIN_THREAD_EM_ASM_INT({
-        return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
+        return allocate(intArrayFromString(emp_i.cb_args[$0]), ALLOC_STACK);
       }, ARG_ID);
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
@@ -178,7 +171,7 @@ namespace emp {
         emp_i.curr_obj[UTF8ToString($0)] = "undefined";
       }
       return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]),
-                      'i8', ALLOC_STACK);
+                   '18', ALLOC_STACK);
     }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
@@ -449,7 +442,11 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
+      #ifdef __EMSCRIPTEN_PTHREADS__
       thread_local emp::vector<JSWrap_Callback_Base *> callback_array{nullptr};
+      #else
+      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
+      #endif
       return callback_array;
     }
 
@@ -608,7 +605,7 @@ void empCppCallback(const size_t cb_id) {
 
     });
 
-    emscripten_async_queue_on_thread_(
+    emscripten_async_queue_on_thread(
       proxy_pthread_id,
       EM_FUNC_SIG_VI, // VI = no return value, one argument
       (void*) &empDoCppCallback,

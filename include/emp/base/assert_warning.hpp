@@ -21,15 +21,15 @@
  *     emp_assert_warning(a==5, a);
  *
  *  When compiled in debug mode (i.e., without the -DNDEBUG flag), this will
- *  pring an assertion error and print the value of a.
+ *  spring an assertion error and print the value of a.
  */
 
 #ifndef EMP_ASSERT_WARNING_HPP
 #define EMP_ASSERT_WARNING_HPP
 
-#include "always_assert.hpp"
+#include "always_assert_warning.hpp"
 
-/// NDEBUG hould trigger its EMP equivalent.
+/// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
 #define EMP_NDEBUG
 #endif
@@ -47,7 +47,7 @@
   /// information on any variables or expressions provided as variadic args.
   /// Note: If NDEBUG is defined, emp_assert_warning() will not do anything.
   /// Due to macro parsing limitations, extra information will not be printed when compiling with MSVC.
-  #define emp_assert_warning(...) emp_always_assert(__VA_ARGS__)
+  #define emp_assert_warning(...) emp_always_assert_warning(__VA_ARGS__)
 
 #endif
 
