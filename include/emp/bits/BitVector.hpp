@@ -1480,7 +1480,7 @@ namespace emp {
     size_t cur_ones = CountOnes() - kept_ones;
 
     // Do we need to add more ones?
-    while (cur_ones < target_ones) {
+    while (cur_ones < (size_t) target_ones) {
       size_t pos = random.GetUInt(start_pos, stop_pos);
       auto bit = operator[](pos);
       if (!bit) {
@@ -1490,7 +1490,7 @@ namespace emp {
     }
 
     // See if we have too many ones.
-    while (cur_ones > target_ones) {
+    while (cur_ones > (size_t) target_ones) {
       size_t pos = random.GetUInt(start_pos, stop_pos);
       auto bit = operator[](pos);
       if (bit) {
@@ -1647,7 +1647,7 @@ namespace emp {
   /// Get the overall value of this BitSet, using a uint encoding, but including all bits
   /// and returning the value as a double.
   double BitVector::GetValue() const {
-    const size_t max_one = FindMaxOne();
+    const int max_one = FindMaxOne();
 
     // If there are no ones, this value must be 0.
     if (max_one == -1) return 0.0;
@@ -1656,7 +1656,7 @@ namespace emp {
     if (max_one < 64) return (double) GetUInt64(0);
 
     // To grab the most significant field, figure out how much to shift it by.
-    const size_t shift_bits = max_one - 63;
+    const int shift_bits = max_one - 63;
     double out_value = (double) (*this >> shift_bits).GetUInt64(0);
 
     out_value *= emp::Pow2(shift_bits);
