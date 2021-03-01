@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element TextFeed js_utils visualizations JSWrap Widget
+TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element TextFeed js_utils JSWrap Widget
 
 # Currently a couple of the tests won't compile to native so this is a separate list for now. Eventually we should fix
 # that and just have one list
