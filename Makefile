@@ -25,7 +25,7 @@ test-web-examples:
 	cd examples && make web-test
 
 test-web:
-	cd tests && make test-web
+	cd tests && make test-web-js
 
 ../cookiecutter-empirical-project:
 	cd .. && git clone --recursive https://github.com/devosoft/cookiecutter-empirical-project.git
