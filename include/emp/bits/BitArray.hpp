@@ -38,14 +38,16 @@ namespace emp {
 
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
-  template <size_t NUM_BITS>
+  ///  @param NUM_BITS is the fixed number of bits in this BitArray.
+  ///  @param ZERO_LEFT indicates the side that bit zero will be located.
+  template <size_t NUM_BITS, bool ZERO_LEFT=true>
   class BitArray {
 
     // make all templated instantiations friends with each other
-    template <size_t FRIEND_BITS> friend class BitArray;
+    template <size_t FRIEND_BITS, bool FRIEND_LEFT> friend class BitArray;
 
   private:
-    using this_t = BitArray<NUM_BITS>;
+    using this_t = BitArray<NUM_BITS, ZERO_LEFT>;
 
     // Determine the size of the fields to use.  By default, size_t will be the natural size for
     // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
@@ -133,7 +135,7 @@ namespace emp {
     explicit BitArray(bool init_val=false) { if (init_val) SetAll(); else Clear(); }
 
     /// Copy constructor from another BitArray
-    BitArray(const BitArray<NUM_BITS> & in_bits) { Copy<NUM_FIELDS>(in_bits.bits); }
+    BitArray(const this_t & in_bits) { Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Constructor to generate a BitArray from a std::bitset.
     explicit BitArray(const std::bitset<NUM_BITS> & bitset);
@@ -163,7 +165,7 @@ namespace emp {
     ~BitArray() = default;
 
     /// Assignment operator (no separate move opperator since no resources to move...)
-    BitArray & operator=(const BitArray<NUM_BITS> & in_bits) { return Copy<NUM_FIELDS>(in_bits.bits); }
+    BitArray & operator=(const this_t & in_bits) { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
     BitArray & operator=(const std::bitset<NUM_BITS> & bitset);
@@ -513,25 +515,25 @@ namespace emp {
     BitArray & EQU_SELF(const BitArray & array2);
 
     /// Perform a Boolean NOT on this BitArray and return the result.
-    [[nodiscard]] BitArray NOT() const { return BitArray<NUM_BITS>(*this).NOT_SELF(); }
+    [[nodiscard]] BitArray NOT() const { return this_t(*this).NOT_SELF(); }
 
     /// Perform a Boolean AND with a second BitArray and return the result.
-    [[nodiscard]] BitArray AND(const BitArray & in) const { return BitArray<NUM_BITS>(*this).AND_SELF(in); }
+    [[nodiscard]] BitArray AND(const BitArray & in) const { return this_t(*this).AND_SELF(in); }
 
     /// Perform a Boolean OR with a second BitArray and return the result.
-    [[nodiscard]] BitArray OR(const BitArray & in) const { return BitArray<NUM_BITS>(*this).OR_SELF(in); }
+    [[nodiscard]] BitArray OR(const BitArray & in) const { return this_t(*this).OR_SELF(in); }
 
     /// Perform a Boolean NAND with a second BitArray and return the result.
-    [[nodiscard]] BitArray NAND(const BitArray & in) const { return BitArray<NUM_BITS>(*this).NAND_SELF(in); }
+    [[nodiscard]] BitArray NAND(const BitArray & in) const { return this_t(*this).NAND_SELF(in); }
 
     /// Perform a Boolean NOR with a second BitArray and return the result.
-    [[nodiscard]] BitArray NOR(const BitArray & in) const { return BitArray<NUM_BITS>(*this).NOR_SELF(in); }
+    [[nodiscard]] BitArray NOR(const BitArray & in) const { return this_t(*this).NOR_SELF(in); }
 
     /// Perform a Boolean XOR with a second BitArray and return the result.
-    [[nodiscard]] BitArray XOR(const BitArray & in) const { return BitArray<NUM_BITS>(*this).XOR_SELF(in); }
+    [[nodiscard]] BitArray XOR(const BitArray & in) const { return this_t(*this).XOR_SELF(in); }
 
     /// Perform a Boolean EQU with a second BitArray and return the result.
-    BitArray EQU(const BitArray & in) const { return BitArray<NUM_BITS>(*this).EQU_SELF(in); }
+    BitArray EQU(const BitArray & in) const { return this_t(*this).EQU_SELF(in); }
 
     /// Positive shifts go right and negative shifts go left (0 does nothing);
     /// return result.
@@ -654,8 +656,8 @@ namespace emp {
 
   // ------------------------ Implementations for Internal Functions ------------------------
 
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::ShiftLeft(const size_t shift_size) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
     // If we have only a single field, this operation can be quick.
     if constexpr (NUM_FIELDS == 1) {
       bits[0] <<= shift_size;
@@ -694,8 +696,8 @@ namespace emp {
 
 
   /// Helper for calling SHIFT with negative number
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::ShiftRight(const size_t shift_size) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
     // If we have only a single field, this operation can be quick.
     if constexpr (NUM_FIELDS == 1) {
       bits[0] >>= shift_size;
@@ -734,8 +736,8 @@ namespace emp {
   }
 
   /// Helper: call ROTATE with negative number
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::RotateLeft(const size_t shift_size_raw) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
     const field_t shift_size = shift_size_raw % NUM_BITS;
 
     // use different approaches based on BitArray size
@@ -751,7 +753,7 @@ namespace emp {
 
     } else if constexpr (NUM_FIELDS < 32) {
       // for small BitArrays, shifting L/R and ORing is faster
-      emp::BitArray<NUM_BITS> dup(*this);
+      this_t dup(*this);
       dup.ShiftLeft(shift_size);
       ShiftRight(NUM_BITS - shift_size);
       OR_SELF(dup);
@@ -818,8 +820,8 @@ namespace emp {
 
 
   /// Helper for calling ROTATE with positive number
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::RotateRight(const size_t shift_size_raw) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
 
     const size_t shift_size = shift_size_raw % NUM_BITS;
 
@@ -837,7 +839,7 @@ namespace emp {
 
     } else if constexpr (NUM_FIELDS < 32) {
       // for small BitArrays, shifting L/R and ORing is faster
-      emp::BitArray<NUM_BITS> dup(*this);
+      this_t dup(*this);
       dup.ShiftRight(shift_size);
       ShiftLeft(NUM_BITS - shift_size);
       OR_SELF(dup);
@@ -893,24 +895,24 @@ namespace emp {
   // -------------------- Longer Constructors and bit copying ---------------------
 
   /// Constructor to generate a BitArray from a std::bitset.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS>::BitArray(const std::bitset<NUM_BITS> & bitset) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT>::BitArray(const std::bitset<NUM_BITS> & bitset) {
     for (size_t bit{}; bit < NUM_BITS; ++bit) Set( bit, bitset[bit] );
     ClearExcessBits();
   }
 
   /// Constructor to generate a BitArray from a string of '0's and '1's.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS>::BitArray(const std::string & bitstring)
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT>::BitArray(const std::string & bitstring)
   {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
     for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
   }
 
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <typename T>
-  BitArray<NUM_BITS>::BitArray(const std::initializer_list<T> l) {
+  BitArray<NUM_BITS,ZERO_LEFT>::BitArray(const std::initializer_list<T> l) {
     emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitArray", l.size(), NUM_BITS);
     Clear();
     auto it = std::begin(l); // Right-most bit is position 0.
@@ -918,15 +920,15 @@ namespace emp {
   }
 
     /// Assignment operator from a std::bitset.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::operator=(const std::bitset<NUM_BITS> & bitset) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
   }
 
   /// Assignment operator from a string of '0's and '1's.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::operator=(const std::string & bitstring) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
     for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
@@ -935,9 +937,9 @@ namespace emp {
 
 
   /// Assign from a BitArray of a different size.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <size_t FROM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Import(
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Import(
     const BitArray<FROM_BITS> & from_array,
     const size_t from_bit
   ) {
@@ -981,9 +983,9 @@ namespace emp {
   }
 
   /// Convert to a BitArray of a different size.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <size_t TO_BITS>
-  BitArray<TO_BITS> BitArray<NUM_BITS>::Export(size_t start_bit) const {
+  BitArray<TO_BITS> BitArray<NUM_BITS,ZERO_LEFT>::Export(size_t start_bit) const {
 
     BitArray<TO_BITS> out_bits;
     out_bits.Import(*this, start_bit);
@@ -992,8 +994,8 @@ namespace emp {
   }
 
     /// For debugging: make sure that there are no obvous problems with a BitArray object.
-  template <size_t NUM_BITS>
-  bool BitArray<NUM_BITS>::OK() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  bool BitArray<NUM_BITS,ZERO_LEFT>::OK() const {
     // Make sure final bits are zeroed out.
     emp_assert((bits[LAST_FIELD] & ~END_MASK) == 0);
 
@@ -1004,8 +1006,8 @@ namespace emp {
 
   // --------------------  Implementations of common accessors -------------------
 
-  template <size_t NUM_BITS>
-  bool BitArray<NUM_BITS>::Get(size_t index) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  bool BitArray<NUM_BITS,ZERO_LEFT>::Get(size_t index) const {
     emp_assert(index >= 0 && index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -1013,8 +1015,8 @@ namespace emp {
   }
 
   /// Set the bit at a specified index.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Set(size_t index, bool value) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Set(size_t index, bool value) {
     emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -1027,16 +1029,16 @@ namespace emp {
   }
 
   /// Set all bits to one.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SetAll() {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetAll() {
     for (field_t & x : bits) x = FIELD_ALL;
     ClearExcessBits();
     return *this;
   }
 
   /// Set a range of bits to one: [start, stop)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SetRange(size_t start, size_t stop) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetRange(size_t start, size_t stop) {
     emp_assert(start <= stop, start, stop);
     emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
     const size_t start_pos = FieldPos(start);
@@ -1075,8 +1077,8 @@ namespace emp {
   }
 
   /// Set a range of bits to 0 in the range [start, stop)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Clear(const size_t start, const size_t stop) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Clear(const size_t start, const size_t stop) {
     emp_assert(start <= stop, start, stop);
     emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
     const size_t start_pos = FieldPos(start);
@@ -1115,8 +1117,8 @@ namespace emp {
   }
 
   /// Flip a single bit
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Toggle(size_t index) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t index) {
     emp_assert(index >= 0 && index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -1128,8 +1130,8 @@ namespace emp {
   }
 
   /// Flips all the bits in a range [start, stop)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Toggle(size_t start, size_t stop) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t start, size_t stop) {
     emp_assert(start <= stop, start, stop);
     emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
     const size_t start_pos = FieldPos(start);
@@ -1172,17 +1174,17 @@ namespace emp {
   // -------------------------  Implementations Randomization functions -------------------------
 
   /// Set all bits randomly, with a 50% probability of being a 0 or 1.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Randomize(Random & random) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Randomize(Random & random) {
     random.RandFill(BytePtr(), TOTAL_BYTES);
     ClearExcessBits();
     return *this;
   }
 
   /// Set all bits randomly, with probability specified at compile time.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <Random::Prob P>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::RandomizeP(Random & random,
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::RandomizeP(Random & random,
                                                   const size_t start_pos, const size_t stop_pos) {
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= NUM_BITS);
@@ -1193,8 +1195,8 @@ namespace emp {
 
 
   /// Set all bits randomly, with a given probability of being on.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::Randomize(Random & random, const double p,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Randomize(Random & random, const double p,
                                                  const size_t start_pos, const size_t stop_pos) {
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= NUM_BITS);
@@ -1205,10 +1207,14 @@ namespace emp {
   }
 
   /// Set all bits randomly, with a given number of them being on.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> &
-  BitArray<NUM_BITS>::ChooseRandom(Random & random, const size_t target_ones,
-                                   const size_t start_pos, const size_t stop_pos) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> &
+  BitArray<NUM_BITS,ZERO_LEFT>::ChooseRandom(
+    Random & random,
+    const size_t target_ones,
+    const size_t start_pos,
+    const size_t stop_pos
+  ) {
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= NUM_BITS);
 
@@ -1265,8 +1271,8 @@ namespace emp {
 
   /// Flip random bits with a given probability.
   // @CAO: Possibly faster to generate a sequence of bits and XORing with them.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::FlipRandom(Random & random,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::FlipRandom(Random & random,
                                                   const double p,
                                                   const size_t start_pos,
                                                   const size_t stop_pos)
@@ -1281,8 +1287,8 @@ namespace emp {
   }
 
   /// Set random bits with a given probability (does not check if already set.)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SetRandom(Random & random,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetRandom(Random & random,
                       const double p,
                       const size_t start_pos,
                       const size_t stop_pos)
@@ -1297,8 +1303,8 @@ namespace emp {
   }
 
   /// Unset random bits with a given probability (does not check if already zero.)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ClearRandom(Random & random,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::ClearRandom(Random & random,
                       const double p,
                       const size_t start_pos,
                       const size_t stop_pos)
@@ -1313,8 +1319,8 @@ namespace emp {
   }
 
   /// Flip a specified number of random bits.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::FlipRandomCount(Random & random,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::FlipRandomCount(Random & random,
                                                        const size_t num_bits)
   {
     emp_assert(num_bits <= NUM_BITS);
@@ -1323,8 +1329,8 @@ namespace emp {
   }
 
   /// Set a specified number of random bits (does not check if already set.)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SetRandomCount(Random & random,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetRandomCount(Random & random,
                                                       const size_t num_bits)
   {
     emp_assert(num_bits <= NUM_BITS);
@@ -1333,8 +1339,8 @@ namespace emp {
   }
 
   /// Unset  a specified number of random bits (does not check if already zero.)
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ClearRandomCount(Random & random,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::ClearRandomCount(Random & random,
                                                         const size_t num_bits)
   {
     emp_assert(num_bits <= NUM_BITS);
@@ -1346,9 +1352,9 @@ namespace emp {
   // -------------------------  Implementations of Comparison Operators -------------------------
 
   /// Test if two BitArray objects are identical.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <size_t SIZE2>
-  bool BitArray<NUM_BITS>::operator==(const BitArray<SIZE2> & in_bits) const {
+  bool BitArray<NUM_BITS,ZERO_LEFT>::operator==(const BitArray<SIZE2> & in_bits) const {
     if constexpr (NUM_BITS != SIZE2) return false;
 
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
@@ -1358,9 +1364,9 @@ namespace emp {
   }
 
   /// Compare two BitArray objects, based on the associated binary value.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <size_t SIZE2>
-  bool BitArray<NUM_BITS>::operator<(const BitArray<SIZE2> & in_bits) const {
+  bool BitArray<NUM_BITS,ZERO_LEFT>::operator<(const BitArray<SIZE2> & in_bits) const {
     if constexpr (NUM_BITS != SIZE2) return NUM_BITS < SIZE2;
 
     for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
@@ -1374,8 +1380,8 @@ namespace emp {
   // -------------------------  Access Groups of bits -------------------------
 
   /// Get the full byte starting from the bit at a specified index.
-  template <size_t NUM_BITS>
-  uint8_t BitArray<NUM_BITS>::GetByte(size_t index) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  uint8_t BitArray<NUM_BITS,ZERO_LEFT>::GetByte(size_t index) const {
     emp_assert(index < TOTAL_BYTES);
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
@@ -1385,8 +1391,8 @@ namespace emp {
 
   /// Get a read-only view into the internal array used by BitArray.
   /// @return Read-only span of BitArray's bytes.
-  template <size_t NUM_BITS>
-  std::span<const std::byte> BitArray<NUM_BITS>::GetBytes() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::span<const std::byte> BitArray<NUM_BITS,ZERO_LEFT>::GetBytes() const {
     return std::span<const std::byte>(
       reinterpret_cast<const std::byte*>(bits),
       TOTAL_BYTES
@@ -1395,8 +1401,8 @@ namespace emp {
 
 
   /// Set the full byte starting at the bit at the specified index.
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::SetByte(size_t index, uint8_t value) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::SetByte(size_t index, uint8_t value) {
     emp_assert(index < TOTAL_BYTES);
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
@@ -1406,8 +1412,8 @@ namespace emp {
 
   /// Get the overall value of this BitArray, using a uint encoding, but including all bits
   /// and returning the value as a double.
-  template <size_t NUM_BITS>
-  double BitArray<NUM_BITS>::GetValue() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  double BitArray<NUM_BITS,ZERO_LEFT>::GetValue() const {
     // If we have 64 bits or fewer, we can load the full value and return it.
     if constexpr (NUM_FIELDS == 1) return (double) bits[0];
 
@@ -1431,9 +1437,9 @@ namespace emp {
   }
 
   /// Get specified type at a given index (in steps of that type size)
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <typename T>
-  T BitArray<NUM_BITS>::GetValueAtIndex(const size_t index) const {
+  T BitArray<NUM_BITS,ZERO_LEFT>::GetValueAtIndex(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
               index, sizeof(T), NUM_BITS, NUM_FIELDS);
@@ -1448,9 +1454,9 @@ namespace emp {
 
 
   /// Set specified type at a given index (in steps of that type size)
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <typename T>
-  void BitArray<NUM_BITS>::SetValueAtIndex(const size_t index, T in_value) {
+  void BitArray<NUM_BITS,ZERO_LEFT>::SetValueAtIndex(const size_t index, T in_value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
               index, sizeof(T), NUM_BITS, NUM_FIELDS);
@@ -1462,9 +1468,9 @@ namespace emp {
 
 
   /// Get the specified type starting from a given BIT position.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <typename T>
-  T BitArray<NUM_BITS>::GetValueAtBit(const size_t index) const {
+  T BitArray<NUM_BITS,ZERO_LEFT>::GetValueAtBit(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < NUM_FIELDS * sizeof(field_t));
 
@@ -1477,15 +1483,15 @@ namespace emp {
 
   /// Set the specified type starting from a given BIT position.
   // @CAO: Can be optimized substantially, especially for long BitArrays.
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template <typename T>
-  void BitArray<NUM_BITS>::SetValueAtBit(const size_t index, T value) {
+  void BitArray<NUM_BITS,ZERO_LEFT>::SetValueAtBit(const size_t index, T value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < NUM_FIELDS * sizeof(field_t));
     constexpr size_t type_bits = sizeof(T) * 8;
 
     Clear(index, index+type_bits);       // Clear out the bits where new value will go.
-    BitArray<NUM_BITS> in_bits;          // Setup a BitArray to place the new bits in.
+    this_t in_bits;          // Setup a BitArray to place the new bits in.
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
     in_bits <<= index;                   // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current BitArray.
@@ -1497,8 +1503,8 @@ namespace emp {
   // -------------------------  Other Analyses -------------------------
 
   /// A simple hash function for bit vectors.
-  template <size_t NUM_BITS>
-  std::size_t BitArray<NUM_BITS>::Hash() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::size_t BitArray<NUM_BITS,ZERO_LEFT>::Hash() const {
     /// If we have a vector of size_t, treat it as a vector of hash values to combine.
     if constexpr (std::is_same_v<field_t, size_t>) {
       return hash_combine(bits, NUM_FIELDS);
@@ -1520,8 +1526,8 @@ namespace emp {
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in the BitArray.
-  template <size_t NUM_BITS>
-  size_t BitArray<NUM_BITS>::CountOnes() const { 
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  size_t BitArray<NUM_BITS,ZERO_LEFT>::CountOnes() const { 
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.
@@ -1533,8 +1539,8 @@ namespace emp {
   }
 
   /// Faster counting of ones for very sparse bit vectors.
-  template <size_t NUM_BITS>
-  size_t BitArray<NUM_BITS>::CountOnes_Sparse() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  size_t BitArray<NUM_BITS,ZERO_LEFT>::CountOnes_Sparse() const {
     size_t bit_count = 0;
     for (field_t cur_field : bits) {
       while (cur_field) {
@@ -1546,8 +1552,8 @@ namespace emp {
   }
 
     /// Return the index of the first one in the sequence; return -1 if no ones are available.
-  template <size_t NUM_BITS>
-  int BitArray<NUM_BITS>::FindOne() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  int BitArray<NUM_BITS,ZERO_LEFT>::FindOne() const {
     size_t field_id = 0;
     while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
@@ -1555,8 +1561,8 @@ namespace emp {
   }
 
   /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
-  template <size_t NUM_BITS>
-  int BitArray<NUM_BITS>::FindOne(const size_t start_pos) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  int BitArray<NUM_BITS,ZERO_LEFT>::FindOne(const size_t start_pos) const {
     if (start_pos >= NUM_BITS) return -1;            // If we're past the end, return fail.
     size_t field_id  = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
@@ -1575,8 +1581,8 @@ namespace emp {
   }
 
   /// Find the most-significant set-bit.
-  template <size_t NUM_BITS>
-  int BitArray<NUM_BITS>::FindMaxOne() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  int BitArray<NUM_BITS,ZERO_LEFT>::FindMaxOne() const {
     // Find the max field with a one.
     int max_field = ((int) NUM_FIELDS) - 1;
     while (max_field >= 0 && bits[max_field] == 0) max_field--;
@@ -1602,16 +1608,16 @@ namespace emp {
   }
 
   /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
-  template <size_t NUM_BITS>
-  int BitArray<NUM_BITS>::PopOne() {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  int BitArray<NUM_BITS,ZERO_LEFT>::PopOne() {
     const int out_bit = FindOne();
     if (out_bit >= 0) Clear(out_bit);
     return out_bit;
   }
 
   /// Return a vector indicating the posistions of all ones in the BitArray.
-  template <size_t NUM_BITS>
-  emp::vector<size_t> BitArray<NUM_BITS>::GetOnes() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  emp::vector<size_t> BitArray<NUM_BITS,ZERO_LEFT>::GetOnes() const {
     // @CAO -- There are better ways to do this with bit tricks.
     emp::vector<size_t> ones(CountOnes());
     size_t cur_pos = 0;
@@ -1622,8 +1628,8 @@ namespace emp {
   }
 
   /// Find the length of the longest continuous series of ones.
-  template <size_t NUM_BITS>
-  size_t BitArray<NUM_BITS>::LongestSegmentOnes() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  size_t BitArray<NUM_BITS,ZERO_LEFT>::LongestSegmentOnes() const {
     size_t length = 0;
     BitArray test_bits(*this);
     while(test_bits.Any()){
@@ -1637,8 +1643,8 @@ namespace emp {
   // -------------------------  Print/String Functions  ------------------------- //
 
   /// Convert this BitArray to an array string [0 index on left]
-  template <size_t NUM_BITS>
-  std::string BitArray<NUM_BITS>::ToArrayString() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::string BitArray<NUM_BITS,ZERO_LEFT>::ToArrayString() const {
     std::string out_string;
     out_string.reserve(NUM_BITS);
     for (size_t i = 0; i < NUM_BITS; ++i) out_string.push_back(GetAsChar(i));
@@ -1646,8 +1652,8 @@ namespace emp {
   }
 
   /// Convert this BitArray to a numerical string [0 index on right]
-  template <size_t NUM_BITS>
-  std::string BitArray<NUM_BITS>::ToBinaryString() const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::string BitArray<NUM_BITS,ZERO_LEFT>::ToBinaryString() const {
     std::string out_string;
     out_string.reserve(NUM_BITS);
     for (size_t i = NUM_BITS; i > 0; --i) out_string.push_back(GetAsChar(i-1));
@@ -1655,16 +1661,16 @@ namespace emp {
   }
 
   /// Convert this BitArray to a series of IDs
-  template <size_t NUM_BITS>
-  std::string BitArray<NUM_BITS>::ToIDString(const std::string & spacer) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::string BitArray<NUM_BITS,ZERO_LEFT>::ToIDString(const std::string & spacer) const {
     std::stringstream ss;
     PrintOneIDs(ss, spacer);
     return ss.str();
   }
 
   /// Convert this BitArray to a series of IDs with ranges condensed.
-  template <size_t NUM_BITS>
-  std::string BitArray<NUM_BITS>::ToRangeString(const std::string & spacer,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::string BitArray<NUM_BITS,ZERO_LEFT>::ToRangeString(const std::string & spacer,
                                        const std::string & ranger) const
   {
     std::stringstream ss;
@@ -1673,8 +1679,8 @@ namespace emp {
   }
 
   /// Print a space between each field (or other provided spacer)
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::PrintFields(std::ostream & out, const std::string & spacer) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::PrintFields(std::ostream & out, const std::string & spacer) const {
     for (size_t i = NUM_BITS-1; i < NUM_BITS; i--) {
       out << Get(i);
       if (i && (i % FIELD_BITS == 0)) out << spacer;
@@ -1682,8 +1688,8 @@ namespace emp {
   }
 
   /// Print a space between each field (or other provided spacer)
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::PrintDebug(std::ostream & out) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::PrintDebug(std::ostream & out) const {
     for (size_t field = 0; field < NUM_FIELDS; field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
         bool bit = (FIELD_1 << bit_id) & bits[field];
@@ -1698,8 +1704,8 @@ namespace emp {
   }
 
   /// Print the locations of all one bits, using the provided spacer (default is a single space)
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
     bool started = false;
     for (size_t i = 0; i < NUM_BITS; i++) {
       if (Get(i)) {
@@ -1711,8 +1717,8 @@ namespace emp {
   }
 
   /// Print the ones in a range format.  E.g., 2-5,7,10-15
-  template <size_t NUM_BITS>
-  void BitArray<NUM_BITS>::PrintAsRange(std::ostream & out,
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  void BitArray<NUM_BITS,ZERO_LEFT>::PrintAsRange(std::ostream & out,
                                       const std::string & spacer,
                                       const std::string & ranger) const
   {
@@ -1735,53 +1741,53 @@ namespace emp {
 
 
   /// Perform a Boolean NOT on this BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NOT_SELF() {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::NOT_SELF() {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean AND with a second BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::AND_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::AND_SELF(const this_t & array2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & array2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean OR with a second BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::OR_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::OR_SELF(const this_t & array2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | array2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean NAND with a second BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NAND_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::NAND_SELF(const this_t & array2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & array2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean NOR with a second BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NOR_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::NOR_SELF(const this_t & array2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | array2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean XOR with a second BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::XOR_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::XOR_SELF(const this_t & array2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ array2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean EQU with a second BitArray, store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::EQU_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::EQU_SELF(const this_t & array2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ array2.bits[i]);
     ClearExcessBits();
     return *this;
@@ -1789,9 +1795,9 @@ namespace emp {
 
   /// Positive shifts go right and negative shifts go left (0 does nothing);
   /// return result.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::SHIFT(const int shift_size) const {
-    BitArray<NUM_BITS> out_array(*this);
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> BitArray<NUM_BITS,ZERO_LEFT>::SHIFT(const int shift_size) const {
+    this_t out_array(*this);
     if (shift_size > 0) out_array.ShiftRight((field_t) shift_size);
     else if (shift_size < 0) out_array.ShiftLeft((field_t) (-shift_size));
     return out_array;
@@ -1799,16 +1805,16 @@ namespace emp {
 
   /// Positive shifts go right and negative shifts go left (0 does nothing);
   /// store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SHIFT_SELF(const int shift_size) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SHIFT_SELF(const int shift_size) {
     if (shift_size > 0) ShiftRight((field_t) shift_size);
     else if (shift_size < 0) ShiftLeft((field_t) -shift_size);
     return *this;
   }
 
   /// Reverse the order of bits in the BitArray
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::REVERSE_SELF() {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::REVERSE_SELF() {
 
     // reverse bytes
     std::reverse( BytePtr().Raw(), BytePtr().Raw() + TOTAL_BYTES );
@@ -1833,18 +1839,18 @@ namespace emp {
   }
 
   /// Reverse order of bits in the BitArray.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::REVERSE() const {
-    BitArray<NUM_BITS> out_array(*this);
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> BitArray<NUM_BITS,ZERO_LEFT>::REVERSE() const {
+    this_t out_array(*this);
     return out_array.REVERSE_SELF();
   }
 
 
   /// Positive rotates go left and negative rotates go left (0 does nothing);
   /// return result.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::ROTATE(const int rotate_size) const {
-    BitArray<NUM_BITS> out_array(*this);
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> BitArray<NUM_BITS,ZERO_LEFT>::ROTATE(const int rotate_size) const {
+    this_t out_array(*this);
     if (rotate_size > 0) out_array.RotateRight((field_t) rotate_size);
     else if (rotate_size < 0) out_array.RotateLeft((field_t) (-rotate_size));
     return out_array;
@@ -1852,17 +1858,17 @@ namespace emp {
 
   /// Positive rotates go right and negative rotates go left (0 does nothing);
   /// store result here, and return this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ROTATE_SELF(const int rotate_size) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::ROTATE_SELF(const int rotate_size) {
     if (rotate_size > 0) RotateRight((field_t) rotate_size);
     else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
     return *this;
   }
 
   /// Helper: call ROTATE with negative number instead
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template<size_t shift_size_raw>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ROTL_SELF() {
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::ROTL_SELF() {
     constexpr size_t shift_size = shift_size_raw % NUM_BITS;
 
     // special case: for exactly one field_t, try to go low level
@@ -1941,9 +1947,9 @@ namespace emp {
 
 
   /// Helper for calling ROTATE with positive number
-  template <size_t NUM_BITS>
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   template<size_t shift_size_raw>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ROTR_SELF() {
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::ROTR_SELF() {
 
     constexpr size_t shift_size = shift_size_raw % NUM_BITS;
 
@@ -2012,17 +2018,17 @@ namespace emp {
   /// Addition of two BitArrays.
   /// Wraps if it overflows.
   /// Returns result.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::ADD(const BitArray & array2) const{
-    BitArray<NUM_BITS> out_array(*this);
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> BitArray<NUM_BITS,ZERO_LEFT>::ADD(const BitArray & array2) const{
+    this_t out_array(*this);
     return out_array.ADD_SELF(array2);
   }
 
   /// Addition of two BitArrays.
   /// Wraps if it overflows.
   /// Returns this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ADD_SELF(const BitArray<NUM_BITS> & array2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::ADD_SELF(const this_t & array2) {
     bool carry = false;
 
     for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
@@ -2049,17 +2055,17 @@ namespace emp {
   /// Subtraction of two BitArrays.
   /// Wraps around if it underflows.
   /// Returns result.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::SUB(const BitArray<NUM_BITS> & array2) const{
-    BitArray<NUM_BITS> out_array(*this);
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> BitArray<NUM_BITS,ZERO_LEFT>::SUB(const this_t & array2) const{
+    this_t out_array(*this);
     return out_array.SUB_SELF(array2);
   }
 
   /// Subtraction of two BitArrays.
   /// Wraps if it underflows.
   /// Returns this object.
-  template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SUB_SELF(const BitArray<NUM_BITS> & array2){
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SUB_SELF(const this_t & array2){
 
     bool carry = false;
 
@@ -2093,8 +2099,9 @@ namespace emp {
   }
 
   /// Computes simple matching coefficient (https://en.wikipedia.org/wiki/Simple_matching_coefficient).
-  template <size_t NUM_BITS>
-  double SimpleMatchCoeff(const BitArray<NUM_BITS> & in1, const BitArray<NUM_BITS> & in2) {
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  double SimpleMatchCoeff(const BitArray<NUM_BITS,ZERO_LEFT> & in1,
+                          const BitArray<NUM_BITS,ZERO_LEFT> & in2) {
     emp_assert(NUM_BITS > 0); // TODO: can be done with XOR
     return (double)(~(in1 ^ in2)).CountOnes() / (double) NUM_BITS;
   }
