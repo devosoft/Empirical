@@ -19,7 +19,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
-test-web: $(addprefix test-web, $(TEST_NAMES)) test-GetUrlParams
+test-web-: $(addprefix test-web-, $(TEST_NAMES)) test-GetUrlParams
 
 test-web-%: %.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
