@@ -4,7 +4,7 @@
  *  @date 2021.
  *
  *  @file  BitArray.hpp
- *  @brief An Array of a fixed number of bits, with the leftmost bit being position zero.
+ *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
  *  @note Status: RELEASE
  *
  *  @todo Some of the functions allow a start bit and end bit; each of these should be checked
@@ -75,7 +75,7 @@ namespace emp {
     static constexpr field_t FIELD_255 = (field_t) 255;  ///< Least significant 8 bits set to 1
     static constexpr field_t FIELD_ALL = ~FIELD_0;       ///< All bits in a field set to 1
 
-    field_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
+    field_t bits[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
 
     // Identify the field that a specified bit is in.
     [[nodiscard]] static size_t FieldID(const size_t index) { return index >> FIELD_LOG2; }
@@ -97,24 +97,24 @@ namespace emp {
 
     // Copy an array of bits into this BitArray (internal use only!)
     template <size_t IN_FIELDS, size_t COPY_FIELDS=NUM_FIELDS>
-    BitArray & Copy(const field_t in_set[IN_FIELDS]) {
+    BitArray & Copy(const field_t in_bits[IN_FIELDS]) {
       static_assert(COPY_FIELDS <= IN_FIELDS, "Cannot copy more fields than we are given.");
       static_assert(COPY_FIELDS <= NUM_FIELDS, "Cannot copy into more fields than are available.");
       constexpr size_t COPY_BYTES = COPY_FIELDS * sizeof(field_t);
-      std::memcpy(bit_set, in_set, COPY_BYTES);
+      std::memcpy(bits, in_bits, COPY_BYTES);
       return *this;
     }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
-    void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= END_MASK; }
+    void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bits[LAST_FIELD] &= END_MASK; }
 
-    // Convert the bit_set to const bytes.
+    // Convert the bits to const bytes.
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const
-    { return reinterpret_cast<const unsigned char*>(bit_set); }
+    { return reinterpret_cast<const unsigned char*>(bits); }
 
-    // Convert the bit_set to bytes.
+    // Convert the bits to bytes.
     [[nodiscard]] emp::Ptr<unsigned char> BytePtr()
-    { return reinterpret_cast<unsigned char*>(bit_set); }
+    { return reinterpret_cast<unsigned char*>(bits); }
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size);
@@ -129,11 +129,11 @@ namespace emp {
     void RotateRight(const size_t shift_size_raw);
 
   public:
-    /// Constructor: Assume all zeroes in set
+    /// Constructor: Assume all bits set to zero.
     explicit BitArray(bool init_val=false) { if (init_val) SetAll(); else Clear(); }
 
     /// Copy constructor from another BitArray
-    BitArray(const BitArray<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); }
+    BitArray(const BitArray<NUM_BITS> & in_bits) { Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Constructor to generate a BitArray from a std::bitset.
     explicit BitArray(const std::bitset<NUM_BITS> & bitset);
@@ -156,14 +156,14 @@ namespace emp {
     /// Constructor to generate a random BitArray with provided NUMBER of 1's.
     BitArray(Random & random, int num_ones) { Clear(); ChooseRandom(random, num_ones); }
 
-    /// Constructor to fill in a bit set from a vector.
+    /// Constructor to fill in a bit array from a vector.
     template <typename T> BitArray(const std::initializer_list<T> l);
 
     /// Destructor.
     ~BitArray() = default;
 
     /// Assignment operator (no separate move opperator since no resources to move...)
-    BitArray & operator=(const BitArray<NUM_BITS> & in_set) { return Copy<NUM_FIELDS>(in_set.bit_set); }
+    BitArray & operator=(const BitArray<NUM_BITS> & in_bits) { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
     BitArray & operator=(const std::bitset<NUM_BITS> & bitset);
@@ -176,9 +176,9 @@ namespace emp {
 
     /// Assignment from another BitArray of a different size.
     template <size_t FROM_BITS>
-    BitArray & Import( const BitArray<FROM_BITS> & from_set, const size_t from_bit=0 );
+    BitArray & Import( const BitArray<FROM_BITS> & from_bits, const size_t from_bit=0 );
 
-    /// Convert to a Bitset of a different size.
+    /// Convert to a BitArray of a different size.
     template <size_t TO_BITS>
     BitArray<TO_BITS> Export(size_t start_bit=0) const;
 
@@ -191,7 +191,7 @@ namespace emp {
     /// How many bytes are in this BitArray?
     [[nodiscard]] constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
 
-    /// How many distinct values could be held in this bitset?
+    /// How many distinct values could be held in this BitArray?
     [[nodiscard]] static constexpr double GetNumStates() { return emp::Pow2(NUM_BITS); }
 
     /// Retrieve the bit as a specified index.
@@ -210,7 +210,7 @@ namespace emp {
     BitArray & SetRange(size_t start, size_t stop);
 
     /// Set all bits to zero.
-    BitArray & Clear() { for (field_t & x : bit_set) x = FIELD_0; return *this; }
+    BitArray & Clear() { for (field_t & x : bits) x = FIELD_0; return *this; }
 
     /// Set specific bit to 0.
     BitArray & Clear(size_t index) { return Set(index, false); }
@@ -234,7 +234,7 @@ namespace emp {
     BitArray & Toggle(size_t start, size_t stop);
 
     /// Return true if ANY bits in the BitArray are one, else return false.
-    [[nodiscard]] bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+    [[nodiscard]] bool Any() const { for (auto i : bits) if (i) return true; return false; }
 
     /// Return true if NO bits in the BitArray are one, else return false.
     [[nodiscard]] bool None() const { return !Any(); }
@@ -446,7 +446,10 @@ namespace emp {
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
     /// Convert this BitArray to a string.
-    [[nodiscard]] std::string ToString() const;
+    [[nodiscard]] std::string ToString() const { return ToArrayString(); }
+
+    /// Convert this BitArray to an array-based string [index 0 on left]
+    [[nodiscard]] std::string ToArrayString() const;
 
     /// Convert this BitArray to a numerical string [index 0 on right]
     [[nodiscard]] std::string ToBinaryString() const;
@@ -492,22 +495,22 @@ namespace emp {
     BitArray & NOT_SELF();
 
     /// Perform a Boolean AND with a second BitArray, store result here, and return this object.
-    BitArray & AND_SELF(const BitArray & set2);
+    BitArray & AND_SELF(const BitArray & array2);
 
     /// Perform a Boolean OR with a second BitArray, store result here, and return this object.
-    BitArray & OR_SELF(const BitArray & set2);
+    BitArray & OR_SELF(const BitArray & array2);
 
     /// Perform a Boolean NAND with a second BitArray, store result here, and return this object.
-    BitArray & NAND_SELF(const BitArray & set2);
+    BitArray & NAND_SELF(const BitArray & array2);
 
     /// Perform a Boolean NOR with a second BitArray, store result here, and return this object.
-    BitArray & NOR_SELF(const BitArray & set2);
+    BitArray & NOR_SELF(const BitArray & array2);
 
     /// Perform a Boolean XOR with a second BitArray, store result here, and return this object.
-    BitArray & XOR_SELF(const BitArray & set2);
+    BitArray & XOR_SELF(const BitArray & array2);
 
     /// Perform a Boolean EQU with a second BitArray, store result here, and return this object.
-    BitArray & EQU_SELF(const BitArray & set2);
+    BitArray & EQU_SELF(const BitArray & array2);
 
     /// Perform a Boolean NOT on this BitArray and return the result.
     [[nodiscard]] BitArray NOT() const { return BitArray<NUM_BITS>(*this).NOT_SELF(); }
@@ -538,10 +541,10 @@ namespace emp {
     /// store result here, and return this object.
     BitArray & SHIFT_SELF(const int shift_size);
 
-    /// Reverse the order of bits in the bitset
+    /// Reverse the order of bits in the BitArray
     BitArray & REVERSE_SELF();
 
-    /// Reverse order of bits in the bitset.
+    /// Reverse order of bits in the BitArray.
     [[nodiscard]] BitArray REVERSE() const;
 
     /// Positive rotates go left and negative rotates go left (0 does nothing);
@@ -560,25 +563,25 @@ namespace emp {
     template<size_t shift_size_raw>
     BitArray & ROTR_SELF();
 
-    /// Addition of two Bitsets.
+    /// Addition of two BitArrays.
     /// Wraps if it overflows.
     /// Returns result.
-    [[nodiscard]] BitArray ADD(const BitArray & set2) const;
+    [[nodiscard]] BitArray ADD(const BitArray & array2) const;
 
-    /// Addition of two Bitsets.
+    /// Addition of two BitArrays.
     /// Wraps if it overflows.
     /// Returns this object.
-    BitArray & ADD_SELF(const BitArray & set2);
+    BitArray & ADD_SELF(const BitArray & array2);
 
-    /// Subtraction of two Bitsets.
+    /// Subtraction of two BitArrays.
     /// Wraps around if it underflows.
     /// Returns result.
-    [[nodiscard]] BitArray SUB(const BitArray & set2) const;
+    [[nodiscard]] BitArray SUB(const BitArray & array2) const;
 
-    /// Subtraction of two Bitsets.
+    /// Subtraction of two BitArrays.
     /// Wraps if it underflows.
     /// Returns this object.
-    BitArray & SUB_SELF(const BitArray & set2);
+    BitArray & SUB_SELF(const BitArray & array2);
     
     /// Operator bitwise NOT...
     [[nodiscard]] BitArray operator~() const { return NOT(); }
@@ -644,7 +647,7 @@ namespace emp {
     template <class Archive>
     void serialize( Archive & ar )
     {
-      ar( bit_set );
+      ar( bits );
     }
 
   };
@@ -655,7 +658,7 @@ namespace emp {
   void BitArray<NUM_BITS>::ShiftLeft(const size_t shift_size) {
     // If we have only a single field, this operation can be quick.
     if constexpr (NUM_FIELDS == 1) {
-      bit_set[0] <<= shift_size;
+      bits[0] <<= shift_size;
       ClearExcessBits();
       return;
     }
@@ -670,19 +673,19 @@ namespace emp {
     // Loop through each field, from L to R, and update it.
     if (field_shift) {
       for (size_t i = LAST_FIELD; i >= field_shift; --i) {
-        bit_set[i] = bit_set[i - field_shift];
+        bits[i] = bits[i - field_shift];
       }
-      for (size_t i = field_shift; i > 0; i--) bit_set[i-1] = 0;
+      for (size_t i = field_shift; i > 0; i--) bits[i-1] = 0;
     }
 
     // account for bit_shift
     if (bit_shift) {
       for (size_t i = LAST_FIELD; i > field_shift; --i) {
-        bit_set[i] <<= bit_shift;
-        bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        bits[i] <<= bit_shift;
+        bits[i] |= (bits[i-1] >> bit_overflow);
       }
       // Handle final field (field_shift position)
-      bit_set[field_shift] <<= bit_shift;
+      bits[field_shift] <<= bit_shift;
     }
 
     // Mask out any bits that have left-shifted away
@@ -695,7 +698,7 @@ namespace emp {
   void BitArray<NUM_BITS>::ShiftRight(const size_t shift_size) {
     // If we have only a single field, this operation can be quick.
     if constexpr (NUM_FIELDS == 1) {
-      bit_set[0] >>= shift_size;
+      bits[0] >>= shift_size;
       return;
     }
 
@@ -715,18 +718,18 @@ namespace emp {
     // account for field_shift
     if (field_shift) {
       for (size_t i = 0; i < (NUM_FIELDS - field_shift); ++i) {
-        bit_set[i] = bit_set[i + field_shift];
+        bits[i] = bits[i + field_shift];
       }
-      for (size_t i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0;
+      for (size_t i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bits[i] = 0;
     }
 
     // account for bit_shift
     if (bit_shift) {
       for (size_t i = 0; i < (LAST_FIELD - field_shift); ++i) {
-        bit_set[i] >>= bit_shift;
-        bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        bits[i] >>= bit_shift;
+        bits[i] |= (bits[i+1] << bit_overflow);
       }
-      bit_set[LAST_FIELD - field_shift] >>= bit_shift;
+      bits[LAST_FIELD - field_shift] >>= bit_shift;
     }
   }
 
@@ -739,7 +742,7 @@ namespace emp {
     if constexpr (NUM_FIELDS == 1) {
       // special case: for exactly one field_T, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      field_t & n = bit_set[0];
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
@@ -773,17 +776,17 @@ namespace emp {
 
       // if rotating more than field capacity, we need to rotate fields
       std::rotate(
-        std::rbegin(bit_set),
-        std::rbegin(bit_set)+field_shift,
-        std::rend(bit_set)
+        std::rbegin(bits),
+        std::rbegin(bits)+field_shift,
+        std::rend(bits)
       );
 
       // if necessary, shift filler bits out of the middle
       if constexpr ((bool)NUM_END_BITS) {
         const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NUM_END_BITS;
+          bits[i] >>= (FIELD_BITS - NUM_END_BITS);
         }
       }
 
@@ -791,19 +794,19 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = NUM_END_BITS ? (
-          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
-          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+          (bits[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
+          | (bits[NUM_FIELDS - 2] >> NUM_END_BITS)
         ) : (
-          bit_set[LAST_FIELD]
+          bits[LAST_FIELD]
         );
 
         for (int i = LAST_FIELD; i > 0; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          bits[i] <<= bit_shift;
+          bits[i] |= (bits[i-1] >> bit_overflow);
         }
         // Handle final field
-        bit_set[0] <<= bit_shift;
-        bit_set[0] |= keystone >> bit_overflow;
+        bits[0] <<= bit_shift;
+        bits[0] |= keystone >> bit_overflow;
 
       }
 
@@ -825,7 +828,7 @@ namespace emp {
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
 
-      field_t & n = bit_set[0];
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
@@ -847,17 +850,17 @@ namespace emp {
 
       // if rotating more than field capacity, we need to rotate fields
       std::rotate(
-        std::begin(bit_set),
-        std::begin(bit_set)+field_shift,
-        std::end(bit_set)
+        std::begin(bits),
+        std::begin(bits)+field_shift,
+        std::end(bits)
       );
 
       // if necessary, shift filler bits out of the middle
       if constexpr (NUM_END_BITS > 0) {
         const int filler_idx = LAST_FIELD - field_shift;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NUM_END_BITS;
+          bits[i] >>= (FIELD_BITS - NUM_END_BITS);
         }
       }
 
@@ -865,21 +868,21 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = NUM_END_BITS ? (
-          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+          bits[0] >> (FIELD_BITS - NUM_END_BITS)
         ) : (
-          bit_set[0]
+          bits[0]
         );
 
         if constexpr (NUM_END_BITS > 0) {
-          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+          bits[NUM_FIELDS-1] |= bits[0] << NUM_END_BITS;
         }
 
         for (size_t i = 0; i < LAST_FIELD; ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          bits[i] >>= bit_shift;
+          bits[i] |= (bits[i+1] << bit_overflow);
         }
-        bit_set[LAST_FIELD] >>= bit_shift;
-        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+        bits[LAST_FIELD] >>= bit_shift;
+        bits[LAST_FIELD] |= keystone << bit_overflow;
       }
     }
 
@@ -935,11 +938,11 @@ namespace emp {
   template <size_t NUM_BITS>
   template <size_t FROM_BITS>
   BitArray<NUM_BITS> & BitArray<NUM_BITS>::Import(
-    const BitArray<FROM_BITS> & from_set,
+    const BitArray<FROM_BITS> & from_array,
     const size_t from_bit
   ) {
     // Only check for same-ness if the two types are the same.
-    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_set != this);
+    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_array != this);
 
     emp_assert(from_bit < FROM_BITS);
 
@@ -951,8 +954,8 @@ namespace emp {
     const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);
 
     std::memcpy(
-      bit_set,
-      reinterpret_cast<const unsigned char*>(from_set.bit_set) + from_bit/8,
+      bits,
+      reinterpret_cast<const unsigned char*>(from_array.bits) + from_bit/8,
       COPY_BYTES
     );
 
@@ -961,9 +964,9 @@ namespace emp {
       this->ShiftRight(from_bit%8);
 
       if (FROM_BYTES > COPY_BYTES) {
-        reinterpret_cast<unsigned char*>(bit_set)[COPY_BYTES-1] |= (
+        reinterpret_cast<unsigned char*>(bits)[COPY_BYTES-1] |= (
           reinterpret_cast<const unsigned char*>(
-            from_set.bit_set
+            from_array.bits
           )[from_bit/8 + COPY_BYTES]
           << (8 - from_bit%8)
         );
@@ -977,7 +980,7 @@ namespace emp {
 
   }
 
-  /// Convert to a Bitset of a different size.
+  /// Convert to a BitArray of a different size.
   template <size_t NUM_BITS>
   template <size_t TO_BITS>
   BitArray<TO_BITS> BitArray<NUM_BITS>::Export(size_t start_bit) const {
@@ -992,7 +995,7 @@ namespace emp {
   template <size_t NUM_BITS>
   bool BitArray<NUM_BITS>::OK() const {
     // Make sure final bits are zeroed out.
-    emp_assert((bit_set[LAST_FIELD] & ~END_MASK) == 0);
+    emp_assert((bits[LAST_FIELD] & ~END_MASK) == 0);
 
     return true;
   }
@@ -1006,7 +1009,7 @@ namespace emp {
     emp_assert(index >= 0 && index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
-    return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
+    return (bits[field_id] & (((field_t)1U) << pos_id)) != 0;
   }
 
   /// Set the bit at a specified index.
@@ -1017,8 +1020,8 @@ namespace emp {
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
 
-    if (value) bit_set[field_id] |= pos_mask;
-    else       bit_set[field_id] &= ~pos_mask;
+    if (value) bits[field_id] |= pos_mask;
+    else       bits[field_id] &= ~pos_mask;
 
     return *this;
   }
@@ -1026,7 +1029,7 @@ namespace emp {
   /// Set all bits to one.
   template <size_t NUM_BITS>
   BitArray<NUM_BITS> & BitArray<NUM_BITS>::SetAll() {
-    for (field_t & x : bit_set) x = FIELD_ALL;
+    for (field_t & x : bits) x = FIELD_ALL;
     ClearExcessBits();
     return *this;
   }
@@ -1045,7 +1048,7 @@ namespace emp {
     if (start_field == stop_field) {
       const size_t bit_count = stop - start;
       const field_t mask = MaskLow<field_t>(bit_count) << start_pos;
-      bit_set[start_field] |= mask;
+      bits[start_field] |= mask;
     }
 
     // Otherwise handle the ends and clear the chunks in between.
@@ -1054,18 +1057,18 @@ namespace emp {
       if (start_pos != 0) {
         const size_t start_bits = FIELD_BITS - start_pos;
         const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-        bit_set[start_field] |= start_mask;
+        bits[start_field] |= start_mask;
         start_field++;
       }
 
       // Middle fields
       for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bit_set[cur_field] = FIELD_ALL;
+        bits[cur_field] = FIELD_ALL;
       }
 
       // Set portions of stop field
       const field_t stop_mask = MaskLow<field_t>(stop_pos);
-      bit_set[stop_field] |= stop_mask;
+      bits[stop_field] |= stop_mask;
     }
 
     return *this;
@@ -1085,7 +1088,7 @@ namespace emp {
     if (start_field == stop_field) {
       const size_t num_bits = stop - start;
       const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
-      bit_set[start_field] &= mask;
+      bits[start_field] &= mask;
     }
 
     // Otherwise handle the ends and clear the chunks in between.
@@ -1094,18 +1097,18 @@ namespace emp {
       if (start_pos != 0) {
         const size_t start_bits = FIELD_BITS - start_pos;
         const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
-        bit_set[start_field] &= start_mask;
+        bits[start_field] &= start_mask;
         start_field++;
       }
 
       // Middle fields
       for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bit_set[cur_field] = 0;
+        bits[cur_field] = 0;
       }
 
       // Clear portions of stop field
       const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
-      bit_set[stop_field] &= stop_mask;
+      bits[stop_field] &= stop_mask;
     }
 
     return *this;
@@ -1119,7 +1122,7 @@ namespace emp {
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
 
-    bit_set[field_id] ^= pos_mask;
+    bits[field_id] ^= pos_mask;
 
     return *this;
   }
@@ -1138,7 +1141,7 @@ namespace emp {
     if (start_field == stop_field) {
       const size_t num_flips = stop - start;
       const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
-      bit_set[start_field] ^= mask;
+      bits[start_field] ^= mask;
     }
 
     // Otherwise handle the ends and clear the chunks in between.
@@ -1147,18 +1150,18 @@ namespace emp {
       if (start_pos != 0) {
         const size_t start_bits = FIELD_BITS - start_pos;
         const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-        bit_set[start_field] ^= start_mask;
+        bits[start_field] ^= start_mask;
         start_field++;
       }
 
       // Middle fields
       for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bit_set[cur_field] = ~bit_set[cur_field];
+        bits[cur_field] = ~bits[cur_field];
       }
 
       // Set portions of stop field
       const field_t stop_mask = MaskLow<field_t>(stop_pos);
-      bit_set[stop_field] ^= stop_mask;
+      bits[stop_field] ^= stop_mask;
     }
 
     return *this;
@@ -1345,11 +1348,11 @@ namespace emp {
   /// Test if two BitArray objects are identical.
   template <size_t NUM_BITS>
   template <size_t SIZE2>
-  bool BitArray<NUM_BITS>::operator==(const BitArray<SIZE2> & in_set) const {
+  bool BitArray<NUM_BITS>::operator==(const BitArray<SIZE2> & in_bits) const {
     if constexpr (NUM_BITS != SIZE2) return false;
 
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
-      if (bit_set[i] != in_set.bit_set[i]) return false;
+      if (bits[i] != in_bits.bits[i]) return false;
     }
     return true;
   }
@@ -1357,12 +1360,12 @@ namespace emp {
   /// Compare two BitArray objects, based on the associated binary value.
   template <size_t NUM_BITS>
   template <size_t SIZE2>
-  bool BitArray<NUM_BITS>::operator<(const BitArray<SIZE2> & in_set) const {
+  bool BitArray<NUM_BITS>::operator<(const BitArray<SIZE2> & in_bits) const {
     if constexpr (NUM_BITS != SIZE2) return NUM_BITS < SIZE2;
 
     for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
-      if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
-      return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
+      if (bits[i] == in_bits.bits[i]) continue;  // If same, keep looking!
+      return (bits[i] < in_bits.bits[i]);        // Otherwise, do comparison
     }
     return false;
   }
@@ -1376,7 +1379,7 @@ namespace emp {
     emp_assert(index < TOTAL_BYTES);
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
-    return (bit_set[field_id] >> pos_id) & 255;
+    return (bits[field_id] >> pos_id) & 255;
   }
 
 
@@ -1385,7 +1388,7 @@ namespace emp {
   template <size_t NUM_BITS>
   std::span<const std::byte> BitArray<NUM_BITS>::GetBytes() const {
     return std::span<const std::byte>(
-      reinterpret_cast<const std::byte*>(bit_set),
+      reinterpret_cast<const std::byte*>(bits),
       TOTAL_BYTES
     );
   }
@@ -1398,7 +1401,7 @@ namespace emp {
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     const field_t val_uint = value;
-    bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
+    bits[field_id] = (bits[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
   }
 
   /// Get the overall value of this BitArray, using a uint encoding, but including all bits
@@ -1406,7 +1409,7 @@ namespace emp {
   template <size_t NUM_BITS>
   double BitArray<NUM_BITS>::GetValue() const {
     // If we have 64 bits or fewer, we can load the full value and return it.
-    if constexpr (NUM_FIELDS == 1) return (double) bit_set[0];
+    if constexpr (NUM_FIELDS == 1) return (double) bits[0];
 
     // Otherwise grab the most significant one and figure out how much to shift it by.
     const size_t max_one = FindMaxOne();
@@ -1435,8 +1438,8 @@ namespace emp {
     emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
               index, sizeof(T), NUM_BITS, NUM_FIELDS);
 
-    // If we are using the native field type, just grab it from bit_set.
-    if constexpr( std::is_same<T, field_t>() ) return bit_set[index];
+    // If we are using the native field type, just grab it from bits.
+    if constexpr( std::is_same<T, field_t>() ) return bits[index];
 
     T out_value;
     std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
@@ -1482,9 +1485,9 @@ namespace emp {
     constexpr size_t type_bits = sizeof(T) * 8;
 
     Clear(index, index+type_bits);       // Clear out the bits where new value will go.
-    BitArray<NUM_BITS> in_bits;            // Setup a bitset to place the new bits in.
+    BitArray<NUM_BITS> in_bits;          // Setup a BitArray to place the new bits in.
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
-    in_bits <<= index;                    // Shift new bits into place.
+    in_bits <<= index;                   // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current BitArray.
 
     ClearExcessBits();
@@ -1498,7 +1501,7 @@ namespace emp {
   std::size_t BitArray<NUM_BITS>::Hash() const {
     /// If we have a vector of size_t, treat it as a vector of hash values to combine.
     if constexpr (std::is_same_v<field_t, size_t>) {
-      return hash_combine(bit_set, NUM_FIELDS);
+      return hash_combine(bits, NUM_FIELDS);
     }
 
     constexpr size_t SIZE_T_BITS = sizeof(std::size_t)*8;
@@ -1522,7 +1525,7 @@ namespace emp {
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.
-        std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+        std::bitset<FIELD_BITS> std_bs(bits[i]);
         bit_count += std_bs.count();
       }
 
@@ -1533,7 +1536,7 @@ namespace emp {
   template <size_t NUM_BITS>
   size_t BitArray<NUM_BITS>::CountOnes_Sparse() const {
     size_t bit_count = 0;
-    for (field_t cur_field : bit_set) {
+    for (field_t cur_field : bits) {
       while (cur_field) {
         cur_field &= (cur_field-1);       // Peel off a single 1.
         bit_count++;                      // Increment the counter
@@ -1546,9 +1549,9 @@ namespace emp {
   template <size_t NUM_BITS>
   int BitArray<NUM_BITS>::FindOne() const {
     size_t field_id = 0;
-    while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(bit_set[field_id]) + (field_id << FIELD_LOG2))  :  -1;
+      (int) (find_bit(bits[field_id]) + (field_id << FIELD_LOG2))  :  -1;
   }
 
   /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
@@ -1559,16 +1562,16 @@ namespace emp {
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
 
     // If there's a hit in a partial first field, return it.
-    if (field_pos && (bit_set[field_id] & ~(MaskLow<field_t>(field_pos)))) {
-      return (int) (find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) +
+    if (field_pos && (bits[field_id] & ~(MaskLow<field_t>(field_pos)))) {
+      return (int) (find_bit(bits[field_id] & ~(MaskLow<field_t>(field_pos))) +
                     field_id * FIELD_BITS);
     }
 
     // Search other fields...
     if (field_pos) field_id++;
-    while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
+      (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS)) : -1;
   }
 
   /// Find the most-significant set-bit.
@@ -1576,12 +1579,12 @@ namespace emp {
   int BitArray<NUM_BITS>::FindMaxOne() const {
     // Find the max field with a one.
     int max_field = ((int) NUM_FIELDS) - 1;
-    while (max_field >= 0 && bit_set[max_field] == 0) max_field--;
+    while (max_field >= 0 && bits[max_field] == 0) max_field--;
 
     // If there are no ones, return -1.
     if (max_field == -1) return -1;
 
-    const field_t field = bit_set[max_field]; // Save a local copy of this field.
+    const field_t field = bits[max_field]; // Save a local copy of this field.
     field_t mask = (field_t) -1;              // Mask off the bits still under consideration.
     size_t offset = 0;                        // Indicate where the mask should be applied.
     size_t range = FIELD_BITS;                // Indicate how many bits are in the mask.
@@ -1610,12 +1613,12 @@ namespace emp {
   template <size_t NUM_BITS>
   emp::vector<size_t> BitArray<NUM_BITS>::GetOnes() const {
     // @CAO -- There are better ways to do this with bit tricks.
-    emp::vector<size_t> out_set(CountOnes());
+    emp::vector<size_t> ones(CountOnes());
     size_t cur_pos = 0;
     for (size_t i = 0; i < NUM_BITS; i++) {
-      if (Get(i)) out_set[cur_pos++] = i;
+      if (Get(i)) ones[cur_pos++] = i;
     }
-    return out_set;
+    return ones;
   }
 
   /// Find the length of the longest continuous series of ones.
@@ -1633,9 +1636,9 @@ namespace emp {
 
   // -------------------------  Print/String Functions  ------------------------- //
 
-  /// Convert this BitArray to a vector string [0 index on left]
+  /// Convert this BitArray to an array string [0 index on left]
   template <size_t NUM_BITS>
-  std::string BitArray<NUM_BITS>::ToString() const {
+  std::string BitArray<NUM_BITS>::ToArrayString() const {
     std::string out_string;
     out_string.reserve(NUM_BITS);
     for (size_t i = 0; i < NUM_BITS; ++i) out_string.push_back(GetAsChar(i));
@@ -1683,7 +1686,7 @@ namespace emp {
   void BitArray<NUM_BITS>::PrintDebug(std::ostream & out) const {
     for (size_t field = 0; field < NUM_FIELDS; field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
-        bool bit = (FIELD_1 << bit_id) & bit_set[field];
+        bool bit = (FIELD_1 << bit_id) & bits[field];
         out << ( bit ? 1 : 0 );
       }
       out << " : " << field << std::endl;
@@ -1734,52 +1737,52 @@ namespace emp {
   /// Perform a Boolean NOT on this BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
   BitArray<NUM_BITS> & BitArray<NUM_BITS>::NOT_SELF() {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean AND with a second BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::AND_SELF(const BitArray<NUM_BITS> & set2) {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::AND_SELF(const BitArray<NUM_BITS> & array2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & array2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean OR with a second BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::OR_SELF(const BitArray<NUM_BITS> & set2) {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::OR_SELF(const BitArray<NUM_BITS> & array2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | array2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean NAND with a second BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NAND_SELF(const BitArray<NUM_BITS> & set2) {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NAND_SELF(const BitArray<NUM_BITS> & array2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & array2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean NOR with a second BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NOR_SELF(const BitArray<NUM_BITS> & set2) {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::NOR_SELF(const BitArray<NUM_BITS> & array2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | array2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean XOR with a second BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::XOR_SELF(const BitArray<NUM_BITS> & set2) {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::XOR_SELF(const BitArray<NUM_BITS> & array2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ array2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean EQU with a second BitArray, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::EQU_SELF(const BitArray<NUM_BITS> & set2) {
-    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::EQU_SELF(const BitArray<NUM_BITS> & array2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ array2.bits[i]);
     ClearExcessBits();
     return *this;
   }
@@ -1788,10 +1791,10 @@ namespace emp {
   /// return result.
   template <size_t NUM_BITS>
   BitArray<NUM_BITS> BitArray<NUM_BITS>::SHIFT(const int shift_size) const {
-    BitArray<NUM_BITS> out_set(*this);
-    if (shift_size > 0) out_set.ShiftRight((field_t) shift_size);
-    else if (shift_size < 0) out_set.ShiftLeft((field_t) (-shift_size));
-    return out_set;
+    BitArray<NUM_BITS> out_array(*this);
+    if (shift_size > 0) out_array.ShiftRight((field_t) shift_size);
+    else if (shift_size < 0) out_array.ShiftLeft((field_t) (-shift_size));
+    return out_array;
   }
 
   /// Positive shifts go right and negative shifts go left (0 does nothing);
@@ -1803,7 +1806,7 @@ namespace emp {
     return *this;
   }
 
-  /// Reverse the order of bits in the bitset
+  /// Reverse the order of bits in the BitArray
   template <size_t NUM_BITS>
   BitArray<NUM_BITS> & BitArray<NUM_BITS>::REVERSE_SELF() {
 
@@ -1829,11 +1832,11 @@ namespace emp {
 
   }
 
-  /// Reverse order of bits in the bitset.
+  /// Reverse order of bits in the BitArray.
   template <size_t NUM_BITS>
   BitArray<NUM_BITS> BitArray<NUM_BITS>::REVERSE() const {
-    BitArray<NUM_BITS> out_set(*this);
-    return out_set.REVERSE_SELF();
+    BitArray<NUM_BITS> out_array(*this);
+    return out_array.REVERSE_SELF();
   }
 
 
@@ -1841,10 +1844,10 @@ namespace emp {
   /// return result.
   template <size_t NUM_BITS>
   BitArray<NUM_BITS> BitArray<NUM_BITS>::ROTATE(const int rotate_size) const {
-    BitArray<NUM_BITS> out_set(*this);
-    if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
-    else if (rotate_size < 0) out_set.RotateLeft((field_t) (-rotate_size));
-    return out_set;
+    BitArray<NUM_BITS> out_array(*this);
+    if (rotate_size > 0) out_array.RotateRight((field_t) rotate_size);
+    else if (rotate_size < 0) out_array.RotateLeft((field_t) (-rotate_size));
+    return out_array;
   }
 
   /// Positive rotates go right and negative rotates go left (0 does nothing);
@@ -1865,7 +1868,7 @@ namespace emp {
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
     if constexpr (NUM_FIELDS == 1) {
-      field_t & n = bit_set[0];
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
@@ -1893,9 +1896,9 @@ namespace emp {
       // if rotating more than field capacity, we need to rotate fields
       if constexpr ((bool)field_shift) {
         std::rotate(
-          std::rbegin(bit_set),
-          std::rbegin(bit_set)+field_shift,
-          std::rend(bit_set)
+          std::rbegin(bits),
+          std::rbegin(bits)+field_shift,
+          std::rend(bits)
         );
       }
 
@@ -1903,8 +1906,8 @@ namespace emp {
       if constexpr ((bool)NUM_END_BITS) {
         const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NUM_END_BITS;
+          bits[i] >>= (FIELD_BITS - NUM_END_BITS);
         }
       }
 
@@ -1912,19 +1915,19 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = NUM_END_BITS ? (
-          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
-          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+          (bits[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
+          | (bits[NUM_FIELDS - 2] >> NUM_END_BITS)
         ) : (
-          bit_set[LAST_FIELD]
+          bits[LAST_FIELD]
         );
 
         for (int i = LAST_FIELD; i > 0; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          bits[i] <<= bit_shift;
+          bits[i] |= (bits[i-1] >> bit_overflow);
         }
         // Handle final field
-        bit_set[0] <<= bit_shift;
-        bit_set[0] |= keystone >> bit_overflow;
+        bits[0] <<= bit_shift;
+        bits[0] |= keystone >> bit_overflow;
 
       }
 
@@ -1947,7 +1950,7 @@ namespace emp {
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
     if constexpr (NUM_FIELDS == 1) {
-      field_t & n = bit_set[0];
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
@@ -1963,9 +1966,9 @@ namespace emp {
       // if rotating more than field capacity, we need to rotate fields
       if constexpr ((bool)field_shift) {
         std::rotate(
-          std::begin(bit_set),
-          std::begin(bit_set)+field_shift,
-          std::end(bit_set)
+          std::begin(bits),
+          std::begin(bits)+field_shift,
+          std::end(bits)
         );
       }
 
@@ -1973,8 +1976,8 @@ namespace emp {
       if constexpr ((bool)NUM_END_BITS) {
         constexpr int filler_idx = LAST_FIELD - field_shift;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NUM_END_BITS;
+          bits[i] >>= (FIELD_BITS - NUM_END_BITS);
         }
       }
 
@@ -1982,21 +1985,21 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = NUM_END_BITS ? (
-          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+          bits[0] >> (FIELD_BITS - NUM_END_BITS)
         ) : (
-          bit_set[0]
+          bits[0]
         );
 
         if constexpr ((bool)NUM_END_BITS) {
-          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+          bits[NUM_FIELDS-1] |= bits[0] << NUM_END_BITS;
         }
 
         for (size_t i = 0; i < LAST_FIELD; ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          bits[i] >>= bit_shift;
+          bits[i] |= (bits[i+1] << bit_overflow);
         }
-        bit_set[LAST_FIELD] >>= bit_shift;
-        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+        bits[LAST_FIELD] >>= bit_shift;
+        bits[LAST_FIELD] |= keystone << bit_overflow;
       }
     }
 
@@ -2006,36 +2009,36 @@ namespace emp {
 
   }
 
-  /// Addition of two Bitsets.
+  /// Addition of two BitArrays.
   /// Wraps if it overflows.
   /// Returns result.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::ADD(const BitArray & set2) const{
-    BitArray<NUM_BITS> out_set(*this);
-    return out_set.ADD_SELF(set2);
+  BitArray<NUM_BITS> BitArray<NUM_BITS>::ADD(const BitArray & array2) const{
+    BitArray<NUM_BITS> out_array(*this);
+    return out_array.ADD_SELF(array2);
   }
 
-  /// Addition of two Bitsets.
+  /// Addition of two BitArrays.
   /// Wraps if it overflows.
   /// Returns this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ADD_SELF(const BitArray<NUM_BITS> & set2) {
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::ADD_SELF(const BitArray<NUM_BITS> & array2) {
     bool carry = false;
 
     for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
-      field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
-      carry = set2.bit_set[i] > addend;
+      field_t addend = array2.bits[i] + static_cast<field_t>(carry);
+      carry = array2.bits[i] > addend;
 
-      field_t sum = bit_set[i] + addend;
-      carry |= bit_set[i] > sum;
+      field_t sum = bits[i] + addend;
+      carry |= bits[i] > sum;
 
-      bit_set[i] = sum;
+      bits[i] = sum;
     }
 
     if constexpr (static_cast<bool>(NUM_END_BITS)) {
-      bit_set[NUM_BITS/FIELD_BITS] = (
-        bit_set[NUM_BITS/FIELD_BITS]
-        + set2.bit_set[NUM_BITS/FIELD_BITS]
+      bits[NUM_BITS/FIELD_BITS] = (
+        bits[NUM_BITS/FIELD_BITS]
+        + array2.bits[NUM_BITS/FIELD_BITS]
         + static_cast<field_t>(carry)
       ) & END_MASK;
     }
@@ -2043,35 +2046,35 @@ namespace emp {
     return *this;
   }
 
-  /// Subtraction of two Bitsets.
+  /// Subtraction of two BitArrays.
   /// Wraps around if it underflows.
   /// Returns result.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> BitArray<NUM_BITS>::SUB(const BitArray<NUM_BITS> & set2) const{
-    BitArray<NUM_BITS> out_set(*this);
-    return out_set.SUB_SELF(set2);
+  BitArray<NUM_BITS> BitArray<NUM_BITS>::SUB(const BitArray<NUM_BITS> & array2) const{
+    BitArray<NUM_BITS> out_array(*this);
+    return out_array.SUB_SELF(array2);
   }
 
-  /// Subtraction of two Bitsets.
+  /// Subtraction of two BitArrays.
   /// Wraps if it underflows.
   /// Returns this object.
   template <size_t NUM_BITS>
-  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SUB_SELF(const BitArray<NUM_BITS> & set2){
+  BitArray<NUM_BITS> & BitArray<NUM_BITS>::SUB_SELF(const BitArray<NUM_BITS> & array2){
 
     bool carry = false;
 
     for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
-      field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
-      carry = set2.bit_set[i] > subtrahend;
-      carry |= bit_set[i] < subtrahend;
-      bit_set[i] -= subtrahend;
+      const field_t subtrahend = array2.bits[i] + static_cast<field_t>(carry);
+      carry = array2.bits[i] > subtrahend;
+      carry |= bits[i] < subtrahend;
+      bits[i] -= subtrahend;
     }
 
     if constexpr (static_cast<bool>(NUM_END_BITS)) {
-      bit_set[NUM_BITS/FIELD_BITS] = (
-        bit_set[NUM_BITS/FIELD_BITS]
-        - set2.bit_set[NUM_BITS/FIELD_BITS]
-        - static_cast<field_t>(carry)
+      bits[NUM_BITS/FIELD_BITS] = (
+        bits[NUM_BITS/FIELD_BITS]
+          - array2.bits[NUM_BITS/FIELD_BITS]
+          - static_cast<field_t>(carry)
       ) & END_MASK;
     }
 
