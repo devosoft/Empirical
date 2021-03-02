@@ -67,17 +67,16 @@ fulldebug: $(addprefix test-native-, $(NATIVE_TEST_NAMES))
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
-opt: $(addprefix test-, $(NATIVE_TEST_NAMES))
+opt: $(addprefix test-native-, $(NATIVE_TEST_NAMES))
 	rm -rf test*.out
 
 cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
-cranky: $(addprefix test-, $(NATIVE_TEST_NAMES))
+cranky: $(addprefix test-native-, $(NATIVE_TEST_NAMES))
 	rm -rf test*.out
-
 
 clean:
 	rm -f *.js.map *.js.mem *~ color_map.out
-	ls *.js | grep -v karma.conf.js | xargs rm
+	ls *.js | grep -v karma.conf.js | xargs rm || true
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
