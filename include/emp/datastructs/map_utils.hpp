@@ -16,6 +16,7 @@
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
+#include "../meta/meta.hpp"
 
 namespace emp {
 
