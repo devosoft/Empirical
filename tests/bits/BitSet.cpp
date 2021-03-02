@@ -207,14 +207,15 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
   // Test Get()
   REQUIRE( bs1.Get(0) == 1 );
   REQUIRE( bs8.Get(0) == 1 );
-  REQUIRE( bs8.Get(4) == 1 );
-  REQUIRE( bs8.Get(6) == 0 );
+  REQUIRE( bs8.Get(1) == 0 );
+  REQUIRE( bs8.Get(3) == 1 );
   REQUIRE( bs8.Get(7) == 1 );
-  REQUIRE( bs75.Get(0) == 0 );
+  REQUIRE( bs75.Get(0) == 1 );
   REQUIRE( bs75.Get(1) == 1 );
+  REQUIRE( bs75.Get(2) == 0 );
   REQUIRE( bs75.Get(72) == 0 );
   REQUIRE( bs75.Get(73) == 1 );
-  REQUIRE( bs75.Get(74) == 1 );
+  REQUIRE( bs75.Get(74) == 0 );
 
   // Test Has() (including out of range)
   REQUIRE( bs1.Has(0) == true );
@@ -222,17 +223,18 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
   REQUIRE( bs1.Has(1000000) == false );
 
   REQUIRE( bs8.Has(0) == true );
-  REQUIRE( bs8.Has(4) == true );
-  REQUIRE( bs8.Has(6) == false );
+  REQUIRE( bs8.Has(1) == false );
+  REQUIRE( bs8.Has(4) == false );
   REQUIRE( bs8.Has(7) == true );
   REQUIRE( bs8.Has(8) == false );
 
-  REQUIRE( bs75.Has(0) == false );
+  REQUIRE( bs75.Has(0) == true );
   REQUIRE( bs75.Has(1) == true );
+  REQUIRE( bs75.Has(2) == false );
   REQUIRE( bs75.Has(72) == false );
   REQUIRE( bs75.Has(73) == true );
-  REQUIRE( bs75.Has(74) == true );
-  REQUIRE( bs75.Has(75) == false );
+  REQUIRE( bs75.Has(74) == false );
+  REQUIRE( bs75.Has(75) == false );       // Out of bounds (which Has() is okay with...)
   REQUIRE( bs75.Has(79) == false );
   REQUIRE( bs75.Has(1000000) == false );
 
@@ -276,7 +278,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   bs1.SetRange(1,1);          REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
 
   // Test when a full byte is used.
-  emp::BitSet<8> bs8( "10001101" );   REQUIRE(bs8.GetValue() == 177.0);  // 10110001
+  emp::BitSet<8> bs8( "10110001" );   REQUIRE(bs8.GetValue() == 177.0);  // 10110001
   bs8.Set(2);                         REQUIRE(bs8.GetValue() == 181.0);  // 10110101
   bs8.Set(0, 0);                      REQUIRE(bs8.GetValue() == 180.0);  // 10110100
   bs8.SetRange(1, 4);                 REQUIRE(bs8.GetValue() == 190.0);  // 10111110
@@ -293,7 +295,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
 
   // Test a full field.
   constexpr double ALL_64 = (double) ((uint64_t) -1);
-  emp::BitSet<64> bs64( "11011000110110001101" );
+  emp::BitSet<64> bs64( "10110001101100011011" );
   REQUIRE(bs64.GetValue() == 727835.0);
   bs64.Set(6);          REQUIRE(bs64.GetValue() == 727899.0);        // ...0 010110001101101011011
   bs64.Set(0, 0);       REQUIRE(bs64.GetValue() == 727898.0);        // ...0 010110001101101011010
@@ -309,17 +311,17 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   bs64.Toggle(0,64);    REQUIRE(bs64.GetValue() == 491520.0);        // ...0 001111000000000000000
 
 
-  emp::BitSet<75> bs75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+  emp::BitSet<75> bs75( "110000111110010011111000001011100000111110001011110000011111010001110100010" );
 
   // Test a full + partial field.
   constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
-  emp::BitSet<88> bs88( "11011000110110001101" ); REQUIRE(bs88.GetValue() == 727835.0);
-  REQUIRE(bs88.GetValue() == 727835.0);                              // ...0 010110001101100011011
+  emp::BitSet<88> bs88( "11011000110110001101" );
+  REQUIRE(bs88.GetValue() == 888205.0);                              // ...0 010110001101100011011
 
   // Start with same tests as last time...
-  bs88.Set(6);          REQUIRE(bs88.GetValue() == 727899.0);        // ...0 010110001101101011011
-  bs88.Set(0, 0);       REQUIRE(bs88.GetValue() == 727898.0);        // ...0 010110001101101011010
-  bs88.SetRange(4, 9);  REQUIRE(bs88.GetValue() == 728058.0);        // ...0 010110001101111111010
+  bs88.Set(6);          REQUIRE(bs88.GetValue() == 888269.0);        // ...0 010110001101101011011
+  bs88.Set(0, 0);       REQUIRE(bs88.GetValue() == 888268.0);        // ...0 010110001101101011010
+  bs88.SetRange(4, 9);  REQUIRE(bs88.GetValue() == 888316.0);        // ...0 010110001101111111010
   bs88.SetAll();        REQUIRE(bs88.GetValue() == ALL_88);          // ...1 111111111111111111111
   bs88.Clear(2);        REQUIRE(bs88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
   bs88.Clear(5,5);      REQUIRE(bs88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
@@ -547,7 +549,7 @@ TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
 
 TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 
-  emp::BitSet<16> bs = "0001000100001110";
+  emp::BitSet<16> bs = "0111000010001000";
 
   REQUIRE(bs.GetSize() == 16);
   REQUIRE(bs.CountOnes() == 5);
@@ -608,25 +610,27 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
 }
 
 TEST_CASE("8: Test printing and string functions.", "[bits]") {
-  emp::BitSet<6> bs6("000111");
+  emp::BitSet<6> bs6("111000");
 
-  REQUIRE(bs6.ToString() == "000111");
+  REQUIRE(bs6.ToString() == "111000");
   REQUIRE(bs6.ToBinaryString() == "111000");
+  REQUIRE(bs6.ToArrayString() == "000111");
   REQUIRE(bs6.ToIDString() == "3 4 5");
   REQUIRE(bs6.ToIDString() == "3 4 5");
   REQUIRE(bs6.ToRangeString() == "3-5");
 
-  emp::BitSet<64> bs64("0001110000000000000100000000000001000110000001000001000100000001");
+  emp::BitSet<64> bs64("1000000010001000001000000110001000000000000010000000000000111000");
 
-  REQUIRE(bs64.ToString()       == "0001110000000000000100000000000001000110000001000001000100000001");
+  REQUIRE(bs64.ToArrayString()  == "0001110000000000000100000000000001000110000001000001000100000001");
   REQUIRE(bs64.ToBinaryString() == "1000000010001000001000000110001000000000000010000000000000111000");
   REQUIRE(bs64.ToIDString() == "3 4 5 19 33 37 38 45 51 55 63");
   REQUIRE(bs64.ToIDString(",") == "3,4,5,19,33,37,38,45,51,55,63");
   REQUIRE(bs64.ToRangeString() == "3-5,19,33,37-38,45,51,55,63");
 
-  emp::BitSet<65> bs65("00011110000000000001000000000000010001100000010000010001000000111");
+//  emp::BitSet<65> bs65("00011110000000000001000000000000010001100000010000010001000000111");
+  emp::BitSet<65> bs65("11100000010001000001000000110001000000000000010000000000001111000");
 
-  REQUIRE(bs65.ToString()       == "00011110000000000001000000000000010001100000010000010001000000111");
+  REQUIRE(bs65.ToArrayString()  == "00011110000000000001000000000000010001100000010000010001000000111");
   REQUIRE(bs65.ToBinaryString() == "11100000010001000001000000110001000000000000010000000000001111000");
   REQUIRE(bs65.ToIDString()     == "3 4 5 6 19 33 37 38 45 51 55 62 63 64");
   REQUIRE(bs65.ToIDString(",")  == "3,4,5,6,19,33,37,38,45,51,55,62,63,64");
@@ -770,35 +774,35 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
     "00110111000101110001011100010111000101110001011100010111000101110001011100010111";
   REQUIRE( bsl80.GetSize() == 80 );
   REQUIRE( bsl80.CountOnes() == 41 );
-  REQUIRE( (bsl80 << 1) ==
+  REQUIRE( (bsl80 >> 1) ==
            emp::BitSet<80>("00011011100010111000101110001011100010111000101110001011100010111000101110001011")
          );
-  REQUIRE( (bsl80 << 2) ==
+  REQUIRE( (bsl80 >> 2) ==
            emp::BitSet<80>("00001101110001011100010111000101110001011100010111000101110001011100010111000101")
          );
-  REQUIRE( (bsl80 << 63) ==
+  REQUIRE( (bsl80 >> 63) ==
            emp::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000110111000101110")
          );
-  REQUIRE( (bsl80 << 64) ==
+  REQUIRE( (bsl80 >> 64) ==
            emp::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000011011100010111")
          );
-  REQUIRE( (bsl80 << 65) ==
+  REQUIRE( (bsl80 >> 65) ==
            emp::BitSet<80>("00000000000000000000000000000000000000000000000000000000000000000001101110001011")
          );
 
-  REQUIRE( (bsl80 >> 1) ==
+  REQUIRE( (bsl80 << 1) ==
            emp::BitSet<80>("01101110001011100010111000101110001011100010111000101110001011100010111000101110")
          );
-  REQUIRE( (bsl80 >> 2) ==
+  REQUIRE( (bsl80 << 2) ==
            emp::BitSet<80>("11011100010111000101110001011100010111000101110001011100010111000101110001011100")
          );
-  REQUIRE( (bsl80 >> 63) ==
+  REQUIRE( (bsl80 << 63) ==
            emp::BitSet<80>("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
          );
-  REQUIRE( (bsl80 >> 64) ==
+  REQUIRE( (bsl80 << 64) ==
            emp::BitSet<80>("00010111000101110000000000000000000000000000000000000000000000000000000000000000")
          );
-  REQUIRE( (bsl80 >> 65) ==
+  REQUIRE( (bsl80 << 65) ==
            emp::BitSet<80>("00101110001011100000000000000000000000000000000000000000000000000000000000000000")
          );
 }
@@ -1725,13 +1729,13 @@ TEST_CASE("Another Test BitSet", "[bits]")
   REQUIRE(bs0.GetUInt64(0) == 0);
   REQUIRE(bs0.GetNumStates() == 8);
 
-  emp::BitSet<3> bs1{1,0,0};
+  emp::BitSet<3> bs1{0,0,1};
   REQUIRE(bs1.GetUInt8(0) == 1);
   REQUIRE(bs1.GetUInt16(0) == 1);
   REQUIRE(bs1.GetUInt32(0) == 1);
   REQUIRE(bs1.GetUInt64(0) == 1);
 
-  emp::BitSet<3> bs2{1,1,0};
+  emp::BitSet<3> bs2{0,1,1};
   REQUIRE(bs2.GetUInt8(0) == 3);
   REQUIRE(bs2.GetUInt16(0) == 3);
   REQUIRE(bs2.GetUInt32(0) == 3);
@@ -1740,7 +1744,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
   emp::BitSet<3> bs3{1,1,1};
   REQUIRE(bs3.GetUInt8(0) == 7);
 
-  emp::BitSet<3> bs4{0,1,1};
+  emp::BitSet<3> bs4{1,1,0};
   REQUIRE(bs4.GetUInt8(0) == 6);
 
   emp::BitSet<32> bs5;
@@ -2344,7 +2348,7 @@ TEST_CASE("Test BitSet string construction", "[tools]") {
 
   // std::bitset treats bits in the opposite direction of emp::BitSet.
   REQUIRE(
-    emp::BitSet<5>( std::bitset<5>( "01001" ) )
+    emp::BitSet<5>( std::bitset<5>( "10010" ) )
     == emp::BitSet<5>{1, 0, 0, 1, 0}
   );
 
