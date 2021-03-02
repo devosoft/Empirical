@@ -19,14 +19,16 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
-test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams fulldebug opt cranky
+test-web: $(addprefix test-web, $(TEST_NAMES)) test-GetUrlParams
 
-test-%: %.cpp
+test-web-%: %.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	cp ../../third-party/package.json .
 	npm install
 	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
+
+test: $(addprefix test-native, $(TEST_NAMES)) test-color_map
 
 test-native-%: %.cpp 
 	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out

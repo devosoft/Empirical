@@ -3,9 +3,6 @@
 	clean clean-dep
 
 test: test-native test-examples test-web
-	make test-native
-	make test-examples
-	make test-web
 
 test-examples: test-native-examples test-web-examples
 
