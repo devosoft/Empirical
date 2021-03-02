@@ -296,6 +296,7 @@ namespace emp {
   //
   // Don't worry about the recurse argument - it's for handling nested arrays
   // internally
+  #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE, typename T>
   void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {
 
@@ -330,7 +331,14 @@ namespace emp {
     free(buffer);
   }
 
+  #else
+
+  template <std::size_t SIZE, typename T>
+  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {;}
+  #endif
+
   /// Same as pass_array_to_cpp, but lets you store values in a vector instead
+  #ifdef __EMSCRIPTEN__
   template <typename T>
   void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
 
@@ -360,6 +368,11 @@ namespace emp {
     //Free the memory we allocated in Javascript
     free(buffer);
   }
+
+  #else
+  template <typename T>
+  void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {;}
+  #endif
 
   /// @cond TEMPLATES
 
@@ -397,6 +410,7 @@ namespace emp {
 
   // Chars aren't one of the types supported by setValue, but by treating them
   // as strings in Javascript we can pass them out to a C++ array
+  #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE>
   void pass_array_to_cpp(emp::array<char, SIZE> & arr, bool recurse = false) {
 
@@ -421,10 +435,14 @@ namespace emp {
 
     free(buffer);
   }
-
+  #else
+  template <std::size_t SIZE>
+  void pass_array_to_cpp(emp::array<char, SIZE> & arr, bool recurse = false) {;}
+  #endif
 
   // Chars aren't one of the types supported by setValue, but by treating them
   // as strings in Javascript we can pass them out to a C++ array
+  #ifdef __EMSCRIPTEN__
   void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) {
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
@@ -445,8 +463,12 @@ namespace emp {
 
     free(buffer);
   }
+  #else
+  void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) {;}
+  #endif
 
   // We can handle strings in a similar way
+  #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE>
   void pass_array_to_cpp(emp::array<std::string, SIZE> & arr, bool recurse = false) {
 
@@ -483,8 +505,13 @@ namespace emp {
 
     free(buffer);
   }
+  #else
+  template <std::size_t SIZE>
+  void pass_array_to_cpp(emp::array<std::string, SIZE> & arr, bool recurse = false) {;}
+  #endif
 
   // We can handle strings in a similar way
+  #ifdef __EMSCRIPTEN__
   void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) {
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
@@ -518,8 +545,12 @@ namespace emp {
 
     free(buffer);
   }
+  #else
+  void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) {;}
+  #endif
 
   // We can handle nested arrays through recursive calls on chunks of them
+  #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE, std::size_t SIZE2, typename T>
   void pass_array_to_cpp(emp::array<emp::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
 
@@ -545,8 +576,13 @@ namespace emp {
     if (recurse == 0) { MAIN_THREAD_EM_ASM({emp_i.__temp_array = [];}); }
     else { MAIN_THREAD_EM_ASM({emp_i.__temp_array.pop();}); }
   }
+  #else
+  template <std::size_t SIZE, std::size_t SIZE2, typename T>
+  void pass_array_to_cpp(emp::array<emp::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {;}
+  #endif
 
   /// We can handle nested arrays through recursive calls on chunks of them
+  #ifdef __EMSCRIPTEN__
   template <typename T>
   void pass_vector_to_cpp(emp::vector<emp::vector<T> > & arr, bool recurse = false) {
 
@@ -580,6 +616,10 @@ namespace emp {
       MAIN_THREAD_EM_ASM({emp_i.__temp_array.pop();});
     }
   }
+  #else
+  template <typename T>
+  void pass_vector_to_cpp(emp::vector<emp::vector<T> > & arr, bool recurse = false) {;}
+  #endif
 
   /// @endcond
 
@@ -605,6 +645,7 @@ namespace emp {
     });
 
     // check to make sure each key is not an object or a function
+    #ifdef __EMSCRIPTEN__
     emp_assert(
         MAIN_THREAD_EM_ASM_INT({
           emp_i.__incoming_map_keys.forEach(function(key) {
@@ -612,6 +653,7 @@ namespace emp {
           });
           return 1;
         }), "Keys cannot be an object or a function");
+    #endif
 
     // pass in extracted values vector to JS
     emp::pass_array_to_javascript(values);
@@ -647,6 +689,7 @@ namespace emp {
     });
 
     // check to make sure each key is not an object or a function
+    #ifdef __EMSCRIPTEN__
     emp_assert(
         MAIN_THREAD_EM_ASM_INT({
           emp_i.__incoming_map_keys.forEach(function(key) {
@@ -654,6 +697,7 @@ namespace emp {
           });
           return 1;
         }), "Keys cannot be an object or a function");
+    #endif
 
     // pass in values vector to JS
     emp::pass_array_to_javascript(values);
