@@ -80,6 +80,12 @@ namespace emp {
     return FindValue(v, val) >= 0;
   }
 
+  // String version to fix template type deduction error
+  template <typename T>
+  bool Has(const emp::vector<T> & v, const std::string & val) {
+    return FindValue(v, val) >= 0;
+  }
+
   /// Return number of times a value occurs in a vector
   template <typename T>
   int Count(const emp::vector<T> & vec, const T & val) {
