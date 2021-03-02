@@ -4,7 +4,7 @@ TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitc
 
 # Currently a couple of the tests won't compile to native so this is a separate list for now. Eventually we should fix
 # that and just have one list
-NATIVE_TEST_NAMES = ConfigPanel LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo Element TextFeed js_utils JSWrap Widget
+NATIVE_TEST_NAMES = ConfigPanel LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo Element TextFeed js_utils JSWrap Widget QueueManager
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../include/ -I../../
