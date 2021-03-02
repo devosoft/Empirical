@@ -28,7 +28,7 @@ test-web-%: %.cpp
 	npm install
 	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
 
-test: $(addprefix test-native, $(TEST_NAMES)) test-color_map
+test: $(addprefix test-native-, $(NATIVE_TEST_NAMES)) test-color_map
 
 test-native-%: %.cpp 
 	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
