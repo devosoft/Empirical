@@ -89,7 +89,7 @@ namespace emp {
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
     char * tmp_var = (char *) MAIN_THREAD_EM_ASM_INT({
-        return allocate(intArrayFromString(emp_i.cb_args[$0]), ALLOC_STACK);
+        return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
       }, ARG_ID);
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
@@ -171,7 +171,7 @@ namespace emp {
         emp_i.curr_obj[UTF8ToString($0)] = "undefined";
       }
       return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]),
-                   '18', ALLOC_STACK);
+                   'i8', ALLOC_STACK);
     }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
