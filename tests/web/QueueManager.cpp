@@ -40,9 +40,11 @@ struct Test_QueueManager : public emp::web::BaseTest {
     queue_manager->AddQueueButton(get_setting_config, get_epochs); // Add button and text input
     queue_manager->BuildTable("my_table"); // Add progress table
     
-
     Doc("emp_test_container")
       << queue_manager->GetDiv();
+
+    // Test adding metric after table built
+    queue_manager->AddMetric(metric_fun, "Late Hello");
 
     queue_manager->AddRun(get_setting_config(), get_epochs());
     queue_manager->AddNewQueuedRunToTable();
@@ -68,6 +70,7 @@ struct Test_QueueManager : public emp::web::BaseTest {
   }
 
   ~Test_QueueManager() {
+    queue_manager->ResetDiv();
     queue_manager.Delete();
   }
 
@@ -89,11 +92,12 @@ struct Test_QueueManager : public emp::web::BaseTest {
 
           it('should have 4 columns', function() {
             columns = $("#my_table").find("th>span");
-            chai.assert.equal(columns.length, 4);
+            chai.assert.equal(columns.length, 5);
             chai.assert.equal(columns[0].firstChild.textContent, "Run");
             chai.assert.equal(columns[1].firstChild.textContent, "my_param");
             chai.assert.equal(columns[2].firstChild.textContent, "Epoch");
             chai.assert.equal(columns[3].firstChild.textContent, "Hello metric");
+            chai.assert.equal(columns[4].firstChild.textContent, "Late Hello");
           });
 
           it('should have 3 rows', function() {
@@ -107,10 +111,12 @@ struct Test_QueueManager : public emp::web::BaseTest {
             chai.assert.equal(rows[1].children[0].firstChild.textContent, "9");
             chai.assert.equal(rows[2].children[0].firstChild.textContent, "50");
             chai.assert.equal(rows[3].children[0].firstChild.textContent, "Hello");
-            chai.assert.equal(rows[4].children[0].firstChild.textContent, "1");
-            chai.assert.equal(rows[5].children[0].firstChild.textContent, "6");
-            chai.assert.equal(rows[6].children[0].firstChild.textContent, "Waiting...");
+            chai.assert.equal(rows[4].children[0].firstChild.textContent, "Hello");
+            chai.assert.equal(rows[5].children[0].firstChild.textContent, "1");
+            chai.assert.equal(rows[6].children[0].firstChild.textContent, "6");
             chai.assert.equal(rows[7].children[0].firstChild.textContent, "Waiting...");
+            chai.assert.equal(rows[8].children[0].firstChild.textContent, "Waiting...");
+            chai.assert.equal(rows[9].children[0].firstChild.textContent, "Waiting...");
           });
 
 
