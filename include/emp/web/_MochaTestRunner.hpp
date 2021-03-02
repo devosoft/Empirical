@@ -154,7 +154,10 @@ namespace web {
         test_runners.begin(),
         test_runners.end(),
         [](TestRunner & runner) {
+          #ifdef __EMSCRIPTEN__
+          // Runner will only get marked as done if all the javascript stuff is actually happening
           emp_assert(runner.done);
+          #endif
           if (runner.test != nullptr) runner.test.Delete();
         }
       );
@@ -351,7 +354,14 @@ namespace web {
     /// Running a test consumes it (i.e., executing Run a second time will not re-run previously run
     /// tests).
     /// Tests are run in the order they were added.
+    #ifdef __EMSCRIPTEN__
     void Run() { if (test_runners.size()) NextTest(); }
+    #else
+    // When running this code natively, we need to call each test individually because the code
+    // to automatically call the each successive test in sequence only exists in Javascript
+    // (this only matters for test coverage)
+    void Run() { while (test_runners.size()) {NextTest(); PopTest();} }
+    #endif
 
     /// Provide a function for MochaTestRunner to call before each test is created and run.
     /// @param fun a function to be run before each test is created and run

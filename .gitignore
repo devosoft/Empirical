@@ -32,6 +32,11 @@ tmp/
 
 .vscode/
 
+*/*/coverage_cov*
+coverage_source/*/*
+*/*/default.profraw
+*/*/default.profdata
+
 demos/Avida/Avida
 demos/Avida/web/Avida.js
 demos/Emphatic/Emphatic

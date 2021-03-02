@@ -3,9 +3,6 @@
 	clean clean-dep
 
 test: test-native test-examples test-web
-	make test-native
-	make test-examples
-	make test-web
 
 test-examples: test-native-examples test-web-examples
 
@@ -28,7 +25,7 @@ test-web-examples:
 	cd examples && make web-test
 
 test-web:
-	cd tests && make test-web
+	cd tests && make test-web-js
 
 ../cookiecutter-empirical-project:
 	cd .. && git clone --recursive https://github.com/devosoft/cookiecutter-empirical-project.git

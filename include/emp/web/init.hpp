@@ -11,6 +11,7 @@
 #define EMP_INIT_H
 
 #include <type_traits>
+#include "emp/base/assert_warning.hpp"
 
 /// If __EMSCRIPTEN__ is defined, initialize everything.  Otherwise create useful stubs.
 #ifdef __EMSCRIPTEN__
@@ -175,22 +176,30 @@ namespace emp {
 
 #else
 
+#define EM_ASM(...)
+#define EM_ASM_ARGS(...)
 #define MAIN_THREAD_EM_ASM(...)
-#define MAIN_THREAD_EM_ASM(...)
+#define MAIN_THREAD_ASYNC_EM_ASM(...)
 #define MAIN_THREAD_EM_ASM_INT(...) 0
 #define MAIN_THREAD_EM_ASM_DOUBLE(...) 0.0
 #define MAIN_THREAD_EM_ASM_INT_V(...) 0
 #define MAIN_THREAD_EM_ASM_DOUBLE_V(...) 0.0
 
+#define emscripten_run_script(...)
+
 #include <fstream>
 
 namespace emp {
   std::ofstream debug_file("debug_file");
+  bool init = false;      // Make sure we only initialize once!
 
   /// Stub for when Emscripten is not in use.
   static bool Initialize() {
     // Nothing to do here yet...
-    static_assert(false, "Emscripten web tools require emcc for compilation (for now).");
+    if (!init) {
+      emp_assert_warning(false && "Warning: you're using Empirical web features but not compiling with emcc. These features will not do anything unless you use emcc.");
+    }
+    init = true;
     return true;
   }
 
@@ -205,6 +214,9 @@ namespace emp {
       if (x == true) return "true";
       else return "false";
     }
+
+    template <typename T>
+    int Live(T x) {return 0;} // Dummy implementation
   }
 
 }
