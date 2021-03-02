@@ -177,12 +177,12 @@ namespace emp {
     BitArray & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitArray of a different size.
-    template <size_t FROM_BITS>
-    BitArray & Import( const BitArray<FROM_BITS> & from_bits, const size_t from_bit=0 );
+    template <size_t FROM_BITS, bool FROM_LEFT>
+    BitArray & Import( const BitArray<FROM_BITS,FROM_LEFT> & from_bits, const size_t from_bit=0 );
 
     /// Convert to a BitArray of a different size.
-    template <size_t TO_BITS>
-    BitArray<TO_BITS> Export(size_t start_bit=0) const;
+    template <size_t TO_BITS, bool TO_LEFT=ZERO_LEFT>
+    BitArray<TO_BITS,TO_LEFT> Export(size_t start_bit=0) const;
 
     /// For debugging: make sure that there are no obvous problems with a BitArray object.
     bool OK() const;
@@ -284,12 +284,23 @@ namespace emp {
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
-    template <size_t T2> [[nodiscard]] bool operator==(const BitArray<T2> & in) const;
-    template <size_t T2> [[nodiscard]] bool operator!=(const BitArray<T2> & in) const { return !(*this == in); }
-    template <size_t T2> [[nodiscard]] bool operator< (const BitArray<T2> & in) const;
-    template <size_t T2> [[nodiscard]] bool operator> (const BitArray<T2> & in) const { return in < *this; }
-    template <size_t T2> [[nodiscard]] bool operator<=(const BitArray<T2> & in) const { return !(in < *this); }
-    template <size_t T2> [[nodiscard]] bool operator>=(const BitArray<T2> & in) const { return !(*this < in); }
+    template <size_t T2, bool L2>
+    [[nodiscard]] bool operator==(const BitArray<T2,L2> & in) const;
+
+    template <size_t T2, bool L2>
+    [[nodiscard]] bool operator!=(const BitArray<T2,L2> & in) const { return !(*this == in); }
+
+    template <size_t T2, bool L2>
+    [[nodiscard]] bool operator< (const BitArray<T2,L2> & in) const;
+
+    template <size_t T2, bool L2>
+    [[nodiscard]] bool operator> (const BitArray<T2,L2> & in) const { return in < *this; }
+
+    template <size_t T2, bool L2>
+    [[nodiscard]] bool operator<=(const BitArray<T2,L2> & in) const { return !(in < *this); }
+
+    template <size_t T2, bool L2>
+    [[nodiscard]] bool operator>=(const BitArray<T2,L2> & in) const { return !(*this < in); }
 
     /// Casting a BitArray to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
@@ -448,7 +459,7 @@ namespace emp {
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
     /// Convert this BitArray to a string.
-    [[nodiscard]] std::string ToString() const { return ToArrayString(); }
+    [[nodiscard]] std::string ToString() const;
 
     /// Convert this BitArray to an array-based string [index 0 on left]
     [[nodiscard]] std::string ToArrayString() const;
@@ -907,7 +918,12 @@ namespace emp {
   {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
-    for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    if constexpr (ZERO_LEFT) {
+      for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    } else {
+      const size_t in_size = bitstring.size();
+      for (size_t i = 0; i < in_size; i++) Set(in_size - i - 1, bitstring[i] != '0');
+    }
   }
 
   template <size_t NUM_BITS, bool ZERO_LEFT>
@@ -915,32 +931,44 @@ namespace emp {
   BitArray<NUM_BITS,ZERO_LEFT>::BitArray(const std::initializer_list<T> l) {
     emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitArray", l.size(), NUM_BITS);
     Clear();
-    auto it = std::begin(l); // Right-most bit is position 0.
-    for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
+    if constexpr (ZERO_LEFT) {
+      auto it = std::begin(l); // Left-most bit is position 0.
+      for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
+    } else {
+      auto it = std::rbegin(l); // Right-most bit is position 0.
+      for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
+    }
   }
 
     /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
+  BitArray<NUM_BITS,ZERO_LEFT> & 
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
   }
 
   /// Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
+  BitArray<NUM_BITS,ZERO_LEFT> & 
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
-    for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    if constexpr (ZERO_LEFT) {
+      for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    } else {
+      const size_t in_size = bitstring.size();
+      for (size_t i = 0; i < in_size; i++) Set(in_size - i - 1, bitstring[i] != '0');
+    }
     return *this;
   }
 
 
   /// Assign from a BitArray of a different size.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  template <size_t FROM_BITS>
+  template <size_t FROM_BITS, bool FROM_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Import(
-    const BitArray<FROM_BITS> & from_array,
+    const BitArray<FROM_BITS, FROM_LEFT> & from_array,
     const size_t from_bit
   ) {
     // Only check for same-ness if the two types are the same.
@@ -984,10 +1012,9 @@ namespace emp {
 
   /// Convert to a BitArray of a different size.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  template <size_t TO_BITS>
-  BitArray<TO_BITS> BitArray<NUM_BITS,ZERO_LEFT>::Export(size_t start_bit) const {
-
-    BitArray<TO_BITS> out_bits;
+  template <size_t TO_BITS, bool TO_LEFT>
+  BitArray<TO_BITS,TO_LEFT> BitArray<NUM_BITS,ZERO_LEFT>::Export(size_t start_bit) const {
+    BitArray<TO_BITS,TO_LEFT> out_bits;
     out_bits.Import(*this, start_bit);
 
     return out_bits;
@@ -1353,8 +1380,8 @@ namespace emp {
 
   /// Test if two BitArray objects are identical.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  template <size_t SIZE2>
-  bool BitArray<NUM_BITS,ZERO_LEFT>::operator==(const BitArray<SIZE2> & in_bits) const {
+  template <size_t SIZE2, bool LEFT2>
+  bool BitArray<NUM_BITS,ZERO_LEFT>::operator==(const BitArray<SIZE2,LEFT2> & in_bits) const {
     if constexpr (NUM_BITS != SIZE2) return false;
 
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
@@ -1365,8 +1392,8 @@ namespace emp {
 
   /// Compare two BitArray objects, based on the associated binary value.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  template <size_t SIZE2>
-  bool BitArray<NUM_BITS,ZERO_LEFT>::operator<(const BitArray<SIZE2> & in_bits) const {
+  template <size_t SIZE2, bool LEFT2>
+  bool BitArray<NUM_BITS,ZERO_LEFT>::operator<(const BitArray<SIZE2,LEFT2> & in_bits) const {
     if constexpr (NUM_BITS != SIZE2) return NUM_BITS < SIZE2;
 
     for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
@@ -1641,6 +1668,13 @@ namespace emp {
 
 
   // -------------------------  Print/String Functions  ------------------------- //
+
+  /// Convert this BitArray to a string (using default direction)
+  template <size_t NUM_BITS, bool ZERO_LEFT>
+  std::string BitArray<NUM_BITS,ZERO_LEFT>::ToString() const {
+    if constexpr (ZERO_LEFT) return ToArrayString();
+    else return ToBinaryString();
+  }
 
   /// Convert this BitArray to an array string [0 index on left]
   template <size_t NUM_BITS, bool ZERO_LEFT>
