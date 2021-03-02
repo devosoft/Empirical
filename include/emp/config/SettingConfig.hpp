@@ -30,7 +30,7 @@ namespace emp {
 /// those values for a factorial analysis.
 
 class SettingConfig {
-   private:
+    private:
     /// Base class to describe information about a single setting.
     struct SettingBase {
         std::string name;        ///< Name for this setting
@@ -109,6 +109,7 @@ class SettingConfig {
         emp::Ptr<SettingBase> Clone() const override {
             auto csi_ptr = emp::NewPtr<ComboSettingInfo<T>>(name, desc, flag, args_label);
             csi_ptr->values = this->values;
+            csi_ptr->id = this->id;
             return csi_ptr;
         }
 
@@ -119,6 +120,13 @@ class SettingConfig {
                 if (i) ss << ',';
                 ss << values[i];
             }
+            return ss.str();
+        }
+
+        std::string AsString(size_t id) const override {
+            std::stringstream ss;
+            ss << values[id];
+            return ss.str();
         }
 
         bool FromString(const std::string_view &input) override {
