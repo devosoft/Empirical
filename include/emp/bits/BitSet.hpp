@@ -450,7 +450,10 @@ namespace emp {
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
     /// Convert this BitSet to a string.
-    [[nodiscard]] std::string ToString() const;
+    [[nodiscard]] std::string ToString() const { return ToBinaryString(); }
+
+    /// Convert this BitSet to an array-based string [index 0 on left]
+    [[nodiscard]] std::string ToArrayString() const;
 
     /// Convert this BitSet to a numerical string [index 0 on right]
     [[nodiscard]] std::string ToBinaryString() const;
@@ -906,7 +909,8 @@ namespace emp {
   {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
-    for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    const size_t in_size = bitstring.size();
+    for (size_t i = 0; i < in_size; i++) Set(in_size - i - 1, bitstring[i] != '0');
   }
 
   template <size_t NUM_BITS>
@@ -914,7 +918,7 @@ namespace emp {
   BitSet<NUM_BITS>::BitSet(const std::initializer_list<T> l) {
     emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitSet", l.size(), NUM_BITS);
     Clear();
-    auto it = std::begin(l); // Right-most bit is position 0.
+    auto it = std::rbegin(l); // Right-most bit is position 0.
     for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
   }
 
@@ -930,7 +934,8 @@ namespace emp {
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::operator=(const std::string & bitstring) {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
-    for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    const size_t in_size = bitstring.size();
+    for (size_t i = 0; i < in_size; i++) Set(in_size - i - 1, bitstring[i] != '0');
     return *this;
   }
 
@@ -1639,7 +1644,7 @@ namespace emp {
 
   /// Convert this BitSet to a vector string [0 index on left]
   template <size_t NUM_BITS>
-  std::string BitSet<NUM_BITS>::ToString() const {
+  std::string BitSet<NUM_BITS>::ToArrayString() const {
     std::string out_string;
     out_string.reserve(NUM_BITS);
     for (size_t i = 0; i < NUM_BITS; ++i) out_string.push_back(GetAsChar(i));
