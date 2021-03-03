@@ -1284,6 +1284,34 @@ namespace emp {
       return pos.SetIndex(neighbor_id);
     };
 
+    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
+
+      emp_assert(pop_sizes.size() == 3);
+
+      const int size_x = (int) pop_sizes[0];
+      const int size_y = (int) pop_sizes[1];
+
+      const int id_1 = (int) pos1.GetIndex();
+      const int id_2 = (int) pos2.GetIndex();
+
+      if (id_1 == id_2) {return false;} // Self isn't neighbor
+
+      const int x_pos_1 = (id_1%size_x);
+      const int y_pos_1 = (id_1/size_x) % (size_y);
+      const int z_pos_1 = (id_1/size_x) / (size_y);
+
+      const int x_pos_2 = (id_2%size_x);
+      const int y_pos_2 = (id_2/size_x) % (size_y);
+      const int z_pos_2 = (id_2/size_x) / (size_y);
+
+      int x_diff = abs(x_pos_1 - x_pos_2);
+      int y_diff = abs(y_pos_1 - y_pos_2);
+      int z_diff = abs(z_pos_1 - z_pos_2);    
+
+      return (x_diff <= 1) && (y_diff <= 1) && (z_diff <= 1);
+
+    };
+
     fun_kill_org = [this](){
       const size_t kill_id = GetRandomCellID();
       RemoveOrgAt(kill_id);

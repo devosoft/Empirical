@@ -414,6 +414,12 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
 	
+	// Test is_neighbor
+	CHECK(world.IsNeighbor(5, 6));
+	CHECK(world.IsNeighbor(0, 20));
+	CHECK(world.IsNeighbor(0, 21));
+	CHECK(world.IsNeighbor(0, 5));
+	CHECK(!world.IsNeighbor(0, 22));
 
 	world.Inject(org1);
 	world.DoBirth(org1, 0);
@@ -432,6 +438,8 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	CHECK(world.GetNumOrgs() == 1);	
 	world.Update();
 	CHECK(world.GetNumOrgs() == 0);	
+
+}
 
 TEST_CASE("Test GetValidNeighborOrgIDs on Grid", "[Evolve]")
 {
