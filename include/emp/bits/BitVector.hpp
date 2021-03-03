@@ -142,9 +142,10 @@ namespace emp {
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
     BitVector(size_t in_num_bits=0, bool init_val=false);
 
-    /// Alias to explicitly capture literal ints for the first argument
-    /// (otherwise ambiguous conversion with char *)
-    BitVector(int in_num_bits, bool init_val=false) : BitVector((size_t) in_num_bits, init_val) {}
+    // Prevent ambiguous conversions...
+    /// Anything not otherwise defined for first argument, convert to size_t.
+    template <typename T>
+    BitVector(T in_num_bits) : BitVector((size_t) in_num_bits, 0) {}
 
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in);
