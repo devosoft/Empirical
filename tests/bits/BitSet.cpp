@@ -1356,7 +1356,6 @@ struct MultiTester {
 
 };
 
-template class emp::BitSet<5>;
 TEST_CASE("Another Test BitSet", "[bits]")
 {
 
