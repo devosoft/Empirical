@@ -71,8 +71,14 @@ class SettingConfig {
                     emp::Ptr<T> _var = nullptr)  ///< Pointer to variable to set (optional)
             : SettingBase(_name, _desc, _flag, _arg), var_ptr(_var) { ; }
 
+        ~SettingInfo(){if(var_ptr){var_ptr.Delete();}}
+
         emp::Ptr<SettingBase> Clone() const override {
-            emp::Ptr<SettingInfo<T>> setting_info_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label);
+            emp::Ptr<T> new_var_ptr = nullptr;
+            if (var_ptr) {
+                new_var_ptr = NewPtr<T>(*var_ptr);
+            }
+            emp::Ptr<SettingInfo<T>> setting_info_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label, new_var_ptr);
             setting_info_ptr->value = this->value;
             return setting_info_ptr;
         }
@@ -106,8 +112,14 @@ class SettingConfig {
                          emp::Ptr<T> _var = nullptr)  ///< Pointer to variable to set (optional)
             : SettingBase(_name, _desc, _flag, _args), var_ptr(_var) { ; }
 
+        ~ComboSettingInfo(){if(var_ptr){var_ptr.Delete();}}
+
         emp::Ptr<SettingBase> Clone() const override {
-            auto csi_ptr = emp::NewPtr<ComboSettingInfo<T>>(name, desc, flag, args_label);
+            emp::Ptr<T> new_var_ptr = nullptr;
+            if (var_ptr) {
+                new_var_ptr = NewPtr<T>(*var_ptr);
+            }
+            auto csi_ptr = emp::NewPtr<ComboSettingInfo<T>>(name, desc, flag, args_label, new_var_ptr);
             csi_ptr->values = this->values;
             csi_ptr->id = this->id;
             return csi_ptr;
@@ -194,11 +206,11 @@ class SettingConfig {
 
     SettingConfig(const SettingConfig &other) {
         combo_settings.resize(other.combo_settings.size());
-        for (size_t i = 0; i < combo_settings.size(); i++) {
-            combo_settings[i] = other.combo_settings[i]->Clone();
-        }
         for (const auto &entry : other.setting_map) {
             setting_map[entry.first] = other.setting_map.at(entry.first)->Clone();
+        }
+        for (size_t i = 0; i < combo_settings.size(); i++) {
+            combo_settings[i] = setting_map[other.combo_settings[i]->name];
         }
 
         action_map = other.action_map;
