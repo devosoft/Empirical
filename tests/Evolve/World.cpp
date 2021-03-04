@@ -430,7 +430,7 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	world.SetPopStruct_3DGrid(5,4,3, true);
 	world.InjectAt(org1, 0);
 	emp::WorldPosition pos = world.DoBirth(org1, 0);
-	legal_neighbors = {0, 1,5,6,20,21,25,26};
+	legal_neighbors = {1,5,6,20,21,25,26};
 	CHECK(emp::Has<size_t>(legal_neighbors, pos.GetIndex() ));
 	CHECK(pos.GetPopID() == 1);
 	CHECK(world.GetNumOrgs() == 1);	

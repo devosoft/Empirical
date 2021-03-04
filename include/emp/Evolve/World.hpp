@@ -32,6 +32,7 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
 #include "../control/Signal.hpp"
 #include "../control/SignalControl.hpp"
 #include "../data/DataFile.hpp"
@@ -1180,7 +1181,7 @@ namespace emp {
 
     // neighbors are in 27-sized neighborhood.
     fun_get_neighbor = [this](WorldPosition pos) {
-
+      std::cout << pos.GetIndex() << " " << pos.GetPopID() << std::endl;
       emp_assert(random_ptr);
       emp_assert(pop_sizes.size() == 3);
 
@@ -1207,69 +1208,66 @@ namespace emp {
           rand_pos++;
         }
       } else {
-        std::set<int> non_options;
-        non_options.insert(self_pos);
+        emp::BitSet<27> options;
+        options.SetAll();
+        options.Set(self_pos, false);
         if (z_pos == 0) {
           for (int i = 0; i < 9; i++) {
-            non_options.insert(i);
+            options.Set(i, false);
           }
         } else if (z_pos == size_z - 1) {
           for (int i = 18; i < 27; i++) {
-            non_options.insert(i);
+            options.Set(i, false);
           }          
         }
        if (y_pos == 0) {
-          non_options.insert(0);
-          non_options.insert(1);
-          non_options.insert(2);
-          non_options.insert(9);
-          non_options.insert(10);
-          non_options.insert(11);
-          non_options.insert(18);
-          non_options.insert(19);
-          non_options.insert(20);
+          options.Set(0, false);
+          options.Set(1, false);
+          options.Set(2, false);
+          options.Set(9, false);
+          options.Set(10, false);
+          options.Set(11, false);
+          options.Set(18, false);
+          options.Set(19, false);
+          options.Set(20, false);
         } else if (y_pos == size_y - 1) {
-          non_options.insert(6);
-          non_options.insert(7);
-          non_options.insert(8);
-          non_options.insert(15);
-          non_options.insert(16);
-          non_options.insert(17);
-          non_options.insert(24);
-          non_options.insert(25);
-          non_options.insert(26);
+          options.Set(6, false);
+          options.Set(7, false);
+          options.Set(8, false);
+          options.Set(15, false);
+          options.Set(16, false);
+          options.Set(17, false);
+          options.Set(24, false);
+          options.Set(25, false);
+          options.Set(26, false);
         }
        if (x_pos == 0) {         
-          non_options.insert(0);
-          non_options.insert(3);
-          non_options.insert(6);
-          non_options.insert(9);
-          non_options.insert(12);
-          non_options.insert(15);
-          non_options.insert(18);
-          non_options.insert(21);
-          non_options.insert(24);
+          options.Set(0, false);
+          options.Set(3, false);
+          options.Set(6, false);
+          options.Set(9, false);
+          options.Set(12, false);
+          options.Set(15, false);
+          options.Set(18, false);
+          options.Set(21, false);
+          options.Set(24, false);
         } else if (x_pos == size_x - 1) {
-          non_options.insert(2);
-          non_options.insert(5);
-          non_options.insert(8);
-          non_options.insert(11);
-          non_options.insert(14);
-          non_options.insert(17);
-          non_options.insert(20);
-          non_options.insert(23);
-          non_options.insert(26);
+          options.Set(2, false);
+          options.Set(5, false);
+          options.Set(8, false);
+          options.Set(11, false);
+          options.Set(14, false);
+          options.Set(17, false);
+          options.Set(20, false);
+          options.Set(23, false);
+          options.Set(26, false);
         }
 
-        emp::vector<int> options;
-        for (int i = 0; i < 27; i++) {
-          if (non_options.count(i) == 0) {
-            options.push_back(i);
-          }
+        int p = random_ptr->GetInt(options.CountOnes());
+        std::cout << p << std::endl;
+        while(p-- >= 0) {
+          rand_pos = options.PopBit();
         }
-
-        int p = random_ptr->GetInt(options.size());
-        rand_pos = options[p];
       }
       
       int rand_z = z_pos + rand_pos / 9 - 1;
