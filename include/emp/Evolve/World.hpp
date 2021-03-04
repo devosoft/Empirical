@@ -32,6 +32,7 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
 #include "../control/Signal.hpp"
 #include "../control/SignalControl.hpp"
 #include "../data/DataFile.hpp"
@@ -255,10 +256,22 @@ namespace emp {
     size_t GetUpdate() const { return update; }
 
     /// How many cells wide is the world? (assumes grids are active.)
-    size_t GetWidth() const { return pop_sizes[0]; }
+    size_t GetWidth() const { 
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "Grid"); 
+      return pop_sizes[0]; 
+    }
 
     /// How many cells tall is the world? (assumes grids are active.)
-    size_t GetHeight() const { return pop_sizes[1]; }
+    size_t GetHeight() const { 
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "Grid"); 
+      return pop_sizes[1]; 
+    }
+
+    /// How many cells deep is the world? (assumes 3d grids are active.)
+    size_t GetDepth() const { 
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "3DGrid"); 
+      return pop_sizes[2]; 
+    }
 
     /// Get the full population to analyze externally.
     const pop_t & GetFullPop() const { return pop; }
@@ -453,6 +466,10 @@ namespace emp {
     /// Set the population to be a grid of cells using the specified dimensions.  The third
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen=false);
+
+    /// Set the population to be a 3D grid of cells using the specified dimensions.  The third
+    /// argument determines if the generations should be synchronous (true) or not (false, default)
+    void SetPopStruct_3DGrid(size_t width, size_t height, size_t depth, bool synchronous_gen=false);
 
     /// Setup the population to automatically test for and trigger mutations.  By default, this
     /// occurs before deciding where an offspring should be placed. Note that this pre-placement
@@ -1144,6 +1161,178 @@ namespace emp {
     }
 
     SetAttribute("PopStruct", "Grid");
+    SetSynchronousSystematics(synchronous_gen);
+  }
+
+  template<typename ORG>
+  void World<ORG>::SetPopStruct_3DGrid(size_t width, size_t height, size_t depth, bool synchronous_gen) {
+    emp::vector<size_t> sizes = {width, height, depth};
+    Resize(sizes);
+    is_synchronous = synchronous_gen;
+    is_space_structured = true;
+    is_pheno_structured = false;
+
+    // -- Setup functions --
+    // Inject a random position in grid
+    fun_find_inject_pos = [this](Ptr<ORG> new_org) {
+      (void) new_org;
+      return WorldPosition(GetRandomCellID());
+    };
+
+    // neighbors are in 27-sized neighborhood.
+    fun_get_neighbor = [this](WorldPosition pos) {
+      std::cout << pos.GetIndex() << " " << pos.GetPopID() << std::endl;
+      emp_assert(random_ptr);
+      emp_assert(pop_sizes.size() == 3);
+
+      const int size_x = (int) pop_sizes[0];
+      const int size_y = (int) pop_sizes[1];
+      const int size_z = (int) pop_sizes[2];
+      const int id = (int) pos.GetIndex();
+
+      const int x_pos = (id%size_x);
+      const int y_pos = (id/size_x) % (size_y);
+      const int z_pos = (id/size_x) / (size_y);
+
+      emp_assert(z_pos < size_z);
+
+      int self_pos = 13;
+      int n_options = 26;
+      int rand_pos = 0;
+
+      if (z_pos > 0 && z_pos < size_z - 1 && y_pos > 0 && y_pos < size_y - 1 && x_pos > 0 && x_pos < size_x - 1){
+        // no edge problems to worry about
+        rand_pos = random_ptr->GetInt(n_options);
+        if (rand_pos >= self_pos) {
+          // skip central cell
+          rand_pos++;
+        }
+      } else {
+        emp::BitSet<27> options;
+        options.SetAll();
+        options.Set(self_pos, false);
+        if (z_pos == 0) {
+          for (int i = 0; i < 9; i++) {
+            options.Set(i, false);
+          }
+        } else if (z_pos == size_z - 1) {
+          for (int i = 18; i < 27; i++) {
+            options.Set(i, false);
+          }          
+        }
+       if (y_pos == 0) {
+          options.Set(0, false);
+          options.Set(1, false);
+          options.Set(2, false);
+          options.Set(9, false);
+          options.Set(10, false);
+          options.Set(11, false);
+          options.Set(18, false);
+          options.Set(19, false);
+          options.Set(20, false);
+        } else if (y_pos == size_y - 1) {
+          options.Set(6, false);
+          options.Set(7, false);
+          options.Set(8, false);
+          options.Set(15, false);
+          options.Set(16, false);
+          options.Set(17, false);
+          options.Set(24, false);
+          options.Set(25, false);
+          options.Set(26, false);
+        }
+       if (x_pos == 0) {         
+          options.Set(0, false);
+          options.Set(3, false);
+          options.Set(6, false);
+          options.Set(9, false);
+          options.Set(12, false);
+          options.Set(15, false);
+          options.Set(18, false);
+          options.Set(21, false);
+          options.Set(24, false);
+        } else if (x_pos == size_x - 1) {
+          options.Set(2, false);
+          options.Set(5, false);
+          options.Set(8, false);
+          options.Set(11, false);
+          options.Set(14, false);
+          options.Set(17, false);
+          options.Set(20, false);
+          options.Set(23, false);
+          options.Set(26, false);
+        }
+
+        int p = random_ptr->GetInt(options.CountOnes());
+        std::cout << p << std::endl;
+        while(p-- >= 0) {
+          rand_pos = options.PopBit();
+        }
+      }
+      
+      int rand_z = z_pos + rand_pos / 9 - 1;
+      int rand_y = y_pos + (rand_pos - (9 * (rand_pos / 9))) / 3 - 1;
+      int rand_x = x_pos + (rand_pos - (9 * (rand_pos / 9))) % 3 - 1;
+
+      const int neighbor_id = rand_z*size_y*size_x + rand_y*size_x + rand_x;
+
+      emp_assert(neighbor_id >= 0 && neighbor_id < size_x*size_y*size_z, neighbor_id, size_x*size_y*size_z);
+      emp_assert((int)pos.GetIndex() != neighbor_id);
+
+      return pos.SetIndex(neighbor_id);
+    };
+
+    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
+
+      emp_assert(pop_sizes.size() == 3);
+
+      const int size_x = (int) pop_sizes[0];
+      const int size_y = (int) pop_sizes[1];
+
+      const int id_1 = (int) pos1.GetIndex();
+      const int id_2 = (int) pos2.GetIndex();
+
+      if (id_1 == id_2) {return false;} // Self isn't neighbor
+
+      const int x_pos_1 = (id_1%size_x);
+      const int y_pos_1 = (id_1/size_x) % (size_y);
+      const int z_pos_1 = (id_1/size_x) / (size_y);
+
+      const int x_pos_2 = (id_2%size_x);
+      const int y_pos_2 = (id_2/size_x) % (size_y);
+      const int z_pos_2 = (id_2/size_x) / (size_y);
+
+      int x_diff = abs(x_pos_1 - x_pos_2);
+      int y_diff = abs(y_pos_1 - y_pos_2);
+      int z_diff = abs(z_pos_1 - z_pos_2);    
+
+      return (x_diff <= 1) && (y_diff <= 1) && (z_diff <= 1);
+
+    };
+
+    fun_kill_org = [this](){
+      const size_t kill_id = GetRandomCellID();
+      RemoveOrgAt(kill_id);
+      return kill_id;
+    };
+
+    if (synchronous_gen) {
+      // Place births in a neighboring position in the new grid.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        emp_assert(new_org);                                    // New organism must exist.
+        WorldPosition next_pos = fun_get_neighbor(parent_pos);  // Place near parent.
+        return next_pos.SetPopID(1);                            // Adjust position to next pop and place..
+      };
+      SetAttribute("SynchronousGen", "True");
+    } else {
+      // Asynchronous: always go to a neighbor in current population.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
+      };
+      SetAttribute("SynchronousGen", "False");
+    }
+
+    SetAttribute("PopStruct", "3DGrid");
     SetSynchronousSystematics(synchronous_gen);
   }
 
