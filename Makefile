@@ -53,7 +53,7 @@ install-coverage-dependencies:
 	cd third-party && make install-coverage-dependencies
 
 clean:
-	rm -rf build/*
+	rm -rf doc/_build/*
 	cd tests && make clean
 clean-dep:
 	cd third-party && make clean
