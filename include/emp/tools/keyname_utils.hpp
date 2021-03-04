@@ -111,6 +111,25 @@ namespace emp::keyname {
 
   }
 
+  inline std::string demote(std::string keyname) {
+    emp_assert( keyname.find('~') == std::string::npos );
+    emp_assert( keyname.find('%') == std::string::npos );
+    std::replace( std::begin( keyname ), std::end( keyname ), '+', '~' );
+    std::replace( std::begin( keyname ), std::end( keyname ), '=', '%' );
+    return keyname;
+  }
+
+  inline std::string promote(std::string demoted_keyname) {
+    emp_assert( demoted_keyname.find('+') == std::string::npos );
+    emp_assert( demoted_keyname.find('=') == std::string::npos );
+    std::replace(
+      std::begin( demoted_keyname ), std::end( demoted_keyname ), '~', '+'
+    );
+    std::replace(
+      std::begin( demoted_keyname ), std::end( demoted_keyname ), '%', '='
+    );
+    return demoted_keyname;
+  }
 
 
 }
