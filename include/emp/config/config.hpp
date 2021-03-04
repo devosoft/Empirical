@@ -44,6 +44,7 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "../base/assert.hpp"
 #include "../base/errors.hpp"
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
@@ -105,6 +106,12 @@ namespace emp {
 
     /// Identify if this setting is fixed at compile time.
     virtual bool IsConst() const = 0;
+
+    /// Reset this setting to its default.
+    void Reset(std::stringstream & warnings) {
+      this->SetValue( GetDefault(), warnings );
+    }
+
   };
 
   /// Master configuration class that manages all of the settings.
@@ -116,10 +123,11 @@ namespace emp {
     protected:
       VAR_TYPE & entry_ref;
     public:
-      tConfigEntry(const std::string _name, const std::string _type,
-                   const std::string _d_val, const std::string _desc,
+      tConfigEntry(const std::string& _name, const std::string& _type,
+                   const std::string& _d_val, const std::string& _desc,
                    VAR_TYPE & _ref)
-        : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
+        : ConfigEntry(_name, _type, emp::to_string(_ref), _desc)
+        , entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
 
       std::string GetValue() const { return emp::to_string(entry_ref); }
@@ -135,10 +143,11 @@ namespace emp {
     protected:
       const VAR_TYPE literal_val;
     public:
-      tConfigConstEntry(const std::string _name, const std::string _type,
-                        const std::string _d_val, const std::string _desc,
+      tConfigConstEntry(const std::string& _name, const std::string& _type,
+                        const std::string& _d_val, const std::string& _desc,
                         const VAR_TYPE & _literal_val)
-        : ConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
+        : ConfigEntry(_name, _type, emp::to_string(_literal_val), _desc)
+        , literal_val(_literal_val) { ; }
       ~tConfigConstEntry() { ; }
 
       std::string GetValue() const { return default_val; }
@@ -158,8 +167,8 @@ namespace emp {
     /// Special settings entry for settings created during the run (only accissibly dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
-      ConfigLiveEntry(const std::string _name, const std::string _type,
-                       const std::string _d_val, const std::string _desc)
+      ConfigLiveEntry(const std::string& _name, const std::string& _type,
+                       const std::string& _d_val, const std::string& _desc)
         : ConfigEntry(_name, _type, _d_val, _desc) { ; }
       ~ConfigLiveEntry() { ; }
 
@@ -424,6 +433,25 @@ namespace emp {
         GetActiveGroup()->Add(var_map[setting_name]);
       }
       var_map[setting_name]->SetValue(new_value, warnings);
+      if (!delay_warnings && warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
+      }
+      return *this;
+    }
+
+    Config & Reset(const std::string& setting_name) {
+      emp_assert( var_map.count( setting_name ), setting_name );
+      var_map[setting_name]->Reset(warnings);
+      if (!delay_warnings && warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
+      }
+      return *this;
+    }
+
+    Config & Reset() {
+      for (auto& [name, entry] : var_map) entry->Reset(warnings);
       if (!delay_warnings && warnings.rdbuf()->in_avail()) {
         emp::NotifyWarning(warnings.str());
         warnings.str(std::string()); // Clear the warnings.
