@@ -1475,7 +1475,7 @@ namespace emp {
     if constexpr( std::is_same<T, field_t>() ) return bits[index];
 
     T out_value;
-    std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
+    std::memcpy( &out_value, BytePtr().Raw() + index * sizeof(T), sizeof(T) );
     return out_value;
   }
 
@@ -1488,7 +1488,7 @@ namespace emp {
     emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
               index, sizeof(T), NUM_BITS, NUM_FIELDS);
 
-    std::memcpy( BytePtr() + index * sizeof(T), &in_value, sizeof(T) );
+    std::memcpy( BytePtr().Raw() + index * sizeof(T), &in_value, sizeof(T) );
 
     ClearExcessBits();
   }
