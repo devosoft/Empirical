@@ -83,11 +83,12 @@ jobs:
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
       - run: sudo docker run devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
-      - run: docker cp devosoft/empirical:/opt/Empirical/doc/_build/doc-coverage.json .
+      - run: mkdir temp
+      - run: sudo docker run -v $HOME/temp:/transfer devosoft/empirical /bin/bash -c "python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /transfer/doc-coverage.json"
       - uses: actions/upload-artifact@v2
         with:
           name: doc-coverage
-          path: doc-coverage.json
+          path: $HOME/temp/doc-coverage.json
   deploy-dockerhub:
     name: Deploy to DockerHub
     runs-on: ubuntu-latest
