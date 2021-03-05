@@ -82,7 +82,7 @@ jobs:
       - uses: docker-practice/actions-setup-docker@v1
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
-      - run: sudo docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage"
+      - run: sudo docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
   deploy-dockerhub:
     name: Deploy to DockerHub
     runs-on: ubuntu-latest

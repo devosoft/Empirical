@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if test $? -eq 0
+then
+  exit 1
+fi
+
 # adapted from https://stackoverflow.com/a/44849814
 
 stdbuf -i0 -o0 -e0 awk -v offset=${MAX_LINES:-20} \
