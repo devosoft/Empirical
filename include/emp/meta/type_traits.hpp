@@ -25,7 +25,7 @@
 
 namespace emp {
 
-  // #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
   // adapted from https://stackoverflow.com/a/29634934
   namespace detail {
 
@@ -52,7 +52,7 @@ namespace emp {
     template <typename T>
     std::false_type is_iterable_impl(...);
   }
-  // #endif // DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Determine if a type is iterable.
   template <typename T>
