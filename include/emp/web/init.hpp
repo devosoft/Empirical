@@ -190,9 +190,9 @@ namespace emp {
 #include <fstream>
 
 namespace emp {
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this. No idea why
+  //#ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this. No idea why
   std::ofstream debug_file("debug_file");
-  #endif
+  //#endif
   bool init = false;      // Make sure we only initialize once!
 
   /// Stub for when Emscripten is not in use.
