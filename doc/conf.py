@@ -34,7 +34,6 @@ import sphinx_rtd_theme
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
     'sphinx_rtd_theme',
@@ -206,3 +205,4 @@ else:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+    extensions.append('sphinx.ext.coverage')

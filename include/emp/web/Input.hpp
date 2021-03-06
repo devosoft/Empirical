@@ -40,7 +40,7 @@ namespace web {
   class Input : public internal::WidgetFacet<Input> {
     friend class InputInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // Inputs associated with the same DOM element share a single InputInfo object.
     class InputInfo : public internal::WidgetInfo {
       friend Input;
@@ -221,7 +221,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::InputInfo"; }
     }; // End of InputInfo definition
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of info.
     InputInfo * Info() { return (InputInfo *) info; }
@@ -294,18 +294,22 @@ namespace web {
 
     /// Update the min
     Input & Min(const std::string & in_m) { Info()->UpdateMin(in_m); return *this; }
+    /// Update the min
     Input & Min(const double & in_m) { Info()->UpdateMin(in_m); return *this; }
 
     /// Update the max
     Input & Max(const std::string & in_m) { Info()->UpdateMax(in_m); return *this; }
+    /// Update the max
     Input & Max(const double & in_m) { Info()->UpdateMax(in_m); return *this; }
 
     /// Update the current value
     Input & Value(const std::string & in_m) { Info()->UpdateValue(in_m); return *this; }
+    /// Update the current value
     Input & Value(const double & in_m) { Info()->UpdateValue(in_m); return *this; }
 
     /// Update the current step size
     Input & Step(const std::string & in_m) { Info()->UpdateStep(in_m); return *this; }
+    /// Update the current step size
     Input & Step(const double & in_m) { Info()->UpdateStep(in_m); return *this; }
 
     /// Setup this Input to have autofocus (or remove it!)

@@ -350,6 +350,7 @@ protected:
 
   // Callback functions for accessing and scaling data
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   //Callback function for getting unscaled x value of data point (used as key function for data binding)
   std::function<double(DATA_TYPE)> return_x = [](DATA_TYPE d){ return d[0]; };
 
@@ -365,6 +366,8 @@ protected:
   std::function<double(DATA_TYPE)> x = [this](DATA_TYPE d){
       return x_scale->ApplyScale(this->return_x(d));
   };
+
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 public:
 
