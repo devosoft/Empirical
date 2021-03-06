@@ -34,6 +34,7 @@ namespace emp {
   template <int> struct PlaceholderType;
 
   // Index into a template parameter pack to grab a specific type.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <size_t ID, typename T, typename... Ts>
     struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
@@ -44,6 +45,7 @@ namespace emp {
 
   template <size_t ID, typename... Ts>
   using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
   // Trim off the last type from a pack.
   template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
@@ -66,10 +68,9 @@ namespace emp {
   constexpr size_t count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
 
   // Return the index of a test type in a set of types.
-  namespace internal {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  namespace internal {
     template <typename TEST_T> constexpr int get_type_index_impl() { return -1; } // Not found!
-#endif
     template <typename TEST_T, typename T1, typename... Ts>
     constexpr int get_type_index_impl() {
       if (std::is_same<TEST_T, T1>()) return 0;                     // Found here!
@@ -78,6 +79,7 @@ namespace emp {
       return next_id + 1;                                           // Found later!
     }
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   template <typename TEST_T, typename... Ts>
   constexpr int get_type_index() { return internal::get_type_index_impl<TEST_T, Ts...>(); }
 
@@ -85,10 +87,10 @@ namespace emp {
   // These functions can be used to test if a type-set has all unique types or not.
 
   // Base cases...
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename TYPE1> constexpr bool has_unique_first_type() { return true; }
   template <typename TYPE1> constexpr bool has_unique_types() { return true; }
-#endif
+  #endif
 
   template <typename TYPE1, typename TYPE2, typename... TYPE_LIST>
   constexpr bool has_unique_first_type() {
@@ -122,12 +124,14 @@ namespace emp {
   //
   // Two helper functions exist to test each part: test_type_exist and test_type_value.
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <template <typename...> class FILTER, typename T>
     constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> x) { return true; }
     template <template <typename...> class FILTER, typename T>
     constexpr bool tt_exist_impl(...) { return false; }
   }
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type_exist() { return internal::tt_exist_impl<TEST, T>(true); }
@@ -135,6 +139,7 @@ namespace emp {
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type_value() { return TEST<T>::value; }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // If a test does have a value field, that value determines success.
     template <typename RESULT, bool value_exist>
@@ -157,6 +162,7 @@ namespace emp {
     template <template <typename...> class TEST, typename T>
     struct test_type_e_impl<TEST,T,0> { constexpr static bool Test() { return false; } };
   }
+  #endif // DOXYGEN_SHOULD_SKIP THIS
 
   // Function to actually perform a universal test.
   template <template <typename...> class TEST, typename T>
@@ -167,7 +173,7 @@ namespace emp {
 
   // TruncateCall reduces the number of arguments for calling a function if too many are used.
   // @CAO: This should be simplified using TypeSet
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <typename... PARAMS>
     struct tcall_impl {
@@ -177,6 +183,7 @@ namespace emp {
       }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   // Truncate the arguments provided, using only the relevant ones for a function call.
   template <typename R, typename... PARAMS, typename... ARGS>
@@ -193,7 +200,7 @@ namespace emp {
     }
   };
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // Allow a hash to be determined by a GetHash() member function.
     template <typename T>
@@ -211,6 +218,7 @@ namespace emp {
       return (size_t) x;
     }
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   // Setup hashes to be dynamically determined.
   template <typename T>
@@ -233,6 +241,7 @@ namespace emp {
   // Change the internal type arguments on a template...
   // Adapted from: Sam Varshavchik
   // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template<typename T, typename ...U> struct AdaptTemplateHelper {
       using type = T;
@@ -243,12 +252,14 @@ namespace emp {
       using type = T<U...>;
     };
   }
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
   template<typename T, typename... U>
   using AdaptTemplate = typename internal::AdaptTemplateHelper<T, U...>::type;
 
 
   // Variation of AdaptTemplate that only adapts first template argument.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template<typename T, typename U> class AdaptTemplateHelper_Arg1 {
     public:
@@ -261,6 +272,7 @@ namespace emp {
       using type = T<U, V...>;
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template<typename T, typename U>
   using AdaptTemplate_Arg1 = typename internal::AdaptTemplateHelper_Arg1<T, U>::type;

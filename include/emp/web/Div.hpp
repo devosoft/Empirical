@@ -46,6 +46,7 @@ namespace web {
   class Table;
   class Element;
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     class TableInfo;
@@ -296,6 +297,7 @@ namespace web {
       virtual std::string GetType() override { return "web::DivInfo"; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// A widget to track a div in an HTML file, and all of its contents.
   class Div : public internal::WidgetFacet<Div> {

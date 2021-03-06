@@ -519,6 +519,7 @@ namespace emp {
   class ContainerDataFile;
 
   // This handles all possible forms of pointers to containers.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     template <typename container_t>
@@ -554,6 +555,7 @@ namespace emp {
     };
 
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Sometimes you may want a data file where a set
   /// of functions is run on every item in a container

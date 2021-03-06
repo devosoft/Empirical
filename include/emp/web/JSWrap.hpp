@@ -62,8 +62,8 @@ extern "C" {
 #else
 // When NOT in Emscripten, need a stub for this function.
 int EMP_GetCBArgCount() { return -1; }
-#endif
-#endif
+#endif // EMSCRIPTEN
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 namespace emp {
 
@@ -625,6 +625,6 @@ void empCppCallback(const size_t cb_id) {
 
 } // extern "C"
 
-/// @endcond
+
 
 #endif

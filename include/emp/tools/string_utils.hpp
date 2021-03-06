@@ -795,7 +795,7 @@ namespace emp {
     return result;
   }
 
-  /// @cond TEMPLATES
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatanated string.
@@ -845,7 +845,7 @@ namespace emp {
 
   }
 
-  /// @endcond
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
   /// This function does its very best to convert anything it gets to a string. Takes any number
@@ -896,6 +896,7 @@ namespace emp {
     return out_val;
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     static inline void _from_string(std::stringstream &) { ; }
 
@@ -905,6 +906,7 @@ namespace emp {
       _from_string(ss, extra_args...);
     }
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// The from_string() function can also take multiple args instead of a return.
   template <typename... Ts>

@@ -24,6 +24,7 @@ namespace emp {
   template <auto... Ts> struct ValPack;
 
   // Anonymous implementations of ValPack interface.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <bool DONE, auto START, auto END, auto STEP, auto... VALS>
     struct vp_range {
@@ -109,6 +110,7 @@ namespace emp {
     };
     template <> struct vp_sort<ValPack<>> { using result = ValPack<>; };
   } // End internal namespace
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
   /// Generate a ValPack with a specified range of values.
   template <auto START, auto END, auto STEP=1>

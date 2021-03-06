@@ -55,6 +55,7 @@
 
 namespace emp {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     static emp::map<std::string,int> & TrackMem_GetMap() {
@@ -110,6 +111,7 @@ namespace emp {
     }
 
   }
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
 }
 #endif

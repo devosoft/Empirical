@@ -12,6 +12,7 @@
 #define EMP_DEPOSITORY_ENTRY_HPP
 
 namespace emp {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace internal {
 
 template<typename Val, typename Tag, typename Regulator>
@@ -26,6 +27,7 @@ struct DepositoryEntry {
 };
 
 } // namespace internal
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 } // namespace emp
 
 #endif // #ifndef EMP_DEPOSITORY_ENTRY_HPP

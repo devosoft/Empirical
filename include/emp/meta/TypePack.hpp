@@ -77,6 +77,7 @@ namespace emp {
   struct null_t {};
 
   // Private helpers for TypePack
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // Create add N copies of the same type to the end of a TypePack.
     template <typename START, typename T, int N>
@@ -196,6 +197,7 @@ namespace emp {
       using result_t = emp::TypePack<emp::TypePack<>>;
     };
   }
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename T, int N>
   using TypePackFill = typename internal::tp_pad<TypePack<>,T,N>::type;

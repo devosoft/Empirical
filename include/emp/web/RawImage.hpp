@@ -25,6 +25,7 @@
 
 namespace emp {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /// Detailed information about an image
     struct ImageInfo {
@@ -119,6 +120,7 @@ namespace emp {
     };
 
   } // End internal namespace
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
   /// Fundamental information about a single image.
   class RawImage {

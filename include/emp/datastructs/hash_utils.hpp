@@ -41,6 +41,7 @@ namespace emp {
   }
 
   // helper functions for murmur hash
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     constexpr inline uint64_t rotate(const size_t x, const size_t r) {
       return (x << r) | (x >> (64 - r));
@@ -53,6 +54,7 @@ namespace emp {
       k ^= k >> 33;
     }
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Implementation of the murmur3 hash, a fast hash with low collisions.
   /// This hash makes it suitable for hash-based lookups.

@@ -48,6 +48,7 @@
 namespace emp {
 namespace web {
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Setup some types we will need later
   namespace internal {
     // Pre-declare WidgetInfo so classes can inter-operate.
@@ -74,7 +75,7 @@ namespace web {
       virtual bool Trigger(WidgetInfo &) const = 0;
     };
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
@@ -206,7 +207,8 @@ namespace web {
     /// Debug...
     std::string GetInfoType() const;
   };
-
+  
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     // WidgetInfo is a base class containing information needed by all GUI widget classes
@@ -380,6 +382,7 @@ namespace web {
     };
 
   }  // end namespaceinternal
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   // Implementation of Widget methods...
 
@@ -566,7 +569,7 @@ namespace web {
     return info->GetType();
   }
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     /// WidgetFacet is a template that provides accessors into Widget with a derived return type.
@@ -953,6 +956,7 @@ namespace web {
     };
 
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 }
