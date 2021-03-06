@@ -51,4 +51,6 @@ TEST_CASE("Test Bloom Filter", "[datastructs]")
 
 	cbf.compress(50);
 	CHECK(cbf.size() == 720);
+	CHECK(b4 != b3);
+	CHECK(b4 == b4);
 }

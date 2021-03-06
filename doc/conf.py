@@ -61,7 +61,8 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../include"
+    "exhaleDoxygenStdin":    "INPUT = ../include",
+    "listingExclude": ["emp::internal::*, emp::web::internal::*", "internal"]
 }
 
 # Tell sphinx what the primary language being documented is.
@@ -126,6 +127,7 @@ html_theme = 'sphinx_rtd_theme'
 #
 html_theme_options = {
 #    'collapse_navigation': False
+    'navigation_depth':2
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

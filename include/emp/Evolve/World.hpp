@@ -434,10 +434,10 @@ namespace emp {
     /// Add a new systematics manager to the world by passing in all the information
     /// the world needs to construct it.
     /// @param calc_taxon a function that calculates the systematics manager's taxon type from an ORG
-    /// @param store_active     Should living organisms' taxa be tracked? (typically yes!)
-    /// @param store_ancestors  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
-    /// @param store_all        Should all dead taxa be maintained? (typically no; it gets BIG!)
-    /// @param store_pos        Should the systematics tracker keep track of organism positions? (yes, unless you're doing something super weird)
+    /// @param active     Should living organisms' taxa be tracked? (typically yes!)
+    /// @param anc  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
+    /// @param all        Should all dead taxa be maintained? (typically no; it gets BIG!)
+    /// @param pos        Should the systematics tracker keep track of organism positions? (yes, unless you're doing something super weird)
     /// @param label            A label for this tracker so you can find it again
     template <typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
     Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> AddSystematics(std::function<ORG_INFO(const ORG&)> calc_taxon, bool active=true, bool anc=true, bool all=true, bool pos=true, std::string label="systematics" ) {
@@ -451,6 +451,7 @@ namespace emp {
     /// Note: You are giving the world object complete control of this
     /// systematics manager. It will be deleted in the destructor
     /// for this object
+    /// @param s a pointer to the systematics manager to add
     /// @param label defines a label for this systematics manager, so you can find it again
     template <typename ORG_INFO, typename DATA_STRUCT>
     void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {

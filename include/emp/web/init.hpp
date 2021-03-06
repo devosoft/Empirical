@@ -5,10 +5,18 @@
  *
  *  @file  init.hpp
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
+ * 
+ * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It 
+ * handles making sure that behind the scenes stuff is all set up properly. It also defines some
+ * useful stubs and dummy functions so that your code will still be possible to comple with a normal
+ * C++ compiler (although the web part won't do anything, of course). These stubs are also helpful
+ * for avoiding confusion in linters and IDEs. 
  */
 
 #ifndef EMP_INIT_H
 #define EMP_INIT_H
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS // This file is just going to confuse doxygen
 
 #include <type_traits>
 #include "emp/base/assert_warning.hpp"
@@ -190,9 +198,8 @@ namespace emp {
 #include <fstream>
 
 namespace emp {
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this. No idea why
+  
   std::ofstream debug_file("debug_file");
-  #endif
   bool init = false;      // Make sure we only initialize once!
 
   /// Stub for when Emscripten is not in use.
@@ -225,5 +232,12 @@ namespace emp {
 
 #endif
 
+#endif
+
+#else // Let doxygen document a non-confusing version of Live
+
+/// Take a function or variable and set it up so that it can update each time a text box is redrawn.
+template <typename T>
+std::function<std::string()> emp::Live(T && val) {;}
 
 #endif

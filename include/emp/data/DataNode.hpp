@@ -201,14 +201,17 @@ namespace emp {
     /// Get this DataNode's keyword
     const std::string & GetKeyword() const { return keyword; }
 
-    /// Set this DataNode's name to @param _in
+    /// Set this DataNode's name to specified value
     void SetName(const std::string & _in) { name = _in; }
-    /// Set this DataNode's description to @param _in
+    /// Set this DataNode's description to specified value
     void SetDescription(const std::string & _in) { desc = _in; }
-    /// Set this DataNode's keyword to @param _in
+    /// Set this DataNode's keyword to specified value
     void SetKeyword(const std::string & _in) { keyword = _in; }
 
-    /// Set this DataNode's name to @param _n , description to @param _d , and keyword to @param _k
+    /// Set this DataNode's information
+    /// @param _n value to set name to
+    /// @param _d value to set description to
+    /// @param _k value to set keyword to
     void SetInfo(const std::string & _n, const std::string & _d="", const std::string & _k="") {
       name = _n;  desc = _d;  keyword = _k;
     }
