@@ -84,10 +84,10 @@ jobs:
       - run: docker ps -a
       - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
       - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
-      - uses: actions/upload-artifact@v2
+      - uses: sylvanld/action-storage@v1
         with:
-          name: doc-coverage
-          path: doc-coverage.json
+          src: doc-coverage.json
+          dst: stats/doc-coverage.json          
   deploy-dockerhub:
     name: Deploy to DockerHub
     runs-on: ubuntu-latest
