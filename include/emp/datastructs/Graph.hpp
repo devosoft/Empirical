@@ -99,7 +99,9 @@ namespace emp {
       return edge_count;
     }
 
+    /// @returns the \c i th node in the graph
     Node GetNode(int i) {return nodes[i];}
+    /// @returns a vector of all nodes in the graph
     emp::vector<Node> GetNodes(){return nodes;}
     
     /// Change the number of vertices in this graph.
@@ -249,9 +251,11 @@ namespace emp {
 
   };
 
+  /// A graph class that maintains a set of vertices (nodes), edges (connecting pairs of nodes),
+  /// and edge weights
   class WeightedGraph : public Graph {
   protected:
-    emp::vector< emp::vector< double > > weights;
+    emp::vector< emp::vector< double > > weights; /// The weight of each edge in the graph
 
   public:
     WeightedGraph(size_t num_nodes=0) : Graph(num_nodes), weights(num_nodes) {
@@ -328,6 +332,7 @@ namespace emp {
       }
     }
 
+    /// @returns the weights for all edges in the graph
     emp::vector<emp::vector<double> > GetWeights(){return weights;}
 
   };
