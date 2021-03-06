@@ -99,7 +99,7 @@ namespace emp {
       static void Run(TUP1_T &, TUP2_T &, const FUN_T &) { ; }
     };
   }
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Call a provided function on each pair of elements in two tuples.
   template <typename TUP1_T, typename TUP2_T, typename FUN_T>

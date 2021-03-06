@@ -572,7 +572,7 @@ namespace web {
     }
 
 
-    size_t GetCurRow() const { return cur_row; }  ///< Determine which row currnetly has focus.
+    size_t GetCurRow() const { return cur_row; }  ///< Determine which row currently has focus.
     size_t GetCurCol() const { return cur_col; }  ///< Determine which column currently has focus.
 
     // Can clear anything from any widget, if properly specified.
