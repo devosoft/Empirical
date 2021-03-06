@@ -23,6 +23,7 @@ public:
 
   emp::vector<NODE> data = emp::vector<NODE>(grid_width*grid_height);
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   std::function<int(NODE)> GetX = [this](NODE n) {
     return cell_size*(n.loc() % grid_width);
   };
@@ -30,6 +31,7 @@ public:
   std::function<int(NODE)> GetY = [this](NODE n) {
     return cell_size*(n.loc() / grid_width);
   };
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   void SetCellSize(int size) {
     cell_size = size;

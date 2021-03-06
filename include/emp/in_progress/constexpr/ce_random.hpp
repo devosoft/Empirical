@@ -316,6 +316,7 @@ namespace emp {
   };
 
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /*! This is an adaptor to make Random behave like a proper STL random number
     generator.
   */
@@ -328,6 +329,7 @@ namespace emp {
 
     Random& _rng;
   };
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
   /*! Draw a sample (with replacement) from an input range, copying to the output range.

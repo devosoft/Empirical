@@ -165,6 +165,7 @@ public:
   D3::Selection circles;
   D3::ToolTip * tip;
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   std::function<double(double, int, int)> scaled_d = [&](double d, int i, int k){
       return y_scale->ApplyScale(d);
   };
@@ -172,6 +173,7 @@ public:
   std::function<double(double, int, int)> scaled_i = [&](double d, int i, int k){
       return x_scale->ApplyScale(i);
   };
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   DotPlot(int w=500, int h=500) : D3Visualization(w, h){;}
 
@@ -794,6 +796,7 @@ protected:
     tree.SetSize(GetHeight(), GetWidth());
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   std::function<std::string(NODE, int)> color_fun_node = [](NODE d, int i){
     return "black";
   };
@@ -801,6 +804,7 @@ protected:
   std::function<std::string(NODE, int)> color_fun_link = [](NODE d, int i){
     return "black";
   };
+  #endif DOXYGEN_SHOULD_SKIP_THIS
 
 public:
   D3::TreeLayout<NODE> tree;
