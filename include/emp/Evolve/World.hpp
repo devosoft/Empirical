@@ -405,7 +405,8 @@ namespace emp {
       return systematics[systematics_labels[label]];
     }
 
-
+    /// Remove a systematics manager from this world
+    /// @param id the id of the systematics manager to remove (0 is the first one you added, 1 is 2nd, etc.)
     void RemoveSystematics(int id) {
       emp_assert(systematics.size() > 0, "Cannot remove systematics file. No systematics file to track.");
       emp_assert(id < systematics.size(), "Invalid systematics file requested to be removed.", id, systematics.size());
@@ -420,6 +421,8 @@ namespace emp {
       }
     }
 
+    /// Remove a systematics manager from this world
+    /// @param label the label of the systematics manager to remove
     void RemoveSystematics(std::string label) {
       emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
 
@@ -428,6 +431,14 @@ namespace emp {
       systematics_labels.erase(label) ;
     }
 
+    /// Add a new systematics manager to the world by passing in all the information
+    /// the world needs to construct it.
+    /// @param calc_taxon a function that calculates the systematics manager's taxon type from an ORG
+    /// @param store_active     Should living organisms' taxa be tracked? (typically yes!)
+    /// @param store_ancestors  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
+    /// @param store_all        Should all dead taxa be maintained? (typically no; it gets BIG!)
+    /// @param store_pos        Should the systematics tracker keep track of organism positions? (yes, unless you're doing something super weird)
+    /// @param label            A label for this tracker so you can find it again
     template <typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
     Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> AddSystematics(std::function<ORG_INFO(const ORG&)> calc_taxon, bool active=true, bool anc=true, bool all=true, bool pos=true, std::string label="systematics" ) {
       Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> sys_ptr;
@@ -436,6 +447,11 @@ namespace emp {
       return sys_ptr;
     }
 
+    /// Add a new systematics manager to the world from a pointer
+    /// Note: You are giving the world object complete control of this
+    /// systematics manager. It will be deleted in the destructor
+    /// for this object
+    /// @param label defines a label for this systematics manager, so you can find it again
     template <typename ORG_INFO, typename DATA_STRUCT>
     void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {
       if (Has(systematics_labels, label)) {
@@ -528,6 +544,8 @@ namespace emp {
       return &(data_nodes.Get("fitness"));
     }
 
+    /// Adds a data nodes to the world with the specified name.
+    /// @returns a pointer to the DataNode
     // Returns a reference so that capturing it in a lambda to call on update
     // is less confusing. It's possible we should change it to be consistent
     // with GetFitnessDataNode, though.
@@ -536,6 +554,8 @@ namespace emp {
       return &(data_nodes.New(name));
     }
 
+    /// Retrieve a pointer to a DataNode maintained by the world
+    /// with a name matching \c name.
     Ptr<DataMonitor<double>> GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
