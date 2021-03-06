@@ -144,7 +144,8 @@ namespace emp {
     return ss.str();
   }
 
-  /// Take a string and convert it to a C++-style literal.
+  /// Take a string or iterable and convert it to a C++-style literal.
+  // This is the version for string. The version for an iterable is below.
   static inline std::string to_literal(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
@@ -155,6 +156,8 @@ namespace emp {
     ss << "\"";
     return ss.str();
   }
+
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Take any iterable value and convert it to a C++-style literal.
   template <typename T>
@@ -170,6 +173,8 @@ namespace emp {
 
     return ss.str();
   }
+
+  #endif
 
   /// Test if an input string is properly formated as a literal character.
   static inline char is_literal_char(const std::string & value) {
@@ -713,10 +718,10 @@ namespace emp {
   }
 
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
-  /// @in_string operand
-  /// @out_set destination
-  /// @delim delimiter to split on
-  /// @max_split defines the maximum number of splits
+  /// @param in_string operand
+  /// @param out_set destination
+  /// @param delim delimiter to split on
+  /// @param max_split defines the maximum number of splits
   static inline void slice(
     const std::string_view & in_string,
     emp::vector<std::string> & out_set,
@@ -754,9 +759,9 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  /// @in_string operand
-  /// @delim delimiter to split on
-  /// @max_split defines the maximum number of splits
+  /// @param in_string operand
+  /// @param delim delimiter to split on
+  /// @param max_split defines the maximum number of splits
   static inline emp::vector<std::string> slice(
     const std::string_view & in_string,
     const char delim='\n',
@@ -767,7 +772,7 @@ namespace emp {
     return result;
   }
 
-  /// Create a set of string_views based on the provided delimitor; fill them in to the provided vector.
+  /// Create a set of string_views based on the provided delimiter; fill them in to the provided vector.
   static inline void view_slices(const std::string_view & in_string,
                                  emp::vector<std::string_view> & out_set,
                                  char delim='\n') {
@@ -845,7 +850,7 @@ namespace emp {
 
   /// This function does its very best to convert anything it gets to a string. Takes any number
   /// of arguments and returns a single string containing all of them concatenated.  Any objects
-  /// that can go through a stringstream, have a ToString() memember functon, or are defined to
+  /// that can go through a stringstream, have a ToString() memember function, or are defined to
   /// be passed into emp::ToString(x) will work correctly.
   template <typename... Ts>
   inline std::string to_string(const Ts &... values) {

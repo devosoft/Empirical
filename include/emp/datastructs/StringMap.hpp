@@ -4,7 +4,7 @@
  *  @date 2018-2019.
  *
  *  @file StringMap.hpp
- *  @brief An std::unordered_map wrapper that deals smootly with strigns and fast compile-time optimizations.
+ *  @brief An std::unordered_map wrapper that deals smoothly with strings and fast compile-time optimizations.
  *  @note Status: ALPHA
  *
  *  StringMap is setup to be a generic dictionary that can link strings to objects of any other

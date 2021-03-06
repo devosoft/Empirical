@@ -160,8 +160,8 @@ namespace emp {
   /// @param inst_lib - Instruction library used to generate the program.
   /// @param min_func_cnt - Mininum number of functions in generated program.
   /// @param max_func_cnt - Maximum number of functions in generated program.
-  /// @param min_inst_cnt - Minimum number of instructions per function.
-  /// @param max_inst_cnt - Maximum number of instructions per function.
+  /// @param min_fun_len - Minimum number of instructions per function.
+  /// @param max_fun_len - Maximum number of instructions per function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
   template<
@@ -355,6 +355,7 @@ namespace emp {
     /// ApplyMutations applies all added mutators to the given program and updates the last mutation count for
     /// each mutator.
     /// @param p - program to be mutated
+    /// @param r - random number generator to use
     size_t ApplyMutations(program_t & p, emp::Random & r) {
       size_t mut_cnt = 0;
       for (auto & mutator_type : mutator_lib) {

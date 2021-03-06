@@ -22,8 +22,8 @@
 namespace emp {
 
   /// Generate a unique long from a pair of ints.
-  /// @param a First 32-bit unsigned int.
-  /// @param b Second 32-bit unsigned int.
+  /// @param a_ First 32-bit unsigned int.
+  /// @param b_ Second 32-bit unsigned int.
   /// @return 64-bit unsigned int representing the szudzik hash of both inputs.
   inline uint64_t szudzik_hash(uint32_t a_, uint32_t b_)
   {

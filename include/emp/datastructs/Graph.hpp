@@ -125,7 +125,7 @@ namespace emp {
     }
 
     /// Get the in-degree (number of incoming edges)
-    /// of the node @param id. 
+    /// of the node @param id
     /// This should only be used for directed graphs (for
     /// undirected graphs, GetDegree() is equivalent and faster) 
     size_t GetInDegree(size_t id) const {
@@ -146,7 +146,7 @@ namespace emp {
       return nodes[id].GetMaskedDegree(mask);
     }
 
-    /// Set label of node @param id
+    /// Set label of node @param id to @param lab
     void SetLabel(size_t id, std::string lab) {
       nodes[id].SetLabel(lab);
     }

@@ -186,8 +186,8 @@ namespace emp {
 
     /// Currently only 3 Block types:
     ///   * NONE:  Not a block.
-    ///   * BASIC: Anything that's not a loop. Once closed/@end of block, execution can just continue.
-    ///   * LOOP:  Once closed/@end of block, execution needs to jump back to beginning of block.
+    ///   * BASIC: Anything that's not a loop. Once closed/at end of block, execution can just continue.
+    ///   * LOOP:  Once closed/at end of block, execution needs to jump back to beginning of block.
     enum class BlockType { NONE=0, BASIC, LOOP };
     /// Struct to store information relevant to a 'code block' (e.g. if statements, while loops, etc).
     /// Maintains the beginning, end, and type of block.

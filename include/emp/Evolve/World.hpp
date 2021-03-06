@@ -10,8 +10,8 @@
  *  and selection techniques for evolutionary computation applications.
  *
  *
- *  @todo Make sure when mutations occure before placement into the population we can control
- *        whether or not they also affect injected organisms.  (Right now they alwyas do!!)
+ *  @todo Make sure when mutations occur before placement into the population we can control
+ *        whether or not they also affect injected organisms.  (Right now they always do!!)
  *  @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
  *        delegation to facilitate demes, pools, islands, etc.
  *  @todo We should be able to have any number of systematics managers, based on various type_trait
@@ -190,7 +190,7 @@ namespace emp {
     Signal<void(WorldPosition,WorldPosition)> on_swap_sig; ///< ...after org positions are swapped
     Signal<void()>             world_destruct_sig;   ///< ...in the World destructor.
 
-    /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
+    /// Build a Setup function in world that calls \c \::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
     /// Get the current cached value for the organism at the specified position.
@@ -204,7 +204,7 @@ namespace emp {
     /// * a random number generator (either a pointer or reference)
     /// * a unique name for the world
     /// If no name is provided, the world remains nameless.
-    /// If no random number generator is provided, gen_random determines if one shold be created.
+    /// If no random number generator is provided, gen_random determines if one should be created.
     World(std::string _name="", bool gen_random=true)
       : update(0), random_ptr(nullptr), random_owner(false), pops(), pop(pops[0]), num_orgs(0)
       , fit_cache()
@@ -221,7 +221,7 @@ namespace emp {
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
       , on_swap_sig(to_string(name,"::on-swap"), control)
-      , world_destruct_sig(to_string(name,"::wolrd-destruct"), control)
+      , world_destruct_sig(to_string(name,"::world-destruct"), control)
     {
       if (gen_random) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -397,7 +397,7 @@ namespace emp {
     }
 
     /// Get a systematics manager (which is tracking lineages in the population.)
-    /// @param id - which systematics manager to return? Systematics managers are
+    /// @param label - which systematics manager to return? Systematics managers are
     /// stored in the order they are added to the world.
     Ptr<SystematicsBase<ORG> > GetSystematics(std::string label) {
       emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
@@ -600,7 +600,7 @@ namespace emp {
     ///  * a distance function that takes references to two organisms and returns a double
     ///    indicating the distance between those organisms,
     ///  * a sharing threshold (sigma share) that defines the maximum distance at which members
-    ///    should be consdered in the same niche,
+    ///    should be considered in the same niche,
     ///  * and a value of alpha, which controls the shape of the fitness sharing curve.
     void SetSharedFitFun(const fun_calc_fitness_t & fit_fun, const fun_calc_dist_t & dist_fun,
                          double sharing_threshold, double alpha);
@@ -680,7 +680,7 @@ namespace emp {
     }
 
     /// Provide a function for World to call at the start of its destructor (for additional cleanup).
-    /// Trigger:  Destructor has begun to execture
+    /// Trigger:  Destructor has begun to execute
     /// Argument: None
     /// Return:   Key value needed to make future modifications.
     SignalKey OnWorldDestruct(const std::function<void()> & fun) {
@@ -709,7 +709,7 @@ namespace emp {
 
     /// Update the world:
     /// 1. Send out an update signal for any external functions to trigger.
-    /// 2. If synchronous generations, move next population into place as the current popoulation.
+    /// 2. If synchronous generations, move next population into place as the current population.
     /// 3. Handle any data-related updates including systematics and files that need to be printed.
     /// 4. Increment the current update number.
     void Update();
@@ -1064,7 +1064,7 @@ namespace emp {
 
       SetAttribute("SynchronousGen", "True");
     } else {
-      // Asynchronous: always go to a neigbor in current population.
+      // Asynchronous: always go to a neighbor in current population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
         return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
@@ -1387,7 +1387,7 @@ namespace emp {
     file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumActive(); }, "num_taxa", "Number of unique taxonomic groups currently active." );
     file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
     file.template AddFun<double>( [this, id](){ return systematics[id]->GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
-    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phylogenies." );
     file.template AddFun<int>(    [this, id](){ return systematics[id]->GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
     file.template AddFun<double>( [this, id](){ return systematics[id]->CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of taxa in population)." );
 
@@ -1429,7 +1429,7 @@ namespace emp {
     on_update_sig.Trigger(update);
 
     // 2. If synchronous generations (i.e, pops[1] is not empty), move next population into
-    //    place as the current popoulation.
+    //    place as the current population.
     if (IsSynchronous()) {
       // Trigger signals for orgs in next pop before they are moved into the active pop.
       for (size_t i = 0; i < pops[1].size(); i++) {

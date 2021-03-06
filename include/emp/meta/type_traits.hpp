@@ -102,7 +102,7 @@ namespace emp {
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
   template <typename T> using remove_pointer_t = remove_ptr_type_t<T>;
-  // @CAO: Make sure we are dealing with const and volitile pointers correctly.
+  // @CAO: Make sure we are dealing with const and volatile pointers correctly.
 
   /// Convert a value to a non-pointer if and only if it is one.
   template <typename T>
