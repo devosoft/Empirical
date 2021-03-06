@@ -102,11 +102,11 @@ namespace emp {
      *  and should be of whatever type all of the nodes in this manger expect.
      *
      * Example:
-     * \code{cpp}
+     * ```
      * DataManager<int, data::Current, data::Range> my_data_manager;
      * my_data_manager.Add("my_node_name");
      * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  
-     * \code */
+     * ```*/
     template <typename... Ts>
     void AddData(const std::string & name, Ts... extra) {
       emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));

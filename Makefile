@@ -54,6 +54,8 @@ install-coverage-dependencies:
 
 clean:
 	rm -rf doc/_build/*
+	rm -rf doc/api
+	rm -rf doc/doxyoutput
 	cd tests && make clean
 clean-dep:
 	cd third-party && make clean
