@@ -37,6 +37,10 @@ coverage_source/*/*
 */*/default.profraw
 */*/default.profdata
 
+doc/api
+doc/doxyoutput
+doc/_build
+
 demos/Avida/Avida
 demos/Avida/web/Avida.js
 demos/Emphatic/Emphatic

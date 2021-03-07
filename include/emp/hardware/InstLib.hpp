@@ -46,7 +46,7 @@ namespace emp {
       size_t num_args;              ///< Number of args needed by function.
       std::string desc;             ///< Description of function.
       ScopeType scope_type;         ///< How does this instruction affect scoping?
-      size_t scope_arg;             ///< Which arg indictes new scope (if any).
+      size_t scope_arg;             ///< Which arg indicates new scope (if any).
       inst_properties_t properties; ///< Are there any generic properties associated with this inst def?
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
@@ -98,7 +98,7 @@ namespace emp {
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
 
-    /// Retrieve a unique letter associared with the specified instruction ID.
+    /// Retrieve a unique letter associated with the specified instruction ID.
     static constexpr char GetSymbol(size_t id) {
       if (id < 26) return ('a' + id);
       if (id < 52) return ('A' + (id - 26));
@@ -136,7 +136,7 @@ namespace emp {
     /// @param num_args How many arguments does this function require? (default=0)
     /// @param desc A description of how this function operates. (default="")
     /// @param scope_type Type of scope does this instruction creates. (default=ScopeType::NONE)
-    /// @param scope_arg If instruction changes scope, which argument specified new scope? (defualt=-1)
+    /// @param scope_arg If instruction changes scope, which argument specified new scope? (default=-1)
     void AddInst(const std::string & name,
                  const fun_t & fun_call,
                  size_t num_args=0,

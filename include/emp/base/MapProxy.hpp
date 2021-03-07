@@ -116,6 +116,7 @@ namespace emp {
 
 
   // Build externaly binary operators with MapProxy as the second argument.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by the enable_ifs
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
   auto operator + (T1 v1, const MapProxy<T2> & v2) { return v1 + v2.emp_GetValue(); }
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
@@ -154,7 +155,7 @@ namespace emp {
   auto operator >= (T1 v1, const MapProxy<T2> & v2) { return v1 >= v2.emp_GetValue(); }
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
   auto operator , (T1 v1, const MapProxy<T2> & v2) { return v1 , v2.emp_GetValue(); }
-
+  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 }
 
 // A crude, generic printing function for emp::MapProxy.

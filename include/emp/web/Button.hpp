@@ -40,7 +40,7 @@ namespace web {
   class Button : public internal::WidgetFacet<Button> {
     friend class ButtonInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // Buttons associated with the same DOM element share a single ButtonInfo object.
     class ButtonInfo : public internal::WidgetInfo {
       friend Button;
@@ -79,6 +79,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }
     }; // End of ButtonInfo definition
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
     // Get a properly cast version of indo.

@@ -1,3 +1,6 @@
+#ifndef EMP_EVO_WORLD_OUTPUT_H
+#define EMP_EVO_WORLD_OUTPUT_H
+
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
@@ -6,8 +9,6 @@
  * This file contains functions for adding additional data files to Worlds.
 **/
 
-#ifndef EMP_EVO_WORLD_OUTPUT_H
-#define EMP_EVO_WORLD_OUTPUT_H
 
 #include "../base/vector.hpp"
 #include "../data/DataFile.hpp"     // Helper to determine when specific events should occur.

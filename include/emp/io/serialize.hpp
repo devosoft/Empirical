@@ -179,7 +179,7 @@ namespace serialize {
 
 
   // Setup for a variadic Store() function that systematically save all variables in a DataPod.
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     // Base implementaion to specialize on.
@@ -199,6 +199,7 @@ namespace serialize {
       static void Store(DataPod &) { ; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename... ARG_TYPES>
   void Store(DataPod & pod, ARG_TYPES&... args) {

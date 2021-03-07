@@ -29,6 +29,7 @@ namespace web {
   class Element : public Div {
   public:
     /// @param in_tag sets the html tag for used this object (i.e., div, footer, header, p, etc.)
+    /// @param in_name sets the id of this html element 
     Element(const std::string & in_tag, const std::string & in_name="")
     : Div(in_name) {
       // When a name is provided, create an associated Widget info.
