@@ -1,8 +1,12 @@
-// Karma configuration
-// Generated on Mon Oct 03 2016 15:06:06 GMT-0400 (EDT)
-
 module.exports = function(config) {
   config.set({
+
+    // to enable commandline input
+    client: {
+      // args: config.name ? ["--name"] : [],
+      // note that this works only with `karma start`, not `karma run`
+      filename: config.filename,
+    },
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../../',
@@ -20,15 +24,24 @@ module.exports = function(config) {
       {pattern: 'examples/web/jquery-1.11.2.min.js'},
       {pattern: 'third-party/node_modules/mocha/mocha.js'},
       {pattern: 'third-party/node_modules/chai/chai.js'},
-      {pattern: 'source/web/d3/d3.min.js'},
-      {pattern: 'source/web/d3/d3-tip.min.js'},
-      {pattern: 'tests/web/test_header.js'},
-      {pattern: 'tests/web/assets/lineage-example.json', included: false},
-      {pattern: 'tests/web/assets/test-line-graph.csv', included: false},
-      {pattern: 'tests/web/test_visualizations.js.map', included: false},
-      {pattern: 'tests/web/test_visualizations.js'},
-      {pattern: 'tests/web/test_visualizations.wasm', included: false, nocache:true},
-      {pattern: 'tests/web/test_visualizations.wasm.map', included: false, nocache:true}
+      {pattern: 'include/emp/web/d3/d3.min.js'},
+      {pattern: 'include/emp/web/d3/d3-tip.min.js'},
+      'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/styles/default.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/highlight.min.js',
+      {pattern: 'include/emp/prefab/HighlightJS.js'},
+      'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js',
+      'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css',
+      'https://cdn.jsdelivr.net/gh/devosoft/Empirical@mastersource/fresh-prefab/DefaultPrefabStyles.less',
+      'https://cdn.jsdelivr.net/npm/less',
+      'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js',
+      {pattern: 'include/emp/prefab/LoadingModal.js'},
+      // TODO: put all prefab dependencies in a directory and link it somehow
+      // {pattern: 'tests/web/CodeBlock/*', included: false},
+      {pattern: 'tests/web/assets/*', included: false},
+      {pattern: `tests/web/${config.filename}.js.map`, included: false},
+      {pattern: `tests/web/${config.filename}.js`},
+      {pattern: `tests/web/${config.filename}.wasm`, included: false, nocache:true},
+      {pattern: `tests/web/${config.filename}.wasm.map`, included: false, nocache:true}
     ],
 
 
@@ -73,6 +86,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
+    // set this to false to keep the browser window open to interactively debug
     singleRun: true,
 
     // Concurrency level

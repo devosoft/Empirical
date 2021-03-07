@@ -1,9 +1,11 @@
 ===============================================================================
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 Michigan State University
-Contributers: Charles Ofria, Emily Dolson, Jacob Fenton, Steven Jorgensen,
-              Jason Stredwick, Luis Zaman, and Jory Schossau
+Copyright (c) 2015-2020 Michigan State University
+Contributers: Charles Ofria, Emily Dolson, Jacob Fenton, Riley Hoffman,
+	      Steven Jorgensen, Alex Lalejini, Robin Miller, Matthew Moreno,
+	      Katherine Perry, Santiago Rodriguez-Papa, Jory Schossau,
+	      Jason Stredwick, Anya Vostinar, and Luis Zaman
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +58,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ===============================================================================
-This repository also contains the source code for C3.js (https://github.com/c3js/c3), which is available 
+This repository also contains the source code for C3.js (https://github.com/c3js/c3), which is available
 under the MIT License:
 
 The MIT License (MIT)
@@ -82,7 +84,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ===============================================================================
 
-This repository also contains the source code for d3-tip.js (https://github.com/Caged/d3-tip), which is available 
+This repository also contains the source code for d3-tip.js (https://github.com/Caged/d3-tip), which is available
 under the MIT License:
 
 The MIT License (MIT)
@@ -106,3 +108,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+===============================================================================
+
+This repository contains source code adapted from the LLVM Project, under the
+Apache License v2.0 with LLVM Exceptions. See https://llvm.org/LICENSE.txt for
+license information. SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception.
