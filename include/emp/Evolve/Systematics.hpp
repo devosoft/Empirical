@@ -1361,7 +1361,7 @@ namespace emp {
     }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
-    Ptr<taxon_t> GetMRCA() const;
+    Ptr<taxon_t> GetMRCA(bool force=false) const;
 
     /// Request the depth of the Most-Recent Common Ancestor; return -1 for none.
     int GetMRCADepth() const;
@@ -1420,7 +1420,14 @@ namespace emp {
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
     else {
+      if (mrca) {
+          std::cout << "Pruning: " << taxon->GetID() << " " << mrca->GetID() << std::endl;
+      } else {
+        std::cout << "Pruning, mrca already null" << taxon->GetID();
+      }
+
       if (taxon == mrca) {
+        std::cout << "Setting mrca to null" << std::endl;
         mrca = nullptr;
       }
       taxon.Delete();                             //  ...or else get rid of it.
@@ -1435,7 +1442,10 @@ namespace emp {
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
-    else if (taxon == mrca && taxon->GetNumOff() == 1) mrca = nullptr;
+    else if (taxon == mrca && taxon->GetNumOff() == 1) { 
+      std::cout << "MRCa only has one offspring" << std::endl;
+      mrca = nullptr;
+    }
   }
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
@@ -1470,11 +1480,19 @@ namespace emp {
     if (store_ancestors) {
       ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
     }
+    if (taxon == mrca && taxon->GetNumOff() <= 1) {
+      // If this taxon was mrca and has only one offspring, then the new
+      // mrca is somewhere farther down the chain.
+      // If this taxon was mrca and now has no offspring, something very
+      // strange has happened.
+      // Either way, we should mark mrca for lazy recalculation
+      mrca = nullptr;
+    } 
     if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
   }
 
 
-  // Request a pointer to the Most-Recent Common Ancestor for the population.
+  Request a pointer to the Most-Recent Common Ancestor for the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
