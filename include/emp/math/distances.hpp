@@ -50,7 +50,7 @@ namespace emp {
       return sqrt(dist);
   }
 
-  #endif
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 

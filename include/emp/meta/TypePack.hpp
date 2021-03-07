@@ -197,7 +197,7 @@ namespace emp {
       using result_t = emp::TypePack<emp::TypePack<>>;
     };
   }
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename T, int N>
   using TypePackFill = typename internal::tp_pad<TypePack<>,T,N>::type;

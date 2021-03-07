@@ -45,7 +45,7 @@ namespace emp {
 
   template <size_t ID, typename... Ts>
   using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   // Trim off the last type from a pack.
   template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
@@ -131,7 +131,7 @@ namespace emp {
     template <template <typename...> class FILTER, typename T>
     constexpr bool tt_exist_impl(...) { return false; }
   }
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type_exist() { return internal::tt_exist_impl<TEST, T>(true); }
@@ -252,7 +252,7 @@ namespace emp {
       using type = T<U...>;
     };
   }
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   template<typename T, typename... U>
   using AdaptTemplate = typename internal::AdaptTemplateHelper<T, U...>::type;

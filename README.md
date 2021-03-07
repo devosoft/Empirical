@@ -29,7 +29,7 @@ Tools in Empirical include:
 * A signal-action system that allows for efficient customization of tools, and flexible
   software that can easily facilitate plug-in functionality.
 
-See [https://empirical.readthedocs.io/en/latest](https://empirical.readthedocs.io/en/latest) for more detailed documentation
+See <https://empirical.readthedocs.io/en/latest> for more detailed documentation
 on the available source files.
 
 # Directory Structure

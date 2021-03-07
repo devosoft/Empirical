@@ -4,6 +4,7 @@
  * 
  * @copyright Arash Partow, 2000 (modified slightly by Emily Dolson)
  * @brief A Bloom filter implementation
+ * @file  BloomFilter.hpp
 */ 
 
 /*

@@ -110,7 +110,7 @@ namespace emp {
     };
     template <> struct vp_sort<ValPack<>> { using result = ValPack<>; };
   } // End internal namespace
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Generate a ValPack with a specified range of values.
   template <auto START, auto END, auto STEP=1>

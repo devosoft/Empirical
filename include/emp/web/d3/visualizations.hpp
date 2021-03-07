@@ -807,7 +807,7 @@ protected:
   std::function<std::string(NODE, int)> color_fun_link = [](NODE d, int i){
     return "black";
   };
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 public:
   D3::TreeLayout<NODE> tree;

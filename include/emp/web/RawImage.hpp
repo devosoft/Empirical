@@ -120,7 +120,7 @@ namespace emp {
     };
 
   } // End internal namespace
-  #endif DOXYGEN_SHOULD_SKIP_THIS
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Fundamental information about a single image.
   class RawImage {
