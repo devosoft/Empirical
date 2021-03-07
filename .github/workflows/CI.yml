@@ -82,7 +82,13 @@ jobs:
       - uses: docker-practice/actions-setup-docker@v1
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
-      - run: sudo docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
+      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
+      - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
+      - uses: sylvanld/action-storage@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          src: doc-coverage.json
+          dst: stats/doc-coverage.json          
   deploy-dockerhub:
     name: Deploy to DockerHub
     runs-on: ubuntu-latest

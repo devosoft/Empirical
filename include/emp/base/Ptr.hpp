@@ -31,12 +31,14 @@
 
 namespace emp {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /// An anonymous log2 calculator for hashing below.
     static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x/2) + 1); }
 
     static bool ptr_debug = false;
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   inline void SetPtrDebug(bool _d = true) { internal::ptr_debug = _d; }
   inline bool GetPtrDebug() { return internal::ptr_debug; }
 

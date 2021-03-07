@@ -10,8 +10,8 @@
  *  and selection techniques for evolutionary computation applications.
  *
  *
- *  @todo Make sure when mutations occure before placement into the population we can control
- *        whether or not they also affect injected organisms.  (Right now they alwyas do!!)
+ *  @todo Make sure when mutations occur before placement into the population we can control
+ *        whether or not they also affect injected organisms.  (Right now they always do!!)
  *  @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
  *        delegation to facilitate demes, pools, islands, etc.
  *  @todo We should be able to have any number of systematics managers, based on various type_trait
@@ -190,7 +190,7 @@ namespace emp {
     Signal<void(WorldPosition,WorldPosition)> on_swap_sig; ///< ...after org positions are swapped
     Signal<void()>             world_destruct_sig;   ///< ...in the World destructor.
 
-    /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
+    /// Build a Setup function in world that calls \c \::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
     /// Get the current cached value for the organism at the specified position.
@@ -204,7 +204,7 @@ namespace emp {
     /// * a random number generator (either a pointer or reference)
     /// * a unique name for the world
     /// If no name is provided, the world remains nameless.
-    /// If no random number generator is provided, gen_random determines if one shold be created.
+    /// If no random number generator is provided, gen_random determines if one should be created.
     World(std::string _name="", bool gen_random=true)
       : update(0), random_ptr(nullptr), random_owner(false), pops(), pop(pops[0]), num_orgs(0)
       , fit_cache()
@@ -221,7 +221,7 @@ namespace emp {
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
       , on_swap_sig(to_string(name,"::on-swap"), control)
-      , world_destruct_sig(to_string(name,"::wolrd-destruct"), control)
+      , world_destruct_sig(to_string(name,"::world-destruct"), control)
     {
       if (gen_random) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -397,7 +397,7 @@ namespace emp {
     }
 
     /// Get a systematics manager (which is tracking lineages in the population.)
-    /// @param id - which systematics manager to return? Systematics managers are
+    /// @param label - which systematics manager to return? Systematics managers are
     /// stored in the order they are added to the world.
     Ptr<SystematicsBase<ORG> > GetSystematics(std::string label) {
       emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
@@ -405,7 +405,8 @@ namespace emp {
       return systematics[systematics_labels[label]];
     }
 
-
+    /// Remove a systematics manager from this world
+    /// @param id the id of the systematics manager to remove (0 is the first one you added, 1 is 2nd, etc.)
     void RemoveSystematics(int id) {
       emp_assert(systematics.size() > 0, "Cannot remove systematics file. No systematics file to track.");
       emp_assert(id < systematics.size(), "Invalid systematics file requested to be removed.", id, systematics.size());
@@ -420,6 +421,8 @@ namespace emp {
       }
     }
 
+    /// Remove a systematics manager from this world
+    /// @param label the label of the systematics manager to remove
     void RemoveSystematics(std::string label) {
       emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
 
@@ -428,6 +431,14 @@ namespace emp {
       systematics_labels.erase(label) ;
     }
 
+    /// Add a new systematics manager to the world by passing in all the information
+    /// the world needs to construct it.
+    /// @param calc_taxon a function that calculates the systematics manager's taxon type from an ORG
+    /// @param active     Should living organisms' taxa be tracked? (typically yes!)
+    /// @param anc  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
+    /// @param all        Should all dead taxa be maintained? (typically no; it gets BIG!)
+    /// @param pos        Should the systematics tracker keep track of organism positions? (yes, unless you're doing something super weird)
+    /// @param label            A label for this tracker so you can find it again
     template <typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
     Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> AddSystematics(std::function<ORG_INFO(const ORG&)> calc_taxon, bool active=true, bool anc=true, bool all=true, bool pos=true, std::string label="systematics" ) {
       Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> sys_ptr;
@@ -436,6 +447,12 @@ namespace emp {
       return sys_ptr;
     }
 
+    /// Add a new systematics manager to the world from a pointer
+    /// Note: You are giving the world object complete control of this
+    /// systematics manager. It will be deleted in the destructor
+    /// for this object
+    /// @param s a pointer to the systematics manager to add
+    /// @param label defines a label for this systematics manager, so you can find it again
     template <typename ORG_INFO, typename DATA_STRUCT>
     void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {
       if (Has(systematics_labels, label)) {
@@ -528,6 +545,8 @@ namespace emp {
       return &(data_nodes.Get("fitness"));
     }
 
+    /// Adds a data nodes to the world with the specified name.
+    /// @returns a pointer to the DataNode
     // Returns a reference so that capturing it in a lambda to call on update
     // is less confusing. It's possible we should change it to be consistent
     // with GetFitnessDataNode, though.
@@ -536,6 +555,8 @@ namespace emp {
       return &(data_nodes.New(name));
     }
 
+    /// Retrieve a pointer to a DataNode maintained by the world
+    /// with a name matching \c name.
     Ptr<DataMonitor<double>> GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
@@ -600,7 +621,7 @@ namespace emp {
     ///  * a distance function that takes references to two organisms and returns a double
     ///    indicating the distance between those organisms,
     ///  * a sharing threshold (sigma share) that defines the maximum distance at which members
-    ///    should be consdered in the same niche,
+    ///    should be considered in the same niche,
     ///  * and a value of alpha, which controls the shape of the fitness sharing curve.
     void SetSharedFitFun(const fun_calc_fitness_t & fit_fun, const fun_calc_dist_t & dist_fun,
                          double sharing_threshold, double alpha);
@@ -680,7 +701,7 @@ namespace emp {
     }
 
     /// Provide a function for World to call at the start of its destructor (for additional cleanup).
-    /// Trigger:  Destructor has begun to execture
+    /// Trigger:  Destructor has begun to execute
     /// Argument: None
     /// Return:   Key value needed to make future modifications.
     SignalKey OnWorldDestruct(const std::function<void()> & fun) {
@@ -709,7 +730,7 @@ namespace emp {
 
     /// Update the world:
     /// 1. Send out an update signal for any external functions to trigger.
-    /// 2. If synchronous generations, move next population into place as the current popoulation.
+    /// 2. If synchronous generations, move next population into place as the current population.
     /// 3. Handle any data-related updates including systematics and files that need to be printed.
     /// 4. Increment the current update number.
     void Update();
@@ -1064,7 +1085,7 @@ namespace emp {
 
       SetAttribute("SynchronousGen", "True");
     } else {
-      // Asynchronous: always go to a neigbor in current population.
+      // Asynchronous: always go to a neighbor in current population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
         return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
@@ -1387,7 +1408,7 @@ namespace emp {
     file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumActive(); }, "num_taxa", "Number of unique taxonomic groups currently active." );
     file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
     file.template AddFun<double>( [this, id](){ return systematics[id]->GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
-    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phylogenies." );
     file.template AddFun<int>(    [this, id](){ return systematics[id]->GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
     file.template AddFun<double>( [this, id](){ return systematics[id]->CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of taxa in population)." );
 
@@ -1429,7 +1450,7 @@ namespace emp {
     on_update_sig.Trigger(update);
 
     // 2. If synchronous generations (i.e, pops[1] is not empty), move next population into
-    //    place as the current popoulation.
+    //    place as the current population.
     if (IsSynchronous()) {
       // Trigger signals for orgs in next pop before they are moved into the active pop.
       for (size_t i = 0; i < pops[1].size(); i++) {

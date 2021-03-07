@@ -78,7 +78,7 @@ protected:
 
   };
 
-  // Get a properly cast version of indo.
+  // Get a properly cast version of info.
   D3VisualizationInfo * Info() { return (D3VisualizationInfo *) info; }
   const D3VisualizationInfo * Info() const { return (D3VisualizationInfo *) info; }
 
@@ -104,7 +104,7 @@ public:
   }
 
   D3Visualization(const D3Visualization & in) : WidgetFacet(in) { ; }
-  D3Visualization(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsD3Visualiation()); }
+  D3Visualization(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsD3Visualization()); }
   virtual ~D3Visualization() { ; }
 
   using INFO_TYPE = D3VisualizationInfo;
@@ -133,7 +133,7 @@ public:
   /// @endcond
 
   /// This callback function will be called every time data is done being drawn.
-  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// Can be a string representing the name of a function in Javascript (can be in the current
   /// window, the emp namespace, or the d3 namespace)
   void SetDrawCallback(std::string func) {
     draw_data_callback = func;
@@ -165,6 +165,7 @@ public:
   D3::Selection circles;
   D3::ToolTip * tip;
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   std::function<double(double, int, int)> scaled_d = [&](double d, int i, int k){
       return y_scale->ApplyScale(d);
   };
@@ -172,6 +173,7 @@ public:
   std::function<double(double, int, int)> scaled_i = [&](double d, int i, int k){
       return x_scale->ApplyScale(i);
   };
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   DotPlot(int w=500, int h=500) : D3Visualization(w, h){;}
 
@@ -348,6 +350,7 @@ protected:
 
   // Callback functions for accessing and scaling data
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   //Callback function for getting unscaled x value of data point (used as key function for data binding)
   std::function<double(DATA_TYPE)> return_x = [](DATA_TYPE d){ return d[0]; };
 
@@ -363,6 +366,8 @@ protected:
   std::function<double(DATA_TYPE)> x = [this](DATA_TYPE d){
       return x_scale->ApplyScale(this->return_x(d));
   };
+
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 public:
 
@@ -386,14 +391,14 @@ public:
   virtual void Setup(){
     D3::Selection * svg = GetSVG();
 
-    //Wrap ncessary callback functions
+    // Wrap necessary callback functions
     JSWrap([this](){exit.Remove(); this->DrawData(true);}, GetID()+"draw_data");
 
-    //Create tool tip
+    // Create tool tip
     tip = new D3::ToolTip([this](DATA_TYPE d) {return D3::FormatFunction(".2f")(return_y(d));});
     GetSVG()->SetupToolTip(*tip);
 
-    //Set up scales
+    // Set up scales
     y_scale = new Y_SCALE_TYPE();
     x_scale = new X_SCALE_TYPE();
     y_scale->SetDomain(emp::array<double, 2>{{y_max, y_min}});
@@ -416,7 +421,7 @@ public:
 
     dataset = new D3::CSVDataset();
 
-    // In case functions were called before initilization
+    // In case functions were called before initialization
     init = true;
     this->pending_funcs.Run();
   }
@@ -470,7 +475,7 @@ public:
   /// For instance, the default accessor assumes that DATA_TYPE is an array with two elements
   /// (x, y): `[](DATA_TYPE d) {return d[0];}`
   /// This accessor will be fed into the x_scale to get x values scaled to the plotting area.
-  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// Can be a string representing the name of a function in Javascript (can be in the current
   /// window, the emp namespace, or the d3 namespace)
 
   void SetXAccessor(std::string func) {
@@ -509,7 +514,7 @@ public:
   /// For instance, the default accessor assumes that DATA_TYPE is an array with two elements
   /// (x, y): `[](DATA_TYPE d) {return d[1];}`
   /// This accessor will be fed into the y_scale to get y values scaled to the plotting area.
-  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// Can be a string representing the name of a function in Javascript (can be in the current
   /// window, the emp namespace, or the d3 namespace)
   void SetYAccessor(std::string func) {
     return_y = [func](DATA_TYPE d){
@@ -794,6 +799,7 @@ protected:
     tree.SetSize(GetHeight(), GetWidth());
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   std::function<std::string(NODE, int)> color_fun_node = [](NODE d, int i){
     return "black";
   };
@@ -801,6 +807,7 @@ protected:
   std::function<std::string(NODE, int)> color_fun_link = [](NODE d, int i){
     return "black";
   };
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 public:
   D3::TreeLayout<NODE> tree;
@@ -859,7 +866,7 @@ public:
     nodes_links[3].Remove();
     // std::cout << "Circles appended" << std::endl;
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
-    // std::cout << "Circles sstyled" << std::endl;
+    // std::cout << "Circles styled" << std::endl;
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
     // std::cout << "links styled" << std::endl;
     CallDrawCallback();

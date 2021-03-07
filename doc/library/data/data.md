@@ -34,6 +34,7 @@ for collecting data over the course of a computational experiment.
 ```{eval-rst}
 .. doxygenfile:: emp/data/DataNode.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ### DataManagers
@@ -41,6 +42,7 @@ for collecting data over the course of a computational experiment.
 ```{eval-rst}
 .. doxygenfile:: emp/data/DataManager.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ### DataInterfaces
@@ -48,6 +50,7 @@ for collecting data over the course of a computational experiment.
 ```{eval-rst}
 .. doxygenfile:: emp/data/DataInterface.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ### DataFiles
@@ -55,5 +58,6 @@ for collecting data over the course of a computational experiment.
 ```{eval-rst}
 .. doxygenfile:: emp/data/DataFile.hpp
   :project: Empirical
+  :no-link:
 ```
 

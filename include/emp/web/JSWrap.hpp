@@ -1,3 +1,6 @@
+#ifndef EMP_JSWRAP_H
+#define EMP_JSWRAP_H
+
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
@@ -36,10 +39,6 @@
  *
  */
 
-#ifndef EMP_JSWRAP_H
-#define EMP_JSWRAP_H
-
-
 #include <array>
 #include <functional>
 #include <tuple>
@@ -55,6 +54,7 @@
 #include "init.hpp"
 #include "js_utils.hpp"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifdef __EMSCRIPTEN__
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
@@ -62,9 +62,12 @@ extern "C" {
 #else
 // When NOT in Emscripten, need a stub for this function.
 int EMP_GetCBArgCount() { return -1; }
-#endif
+#endif // EMSCRIPTEN
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 namespace emp {
+
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename JSON_TYPE, int ARG_ID, int FIELD>
   struct LoadTuple;
@@ -501,8 +504,13 @@ namespace emp {
     return JSWrap(fun_ptr, fun_name, dispose_on_use);
   }
 
-  /// @endcond
+  #endif // end DOXYGEN_SHOULD_SKIP_THIS
 
+  /// JSWrap takes a C++ function and wraps it in Javascript for easy calling in web code
+  /// @param in_fun a C++ function to wrap
+  /// @param fun_name optionally, a name to call the function on the Javascript size
+  /// @param dispose_on_use should we delete this function after using it?
+  /// @returns the id of the function on the Javascript side
   template <typename FUN_TYPE>
   size_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   {
@@ -523,8 +531,6 @@ namespace emp {
     delete callback_array[fun_id];
     callback_array[fun_id] = nullptr;
   }
-
-  /// @cond SIMPLIFY
 }
 
 extern "C" {
@@ -619,6 +625,6 @@ void empCppCallback(const size_t cb_id) {
 
 } // extern "C"
 
-/// @endcond
+
 
 #endif

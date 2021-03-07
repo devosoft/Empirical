@@ -53,38 +53,42 @@ namespace emp {
       return std::end(node_map);
     }
 
-    /// Returns the number of DataNodes in this DataManager
+    /// @returns the number of DataNodes in this DataManager
     size_t GetSize() const { return node_map.size(); }
-    /// Returns the std::map mapping node names (strings) to DataNodes
+    /// @returns the std::map mapping node names (strings) to DataNodes
     auto & GetNodes() const { return node_map; }
 
     bool HasNode(const std::string & name) {
       return Has(node_map, name);
     }
 
-    /// Creates and adds a new DataNode, with the name specified in @param name.
+    /// Creates and adds a new DataNode
+    /// @param name the name of the DataNode
     node_t & New(const std::string & name) {
       emp_assert(!Has(node_map, name), name);
       node_map[name] = new node_t;
       return *(node_map[name]);
     }
 
-    /// Deletes the DataNode with the name @param name.
+    /// Deletes the DataNode with the specified name.
     /// Throws an error if there is no node with that name in this manager.
+    /// @param name the name of the DataNode to delete
     void Delete(const std::string & name) {
       emp_assert(Has(node_map, name), name);
       node_map.erase(name);
     }
 
-    /// Returns a const reference to the node named @param name.
+    /// @returns a const reference to the DataNode with the specified name
     /// Throws an error if there is no node with that name in this manager
+    /// @param name the name of the DataNode
     const node_t & Get(const std::string & name) const {
       emp_assert(Has(node_map, name), name);
       return *(node_map[name]);
     }
 
-    /// Returns a reference to the node named @param name.
+    /// @returns a reference to the node with the specified name
     /// Throws an error if there is no node with that name in this manager
+    /// @param name the name of the DataNode
     node_t & Get(const std::string & name) {
       emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));
       return *(node_map[name]);
@@ -93,15 +97,16 @@ namespace emp {
     // == Operations that forward to DataNode objects ==
 
     /** Adds data to a node in the DataManager.
-     *  @param name is the node to add the data to.
-     *  All subsequent arguments are the data to add to that node,
-     *  and should be of whatever type all of the nodes in this maanger expect.
+     *  @param name the node to add the data to.
+     *  @param extra All subsequent arguments are the data to add to that node,
+     *  and should be of whatever type all of the nodes in this manger expect.
      *
      * Example:
-     *
+     * ```
      * DataManager<int, data::Current, data::Range> my_data_manager;
      * my_data_manager.Add("my_node_name");
-     * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  */
+     * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  
+     * ```*/
     template <typename... Ts>
     void AddData(const std::string & name, Ts... extra) {
       emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));

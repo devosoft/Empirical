@@ -18,7 +18,7 @@
 
 namespace emp {
 
-  /// A map of weighted indecies.  If a random index is selected, the probability of an index being
+  /// A map of weighted indices.  If a random index is selected, the probability of an index being
   /// returned is directly proportional to its weight.
   class UnorderedIndexMap {
   private:
@@ -66,7 +66,7 @@ namespace emp {
 
   public:
     /// Construct an UnorderedIndexMap where num_items is the maximum number of items that can be placed
-    /// into the data structure.  All item weigths default to zero.
+    /// into the data structure.  All item weights default to zero.
     UnorderedIndexMap(size_t _items=0, double init_weight=0.0)
       : num_items(_items), num_nodes(_items-1), needs_refresh(_items && (init_weight > 0.0)), weights(0)
       { if (_items > 0) weights.resize(_items*2-1, init_weight); }
@@ -90,7 +90,7 @@ namespace emp {
     double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
     double GetProb(size_t id) const { return RawProb(id + num_nodes); }
 
-    /// Change the number of indecies in the map.
+    /// Change the number of indices in the map.
     void Resize(size_t new_size, double def_value=0.0) {
       const size_t min_size = std::min(num_items, new_size);
       emp::vector<double> new_weights(2*new_size - 1);
@@ -132,7 +132,7 @@ namespace emp {
 
     /// Adjust the weight associated with a particular index in the map.
     /// @param id is the identification number of the item whose weight is being adjusted.
-    /// @param weight is the new weight for that entry.
+    /// @param new_weight is the new weight for that entry.
     void RawAdjust(size_t id, const double new_weight) {
       // Update this node.
       const double weight_diff = new_weight - weights[id]; // Track change size for tree weights.
@@ -199,7 +199,7 @@ namespace emp {
       return *this;
     }
 
-    /// Substract the weigthes from another index map from this one.
+    /// Substract the weights from another index map from this one.
     UnorderedIndexMap & operator-=(UnorderedIndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {

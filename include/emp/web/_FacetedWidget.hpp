@@ -11,6 +11,8 @@
 
 #include "../web/Widget.hpp"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 namespace emp{
 namespace web{
   namespace internal{
@@ -25,3 +27,5 @@ namespace web{
   }
 }
 }
+
+#endif

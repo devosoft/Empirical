@@ -74,7 +74,7 @@ namespace emp {
     template <typename PHEN_TYPE>
     struct mut_landscape_info { /// Track information related to the mutational landscape
       /// Maps a string representing a type of mutation to a count representing
-      /// the number of that type of mutation that occured to bring about this taxon.
+      /// the number of that type of mutation that occurred to bring about this taxon.
       using phen_t = PHEN_TYPE;
       using has_phen_t = std::true_type;
       using has_mutations_t = std::true_type;
@@ -127,7 +127,7 @@ namespace emp {
     using info_t = ORG_INFO;
 
     size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
-    const info_t info;        ///<  Details for the organims associated within this taxanomic group.
+    const info_t info;        ///<  Details for the organisms associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
     size_t num_orgs;          ///<  How many organisms currently exist of this group?
@@ -252,7 +252,7 @@ namespace emp {
 
 
   /// A base class for Systematics, maintaining information common to all systematics managers
-  /// and providing virtual functaions.
+  /// and providing virtual functions.
 
   template <typename ORG>
   class SystematicsBase {
@@ -292,7 +292,7 @@ namespace emp {
     /// Are we storing all taxa that are still alive in the population?
     bool GetStoreActive() const { return store_active; }
 
-    /// Are we storing all taxa that are the ancestors of living organims in the population?
+    /// Are we storing all taxa that are the ancestors of living organisms in the population?
     bool GetStoreAncestors() const { return store_ancestors; }
 
     /// Are we storing all taxa that have died out, as have all of their descendants.
@@ -322,7 +322,7 @@ namespace emp {
     /// Are we storing all taxa that are still alive in the population?
     void SetStoreActive(bool new_val) { store_active = new_val; }
 
-    /// Are we storing all taxa that are the ancestors of living organims in the population?
+    /// Are we storing all taxa that are the ancestors of living organisms in the population?
     void SetStoreAncestors(bool new_val) { store_ancestors = new_val; }
 
     /// Are we storing all taxa that have died out, as have all of their descendants.
@@ -521,12 +521,14 @@ namespace emp {
     /**
      * Contructor for Systematics; controls what information should be stored.
      * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
-     * @param store_ancestors  Should ancestral organims' taxa be maintained?  (yes for lineages!)
-     * @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
+     * @param store_ancestors  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
+     * @param store_all        Should all dead taxa be maintained? (typically no; it gets BIG!)
+     * @param store_pos        Should the systematics tracker keep track of organism positions?
+     *                         (probably yes - only turn this off if you know what you're doing)
      */
 
-    Systematics(fun_calc_info_t calc_taxon, bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
-      : parent_t(_active, _anc, _all, _pos)
+    Systematics(fun_calc_info_t calc_taxon, bool store_active=true, bool store_ancestors=true, bool store_all=false, bool store_pos=true)
+      : parent_t(store_active, store_ancestors, store_all, store_pos)
       , calc_info_fun(calc_taxon)
       , active_taxa(), ancestor_taxa(), outside_taxa()
       , mrca(nullptr) { ; }
@@ -632,7 +634,7 @@ namespace emp {
 
     /// Privide a function for Systematics to call each time a taxon is about to be pruned.
     /// Trigger:  Taxon is about to be killed
-    /// Argument: Pounter to taxon
+    /// Argument: Pointer to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
     virtual data_ptr_t
@@ -722,7 +724,7 @@ namespace emp {
     }
 
     data_ptr_t AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
-      emp_assert(false, "Calculating uniqe taxa requires suitable DATA_STRUCT");
+      emp_assert(false, "Calculating unique taxa requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
 
@@ -817,13 +819,13 @@ namespace emp {
     */
     double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
 
-    /** This metric (from Isaac, 2007; reviewd in Winter et al., 2013) measures how
+    /** This metric (from Isaac, 2007; reviewed in Winter et al., 2013) measures how
      * distinct @param tax is from the rest of the population, weighted for the amount of
      * unique evolutionary history that it represents.
      *
      * To quantify length of evolutionary history, this method needs @param time: the current
      * time, in whatever units time is being measured in when taxa are added to the systematics
-     * manager. Note that passing a time in the past will produce innacurate results (since we
+     * manager. Note that passing a time in the past will produce inacurate results (since we
      * don't know what the state of the tree was at that time).
      *
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.
@@ -840,14 +842,14 @@ namespace emp {
         return 0;
       }
 
-      // std::cout << "Initializing divisor to " << divisor << " Offspinrg: " << tax->GetTotalOffspring() << std::endl;
+      // std::cout << "Initializing divisor to " << divisor << " Offspring: " << tax->GetTotalOffspring() << std::endl;
       // std::cout << "MRCA ID: " << mrca->GetID() << " Tax ID: " << tax->GetID() << " time: " << time << " Orig: " << tax->GetOriginationTime() << std::endl;
 
       Ptr<taxon_t> test_taxon = tax->GetParent();
 
       emp_assert(time != -1 && "Invalid time - are you passing time to rg?", time);
       emp_assert(time >= tax->GetOriginationTime()
-                 && "GetEvolutionaryDistinctiveness recieved a time that is earlier than the taxon's origination time.", tax->GetOriginationTime(), time);
+                 && "GetEvolutionaryDistinctiveness received a time that is earlier than the taxon's origination time.", tax->GetOriginationTime(), time);
 
       while (test_taxon) {
 
@@ -884,11 +886,11 @@ namespace emp {
 
     /** Calculates mean pairwise distance between extant taxa (Webb and Losos, 2000).
      * This measurement is also called Average Taxonomic Diversity (Warwick and Clark, 1998)
-     * (for demonstration of equivalence see Tucker et al, 2016). This measurment tells
+     * (for demonstration of equivalence see Tucker et al, 2016). This measurement tells
      * you about the amount of distinctness in the community as a whole.
      *
      * @param branch_only only counts distance in terms of nodes that represent a branch
-     * between two extant taxa (poentially useful for comparison to biological data, where
+     * between two extant taxa (potentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      *
      * This measurement assumes that the tree is fully connected. Will return -1
@@ -903,7 +905,7 @@ namespace emp {
      *  out that this is a measure of phylogenetic richness.
      *
      * @param branch_only only counts distance in terms of nodes that represent a branch
-     * between two extant taxa (poentially useful for comparison to biological data, where
+     * between two extant taxa (potentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      *
      * This measurement assumes that the tree is fully connected. Will return -1
@@ -918,7 +920,7 @@ namespace emp {
      *  out that this is a measure of phylogenetic regularity.
      *
      * @param branch_only only counts distance in terms of nodes that represent a branch
-     * between two extant taxa (poentially useful for comparison to biological data, where
+     * between two extant taxa (potentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      *
      * This measurement assumes that the tree is fully connected. Will return -1
@@ -932,7 +934,7 @@ namespace emp {
     /** Calculates a vector of all pairwise distances between extant taxa.
      *
      * @param branch_only only counts distance in terms of nodes that represent a branch
-     * between two extant taxa (poentially useful for comparison to biological data, where
+     * between two extant taxa (potentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      *
      * This method assumes that the tree is fully connected. Will return -1
@@ -1359,7 +1361,7 @@ namespace emp {
     }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
-    Ptr<taxon_t> GetMRCA() const;
+    Ptr<taxon_t> GetMRCA(bool force=false) const;
 
     /// Request the depth of the Most-Recent Common Ancestor; return -1 for none.
     int GetMRCADepth() const;
@@ -1418,7 +1420,14 @@ namespace emp {
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
     else {
+      if (mrca) {
+          std::cout << "Pruning: " << taxon->GetID() << " " << mrca->GetID() << std::endl;
+      } else {
+        std::cout << "Pruning, mrca already null" << taxon->GetID();
+      }
+
       if (taxon == mrca) {
+        std::cout << "Setting mrca to null" << std::endl;
         mrca = nullptr;
       }
       taxon.Delete();                             //  ...or else get rid of it.
@@ -1433,7 +1442,10 @@ namespace emp {
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
-    else if (taxon == mrca && taxon->GetNumOff() == 1) mrca = nullptr;
+    else if (taxon == mrca && taxon->GetNumOff() == 1) { 
+      std::cout << "MRCa only has one offspring" << std::endl;
+      mrca = nullptr;
+    }
   }
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
@@ -1468,11 +1480,19 @@ namespace emp {
     if (store_ancestors) {
       ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
     }
+    if (taxon == mrca && taxon->GetNumOff() <= 1) {
+      // If this taxon was mrca and has only one offspring, then the new
+      // mrca is somewhere farther down the chain.
+      // If this taxon was mrca and now has no offspring, something very
+      // strange has happened.
+      // Either way, we should mark mrca for lazy recalculation
+      mrca = nullptr;
+    } 
     if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
   }
 
 
-  // Request a pointer to the Most-Recent Common Ancestor for the population.
+  Request a pointer to the Most-Recent Common Ancestor for the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
@@ -1583,7 +1603,7 @@ namespace emp {
 
       cur_taxon->SetOriginationTime(update);
     }
-    // std::cout << "about to store poisiton" << std::endl;
+    // std::cout << "about to store poisition" << std::endl;
     if (store_position && pos.GetIndex() >= 0) {
       if (pos.GetPopID()) {
         if (pos.GetIndex() >= next_taxon_locations.size()) {
