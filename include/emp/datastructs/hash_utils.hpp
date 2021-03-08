@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019-2020
+ *  @date 2019-2021.
  *
  *  @file  hash_utils.hpp
  *  @brief This file provides tools for hashing values and containers.
@@ -22,21 +22,45 @@
 
 namespace emp {
 
+  namespace internal {
+    // Allow a hash to be determined by a Hash() member function.
+    template <typename T>
+    auto Hash_impl(const T & x, bool) noexcept -> decltype(x.Hash()) { return x.Hash(); }
+
+    // By default, use std::hash if nothing else exists.
+    template <typename T>
+    auto Hash_impl(const T & x, int) noexcept -> decltype(std::hash<T>()(x)) { return std::hash<T>()(x); }
+
+    // Try direct cast to size_t if nothing else works.
+    template <typename T>
+    std::size_t Hash_impl(const T & x, ...) noexcept {
+      // @CAO Setup directory structure to allow the following to work:
+      // LibraryWarning("Resorting to casting to size_t for emp::Hash implementation.");
+      return (size_t) x;
+    }
+  }
+
+  // Setup hashes to be dynamically determined
+  template <typename T>
+  std::size_t Hash(const T & x) noexcept { return internal::Hash_impl(x, true); }
+
+
   /// Generate a unique long from a pair of ints.
   /// @param a First 32-bit unsigned int.
   /// @param b Second 32-bit unsigned int.
   /// @return 64-bit unsigned int representing the szudzik hash of both inputs.
-  inline uint64_t szudzik_hash(uint32_t a_, uint32_t b_)
+  inline uint64_t szudzik_hash(uint32_t a_, uint32_t b_) noexcept
   {
     uint64_t a = a_, b = b_;
     return a >= b ? a * a + a + b : a + b * b;
   }
+
   /// Boost's implementation of a simple hash-combining function.
   /// Taken from https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
   /// @param hash1 First hash to combine.
   /// @param hash2 Second hash to combine.
   /// @return Combined hash.
-  constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2)
+  constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2) noexcept
   {
     return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
   }
@@ -44,7 +68,7 @@ namespace emp {
   /// Allow hash_combine to work with more than two input values.
   template <typename... Ts>
   constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2,
-                                            std::size_t hash3, Ts... extras)
+                                            std::size_t hash3, Ts... extras) noexcept
   {
     // combine the first two, put them at the end (so the same ones don't keep getting recombined
     // every step of the way through), and recurse.
@@ -53,7 +77,7 @@ namespace emp {
   }
 
   /// Allow hash_combine to take a series of size_t's to merge into a single hash.
-  inline std::size_t hash_combine(emp::Ptr<const std::size_t> hashes, size_t num_hashes)
+  inline std::size_t hash_combine(emp::Ptr<const std::size_t> hashes, size_t num_hashes) noexcept
   {
     emp_assert(num_hashes > 0);                // At least one hash is required!
     if (num_hashes == 1) return hashes[0];     // If we have exactly one, just return it.
@@ -68,12 +92,20 @@ namespace emp {
     return hash_combine(partial_hash, partial_hash2);
   }
 
+  /// Alias hash_combine() to CombineHash()
+  template<typename... Ts>
+  inline std::size_t CombineHash(const Ts &... args) {
+    return hash_combine(std::forward<Ts>(args)...);
+  }
+
+
+
   // helper functions for murmur hash
   namespace internal {
-    constexpr inline uint64_t rotate(const size_t x, const size_t r) {
+    constexpr inline uint64_t rotate(const size_t x, const size_t r) noexcept {
       return (x << r) | (x >> (64 - r));
     }
-    constexpr inline void fmix64(uint64_t& k) {
+    constexpr inline void fmix64(uint64_t& k) noexcept {
       k ^= k >> 33;
       k *= 0xff51afd7ed558ccd;
       k ^= k >> 33;
@@ -93,7 +125,7 @@ namespace emp {
   constexpr inline size_t murmur_hash(
     const std::span<const std::byte> key,
     const size_t seed = 0
-  ) {
+  ) noexcept {
     // define constants
     const size_t numbytes = key.size();
     const size_t nblocks = numbytes / 16;
