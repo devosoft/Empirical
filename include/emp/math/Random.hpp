@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2020.
+ *  @date 2015-2021.
  *
  *  @file  Random.hpp
  *  @brief A versatile and non-patterned pseudo-random-number generator.
@@ -46,7 +46,7 @@ namespace emp {
 
     /// Basic Random number
     /// Returns a random number [0, RAND_CAP)
-    uint32_t Get() {
+    uint32_t Get() noexcept {
       value *= value;                       // Square the current value.
       value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
       value = (value>>32) | (value<<32);    // Return the middle of the value
@@ -55,21 +55,21 @@ namespace emp {
 
   public:
     /// Set up the random generator object with an optional seed value.
-    Random(const int seed = -1) {
+    Random(const int seed = -1) noexcept {
       ResetSeed(seed);  // Calls init()
     }
 
     ~Random() { ; }
 
     /// Advance pseudorandom number generation engine one step.
-    void StepEngine() { Get(); }
+    void StepEngine() noexcept { Get(); }
 
     /// @return The current seed used to initialize this pseudo-random sequence.
-    inline uint64_t GetSeed() const { return original_seed; }
+    inline uint64_t GetSeed() const noexcept { return original_seed; }
 
     /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
     /// number generator gets its seed from the current system time and the process memory.
-    void ResetSeed(const int64_t seed) {
+    void ResetSeed(const int64_t seed) noexcept {
       // If the provided seed is <= 0, choose a unique seed based on time and memory location.
       if (seed <= 0) {
         uint64_t seed_time = (uint64_t) time(NULL);
@@ -90,74 +90,74 @@ namespace emp {
     // Random Number Generation /////////////////////////////////////////////////
 
     /// @return A pseudo-random double value between 0.0 and 1.0
-    inline double GetDouble() { return Get() / (double) RAND_CAP; }
+    inline double GetDouble() noexcept { return Get() / (double) RAND_CAP; }
 
     /// @return A pseudo-random double value between 0.0 and max
-    inline double GetDouble(const double max) { return GetDouble() * max; }
+    inline double GetDouble(const double max) noexcept { return GetDouble() * max; }
 
     /// @return A pseudo-random double value between min and max
-    inline double GetDouble(const double min, const double max) {
+    inline double GetDouble(const double min, const double max) noexcept {
       return GetDouble() * (max - min) + min;
     }
 
     /// @return A pseudo-random double in the provided range.
-    inline double GetDouble(const Range<double> range) {
+    inline double GetDouble(const Range<double> range) noexcept {
       return GetDouble(range.GetLower(), range.GetUpper());
      }
 
 
     /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
-    inline uint32_t GetUInt() { return Get(); }
+    inline uint32_t GetUInt() noexcept { return Get(); }
 
     /// @return A pseudo-random 32-bit unsigned int value between 0 and max
     template <typename T>
-    inline uint32_t GetUInt(const T max) {
+    inline uint32_t GetUInt(const T max) noexcept {
       return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
     }
 
     /// @return A pseudo-random 32-bit unsigned int value between min and max
     template <typename T1, typename T2>
-    inline uint32_t GetUInt(const T1 min, const T2 max) {
+    inline uint32_t GetUInt(const T1 min, const T2 max) noexcept {
       return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
     }
 
     /// @return A pseudo-random 32-bit unsigned int value in the provided range.
     template <typename T>
-    inline uint32_t GetUInt(const Range<T> range) {
+    inline uint32_t GetUInt(const Range<T> range) noexcept {
       return GetUInt(range.GetLower(), range.GetUpper());
     }
 
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 12.5% chance of each bit being 1.
-    inline uint32_t GetBits12_5() { return Get() & Get() & Get(); }
+    inline uint32_t GetBits12_5() noexcept { return Get() & Get() & Get(); }
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 25% chance of each bit being 1.
-    inline uint32_t GetBits25() { return Get() & Get(); }
+    inline uint32_t GetBits25() noexcept { return Get() & Get(); }
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 37.5% chance of each bit being 1.
-    inline uint32_t GetBits37_5() { return (Get() | Get()) & Get(); }
+    inline uint32_t GetBits37_5() noexcept { return (Get() | Get()) & Get(); }
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 50% chance of each bit being 1.
-    inline uint32_t GetBits50() { return Get(); }
+    inline uint32_t GetBits50() noexcept { return Get(); }
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 62.5% chance of each bit being 1.
-    inline uint32_t GetBits62_5() { return (Get() & Get()) | Get(); }
+    inline uint32_t GetBits62_5() noexcept { return (Get() & Get()) | Get(); }
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 75% chance of each bit being 1.
-    inline uint32_t GetBits75() { return Get() | Get(); }
+    inline uint32_t GetBits75() noexcept { return Get() | Get(); }
 
     /// @return A pseudo-random 32 bits (unsigned int) with a 87.5% chance of each bit being 1.
-    inline uint32_t GetBits87_5() { return Get() | Get() | Get(); }
+    inline uint32_t GetBits87_5() noexcept { return Get() | Get() | Get(); }
 
 
     /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
-    inline uint64_t GetUInt64() {
+    inline uint64_t GetUInt64() noexcept {
       return ( static_cast<uint64_t>(GetUInt()) << 32 )
              + static_cast<uint64_t>(GetUInt());
     }
 
     /// @return A pseudo-random 64-bit unsigned int value between 0 and max
-    inline uint64_t GetUInt64(const uint64_t max) {
+    inline uint64_t GetUInt64(const uint64_t max) noexcept {
       if (max <= RAND_CAP) return (uint64_t) GetUInt(max);  // Don't need extra precision.
 
       size_t mask = emp::MaskUsed(max);              // Create a mask for just the bits we need.
@@ -169,15 +169,15 @@ namespace emp {
 
 
     /// @return A pseudo-random 32-bit (4 byte) int value between 0 and max
-    inline int32_t GetInt(const int32_t max) {
+    inline int32_t GetInt(const int32_t max) noexcept {
       return static_cast<int32_t>(GetUInt((uint32_t) max));
     }
 
     /// @return A pseudo-random 32-bit (4 byte) int value between min and max
-    inline int32_t GetInt(const int min, const int max) { return GetInt(max - min) + min; }
+    inline int32_t GetInt(const int min, const int max) noexcept { return GetInt(max - min) + min; }
 
     /// @return A pseudo-random 32-bit (4 byte) int value in range
-    inline int32_t GetInt(const Range<int> range) {
+    inline int32_t GetInt(const Range<int> range) noexcept {
       return GetInt(range.GetLower(), range.GetUpper());
     }
 
@@ -193,13 +193,13 @@ namespace emp {
     using mem_ptr_t = emp::Ptr<unsigned char>;
 
     /// Randomize a contiguous segment of memory.
-    void RandFill(mem_ptr_t dest, const size_t num_bytes) {
+    void RandFill(mem_ptr_t dest, const size_t num_bytes) noexcept {
       dest.FillMemoryFunction( num_bytes, [this](){ return Get(); } );
     }
 
     /// Randomize a contiguous segment of memory.
     template <Prob PROB>
-    void RandFillP(mem_ptr_t dest, const size_t num_bytes) {
+    void RandFillP(mem_ptr_t dest, const size_t num_bytes) noexcept {
       if constexpr (PROB == PROB_0) {
         dest.FillMemoryFunction( num_bytes, [](){ return 0; } );
       } else if constexpr (PROB == PROB_12_5) {
@@ -223,7 +223,7 @@ namespace emp {
 
     /// Randomize a contiguous segment of memory between specified bit positions.
     template <Prob PROB>
-    void RandFillP(mem_ptr_t dest, const size_t num_bytes, size_t start_bit, size_t stop_bit)
+    void RandFillP(mem_ptr_t dest, const size_t num_bytes, size_t start_bit, size_t stop_bit) noexcept
     {
       const size_t start_byte_id = start_bit >> 3;     // At which byte do we start?
       const size_t end_byte_id = stop_bit >> 3;        // At which byte do we stop?
@@ -264,37 +264,37 @@ namespace emp {
     }
 
     // Shortcuts to randomize a contiguous segment of memory with fixed probabilities of a 1.
-    void RandFill0(   mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_0>   (dest, bytes); }
-    void RandFill12_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_12_5>(dest, bytes); }
-    void RandFill25(  mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_25>  (dest, bytes); }
-    void RandFill37_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_37_5>(dest, bytes); }
-    void RandFill50(  mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_50>  (dest, bytes); }
-    void RandFill62_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_62_5>(dest, bytes); }
-    void RandFill75(  mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_75>  (dest, bytes); }
-    void RandFill87_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_87_5>(dest, bytes); }
-    void RandFill100( mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_100> (dest, bytes); }
+    void RandFill0(   mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_0>   (dest, bytes); }
+    void RandFill12_5(mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_12_5>(dest, bytes); }
+    void RandFill25(  mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_25>  (dest, bytes); }
+    void RandFill37_5(mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_37_5>(dest, bytes); }
+    void RandFill50(  mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_50>  (dest, bytes); }
+    void RandFill62_5(mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_62_5>(dest, bytes); }
+    void RandFill75(  mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_75>  (dest, bytes); }
+    void RandFill87_5(mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_87_5>(dest, bytes); }
+    void RandFill100( mem_ptr_t dest, const size_t bytes) noexcept { RandFillP<PROB_100> (dest, bytes); }
 
-    void RandFill0(   mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill0(   mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_0>   (dest, bytes, start_bit, stop_bit); }
-    void RandFill12_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill12_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_12_5>(dest, bytes, start_bit, stop_bit); }
-    void RandFill25(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill25(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_25>  (dest, bytes, start_bit, stop_bit); }
-    void RandFill37_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill37_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_37_5>(dest, bytes, start_bit, stop_bit); }
-    void RandFill50(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill50(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_50>  (dest, bytes, start_bit, stop_bit); }
-    void RandFill62_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill62_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_62_5>(dest, bytes, start_bit, stop_bit); }
-    void RandFill75(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill75(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_75>  (dest, bytes, start_bit, stop_bit); }
-    void RandFill87_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill87_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_87_5>(dest, bytes, start_bit, stop_bit); }
-    void RandFill100( mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+    void RandFill100( mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit) noexcept
       { RandFillP<PROB_100> (dest, bytes, start_bit, stop_bit); }
 
     /// Randomize a contiguous segment of memory with a given probability of each bit being on.
-    void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p) {
+    void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p) noexcept {
       // Try to find a shortcut if p allows....
       if (p == 0.0)        return RandFill0(dest, num_bytes);
       else if (p == 0.125) return RandFill12_5(dest, num_bytes);
@@ -313,7 +313,7 @@ namespace emp {
 
     /// Randomize a contiguous segment of memory with a given probability of each bit being on.
     void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p,
-                  const size_t start_bit, const size_t stop_bit) {
+                  const size_t start_bit, const size_t stop_bit) noexcept {
       emp_assert((stop_bit >> 3) <= num_bytes);
 
       // Try to find a shortcut if p allows....
@@ -347,13 +347,13 @@ namespace emp {
 
     /// Tests a random value [0,1) against a given probability p, and returns true of false.
     /// @param p The probability of the result being "true".
-    inline bool P(const double p) {
+    inline bool P(const double p) noexcept {
       emp_assert(p >= 0.0 && p <= 1.0, p);
       return (Get() < (p * RAND_CAP));
     }
 
     /// Full random byte with each bit being a one with a given probability.
-    unsigned char GetByte(const double p) {
+    unsigned char GetByte(const double p) noexcept {
       unsigned char out_byte = 0;
       if (P(p)) out_byte |= 1;
       if (P(p)) out_byte |= 2;
@@ -372,7 +372,7 @@ namespace emp {
     // Distributions //
 
     /// Generate a random variable drawn from a unit normal distribution.
-    double GetRandNormal() {
+    double GetRandNormal() noexcept {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
@@ -458,7 +458,11 @@ namespace emp {
 
   /// Draw a sample (with replacement) from an input range, copying to the output range.
   template <typename ForwardIterator, typename OutputIterator, typename RNG>
-  void sample_with_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
+  void sample_with_replacement(ForwardIterator first,
+                               ForwardIterator last,
+                               OutputIterator ofirst,
+                               OutputIterator olast,
+                               RNG rng) noexcept {
     std::size_t range = std::distance(first, last);
     while(ofirst != olast) {
       *ofirst = *(first+rng(range));
