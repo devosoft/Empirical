@@ -43,6 +43,7 @@
 #include "../math/stats.hpp"
 #include "../tools/string_utils.hpp"
 #include "../data/DataFile.hpp"
+#include "../io/File.hpp"
 #include "SystematicsAnalysis.hpp"
 #include "World_structure.hpp"
 
@@ -1436,7 +1437,7 @@ namespace emp {
     }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
-    Ptr<taxon_t> GetMRCA(bool force=false) const;
+    Ptr<taxon_t> GetMRCA() const;
 
     /// Request the depth of the Most-Recent Common Ancestor; return -1 for none.
     int GetMRCADepth() const;
@@ -1495,14 +1496,7 @@ namespace emp {
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
     else {
-      if (mrca) {
-          std::cout << "Pruning: " << taxon->GetID() << " " << mrca->GetID() << std::endl;
-      } else {
-        std::cout << "Pruning, mrca already null" << taxon->GetID();
-      }
-
       if (taxon == mrca) {
-        std::cout << "Setting mrca to null" << std::endl;
         mrca = nullptr;
       }
       taxon.Delete();                             //  ...or else get rid of it.
@@ -1518,7 +1512,6 @@ namespace emp {
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
     else if (taxon == mrca && taxon->GetNumOff() == 1) { 
-      std::cout << "MRCa only has one offspring" << std::endl;
       mrca = nullptr;
     }
   }
@@ -1567,7 +1560,7 @@ namespace emp {
   }
 
 
-  Request a pointer to the Most-Recent Common Ancestor for the population.
+  // Request a pointer to the Most-Recent Common Ancestor for the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.

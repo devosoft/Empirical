@@ -127,22 +127,22 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	CHECK(emp::CountMutSteps(ptr1, "short") == 1);
 	CHECK(emp::CountMutSteps(ptr2, "short") == 2);
 
-	 emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
-  	std::cout << "\nAddOrg 25 (id1, no parent)\n";
-  	auto id1 = sys.AddOrg(25, nullptr, 0);
-  	std::cout << "\nAddOrg -10 (id2; parent id1)\n";
-  	auto id2 = sys.AddOrg(-10, id1, 6);
-  	std::cout << "\nAddOrg 26 (id3; parent id1)\n";
-  	auto id3 = sys.AddOrg(26, id1, 10);
-  	std::cout << "\nAddOrg 27 (id4; parent id2)\n";
-  	auto id4 = sys.AddOrg(27, id2, 25);
-  	std::cout << "\nAddOrg 28 (id5; parent id2)\n";
-  	auto id5 = sys.AddOrg(28, id2, 32);
-  	std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  	auto id6 = sys.AddOrg(29, id5, 39);
-  	std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  	auto id7 = sys.AddOrg(30, id1, 6);
+  std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  auto id1 = sys.AddOrg(25, nullptr, 0);
+  std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  auto id2 = sys.AddOrg(-10, id1, 6);
+  std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  auto id3 = sys.AddOrg(26, id1, 10);
+  std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  auto id4 = sys.AddOrg(27, id2, 25);
+  std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  auto id5 = sys.AddOrg(28, id2, 32);
+  std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  auto id6 = sys.AddOrg(29, id5, 39);
+  std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  auto id7 = sys.AddOrg(30, id1, 6);
 
 
   std::cout << "\nRemoveOrg (id2)\n";
@@ -1074,4 +1074,38 @@ TEST_CASE("Tree balance", "[evo]") {
 
   CHECK(treecl.SackinIndex() == 18);
   CHECK(treecl.CollessLikeIndex() == Approx(1.746074));
+}
+
+// Test that MRCA is properly updated when the MRCA is alive and then dies,
+// causing a new taxon to be MRCA
+TEST_CASE("Dieing MRCA", "[evo]") {
+  emp::Systematics<int, int> tree([](const int & i){return i;}, true, true, false, false);
+  CHECK(!tree.GetTrackSynchronous());
+
+  std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  auto id1 = tree.AddOrg(25, nullptr, 0);
+  std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  auto id2 = tree.AddOrg(-10, id1, 6);
+  std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  auto id3 = tree.AddOrg(26, id1, 10);
+  std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  auto id4 = tree.AddOrg(27, id2, 25);
+  std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  auto id5 = tree.AddOrg(28, id2, 32);
+  std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  auto id6 = tree.AddOrg(29, id5, 39);
+  std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  auto id7 = tree.AddOrg(30, id1, 6);
+
+  CHECK(tree.GetMRCA() == id1);
+  tree.RemoveOrg(id7);
+  tree.RemoveOrg(id3);
+  tree.RemoveOrg(id2);
+  CHECK(tree.GetMRCA() == id1);
+  tree.RemoveOrg(id1);
+  CHECK(tree.GetMRCA() == id2);
+  tree.RemoveOrg(id4);
+  CHECK(tree.GetMRCA() == id5);
+  tree.RemoveOrg(id5);
+  CHECK(tree.GetMRCA() == id6);
 }

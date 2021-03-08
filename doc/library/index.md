@@ -11,6 +11,7 @@ compiler/compiler
 data/data
 datastructs/datastructs
 debug/debug
+Evolve/systematics
 functional/functional
 io/io
 math/math
