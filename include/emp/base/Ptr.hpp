@@ -610,12 +610,12 @@ namespace emp {
     }
 
     /// Convert this pointer to a hash value.
-    size_t Hash() const {
+    size_t Hash() const noexcept {
       // Chop off useless bits of pointer...
       static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
-    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     /// Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
@@ -874,11 +874,11 @@ namespace emp {
     void Delete() { delete ptr; }
     void DeleteArray() { delete [] ptr; }
 
-    size_t Hash() const {
+    size_t Hash() const noexcept {
       static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t)(ptr) >> shift;
     }
-    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     // Copy assignments
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
