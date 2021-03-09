@@ -13,8 +13,7 @@
 #define EMP_WEB_NATIVECANVAS_H
 
 #include <string>
-
-
+#include <memory>
 
 #include <SFML/Graphics.hpp>
 
@@ -38,7 +37,9 @@ namespace web {
     double height{};
     std::string id;
 
-    sf::RenderTexture window;
+    std::shared_ptr<sf::RenderTexture> window{
+      std::make_shared<sf::RenderTexture>()
+    };
     // sf::RenderWindow window;
 
   public:
@@ -48,8 +49,8 @@ namespace web {
     , height( h )
     , id( in_id ) {
     // , window( sf::VideoMode(w, h), id ) {
-      window.clear();
-      [[maybe_unused]] const auto res = window.create( width, height);
+      window->clear();
+      [[maybe_unused]] const auto res = window->create( width, height);
       emp_assert( res );
      }
 
@@ -91,7 +92,7 @@ namespace web {
       circle.setFillColor((sf::Color) emp::web::Color( fc ));
       circle.setOutlineColor((sf::Color) emp::web::Color( lc ));
       circle.setOutlineThickness(thickness);
-      window.draw( circle );
+      window->draw( circle );
       return *this;
     }
 
@@ -114,7 +115,7 @@ namespace web {
       shape.setOutlineColor( (sf::Color) emp::web::Color( lc ) );
       shape.setOutlineThickness( lw );
 
-      window.draw( shape );
+      window->draw( shape );
       return *this;
     }
 
@@ -143,7 +144,7 @@ namespace web {
       shape.setOutlineColor( (sf::Color) emp::web::Color( lc ) );
       shape.setOutlineThickness( lw );
 
-      window.draw( shape );
+      window->draw( shape );
       return *this;
     }
 
@@ -215,7 +216,7 @@ namespace web {
         message.setFillColor((sf::Color) emp::web::Color( fc ));
         message.setOutlineColor((sf::Color) emp::web::Color( lc ));
         message.setOutlineThickness(thickness);
-        window.draw( message );
+        window->draw( message );
         return *this;
     }
 
@@ -234,7 +235,7 @@ namespace web {
 
     /// Draw an arbitrary shape onto this canvas.
     Canvas & Draw(const CanvasShape & shape) {
-      shape.Apply( window );
+      shape.Apply( *window );
       return *this;
     }
 
@@ -252,13 +253,13 @@ namespace web {
 
     /// Clear everything off of this canvas.
     Canvas & Clear() {
-      window.clear();
+      window->clear();
       return *this;
     }
 
     /// Clear to a specific background color.
     Canvas & Clear(const std::string & bg_color) {
-      window.clear((sf::Color) emp::web::Color( bg_color ));
+      window->clear((sf::Color) emp::web::Color( bg_color ));
       return *this;
     }
 
@@ -270,9 +271,9 @@ namespace web {
 
     /// Save a PNG image of a canvas.
     void SavePNG(const std::string& fname) {
-      window.display();
-      window.getTexture().copyToImage().saveToFile( fname );
-      // window.capture().saveToFile( fname );
+      window->display();
+      window->getTexture().copyToImage().saveToFile( fname );
+      // window->capture().saveToFile( fname );
     }
 
   };
