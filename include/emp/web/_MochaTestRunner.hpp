@@ -248,7 +248,9 @@ namespace web {
 
           // Did the error count increase after running this test? If so, force failure.
           if (post_test_error_cnt != cur_runner.before_test_error_count) {
-            // changed to EM instead of EMP
+            // changed to EM instead of EMP to fix syntax error
+            // in file https://gist.github.com/perryk12/099709aee2bbf59d6b55054db543dd0c#file-test-web-configpanel-js-L1569
+            // error: https://github.com/devosoft/Empirical/runs/2068220642?check_suite_focus=true
             MAIN_THREAD_EM_ASM({
               const test_name = UTF8ToString($0);
               describe(`${test_name} failed`, function() {
