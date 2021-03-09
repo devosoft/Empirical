@@ -248,7 +248,8 @@ namespace web {
 
           // Did the error count increase after running this test? If so, force failure.
           if (post_test_error_cnt != cur_runner.before_test_error_count) {
-            MAIN_THREAD_EMP_ASM({
+            // changed to EM instead of EMP
+            MAIN_THREAD_EM_ASM({
               const test_name = UTF8ToString($0);
               describe(`${test_name} failed`, function() {
                 it("failed at least one C++ unit test", function() {
