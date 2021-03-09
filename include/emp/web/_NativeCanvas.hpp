@@ -63,13 +63,13 @@ namespace web {
     double GetHeight() const { return height; }
 
     /// Set a new width for this Canvas.
-    void SetWidth(const double w) { 
-         LibraryWarning("No support for changing width."); 
+    void SetWidth(const double w) {
+         LibraryWarning("No support for changing width.");
     }
 
     /// Set a new height for this Canvas.
-    void SetHeight(const double h) { 
-        LibraryWarning("No support for changing height."); 
+    void SetHeight(const double h) {
+        LibraryWarning("No support for changing height.");
     }
 
     /// Set Canvas size.
@@ -149,7 +149,7 @@ namespace web {
     }
 
     Canvas & Line(
-      emp::Point p1, emp::Point p2, const std::string& fc="", 
+      emp::Point p1, emp::Point p2, const std::string& fc="",
       const std::string& lc="", const double lw=1.0
       ) {
       return this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
@@ -157,7 +157,7 @@ namespace web {
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
     template <typename... Ts>
-    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string& fc="", 
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string& fc="",
       const std::string& lc="", const double lw=1.0) {
           for (auto p2 : points) {
               this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
@@ -167,12 +167,12 @@ namespace web {
 
     /// Add a string to this canvas at x,y with specified text.  Optional face color,
     /// line color, size, and thickness.
-    Canvas & Text(emp::Point p, const std::string& words="", const std::string& fc="black", 
+    Canvas & Text(emp::Point p, const std::string& words="", const std::string& fc="black",
       const std::string& lc="black", const float size = 15, const float thickness=0.5) {
       return this->Text(p.GetX(), p.GetY(), words, fc, lc, size, thickness);
     }
 
-    Canvas & Text(double x, double y, const std::string& words="", const std::string& fc="black", 
+    Canvas & Text(double x, double y, const std::string& words="", const std::string& fc="black",
       const std::string& lc="black", const float size = 15, const float thickness=0.5) {
 
         // Declare and load a font
@@ -188,20 +188,20 @@ namespace web {
         message.setOutlineThickness(thickness);
 
         // draw the message on the canvas
-        window.draw( message );
+        window->draw( message );
         return *this;
 
     }
 
     /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
     /// line color.
-    Canvas & CenterText(emp::Point p, const std::string& words="", const std::string& fc="black", 
+    Canvas & CenterText(emp::Point p, const std::string& words="", const std::string& fc="black",
       const std::string& lc="black", const float size = 15, const float thickness=0.5) {
       this->CenterText(p.GetX(), p.GetY(), words, fc, lc, size, thickness);
       return *this;
     }
 
-    Canvas & CenterText(double x, double y, const std::string& words="", const std::string& fc="black", 
+    Canvas & CenterText(double x, double y, const std::string& words="", const std::string& fc="black",
       const std::string& lc="black", const float size = 15, const float thickness=0.5) {
       // Declare and load a font
         sf::Font font;
