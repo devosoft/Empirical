@@ -110,20 +110,12 @@ namespace emp {
       operator ITERATOR_T() { return *this; }
       operator const ITERATOR_T() const { return *this; }
 
-      auto & operator*() {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
-        return wrapped_t::operator*();
-      }
-      const auto & operator*() const {
+      decltype(auto) operator*() const {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
 
-      auto operator->() {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
-        return wrapped_t::operator->();
-      }
-      const auto operator->() const {
+      decltype(auto) operator->() const {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }
