@@ -144,7 +144,7 @@ namespace emp {
 
     // Prevent ambiguous conversions...
     /// Anything not otherwise defined for first argument, convert to size_t.
-    template <typename T>
+    template <typename T, typename std::enable_if<std::is_arithmetic<T>::value, int>::type = 0>
     BitVector(T in_num_bits) : BitVector((size_t) in_num_bits, 0) {}
 
     /// Copy constructor of existing bit field.
