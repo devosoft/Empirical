@@ -55,6 +55,9 @@ namespace emp {
     return a >= b ? a * a + a + b : a + b * b;
   }
 
+  /// If hash_combine has a single value, there's nothing to combine; just return it!
+  constexpr inline std::size_t hash_combine(std::size_t hash1) noexcept { return hash1; }
+
   /// Boost's implementation of a simple hash-combining function.
   /// Taken from https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
   /// @param hash1 First hash to combine.
@@ -94,11 +97,11 @@ namespace emp {
 
   /// Alias hash_combine() to CombineHash()
   template<typename... Ts>
+  // inline std::size_t CombineHash(Ts &&... args) {
+  //   return hash_combine(Hash<Ts>(std::forward<Ts>(args))...);
   inline std::size_t CombineHash(const Ts &... args) {
-    return hash_combine(std::forward<Ts>(args)...);
+    return hash_combine(Hash<Ts>(args)...);
   }
-
-
 
   // helper functions for murmur hash
   namespace internal {
