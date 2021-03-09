@@ -14,8 +14,8 @@
 #include <functional>
 #include <tuple>
 
+#include "hash_utils.hpp"
 #include "../meta/ValPack.hpp"
-#include "../meta/meta.hpp"
 
 namespace emp {
 
@@ -31,21 +31,6 @@ namespace emp {
   }
 
 
-  /// Apply a tuple as arguments to a function, where all argument positions in function are
-  /// specified with and ValPack
-  template < typename FUN_T, typename TUPLE_T, int... N >   // Specify positions to apply...
-  auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup, ValPack<N...>) {
-    return fun(std::get<N>(tup)...);
-  }
-
-  /// Apply a tuple as arguments to a function, in order.
-  template <typename FUN_T, typename TUPLE_T>              // Apply whole tuple
-  auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup) {
-    return ApplyTuple(fun, tup, ValPackRange<0,tuple_size<TUPLE_T>()>());
-  }
-
-
-
   /// Setup tuples to be able to be used in hash tables.
   template <typename... TYPES>
   struct TupleHash {
@@ -53,7 +38,10 @@ namespace emp {
     using fun_t = std::function<std::size_t(TYPES...)>;
 
     std::size_t operator()( const tuple_t & tup ) const {
-      return ApplyTuple<fun_t, tuple_t> (emp::CombineHash<TYPES...>, tup);
+      return std::apply (
+        [](TYPES... args) { return emp::CombineHash<TYPES...>(args...); },
+        tup
+      );
     }
   };
 
