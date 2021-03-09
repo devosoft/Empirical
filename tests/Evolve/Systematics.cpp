@@ -144,6 +144,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
   std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   auto id7 = sys.AddOrg(30, id1, 6);
 
+  CHECK(*id1 < *id2);
 
   std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
@@ -552,36 +553,61 @@ TEST_CASE("Test Data Struct", "[evo]")
   id4->GetData().phenotype = 3;
 
   auto id5 = sys->AddOrg(5, id4);
-  id5->GetData().mut_counts["substitution"] = 1;
-  id5->GetData().fitness.Add(2);
-  id5->GetData().phenotype = 6;
+  std::unordered_map<std::string, int> muts;
+  muts["substitution"] = 1;
+  id5->GetData().RecordMutation(muts);
+  id5->GetData().RecordFitness(2);
+  id5->GetData().RecordPhenotype(6);
 
+  CHECK(id5->GetData().GetPhenotype() == 6);
+  CHECK(id5->GetData().GetFitness() == 2);
 
   CHECK(CountMuts(id4) == 3);
   CHECK(CountDeleteriousSteps(id4) == 1);
   CHECK(CountPhenotypeChanges(id4) == 1);
   CHECK(CountUniquePhenotypes(id4) == 2);
+  CHECK(LineageLength(id4) == 3);
 
   CHECK(CountMuts(id3) == 5);
   CHECK(CountDeleteriousSteps(id3) == 1);
   CHECK(CountPhenotypeChanges(id3) == 0);
   CHECK(CountUniquePhenotypes(id3) == 1);
+  CHECK(LineageLength(id3) == 2);
 
   CHECK(CountMuts(id5) == 4);
   CHECK(CountDeleteriousSteps(id5) == 2);
   CHECK(CountPhenotypeChanges(id5) == 2);
   CHECK(CountUniquePhenotypes(id5) == 2);
+  CHECK(LineageLength(id5) == 4);
+
+  CHECK(FindDominant(*sys) == id4);
 
   sys.Delete();
+
+  emp::Ptr<emp::Systematics<int, int, emp::datastruct::fitness >> sys2;
+  sys2.New([](const int & i){return i;}, true, true, true, false);
+  auto new_tax = sys2->AddOrg(1, nullptr);
+  new_tax->GetData().RecordFitness(2);
+  CHECK(new_tax->GetData().GetFitness() == 2);
+  new_tax->GetData().RecordFitness(4);
+  CHECK(new_tax->GetData().GetFitness() == 3);
+
+  emp::datastruct::fitness fit_data;
+  fit_data.RecordFitness(5);
+  new_tax->SetData(fit_data);
+  CHECK(new_tax->GetData().GetFitness() == 5);
+
+  sys2.Delete();
+
 
 }
 
 
 TEST_CASE("World systematics integration", "[evo]") {
 
-  // std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>>)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>> tax){
-  //   tax->GetData().phenotype = emp::Sum(tax->GetInfo());
-  // };
+  std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>>, emp::vector<int> &)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>> tax, emp::vector<int> & org){
+    tax->GetData().phenotype = emp::Sum(tax->GetInfo());
+  };
 
   using systematics_t = emp::Systematics<
       emp::vector<int>,
@@ -596,13 +622,14 @@ TEST_CASE("World systematics integration", "[evo]") {
 
   world.SetMutFun([](emp::vector<int> & org, emp::Random & r){return 0;});
 
-  // world.GetSystematics().OnNew(setup_phenotype);
+  sys->OnNew(setup_phenotype);
   world.InjectAt(emp::vector<int>({1,2,3}), 0);
 
-  sys->GetTaxonAt(0)->GetData().RecordPhenotype(6);
-  sys->GetTaxonAt(0)->GetData().RecordFitness(2);
-
   CHECK(sys->GetTaxonAt(0)->GetData().phenotype == 6);
+  sys->GetTaxonAt(0)->GetData().RecordPhenotype(10);
+  CHECK(sys->GetTaxonAt(0)->GetData().phenotype == 10);
+
+  sys->GetTaxonAt(0)->GetData().RecordFitness(2);
 
   std::unordered_map<std::string, int> mut_counts;
   mut_counts["substitution"] = 3;
@@ -613,7 +640,7 @@ TEST_CASE("World systematics integration", "[evo]") {
 
   CHECK(old_taxon->GetNumOrgs() == 0);
   CHECK(old_taxon->GetNumOff() == 1);
-  CHECK(sys->GetTaxonAt(0)->GetParent()->GetData().phenotype == 6);
+  CHECK(sys->GetTaxonAt(0)->GetParent()->GetData().phenotype == 10);
   CHECK((*sys->GetActive().begin())->GetNumOrgs() == 1);
 
 }
@@ -623,35 +650,64 @@ emp::DataFile AddDominantFile(WORLD_TYPE & world){
   using mut_count_t [[maybe_unused]] = std::unordered_map<std::string, int>;
   using data_t = emp::datastruct::mut_landscape_info<emp::vector<double>>;
   using org_t = emp::AvidaGP;
-  using systematics_t = emp::Systematics<org_t, org_t, data_t>;
+  using systematics_t = emp::Systematics<org_t, org_t::genome_t, data_t>;
 
 
-    auto & file = world.SetupFile("dominant.csv");
+  auto & file = world.SetupFile("dominant.csv");
 
-    std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
-    std::function<int(void)> dom_mut_count = [&world](){
-      return CountMuts(dynamic_cast<emp::Ptr<systematics_t>>(world.GetSystematics(0))->GetTaxonAt(0));
-    };
-    std::function<int(void)> dom_del_step = [&world](){
-      return CountDeleteriousSteps(dynamic_cast<emp::Ptr<systematics_t>>(world.GetSystematics(0))->GetTaxonAt(0));
-    };
-    std::function<size_t(void)> dom_phen_vol = [&world](){
-      return CountPhenotypeChanges(dynamic_cast<emp::Ptr<systematics_t>>(world.GetSystematics(0))->GetTaxonAt(0));
-    };
-    std::function<size_t(void)> dom_unique_phen = [&world](){
-      return CountUniquePhenotypes(dynamic_cast<emp::Ptr<systematics_t>>(world.GetSystematics(0))->GetTaxonAt(0));
-    };
+  std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
+  std::function<int(void)> dom_mut_count = [&world](){
+    emp::Ptr<emp::SystematicsBase<org_t>> sys = world.GetSystematics(0);
+    emp::Ptr<systematics_t> full_sys = sys.DynamicCast<systematics_t>();
+    if (full_sys->GetNumActive() > 0) {
+      return emp::CountMuts(emp::FindDominant(*full_sys));
+    }
+    return 0;
+  };
+  std::function<int(void)> dom_del_step = [&world](){
+    emp::Ptr<emp::SystematicsBase<org_t>> sys = world.GetSystematics(0);
+    emp::Ptr<systematics_t> full_sys = sys.DynamicCast<systematics_t>();
+    if (full_sys->GetNumActive() > 0) {
+      return emp::CountDeleteriousSteps(emp::FindDominant(*full_sys));
+    }
+    return 0;
+  };
+  std::function<size_t(void)> dom_phen_vol = [&world](){
+    emp::Ptr<emp::SystematicsBase<org_t>> sys = world.GetSystematics(0);
+    emp::Ptr<systematics_t> full_sys = sys.DynamicCast<systematics_t>();
+    if (full_sys->GetNumActive() > 0) {
+      return emp::CountPhenotypeChanges(emp::FindDominant(*full_sys));
+    }
+    return 0;
+  };
+  std::function<size_t(void)> dom_unique_phen = [&world](){
+    emp::Ptr<emp::SystematicsBase<org_t>> sys = world.GetSystematics(0);
+    emp::Ptr<systematics_t> full_sys = sys.DynamicCast<systematics_t>();
+    if (full_sys->GetNumActive() > 0) {
+      return emp::CountUniquePhenotypes(emp::FindDominant(*full_sys));
+    }
+    return 0;
+  };
+  std::function<size_t(void)> lin_len = [&world](){
+    emp::Ptr<emp::SystematicsBase<org_t>> sys = world.GetSystematics(0);
+    emp::Ptr<systematics_t> full_sys = sys.DynamicCast<systematics_t>();
+    if (full_sys->GetNumActive() > 0) {
+      return emp::LineageLength(emp::FindDominant(*full_sys));
+    }
+    return 0;
+  };
 
-
-    file.AddFun(get_update, "update", "Update");
-    file.AddFun(dom_mut_count, "dominant_mutation_count", "sum of mutations along dominant organism's lineage");
-    file.AddFun(dom_del_step, "dominant_deleterious_steps", "count of deleterious steps along dominant organism's lineage");
-    file.AddFun(dom_phen_vol, "dominant_phenotypic_volatility", "count of changes in phenotype along dominant organism's lineage");
-    file.AddFun(dom_unique_phen, "dominant_unique_phenotypes", "count of unique phenotypes along dominant organism's lineage");
-    file.PrintHeaderKeys();
-    return file;
+  file.AddFun(get_update, "update", "Update");
+  file.AddFun(dom_mut_count, "dominant_mutation_count", "sum of mutations along dominant organism's lineage");
+  file.AddFun(dom_del_step, "dominant_deleterious_steps", "count of deleterious steps along dominant organism's lineage");
+  file.AddFun(dom_phen_vol, "dominant_phenotypic_volatility", "count of changes in phenotype along dominant organism's lineage");
+  file.AddFun(dom_unique_phen, "dominant_unique_phenotypes", "count of unique phenotypes along dominant organism's lineage");
+  file.AddFun(lin_len, "lineage_length", "number of taxa dominant organism's lineage");
+  file.PrintHeaderKeys();
+  return file;
 }
 
+// Integration test for using multiple systematics managers in a world and recording data
 TEST_CASE("Run world", "[evo]") {
   using mut_count_t = std::unordered_map<std::string, int>;
   using data_t = emp::datastruct::mut_landscape_info<emp::vector<double>>;
@@ -705,9 +761,12 @@ TEST_CASE("Run world", "[evo]") {
     world.GetSystematics(1).Cast<phen_systematics_t>()->GetTaxonAt(pos)->GetData().RecordPhenotype(phen);
   });
 
-  // world.OnOrgPlacement([&last_mutation, &world](size_t pos){
-  //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordMutation(last_mutation);
-  // });
+  emp::Ptr<emp::SystematicsBase<org_t>> sys0 = world.GetSystematics(0);
+  emp::Ptr<gene_systematics_t> sys0_cast = sys0.DynamicCast<gene_systematics_t>();
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> capture_mut_fun = [&last_mutation](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & org){
+    tax->GetData().RecordMutation(last_mutation);
+  };
+  sys0_cast->OnNew(capture_mut_fun);
 
   world.SetupSystematicsFile().SetTimingRepeat(1);
   world.SetupFitnessFile().SetTimingRepeat(1);
@@ -715,7 +774,7 @@ TEST_CASE("Run world", "[evo]") {
   emp::AddPhylodiversityFile(world, 0, "genotype_phylodiversity.csv").SetTimingRepeat(1);
   emp::AddPhylodiversityFile(world, 1, "phenotype_phylodiversity.csv").SetTimingRepeat(1);
   emp::AddLineageMutationFile(world).SetTimingRepeat(1);
-  // AddDominantFile(world).SetTimingRepeat(1);
+  AddDominantFile(world).SetTimingRepeat(1);
   // emp::AddMullerPlotFile(world).SetTimingOnce(1);
 
 
@@ -754,15 +813,7 @@ TEST_CASE("Run world", "[evo]") {
 
   world.SetFitFun(fit_fun);
 
-  // emp::vector< std::function<double(const emp::AvidaGP &)> > fit_set(16);
-  // for (size_t out_id = 0; out_id < 16; out_id++) {
-  //   // Setup the fitness function.
-  //   fit_set[out_id] = [out_id](const emp::AvidaGP & org) {
-  //     return (double) -std::abs(org.GetOutput((int)out_id) - (double) (out_id * out_id));
-  //   };
-  // }
-
-  // Build a random initial popoulation.
+  // Build a random initial population.
   for (size_t i = 0; i < 1; i++) {
     emp::AvidaGP cpu;
     cpu.PushRandom(random, 20);
@@ -779,16 +830,15 @@ TEST_CASE("Run world", "[evo]") {
     // Update the status of all organisms.
     world.ResetHardware();
     world.Process(200);
-    double fit0 = world.CalcFitnessID(0);
-    std::cout << (ud+1) << " : " << 0 << " : " << fit0 << std::endl;
+    // double fit0 = world.CalcFitnessID(0);
+    // std::cout << (ud+1) << " : " << fit0 << std::endl;
 
     // Keep the best individual.
     EliteSelect(world, 1, 1);
 
     // Run a tournament for the rest...
     TournamentSelect(world, 2, 99);
-    // LexicaseSelect(world, fit_set, POP_SIZE-1);
-    // EcoSelect(world, fit_fun, fit_set, 100, 5, POP_SIZE-1);
+
     for (size_t i = 0; i < world.GetSize(); i++) {
       record_fit_sig.Trigger(i, world.CalcFitnessID(i));
       record_phen_sig.Trigger(i, phen_fun(world.GetOrg(i)));
@@ -797,14 +847,6 @@ TEST_CASE("Run world", "[evo]") {
     world.Update();
 
   }
-
-  // std::cout << std::endl;
-  // world[0].PrintGenome();
-  // std::cout << std::endl;
-  // for (int i = 0; i < 16; i++) {
-  //   std::cout << i << ":" << world[0].GetOutput(i) << "  ";
-  // }
-  // std::cout << std::endl;
 }
 
 
@@ -1108,4 +1150,45 @@ TEST_CASE("Dieing MRCA", "[evo]") {
   CHECK(tree.GetMRCA() == id5);
   tree.RemoveOrg(id5);
   CHECK(tree.GetMRCA() == id6);
+}
+
+TEST_CASE("Test RemoveBefore", "[Evolve]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto id1 = sys.AddOrg(25, nullptr, 0);
+  auto id2 = sys.AddOrg(-10, id1, 6);
+  auto id3 = sys.AddOrg(26, id1, 10);
+  auto id4 = sys.AddOrg(27, id2, 25);
+  auto id5 = sys.AddOrg(28, id2, 32);
+  auto id6 = sys.AddOrg(29, id5, 39);
+  auto id7 = sys.AddOrg(30, id1, 6);
+  auto id8 = sys.AddOrg(2, id3, 33);
+  auto id9 = sys.AddOrg(4, id8, 33);
+  auto id10 = sys.AddOrg(5, id9, 34);
+
+  sys.RemoveOrg(id1, 40);
+  sys.RemoveOrg(id2, 41);
+  sys.RemoveOrg(id9, 40);
+  sys.RemoveOrg(id8, 60);
+
+  CHECK(emp::Has(sys.GetAncestors(), id1));
+  CHECK(emp::Has(sys.GetAncestors(), id2));
+
+  sys.RemoveBefore(50);
+
+  CHECK(!emp::Has(sys.GetAncestors(), id1));
+  CHECK(!emp::Has(sys.GetAncestors(), id2));
+  CHECK(emp::Has(sys.GetAncestors(), id9));
+  CHECK(emp::Has(sys.GetActive(), id3));
+  CHECK(emp::Has(sys.GetActive(), id4));
+  CHECK(emp::Has(sys.GetActive(), id5));
+  CHECK(emp::Has(sys.GetActive(), id6));
+  CHECK(emp::Has(sys.GetActive(), id7));
+  CHECK(emp::Has(sys.GetAncestors(), id8));
+
+  sys.RemoveBefore(70);
+  CHECK(!emp::Has(sys.GetActive(), id8));
+  CHECK(!emp::Has(sys.GetActive(), id9));
+
 }
