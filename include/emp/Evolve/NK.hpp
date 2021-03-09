@@ -172,8 +172,8 @@ namespace emp {
 
   class NKLandscapeMemo {
   private:
-    const size_t N;
-    const size_t K;
+    size_t N;
+    size_t K;
     mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
     emp::vector<BitVector> masks;
 
