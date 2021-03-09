@@ -53,7 +53,7 @@ int main()
   bv_set.insert(set2);
 
   emp::BitVector bv(10);
-  std::cout << bv.Hash() << "  (initial, 10 bits)" << std::endl;
+  std::cout << bv.Hash() << "  (initial Hash, 10 bits)" << std::endl;
   bv[3] = true;
   std::cout << bv.Hash() << "  (bit 3 set to true)" << std::endl;
   bv.Resize(9);
