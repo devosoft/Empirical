@@ -11,6 +11,7 @@
 #include "emp/bits/BitSet.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -321,6 +322,10 @@ TEST_CASE("Test fitness sharing", "[evo]")
   REQUIRE(pop.CalcFitnessID(0) == Approx(0.526316));
   REQUIRE(pop.CalcFitnessID(POP_SIZE-1) == 2);
 
+  // Check neighbor function works for mixed
+  REQUIRE(pop.GetValidNeighborOrgIDs(21).size() == POP_SIZE);
+  REQUIRE(pop.IsNeighbor(21, 20));
+
   // Run a tournament...
   emp::TournamentSelect(pop, 5, POP_SIZE);
   pop.Update();
@@ -372,8 +377,100 @@ TEST_CASE("Test fitness sharing", "[evo]")
 
   std::cout << std::endl;
   grid_world.PrintGrid();
-  std::cout << "Final Org Counts:\n";
+  //std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
   //   std::cout << std::endl;
 
+}
+
+TEST_CASE("Test 3D population structure", "[Evolve]")
+{
+	emp::World<int> world;
+	world.SetPopStruct_3DGrid(5,4,3);
+	CHECK(world.GetWidth() == 5);
+	CHECK(world.GetHeight() == 4);
+	CHECK(world.GetDepth() == 3);
+	CHECK(world.GetSize() == 5*4*3);
+	
+	int org1 = 5;
+
+	world.InjectAt(org1, 0);
+
+	// Test lower bounds
+	emp::WorldPosition neigh = world.GetRandomNeighborPos(0);
+	emp::vector<size_t> legal_neighbors = {1,5,6,20,21,25,26};
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
+	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
+
+	// Test middle of grid
+	neigh = world.GetRandomNeighborPos(26);
+	legal_neighbors = {0,1,2, 5,6,7,10,11,12,20, 21, 22, 25, 27, 30, 31, 32, 40, 41, 42, 45, 46, 47, 50, 51, 52};
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
+	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
+
+	// Test upper bounds
+	neigh = world.GetRandomNeighborPos(59);
+	legal_neighbors = {58, 54, 53, 39, 38, 34, 33};
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
+	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
+	
+	// Test is_neighbor
+	CHECK(world.IsNeighbor(5, 6));
+	CHECK(world.IsNeighbor(0, 20));
+	CHECK(world.IsNeighbor(0, 21));
+	CHECK(world.IsNeighbor(0, 5));
+	CHECK(!world.IsNeighbor(0, 22));
+
+	world.Inject(org1);
+	world.DoBirth(org1, 0);
+	world.DoDeath();
+
+	// test synchronous
+	world.Clear();
+	world.SetPopStruct_3DGrid(5,4,3, true);
+	world.InjectAt(org1, 0);
+	emp::WorldPosition pos = world.DoBirth(org1, 0);
+	legal_neighbors = {1,5,6,20,21,25,26};
+	CHECK(emp::Has<size_t>(legal_neighbors, pos.GetIndex() ));
+	CHECK(pos.GetPopID() == 1);
+	CHECK(world.GetNumOrgs() == 1);	
+	world.Update();
+	CHECK(world.GetNumOrgs() == 1);	
+	world.Update();
+	CHECK(world.GetNumOrgs() == 0);	
+
+}
+
+TEST_CASE("Test GetValidNeighborOrgIDs on Grid", "[Evolve]")
+{
+  emp::Random random(1);
+  std::function<void(int &, std::ostream &)> print_fun = [](int & val, std::ostream & os) {
+    val %= 63;
+    if (val < 10) os << (char) ('0' + val);
+    else if (val < 36) os << (char) ('a' + (val - 10));
+    else if (val < 62) os << (char) ('A' + (val - 36));
+    else os << '+';
+  };
+
+  emp::World<int> grid_world(random);
+  grid_world.SetPopStruct_Grid(5, 10);
+  grid_world.Resize(5, 10);
+  grid_world.SetPrintFun(print_fun);
+
+  grid_world.InjectAt(30, 12);
+  grid_world.InjectAt(31, 13);
+  grid_world.InjectAt(34, 7);
+  grid_world.InjectAt(30, 0);
+  grid_world.InjectAt(32, 49);
+
+  // Check neighbor function works for grid
+  std::cout << "Testing Neighbor functions in Grid\n";
+  grid_world.PrintGrid();
+  emp::vector<size_t> valid_neighbors = {7, 13};
+  REQUIRE(grid_world.IsNeighbor(12, 13));
+  REQUIRE(grid_world.IsNeighbor(13, 12));
+  REQUIRE(grid_world.GetValidNeighborOrgIDs(12) == valid_neighbors);
+  REQUIRE(grid_world.IsNeighbor(0, 49));
+
+  std::cout << std::endl;
 }

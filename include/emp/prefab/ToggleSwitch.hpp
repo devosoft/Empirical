@@ -17,6 +17,7 @@ namespace prefab {
        * @param cb callback function passed onto input constructor
        * @param label text for switch label
        * @param is_checked is the switched defaulted to on?
+       * @param t_switch_id the id to assign the html object for this switch
        */
       ToggleSwitch(
         const std::function<void(std::string)> & cb,

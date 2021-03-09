@@ -57,7 +57,7 @@ namespace emp {
     }
   };
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // Recursive case for the tuple.
     template <typename TUPLE_T, typename FUN_T, size_t TOT, size_t POS>
@@ -74,6 +74,7 @@ namespace emp {
       static void Run(TUPLE_T & tup, const FUN_T & fun) { ; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Call a provided function on each element of a tuple.
   template <typename TUPLE_T, typename FUN_T>
@@ -81,7 +82,7 @@ namespace emp {
     internal::TupleIterate_impl<TUPLE_T, FUN_T, tuple_size<TUPLE_T>(), 0>::Run(tup, fun);
   }
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // Recursive case for the tuple.
     template <typename TUP1_T, typename TUP2_T, typename FUN_T, size_t TOT, size_t POS>
@@ -98,6 +99,7 @@ namespace emp {
       static void Run(TUP1_T &, TUP2_T &, const FUN_T &) { ; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Call a provided function on each pair of elements in two tuples.
   template <typename TUP1_T, typename TUP2_T, typename FUN_T>

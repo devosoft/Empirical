@@ -43,7 +43,7 @@ namespace web {
     > documents;
 
   public:
-    /// @document_ids vector of HTML IDs of divs to attach to
+    /// @param document_ids vector of HTML IDs of divs to attach to
     BaseTest(const emp::vector<std::string> document_ids={}) {
 
       for (const auto & id : document_ids) {
@@ -60,7 +60,7 @@ namespace web {
 
     }
 
-    // Remember to clean up after your test!
+    /// Remember to clean up after your test!
     virtual ~BaseTest() { ; }
 
     /// Describe is run after construction.
@@ -128,9 +128,11 @@ namespace web {
     emp::Signal<void()> after_each_test_sig;    ///< Is triggered after each test (after test marked 'done', but before test is deleted).
     std::deque<TestRunner> test_runners;        ///< Store test runners in a first-in-first-out (out=run) queue
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     const size_t next_test_js_func_id;
     const size_t pop_test_js_func_id;
     const size_t cleanup_all_js_func_id;
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// Run the next test!
     void NextTest() {
@@ -154,7 +156,10 @@ namespace web {
         test_runners.begin(),
         test_runners.end(),
         [](TestRunner & runner) {
+          #ifdef __EMSCRIPTEN__
+          // Runner will only get marked as done if all the javascript stuff is actually happening
           emp_assert(runner.done);
+          #endif
           if (runner.test != nullptr) runner.test.Delete();
         }
       );
@@ -351,7 +356,14 @@ namespace web {
     /// Running a test consumes it (i.e., executing Run a second time will not re-run previously run
     /// tests).
     /// Tests are run in the order they were added.
+    #ifdef __EMSCRIPTEN__
     void Run() { if (test_runners.size()) NextTest(); }
+    #else
+    // When running this code natively, we need to call each test individually because the code
+    // to automatically call the each successive test in sequence only exists in Javascript
+    // (this only matters for test coverage)
+    void Run() { while (test_runners.size()) {NextTest(); PopTest();} }
+    #endif
 
     /// Provide a function for MochaTestRunner to call before each test is created and run.
     /// @param fun a function to be run before each test is created and run

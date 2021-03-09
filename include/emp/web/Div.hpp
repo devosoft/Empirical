@@ -46,6 +46,7 @@ namespace web {
   class Table;
   class Element;
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     class TableInfo;
@@ -61,6 +62,7 @@ namespace web {
       std::string tag; ///< Jury rig this class for non-div duty (i.e., footer, header, p, etc.)
 
       /// @param in_tag sets the html tag for used this object (i.e., div, footer, header, p, etc.)
+      /// @param in_id the id to assign to the html element for this object
       DivInfo(const std::string & in_id="", const std::string & in_tag="div")
         : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true), text_append(false)
         , widget_dict(), anim_map(), tag(in_tag)
@@ -132,7 +134,7 @@ namespace web {
       }
 
       /// Remove a specific Widget child.
-      /// @param the Widget to remove
+      /// @param child the Widget to remove
       void RemoveChild(Widget & child) override {
         // ensure child is present
         emp_assert(1 == std::count(
@@ -240,7 +242,7 @@ namespace web {
         return new_text;
       }
 
-      // All derived widgets must suply a mechanism for providing associated HTML code.
+      // All derived widgets must supply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");       // Clear the current text.
 
@@ -295,6 +297,7 @@ namespace web {
       virtual std::string GetType() override { return "web::DivInfo"; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// A widget to track a div in an HTML file, and all of its contents.
   class Div : public internal::WidgetFacet<Div> {

@@ -926,6 +926,7 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     // accessory to UnifMod
@@ -1064,6 +1065,7 @@ namespace emp {
       lookup_holder() : metric(), lookup(metric) { ; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Reshape metric's probability distribution to be approximately uniform.
   /// Sample from the original distribution to create a percentile map,

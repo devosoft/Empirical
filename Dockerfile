@@ -86,6 +86,9 @@ RUN \
     vim \
     nano \
     wget \
+    ssh-client \
+    libasound2 \
+    gpg-agent \
     && \
   apt-get clean \
     && \

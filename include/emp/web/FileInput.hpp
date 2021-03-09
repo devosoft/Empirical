@@ -34,6 +34,7 @@ namespace web {
   protected:
 
     // FileInputs associated with the same DOM element share a single FileInputInfo object.
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class FileInputInfo : public internal::WidgetInfo {
       friend FileInput;
     protected:
@@ -83,7 +84,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::FileInputInfo"; }
     }; // End of FileInputInfo definition
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of indo.
     FileInputInfo * Info() { return (FileInputInfo *) info; }

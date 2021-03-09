@@ -18,6 +18,7 @@
 
 namespace emp {
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace internal {
 
   const emp::vector<std::string> adjectives{
@@ -2710,6 +2711,7 @@ namespace internal {
   };
 
 } // namespace internal
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   std::string hash_namify( const size_t hash ) {
 

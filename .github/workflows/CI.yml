@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Tests
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         cxx: [clang++, g++]
@@ -41,7 +41,7 @@ jobs:
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -55,7 +55,7 @@ jobs:
           run: make test-web
   test-coverage:
     name: Measure Test Coverage
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -78,7 +78,7 @@ jobs:
       - run: curl -s https://codecov.io/bash | bash
   test-documentation:
     name: Test Documentation Build
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -86,10 +86,16 @@ jobs:
       - uses: docker-practice/actions-setup-docker@v1
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
-      - run: sudo docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
+      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
+      - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
+      - uses: sylvanld/action-storage@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          src: doc-coverage.json
+          dst: stats/doc-coverage.json          
   deploy-dockerhub:
     name: Deploy to DockerHub
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     needs:
       - test

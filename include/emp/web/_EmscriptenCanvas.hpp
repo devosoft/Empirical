@@ -28,7 +28,7 @@ namespace web {
   class Canvas : public internal::WidgetFacet<Canvas> {
     friend class CanvasInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class CanvasInfo : public internal::WidgetInfo {
       friend Canvas;
 
@@ -75,6 +75,7 @@ namespace web {
         EM_ASM({
           var cname = UTF8ToString($0);
           var canvas = document.getElementById(cname);
+          emp_i.ctx = canvas.getContext('2d');
         }, id.c_str());
         #endif
       }
@@ -104,8 +105,8 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::CanvasInfo"; }
 
-    };  // End of ButtonInfo definition.
-
+    };  // End of CanvasInfo definition.
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of indo.
     CanvasInfo * Info() { return (CanvasInfo *) info; }

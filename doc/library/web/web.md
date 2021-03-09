@@ -11,6 +11,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Animate.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Attributes
@@ -18,6 +19,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Attributes.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Buttons
@@ -25,6 +27,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Button.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Canvas
@@ -32,6 +35,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Canvas.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Canvas Utilities
@@ -39,6 +43,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/canvas_utils.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Canvas Actions
@@ -46,6 +51,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/CanvasAction.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Canvas Shapes
@@ -53,6 +59,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/CanvasShape.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Color maps
@@ -60,6 +67,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/color_map.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Commands
@@ -67,6 +75,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/commands.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Divs
@@ -74,6 +83,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Div.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Documents
@@ -81,6 +91,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Document.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Useful functions for emscripten
@@ -88,6 +99,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/emfunctions.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Event Handling
@@ -95,6 +107,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/events.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## File Input
@@ -102,6 +115,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/FileInput.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Font
@@ -109,6 +123,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Font.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Images
@@ -116,6 +131,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Image.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Initialization
@@ -123,6 +139,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/init.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Javascript Utilities
@@ -130,6 +147,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/js_utils.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## JSWrap
@@ -137,6 +155,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/JSWrap.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Keypress Manager
@@ -144,6 +163,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/KeypressManager.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Listeners
@@ -151,6 +171,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Listeners.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Raw Image
@@ -158,6 +179,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/RawImage.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Selector
@@ -165,6 +187,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Selector.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Styles
@@ -172,6 +195,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Style.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Tables
@@ -179,6 +203,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Table.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Text
@@ -186,6 +211,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Text.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Text Areas
@@ -193,6 +219,7 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/TextArea.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Tweens
@@ -200,16 +227,19 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/Tween.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ## Widgets
 
 ```{eval-rst}
-.. doxygenfile:: emp/web/Widget.hpp
+..  emp/web/Widget.hpp
   :project: Empirical
+  :no-link:
 ```
 
 ```{eval-rst}
 .. doxygenfile:: emp/web/WidgetExtras.hpp
   :project: Empirical
+  :no-link: 
 ```

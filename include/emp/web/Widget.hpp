@@ -48,6 +48,7 @@
 namespace emp {
 namespace web {
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Setup some types we will need later
   namespace internal {
     // Pre-declare WidgetInfo so classes can inter-operate.
@@ -74,7 +75,7 @@ namespace web {
       virtual bool Trigger(WidgetInfo &) const = 0;
     };
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
@@ -140,7 +141,7 @@ namespace web {
     bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
     bool IsTextFeed() const { return GetInfoTypeName() == "TextFeedInfo"; }
 
-    bool IsD3Visualiation() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
+    bool IsD3Visualization() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
 
     const std::string & GetID() const;  ///< What is the HTML string ID for this Widget?
 
@@ -160,7 +161,7 @@ namespace web {
     /// Are two Widgets refering to the same HTML object?
     bool operator==(const Widget & in) const { return info == in.info; }
 
-    /// Are two Widgets refering to differnt HTML objects?
+    /// Are two Widgets refering to different HTML objects?
     bool operator!=(const Widget & in) const { return info != in.info; }
 
     /// Conver Widget to bool (I.e., is this Widget active?)
@@ -187,7 +188,7 @@ namespace web {
     /// (Argument is for recursive, internal use only.)
     virtual void Deactivate(bool top_level=true);
 
-    /// Doggle between Active and Deactivated.
+    /// Toggle between Active and Deactivated.
     bool ToggleActive();
 
     /// Clear and redraw the current widget on the screen.
@@ -206,7 +207,8 @@ namespace web {
     /// Debug...
     std::string GetInfoType() const;
   };
-
+  
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     // WidgetInfo is a base class containing information needed by all GUI widget classes
@@ -221,7 +223,7 @@ namespace web {
       std::string id;                 ///< ID used for associated DOM element.
       WidgetExtras extras;            ///< HTML attributes, CSS style, and listeners for web events.
 
-      // Track hiearchy
+      // Track hierarchy
       WidgetInfo * parent;            ///< Which WidgetInfo is this one contained within?
       emp::vector<Widget> dependants; ///< Widgets to be refreshed if this one is triggered
       Widget::ActivityState state;    ///< Is this element active in DOM?
@@ -255,7 +257,7 @@ namespace web {
 
       // Some nodes can have children and need to be able to recursively register them.
       virtual void RegisterChildren(DivInfo * registrar) { ; }   // No children by default.
-      virtual void UnregisterChildren(DivInfo * regestrar) { ; } // No children by default.
+      virtual void UnregisterChildren(DivInfo * registrar) { ; } // No children by default.
 
       virtual void AddChild(Widget in) { ; }
       virtual void RemoveChild(Widget & child) { ; }
@@ -318,7 +320,7 @@ namespace web {
           return Append(cmd);
         }
 
-        // Next, test if this if an invoable function
+        // Next, test if this if an invocable function
         // @CAO: We should make sure it returns a string when called with no arguments.
         else if constexpr ( std::is_invocable<T>() ) {
           std::function<std::string()> fun_val( val );
@@ -338,7 +340,7 @@ namespace web {
         return parent->Append(std::forward<FWD_TYPE>(arg));
       }
 
-      // All derived widgets must suply a mechanism for providing associated HTML code.
+      // All derived widgets must supply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & ss) = 0;
 
       // Derived widgets may also provide JavaScript code to be run on redraw.
@@ -380,6 +382,7 @@ namespace web {
     };
 
   }  // end namespaceinternal
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   // Implementation of Widget methods...
 
@@ -566,7 +569,7 @@ namespace web {
     return info->GetType();
   }
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     /// WidgetFacet is a template that provides accessors into Widget with a derived return type.
@@ -793,18 +796,22 @@ namespace web {
       return_t & SetTitle(const std::string & _in) { return SetAttr("title", _in); }
 
       /// Update the width of this Widget.
+      /// @param w new width of the widget
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
       return_t & SetWidth(double w, const std::string & unit="px") {
         return SetCSS("width", emp::to_string(w, unit) );
       }
 
       /// Update the height of this Widget.
+      /// @param h new height for the widget
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
       return_t & SetHeight(double h, const std::string & unit="px") {
         return SetCSS("height", emp::to_string(h, unit) );
       }
 
       /// Update the size (width and height) of this widget.
+      /// @param w widget width
+      /// @param h widget height
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
       return_t & SetSize(double w, double h, const std::string & unit="px") {
         SetWidth(w, unit); return SetHeight(h, unit);
@@ -949,6 +956,7 @@ namespace web {
     };
 
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 }

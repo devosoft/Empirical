@@ -39,7 +39,7 @@ namespace emp {
     std::string filename;            ///< Name of the file that we are printing to (if one exists)
     std::ostream * os;               ///< Stream to print to.
     FunctionSet<fun_t> funs;         ///< Set of functions to call, one per column in the file.
-    FunctionSet<void()> pre_funs; ///< Set of functions to call before calculating data.
+    FunctionSet<void()> pre_funs;    ///< Set of functions to call before calculating data.
     emp::vector<std::string> keys;   ///< Keywords associated with each column.
     emp::vector<std::string> descs;  ///< Full description for each column.
     time_fun_t timing_fun;           ///< Function to determine updates to print on (default: all)
@@ -108,13 +108,14 @@ namespace emp {
       };
     }
 
-    /// Print @param _in at the beginning of each line.
+    /// Print a string at the beginning of each line. @param _in the string to print
     void SetLineBegin(const std::string & _in) { line_begin = _in; }
-    /// Print @param _in between elements (i.e. make @param _in the delimeter).
+    /// Print a string between elements @param _in the string (i.e. the delimeter).
     void SetSpacer(const std::string & _in) { line_spacer = _in; }
-    /// Print @param _in at the end of each line.
+    /// Print a string at the end of each line. @param _in the string to print
     void SetLineEnd(const std::string & _in) { line_end = _in; }
-    /// Set line begin character (@param b), column delimeter (@param s), and line end character (@param e)
+    /// Set line begin, delimeter, and line end characters.
+    /// @param b line-begin character. @param s column delimeter @param e line end character
     void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
       line_begin = b;
       line_spacer = s;
@@ -152,18 +153,24 @@ namespace emp {
       os->flush();
     }
 
-    /// If Update is called with an update number, call the full version of update only if the
+    /// If Update is called with an update number, the full version of update is called only if the
     /// update value passes the timing function (that is, the timing function returns true).
+    /// @param update the current time step
     virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
-
+    /// Add a function to run before each time data is calculated. You can add as many
+    /// functions as you want.
+    /// @param fun the function to add
     void AddPreFun(pre_fun_t fun) {
       pre_funs.Add(fun);
     }
 
-    /// If a function takes an ostream, pass in the correct one.
+    // If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
     /// want to call one of the more specific ones.
+    /// @param fun function to call to get the value to print
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
     size_t Add(const std::function<void(std::ostream &)> & fun, const std::string & key, const std::string & desc) {
       size_t id = funs.GetSize();
       funs.Add(fun);
@@ -173,13 +180,19 @@ namespace emp {
     }
 
     /// Add a function that returns a value to be printed to the file.
+    /// @param fun function to call to get the value to print
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
     template <typename T>
     size_t AddFun(const std::function<T()> & fun, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always prints the current value of @param var.
+    /// Add a function that always prints the current value of \c var.
+    /// @param var variable to print value of
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
     template <typename T>
     size_t AddVar(const T & var, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&var](std::ostream & os){ os << var; };
@@ -193,10 +206,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the current value from the DataNode @param node.
-    /// Requires that @param node have the data::Current modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the current value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Current modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -208,10 +225,14 @@ namespace emp {
     }
 
 
-    /// Add a function that always pulls the mean value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the mean value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?    template <typename VAL_TYPE, emp::data... MODS>
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -222,10 +243,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the median value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the median value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMedian(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -236,10 +261,15 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the Percentile value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the Percentile value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param pct the percentile value to return
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddPercentile(DataNode<VAL_TYPE, MODS...> & node, const double pct=100.0, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull, pct](std::ostream & os){
@@ -250,10 +280,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the total value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the total value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -264,10 +298,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the minimum value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the minimum value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -278,10 +316,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the maximum value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the maximum value from the DataNode \c node.
+    /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -292,8 +334,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the variance from the DataNode @param node
-    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// Add a function that always pulls the variance from the DataNode \c node
+    /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddVariance(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -304,8 +352,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the standard deviation from the DataNode @param node
-    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// Add a function that always pulls the standard deviation from the DataNode \c node
+    /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddStandardDeviation(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -316,8 +370,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the skewness from the DataNode @param node
-    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// Add a function that always pulls the skewness from the DataNode \c node
+    /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddSkew(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -328,8 +388,14 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the kurtosis from the DataNode @param node
-    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// Add a function that always pulls the kurtosis from the DataNode \c node
+    /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddKurtosis(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -341,15 +407,21 @@ namespace emp {
     }
 
     /// Add multiple functions that pull common stats measurements (mean, variance, min, and max)
-    /// from the DataNode @param node.
-    /// Requires that @param node have the data::Stats or data::FullStats modifier.
-    /// @param key and @param desc will have the name of the stat appended to the beginning.
+    /// from the DataNode \c node.
+    /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
+    /// \c key and \c desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
     /// same node.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       AddMean(node, "mean_" + key, "mean of " + desc, false, pull);
@@ -360,15 +432,21 @@ namespace emp {
 
 
     /// Add multiple functions that pull all stats measurements (mean, variance, min, max,
-    /// skew, and kurtosis) from the DataNode @param node
-    /// Requires that @param node have the data::Stats or data::FullStats modifier.
-    /// @param key and @param desc will have the name of the stat appended to the beginning.
+    /// skew, and kurtosis) from the DataNode \c node
+    /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
+    /// \c key and \c desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
     /// same node.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     void AddAllStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       AddStats(node, key, desc, false, pull);
@@ -376,11 +454,16 @@ namespace emp {
       AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc, reset);
     }
 
-    /// Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
-    /// from @param node. Requires that @param node have the data::Histogram modifier and at least
-    /// @bin_id bins.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the count of the \c bin_id 'th bin of the histogram
+    /// from \c node. Requires that \c node have the \c data::Histogram modifier and at least
+    /// \c bin_id bins.
+    /// @param node DataNode to get data from
+    /// @param bin_id id of bin to log data from (0-indexed)
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun =
@@ -393,14 +476,18 @@ namespace emp {
     }
 
     /// Add a set of functions that always pull the count of each bin of the histogram
-    /// from @param node. Requires that @param node have the data::Histogram modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
-    /// current value from the node
-    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic
+    /// from \c node. Requires that \c node have the \c data::Histogram modifier.
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
     /// same node.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     void AddAllHistBins(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
         bool actual_reset = false;
@@ -414,10 +501,14 @@ namespace emp {
         }
     }
 
-    /// Add a function that always pulls the inferiority (mean divided by max) from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier.
-    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// Add a function that always pulls the inferiority (mean divided by max) from the specified DataNode.
+    /// Requires that node have the data::Range or data::FullRange modifier.
+    /// @param node DataNode to get data from
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
@@ -435,6 +526,7 @@ namespace emp {
   class ContainerDataFile;
 
   // This handles all possible forms of pointers to containers.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     template <typename container_t>
@@ -470,13 +562,14 @@ namespace emp {
     };
 
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Sometimes you may want a data file where a set
   /// of functions is run on every item in a container
   /// every time you write to the file. ContainerDataFiles do that.
   ///
   /// Note: CONTAINER type can be a pointer to a container and the
-  /// datafile will handle derefeferencing it appropriately.
+  /// datafile will handle dereferencing it appropriately.
 
   template <typename CONTAINER>
   class ContainerDataFile : public DataFile {
@@ -587,6 +680,10 @@ namespace emp {
 
   /// Convenience function for building a container data file.
   /// @param fun is the function to call to update the container
+  /// @param filename is the name of the file to output to
+  /// @param b character to print at the beggininning of each line
+  /// @param s delimeter (i.e. what character to print between entries on each line)
+  /// @param e character to print at the end of each line
   template <typename CONTAINER>
   ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
                                                     const std::string & filename,

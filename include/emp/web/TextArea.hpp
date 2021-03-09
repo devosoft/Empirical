@@ -27,6 +27,7 @@ namespace web {
   protected:
 
     // TextAreas associated with the same DOM element share a single TextAreaInfo object.
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class TextAreaInfo : public internal::WidgetInfo {
       friend TextArea;
     protected:
@@ -94,7 +95,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::TextAreaInfo"; }
     }; // End of TextAreaInfo definition
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of indo.
     TextAreaInfo * Info() { return (TextAreaInfo *) info; }

@@ -37,7 +37,7 @@ namespace emp {
 namespace emp {
 
   /// We are in debug mode, so emp::array has the same interface as std::array, but with extra
-  /// bounds checking.  Using vector as our base since it has the right pieces and is dyanmic.
+  /// bounds checking.  Using vector as our base since it has the right pieces and is dynamic.
   template <typename T, size_t N>
   class array : public std::vector<T> {
   private:

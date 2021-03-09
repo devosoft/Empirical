@@ -3,9 +3,6 @@
 	clean clean-dep
 
 test: test-native test-examples test-web
-	make test-native
-	make test-examples
-	make test-web
 
 test-examples: test-native-examples test-web-examples
 
@@ -28,7 +25,7 @@ test-web-examples:
 	cd examples && make web-test
 
 test-web:
-	cd tests && make test-web
+	cd tests && make test-web-js
 
 ../cookiecutter-empirical-project:
 	cd .. && git clone --recursive https://github.com/devosoft/cookiecutter-empirical-project.git
@@ -56,7 +53,8 @@ install-coverage-dependencies:
 	cd third-party && make install-coverage-dependencies
 
 clean:
-	rm -rf build/*
+	cd docs && make clean
 	cd tests && make clean
+
 clean-dep:
 	cd third-party && make clean
