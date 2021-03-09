@@ -67,11 +67,11 @@ namespace emp {
       return std::move( parent_t::value() );
     }
 
-    constexpr bool operator==( const optional& other ) {
+    constexpr bool operator==( const optional& other ) const {
       return static_cast<parent_t>(*this) == static_cast<parent_t>(other);
     }
 
-    constexpr bool operator<( const optional& other ) {
+    constexpr bool operator<( const optional& other ) const {
       return static_cast<parent_t>(*this) < static_cast<parent_t>(other);
     }
 
