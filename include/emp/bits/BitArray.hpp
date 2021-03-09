@@ -99,7 +99,7 @@ namespace emp {
 
     // Copy an array of bits into this BitArray (internal use only!)
     template <size_t IN_FIELDS, size_t COPY_FIELDS=NUM_FIELDS>
-    BitArray & Copy(const field_t in_bits[IN_FIELDS]) {
+    BitArray & Copy(const field_t in_bits[IN_FIELDS]) noexcept {
       static_assert(COPY_FIELDS <= IN_FIELDS, "Cannot copy more fields than we are given.");
       static_assert(COPY_FIELDS <= NUM_FIELDS, "Cannot copy into more fields than are available.");
       constexpr size_t COPY_BYTES = COPY_FIELDS * sizeof(field_t);
@@ -108,7 +108,7 @@ namespace emp {
     }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
-    void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bits[LAST_FIELD] &= END_MASK; }
+    void ClearExcessBits() noexcept { if constexpr (NUM_END_BITS > 0) bits[LAST_FIELD] &= END_MASK; }
 
     // Convert the bits to const bytes.
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const
@@ -132,10 +132,10 @@ namespace emp {
 
   public:
     /// Constructor: Assume all bits set to zero.
-    explicit BitArray(bool init_val=false) { if (init_val) SetAll(); else Clear(); }
+    explicit BitArray(bool init_val=false) noexcept { if (init_val) SetAll(); else Clear(); }
 
     /// Copy constructor from another BitArray
-    BitArray(const this_t & in_bits) { Copy<NUM_FIELDS>(in_bits.bits); }
+    BitArray(const this_t & _in) noexcept { Copy<NUM_FIELDS>(_in.bits); }
 
     /// Constructor to generate a BitArray from a std::bitset.
     explicit BitArray(const std::bitset<NUM_BITS> & bitset);
@@ -165,7 +165,7 @@ namespace emp {
     ~BitArray() = default;
 
     /// Assignment operator (no separate move opperator since no resources to move...)
-    BitArray & operator=(const this_t & in_bits) { return Copy<NUM_FIELDS>(in_bits.bits); }
+    BitArray & operator=(const this_t & in_bits) noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
     BitArray & operator=(const std::bitset<NUM_BITS> & bitset);
@@ -206,13 +206,13 @@ namespace emp {
     BitArray & Set(size_t index, bool value=true);
 
     /// Set all bits to one.
-    BitArray & SetAll();
+    BitArray & SetAll() noexcept;
 
     /// Set a range of bits to one: [start, stop)
     BitArray & SetRange(size_t start, size_t stop);
 
     /// Set all bits to zero.
-    BitArray & Clear() { for (field_t & x : bits) x = FIELD_0; return *this; }
+    BitArray & Clear() noexcept { for (field_t & x : bits) x = FIELD_0; return *this; }
 
     /// Set specific bit to 0.
     BitArray & Clear(size_t index) { return Set(index, false); }
@@ -407,7 +407,7 @@ namespace emp {
     // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
 
     /// A simple hash function for bit vectors.
-    [[nodiscard]] std::size_t Hash() const;
+    [[nodiscard]] std::size_t Hash() const noexcept;
 
     /// Count the number of ones in the BitArray.
     [[nodiscard]] size_t CountOnes() const;
@@ -1057,7 +1057,7 @@ namespace emp {
 
   /// Set all bits to one.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetAll() {
+  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetAll() noexcept {
     for (field_t & x : bits) x = FIELD_ALL;
     ClearExcessBits();
     return *this;
@@ -1531,7 +1531,7 @@ namespace emp {
 
   /// A simple hash function for bit vectors.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  std::size_t BitArray<NUM_BITS,ZERO_LEFT>::Hash() const {
+  std::size_t BitArray<NUM_BITS,ZERO_LEFT>::Hash() const noexcept {
     /// If we have a vector of size_t, treat it as a vector of hash values to combine.
     if constexpr (std::is_same_v<field_t, size_t>) {
       return hash_combine(bits, NUM_FIELDS);
@@ -2145,10 +2145,10 @@ namespace emp {
 /// For hashing BitArrays
 namespace std
 {
-    template <size_t N>
-    struct hash<emp::BitArray<N>>
+    template <size_t N, bool ZERO_LEFT>
+    struct hash<emp::BitArray<N, ZERO_LEFT>>
     {
-        size_t operator()( const emp::BitArray<N>& bs ) const
+        size_t operator()( const emp::BitArray<N,ZERO_LEFT> & bs ) const noexcept
         {
           return bs.Hash();
         }
