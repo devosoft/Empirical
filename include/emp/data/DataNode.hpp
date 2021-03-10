@@ -16,7 +16,7 @@
  *   * Send data to a stream
  *     (or stats automatically have a stream that, if non-null data is sent to?)
  *
- *  @todo: The Archive data node should have Log as a requiste and then copy the current vals into the
+ *  @todo: The Archive data node should have Log as a requisite and then copy the current vals into the
  *         archive on reset.  This change will also make it so that the size of the archive correctly
  *         reflects the number of resets.
  */
@@ -49,7 +49,7 @@ namespace emp {
     Range,        ///< Track min, max, mean, total
     FullRange,    ///< Track Range data over time.
     Histogram,    ///< Keep a full histogram.
-    Stats,        ///< Track Range + variance, standard deviation, skew, kertosis
+    Stats,        ///< Track Range + variance, standard deviation, skew, kurtosis
     // FullStats,    // Track States + ALL values over time (with purge/merge options)
 
     Pull,         ///< Enable data collection on request.
@@ -201,14 +201,17 @@ namespace emp {
     /// Get this DataNode's keyword
     const std::string & GetKeyword() const { return keyword; }
 
-    /// Set this DataNode's name to @param _in
+    /// Set this DataNode's name to specified value
     void SetName(const std::string & _in) { name = _in; }
-    /// Set this DataNode's description to @param _in
+    /// Set this DataNode's description to specified value
     void SetDescription(const std::string & _in) { desc = _in; }
-    /// Set this DataNode's keyword to @param _in
+    /// Set this DataNode's keyword to specified value
     void SetKeyword(const std::string & _in) { keyword = _in; }
 
-    /// Set this DataNode's name to @param _n, description to @param _d, and keyword to @param _k
+    /// Set this DataNode's information
+    /// @param _n value to set name to
+    /// @param _d value to set description to
+    /// @param _k value to set keyword to
     void SetInfo(const std::string & _n, const std::string & _d="", const std::string & _k="") {
       name = _n;  desc = _d;  keyword = _k;
     }
@@ -370,7 +373,7 @@ namespace emp {
       parent_t::AddDatum(val);
     }
 
-    /// Reset DataNode, setting the running calucluations of total, min, mean, and max to 0
+    /// Reset DataNode, setting the running calculations of total, min, mean, and max to 0
     void Reset() {
       total = 0.0;
       min = 0.0;
@@ -387,7 +390,7 @@ namespace emp {
 
   /// == data::FullRange ==
   /// This module makes the DataNode store a history of distributional information measured by
-  /// data::Range beteen calls to Reset().  Series of historical values are stored in vectors
+  /// data::Range between calls to Reset().  Series of historical values are stored in vectors
   /// (except mean, which is calculated from total and count).
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::FullRange, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
@@ -457,7 +460,7 @@ namespace emp {
 
   /// == data::Stats ==
   /// Note: These statistics are calculated with the assumption that the data this node has
-  /// recieved is the entire population of measurements we're interested in, not a sample.
+  /// received is the entire population of measurements we're interested in, not a sample.
   ///
   /// Note 2: Kurtosis is calculated using Snedecor and Cochran (1967)'s formula. A perfect normal
   /// distribution has a kurtosis of 0.
@@ -741,20 +744,20 @@ namespace emp {
 
   // Shortcuts for common types of data nodes...
 
-  /** A node that stores data about the most recent value it recieved, as well as the
-   * distribution (min, max, count, total, and mean) of values it has recieved since
+  /** A node that stores data about the most recent value it received, as well as the
+   * distribution (min, max, count, total, and mean) of values it has received since
    * the last reset. It also allows you to give it a name, description, and keyword.*/
   template <typename T, emp::data... MODS>
   using DataMonitor = DataNode<T, data::Current, data::Info, data::Range, data::Stats, MODS...>;
 
-  /** A node that stores data about the most recent value it recieved, as well as all
-   * values it has recieved since the last reset. It also allows you to give it a name,
+  /** A node that stores data about the most recent value it received, as well as all
+   * values it has received since the last reset. It also allows you to give it a name,
    * description, and keyword.*/
   template <typename T, emp::data... MODS>
   using DataLog = DataNode<T, data::Current, data::Info, data::Log, MODS...>;
 
-  /** A node that stores all data it recieves in an archive (vector of vectors). The inner
-   * vectors are groups of data that were recieved between resets. This node also keeps
+  /** A node that stores all data it receives in an archive (vector of vectors). The inner
+   * vectors are groups of data that were received between resets. This node also keeps
    * a record of the min, max, count, and total of each vector, so you don't have to
    * recalculate it later. Additionally, it allows you to give it a name, description,
    * and keyword.*/

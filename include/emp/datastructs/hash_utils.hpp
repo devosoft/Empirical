@@ -46,8 +46,8 @@ namespace emp {
 
 
   /// Generate a unique long from a pair of ints.
-  /// @param a First 32-bit unsigned int.
-  /// @param b Second 32-bit unsigned int.
+  /// @param a_ First 32-bit unsigned int.
+  /// @param b_ Second 32-bit unsigned int.
   /// @return 64-bit unsigned int representing the szudzik hash of both inputs.
   inline uint64_t szudzik_hash(uint32_t a_, uint32_t b_) noexcept
   {
@@ -104,6 +104,7 @@ namespace emp {
   }
 
   // helper functions for murmur hash
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     constexpr inline uint64_t rotate(const size_t x, const size_t r) noexcept {
       return (x << r) | (x >> (64 - r));
@@ -116,6 +117,7 @@ namespace emp {
       k ^= k >> 33;
     }
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Implementation of the murmur3 hash, a fast hash with low collisions.
   /// This hash makes it suitable for hash-based lookups.

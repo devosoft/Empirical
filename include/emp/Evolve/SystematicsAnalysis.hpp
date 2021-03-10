@@ -65,7 +65,7 @@ namespace emp {
         return count;
     }
 
-    /// Returns the total number of times a mutation of type @param type
+    /// Returns the total number of times a mutation of the types @param types
     /// that along @param taxon 's lineage. (Different from CountMuts in
     /// that CountMuts sums them whereas CountMutSteps would count two
     /// simultaneous mutations of the same type as one event)
@@ -97,7 +97,7 @@ namespace emp {
         return count;
     }
 
-    /// Returns the total number of mutations of type @param type that occurred
+    /// Returns the total number of mutations of the types @param types that occurred
     /// along @param taxon 's lineage.
     template <typename taxon_t>
     int CountMuts(Ptr<taxon_t> taxon, emp::vector<std::string> types) {

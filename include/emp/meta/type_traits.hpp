@@ -25,6 +25,7 @@
 
 namespace emp {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
   // adapted from https://stackoverflow.com/a/29634934
   namespace detail {
 
@@ -51,6 +52,7 @@ namespace emp {
     template <typename T>
     std::false_type is_iterable_impl(...);
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Determine if a type is iterable.
   template <typename T>
@@ -100,7 +102,7 @@ namespace emp {
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
   template <typename T> using remove_pointer_t = remove_ptr_type_t<T>;
-  // @CAO: Make sure we are dealing with const and volitile pointers correctly.
+  // @CAO: Make sure we are dealing with const and volatile pointers correctly.
 
   /// Convert a value to a non-pointer if and only if it is one.
   template <typename T>

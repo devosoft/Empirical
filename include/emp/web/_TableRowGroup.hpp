@@ -12,6 +12,8 @@
 #ifndef EMP_WEB_TABLE_ROW_GROUP_H
 #define EMP_WEB_TABLE_ROW_GROUP_H
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 namespace emp {
 namespace web {
 
@@ -79,5 +81,7 @@ namespace web {
 
 }
 }
+
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif

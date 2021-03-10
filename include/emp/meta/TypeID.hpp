@@ -35,6 +35,7 @@ namespace emp {
 
   inline void SetupTypeNames();
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // Internal class to setup type names on startup.
     struct TypeID_Setup {
@@ -42,6 +43,7 @@ namespace emp {
     };
     static TypeID_Setup _TypeID_Setup;
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Basic TypeID data structure.
   struct TypeID {
@@ -319,6 +321,7 @@ namespace emp {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // Unimplemented base class -- TypePackIDs are meaningless for non-TypePack classes.
     template <typename T> struct TypePackIDs_impl { };
@@ -329,6 +332,7 @@ namespace emp {
       static emp::vector<TypeID> GetIDs() { return GetTypeIDs<Ts...>(); }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Retrieve a vector of TypeIDs for a TypePack of types passed in.
   template <typename T>

@@ -107,10 +107,10 @@ namespace emp {
     void PullData() { node->PullData(); }
 
     /// Reset this node. The exact effects of this depend on the modules that this node has,
-    /// but in general it prepares the node to recieve a new set of data.
+    /// but in general it prepares the node to receive a new set of data.
     void Reset() { node->Reset(); }
 
-    /// Print debug information about this node to @param os.
+    /// Print debug information about this node to @param os
     /// Useful for tracking which modifiers are included.
     void PrintDebug(std::ostream & os=std::cout) { node->PrintDebug(os); }
 

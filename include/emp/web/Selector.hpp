@@ -36,7 +36,7 @@ namespace web {
   class Selector : public internal::WidgetFacet<Selector> {
     friend class SelectorInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class SelectorInfo : public internal::WidgetInfo {
       friend Selector;
     protected:
@@ -106,7 +106,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::SelectorInfo"; }
     };  // End of SelectorInfo class.
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of indo.
     SelectorInfo * Info() { return (SelectorInfo *) info; }

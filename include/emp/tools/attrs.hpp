@@ -926,6 +926,7 @@ namespace emp {
     /// Creates a new attribute pack which has all the attributes of this
     /// pack and another pack. Values will be taken from other other pack
     /// preferentially.
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
     template <typename... U>
     constexpr auto Merge(U&&... packs)
       // This hint is required by some older compilers
@@ -934,6 +935,10 @@ namespace emp {
       return MergeReduce(Attrs<>{}, __impl_attrs_merge::attrs_merge,
                          std::forward<U>(packs)...);
     }
+    #else
+    template <typename... U>
+    constexpr auto Merge(U&&... packs) {;}
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
     namespace __attrs_impl {
       template <class...>

@@ -221,81 +221,107 @@ struct TestPassArrayToCpp : public emp::web::BaseTest {
     EM_ASM({emp_i.__outgoing_array = ([5, 1, 3])});
     emp::array<int, 3> test_arr_1;
     emp::pass_array_to_cpp(test_arr_1);
+
+    #ifdef __EMSCRIPTEN__
     assert(test_arr_1[0] == 5);
     assert(test_arr_1[1] == 1);
     assert(test_arr_1[2] == 3);
+    #endif
 
     // Test floats
     EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});
     emp::array<float, 3> test_arr_2;
     emp::pass_array_to_cpp(test_arr_2);
+
+    #ifdef __EMSCRIPTEN__
     assert(emp::to_string(test_arr_2[0]) == emp::to_string(5.2));
     assert(test_arr_2[1] == 1.5);
     assert(emp::to_string(test_arr_2[2]) == emp::to_string(3.1));
+    #endif 
 
     // Test doubles
     EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});
     emp::array<double, 3> test_arr_3;
     emp::pass_array_to_cpp(test_arr_3);
+
+    #ifdef __EMSCRIPTEN__
     assert(test_arr_3[0] == 5.2);
     assert(test_arr_3[1] == 1.5);
     assert(test_arr_3[2] == 3.1);
+    #endif
 
     // Test doubles in vector
     EM_ASM({emp_i.__outgoing_array = ([5.3, 1.6, 3.2])});
     emp::vector<double> test_vec;
     emp::pass_vector_to_cpp(test_vec);
+
+    #ifdef __EMSCRIPTEN__
     assert(test_vec[0] == 5.3);
     assert(test_vec[1] == 1.6);
     assert(test_vec[2] == 3.2);
+    #endif
 
     // Test chars
     EM_ASM({emp_i.__outgoing_array = (["h", "i", "!"])});
     emp::array<char, 3> test_arr_4;
     emp::pass_array_to_cpp(test_arr_4);
+    #ifdef __EMSCRIPTEN__
     assert(test_arr_4[0] == 'h');
     assert(test_arr_4[1] == 'i');
     assert(test_arr_4[2] == '!');
+    #endif
+
     emp::vector<char> test_vec_4;
     emp::pass_vector_to_cpp(test_vec_4);
+    #ifdef __EMSCRIPTEN__
     assert(test_vec_4[0] == 'h');
     assert(test_vec_4[1] == 'i');
     assert(test_vec_4[2] == '!');
+    #endif
 
     // Test std::strings
     EM_ASM({emp_i.__outgoing_array = (["jello", "world", "!!"])});
     emp::array<std::string, 3> test_arr_5;
     emp::pass_array_to_cpp(test_arr_5);
+    #ifdef __EMSCRIPTEN__
     assert(test_arr_5[0] == "jello");
     assert(test_arr_5[1] == "world");
     assert(test_arr_5[2] == "!!");
+    #endif
+
     emp::vector<std::string> test_vec_5;
     emp::pass_vector_to_cpp(test_vec_5);
+    #ifdef __EMSCRIPTEN__
     assert(test_vec_5[0] == "jello");
     assert(test_vec_5[1] == "world");
     assert(test_vec_5[2] == "!!");
+    #endif
 
     // Test nested arrays
     EM_ASM({emp_i.__outgoing_array = ([[4,5], [3,1], [7,8]])});
     emp::array<emp::array<int, 2>, 3> test_arr_6;
     emp::pass_array_to_cpp(test_arr_6);
+    #ifdef __EMSCRIPTEN__
     assert(test_arr_6[0][0] == 4);
     assert(test_arr_6[0][1] == 5);
     assert(test_arr_6[1][0] == 3);
     assert(test_arr_6[1][1] == 1);
     assert(test_arr_6[2][0] == 7);
     assert(test_arr_6[2][1] == 8);
+    #endif
 
     // Test nested vectors
     EM_ASM({emp_i.__outgoing_array = ([[4,5], [3,1], [7,8]])});
     emp::vector<emp::vector<int> > test_vec_6;
     emp::pass_vector_to_cpp(test_vec_6);
+    #ifdef __EMSCRIPTEN__
     assert(test_vec_6[0][0] == 4);
     assert(test_vec_6[0][1] == 5);
     assert(test_vec_6[1][0] == 3);
     assert(test_vec_6[1][1] == 1);
     assert(test_vec_6[2][0] == 7);
     assert(test_vec_6[2][1] == 8);
+    #endif
 
     // Test more deeply nested arrays
     EM_ASM({emp_i.__outgoing_array = ([[["Sooo", "many"], ["strings", "here"]],
@@ -303,6 +329,7 @@ struct TestPassArrayToCpp : public emp::web::BaseTest {
       [["in", "this"], ["nested", "array!"]]]);});
     emp::array<emp::array<emp::array<std::string, 2>, 2>, 3> test_arr_7;
     emp::pass_array_to_cpp(test_arr_7);
+    #ifdef __EMSCRIPTEN__
     assert(test_arr_7[0][0][0] == "Sooo");
     assert(test_arr_7[0][0][1] == "many");
     assert(test_arr_7[0][1][0] == "strings");
@@ -315,6 +342,7 @@ struct TestPassArrayToCpp : public emp::web::BaseTest {
     assert(test_arr_7[2][0][1] == "this");
     assert(test_arr_7[2][1][0] == "nested");
     assert(test_arr_7[2][1][1] == "array!");
+    #endif
   }
 
 };

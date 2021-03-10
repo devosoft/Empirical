@@ -16,7 +16,8 @@
 
 namespace emp {
 
-  /// Calculate Euclidean distance between two containers
+  /// Calculate Euclidean distance between two containers. If the containers contain a pointer
+  /// type, the pointers will be de-referenced first.
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
   EuclideanDistance(C & p1, C & p2) {
@@ -30,6 +31,8 @@ namespace emp {
 
       return sqrt(dist);
   }
+
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Calculate Euclidean distance between two containers of pointers (de-referencing the pointers)
   template <typename C>
@@ -47,6 +50,7 @@ namespace emp {
       return sqrt(dist);
   }
 
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 

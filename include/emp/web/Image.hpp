@@ -26,7 +26,7 @@ namespace web {
   class Image : public internal::WidgetFacet<Image> {
     friend class ImageInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class ImageInfo : public internal::WidgetInfo {
       friend Image;
 
@@ -60,7 +60,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }
     };
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of indo.
     ImageInfo * Info() { return (ImageInfo *) info; }

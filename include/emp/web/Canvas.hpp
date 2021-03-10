@@ -28,7 +28,7 @@ namespace web {
   class Canvas : public internal::WidgetFacet<Canvas> {
     friend class CanvasInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class CanvasInfo : public internal::WidgetInfo {
       friend Canvas;
 
@@ -106,7 +106,7 @@ namespace web {
       virtual std::string GetType() override { return "web::CanvasInfo"; }
 
     };  // End of ButtonInfo definition.
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of indo.
     CanvasInfo * Info() { return (CanvasInfo *) info; }
