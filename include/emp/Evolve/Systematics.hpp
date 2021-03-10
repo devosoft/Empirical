@@ -407,8 +407,7 @@ namespace emp {
     virtual void PrintStatus(std::ostream & os) const = 0;
     virtual double CalcDiversity() const = 0;
     virtual void Update() = 0;
-    virtual void SetNextParent(int pos) = 0;
-    virtual void SetNextParent(WorldPosition & pos) = 0;
+    virtual void SetNextParent(WorldPosition pos) = 0;
   };
 
   /// @brief A tool to track phylogenetic relationships among organisms.
@@ -456,20 +455,15 @@ namespace emp {
     using parent_t::GetTreeSize;
     using parent_t::GetNumTaxa;
     using parent_t::GetPhylogeneticDiversity;
-    // using parent_t::GetTaxonDistinctiveness;
-    // using parent_t::GetEvolutionaryDistinctiveness;
     using parent_t::GetMeanPairwiseDistance;
     using parent_t::GetSumPairwiseDistance;
     using parent_t::GetVariancePairwiseDistance;
     using parent_t::GetPairwiseDistances;
-    // using parent_t::GetDistanceToRoot;
-    // using parent_t::GetBranchesToRoot;
     using parent_t::GetMRCADepth;
     using parent_t::AddOrg;
     using parent_t::RemoveOrg;
     using parent_t::RemoveOrgAfterRepro;
     using parent_t::PrintStatus;
-    // using parent_t::PrintLineage;
     using parent_t::CalcDiversity;
     using parent_t::Update;
     using parent_t::SetNextParent;
@@ -617,7 +611,14 @@ namespace emp {
       return max_depth;
     }
 
-    void SetNextParent(WorldPosition & pos) {
+    ///@{ 
+    /// Tell systematics manager that the parent of the next taxon added
+    /// will be the one specified by this function (either at the specified
+    /// position or the one pointed to by the given pointer)
+    /// Works with version of AddOrg that only takes org, position, and 
+    /// update.
+    /// Will be set to null after being assigned as the parent of a taxon
+    void SetNextParent(WorldPosition pos) {
       emp_assert(pos.IsActive() || !pos.IsValid());
       if (!pos.IsValid()) {
         next_parent = nullptr;
@@ -626,29 +627,26 @@ namespace emp {
       }
     }
 
-    void SetNextParent(int pos) {
-      emp_assert(pos < (int)taxon_locations.size(), "Invalid parent", pos, taxon_locations.size());
-      if (pos == -1) {
-        next_parent = nullptr;
-      } else {
-        emp_assert(pos >= 0, "Invalid parent", pos);
-        emp_assert(taxon_locations[pos], pos);
-        next_parent = taxon_locations[pos];
-      }
-    }
-
     void SetNextParent(Ptr<taxon_t> p) {
       next_parent = p;
     }
+    ///@}
 
+    /// @returns the taxon that will be used as the parent
+    /// of the next taxon created via the version of AddOrg
+    /// that does not accept a parent
     Ptr<taxon_t> GetNextParent() {
       return next_parent;
     }
 
+    /// @returns the most recently created taxon
     Ptr<taxon_t> GetMostRecent() {
       return most_recent;
     }
 
+    /// Privide a function for Systematics to call each time a new taxon is created.
+    /// Trigger:  New taxon is made
+    /// Argument: Pointer to taxon
     SignalKey OnNew(std::function<void(Ptr<taxon_t> t, ORG & org)> & fun) { return on_new_sig.AddAction(fun); }
 
     /// Privide a function for Systematics to call each time a taxon is about to be pruned.
@@ -656,6 +654,8 @@ namespace emp {
     /// Argument: Pointer to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
+    /// Add data node that records evolutionary distinctiveness when requested to pull.
+    /// Used by AddPhylodiversityFile in World_output.hpp
     virtual data_ptr_t
     AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
       auto node = AddDataNode(name);
@@ -670,6 +670,8 @@ namespace emp {
       return node;
     }
 
+    /// Add data node that records pariwise distance when requested to pull.
+    /// Used by AddPhylodiversityFile in World_output.hpp
     virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -678,6 +680,8 @@ namespace emp {
       return node;
     }
 
+    /// Add data node that records phylogenetic distinctiveness when requested to pull.
+    /// Used by AddPhylodiversityFile in World_output.hpp
     virtual data_ptr_t AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") {
       auto node = AddDataNode(name);
       node->AddPull([this](){
@@ -686,17 +690,23 @@ namespace emp {
       return node;
     }
 
-
+    /// Add data node that records counts of deleterious steps along
+    /// lineages in this systematics manager when requested to pull.
+    /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") {
       return AddDeleteriousStepDataNodeImpl(1, name);
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    /// Decoy to warn if you to try to use this with a data_struct
+    /// type that doesn't keep track of the correct information
     data_ptr_t AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
       emp_assert(false, "Calculating deleterious steps requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
 
+    /// Actual implementation of adding deleterious step node
     template <typename T=int>
     data_ptr_t
     AddDeleteriousStepDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_fitness_t::value, T>::type decoy, const std::string & name = "deleterious_steps") {
@@ -711,12 +721,17 @@ namespace emp {
 
       return node;
     }
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
+    /// Add data node that phenotypic volatility (changes in phenotype) along
+    /// lineages in this systematics manager when requested to pull.
+    /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddVolatilityDataNode(const std::string & name = "volatility") {
       return AddVolatilityDataNodeImpl(1, name);
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     data_ptr_t AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
       emp_assert(false, "Calculating taxon volatility requires suitable DATA_STRUCT");
       return AddDataNode(name);
@@ -736,12 +751,17 @@ namespace emp {
 
       return node;
     }
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
+    /// Add data node that records counts of unique taxa along
+    /// lineages in this systematics manager when requested to pull.
+    /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
       return AddUniqueTaxaDataNodeImpl(1, name);
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     data_ptr_t AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
       emp_assert(false, "Calculating unique taxa requires suitable DATA_STRUCT");
       return AddDataNode(name);
@@ -761,12 +781,17 @@ namespace emp {
 
       return node;
     }
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
+    /// Add data node that records counts of mutations of the specified type along
+    /// lineages in this systematics manager when requested to pull.
+    /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       return AddMutationCountDataNodeImpl(1, name, mutation);
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     data_ptr_t AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       emp_assert(false, "Calculating mutation count requires suitable DATA_STRUCT");
       return AddDataNode(name);
@@ -786,6 +811,7 @@ namespace emp {
 
       return node;
     }
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// Add a new snapshot function.
     /// When a snapshot of the systematics is taken, in addition to the default
@@ -797,21 +823,28 @@ namespace emp {
       user_snapshot_funs.emplace_back(fun, key, desc);
     }
 
-    bool IsTaxonAt(int id) {
-      emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
-      return taxon_locations[id] == nullptr;
+    /// @returns true if there is a taxon at specified location
+    bool IsTaxonAt(WorldPosition id) {
+      if (id.GetPopID() == 0) {
+        emp_assert(id.GetIndex() < taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
+        return taxon_locations[id.GetIndex()] != nullptr;
+      } else {
+        emp_assert(id.GetIndex() < next_taxon_locations.size(), "Invalid taxon location", id, next_taxon_locations.size());
+        return next_taxon_locations[id.GetIndex()] != nullptr; 
+      }
     }
 
-    Ptr<taxon_t> GetTaxonAt(int id) {
-      emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
-      emp_assert(taxon_locations[id], "No taxon at specified location");
-      return taxon_locations[id];
-    }
-    Ptr<taxon_t> GetNextTaxonAt(int id) {
-      emp_assert(id < (int)next_taxon_locations.size(), "Invalid taxon location");
-      emp_assert(next_taxon_locations[id], "No taxon at specified location");
-
-      return next_taxon_locations[id];
+    /// @returns pointer to taxon at specified location
+    Ptr<taxon_t> GetTaxonAt(WorldPosition id) {
+      if (id.GetPopID() == 0) { 
+        emp_assert(id.GetIndex() < taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
+        emp_assert(taxon_locations[id.GetIndex()], "No taxon at specified location");
+        return taxon_locations[id.GetIndex()];
+      } else {
+        emp_assert(id.GetIndex() < next_taxon_locations.size(), "Invalid taxon location", id, next_taxon_locations.size());
+        emp_assert(next_taxon_locations[id.GetIndex()], "No taxon at specified location");
+        return next_taxon_locations[id.GetIndex()];
+      }
     }
 
     /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is
@@ -826,7 +859,6 @@ namespace emp {
      *   origination of parent and origination of offspring
      * - Enable a paleontology compatibility mode where only branching points are calculated
      */
-
     int GetPhylogeneticDiversity() const {
       // As shown on page 5 of Faith 1992, when all branch lengths are equal the phylogenetic
       // diversity is the number of internal nodes plus the number of extant taxa - 1.
@@ -836,89 +868,53 @@ namespace emp {
     }
 
 
-  //FindPhyloData() will use the GetPhylogeneticDiversity() function.
-  //it will then compare the phylogenetic diversity with the null model of the systematics normalization project
-  
-  int FindPhyloData(){
-    int percentile; 
+    /// @returns phylogenetic diversity if used without any arguments .
+    /// If you want to receive normalized data, you need to include the number of generations 
+    /// your tree has (multiples of 10 from 10 to 100 are allowed)
+    /// you also need to specify a file with which to normalize your data. 
+    /// If value is outside of the values in the file, 100th percentile will be returned
+    int GetPhylogeneticDiversityNormalize(int generation = 0, std::string filename = ""){ 
+      int gen_value = ((generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
+      bool percent_found = false; 
+      int phylogenetic_diversity = ancestor_taxa.size() + active_taxa.size() - 1; 
 
-    emp::File tree_percentiles("tree_percentiles.csv"); //loading file
+      if(filename == ""){ 
+        //std::cout << "Phylogenetic Diversity is " << phylogenetic_diversity << std::endl; 
+        return phylogenetic_diversity; 
+      } else{ 
 
-    emp::vector< emp::vector<double> > percentile_data = tree_percentiles.ToData<double>(','); //turns data into an array
+        emp::File generation_percentiles(filename); //opens file
+        emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
 
-     int PhyloDiversity = GetPhylogeneticDiversity(); 
+        for(int j = 0; j <= percentile_data[gen_value].size() - 2; j++){ //searches through vector for slot where phylo diversity fits 
 
-    for (int i = 0; i < percentile_data.size() - 1; i++){ 
-
-        if( (PhyloDiversity >= percentile_data[i][1]) && (PhyloDiversity < percentile_data[i + 1][1])){ 
-           //std::cout << "Phylogenetic Diversity: " << PhyloDiversity << std::endl; 
-           //std::cout << "phylo diversity is in between: " << percentile_data[i][1] << " and " << percentile_data[i + 1][1] << std::endl; 
-           std::cout << PhyloDiversity << " is in percentile: " << percentile_data[i][0] << std::endl;       
-
-           percentile = percentile_data[i][0];
-
-           std::cout << percentile << std::endl; 
-           }
-      }
-      return percentile; 
-    }
-
-  //this function returns phylogenetic diversity if used without any arguments 
-  //if you want to receive normalized data, you need to include the number of generations your tree has (multiples of 10 from 10 to 100 are allowed)
-  //you also need to specify a file with which to normalize your data. 
-  //if you want to normalize with no pressure for diversity, use "TensChooseOrgGenotype.csv"
-  //if you want to normalize with pressure for diversity, use "TensChooseOrgDiversityGenotype.csv"
-  //these are located in Empirical/source/Evolve/miniphulotrees/GenTrees
-  //if your value is outside of the values in the file, 100th percentile will be returned
-
-  int GetPhylogeneticDiversityNormalize(int Generation = 0, std::string filename = ""){ 
-    int GenValue = ((Generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
-    bool percentFound = false; 
-    int PhylogeneticDiversity = ancestor_taxa.size() + active_taxa.size() - 1; 
-
-    if(filename == ""){ 
-      //std::cout << "Phylogenetic Diversity is " << PhylogeneticDiversity << std::endl; 
-      return PhylogeneticDiversity; 
-    } else{ 
-
-      emp::File generation_percentiles(filename); //opens file
-      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
-
-          for(int j = 0; j <= percentile_data[GenValue].size() - 2; j++){ //searches through vector for slot where phylo diversity fits 
-
-          if((percentile_data[GenValue][j] <= PhylogeneticDiversity) && (percentile_data[GenValue][j + 1] > PhylogeneticDiversity)){
-            std::cout << "phylogenetic diversity is in between: " << percentile_data[GenValue][j] << "and " << percentile_data[GenValue][j+1] << std::endl;
-            std::cout << "The phylogenetic diversity value " << PhylogeneticDiversity << " is in the " << j << " percentile, in the " << ((GenValue + 1)* 10) << " generation" << std::endl;
-            return j;   
-
-            percentFound = true; 
-          }
-          if(percentFound == true){ 
-            break; 
+          if((percentile_data[gen_value][j] <= phylogenetic_diversity) && (percentile_data[gen_value][j + 1] > phylogenetic_diversity)){
+              // std::cout << "phylogenetic diversity is in between: " << percentile_data[gen_value][j] << "and " << percentile_data[gen_value][j+1] << std::endl;
+              // std::cout << "The phylogenetic diversity value " << phylogenetic_diversity << " is in the " << j << " percentile, in the " << ((gen_value + 1)* 10) << " generation" << std::endl;
+              return j;   
+            }
           }
         }
-      }
-      return 100; 
-   }
+        return 100; 
+    }
 
 
-    /** This is a metric of how distinct @param tax is from the rest of the population.
+    /** This is a metric of how distinct \c tax is from the rest of the population.
      *
      * (From Vane-Wright et al., 1991; reviewed in Winter et al., 2013)
     */
     double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
 
     /** This metric (from Isaac, 2007; reviewed in Winter et al., 2013) measures how
-     * distinct @param tax is from the rest of the population, weighted for the amount of
+     * distinct \c tax is from the rest of the population, weighted for the amount of
      * unique evolutionary history that it represents.
      *
-     * To quantify length of evolutionary history, this method needs @param time: the current
+     * To quantify length of evolutionary history, this method needs \c time: the current
      * time, in whatever units time is being measured in when taxa are added to the systematics
      * manager. Note that passing a time in the past will produce inacurate results (since we
      * don't know what the state of the tree was at that time).
      *
-     * Assumes the tree is all connected. Will return -1 if this assumption isn't met.
-    */
+     * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
     double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const {
 
       double depth = 0; // Length (in time units) of section we're currently exploring
@@ -983,8 +979,7 @@ namespace emp {
      * non-branching nodes generally cannot be inferred).
      *
      * This measurement assumes that the tree is fully connected. Will return -1
-     * if this is not the case.
-     * */
+     * if this is not the case. */
     double GetMeanPairwiseDistance(bool branch_only=false) const {
       emp::vector<double> dists = GetPairwiseDistances(branch_only);
       return (double)Sum(dists)/dists.size();
@@ -998,8 +993,7 @@ namespace emp {
      * non-branching nodes generally cannot be inferred).
      *
      * This measurement assumes that the tree is fully connected. Will return -1
-     * if this is not the case.
-     * */
+     * if this is not the case. */
     double GetSumPairwiseDistance(bool branch_only=false) const {
       emp::vector<double> v = GetPairwiseDistances(branch_only);
       return Sum(v);
@@ -1013,8 +1007,7 @@ namespace emp {
      * non-branching nodes generally cannot be inferred).
      *
      * This measurement assumes that the tree is fully connected. Will return -1
-     * if this is not the case.
-     * */
+     * if this is not the case. */
     double GetVariancePairwiseDistance(bool branch_only=false) const {
       emp::vector<double> v = GetPairwiseDistances(branch_only);
       return Variance(v);
@@ -1027,8 +1020,7 @@ namespace emp {
      * non-branching nodes generally cannot be inferred).
      *
      * This method assumes that the tree is fully connected. Will return -1
-     * if this is not the case.
-     * */
+     * if this is not the case.* */
     emp::vector<double> GetPairwiseDistances(bool branch_only=false) const {
       // The overarching approach here is to start with a bunch of pointers to all
       // extant organisms (since that will include all leaves). Then we trace back up
@@ -1157,10 +1149,8 @@ namespace emp {
     }
 
 
-
     /** Counts the total number of ancestors between @param tax and MRCA, if there is one. If
-     *  there is no common ancestor, distance to the root of this tree is calculated instead.
-    */
+     *  there is no common ancestor, distance to the root of this tree is calculated instead.*/
     int GetDistanceToRoot(Ptr<taxon_t> tax) const {
       // Now, trace the line of descent, updating the candidate as we go.
       GetMRCA();
@@ -1200,8 +1190,7 @@ namespace emp {
     }
 
     /** Calculate Sackin Index of this tree (Sackin, 1972; reviewed in Shao, 1990).
-     * Measures tree balance
-    */
+     * Measures tree balance*/
     int SackinIndex() const {
       int sackin = 0;
 
@@ -1212,11 +1201,14 @@ namespace emp {
       return sackin;
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    // Helper for Colless function calculation
     struct CollessStruct {
       double total = 0;
       emp::vector<double> ns;
     };
 
+    // Helper for Colless function calculation
     CollessStruct RecursiveCollessStep(Ptr<taxon_t> curr) const {
       CollessStruct result;
 
@@ -1250,12 +1242,12 @@ namespace emp {
       result.total += sum_diffs/result.ns.size();
       return result;
     }
+    #endif
 
     /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
      * Measures tree balance. The standard Colless index only works for bifurcating trees,
      * so this will be a Colless-like Index, as suggested in
-     * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)
-    */
+     * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)*/
     double CollessLikeIndex() const {
       GetMRCA();
 
@@ -1309,38 +1301,70 @@ namespace emp {
     /// @returns the depth of the Most-Recent Common Ancestor; return -1 for none.
     int GetMRCADepth() const;
 
+    ///@{ 
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
     /// return a pointer for the associated taxon.
+    /// @returns a pointer for the associated taxon.
+    /// @param org a reference to the organism being added
+    /// @param pos the position of the organism being added
+    /// @param parent a pointer to the org's parent
+    /// @param update the time at which the org was added     
     void AddOrg(ORG && org, WorldPosition pos, int update=-1);
-    Ptr<taxon_t> AddOrg(ORG && org, WorldPosition pos, Ptr<taxon_t> parent=nullptr, int update=-1);
+    Ptr<taxon_t> AddOrg(ORG && org, WorldPosition pos, Ptr<taxon_t> parent, int update=-1);
     Ptr<taxon_t> AddOrg(ORG && org, Ptr<taxon_t> parent=nullptr, int update=-1);
 
     void AddOrg(ORG & org, WorldPosition pos, int update=-1);
-    Ptr<taxon_t> AddOrg(ORG & org, WorldPosition pos, Ptr<taxon_t> parent=nullptr, int update=-1);
+    Ptr<taxon_t> AddOrg(ORG & org, WorldPosition pos, Ptr<taxon_t> parent, int update=-1);
     Ptr<taxon_t> AddOrg(ORG & org, Ptr<taxon_t> parent=nullptr, int update=-1);
+    ///@}
+    // TODO: Get rid of time arguments and just use curr_update
 
-
+    ///@{ 
     /// Remove an instance of an organism; track when it's gone.
+    /// @param pos the world position of the individual being removed
+    /// @param time the time at which this individual is being removed
     bool RemoveOrg(WorldPosition pos, int time=-1);
     bool RemoveOrg(Ptr<taxon_t> taxon, int time=-1);
+    ///@} 
 
+    ///@{ 
+    /// Mark an instance of a taxon to be removed; track when it's gone.
+    /// This is a work-around to deal with steady state/non-synchronous
+    /// populations in which an organism might die as its offspring is born
+    /// (e.g. in a spatial world where the offspring replaces the parent).
+    /// If the bookkeeping is not handled correctly, we could accidentally
+    /// mark the taxon as extinct when it is actually continuing.
+    /// By using this method, the taxon won't be removed until after the
+    /// next org is added or the next time an org is marked for removal.
+    /// @param pos the world position of the individual being removed
+    /// @param time the time at which this individual is being removed
     void RemoveOrgAfterRepro(WorldPosition pos, int time=-1);
     void RemoveOrgAfterRepro(Ptr<taxon_t> taxon, int time=-1);
+    ///@}
 
-    /// Climb up a lineage...
+    /// @returns a pointer to the parent of a given taxon
     Ptr<taxon_t> Parent(Ptr<taxon_t> taxon) const;
 
     /// Print details about the Systematics manager.
+    /// First prints setting, followed by all active, ancestor, and outside
+    /// taxa being stored. Format for taxa is 
+    /// [ id | number of orgs in this taxon, number of offspring taxa of this taxon | parent taxon]
+    /// @param os output stream to print to
     void PrintStatus(std::ostream & os=std::cout) const;
 
-    /// Print whole lineage.
+    /// Print a whole lineage. Format: "Lineage:", followed by each taxon in the lineage, each on new line
+    /// @param taxon a pointer to the taxon to print the lineage of 
+    /// @param os output stream to print to
     void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const;
 
+    /// Take a snapshot of current state of taxon phylogeny.
+    /// WARNING: Current, this function assumes one parent taxon per-taxon.
+    /// @param file_path the file to store the snapshot data in
     void Snapshot(const std::string & file_path) const;
 
-    /// Calculate the genetic diversity of the population.
+    /// @returns the genetic diversity of the population.
     double CalcDiversity() const;
 
   };
@@ -1379,7 +1403,7 @@ namespace emp {
     }
   }
 
-  /// Mark a taxon extinct if there are no more living members.  There may be descendants.
+  // Mark a taxon extinct if there are no more living members.  There may be descendants.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon, int time) {
     emp_assert(taxon);
@@ -1423,7 +1447,7 @@ namespace emp {
   }
 
 
-  /// @returns a pointer to the Most-Recent Common Ancestor for the population or null pointer if there isn't one
+  // @returns a pointer to the Most-Recent Common Ancestor for the population or null pointer if there isn't one
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
@@ -1449,7 +1473,7 @@ namespace emp {
     return mrca;
   }
 
-  /// @returns the depth of the Most-Recent Common Ancestor or -1 for none.
+  // @returns the depth of the Most-Recent Common Ancestor or -1 for none.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCADepth() const {
     GetMRCA();
@@ -1484,7 +1508,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, Ptr<taxon_t> parent, int update) {
-    return AddOrg(org, -1, parent, update);
+    return AddOrg(org, WorldPosition::invalid_id, parent, update);
   }
 
   // Version for if you aren't tracking positions
@@ -1504,12 +1528,7 @@ namespace emp {
     return AddOrg(org, pos, parent, update);
   }
 
-  /// Add information about a new organism, including its stored info and parent's taxon;
-  /// @returns a pointer for the associated taxon.
-  /// @param org a reference to the organism being added
-  /// @param pos the position of the organism being added
-  /// @param parent a pointer to the org's parent
-  /// @param update the time at which the org was added
+  // Add information about a new organism, including its stored info and parent's taxon;
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos, Ptr<taxon_t> parent, int update) {
@@ -1564,16 +1583,6 @@ namespace emp {
     return cur_taxon;                       // Return the taxon used.
   }
 
-  /// Mark an instance of a taxon to be removed; track when it's gone.
-  /// This is a work-around to deal with steady state/non-synchronous
-  /// populations in which an organism might die as its offspring is born
-  /// (e.g. in a spatial world where the offspring replaces the parent).
-  /// If the bookkeeping is not handled correctly, we could accidentally
-  /// mark the taxon as extinct when it is actually continuing.
-  /// By using this method, the taxon won't be removed until after the
-  /// next org is added or the next time an org is marked for removal.
-  /// @param pos the world position of the individual being removed
-  /// @param time the time at which this individual is being removed
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(WorldPosition pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
@@ -1601,9 +1610,7 @@ namespace emp {
   }
 
 
-  /// Remove an instance of a taxon; track when it's gone.
-  /// @param pos the world position of the individual being removed
-  /// @param time the time at which this individual is being removed
+  // Remove an instance of a taxon; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(WorldPosition pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
@@ -1625,9 +1632,9 @@ namespace emp {
     }
   }
 
-  /// Remove an instance of a taxon; track when it's gone.
-  /// @param taxon the taxon of which one instance is being removed
-  /// @param time the time at which this individual is being removed
+  // Remove an instance of a taxon; track when it's gone.
+  // @param taxon the taxon of which one instance is being removed
+  // @param time the time at which this individual is being removed
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon, int time) {
     emp_assert(taxon);
@@ -1643,7 +1650,7 @@ namespace emp {
     return active;
   }
 
-  /// @returns a pointer to the parent of a given taxon
+  // @returns a pointer to the parent of a given taxon
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::Parent(Ptr<taxon_t> taxon) const {
     emp_assert(taxon);
@@ -1651,11 +1658,11 @@ namespace emp {
     return taxon->GetParent();
   }
 
-  /// Print details about the Systematics manager.
-  /// First prints setting, followed by all active, ancestor, and outside
-  /// taxa being stored. Format for taxa is 
-  /// [ id | number of orgs in this taxon, number of offspring taxa of this taxon | parent taxon]
-  /// @param os output stream to print to
+  // Print details about the Systematics manager.
+  // First prints setting, followed by all active, ancestor, and outside
+  // taxa being stored. Format for taxa is 
+  // [ id | number of orgs in this taxon, number of offspring taxa of this taxon | parent taxon]
+  // @param os output stream to print to
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::PrintStatus(std::ostream & os) const {
     os << "Systematics Status:\n";
@@ -1688,9 +1695,6 @@ namespace emp {
     os << std::endl;
   }
 
-  /// Print a whole lineage. Format: "Lineage:", followed by each taxon in the lineage, each on new line
-  /// @param taxon a pointer to the taxon to print the lineage of 
-  /// @param os output stream to print to
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
     os << "Lineage:\n";
@@ -1700,9 +1704,6 @@ namespace emp {
     }
   }
 
-  /// Take a snapshot of current state of taxon phylogeny.
-  /// WARNING: Current, this function assumes one parent taxon per-taxon.
-  /// @param file_path the file to store the snapshot data in
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Snapshot(const std::string & file_path) const {
     emp::DataFile file(file_path);
@@ -1800,7 +1801,7 @@ namespace emp {
 
   }
 
-  /// @returns the genetic diversity of the population.
+  // @returns the genetic diversity of the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);

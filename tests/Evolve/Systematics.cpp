@@ -55,12 +55,19 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	CHECK(sys1.GetTrackSynchronous() == true);
 	sys1.AddOrg(15.0, {0,0}, 0);
 	CHECK(sys1.GetNumActive() == 1);
-	CHECK(sys1.GetTaxonAt(0)->GetInfo() == "small");
+	CHECK(sys1.GetTaxonAt({0,0})->GetInfo() == "small");
+  CHECK(sys1.IsTaxonAt({0,0}));
 	sys1.AddOrg(56.0, {1,1}, 0);
 	CHECK(sys1.GetNumActive() == 2);
-	CHECK(sys1.GetNextTaxonAt(1)->GetInfo() == "large");
+	CHECK(sys1.GetTaxonAt({1,1})->GetInfo() == "large");
+  CHECK(sys1.IsTaxonAt({1,1}));
 	sys1.RemoveOrg({1,1});
+  CHECK(!sys1.IsTaxonAt({1,1}));
 	CHECK(sys1.GetNumActive() == 1);
+	sys1.AddOrg(56.0, {1,0}, 0);
+  CHECK(sys1.IsTaxonAt({1,0}));
+	CHECK(!sys1.RemoveOrg({1,0}));
+  CHECK(!sys1.IsTaxonAt({1,0}));
 
 	// Base setters and getters
 	CHECK(sys1.GetStoreActive() == true);
@@ -145,6 +152,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
   auto id7 = sys.AddOrg(30, id1, 6);
 
   CHECK(*id1 < *id2);
+  CHECK(sys.Parent(id2) == id1);
 
   std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
@@ -304,6 +312,8 @@ TEST_CASE("Test Systematics", "[Evolve]")
   CHECK(outside_taxon->GetNumOrgs() == 0);
   CHECK(outside_taxon->GetNumOff() == 0);
   CHECK(outside_taxon->GetParent()->GetID() == 8);
+
+  CHECK(sys.GetMaxDepth() == 8);
 
   auto active = sys.GetActive();
   emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
@@ -1191,4 +1201,107 @@ TEST_CASE("Test RemoveBefore", "[Evolve]")
   CHECK(!emp::Has(sys.GetActive(), id8));
   CHECK(!emp::Has(sys.GetActive(), id9));
 
+}
+
+TEST_CASE("Test Snapshot", "[Evolve]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto id1 = sys.AddOrg(25, nullptr, 0);
+  auto id2 = sys.AddOrg(-10, id1, 6);
+  auto id3 = sys.AddOrg(26, id1, 10);
+  auto id4 = sys.AddOrg(27, id2, 25);
+  auto id5 = sys.AddOrg(28, id2, 32);
+  auto id6 = sys.AddOrg(29, id5, 39);
+  auto id7 = sys.AddOrg(30, id1, 6);
+  auto id8 = sys.AddOrg(2, id3, 33);
+  auto id9 = sys.AddOrg(4, id8, 33);
+  auto id10 = sys.AddOrg(5, id9, 34);
+
+  sys.RemoveOrg(id1, 40);
+  sys.RemoveOrg(id2, 41);
+  sys.RemoveOrg(id9, 40);
+  sys.RemoveOrg(id8, 60);
+
+  sys.AddSnapshotFun([](const emp::Taxon<int> & t){return std::to_string(t.GetInfo());}, "genome", "genome");
+  sys.Snapshot("systematics_snapshot.csv");
+
+  // TODO: Would be nice to compare this to existing snapshot file, but lines could be in any order
+}
+
+TEST_CASE("Test Prune", "[Evolve]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  int prunes = 0;
+  std::function<void(emp::Ptr<emp::Taxon<int> >)> prune_fun = [&prunes](emp::Ptr<emp::Taxon<int>> tax){prunes++;};
+  sys.OnPrune(prune_fun);
+
+  auto id1 = sys.AddOrg(25, nullptr, 0);
+  auto id2 = sys.AddOrg(-10, id1, 6);
+  auto id3 = sys.AddOrg(26, id1, 10);
+  auto id4 = sys.AddOrg(27, id2, 25);
+  auto id5 = sys.AddOrg(28, id2, 32);
+  auto id6 = sys.AddOrg(29, id5, 39);
+  auto id7 = sys.AddOrg(30, id1, 6);
+  auto id8 = sys.AddOrg(2, id3, 33);
+  auto id9 = sys.AddOrg(4, id8, 33);
+  auto id10 = sys.AddOrg(5, id9, 34);
+  auto id11 = sys.AddOrg(5, id3, 34);
+
+  sys.RemoveOrg(id1, 40);
+  sys.RemoveOrg(id2, 40);
+  sys.RemoveOrg(id3, 40);
+  sys.RemoveOrg(id8, 40);
+  sys.RemoveOrg(id9, 40);
+
+  CHECK(sys.GetMRCA() == id1);
+
+  CHECK(prunes == 0);
+  CHECK(Has(sys.GetAncestors(), id9));
+  sys.RemoveOrg(id10, 40);
+  CHECK(prunes == 3);
+  CHECK(!Has(sys.GetAncestors(), id9));
+  CHECK(Has(sys.GetAncestors(), id3));
+
+  sys.RemoveOrg(id11, 40);
+  CHECK(prunes == 5);
+  CHECK(!Has(sys.GetAncestors(), id3));
+  CHECK(sys.GetMRCA() == id1);
+
+  sys.RemoveOrg(id7, 40);
+  CHECK(prunes == 6);
+  CHECK(sys.GetMRCA() == id2);
+}
+
+TEST_CASE("Test tracking position", "[Evolve]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
+
+  auto id1 = sys.AddOrg(25, {0,0}, nullptr, 0);
+  auto id2 = sys.AddOrg(-10, {1,0}, id1, 6);
+  CHECK(sys.Parent(id2) == id1);
+  sys.SetNextParent(id1);
+  sys.AddOrg(26, {2,0}, 10);
+  auto id3 = sys.GetMostRecent();
+  CHECK(id3->GetParent() == id1);
+  CHECK(id3->GetInfo() == 26);
+  CHECK(id3->GetOriginationTime() == 10);
+  sys.SetNextParent({1,0});
+  sys.AddOrg(27, {3,0}, 25);
+  auto id4 = sys.GetMostRecent();
+  CHECK(id4->GetParent() == id2);
+  CHECK(id4->GetInfo() == 27);
+  CHECK(id4->GetOriginationTime() == 25);
+
+  sys.RemoveOrg({0,0}, 40);
+  CHECK(id1->GetDestructionTime() == 40);
+  CHECK(id1->GetNumOrgs() == 0);
+
+  sys.RemoveOrgAfterRepro(id4, 40);
+  CHECK(!Has(sys.GetAncestors(), id4));
+  auto id5 = sys.AddOrg(88, {4,0}, id4, 34);
+  CHECK(id4->GetNumOrgs() == 0);
+  CHECK(id4->GetNumOff() == 1);
+  CHECK(Has(sys.GetAncestors(), id4));
 }
