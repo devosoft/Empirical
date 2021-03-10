@@ -855,7 +855,8 @@ TEST_CASE("Run world", "[evo]") {
     }
 
     world.Update();
-
+    CHECK(world.GetUpdate() == gene_sys->GetUpdate());
+    CHECK(world.GetUpdate() == phen_sys->GetUpdate());
   }
 }
 
@@ -1205,7 +1206,7 @@ TEST_CASE("Test RemoveBefore", "[Evolve]")
 
 TEST_CASE("Test Snapshot", "[Evolve]")
 {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   auto id1 = sys.AddOrg(25, nullptr, 0);
   auto id2 = sys.AddOrg(-10, id1, 6);
@@ -1222,6 +1223,7 @@ TEST_CASE("Test Snapshot", "[Evolve]")
   sys.RemoveOrg(id2, 41);
   sys.RemoveOrg(id9, 40);
   sys.RemoveOrg(id8, 60);
+  sys.RemoveOrg(id10, 60);
 
   sys.AddSnapshotFun([](const emp::Taxon<int> & t){return std::to_string(t.GetInfo());}, "genome", "genome");
   sys.Snapshot("systematics_snapshot.csv");

@@ -333,6 +333,9 @@ namespace emp {
     /// What is the average phylogenetic depth of organisms in the population?
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
+    /// @returns current update/time step
+    size_t GetUpdate() const {return curr_update;}
+
     /// Are we tracking organisms evolving in synchronous generations?
     void SetTrackSynchronous(bool new_val) {track_synchronous = new_val; }
 
@@ -351,14 +354,19 @@ namespace emp {
     /// Are we storing the location of taxa?
     void SetStorePosition(bool new_val) { store_position = new_val; }
 
-    // Returns a reference so that capturing it in a lambda to call on update
-    // is less confusing. It's possible we should change it to be consistent
-    // with GetFitnessDataNode, though.
+    /// Sets the current update/time step
+    void SetUpdate(size_t ud) const {curr_update = ud;}
+
+    /// Add a data node to this systematics manager
+    /// @param name the name of the data node (so it can be found later)
     data_ptr_t AddDataNode(const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       return &(data_nodes.New(name));
     }
 
+    /// Add a data node to this systematics manager
+    /// @param name the name of the data node (so it can be found later)
+    /// @param pull_set_fun a function to run when the data node is requested to pull data (returns vector of values)
     data_ptr_t AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
@@ -366,6 +374,9 @@ namespace emp {
       return node;
     }
 
+    /// Add a data node to this systematics manager
+    /// @param name the name of the data node (so it can be found later)
+    /// @param pull_set_fun a function to run when the data node is requested to pull data (returns single value)
     data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
@@ -373,7 +384,7 @@ namespace emp {
       return node;
     }
 
-
+    /// @returns a pointer to the data node with the specified name 
     data_ptr_t GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
