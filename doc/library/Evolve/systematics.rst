@@ -13,13 +13,6 @@ Documentation for Systematics
 
    modules
 
-Indices and tables
-==================
-
- * :ref:`genindex`
- * :ref:`modindex`
- * :ref:`search`
-
 Systematics
 ===========
 
@@ -133,7 +126,7 @@ Using the Systematics Manager
 The systematics.h file alone will not give you any useful information. You must use a test file in conjunction with the systematics manager
 in order to see output. 
 
-To retreive some results we will use the file Systematics.cc
+To retrieve some results we will use the file Systematics.cc
 which is located in Empirical/tests/Evolve/Systematics.cc. 
 
 To compile to code use this command in the tests directory::

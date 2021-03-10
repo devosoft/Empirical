@@ -197,17 +197,25 @@ namespace emp {
     /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
+    /// Get data struct associated with this taxon
     data_t & GetData() {return data;}
+    /// Get data struct associated with this taxon
     const data_t & GetData() const {return data;}
 
+    /// Get pointers to this taxon's offspring
     std::set<Ptr<this_t> > GetOffspring() {return offspring;}
 
+    /// Set this taxon's data struct to the given value
     void SetData(data_t d) {data = d;}
 
+    /// @returns this taxon's origination time
     double GetOriginationTime() const {return origination_time;}
+    /// Set this taxon's origination time
     void SetOriginationTime(double time) {origination_time = time;}
 
+    /// @returns this taxon's destruction time
     double GetDestructionTime() const {return destruction_time;}
+    /// Sets this taxon's destruction time
     void SetDestructionTime(double time) {destruction_time = time;}
 
     /// Add a new organism to this Taxon.
@@ -243,6 +251,7 @@ namespace emp {
       return num_orgs;
     }
 
+    /// Remove specified taxon from this taxon's offspring list
     void RemoveFromOffspring(Ptr<this_t> offspring_tax) {
       offspring.erase(offspring_tax);
     }
@@ -421,7 +430,7 @@ namespace emp {
     virtual void SetNextParent(WorldPosition pos) = 0;
   };
 
-  // Forrward-declare CollessStruct for use in calculating Colless metric
+  // Forward-declare CollessStruct for use in calculating Colless metric
   struct CollessStruct;
 
   /// @brief A tool to track phylogenetic relationships among organisms.
