@@ -53,18 +53,18 @@ TEST_CASE("Test Systematics", "[Evolve]")
 
 	sys1.SetTrackSynchronous(true);
 	CHECK(sys1.GetTrackSynchronous() == true);
-	sys1.AddOrg(15.0, {0,0}, 0);
+	sys1.AddOrg(15.0, {0,0});
 	CHECK(sys1.GetNumActive() == 1);
 	CHECK(sys1.GetTaxonAt({0,0})->GetInfo() == "small");
   CHECK(sys1.IsTaxonAt({0,0}));
-	sys1.AddOrg(56.0, {1,1}, 0);
+	sys1.AddOrg(56.0, {1,1});
 	CHECK(sys1.GetNumActive() == 2);
 	CHECK(sys1.GetTaxonAt({1,1})->GetInfo() == "large");
   CHECK(sys1.IsTaxonAt({1,1}));
 	sys1.RemoveOrg({1,1});
   CHECK(!sys1.IsTaxonAt({1,1}));
 	CHECK(sys1.GetNumActive() == 1);
-	sys1.AddOrg(56.0, {1,0}, 0);
+	sys1.AddOrg(56.0, {1,0});
   CHECK(sys1.IsTaxonAt({1,0}));
 	CHECK(!sys1.RemoveOrg({1,0}));
   CHECK(!sys1.IsTaxonAt({1,0}));
@@ -136,36 +136,45 @@ TEST_CASE("Test Systematics", "[Evolve]")
 
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
-  std::cout << "\nAddOrg 25 (id1, no parent)\n";
-  auto id1 = sys.AddOrg(25, nullptr, 0);
-  std::cout << "\nAddOrg -10 (id2; parent id1)\n";
-  auto id2 = sys.AddOrg(-10, id1, 6);
-  std::cout << "\nAddOrg 26 (id3; parent id1)\n";
-  auto id3 = sys.AddOrg(26, id1, 10);
-  std::cout << "\nAddOrg 27 (id4; parent id2)\n";
-  auto id4 = sys.AddOrg(27, id2, 25);
-  std::cout << "\nAddOrg 28 (id5; parent id2)\n";
-  auto id5 = sys.AddOrg(28, id2, 32);
-  std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  auto id6 = sys.AddOrg(29, id5, 39);
-  std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  auto id7 = sys.AddOrg(30, id1, 6);
+  // std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id5);
+  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  sys.SetUpdate(6);
+  auto id7 = sys.AddOrg(30, id1);
 
   CHECK(*id1 < *id2);
   CHECK(sys.Parent(id2) == id1);
 
-  std::cout << "\nRemoveOrg (id2)\n";
+  // std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
   sys.RemoveOrg(id2);
 
   double mpd = sys.GetMeanPairwiseDistance();
-  std::cout << "MPD: " << mpd <<std::endl;
+  // std::cout << "MPD: " << mpd <<std::endl;
   CHECK(mpd == Approx(2.8));
 
-  std::cout << "\nAddOrg 31 (id8; parent id7)\n";
-  auto id8 = sys.AddOrg(31, id7, 11);
-  std::cout << "\nAddOrg 32 (id9; parent id8)\n";
-  auto id9 = sys.AddOrg(32, id8, 19);
+  // std::cout << "\nAddOrg 31 (id8; parent id7)\n";
+  sys.SetUpdate(11);
+  auto id8 = sys.AddOrg(31, id7);
+  // std::cout << "\nAddOrg 32 (id9; parent id8)\n";
+  sys.SetUpdate(19);
+  auto id9 = sys.AddOrg(32, id8);
 
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id3, 10) == 10);
@@ -175,8 +184,8 @@ TEST_CASE("Test Systematics", "[Evolve]")
   CHECK(sys.GetEvolutionaryDistinctiveness(id6, 45) == 28);
   CHECK(sys.GetEvolutionaryDistinctiveness(id9, 19) == 12.5);
 
-  std::cout << "\nAddOrg 33 (id10; parent id8)\n";
-  auto id10 = sys.AddOrg(33, id8, 19);
+  // std::cout << "\nAddOrg 33 (id10; parent id8)\n";
+  auto id10 = sys.AddOrg(33, id8);
 
   sys.RemoveOrg(id7);
   sys.RemoveOrg(id8);
@@ -189,42 +198,49 @@ TEST_CASE("Test Systematics", "[Evolve]")
   CHECK(sys.GetEvolutionaryDistinctiveness(id9, 19) == 19);
 
 
-  std::cout << "\nAddOrg 34 (id11; parent id9)\n";
-  auto id11 = sys.AddOrg(34, id9, 22);
-  std::cout << "\nAddOrg 35 (id12; parent id10)\n";
-  auto id12 = sys.AddOrg(35, id11, 23);
+  // std::cout << "\nAddOrg 34 (id11; parent id9)\n";
+  sys.SetUpdate(22);
+  auto id11 = sys.AddOrg(34, id9);
+  // std::cout << "\nAddOrg 35 (id12; parent id10)\n";
+  sys.SetUpdate(23);
+  auto id12 = sys.AddOrg(35, id11);
 
   sys.RemoveOrg(id9);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id11, 26) == 13);
   CHECK(sys.GetEvolutionaryDistinctiveness(id12, 26) == 15);
 
-  std::cout << "\nAddOrg 36 (id13; parent id12)\n";
-  auto id13 = sys.AddOrg(36, id12, 27);
-  std::cout << "\nAddOrg 37 (id14; parent id13)\n";
-  auto id14 = sys.AddOrg(37, id13, 30);
+  // std::cout << "\nAddOrg 36 (id13; parent id12)\n";
+  sys.SetUpdate(27);
+  auto id13 = sys.AddOrg(36, id12);
+  // std::cout << "\nAddOrg 37 (id14; parent id13)\n";
+  sys.SetUpdate(30);
+  auto id14 = sys.AddOrg(37, id13);
 
   sys.RemoveOrg(id13);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id14, 33) == Approx(17.833333));
 
-  std::cout << "\nAddOrg 38 (id15; parent id14)\n";
-  auto id15 = sys.AddOrg(38, id14, 33);
+  // std::cout << "\nAddOrg 38 (id15; parent id14)\n";
+  sys.SetUpdate(33);
+  auto id15 = sys.AddOrg(38, id14);
 
   sys.RemoveOrg(id14);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id15, 33) == Approx(17.833333));
 
-  std::cout << "\nAddOrg 39 (id16; parent id11)\n";
-  auto id16 = sys.AddOrg(39, id11, 35);
-  std::cout << "\nAddOrg 40 (id17; parent id11)\n";
-  auto id17 = sys.AddOrg(40, id11, 35);
+  // std::cout << "\nAddOrg 39 (id16; parent id11)\n";
+  sys.SetUpdate(35);
+  auto id16 = sys.AddOrg(39, id11);
+  // std::cout << "\nAddOrg 40 (id17; parent id11)\n";
+  auto id17 = sys.AddOrg(40, id11);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id16, 35) == Approx(17.4));
   CHECK(sys.GetEvolutionaryDistinctiveness(id17, 35) == Approx(17.4));
 
-  std::cout << "\nAddOrg 41 (id18; parent id17)\n";
-  auto id18 = sys.AddOrg(41, id17, 36);
+  // std::cout << "\nAddOrg 41 (id18; parent id17)\n";
+  sys.SetUpdate(36);
+  auto id18 = sys.AddOrg(41, id17);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id18, 37) == Approx(12.1666667));
 
@@ -233,7 +249,8 @@ TEST_CASE("Test Systematics", "[Evolve]")
   CHECK(sys.GetDistanceToRoot(id18) == 6);
 
   std::cout << "\nAddOrg 42 (id19; parent id17)\n";
-  auto id19 = sys.AddOrg(42, id17, 37);
+  sys.SetUpdate(37);
+  auto id19 = sys.AddOrg(42, id17);
   CHECK(sys.GetBranchesToRoot(id19) == 2);
   CHECK(sys.GetDistanceToRoot(id19) == 6);
   CHECK(sys.GetTaxonDistinctiveness(id19) == Approx(1.0/6.0));
@@ -382,71 +399,86 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
 {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
 
-  std::cout << "\nAddOrg 25 (id1, no parent)\n";
-  auto id1 = sys.AddOrg(25, nullptr, 0);
-  std::cout << "\nAddOrg -10 (id2; parent id1)\n";
-  auto id2 = sys.AddOrg(-10, id1, 6);
-  std::cout << "\nAddOrg 26 (id3; parent id1)\n";
-  auto id3 = sys.AddOrg(26, id1, 10);
-  std::cout << "\nAddOrg 27 (id4; parent id2)\n";
-  auto id4 = sys.AddOrg(27, id2, 25);
-  std::cout << "\nAddOrg 28 (id5; parent id2)\n";
-  auto id5 = sys.AddOrg(28, id2, 32);
-  std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  auto id6 = sys.AddOrg(29, id5, 39);
-  std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  auto id7 = sys.AddOrg(30, id1, 6);
+  // std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id5);
+  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  sys.SetUpdate(6);
+  auto id7 = sys.AddOrg(30, id1);
   
 
-  std::cout << "\nRemoveOrg (id2)\n";
+  // std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
   sys.RemoveOrg(id2);
 
-  double mpd = sys.GetMeanPairwiseDistance();
+  // std::cout << "\nAddOrg 31 (id8; parent id7)\n";
+  sys.SetUpdate(11);
+  auto id8 = sys.AddOrg(31, id7);
+  // std::cout << "\nAddOrg 32 (id9; parent id8)\n";
+  sys.SetUpdate(19);
+  auto id9 = sys.AddOrg(32, id8);
 
-  std::cout << "\nAddOrg 31 (id8; parent id7)\n";
-  auto id8 = sys.AddOrg(31, id7, 11);
-  std::cout << "\nAddOrg 32 (id9; parent id8)\n";
-  auto id9 = sys.AddOrg(32, id8, 19);
-
-  std::cout << "\nAddOrg 33 (id10; parent id8)\n";
-  auto id10 = sys.AddOrg(33, id8, 19);
+  // std::cout << "\nAddOrg 33 (id10; parent id8)\n";
+  auto id10 = sys.AddOrg(33, id8);
 
   sys.RemoveOrg(id7);
   sys.RemoveOrg(id8);
 
   sys.RemoveOrg(id10);
 
-
-  std::cout << "\nAddOrg 34 (id11; parent id9)\n";
-  auto id11 = sys.AddOrg(34, id9, 22);
-  std::cout << "\nAddOrg 35 (id12; parent id10)\n";
-  auto id12 = sys.AddOrg(35, id11, 23);
+  // std::cout << "\nAddOrg 34 (id11; parent id9)\n";
+  sys.SetUpdate(22);
+  auto id11 = sys.AddOrg(34, id9);
+  // std::cout << "\nAddOrg 35 (id12; parent id10)\n";
+  sys.SetUpdate(23);
+  auto id12 = sys.AddOrg(35, id11);
 
   sys.RemoveOrg(id9);
 
-  std::cout << "\nAddOrg 36 (id13; parent id12)\n";
-  auto id13 = sys.AddOrg(36, id12, 27);
-  std::cout << "\nAddOrg 37 (id14; parent id13)\n";
-  auto id14 = sys.AddOrg(37, id13, 30);
+  // std::cout << "\nAddOrg 36 (id13; parent id12)\n";
+  sys.SetUpdate(27);
+  auto id13 = sys.AddOrg(36, id12);
+  // std::cout << "\nAddOrg 37 (id14; parent id13)\n";
+  sys.SetUpdate(30);
+  auto id14 = sys.AddOrg(37, id13);
 
   sys.RemoveOrg(id13);
 
-  std::cout << "\nAddOrg 38 (id15; parent id14)\n";
-  auto id15 = sys.AddOrg(38, id14, 33);
+  // std::cout << "\nAddOrg 38 (id15; parent id14)\n";
+  sys.SetUpdate(33);
+  auto id15 = sys.AddOrg(38, id14);
 
   sys.RemoveOrg(id14);
 
-  std::cout << "\nAddOrg 39 (id16; parent id11)\n";
-  auto id16 = sys.AddOrg(39, id11, 35);
-  std::cout << "\nAddOrg 40 (id17; parent id11)\n";
-  auto id17 = sys.AddOrg(40, id11, 35);
+  // std::cout << "\nAddOrg 39 (id16; parent id11)\n";
+  sys.SetUpdate(35);
+  auto id16 = sys.AddOrg(39, id11);
+  // std::cout << "\nAddOrg 40 (id17; parent id11)\n";
+  auto id17 = sys.AddOrg(40, id11);
 
-  std::cout << "\nAddOrg 41 (id18; parent id17)\n";
-  auto id18 = sys.AddOrg(41, id17, 36);
+  // std::cout << "\nAddOrg 41 (id18; parent id17)\n";
+  sys.SetUpdate(36);
+  auto id18 = sys.AddOrg(41, id17);
 
   std::cout << "\nAddOrg 42 (id19; parent id17)\n";
-  auto id19 = sys.AddOrg(42, id17, 37);
+  sys.SetUpdate(37);
+  auto id19 = sys.AddOrg(42, id17);
+
   CHECK(id17->GetTotalOffspring() > 0);
 
   std::cout << "id3 = " << id3 << std::endl;
@@ -755,6 +787,32 @@ TEST_CASE("Run world", "[evo]") {
   world.AddSystematics(gene_sys);
   world.AddSystematics(phen_sys);
 
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> check_update = [&gene_sys, &world](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & org){
+    CHECK(tax->GetOriginationTime() == gene_sys->GetUpdate());
+    CHECK(tax->GetOriginationTime() == world.GetUpdate());
+    CHECK(tax->GetNumOff() == 0);
+  };
+
+  gene_sys->OnNew(check_update);
+
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>)> extinction_checks = [&gene_sys, &world](emp::Ptr<gene_systematics_t::taxon_t> tax){
+    CHECK(tax->GetDestructionTime() == gene_sys->GetUpdate());
+    CHECK(tax->GetDestructionTime() == world.GetUpdate());
+    CHECK(tax->GetNumOrgs() == 0);
+  };
+
+  gene_sys->OnExtinct(extinction_checks);
+
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>)> prune_checks = [&world](emp::Ptr<gene_systematics_t::taxon_t> tax){
+    CHECK(tax->GetNumOrgs() == 0);
+    CHECK(tax->GetNumOff() == 0);
+    CHECK(tax->GetOriginationTime() <= world.GetUpdate());
+    CHECK(tax->GetDestructionTime() <= world.GetUpdate());
+  };
+
+  gene_sys->OnPrune(prune_checks);
+
+
   emp::Signal<void(mut_count_t)> on_mutate_sig;    ///< Trigger signal before organism gives birth.
   emp::Signal<void(size_t pos, double)> record_fit_sig;    ///< Trigger signal before organism gives birth.
   emp::Signal<void(size_t pos, emp::vector<double>)> record_phen_sig;    ///< Trigger signal before organism gives birth.
@@ -840,14 +898,7 @@ TEST_CASE("Run world", "[evo]") {
     // Update the status of all organisms.
     world.ResetHardware();
     world.Process(200);
-    // double fit0 = world.CalcFitnessID(0);
-    // std::cout << (ud+1) << " : " << fit0 << std::endl;
-
-    // Keep the best individual.
-    EliteSelect(world, 1, 1);
-
-    // Run a tournament for the rest...
-    TournamentSelect(world, 2, 99);
+    TournamentSelect(world, 2, 100);
 
     for (size_t i = 0; i < world.GetSize(); i++) {
       record_fit_sig.Trigger(i, world.CalcFitnessID(i));
@@ -857,22 +908,26 @@ TEST_CASE("Run world", "[evo]") {
     world.Update();
     CHECK(world.GetUpdate() == gene_sys->GetUpdate());
     CHECK(world.GetUpdate() == phen_sys->GetUpdate());
+    CHECK(gene_sys->GetTaxonAt(0)->GetOriginationTime() <= world.GetUpdate());
   }
 }
-
 
 
 TEST_CASE("Test GetCanopy", "[evo]")
 {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
-  auto id1 = sys.AddOrg(1, nullptr, 0);
-  auto id2 = sys.AddOrg(2, id1, 2);
-  auto id3 = sys.AddOrg(3, id1, 3);
-  auto id4 = sys.AddOrg(4, id2, 3);
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(1, nullptr);
+  sys.SetUpdate(2);
+  auto id2 = sys.AddOrg(2, id1);
+  sys.SetUpdate(3);
+  auto id3 = sys.AddOrg(3, id1);
+  auto id4 = sys.AddOrg(4, id2);
 
-  sys.RemoveOrg(id1, 3);
-  sys.RemoveOrg(id2, 5);
+  sys.RemoveOrg(id1);
+  sys.SetUpdate(5);
+  sys.RemoveOrg(id2);
 
   auto can_set = sys.GetCanopyExtantRoots(4);
 
@@ -889,7 +944,8 @@ TEST_CASE("Test GetCanopy", "[evo]")
   CHECK(Has(can_set, id1));
   CHECK(Has(can_set, id2));
 
-  sys.RemoveOrg(id3, 7);
+  sys.SetUpdate(7);
+  sys.RemoveOrg(id3);
 
   can_set = sys.GetCanopyExtantRoots(2);
 
@@ -899,10 +955,14 @@ TEST_CASE("Test GetCanopy", "[evo]")
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id2));
 
-  auto id5 = sys.AddOrg(5, id4, 8);
-  sys.RemoveOrg(id4, 9);
-  auto id6 = sys.AddOrg(6, id5, 10);
-  sys.RemoveOrg(id5, 11);
+  sys.SetUpdate(8);
+  auto id5 = sys.AddOrg(5, id4);
+  sys.SetUpdate(9);
+  sys.RemoveOrg(id4);
+  sys.SetUpdate(10);
+  auto id6 = sys.AddOrg(6, id5);
+  sys.SetUpdate(11);
+  sys.RemoveOrg(id5);
 
   can_set = sys.GetCanopyExtantRoots(7);
   // Should only be 4 
@@ -914,16 +974,20 @@ TEST_CASE("Test GetCanopy", "[evo]")
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id5));
 
+  sys.SetUpdate(12);
+  auto id7 = sys.AddOrg(7, id6);
+  sys.SetUpdate(13);
+  auto id8 = sys.AddOrg(8, id7);
+  sys.SetUpdate(14);
+  auto id9 = sys.AddOrg(9, id8);
+  sys.SetUpdate(15);
+  auto id10 = sys.AddOrg(10, id9);
 
-  auto id7 = sys.AddOrg(7, id6, 12);
-  auto id8 = sys.AddOrg(8, id7, 13);
-  auto id9 = sys.AddOrg(9, id8, 14);
-  auto id10 = sys.AddOrg(10, id9, 15);
-
-  sys.RemoveOrg(id6, 20);
-  sys.RemoveOrg(id7, 20);
-  sys.RemoveOrg(id8, 20);
-  sys.RemoveOrg(id9, 20);
+  sys.SetUpdate(20);
+  sys.RemoveOrg(id6);
+  sys.RemoveOrg(id7);
+  sys.RemoveOrg(id8);
+  sys.RemoveOrg(id9);
 
   can_set = sys.GetCanopyExtantRoots(22);
   // Should only be 10 
@@ -951,13 +1015,6 @@ TEST_CASE("Test GetCanopy", "[evo]")
   can_set = sys.GetCanopyExtantRoots(9);
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id5));
-
-
-  // auto id5 = sys.AddOrg(28, id2, 32);
-  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  // auto id6 = sys.AddOrg(29, id5, 39);
-  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  // auto id7 = sys.AddOrg(30, id1, 6);
 
 }
 
@@ -1135,20 +1192,27 @@ TEST_CASE("Dieing MRCA", "[evo]") {
   emp::Systematics<int, int> tree([](const int & i){return i;}, true, true, false, false);
   CHECK(!tree.GetTrackSynchronous());
 
-  std::cout << "\nAddOrg 25 (id1, no parent)\n";
-  auto id1 = tree.AddOrg(25, nullptr, 0);
-  std::cout << "\nAddOrg -10 (id2; parent id1)\n";
-  auto id2 = tree.AddOrg(-10, id1, 6);
-  std::cout << "\nAddOrg 26 (id3; parent id1)\n";
-  auto id3 = tree.AddOrg(26, id1, 10);
-  std::cout << "\nAddOrg 27 (id4; parent id2)\n";
-  auto id4 = tree.AddOrg(27, id2, 25);
-  std::cout << "\nAddOrg 28 (id5; parent id2)\n";
-  auto id5 = tree.AddOrg(28, id2, 32);
-  std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  auto id6 = tree.AddOrg(29, id5, 39);
-  std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  auto id7 = tree.AddOrg(30, id1, 6);
+  // std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  tree.SetUpdate(0);
+  auto id1 = tree.AddOrg(25, nullptr);
+  // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  tree.SetUpdate(6);
+  auto id2 = tree.AddOrg(-10, id1);
+  // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  tree.SetUpdate(10);
+  auto id3 = tree.AddOrg(26, id1);
+  // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  tree.SetUpdate(25);
+  auto id4 = tree.AddOrg(27, id2);
+  // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  tree.SetUpdate(32);
+  auto id5 = tree.AddOrg(28, id2);
+  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  tree.SetUpdate(39);
+  auto id6 = tree.AddOrg(29, id5);
+  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  tree.SetUpdate(6);
+  auto id7 = tree.AddOrg(30, id1);
 
   CHECK(tree.GetMRCA() == id1);
   tree.RemoveOrg(id7);
@@ -1167,21 +1231,41 @@ TEST_CASE("Test RemoveBefore", "[Evolve]")
 {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
-  auto id1 = sys.AddOrg(25, nullptr, 0);
-  auto id2 = sys.AddOrg(-10, id1, 6);
-  auto id3 = sys.AddOrg(26, id1, 10);
-  auto id4 = sys.AddOrg(27, id2, 25);
-  auto id5 = sys.AddOrg(28, id2, 32);
-  auto id6 = sys.AddOrg(29, id5, 39);
-  auto id7 = sys.AddOrg(30, id1, 6);
-  auto id8 = sys.AddOrg(2, id3, 33);
-  auto id9 = sys.AddOrg(4, id8, 33);
-  auto id10 = sys.AddOrg(5, id9, 34);
+  // std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id5);
+  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  sys.SetUpdate(6);
+  auto id7 = sys.AddOrg(30, id1);
+  sys.SetUpdate(33);
+  auto id8 = sys.AddOrg(2, id3);
+  auto id9 = sys.AddOrg(4, id8);
+  sys.SetUpdate(34);
+  auto id10 = sys.AddOrg(5, id9);
 
-  sys.RemoveOrg(id1, 40);
-  sys.RemoveOrg(id2, 41);
-  sys.RemoveOrg(id9, 40);
-  sys.RemoveOrg(id8, 60);
+  sys.SetUpdate(40);
+  sys.RemoveOrg(id1);
+  sys.SetUpdate(41);
+  sys.RemoveOrg(id2);
+  sys.SetUpdate(40);
+  sys.RemoveOrg(id9);
+  sys.SetUpdate(60);
+  sys.RemoveOrg(id8);
 
   CHECK(emp::Has(sys.GetAncestors(), id1));
   CHECK(emp::Has(sys.GetAncestors(), id2));
@@ -1208,22 +1292,35 @@ TEST_CASE("Test Snapshot", "[Evolve]")
 {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
-  auto id1 = sys.AddOrg(25, nullptr, 0);
-  auto id2 = sys.AddOrg(-10, id1, 6);
-  auto id3 = sys.AddOrg(26, id1, 10);
-  auto id4 = sys.AddOrg(27, id2, 25);
-  auto id5 = sys.AddOrg(28, id2, 32);
-  auto id6 = sys.AddOrg(29, id5, 39);
-  auto id7 = sys.AddOrg(30, id1, 6);
-  auto id8 = sys.AddOrg(2, id3, 33);
-  auto id9 = sys.AddOrg(4, id8, 33);
-  auto id10 = sys.AddOrg(5, id9, 34);
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id5);
+  sys.SetUpdate(6);
+  auto id7 = sys.AddOrg(30, id1);
+  sys.SetUpdate(33);
+  auto id8 = sys.AddOrg(2, id3);
+  auto id9 = sys.AddOrg(4, id8);
+  sys.SetUpdate(34);
+  auto id10 = sys.AddOrg(5, id9);
 
-  sys.RemoveOrg(id1, 40);
-  sys.RemoveOrg(id2, 41);
-  sys.RemoveOrg(id9, 40);
-  sys.RemoveOrg(id8, 60);
-  sys.RemoveOrg(id10, 60);
+  sys.SetUpdate(40);
+  sys.RemoveOrg(id1);
+  sys.SetUpdate(41);
+  sys.RemoveOrg(id2);
+  sys.SetUpdate(40);
+  sys.RemoveOrg(id9);
+  sys.SetUpdate(60);
+  sys.RemoveOrg(id8);
+  sys.RemoveOrg(id10);
 
   sys.AddSnapshotFun([](const emp::Taxon<int> & t){return std::to_string(t.GetInfo());}, "genome", "genome");
   sys.Snapshot("systematics_snapshot.csv");
@@ -1239,39 +1336,49 @@ TEST_CASE("Test Prune", "[Evolve]")
   std::function<void(emp::Ptr<emp::Taxon<int> >)> prune_fun = [&prunes](emp::Ptr<emp::Taxon<int>> tax){prunes++;};
   sys.OnPrune(prune_fun);
 
-  auto id1 = sys.AddOrg(25, nullptr, 0);
-  auto id2 = sys.AddOrg(-10, id1, 6);
-  auto id3 = sys.AddOrg(26, id1, 10);
-  auto id4 = sys.AddOrg(27, id2, 25);
-  auto id5 = sys.AddOrg(28, id2, 32);
-  auto id6 = sys.AddOrg(29, id5, 39);
-  auto id7 = sys.AddOrg(30, id1, 6);
-  auto id8 = sys.AddOrg(2, id3, 33);
-  auto id9 = sys.AddOrg(4, id8, 33);
-  auto id10 = sys.AddOrg(5, id9, 34);
-  auto id11 = sys.AddOrg(5, id3, 34);
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id5);
+  sys.SetUpdate(6);
+  auto id7 = sys.AddOrg(30, id1);
+  sys.SetUpdate(33);
+  auto id8 = sys.AddOrg(2, id3);
+  auto id9 = sys.AddOrg(4, id8);
+  sys.SetUpdate(34);
+  auto id10 = sys.AddOrg(5, id9);
+  auto id11 = sys.AddOrg(5, id3);
 
-  sys.RemoveOrg(id1, 40);
-  sys.RemoveOrg(id2, 40);
-  sys.RemoveOrg(id3, 40);
-  sys.RemoveOrg(id8, 40);
-  sys.RemoveOrg(id9, 40);
+  sys.SetUpdate(40);
+  sys.RemoveOrg(id1);
+  sys.RemoveOrg(id2);
+  sys.RemoveOrg(id3);
+  sys.RemoveOrg(id8);
+  sys.RemoveOrg(id9);
 
   CHECK(sys.GetMRCA() == id1);
 
   CHECK(prunes == 0);
   CHECK(Has(sys.GetAncestors(), id9));
-  sys.RemoveOrg(id10, 40);
+  sys.RemoveOrg(id10);
   CHECK(prunes == 3);
   CHECK(!Has(sys.GetAncestors(), id9));
   CHECK(Has(sys.GetAncestors(), id3));
 
-  sys.RemoveOrg(id11, 40);
+  sys.RemoveOrg(id11);
   CHECK(prunes == 5);
   CHECK(!Has(sys.GetAncestors(), id3));
   CHECK(sys.GetMRCA() == id1);
 
-  sys.RemoveOrg(id7, 40);
+  sys.RemoveOrg(id7);
   CHECK(prunes == 6);
   CHECK(sys.GetMRCA() == id2);
 }
@@ -1280,29 +1387,35 @@ TEST_CASE("Test tracking position", "[Evolve]")
 {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
 
-  auto id1 = sys.AddOrg(25, {0,0}, nullptr, 0);
-  auto id2 = sys.AddOrg(-10, {1,0}, id1, 6);
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, {0,0}, nullptr);
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, {1,0}, id1);
   CHECK(sys.Parent(id2) == id1);
   sys.SetNextParent(id1);
-  sys.AddOrg(26, {2,0}, 10);
+  sys.SetUpdate(10);
+  sys.AddOrg(26, {2,0});
   auto id3 = sys.GetMostRecent();
   CHECK(id3->GetParent() == id1);
   CHECK(id3->GetInfo() == 26);
   CHECK(id3->GetOriginationTime() == 10);
   sys.SetNextParent({1,0});
-  sys.AddOrg(27, {3,0}, 25);
+  sys.SetUpdate(25);
+  sys.AddOrg(27, {3,0});
   auto id4 = sys.GetMostRecent();
   CHECK(id4->GetParent() == id2);
   CHECK(id4->GetInfo() == 27);
   CHECK(id4->GetOriginationTime() == 25);
 
-  sys.RemoveOrg({0,0}, 40);
+  sys.SetUpdate(40);
+  sys.RemoveOrg({0,0});
   CHECK(id1->GetDestructionTime() == 40);
   CHECK(id1->GetNumOrgs() == 0);
 
-  sys.RemoveOrgAfterRepro(id4, 40);
+  sys.RemoveOrgAfterRepro(id4);
   CHECK(!Has(sys.GetAncestors(), id4));
-  auto id5 = sys.AddOrg(88, {4,0}, id4, 34);
+  sys.SetUpdate(34);
+  auto id5 = sys.AddOrg(88, {4,0}, id4);
   CHECK(id4->GetNumOrgs() == 0);
   CHECK(id4->GetNumOff() == 1);
   CHECK(Has(sys.GetAncestors(), id4));

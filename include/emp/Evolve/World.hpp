@@ -968,7 +968,7 @@ namespace emp {
 
     // Track the new systematics info
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, pos, (int) update);
+      s->AddOrg(*new_org, pos);
     }
 
     SetupOrg(*new_org, pos, *random_ptr);
@@ -992,7 +992,7 @@ namespace emp {
     } 
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->RemoveOrgAfterRepro(pos, update);          // Notify systematics about organism removal
+      s->RemoveOrgAfterRepro(pos);                   // Notify systematics about organism removal
     }
 
   }
