@@ -25,6 +25,7 @@
 #include "_LineShape.hpp"
 #include "CanvasShape.hpp"
 #include "Color.hpp"
+#include "Widget.hpp"
 #include "LiberationSansRegular.hpp"
 
 namespace emp {
@@ -53,6 +54,9 @@ namespace web {
       [[maybe_unused]] const auto res = window->create( width, height);
       emp_assert( res );
      }
+
+     /// Create a new canvas that takes a widget and ignores it.
+    Canvas(Widget& widget){}
 
     Canvas() = default;
 
