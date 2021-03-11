@@ -31,7 +31,7 @@ test-web-%: %.cpp
 test: $(addprefix test-native-, $(NATIVE_TEST_NAMES)) test-color_map
 
 test-native-%: %.cpp 
-	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
+	$(CXX) $(CFLAGS_all) $< -lsfml-graphics -lsfml-window -lsfml-system -lstdc++fs -o $@.out
 	# execute test
 	./$@.out
 
@@ -54,7 +54,7 @@ test-CanvasShape: CanvasShape.cpp
 	git submodule update
 
 cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
+	$(CXX) $(CFLAGS_all) $< -lsfml-graphics -lsfml-window -lsfml-system -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
