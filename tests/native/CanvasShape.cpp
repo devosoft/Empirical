@@ -4,6 +4,8 @@
 #include "emp/web/Canvas.hpp"
 #include "emp/web/CanvasShape.hpp"
 
+#ifdef EMP_NATIVE_SUPPORT
+
 TEST_CASE("Test CanvasShape up", "[native]") {
 
   emp::web::Canvas canvas{ 500, 500 };
@@ -103,3 +105,5 @@ TEST_CASE("Test CanvasShape right", "[native]") {
   canvas.SavePNG("right.png");
 
 }
+
+#endif
