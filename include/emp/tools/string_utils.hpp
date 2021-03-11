@@ -656,8 +656,14 @@ namespace emp {
   static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
-    remove_punctuation(res);
+
+    // replace punctuation with whitespace
+    std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
+      return (is_alphanumeric(ch)) ? ch : ' ';
+    });
+
     compress_whitespace(res);
+
     std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
       return (ch == ' ') ? '-' : ch;
     });
