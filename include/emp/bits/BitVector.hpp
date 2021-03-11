@@ -126,6 +126,10 @@ namespace emp {
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() { if (NumEndBits()) bits[LastField()] &= EndMask(); }
 
+    // Apply a transformation to each bit field in a specified range.
+    template <typename FUN_T>
+    inline BitVector & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
+
     // Helper: call SHIFT with positive number
     void ShiftLeft(const size_t shift_size);
 
@@ -734,6 +738,50 @@ namespace emp {
     move_bits.Clear(0, to);                             // Clear everything BEFORE moved bits.
     move_bits.Clear(to_stop, num_bits);                 // Clear everything AFTER moved bits.
     OR_SELF(move_bits);                                 // Merge bitstrings together.
+  }
+
+  template <typename FUN_T>
+  BitVector & BitVector::ApplyRange(const FUN_T & fun, size_t start, size_t stop) {
+    if (start == stop) return *this;  // Empty range.
+
+    emp_assert(start <= stop, start, stop, num_bits);  // Start cannot be after stop.
+    emp_assert(stop <= num_bits, stop, num_bits);      // Stop cannot be past the end of the bits
+    const size_t start_pos = FieldPos(start);          // Identify the start position WITHIN a bit field.
+    const size_t stop_pos = FieldPos(stop);            // Identify the stop position WITHIN a bit field.
+    size_t start_field = FieldID(start);               // Ideftify WHICH bit field we're starting in.
+    const size_t stop_field = FieldID(stop-1);         // Identify the last field where we actually make a change.
+
+    // If the start field and stop field are the same, mask off the middle.
+    if (start_field == stop_field) {
+      const size_t apply_bits = stop - start;                          // How many bits to change?
+      const field_t mask = MaskLow<field_t>(apply_bits) << start_pos;  // Target change bits with a mask.
+      field_t & target = bits[start_field];                            // Isolate the field to change.
+      target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+    }
+
+    // Otherwise mask the ends and fully modify the chunks in between.
+    else {
+      // If we're only using a portions of start field, mask it and setup.
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;                // How many bits in start field?
+        const field_t mask = MaskLow<field_t>(start_bits) << start_pos;  // Target start bits with a mask.
+        field_t & target = bits[start_field];                            // Isolate the field to change.
+        target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+        start_field++;                                                   // Done with this field; move to the next.
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bits[cur_field] = fun(bits[cur_field]);
+      }
+
+      // Set portions of stop field
+      const field_t mask = MaskLow<field_t>(stop_pos);
+      field_t & target = bits[start_field];                            // Isolate the field to change.
+      target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+    }
+
+    return *this;
   }
 
   void BitVector::ShiftLeft(const size_t shift_size) {
