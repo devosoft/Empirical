@@ -239,7 +239,8 @@ namespace emp {
     BitVector & SetAll();
 
     /// Set a range of bits to one: [start, stop)
-    BitVector & SetRange(size_t start, size_t stop);
+    BitVector & SetRange(size_t start, size_t stop)
+      { return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop); }
 
     /// Set all bits to 0.
     BitVector & Clear();
@@ -248,7 +249,9 @@ namespace emp {
     BitVector & Clear(size_t index) { return Set(index, false); }
 
     /// Set bits to 0 in the range [start, stop)
-    BitVector & Clear(const size_t start, const size_t stop);    
+    BitVector & Clear(const size_t start, const size_t stop)
+      { return ApplyRange([](field_t){ return 0; }, start, stop); }
+
 
     /// Const index operator -- return the bit at the specified position.
     [[nodiscard]] bool operator[](size_t index) const { return Get(index); }
@@ -1279,95 +1282,11 @@ namespace emp {
     ClearExcessBits();
     return *this;
   }
-
-  /// Set a range of bits to one: [start, stop)
-  BitVector & BitVector::SetRange(size_t start, size_t stop) {
-    if (start == stop) return *this;  // Empty range.
-
-    emp_assert(start <= stop, start, stop, num_bits);
-    emp_assert(stop <= num_bits, stop, num_bits);
-    const size_t start_pos = FieldPos(start);
-    const size_t stop_pos = FieldPos(stop);
-    size_t start_field = FieldID(start);
-    const size_t stop_field = FieldID(stop);
-
-    // If the start field and stop field are the same, just step through the bits.
-    if (start_field == stop_field) {
-      const size_t num_bits = stop - start;
-      const field_t mask = MaskLow<field_t>(num_bits) << start_pos;
-      bits[start_field] |= mask;
-    }
-
-    // Otherwise handle the ends and clear the chunks in between.
-    else {
-      // Set portions of start field
-      if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-        bits[start_field] |= start_mask;
-        start_field++;
-      }
-
-      // Middle fields
-      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = FIELD_ALL;
-      }
-
-      // Set portions of stop field
-      const field_t stop_mask = MaskLow<field_t>(stop_pos);
-      bits[stop_field] |= stop_mask;
-    }
-
-    return *this;
-  }
   
   /// Set all bits to 0.
   BitVector & BitVector::Clear() {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
-    return *this;
-  }
-
-  /// Set a range of bits to 0 in the range [start, stop)
-  BitVector & BitVector::Clear(const size_t start, const size_t stop) {
-    emp_assert(start <= stop, start, stop, num_bits);
-    emp_assert(stop <= num_bits, stop, num_bits);
-
-    // If we're not actually clearning anything, stop now.
-    if (start == stop) return *this;
-
-    const size_t start_pos = FieldPos(start);
-    const size_t stop_pos = FieldPos(stop);
-    size_t start_field = FieldID(start);
-    const size_t stop_field = FieldID(stop);
-
-    // If the start field and stop field are the same, just step through the bits.
-    if (start_field == stop_field) {
-      const size_t num_bits = stop - start;
-      const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
-      bits[start_field] &= mask;
-    }
-
-    // Otherwise handle the ends and clear the chunks in between.
-    else {
-      // Clear portions of start field
-      if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
-        bits[start_field] &= start_mask;
-        start_field++;
-      }
-
-      // Middle fields
-      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = 0;
-      }
-
-      // Clear portions of stop field
-      const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
-      bits[stop_field] &= stop_mask;
-    }
-
     return *this;
   }
 
