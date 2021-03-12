@@ -472,6 +472,34 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
     bs.SetRandomCount(random, 567);    // Half of the remaining ones should be set; 607.871 expected.
     num_ones = bs.CountOnes();         REQUIRE(num_ones == 567);
   }
+
+
+  // During randomization, make sure each bit position is set appropriately.
+  std::vector<size_t> one_counts(1000, 0);
+
+  for (size_t test_num = 0; test_num < 1000; ++test_num) {
+    // Set bits with different probabilities in different ranges.
+    bs.Clear();
+    bs.Randomize(random, 0.5,  100, 250);
+    bs.Randomize(random, 0.25, 250, 400);
+    bs.Randomize(random, 0.75, 400, 550);
+    bs.Randomize(random, 0.10, 550, 700);
+    bs.Randomize(random, 0.98, 700, 850);
+
+    // Keep count of how many times each position was a one.
+    for (size_t i = 0; i < bs.GetSize(); ++i) {
+      if (bs.Get(i)) one_counts[i]++;
+    }
+  }
+
+  // Check if the counts are reasonable.
+  for (size_t i = 0;   i < 100; i++)  { REQUIRE(one_counts[i] == 0); }
+  for (size_t i = 100; i < 250; i++)  { REQUIRE(one_counts[i] > 420);  REQUIRE(one_counts[i] < 580); }
+  for (size_t i = 250; i < 400; i++)  { REQUIRE(one_counts[i] > 190);  REQUIRE(one_counts[i] < 320); }
+  for (size_t i = 400; i < 550; i++)  { REQUIRE(one_counts[i] > 680);  REQUIRE(one_counts[i] < 810); }
+  for (size_t i = 550; i < 700; i++)  { REQUIRE(one_counts[i] >  60);  REQUIRE(one_counts[i] < 150); }
+  for (size_t i = 700; i < 850; i++)  { REQUIRE(one_counts[i] > 950);  REQUIRE(one_counts[i] < 999); }
+  for (size_t i = 850; i < 1000; i++) { REQUIRE(one_counts[i] == 0); }
 }
 
 TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
@@ -1295,13 +1323,15 @@ struct MultiTester {
   static void test() {
 
     constexpr int width = I;
+    constexpr int STEP = (I <= 200) ? 1 : I/100;
 
     emp::Random rand(1);
     emp::BitArray<width> bs(rand);
     const emp::BitArray<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
-
-    for (int i = -width - 1; i <= width + 1; ++i) {
+    
+    // Rotations should not change the number of ones.
+    for (int i = -width - STEP - 1; i <= width + STEP + 1; i += STEP) {
       for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
@@ -1309,7 +1339,8 @@ struct MultiTester {
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -width - 1; i <= width + 1; ++i) {
+    // Try each individual bit set with many possible rotations.
+    for (int i = -width - STEP - 1; i <= width + STEP + 1; i += STEP) {
       // for large widths, just do one starting position
       for (int j = 0; j < (width < 200 ? width : 1); ++j) {
         bs.Clear(); bs.Set(j);
