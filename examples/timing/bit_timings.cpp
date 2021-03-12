@@ -1,14 +1,15 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
+//  Copyright (C) Michigan State University, 2020-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Some code testing the speed of operations on BitSet and BitVector.
 
+#include <algorithm>     // For std::max
 #include <ctime>         // For std::clock
 #include <iomanip>       // For std::setw
 #include <map>
 
-#include "emp/bits/BitVector2.hpp"
+#include "emp/bits/BitVector.hpp"
 #include "emp/base/array.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/bits/BitSet.hpp"
@@ -18,6 +19,7 @@
 
 // How many total bits should we work with?  The below represents 80 meg worth per test.
 static constexpr size_t TEST_BITS = 5120000;
+//static constexpr size_t TEST_BITS = 1000000;
 static constexpr size_t TEST_COUNT = 1000;
 
 
@@ -85,6 +87,14 @@ struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_S
     if constexpr (HAS_OTHERS) base_t::TestSetAll(bs_map, bv_map);
   }
 
+  void TestToggleRange(size_timings_t & bs_map, size_timings_t & bv_map) {
+    std::cout << "Testing 'toggle_range' for size " << SIZE1 << std::endl;
+    const size_t end_pos = std::max<size_t>(1, SIZE1 - 1);
+    bs_map[SIZE1] = MultiTimeFunction([this](){ for (auto & x : bs_objs) x.Toggle(1, end_pos); });
+    bv_map[SIZE1] = MultiTimeFunction([this](){ for (auto & x : bv_objs) x.Toggle(1, end_pos); });
+    if constexpr (HAS_OTHERS) base_t::TestToggleRange(bs_map, bv_map);
+  }
+
   void TestRandomize(size_timings_t & bs_map, size_timings_t & bv_map, emp::Random & random) {
     std::cout << "Testing 'randomize' for size " << SIZE1 << std::endl;
     bs_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bs_objs) x.Randomize(random); });
@@ -141,6 +151,7 @@ struct SpeedTester {
     // Conduct the tests.
     impl.TestClear(bs_timings["clear"], bv_timings["clear"]);
     impl.TestSetAll(bs_timings["set_all"], bv_timings["set_all"]);
+    impl.TestToggleRange(bs_timings["toggle_range"], bv_timings["toggle_range"]);
     impl.TestRandomize(bs_timings["randomize"], bv_timings["randomize"], random);
     impl.TestRandomize75(bs_timings["randomize75"], bv_timings["randomize75"], random);
     impl.TestRandomize82(bs_timings["randomize82"], bv_timings["randomize82"], random);
@@ -150,6 +161,7 @@ struct SpeedTester {
     // Print the results.
     PrintResults(bs_timings, bv_timings, "clear");
     PrintResults(bs_timings, bv_timings, "set_all");
+    PrintResults(bs_timings, bv_timings, "toggle_range");
     PrintResults(bs_timings, bv_timings, "randomize");
     PrintResults(bs_timings, bv_timings, "randomize75");
     PrintResults(bs_timings, bv_timings, "randomize82");
