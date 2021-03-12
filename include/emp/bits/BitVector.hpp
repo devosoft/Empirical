@@ -263,7 +263,8 @@ namespace emp {
     BitVector & Toggle(size_t index);
 
     /// Flips all the bits in a range [start, end)
-    BitVector & Toggle(size_t start, size_t stop);
+    BitVector & Toggle(size_t start, size_t stop)
+      { return ApplyRange([](field_t x){ return ~x; }, start, stop); }
 
     /// Return true if ANY bits are set to 1, otherwise return false.
     [[nodiscard]] bool Any() const;
@@ -777,7 +778,7 @@ namespace emp {
 
       // Set portions of stop field
       const field_t mask = MaskLow<field_t>(stop_pos);
-      field_t & target = bits[start_field];                            // Isolate the field to change.
+      field_t & target = bits[stop_field];                             // Isolate the field to change.
       target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
     }
 
@@ -1378,48 +1379,6 @@ namespace emp {
     const field_t pos_mask = FIELD_1 << pos_id;
 
     bits[field_id] ^= pos_mask;
-
-    return *this;
-  }
-
-  /// Flips all the bits in a range [start, end)
-  BitVector & BitVector::Toggle(size_t start, size_t stop) {
-    if (start == stop) return *this;  // Empty range.
-
-    emp_assert(start <= stop, start, stop, num_bits);
-    emp_assert(stop <= num_bits, stop, num_bits);
-
-    const size_t start_pos = FieldPos(start);
-    const size_t stop_pos = FieldPos(stop);
-    size_t start_field = FieldID(start);
-    const size_t stop_field = FieldID(stop);
-
-    // If the start field and stop field are the same, just step through the bits.
-    if (start_field == stop_field) {
-      const size_t num_flips = stop - start;
-      const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
-      bits[start_field] ^= mask;
-    }
-
-    // Otherwise handle the ends and clear the chunks in between.
-    else {
-      // Toggle correct portions of start field
-      if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-        bits[start_field] ^= start_mask;
-        start_field++;
-      }
-
-      // Middle fields
-      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = ~bits[cur_field];
-      }
-
-      // Set portions of stop field
-      const field_t stop_mask = MaskLow<field_t>(stop_pos);
-      bits[stop_field] ^= stop_mask;
-    }
 
     return *this;
   }
