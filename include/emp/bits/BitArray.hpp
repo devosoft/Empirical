@@ -1381,7 +1381,7 @@ namespace emp {
     if constexpr (NUM_FIELDS == 1) return (double) bits[0];
 
     // Otherwise grab the most significant one and figure out how much to shift it by.
-    const size_t max_one = FindMaxOne();
+    const int max_one = FindMaxOne();
 
     // If there are no ones, this value must be 0.
     if (max_one == -1) return 0.0;
@@ -1391,7 +1391,7 @@ namespace emp {
     if (max_one < 64) return (double) GetUInt64(0);
 
     // To grab the most significant field, figure out how much to shift it by.
-    const size_t shift_bits = max_one - 63;
+    const size_t shift_bits = (size_t) max_one - 63;
     double out_value = (double) (*this >> shift_bits).GetUInt64(0);
 
     out_value *= emp::Pow2(shift_bits);
