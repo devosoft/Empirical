@@ -110,6 +110,10 @@ namespace emp {
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() noexcept { if constexpr (NUM_END_BITS > 0) bits[LAST_FIELD] &= END_MASK; }
 
+    // Apply a transformation to each bit field in a specified range.
+    template <typename FUN_T>
+    inline BitArray & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
+
     // Convert the bits to const bytes.
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const
     { return reinterpret_cast<const unsigned char*>(bits); }
@@ -209,7 +213,8 @@ namespace emp {
     BitArray & SetAll() noexcept;
 
     /// Set a range of bits to one: [start, stop)
-    BitArray & SetRange(size_t start, size_t stop);
+    BitArray & SetRange(size_t start, size_t stop)
+      { return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop); }
 
     /// Set all bits to zero.
     BitArray & Clear() noexcept { for (field_t & x : bits) x = FIELD_0; return *this; }
@@ -218,7 +223,8 @@ namespace emp {
     BitArray & Clear(size_t index) { return Set(index, false); }
 
     /// Set bits to 0 in the range [start, stop)
-    BitArray & Clear(const size_t start, const size_t stop);
+    BitArray & Clear(const size_t start, const size_t stop)
+      { return ApplyRange([](field_t){ return 0; }, start, stop); }
 
     /// Index into a const BitArray (i.e., cannot be set this way.)
     bool operator[](size_t index) const { return Get(index); }
@@ -233,7 +239,8 @@ namespace emp {
     BitArray & Toggle(size_t index);
 
     /// Flips all the bits in a range [start, stop)
-    BitArray & Toggle(size_t start, size_t stop);
+    BitArray & Toggle(size_t start, size_t stop)
+      { return ApplyRange([](field_t x){ return ~x; }, start, stop); }
 
     /// Return true if ANY bits in the BitArray are one, else return false.
     [[nodiscard]] bool Any() const { for (auto i : bits) if (i) return true; return false; }
@@ -668,6 +675,54 @@ namespace emp {
   // ------------------------ Implementations for Internal Functions ------------------------
 
   template <size_t NUM_BITS, bool ZERO_LEFT>
+  template <typename FUN_T>
+  BitArray<NUM_BITS,ZERO_LEFT> &
+  BitArray<NUM_BITS,ZERO_LEFT>::ApplyRange(const FUN_T & fun, size_t start, size_t stop) {
+    if (start == stop) return *this;  // Empty range.
+
+    emp_assert(start <= stop, start, stop, NUM_BITS);  // Start cannot be after stop.
+    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);      // Stop must be in range.
+
+    const size_t start_pos = FieldPos(start);          // Identify the start position WITHIN a bit field.
+    const size_t stop_pos = FieldPos(stop);            // Identify the stop position WITHIN a bit field.
+    size_t start_field = FieldID(start);               // Ideftify WHICH bit field we're starting in.
+    const size_t stop_field = FieldID(stop-1);         // Identify the last field where we actually make a change.
+
+    // If the start field and stop field are the same, mask off the middle.
+    if (start_field == stop_field) {
+      const size_t apply_bits = stop - start;                          // How many bits to change?
+      const field_t mask = MaskLow<field_t>(apply_bits) << start_pos;  // Target change bits with a mask.
+      field_t & target = bits[start_field];                            // Isolate the field to change.
+      target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+    }
+
+    // Otherwise mask the ends and fully modify the chunks in between.
+    else {
+      // If we're only using a portions of start field, mask it and setup.
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;                // How many bits in start field?
+        const field_t mask = MaskLow<field_t>(start_bits) << start_pos;  // Target start bits with a mask.
+        field_t & target = bits[start_field];                            // Isolate the field to change.
+        target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+        start_field++;                                                   // Done with this field; move to the next.
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bits[cur_field] = fun(bits[cur_field]);
+      }
+
+      // Set portions of stop field
+      const field_t mask = MaskLow<field_t>(stop_pos);
+      field_t & target = bits[stop_field];                             // Isolate the field to change.
+      target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+    }
+
+    return *this;
+  }
+
+
+  template <size_t NUM_BITS, bool ZERO_LEFT>
   void BitArray<NUM_BITS,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
     // If we have only a single field, this operation can be quick.
     if constexpr (NUM_FIELDS == 1) {
@@ -1063,85 +1118,6 @@ namespace emp {
     return *this;
   }
 
-  /// Set a range of bits to one: [start, stop)
-  template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::SetRange(size_t start, size_t stop) {
-    emp_assert(start <= stop, start, stop);
-    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
-    const size_t start_pos = FieldPos(start);
-    const size_t stop_pos = FieldPos(stop);
-    size_t start_field = FieldID(start);
-    const size_t stop_field = FieldID(stop);
-
-    // If the start field and stop field are the same, just set those bits.
-    if (start_field == stop_field) {
-      const size_t bit_count = stop - start;
-      const field_t mask = MaskLow<field_t>(bit_count) << start_pos;
-      bits[start_field] |= mask;
-    }
-
-    // Otherwise handle the ends and clear the chunks in between.
-    else {
-      // Set portions of start field
-      if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-        bits[start_field] |= start_mask;
-        start_field++;
-      }
-
-      // Middle fields
-      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = FIELD_ALL;
-      }
-
-      // Set portions of stop field
-      const field_t stop_mask = MaskLow<field_t>(stop_pos);
-      bits[stop_field] |= stop_mask;
-    }
-
-    return *this;
-  }
-
-  /// Set a range of bits to 0 in the range [start, stop)
-  template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Clear(const size_t start, const size_t stop) {
-    emp_assert(start <= stop, start, stop);
-    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
-    const size_t start_pos = FieldPos(start);
-    const size_t stop_pos = FieldPos(stop);
-    size_t start_field = FieldID(start);
-    const size_t stop_field = FieldID(stop);
-
-    // If the start field and stop field are the same, just step through the bits.
-    if (start_field == stop_field) {
-      const size_t num_bits = stop - start;
-      const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
-      bits[start_field] &= mask;
-    }
-
-    // Otherwise handle the ends and clear the chunks in between.
-    else {
-      // Clear portions of start field
-      if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
-        bits[start_field] &= start_mask;
-        start_field++;
-      }
-
-      // Middle fields
-      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = 0;
-      }
-
-      // Clear portions of stop field
-      const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
-      bits[stop_field] &= stop_mask;
-    }
-
-    return *this;
-  }
 
   /// Flip a single bit
   template <size_t NUM_BITS, bool ZERO_LEFT>
@@ -1152,46 +1128,6 @@ namespace emp {
     const field_t pos_mask = FIELD_1 << pos_id;
 
     bits[field_id] ^= pos_mask;
-
-    return *this;
-  }
-
-  /// Flips all the bits in a range [start, stop)
-  template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t start, size_t stop) {
-    emp_assert(start <= stop, start, stop);
-    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
-    const size_t start_pos = FieldPos(start);
-    const size_t stop_pos = FieldPos(stop);
-    size_t start_field = FieldID(start);
-    const size_t stop_field = FieldID(stop);
-
-    // If the start field and stop field are the same, just step through the bits.
-    if (start_field == stop_field) {
-      const size_t num_flips = stop - start;
-      const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
-      bits[start_field] ^= mask;
-    }
-
-    // Otherwise handle the ends and clear the chunks in between.
-    else {
-      // Toggle correct portions of start field
-      if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-        bits[start_field] ^= start_mask;
-        start_field++;
-      }
-
-      // Middle fields
-      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = ~bits[cur_field];
-      }
-
-      // Set portions of stop field
-      const field_t stop_mask = MaskLow<field_t>(stop_pos);
-      bits[stop_field] ^= stop_mask;
-    }
 
     return *this;
   }
