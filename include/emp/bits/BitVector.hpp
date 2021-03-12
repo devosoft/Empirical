@@ -115,10 +115,10 @@ namespace emp {
     // Copy bits from one position in the genome to another; leave old positions unchanged.
     void RawCopy(const size_t from_start, const size_t from_stop, const size_t to);
 
-    // Convert the bits to bytes.
+    // Convert the bits to bytes (note that bits are NOT in order at the byte level!)
     [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
 
-    // Convert the bits to const bytes vector.
+    // Convert the bits to const bytes array (note that bits are NOT in order at the byte level!)
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
       return bits.ReinterpretCast<const unsigned char>();
     }
@@ -220,7 +220,7 @@ namespace emp {
     /// How many bits do we currently have?
     [[nodiscard]] size_t GetSize() const { return num_bits; }
 
-    /// How many bytes are in this BitVector?
+    /// How many bytes are in this BitVector? (includes empty field space)
     [[nodiscard]] size_t GetNumBytes() const { return NumBytes(); }
 
     /// How many distinct values could be held in this BitVector?
@@ -351,6 +351,7 @@ namespace emp {
     [[nodiscard]] std::span<const std::byte> GetBytes() const;
 
     /// Get a read-only pointer to the internal array used by BitVector.
+    /// (note that bits are NOT in order at the byte level!)
     /// @return Read-only pointer to BitVector's bytes.
     emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
@@ -1598,7 +1599,7 @@ namespace emp {
     emp_assert((index + 1) * sizeof(T) <= TotalBytes());
 
     T out_value;
-    std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
+    std::memcpy( &out_value, BytePtr().Raw() + index * sizeof(T), sizeof(T) );
     return out_value;
   }
 
@@ -1609,7 +1610,7 @@ namespace emp {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= TotalBytes());
 
-    std::memcpy( BytePtr() + index * sizeof(T), &in_value, sizeof(T) );
+    std::memcpy( BytePtr().Raw() + index * sizeof(T), &in_value, sizeof(T) );
 
     ClearExcessBits();
   }
