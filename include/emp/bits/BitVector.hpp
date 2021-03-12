@@ -1054,9 +1054,9 @@ namespace emp {
   BitVector::BitVector(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
+      Clear();
       for (size_t i = 0; i < NUM_BITS; i++) if (bitset[i]) Set(i);
     }
-    ClearExcessBits();
   }
 
   /// Constructor to generate a BitVector from a string of '0's and '1's.
@@ -1149,7 +1149,7 @@ namespace emp {
   /// Move operator.
   BitVector & BitVector::operator=(BitVector && in) {
     emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
-    if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
+    if (bits) bits.DeleteArray();   // If we already have bits, get rid of them.
     num_bits = in.num_bits;         // Update the number of bits...
     bits = in.bits;                 // And steal the old memory for what those bits are.
     in.bits = nullptr;              // Prepare in for deletion without deallocating.
@@ -1170,13 +1170,10 @@ namespace emp {
       if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
       if constexpr (NUM_BITS > 0) bits = NewArrayPtr<field_t>(new_fields);
       else bits = nullptr;
-      ClearExcessBits();              // Make sure excess bits are zeros.
-   }
-
-    // If we have bits, copy them in.
-    if constexpr (NUM_BITS > 0) {
-      for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     }
+
+    for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);  // Copy bits in.
+    ClearExcessBits();                                        // Set excess bits to zeros.
 
     return *this;
   }
@@ -1380,7 +1377,7 @@ namespace emp {
 
     const size_t target_size = stop_pos - start_pos;
     emp_assert(target_ones >= 0);
-    emp_assert(target_ones <= target_size);
+    emp_assert(target_ones <= (int) target_size);
 
     // Approximate the probability of ones as a starting point.
     double p = ((double) target_ones) / (double) target_size;
