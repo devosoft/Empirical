@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
+//  Copyright (C) Michigan State University, 2020-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #define CATCH_CONFIG_MAIN
@@ -26,6 +26,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   // test ExactStreakDistribution
   {
+    std::cout << "Checkpoint 1" << std::endl;
+
     emp::ExactStreakDistribution<4> dist;
 
     REQUIRE( dist.GetStreakProbability(2,2) == 0.25 );
@@ -38,10 +40,12 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE( dist.GetStreakProbability(3) == 3.0/16.0 );
     REQUIRE( dist.GetStreakProbability(4) == 1.0/16.0 );
 
+    std::cout << "Checkpoint 2" << std::endl;
   }
 
   // test ApproxSingleStreakMetric
   {
+    std::cout << "Checkpoint 3" << std::endl;
 
     emp::ApproxSingleStreakMetric<4> metric;
 
@@ -64,6 +68,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) >= 0.0);
     }
 
+    std::cout << "Checkpoint 4" << std::endl;
   }
 
   // test ApproxDualStreakMetric
@@ -87,6 +92,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   // test ExactSingleStreakMetric
   {
+    std::cout << "Checkpoint 5" << std::endl;
 
     emp::ExactSingleStreakMetric<4> metric;
 
@@ -105,6 +111,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) >= 0.0);
     }
 
+    std::cout << "Checkpoint 6" << std::endl;
   }
 
   // test ExactDualStreakMetric
@@ -127,6 +134,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) >= 0.0);
     }
 
+    std::cout << "Checkpoint 7" << std::endl;
   }
 
   // test SieveSelector with auto adjust
@@ -149,6 +157,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   bin.Put("one-fifteen", 115);
 
+  std::cout << "Checkpoint 8" << std::endl;
+
   const size_t nrep = 1000;
 
   std::unordered_map<std::string, size_t> res;
@@ -167,6 +177,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE(uniques.size() == matches.size());
 
   }
+
+  std::cout << "Checkpoint 9" << std::endl;
 
   REQUIRE(res["one"] == 0);
   REQUIRE(res["two-two-seven"] > 0);
@@ -195,6 +207,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE(res["one-fifteen"] < nrep);
   REQUIRE(res["fifteen"] == nrep);
   }
+
+  std::cout << "Checkpoint 10" << std::endl;
 
   // test SieveSelector with no stochastic
   {
@@ -246,6 +260,9 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     bin.Put(emp::to_string(i*10), i*10);
   }
 
+  std::cout << "Checkpoint 11" << std::endl;
+
+
   res.clear();
 
   for (size_t rep = 0; rep < nrep; ++rep) {
@@ -285,6 +302,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   bin.Put("one-fifteen", 115);
 
   const size_t nrep = 1000;
+
+  std::cout << "Checkpoint 12" << std::endl;
 
   std::unordered_map<std::string, size_t> res;
   for (size_t rep = 0; rep < nrep; ++rep) {
@@ -330,6 +349,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE(res["one-fifteen"] == nrep);
   REQUIRE(res["fifteen"] == nrep);
   }
+
+  std::cout << "Checkpoint 13" << std::endl;
 
   // test PowMod, LogMod
   {
@@ -380,6 +401,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE( stretch_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
   }
 
+  std::cout << "Checkpoint 14" << std::endl;
+
   // more tests for PowMod, LogMod
   {
 
@@ -415,6 +438,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   }
 
   }
+
+  std::cout << "Checkpoint 15" << std::endl;
 
   // test CacheMod
   // test PowMod, LogMod
@@ -483,6 +508,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
+  std::cout << "Checkpoint 16" << std::endl;
 
   // test UnifMod
   {
@@ -553,6 +579,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
+  std::cout << "Checkpoint 17" << std::endl;
+
   // test EuclideanDimMod
   {
   emp::Random rand(1);
@@ -621,6 +649,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
   }
 
+  std::cout << "Checkpoint 18" << std::endl;
+
   // more tests for EuclideanDimMod
   {
 
@@ -681,6 +711,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  std::cout << "Checkpoint 19" << std::endl;
 
   // upregulate both, "hi" should still match better
   bin.AdjRegulator(hi, -20.0); // upregulate
@@ -746,6 +778,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
   }
+
+  std::cout << "Checkpoint 20" << std::endl;
 
   // tests for MultiplicativeCountdownRegulator
   {
@@ -831,6 +865,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
+  std::cout << "Checkpoint 21" << std::endl;
+
   // tests for NopRegulator
   {
 
@@ -905,6 +941,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   ));
   }
 
+  std::cout << "Checkpoint 22" << std::endl;
+
   bin.DecayRegulator(salut, 1);
   bin.DecayRegulator(hi, 0);
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
@@ -946,5 +984,5 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-
+  std::cout << "Checkpoint 23" << std::endl;
 }
