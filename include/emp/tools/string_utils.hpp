@@ -1030,7 +1030,10 @@ namespace emp {
 
   /// Make a string appear bold when printed to the command line.
   inline std::string to_ansi_bold(const std::string & in_string) {
-    return std::string("\e[1m") + in_string + "\e[0m";
+    std::stringstream ss;
+    char esc_char = 27;
+    ss << esc_char << "[1m" << in_string << esc_char << "[0m";
+    return ss.str();
   }
 
   
