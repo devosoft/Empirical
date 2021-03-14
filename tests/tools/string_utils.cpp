@@ -4,6 +4,7 @@
 
 #define CATCH_CONFIG_MAIN
 
+#include "emp/base/optional.hpp"
 #include "emp/tools/string_utils.hpp"
 #include "../third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -485,5 +486,15 @@ TEST_CASE("Test repeat", "[tools]") {
 	REQUIRE( emp::repeat("abc", 0) == "" );
 	REQUIRE( emp::repeat("abc", 1) == "abc" );
 	REQUIRE( emp::repeat("abc", 2) == "abcabc" );
+
+}
+
+TEST_CASE("Test to_string with emp::optional", "[tools]") {
+
+	emp::optional<size_t> foo;
+	REQUIRE( emp::to_string( foo ) == "" );
+
+	foo = 1;
+	REQUIRE( emp::to_string( foo ) == "1" );
 
 }

@@ -29,6 +29,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/optional.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
@@ -809,6 +810,7 @@ namespace emp {
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
   template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+  template <typename T> inline std::string ToString(const emp::optional<T> & container);
 
   /// Join a container of strings with a delimiter.
   /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
@@ -889,6 +891,13 @@ namespace emp {
     }
     ss << "]";
     return ss.str();
+  }
+
+  /// Setup emp::ToString to work on optionals.
+  template <typename T>
+  inline std::string ToString(const emp::optional<T> & container) {
+    if ( container.has_value() ) return emp::to_string( *container );
+    else return std::string{};
   }
 
   /// This function tries to convert a string into any type you're looking for...  You just
