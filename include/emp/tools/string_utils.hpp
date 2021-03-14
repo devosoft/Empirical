@@ -1027,13 +1027,14 @@ namespace emp {
     return to_english_list(quote_strings(in_strings, quote));
   }
 
+  // Some ANSI helper functions.
+  inline constexpr char ANSI_ESC() { return (char) 27; }
+  inline std::string ANSI_Bold() { return "\033[1m"; }
+  inline std::string ANSI_NoBold() { return "\033[0m"; }
 
   /// Make a string appear bold when printed to the command line.
   inline std::string to_ansi_bold(const std::string & in_string) {
-    std::stringstream ss;
-    char esc_char = 27;
-    ss << esc_char << "[1m" << in_string << esc_char << "[0m";
-    return ss.str();
+    return ANSI_Bold() + in_string + ANSI_NoBold();
   }
 
   
