@@ -1,4 +1,4 @@
-TEST_NAMES = CanvasShape Canvas CanvasImages
+TEST_NAMES = CanvasShape Canvas CanvasImages Color
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 DISPLAY_ENV := ${DISPLAY}
