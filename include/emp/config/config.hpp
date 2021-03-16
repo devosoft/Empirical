@@ -50,6 +50,7 @@
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
+#include "../data/DataFile.hpp"
 #include "ConfigManager.hpp"
 
 
@@ -245,10 +246,13 @@ namespace emp {
 
         out << std::endl; // Skip a line after each group.
       }
+//
 void Write2(std::ostream & out) const {
         std::string prefix = "Config_";
+        out << prefix << "name," << prefix << "description,";
+        out << std::endl;
         // Print header information with the group name.
-        out << prefix << name << ",";
+        out << name << ",";
         // Print group description.
         auto desc_lines = slice(desc);
         for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
@@ -280,13 +284,13 @@ void Write2(std::ostream & out) const {
           size_t start_col = setting_info[i].size();
           for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
             for (size_t ws = start_col; ws < max_length; ws++) out << ' ';
-            out << "# " << desc_lines[comment_line] << std::endl;
+            out << desc_lines[comment_line] << ",";
             start_col = 0;
           }
         }
 
         out << std::endl; // Skip a line after each group.
-        emp::DataFile file( out_stream );
+        emp::DataFile file( out );
       }
 
 
