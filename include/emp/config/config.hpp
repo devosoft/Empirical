@@ -245,6 +245,50 @@ namespace emp {
 
         out << std::endl; // Skip a line after each group.
       }
+void Write2(std::ostream & out) const {
+        std::string prefix = "Config_";
+        // Print header information with the group name.
+        out << prefix << name << ",";
+        // Print group description.
+        auto desc_lines = slice(desc);
+        for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
+          out << prefix << desc_lines[comment_line] << ",";
+        }
+        out << std::endl;
+
+        const size_t entry_count = entry_set.size();
+        emp::vector<std::string> setting_info(entry_count);
+        size_t max_length = 0;
+
+        // Loop through once to figure out non-comment output
+        for (size_t i = 0; i < entry_count; i++) {
+          setting_info[i] = "set ";
+          setting_info[i] += entry_set[i]->GetName();
+          setting_info[i] += " ";
+          setting_info[i] += entry_set[i]->GetValue();
+          if (max_length < setting_info[i].size()) max_length = setting_info[i].size();
+        }
+
+        // Loop through a second time to actually do the printing with properly spaced comments.
+        max_length += 2;
+        for (size_t i = 0; i < entry_count; i++) {
+          out << setting_info[i];
+
+          // Break the description up over multiple lines.
+          auto desc_lines = emp::slice(entry_set[i]->GetDescription());
+
+          size_t start_col = setting_info[i].size();
+          for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
+            for (size_t ws = start_col; ws < max_length; ws++) out << ' ';
+            out << "# " << desc_lines[comment_line] << std::endl;
+            start_col = 0;
+          }
+        }
+
+        out << std::endl; // Skip a line after each group.
+        emp::DataFile file( out_stream );
+      }
+
 
       void WriteMacros(std::ostream & out, bool as_const) const {
         // Print header information to register group.
