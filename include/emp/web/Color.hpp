@@ -57,6 +57,13 @@ namespace web {
     operator sf::Color() const { return sf::Color( r, g, b, a * 255 ); }
     #endif
 
+    Color& ParseColor(const std::string str, const std::string& css_str);
+    bool DetectABC(const std::string str);
+    Color & ParseABC(const std::string str, const std::string& css_str);
+    Color & ParseRGB(const std::string str, const std::string& css_str, const std::string fname,
+        const std::vector<std::string> params, float alpha);
+    Color& ParseHSL(const std::string str, const std::string& css_str, const std::string fname,
+        const std::vector<std::string> params, float alpha);
   };
 
   namespace color_impl {
@@ -221,41 +228,17 @@ namespace web {
         }
     }
 
-    // #abc and #abc123 syntax.
-    if (str.length() && str.front() == '#') {
-        if (str.length() == 4) {
-            int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
-            if (!(iv >= 0 && iv <= 0xfff)) {
-                emp_assert( false, css_str );
-                return;
-            } else {
-                *this = {
-                    static_cast<uint8_t>(((iv & 0xf00) >> 4) | ((iv & 0xf00) >> 8)),
-                    static_cast<uint8_t>((iv & 0xf0) | ((iv & 0xf0) >> 4)),
-                    static_cast<uint8_t>((iv & 0xf) | ((iv & 0xf) << 4)),
-                    1
-                };
-                return;
-            }
-        } else if (str.length() == 7) {
-            int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
-            if (!(iv >= 0 && iv <= 0xffffff)) {
-              emp_assert( false, css_str );
-              return;  // Covers NaN.
-            } else {
-                *this = {
-                    static_cast<uint8_t>((iv & 0xff0000) >> 16),
-                    static_cast<uint8_t>((iv & 0xff00) >> 8),
-                    static_cast<uint8_t>(iv & 0xff),
-                    1
-                };
-                return;
-            }
-        }
+    ParseColor(str, css_str);
+    
+    return;
 
-        emp_assert( false, css_str );
-        return;
-    }
+  }
+  
+  // Handle all color detection and parsing from the string
+  Color & Color::ParseColor(const std::string str, const std::string& css_str) {
+      // #abc and #abc123 syntax.
+    if (DetectABC(str))
+        return ParseABC(str, css_str);
 
     size_t op = str.find_first_of('('), ep = str.find_first_of(')');
     if (op != std::string::npos && ep + 1 == str.length()) {
@@ -263,18 +246,71 @@ namespace web {
         const std::vector<std::string> params = color_impl::split(str.substr(op + 1, ep - (op + 1)), ',');
 
         float alpha = 1.0f;
-
         if (fname == "rgba" || fname == "rgb") {
-            if (fname == "rgba") {
+            return ParseRGB(str, css_str, fname, params, alpha);
+
+        } else if (fname == "hsla" || fname == "hsl") {
+            return ParseHSL(str, css_str, fname, params, alpha);
+        }
+        return *this;
+    }
+
+    emp_assert( false, css_str );
+    return *this;
+  }
+
+  bool Color::DetectABC(const std::string str) {
+      if (str.length() && str.front() == '#')
+          return true;
+      return false;
+  }
+  Color & Color::ParseABC(const std::string str, const std::string& css_str){
+      if (str.length() == 4) {
+            int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
+            if (!(iv >= 0 && iv <= 0xfff)) {
+                emp_assert( false, css_str );
+                return *this;
+            } else {
+                *this = {
+                    static_cast<uint8_t>(((iv & 0xf00) >> 4) | ((iv & 0xf00) >> 8)),
+                    static_cast<uint8_t>((iv & 0xf0) | ((iv & 0xf0) >> 4)),
+                    static_cast<uint8_t>((iv & 0xf) | ((iv & 0xf) << 4)),
+                    1
+                };
+                return *this;
+            }
+        } else if (str.length() == 7) {
+            int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
+            if (!(iv >= 0 && iv <= 0xffffff)) {
+              emp_assert( false, css_str );
+              return *this;  // Covers NaN.
+            } else {
+                *this = {
+                    static_cast<uint8_t>((iv & 0xff0000) >> 16),
+                    static_cast<uint8_t>((iv & 0xff00) >> 8),
+                    static_cast<uint8_t>(iv & 0xff),
+                    1
+                };
+                return *this;
+            }
+        }
+
+        emp_assert( false, css_str );
+        return *this;
+  }
+  
+  Color & Color::ParseRGB(const std::string str, const std::string& css_str, const std::string fname,
+        const std::vector<std::string> params, float alpha){
+      if (fname == "rgba") {
                 if (params.size() != 4) {
                     emp_assert( false, css_str );
-                    return;
+                    return *this;
                 }
                 alpha = color_impl::parse_css_float(params.back());
             } else {
                 if (params.size() != 3) {
                     emp_assert( false, css_str );
-                    return;
+                    return *this;
                 }
             }
 
@@ -284,19 +320,21 @@ namespace web {
                 color_impl::parse_css_int(params[2]),
                 alpha
             };
-            return;
+            return *this;
+  }
 
-        } else if (fname == "hsla" || fname == "hsl") {
+  Color& Color::ParseHSL(const std::string str, const std::string& css_str, const std::string fname,
+        const std::vector<std::string> params, float alpha){
             if (fname == "hsla") {
                 if (params.size() != 4) {
                     emp_assert( false, css_str );
-                    return;
+                    return *this;
                 }
                 alpha = color_impl::parse_css_float(params.back());
             } else {
                 if (params.size() != 3) {
                     emp_assert( false, css_str );
-                    return;
+                    return *this;
                 }
             }
 
@@ -319,14 +357,8 @@ namespace web {
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h - 1.0f / 3.0f) * 255.0f),
                 alpha
             };
-            return;
+            return *this;
         }
-    }
-
-    emp_assert( false, css_str );
-    return;
-
-  }
 
 }
 }
