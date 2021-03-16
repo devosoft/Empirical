@@ -38,6 +38,7 @@ jobs:
       - run: ${CXX} --version
       - run: |
           source third-party/emsdk/emsdk_env.sh
+          echo ${DISPLAY}
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
