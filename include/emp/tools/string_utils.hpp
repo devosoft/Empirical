@@ -1029,8 +1029,59 @@ namespace emp {
 
   // Some ANSI helper functions.
   inline constexpr char ANSI_ESC() { return (char) 27; }
+  inline std::string ANSI_Reset() { return "\033[0m"; }
   inline std::string ANSI_Bold() { return "\033[1m"; }
-  inline std::string ANSI_NoBold() { return "\033[0m"; }
+  inline std::string ANSI_Faint() { return "\033[2m"; }
+  inline std::string ANSI_Italic() { return "\033[3m"; }
+  inline std::string ANSI_Underline() { return "\033[4m"; }
+  inline std::string ANSI_SlowBlink() { return "\033[5m"; }
+  inline std::string ANSI_Blink() { return "\033[6m"; }
+  inline std::string ANSI_Reverse() { return "\033[7m"; }
+  inline std::string ANSI_Strike() { return "\033[9m"; }
+
+  inline std::string ANSI_NoBold() { return "\033[22m"; }
+  inline std::string ANSI_NoItalic() { return "\033[23m"; }
+  inline std::string ANSI_NoUnderline() { return "\033[24m"; }
+  inline std::string ANSI_NoBlink() { return "\033[25m"; }
+  inline std::string ANSI_NoReverse() { return "\033[27m"; }
+
+  inline std::string ANSI_Black() { return "\033[30m"; }
+  inline std::string ANSI_Red() { return "\033[31m"; }
+  inline std::string ANSI_Green() { return "\033[32m"; }
+  inline std::string ANSI_Yellow() { return "\033[33m"; }
+  inline std::string ANSI_Blue() { return "\033[34m"; }
+  inline std::string ANSI_Magenta() { return "\033[35m"; }
+  inline std::string ANSI_Cyan() { return "\033[36m"; }
+  inline std::string ANSI_White() { return "\033[37m"; }
+  inline std::string ANSI_DefaultColor() { return "\033[39m"; }
+
+  inline std::string ANSI_BlackBG() { return "\033[40m"; }
+  inline std::string ANSI_RedBG() { return "\033[41m"; }
+  inline std::string ANSI_GreenBG() { return "\033[42m"; }
+  inline std::string ANSI_YellowBG() { return "\033[43m"; }
+  inline std::string ANSI_BlueBG() { return "\033[44m"; }
+  inline std::string ANSI_MagentaBG() { return "\033[45m"; }
+  inline std::string ANSI_CyanBG() { return "\033[46m"; }
+  inline std::string ANSI_WhiteBG() { return "\033[47m"; }
+  inline std::string ANSI_DefaultBGColor() { return "\033[49m"; }
+
+  inline std::string ANSI_BrightBlack() { return "\033[30m"; }
+  inline std::string ANSI_BrightRed() { return "\033[31m"; }
+  inline std::string ANSI_BrightGreen() { return "\033[32m"; }
+  inline std::string ANSI_BrightYellow() { return "\033[33m"; }
+  inline std::string ANSI_BrightBlue() { return "\033[34m"; }
+  inline std::string ANSI_BrightMagenta() { return "\033[35m"; }
+  inline std::string ANSI_BrightCyan() { return "\033[36m"; }
+  inline std::string ANSI_BrightWhite() { return "\033[37m"; }
+
+  inline std::string ANSI_BrightBlackBG() { return "\033[40m"; }
+  inline std::string ANSI_BrightRedBG() { return "\033[41m"; }
+  inline std::string ANSI_BrightGreenBG() { return "\033[42m"; }
+  inline std::string ANSI_BrightYellowBG() { return "\033[43m"; }
+  inline std::string ANSI_BrightBlueBG() { return "\033[44m"; }
+  inline std::string ANSI_BrightMagentaBG() { return "\033[45m"; }
+  inline std::string ANSI_BrightCyanBG() { return "\033[46m"; }
+  inline std::string ANSI_BrightWhiteBG() { return "\033[47m"; }
 
   /// Make a string appear bold when printed to the command line.
   inline std::string to_ansi_bold(const std::string & in_string) {
