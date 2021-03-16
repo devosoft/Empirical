@@ -44,6 +44,15 @@
 #include <tuple>
 #include <type_traits>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#include <emscripten/threading.h>
+#endif // __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN_PTHREADS__
+#include <pthread.h>
+#endif //  __EMSCRIPTEN_PTHREADS__
+
+
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/tuple_struct.hpp"
