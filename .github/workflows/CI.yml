@@ -26,6 +26,8 @@ jobs:
         with:
           submodules: 'recursive'
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      - run: sudo apt-get install -qq software-properties-common
+      - run: sudo apt-add-repository universe
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libsfml-dev xvfb libc6-dbg gdb
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
