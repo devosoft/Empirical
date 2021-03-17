@@ -10,6 +10,7 @@ jobs:
     name: Tests
     runs-on: ubuntu-18.04
     strategy:
+      fail-fast: false
       matrix:
         cxx: [clang++, g++]
         test-set:
