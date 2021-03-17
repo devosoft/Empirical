@@ -1084,11 +1084,31 @@ namespace emp {
   inline std::string ANSI_BrightWhiteBG() { return "\033[47m"; }
 
   /// Make a string appear bold when printed to the command line.
-  inline std::string to_ansi_bold(const std::string & in_string) {
-    return ANSI_Bold() + in_string + ANSI_NoBold();
+  inline std::string to_ansi_bold(const std::string & _in) {
+    return ANSI_Bold() + _in + ANSI_NoBold();
   }
 
-  
+  /// Make a string appear italics when printed to the command line.
+  inline std::string to_ansi_italic(const std::string & _in) {
+    return ANSI_Italic() + _in + ANSI_NoItalic();
+  }
+
+  /// Make a string appear underline when printed to the command line.
+  inline std::string to_ansi_underline(const std::string & _in) {
+    return ANSI_Underline() + _in + ANSI_NoUnderline();
+  }
+
+  /// Make a string appear blink when printed to the command line.
+  inline std::string to_ansi_blink(const std::string & _in) {
+    return ANSI_Blink() + _in + ANSI_NoBlink();
+  }
+
+  /// Make a string appear reverse when printed to the command line.
+  inline std::string to_ansi_reverse(const std::string & _in) {
+    return ANSI_Reverse() + _in + ANSI_NoReverse();
+  }
+
+
   /// Apply sprintf-like formatting to a string.
   /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
   /// Adapted from https://stackoverflow.com/a/26221725.
