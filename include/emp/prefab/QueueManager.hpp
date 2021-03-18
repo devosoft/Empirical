@@ -101,88 +101,89 @@ namespace emp {
 
 /// Primary class that establishes queue for runs and processes them accordingly
 class QueueManager {
-    public:
+  public:
 
-    /// Information of each element within queue. This info represents the information required for each run to be processed.
-    struct RunInfo {
-        SettingConfig runinfo_config; // Holds all program-specific settings
-        size_t id; // The id of this run in the queue
-        size_t cur_epoch; // The current epoch that this run is on (will either be 0 or `epochs` unless this run is in progress)
-        size_t epochs; // The number of epochs this run is supposed to run for
+  /// Information of each element within queue. This info represents the information required for each run to be processed.
+  struct RunInfo {
+    SettingConfig runinfo_config; // Holds all program-specific settings
+    size_t id; // The id of this run in the queue
+    size_t cur_epoch; // The current epoch that this run is on (will either be 0 or `epochs` unless this run is in progress)
+    size_t epochs; // The number of epochs this run is supposed to run for
 
-        RunInfo(SettingConfig _config, size_t _id)
-            : runinfo_config(_config), id(_id), cur_epoch(0) { ; }
+    RunInfo(SettingConfig _config, size_t _id)
+        : runinfo_config(_config), id(_id), cur_epoch(0) { ; }
 
-        /// @returns current epoch
-        size_t GetEpoch() {return cur_epoch;}
-        /// @returns number of epochs to run for
-        size_t GetNEpochs() {return epochs;}
-        /// Increment current epoch by @param x
-        void IncEpoch(int x = 1) {cur_epoch += x;}
-        /// @returns configuration for this run
-        SettingConfig GetConfig() {return runinfo_config;}
-    };
+    /// @returns current epoch
+    size_t GetEpoch() {return cur_epoch;}
+    /// @returns number of epochs to run for
+    size_t GetNEpochs() {return epochs;}
+    /// Increment current epoch by @param x
+    void IncEpoch(int x = 1) {cur_epoch += x;}
+    /// @returns configuration for this run
+    SettingConfig GetConfig() {return runinfo_config;}
+  };
 
 
-   private:
-    SettingConfig queue_config;
-    std::queue<emp::QueueManager::RunInfo> runs;
-    emp::web::Div display_div;
-    emp::web::TextArea run_input;
-    emp::web::Button queue_button;
-    emp::web::Table display_table;
+  private:
+  SettingConfig queue_config;
+  std::queue<emp::QueueManager::RunInfo> runs;
+  emp::web::Div display_div;
+  emp::web::TextArea run_input;
+  emp::web::Button queue_button;
+  emp::web::Table display_table;
 
-    emp::vector<std::string> ordered_metric_names;
-    emp::vector<std::function<std::string()>> metric_funs;
+  emp::vector<std::string> ordered_metric_names;
+  emp::vector<std::function<std::string()>> metric_funs;
 
-    size_t num_runs = 10;
-    bool table_built = false;
+  size_t num_runs = 10;
+  bool table_built = false;
 
-   public:
+  public:
 
     /// @param user_config An example configuration file for this program. Used to initialize table headers.
     QueueManager(SettingConfig user_config) : queue_config(user_config) { ; }
 
     /// @returns True if queue is empty, false if it is not
     bool IsEmpty() {
-        return runs.empty();
+      return runs.empty();
     }
 
     /// @returns Number of runs remaining in the queue
     size_t RunsRemaining() {
-        return runs.size();
+      return runs.size();
     }
 
     /// Adds new run to queue using settings specified in @param settings.
     /// @param epochs indicates how many epochs this run should run for.  
     void AddRun(SettingConfig settings, size_t epochs) {
-        RunInfo new_run(settings, runs.size());
-        new_run.epochs = epochs;
-        runs.push(new_run);
+      RunInfo new_run(settings, runs.size());
+      new_run.epochs = epochs;
+      runs.push(new_run);
     }
 
     /// Removes run from front of queue
     void RemoveRun() {
-        emp_assert(!IsEmpty(), "Queue is empty! Cannot remove!");
-        runs.pop();
+      emp_assert(!IsEmpty(), "Queue is empty! Cannot remove!");
+      runs.pop();
     }
 
     /// @returns The a reference to the first run in the queue
     /// (i.e. the one that is running currently or, if none are
     ///  in progress, the next run)
     RunInfo& FrontRun() {
-        emp_assert(!IsEmpty(), "Queue is empty! Cannot access Front!");
-        return runs.front();
+      emp_assert(!IsEmpty(), "Queue is empty! Cannot access Front!");
+      return runs.front();
     }
 
     /// @returns the Div associated with this QueueManager.
     emp::web::Div GetDiv() {
-        return display_div;
+      return display_div;
     }
+
     /// Clears the content of the div associated with this QueueManager
     void ResetDiv() {
-        display_div.Clear();
-        table_built = false;
+      display_div.Clear();
+      table_built = false;
     }
 
     /// Adds table containing information for this QueueManager to the
@@ -194,95 +195,95 @@ class QueueManager {
     /// Note that you still need to add this div to your document,
     /// e.g. `my_doc << my_queue_manager.GetDiv()`;
     void BuildTable(const std::string & id = "") {
-        emp_assert(!table_built && 
-                   "Trying to add QueueManager table but QueueManager table already built");
+      emp_assert(!table_built && 
+                  "Trying to add QueueManager table but QueueManager table already built");
 
-        // Get parameter names
-        emp::vector<std::string> setting_names = queue_config.GetSettingMapNames();
+      // Get parameter names
+      emp::vector<std::string> setting_names = queue_config.GetSettingMapNames();
 
-        // Total number of columns is number of params + number of metrics +
-        // a column for the run id and a column for the current epoch.
-        size_t col = 2 + setting_names.size() + ordered_metric_names.size();
+      // Total number of columns is number of params + number of metrics +
+      // a column for the run id and a column for the current epoch.
+      size_t col = 2 + setting_names.size() + ordered_metric_names.size();
 
-        // Make and style table
-        display_table = emp::web::Table(1, col, id);
-        display_table.SetCSS("border-collapse", "collapse");
-        display_table.SetCSS("border", "3px solid black");
-        display_table.CellsCSS("border", "1px solid black");
+      // Make and style table
+      display_table = emp::web::Table(1, col, id);
+      display_table.SetCSS("border-collapse", "collapse");
+      display_table.SetCSS("border", "3px solid black");
+      display_table.CellsCSS("border", "1px solid black");
 
-        // Fill out header
-        display_table.GetCell(0, 0).SetHeader() << "Run";
-        int column_count = 1;
-        for (const auto& p : setting_names) {
-            display_table.GetCell(0, column_count).SetHeader() << "<i>" << p << "</i>";
-            ++column_count;
-        }
-
-        display_table.GetCell(0, column_count).SetHeader() <<  "Epoch";
+      // Fill out header
+      display_table.GetCell(0, 0).SetHeader() << "Run";
+      int column_count = 1;
+      for (const auto& p : setting_names) {
+        display_table.GetCell(0, column_count).SetHeader() << "<i>" << p << "</i>";
         ++column_count;
+      }
 
-        // if adding more features after this point, keep in mind of where
-        // the col count will be
-        for (size_t i = 0; i < ordered_metric_names.size(); i++) {
-            display_table.GetCell(0, column_count + i).SetHeader() << ordered_metric_names[i];
-        }
+      display_table.GetCell(0, column_count).SetHeader() <<  "Epoch";
+      ++column_count;
 
-        display_div << display_table;
-        table_built = true;
+      // if adding more features after this point, keep in mind of where
+      // the col count will be
+      for (size_t i = 0; i < ordered_metric_names.size(); i++) {
+        display_table.GetCell(0, column_count + i).SetHeader() << ordered_metric_names[i];
+      }
+
+      display_div << display_table;
+      table_built = true;
     }
 
     /// Helper function to add the last run in the queue to the table
     /// Called by queue button.
     void AddNewQueuedRunToTable() {
-        emp_assert(table_built && 
-                   "Trying to add run to QueueManager table but table hasn't been initialized. Call BuildTable first.");
+      emp_assert(table_built && 
+                 "Trying to add run to QueueManager table but table hasn't been initialized. Call BuildTable first.");
 
-        // Update the table.
-        int line_id = display_table.GetNumRows();
-        display_table.Rows(line_id + 1);
-        int col_count = 0;
-        display_table.GetCell(line_id, col_count) << runs.back().id;
+      // Update the table.
+      int line_id = display_table.GetNumRows();
+      display_table.Rows(line_id + 1);
+      int col_count = 0;
+      display_table.GetCell(line_id, col_count) << runs.back().id;
 
-        // Add correct parameter values
-        for (auto p : runs.back().runinfo_config.GetSettingMapBase()) {
-            display_table.GetCell(line_id, ++col_count) << (*p).AsString();
-        }
+      // Add correct parameter values
+      for (auto p : runs.back().runinfo_config.GetSettingMapBase()) {
+        display_table.GetCell(line_id, ++col_count) << (*p).AsString();
+      }
 
-        // Add placeholders for metrics and epoch column
-        for (int i = 0; i < ordered_metric_names.size() + 1; i++) {
-            display_table.GetCell(line_id, ++col_count) << "Waiting..."; 
-        }
+      // Add placeholders for metrics and epoch column
+      for (int i = 0; i < ordered_metric_names.size() + 1; i++) {
+        display_table.GetCell(line_id, ++col_count) << "Waiting..."; 
+      }
 
-        // Draw the new table.
-        display_table.CellsCSS("border", "1px solid black");
-        display_table.Redraw();
+      // Draw the new table.
+      display_table.CellsCSS("border", "1px solid black");
+      display_table.Redraw();
     }
 
     /// Update QueueManager to reflect current status of runs and metrics.
     /// Handles updating table and updating queue (checking if current run is done).
     void Update() {
-        emp_assert(table_built && 
-                "Trying to update QueueManager table but table hasn't been initialized. Call BuildTable first.");
+      emp_assert(table_built && 
+                 "Trying to update QueueManager table but table hasn't been initialized. Call BuildTable first.");
 
-        size_t id = FrontRun().id;
-        RunInfo& current_run = FrontRun();
+      size_t id = FrontRun().id;
+      RunInfo& current_run = FrontRun();
 
-        size_t n_settings = queue_config.GetSettingMapNames().size();
+      size_t n_settings = queue_config.GetSettingMapNames().size();
 
-        display_table.Freeze();
-        display_table.GetCell(id + 1, n_settings+1).ClearChildren() << emp::to_string(current_run.cur_epoch);
+      display_table.Freeze();
+      display_table.GetCell(id + 1, n_settings+1).ClearChildren() << emp::to_string(current_run.cur_epoch);
 
-        // user function configuration
-        for (int i = 0; i < metric_funs.size(); i++) {
-            display_table.GetCell(id + 1, n_settings + 2 + i).ClearChildren() << metric_funs[i]();            
-        }
+      // user function configuration
+      for (int i = 0; i < metric_funs.size(); i++) {
+        display_table.GetCell(id + 1, n_settings + 2 + i).ClearChildren() << metric_funs[i]();            
+      }
 
 
-        if (current_run.cur_epoch >= current_run.epochs) {  // Are we done with this run?
-            RemoveRun();                                    // Updates to the next run
-        }
+      if (current_run.cur_epoch >= current_run.epochs) {  // Are we done with this run?
+        RemoveRun();                                    // Updates to the next run
+      }
 
-        display_table.Activate();
+      display_table.Activate();
     }
 
 
@@ -295,19 +296,19 @@ class QueueManager {
     /// @param get_epochs is a function that will be used to determine how many epochs/time steps 
     /// the run is supposed to go for 
     void AddQueueButton(std::function<emp::SettingConfig()> get_conf, std::function<size_t()> get_epochs) {
-        run_input = emp::web::TextArea([this](const std::string & str){
-            this->num_runs = emp::from_string<size_t>(str);
-        }, "run_count");
-        run_input.SetText(emp::to_string(num_runs));
-        display_div << run_input;
+      run_input = emp::web::TextArea([this](const std::string & str){
+        this->num_runs = emp::from_string<size_t>(str);
+      }, "run_count");
+      run_input.SetText(emp::to_string(num_runs));
+      display_div << run_input;
 
-        queue_button = emp::web::Button([this, get_conf, get_epochs]() {
-            for (int i = 0; i < this->num_runs; i++) {
-                AddRun(get_conf(), get_epochs());
-                AddNewQueuedRunToTable();
-            }
-        }, "Queue", "queue_but");
-        display_div << queue_button;
+      queue_button = emp::web::Button([this, get_conf, get_epochs]() {
+        for (int i = 0; i < this->num_runs; i++) {
+          AddRun(get_conf(), get_epochs());
+          AddNewQueuedRunToTable();
+        }
+      }, "Queue", "queue_but");
+      display_div << queue_button;
     }
 
     /// Adds new metric to table
@@ -317,15 +318,14 @@ class QueueManager {
     /// @param header_name the name this column should have in the table
     ///
     void AddMetric(std::function<std::string()> func, std::string header_name) {
-        ordered_metric_names.push_back(header_name);
-        metric_funs.push_back(func);
+      ordered_metric_names.push_back(header_name);
+      metric_funs.push_back(func);
 
-        if (table_built) {
-            size_t col_id = display_table.GetNumCols();
-            display_table.Cols(col_id + 1);
-            display_table.GetCell(0, col_id).SetHeader() << header_name;
-        }
+      if (table_built) {
+        size_t col_id = display_table.GetNumCols();
+        display_table.Cols(col_id + 1);
+        display_table.GetCell(0, col_id).SetHeader() << header_name;
+      }
     }
-};
-
+  };
 }  // namespace emp

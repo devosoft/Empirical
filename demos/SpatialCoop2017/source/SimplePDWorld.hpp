@@ -119,7 +119,7 @@ public:
   }
 
   void RunStep() {
-      for (size_t o = 0; o < N; o++) Repro();
+    for (size_t o = 0; o < N; o++) Repro();
   }
 
   size_t CountCoop();

@@ -130,8 +130,8 @@ namespace emp {
         std::stringstream ss;
         for (size_t i=0; i < values.size(); i++) {
           if (i) ss << ',';
-            ss << values[i];
-          }
+          ss << values[i];
+        }
         return ss.str();
       }
 
@@ -441,8 +441,8 @@ namespace emp {
         if (ptr) {
           if (out_str.size()) out_str += separator;
           out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->GetID()]) : ptr->AsString();
-          }
         }
+      }
       return out_str;
     }
 
