@@ -80,6 +80,7 @@ namespace emp {
   class SignalManager;  // ...for setting up as friend.
 
   // Mechanisms for Signals to report to a manager.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     struct SignalManager_Base {
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
@@ -92,6 +93,7 @@ namespace emp {
       virtual ~SignalControl_Base() { ; }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Base class for all signals.
   class SignalBase {

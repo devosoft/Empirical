@@ -43,7 +43,7 @@ namespace web {
     > documents;
 
   public:
-    /// @document_ids vector of HTML IDs of divs to attach to
+    /// @param document_ids vector of HTML IDs of divs to attach to
     BaseTest(const emp::vector<std::string> document_ids={}) {
 
       for (const auto & id : document_ids) {
@@ -60,7 +60,7 @@ namespace web {
 
     }
 
-    // Remember to clean up after your test!
+    /// Remember to clean up after your test!
     virtual ~BaseTest() { ; }
 
     /// Describe is run after construction.
@@ -128,9 +128,11 @@ namespace web {
     emp::Signal<void()> after_each_test_sig;    ///< Is triggered after each test (after test marked 'done', but before test is deleted).
     std::deque<TestRunner> test_runners;        ///< Store test runners in a first-in-first-out (out=run) queue
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     const size_t next_test_js_func_id;
     const size_t pop_test_js_func_id;
     const size_t cleanup_all_js_func_id;
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// Run the next test!
     void NextTest() {

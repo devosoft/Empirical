@@ -10,7 +10,7 @@
 //  Constructor:
 //    Random(int _seed=-1)
 //      _seed is the random number seed that will produce a unique pseudo-random sequence.
-//      (a value of -1 indicates that the seed should be bassed off of a combination of time
+//      (a value of -1 indicates that the seed should be based off of a combination of time
 //      and the memory position of the random number generator, in case multiple generators
 //      start at the same time.)
 //
@@ -147,9 +147,9 @@ namespace emp {
      * A negative seed means that the random number generator gets its
      * seed from the actual system time and the process ID.
      **/
-    constexpr void ResetSeed(const int _seed) {
-      original_seed = _seed;
-      seed = _seed;
+    constexpr void ResetSeed(const int new_seed) {
+      original_seed = new_seed;
+      seed = new_seed;
       if (seed < 0) seed *= -1;
       seed %= _RAND_MSEED;
       init();
@@ -203,10 +203,17 @@ namespace emp {
      * Generate an int out of an interval.
      *
      * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     constexpr int32_t GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
+
+    /**
+     * Generate an int out of an interval.
+     *
+     * @return The pseudo random number.
+     * @param min The lower bound for the random numbers.
+     * @param max The upper bound for the random numbers (will never be returned).
+     **/
     constexpr int32_t GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
 
 
@@ -266,7 +273,7 @@ namespace emp {
      * Generate a random variable drawn from a Poisson distribution.
      **/
     constexpr uint32_t GetRandPoisson(const double n, double p) {
-      // Optimizes for speed and calculability using symetry of the distribution
+      // Optimizes for speed and calculability using symmetry of the distribution
       if (p > .5) return (uint32_t) n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
     }
@@ -309,6 +316,7 @@ namespace emp {
   };
 
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /*! This is an adaptor to make Random behave like a proper STL random number
     generator.
   */
@@ -321,6 +329,7 @@ namespace emp {
 
     Random& _rng;
   };
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
   /*! Draw a sample (with replacement) from an input range, copying to the output range.

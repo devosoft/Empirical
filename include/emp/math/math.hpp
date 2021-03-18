@@ -159,7 +159,7 @@ namespace emp {
     return (in1 < cur_result) ? cur_result : in1;
   }
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     // A compile-time log calculator for values [1,2)
     static constexpr double Log2_base(double x) {
@@ -182,8 +182,7 @@ namespace emp {
     }
 
   }
-
-  /// @endcond
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Compile-time log base 2 calculator.
   static constexpr double Log2(double x) {
@@ -203,6 +202,7 @@ namespace emp {
   static constexpr T Square(T val) { return val * val; }
 
   // Pow helper functions.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     static constexpr double Pow2_lt1(double exp, int id=0) {
       return (id==32) ? 1.0 :
@@ -223,6 +223,7 @@ namespace emp {
     return emp::Square( PowIntImpl(base,p/2) );          // Even exponent: calc for half and square result.
   }
   } // namespace internal
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
@@ -236,6 +237,7 @@ namespace emp {
     return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
   /// A fast method for calculating exponents on doubles.
   static constexpr double PowDoubleImpl(double base, double exp) {
@@ -251,7 +253,7 @@ namespace emp {
   template <typename T> struct identity { typedef T type; };
 
   } // namespace internal
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// A fast method for calculating exponents on doubles or integral types.
   /// Uses if constexpr to work around compiler bug in Emscripten (issue #296).

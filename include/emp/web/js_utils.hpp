@@ -1,3 +1,6 @@
+#ifndef EMP_JS_UTILS_H
+#define EMP_JS_UTILS_H
+
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
@@ -6,10 +9,6 @@
  *  @file  js_utils.hpp
  *  @brief Tools for passing data between C++ and Javascript.
  */
-
-
-#ifndef EMP_JS_UTILS_H
-#define EMP_JS_UTILS_H
 
 #include <map>
 #include <string>

@@ -177,8 +177,8 @@ namespace web {
   /// @param grid A vector of vectors of color IDs.
   /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
-  /// @param cell_width How many pixels wide is each cell to draw?
-  /// @param cell_height How many pixels tall is each cell to draw?
+  /// @param cell_w How many pixels wide is each cell to draw?
+  /// @param cell_h How many pixels tall is each cell to draw?
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,
