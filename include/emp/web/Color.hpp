@@ -24,6 +24,7 @@
 
 #include "../base/vector.hpp"
 #include "../geometry/Circle2D.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 namespace web {
@@ -58,12 +59,12 @@ namespace web {
     #endif
 
     Color& ParseColor(const std::string& str, const std::string& css_str);
-    bool DetectABC(const std::string& str);
+    bool DetectSyntaxABC(const std::string& str);
     Color & ParseABC(const std::string& str, const std::string& css_str);
     Color & ParseRGB(const std::string& str, const std::string& css_str, const std::string& fname,
-        const std::vector<std::string> params, float alpha);
+        const std::vector<std::string>& color_tokens, const float alpha);
     Color& ParseHSL(const std::string& str, const std::string& css_str, const std::string& fname,
-        const std::vector<std::string> params, float alpha);
+        const std::vector<std::string>& color_tokens, const float alpha);
   };
 
   namespace color_impl {
@@ -149,12 +150,12 @@ namespace web {
     template <typename T>
     uint8_t clamp_css_byte(T i) {  // Clamp to integer 0 .. 255.
         i = ::round(i);  // Seems to be what Chrome does (vs truncation).
-        return i < 0 ? 0 : i > 255 ? 255 : uint8_t(i);
+        return uint8_t(std::clamp(i,T(0),T(255)));
     }
 
     template <typename T>
     float clamp_css_float(T f) {  // Clamp to float 0.0 .. 1.0.
-        return f < 0 ? 0 : f > 1 ? 1 : float(f);
+        return std::clamp(float(f),float(0.0),float(1.0));
     }
 
     float parseFloat(const std::string& str) {
@@ -181,7 +182,7 @@ namespace web {
         }
     }
 
-    float css_hue_to_rgb(float m1, float m2, float h) {
+    float css_hue_to_rgb(const float m1, const float m2, float h) {
         if (h < 0.0f) {
             h += 1.0f;
         } else if (h > 1.0f) {
@@ -216,10 +217,10 @@ namespace web {
    std::string str = css_str;
 
     // Remove all whitespace, not compliant, but should just be more accepting.
-    str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
+    emp::remove_whitespace(str);
 
     // Convert to lowercase.
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    emp::to_lower(str);
 
     for (const auto& namedColor : color_impl::namedColors) {
         if (str == namedColor.name) {
@@ -237,20 +238,23 @@ namespace web {
   // Handle all color detection and parsing from the string
   Color & Color::ParseColor(const std::string& str, const std::string& css_str) {
       // #abc and #abc123 syntax.
-    if (DetectABC(str))
+    if (DetectSyntaxABC(str)) {
         return ParseABC(str, css_str);
+    }
 
-    size_t op = str.find_first_of('('), ep = str.find_first_of(')');
-    if (op != std::string::npos && ep + 1 == str.length()) {
-        const std::string fname = str.substr(0, op);
-        const std::vector<std::string> params = color_impl::split(str.substr(op + 1, ep - (op + 1)), ',');
+    size_t open_paren = str.find_first_of('(');
+    size_t close_paren = str.find_first_of(')');
+    if (open_paren != std::string::npos && close_paren + 1 == str.length()) {
+        const std::string fname = str.substr(0, open_paren);
+        const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
+            close_paren - (open_paren + 1)), ',');
 
         float alpha = 1.0f;
         if (fname == "rgba" || fname == "rgb") {
-            return ParseRGB(str, css_str, fname, params, alpha);
+            return ParseRGB(str, css_str, fname, color_tokens, alpha);
 
         } else if (fname == "hsla" || fname == "hsl") {
-            return ParseHSL(str, css_str, fname, params, alpha);
+            return ParseHSL(str, css_str, fname, color_tokens, alpha);
         }
         return *this;
     }
@@ -259,14 +263,14 @@ namespace web {
     return *this;
   }
 
-  bool Color::DetectABC(const std::string& str) {
+  bool Color::DetectSyntaxABC(const std::string& str) {
       if (str.length() && str.front() == '#')
           return true;
       return false;
   }
   Color & Color::ParseABC(const std::string& str, const std::string& css_str){
       if (str.length() == 4) {
-            int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
+            const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xfff)) {
                 emp_assert( false, css_str );
                 return *this;
@@ -280,7 +284,7 @@ namespace web {
                 return *this;
             }
         } else if (str.length() == 7) {
-            int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
+            const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xffffff)) {
               emp_assert( false, css_str );
               return *this;  // Covers NaN.
@@ -300,53 +304,53 @@ namespace web {
   }
   
   Color & Color::ParseRGB(const std::string& str, const std::string& css_str, 
-    const std::string& fname, const std::vector<std::string> params, float alpha){
+    const std::string& fname, const std::vector<std::string>& color_tokens, float alpha){
       if (fname == "rgba") {
-                if (params.size() != 4) {
-                    emp_assert( false, css_str );
-                    return *this;
-                }
-                alpha = color_impl::parse_css_float(params.back());
-            } else {
-                if (params.size() != 3) {
-                    emp_assert( false, css_str );
-                    return *this;
-                }
+            if (color_tokens.size() != 4) {
+                emp_assert( false, css_str );
+                return *this;
             }
+            alpha = color_impl::parse_css_float(color_tokens.back());
+        } else {
+            if (color_tokens.size() != 3) {
+                emp_assert( false, css_str );
+                return *this;
+            }
+        }
 
-            *this = {
-                color_impl::parse_css_int(params[0]),
-                color_impl::parse_css_int(params[1]),
-                color_impl::parse_css_int(params[2]),
-                alpha
-            };
-            return *this;
+        *this = {
+            color_impl::parse_css_int(color_tokens[0]),
+            color_impl::parse_css_int(color_tokens[1]),
+            color_impl::parse_css_int(color_tokens[2]),
+            alpha
+        };
+        return *this;
   }
 
   Color& Color::ParseHSL(const std::string& str, const std::string& css_str, 
-    const std::string& fname, const std::vector<std::string> params, float alpha){
+    const std::string& fname, const std::vector<std::string>& color_tokens, float alpha){
             if (fname == "hsla") {
-                if (params.size() != 4) {
+                if (color_tokens.size() != 4) {
                     emp_assert( false, css_str );
                     return *this;
                 }
-                alpha = color_impl::parse_css_float(params.back());
+                alpha = color_impl::parse_css_float(color_tokens.back());
             } else {
-                if (params.size() != 3) {
+                if (color_tokens.size() != 3) {
                     emp_assert( false, css_str );
                     return *this;
                 }
             }
 
-            float h = color_impl::parseFloat(params[0]) / 360.0f;
+            float h = color_impl::parseFloat(color_tokens[0]) / 360.0f;
             float i;
             // Normalize the hue to [0..1]
             h = std::modf(h, &i);
 
             // NOTE(deanm): According to the CSS spec s/l should only be
             // percentages, but we don't bother and let float or percentage.
-            float s = color_impl::parse_css_float(params[1]);
-            float l = color_impl::parse_css_float(params[2]);
+            float s = color_impl::parse_css_float(color_tokens[1]);
+            float l = color_impl::parse_css_float(color_tokens[2]);
 
             float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
             float m1 = l * 2.0f - m2;
