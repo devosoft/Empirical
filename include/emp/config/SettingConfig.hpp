@@ -26,11 +26,11 @@
 
 namespace emp {
 
-/// Class to take a set of value for each "setting" and then step through all combinations of
-/// those values for a factorial analysis.
+  /// Class to take a set of value for each "setting" and then step through all combinations of
+  /// those values for a factorial analysis.
 
-class SettingConfig {
-    private:
+  class SettingConfig {
+  private:
     /// Base class to describe information about a single setting.
     struct SettingBase {
       std::string name;          ///< Name for this setting
@@ -40,22 +40,21 @@ class SettingConfig {
       std::string args_label;    ///< Label for option arguments (used in --help)
 
       SettingBase(const std::string & _name, const std::string & _desc,
-                    const char _flag, const std::string & _args_label)
-            : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
-            , args_label(_args_label) { }
+                  const char _flag, const std::string & _args_label)
+        : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
+        , args_label(_args_label) { }
       virtual ~SettingBase() { }
 
+      virtual size_t GetSize() const = 0;                    ///< How many values are available?
+      virtual std::string AsString() const = 0;              ///< All values, as a single string.
+      virtual std::string AsString(size_t) const = 0;        ///< A specified value as a string.
+      virtual bool FromString(const std::string_view &) = 0; ///< Convert string to set of settings.
+      virtual bool SetValueID(size_t) {return false; }       ///< Setup cur value in linked variable
+      virtual bool IsComboSetting() { return false; }        ///< Do we have a combo setting?
+      virtual size_t GetID() const { return (size_t) -1; }   ///< Combination ID for this setting.
       virtual emp::Ptr<SettingBase> Clone() const = 0;
 
-      virtual size_t GetSize() const = 0;                     ///< How many values are available?
-      virtual std::string AsString() const = 0;               ///< All values, as a single string.
-      virtual std::string AsString(size_t) const = 0;         ///< A specified value as a string.
-      virtual bool FromString(const std::string_view &) = 0;  ///< Convert string to set of settings.
-      virtual bool SetValueID(size_t) { return false; }       ///< Setup cur value in linked variable
-      virtual bool IsComboSetting() { return false; }         ///< Do we have a combo setting?
-      virtual size_t GetID() const { return (size_t)-1; }     ///< Combination ID for this setting.
-
-      bool IsOptionMatch(const std::string &test_option) const { return test_option == option; }
+      bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
       bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
     };
 
@@ -66,10 +65,10 @@ class SettingConfig {
       emp::Ptr<T> var_ptr = nullptr;
 
       SettingInfo(const std::string & _name,  ///< Unique name for this setting.
-                    const std::string & _desc,  ///< Description of this setting (for help)
-                    const char _flag,           ///< Single char flag for easy access (e.g., "-h")
-                    const std::string & _arg,   ///< Label for option argument (for help)
-                    emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
+                  const std::string & _desc,  ///< Description of this setting (for help)
+                  const char _flag,           ///< Single char flag for easy access (e.g., "-h")
+                  const std::string & _arg,   ///< Label for option argument (for help)
+                  emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
         : SettingBase(_name, _desc, _flag, _arg), var_ptr(_var) { }
 
         ~SettingInfo(){if(var_ptr){var_ptr.Delete();}}
@@ -143,48 +142,48 @@ class SettingConfig {
         }
 
         bool FromString(const std::string_view & input) override {
-            // Divide up inputs into comma-separated units.
-            auto slices = emp::slice(input, ',');
+          // Divide up inputs into comma-separated units.
+          auto slices = emp::slice(input, ',');
 
-            // Clear out the values to set, one at a time (in most cases, aleady clear)
-            values.resize(0);
+          // Clear out the values to set, one at a time (in most cases, aleady clear)
+          values.resize(0);
 
             // Process each slice into one or more values.
-            for (auto & cur_str : slices) {
-                // If we are working with an arithmetic type, check if this is a range.
-                if constexpr (std::is_arithmetic<T>::value) {
-                    auto r_slices = emp::slice(cur_str, ':');
-                    if (r_slices.size() > 3) return false; // Error!  Too many slices!!!
-                    T start = emp::from_string<T>( r_slices[0] );
-                    T end = emp::from_string<T>( r_slices.back() ); // Same as start if one value.
-                    T step = (r_slices.size() == 3) ? emp::from_string<T>( r_slices[1] ) : 1;
-                    while (start <= end) {
-                        values.push_back(start);
-                        start += step;
-                    }
-                }
-
-                // Otherwise do a direct conversion.
-                else {
-                    values.push_back( emp::from_string<T>(cur_str) );
+          for (auto & cur_str : slices) {
+            // If we are working with an arithmetic type, check if this is a range.
+            if constexpr (std::is_arithmetic<T>::value) {
+                auto r_slices = emp::slice(cur_str, ':');
+                if (r_slices.size() > 3) return false; // Error!  Too many slices!!!
+                T start = emp::from_string<T>( r_slices[0] );
+                T end = emp::from_string<T>( r_slices.back() ); // Same as start if one value.
+                T step = (r_slices.size() == 3) ? emp::from_string<T>( r_slices[1] ) : 1;
+                while (start <= end) {
+                  values.push_back(start);
+                  start += step;
                 }
             }
 
-            if (!var_ptr.IsNull() && values.size()) *var_ptr = values[0];
-            return values.size();  // Must result in at least one value.
-        }
+            // Otherwise do a direct conversion.
+            else {
+              values.push_back( emp::from_string<T>(cur_str) );
+            }
+          }
 
-        bool SetValueID(size_t id) override { if (var_ptr) *var_ptr = values[id]; return true; }
-        bool IsComboSetting() override { return true; }
-        size_t GetID() const override  { return id; }
+          if (!var_ptr.IsNull() && values.size()) *var_ptr = values[0];
+          return values.size();  // Must result in at least one value.
+      }
+
+      bool SetValueID(size_t id) override { if (var_ptr) *var_ptr = values[id]; return true; }
+      bool IsComboSetting() override { return true; }
+      size_t GetID() const override  { return id; }
     };
 
     /// A setting that is just a flag with an action function to run if it's called.
     struct ActionFlag {
-        std::string name;           ///< Name for this flag
-        std::string desc;           ///< Description of flag
-        char flag;                  ///< Command-line flag ('\0' for none)
-        std::function<void()> fun;  ///< Function to be called if flag is set.
+      std::string name;           ///< Name for this flag
+      std::string desc;           ///< Description of flag
+      char flag;                  ///< Command-line flag ('\0' for none)
+      std::function<void()> fun;  ///< Function to be called if flag is set.
     };
 
     std::string exe_name = "";
