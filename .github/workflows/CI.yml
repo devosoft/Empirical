@@ -29,15 +29,16 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libsfml-dev xvfb libc6-dbg gdb
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-      - run: export DISPLAY=":$$"
-      - run: rm -f "/tmp/.X$$-lock"
-      - run: Xvfb "${DISPLAY}" -auth /dev/null/ &
-      - run: export XVFB_PID=$!
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
       - run: ${CXX} --version
       - run: |
           source third-party/emsdk/emsdk_env.sh
+          export DISPLAY=":$$"
+          rm -f "/tmp/.X$$-lock"
+          Xvfb "${DISPLAY}" -auth /dev/null/ &
+          export XVFB_PID=$!
+          echo "DISPLAY: " ${DISPLAY}
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
