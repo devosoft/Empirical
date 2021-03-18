@@ -8,7 +8,7 @@ NATIVE_TEST_NAMES = ConfigPanel LoadingModal Card CommentBox Modal ToggleSwitch 
 
 # Flags to use regardless of compiler
 DISPLAY_ENV := ${DISPLAY}
-CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../include/ -I../../ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
+CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -g -I../../include/ -I../../ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -31,10 +31,18 @@ test-web-%: %.cpp
 
 test: $(addprefix test-native-, $(NATIVE_TEST_NAMES)) test-color_map
 
+<<<<<<< HEAD
 test-native-%: %.cpp 
 	$(CXX) $(CFLAGS_all) $< -lsfml-graphics -lsfml-window -lsfml-system -lstdc++fs -o $@.out
 	# execute test
 	./$@.out
+=======
+test-native-%: %.cpp
+	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
+	# execute test; on fail, run again and backtrace
+	./$@.out \
+		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
+>>>>>>> 7b3fbbeaee4aa4bafe023dfa34c31accceff3afc
 
 test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	g++ $(CFLAGS_all) color_map.cpp -o color_map.out
