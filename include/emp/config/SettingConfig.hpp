@@ -71,31 +71,31 @@ namespace emp {
                   emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
         : SettingBase(_name, _desc, _flag, _arg), var_ptr(_var) { }
 
-        ~SettingInfo(){if(var_ptr){var_ptr.Delete();}}
+      ~SettingInfo(){if(var_ptr){var_ptr.Delete();}}
 
-        emp::Ptr<SettingBase> Clone() const override {
-          emp::Ptr<T> new_var_ptr = nullptr;
-          if (var_ptr) {
-            new_var_ptr = NewPtr<T>(*var_ptr);
-          }
-          emp::Ptr<SettingInfo<T>> setting_info_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label, new_var_ptr);
-          setting_info_ptr->value = this->value;
-          return setting_info_ptr;
+      emp::Ptr<SettingBase> Clone() const override {
+        emp::Ptr<T> new_var_ptr = nullptr;
+        if (var_ptr) {
+          new_var_ptr = NewPtr<T>(*var_ptr);
         }
+        emp::Ptr<SettingInfo<T>> setting_info_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label, new_var_ptr);
+        setting_info_ptr->value = this->value;
+        return setting_info_ptr;
+      }
 
-        size_t GetSize() const override { return 1; }
-        std::string AsString() const override { return emp::to_string(value); }
-        std::string AsString(size_t id) const override {
-            emp_assert(id == 0);
-            return emp::to_string(value);
-        }
+      size_t GetSize() const override { return 1; }
+      std::string AsString() const override { return emp::to_string(value); }
+      std::string AsString(size_t id) const override {
+        emp_assert(id == 0);
+        return emp::to_string(value);
+      }
 
-        bool FromString(const std::string_view & input) override {
-            value = emp::from_string<T>(input);
-            // @CAO: Could do more tests to make sure whole string was used.
-            if (!var_ptr.IsNull()) *var_ptr = value;
-            return true;
-        }
+      bool FromString(const std::string_view & input) override {
+        value = emp::from_string<T>(input);
+        // @CAO: Could do more tests to make sure whole string was used.
+        if (!var_ptr.IsNull()) *var_ptr = value;
+        return true;
+      }
     };
 
     /// Allow a single setting to have multiple values specified that should be stepped through.
@@ -106,10 +106,10 @@ namespace emp {
       size_t id;                                   ///< Unique ID/position for this setting.
 
       ComboSettingInfo(const std::string & _name,  ///< Unique name for this setting.
-                        const std::string & _desc,  ///< Description of this setting (for help)
-                        const char _flag,           ///< Char flag for easy access (e.g., "-h")
-                        const std::string & _args,  ///< Label for option arguments (for help)
-                        emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
+                       const std::string & _desc,  ///< Description of this setting (for help)
+                       const char _flag,           ///< Char flag for easy access (e.g., "-h")
+                       const std::string & _args,  ///< Label for option arguments (for help)
+                       emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
         : SettingBase(_name, _desc, _flag, _args), var_ptr(_var) { }
 
         ~ComboSettingInfo(){if(var_ptr){var_ptr.Delete();}}
@@ -288,10 +288,10 @@ namespace emp {
 
     template <typename T>
     T & AddSetting(const std::string & name,
-                  const std::string & desc,
-                  const char option_flag,
-                  T & var,
-                  const std::string & args_label="Value")
+                   const std::string & desc,
+                   const char option_flag,
+                   T & var,
+                   const std::string & args_label="Value")
     {
       emp_assert(!emp::Has(setting_map, name));
       auto new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, args_label, &var);
@@ -318,8 +318,8 @@ namespace emp {
 
     template <typename T>
     emp::vector<T> & AddComboSetting(const std::string & name,
-                                    const std::string & desc="",
-                                    const char option_flag='\0') {
+                                     const std::string & desc="",
+                                     const char option_flag='\0') {
       emp_assert(!emp::Has(setting_map, name));
       auto new_ptr = emp::NewPtr<ComboSettingInfo<T>>(name, desc, option_flag, "Values...");
       new_ptr->id = combo_settings.size();
@@ -332,10 +332,10 @@ namespace emp {
     /// A setting can also be linked to a value that is kept up-to-date.
     template <typename T>
     emp::vector<T> & AddComboSetting(const std::string & name,
-                                    const std::string & desc,
-                                    const char option_flag,
-                                    T & var,
-                                    const std::string & args_label="Values...")
+                                     const std::string & desc,
+                                     const char option_flag,
+                                     T & var,
+                                     const std::string & args_label="Values...")
     {
       emp_assert(!emp::Has(setting_map, name));
       auto new_ptr = emp::NewPtr<ComboSettingInfo<T>>(name, desc, option_flag, args_label, &var);
@@ -429,7 +429,7 @@ namespace emp {
       std::string out_str;
       for (auto [name,ptr] : setting_map) {
         if (out_str.size()) out_str += separator;
-          out_str += ptr->name;
+        out_str += ptr->name;
       }
       return out_str;
     }
@@ -440,7 +440,7 @@ namespace emp {
       for (auto [name,ptr] : setting_map) {
         if (ptr) {
           if (out_str.size()) out_str += separator;
-            out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->GetID()]) : ptr->AsString();
+          out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->GetID()]) : ptr->AsString();
           }
         }
       return out_str;
@@ -451,7 +451,7 @@ namespace emp {
       std::string out_string;
       for (size_t i = 0; i < combo_settings.size(); i++) {
         if (i) out_string += separator;
-          out_string += combo_settings[i]->name;
+        out_string += combo_settings[i]->name;
       }
       return out_string;
     }
@@ -555,22 +555,22 @@ namespace emp {
         std::cout << " -" << ptr->flag << " [" << ptr->args_label << "]" << spacing << ": "
                   << ptr->desc << " (--" << name << ") ["
                   << ptr->AsString() << "]\n";
-        }
+      }
 
-        std::cout << "\nAction Options:\n";
-        for (auto [name, action] : action_map) {
-          if (name.size() == 2) continue;  // Skip flag entries.
-          std::cout << " -" << action.flag << " : "
-                    << action.desc << " (" << name << ")\n";
-        }
+      std::cout << "\nAction Options:\n";
+      for (auto [name, action] : action_map) {
+        if (name.size() == 2) continue;  // Skip flag entries.
+        std::cout << " -" << action.flag << " : "
+                  << action.desc << " (" << name << ")\n";
+      }
 
-        if constexpr (sizeof...(examples) > 0) {
-          std::cout << "\nExample: " << emp::to_string(examples...) << std::endl;
-        }
+      if constexpr (sizeof...(examples) > 0) {
+        std::cout << "\nExample: " << emp::to_string(examples...) << std::endl;
+      }
 
-        std::cout.flush();
+      std::cout.flush();
     }
-  }; 
+  };
 
 }
 
