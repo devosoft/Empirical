@@ -57,12 +57,12 @@ namespace web {
     operator sf::Color() const { return sf::Color( r, g, b, a * 255 ); }
     #endif
 
-    Color& ParseColor(const std::string str, const std::string& css_str);
-    bool DetectABC(const std::string str);
-    Color & ParseABC(const std::string str, const std::string& css_str);
-    Color & ParseRGB(const std::string str, const std::string& css_str, const std::string fname,
+    Color& ParseColor(const std::string& str, const std::string& css_str);
+    bool DetectABC(const std::string& str);
+    Color & ParseABC(const std::string& str, const std::string& css_str);
+    Color & ParseRGB(const std::string& str, const std::string& css_str, const std::string& fname,
         const std::vector<std::string> params, float alpha);
-    Color& ParseHSL(const std::string str, const std::string& css_str, const std::string fname,
+    Color& ParseHSL(const std::string& str, const std::string& css_str, const std::string& fname,
         const std::vector<std::string> params, float alpha);
   };
 
@@ -235,7 +235,7 @@ namespace web {
   }
   
   // Handle all color detection and parsing from the string
-  Color & Color::ParseColor(const std::string str, const std::string& css_str) {
+  Color & Color::ParseColor(const std::string& str, const std::string& css_str) {
       // #abc and #abc123 syntax.
     if (DetectABC(str))
         return ParseABC(str, css_str);
@@ -259,12 +259,12 @@ namespace web {
     return *this;
   }
 
-  bool Color::DetectABC(const std::string str) {
+  bool Color::DetectABC(const std::string& str) {
       if (str.length() && str.front() == '#')
           return true;
       return false;
   }
-  Color & Color::ParseABC(const std::string str, const std::string& css_str){
+  Color & Color::ParseABC(const std::string& str, const std::string& css_str){
       if (str.length() == 4) {
             int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xfff)) {
@@ -299,8 +299,8 @@ namespace web {
         return *this;
   }
   
-  Color & Color::ParseRGB(const std::string str, const std::string& css_str, const std::string fname,
-        const std::vector<std::string> params, float alpha){
+  Color & Color::ParseRGB(const std::string& str, const std::string& css_str, 
+    const std::string& fname, const std::vector<std::string> params, float alpha){
       if (fname == "rgba") {
                 if (params.size() != 4) {
                     emp_assert( false, css_str );
@@ -323,8 +323,8 @@ namespace web {
             return *this;
   }
 
-  Color& Color::ParseHSL(const std::string str, const std::string& css_str, const std::string fname,
-        const std::vector<std::string> params, float alpha){
+  Color& Color::ParseHSL(const std::string& str, const std::string& css_str, 
+    const std::string& fname, const std::vector<std::string> params, float alpha){
             if (fname == "hsla") {
                 if (params.size() != 4) {
                     emp_assert( false, css_str );
