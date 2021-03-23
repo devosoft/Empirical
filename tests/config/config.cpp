@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <optional>
+#include <fstream>
 
 #include "emp/base/assert.hpp"
 #include "emp/base/vector.hpp"
@@ -35,6 +36,25 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(config.RANDOM_SEED() == 123);
 
+    config.WriteCSV("assets/test_new.csv");    
+    std::ifstream fs1("assets/test.csv");
+    std::ifstream fs2("assets/test_new.csv");
+    std::string line1, line2;
+    while(getline(fs1, line1))
+    {
+        getline(fs2, line2);
+        REQUIRE(line1 == line2);
+    }
+
+    config.Write("assets/test_new.cfg");
+
+    fs1.open("assets/test.cfg");
+    fs2.open("assets/test_new.cfg");
+    while(getline(fs1, line1))
+    {
+        getline(fs2, line2);
+        REQUIRE(line1 == line2);
+    }
   }
 
 }

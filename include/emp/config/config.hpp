@@ -246,24 +246,6 @@ namespace emp {
 
         out << std::endl; // Skip a line after each group.
       }
-//
-void WriteCSV(std::ostream & out, std::string prefix = "") const {
-        const size_t entry_count = entry_set.size();
-
-        // Loop through values
-        for (size_t i = 0; i < entry_count; i++) {
-          out << entry_set[i]->GetName();
-          if (i < entry_count - 1) out << ",";
-        }
-        out << std::endl;
-        for (size_t i = 0; i < entry_count; i++) {
-          out << entry_set[i]->GetValue();
-          if (i < entry_count - 1) out << ",";
-        }      
-
-        out << std::endl; // Skip a line after each group
-      }
-
 
       void WriteMacros(std::ostream & out, bool as_const) const {
         // Print header information to register group.
@@ -522,8 +504,23 @@ void WriteCSV(std::ostream & out, std::string prefix = "") const {
 
       // Next print each group and its information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        (*it)->WriteCSV(out);
+        const size_t entry_count = (*it)->GetSize();
+
+        // Loop through values
+        for (size_t i = 0; i < entry_count; i++) {
+          out << (*it)->GetEntry(i)->GetName();
+          if (it != group_set.end()-1  || i < entry_count - 1) out << ",";
+        }
       }
+      out << std::endl;
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
+        const size_t entry_count = (*it)->GetSize();
+        for (size_t i = 0; i < entry_count; i++) {
+            out << (*it)->GetEntry(i)->GetValue();
+            if (it != group_set.end()-1  || i < entry_count - 1) out << ",";
+        }
+      }
+      out << std::endl;
     }
 
     // If a string is passed into Write, treat it as a filename.
