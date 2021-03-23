@@ -165,7 +165,7 @@ namespace emp {
       bool IsConst() const { return true; }
     };
 
-    /// Special settings entry for settings created during the run (only accissibly dynamically)
+    /// Special settings entry for settings created during the run (only accessible dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
       ConfigLiveEntry(const std::string& _name, const std::string& _type,
