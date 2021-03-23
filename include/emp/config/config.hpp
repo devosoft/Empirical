@@ -247,50 +247,21 @@ namespace emp {
         out << std::endl; // Skip a line after each group.
       }
 //
-void Write2(std::ostream & out) const {
-        std::string prefix = "Config_";
-        out << prefix << "name," << prefix << "description,";
-        out << std::endl;
-        // Print header information with the group name.
-        out << name << ",";
-        // Print group description.
-        auto desc_lines = slice(desc);
-        for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
-          out << prefix << desc_lines[comment_line] << ",";
-        }
-        out << std::endl;
-
+void WriteCSV(std::ostream & out, std::string prefix = "") const {
         const size_t entry_count = entry_set.size();
-        emp::vector<std::string> setting_info(entry_count);
-        size_t max_length = 0;
 
-        // Loop through once to figure out non-comment output
+        // Loop through values
         for (size_t i = 0; i < entry_count; i++) {
-          setting_info[i] = "set ";
-          setting_info[i] += entry_set[i]->GetName();
-          setting_info[i] += " ";
-          setting_info[i] += entry_set[i]->GetValue();
-          if (max_length < setting_info[i].size()) max_length = setting_info[i].size();
+          out << entry_set[i]->GetName();
+          if (i < entry_count - 1) out << ",";
         }
-
-        // Loop through a second time to actually do the printing with properly spaced comments.
-        max_length += 2;
+        out << std::endl;
         for (size_t i = 0; i < entry_count; i++) {
-          out << setting_info[i];
+          out << entry_set[i]->GetValue();
+          if (i < entry_count - 1) out << ",";
+        }      
 
-          // Break the description up over multiple lines.
-          auto desc_lines = emp::slice(entry_set[i]->GetDescription());
-
-          size_t start_col = setting_info[i].size();
-          for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
-            for (size_t ws = start_col; ws < max_length; ws++) out << ' ';
-            out << desc_lines[comment_line] << ",";
-            start_col = 0;
-          }
-        }
-
-        out << std::endl; // Skip a line after each group.
-        emp::DataFile file( out );
+        out << std::endl; // Skip a line after each group
       }
 
 
@@ -542,6 +513,23 @@ void Write2(std::ostream & out) const {
     void Write(std::string filename) const {
       std::ofstream out(filename);
       Write(out);
+      out.close();
+    }
+
+    // Generate a text representation (typically a file) for the state of Config
+    void WriteCSV(std::ostream & out) const {
+      // @CAO Start by printing some file header information?
+
+      // Next print each group and its information.
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
+        (*it)->WriteCSV(out);
+      }
+    }
+
+    // If a string is passed into Write, treat it as a filename.
+    void WriteCSV(std::string filename) const {
+      std::ofstream out(filename);
+      WriteCSV(out);
       out.close();
     }
 
