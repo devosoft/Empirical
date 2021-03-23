@@ -25,6 +25,7 @@
 #include "../base/vector.hpp"
 #include "../geometry/Circle2D.hpp"
 #include "../tools/string_utils.hpp"
+#include "color_logic_utils.hpp"
 
 namespace emp {
 namespace web {
@@ -58,12 +59,11 @@ namespace web {
     operator sf::Color() const { return sf::Color( r, g, b, a * 255 ); }
     #endif
 
-    Color& ParseColor(const std::string& str, const std::string& css_str);
-    bool DetectSyntaxABC(const std::string& str);
-    Color & ParseABC(const std::string& str, const std::string& css_str);
-    Color & ParseRGB(const std::string& str, const std::string& css_str, const std::string& fname,
+    static Color ParseColor(const std::string& str, const std::string& css_str);
+    static Color ParseABC(const std::string& str, const std::string& css_str);
+    static Color ParseRGB(const std::string& str, const std::string& css_str, const std::string& fname,
         const std::vector<std::string>& color_tokens, const float alpha);
-    Color& ParseHSL(const std::string& str, const std::string& css_str, const std::string& fname,
+    static Color ParseHSL(const std::string& str, const std::string& css_str, const std::string& fname,
         const std::vector<std::string>& color_tokens, const float alpha);
   };
 
@@ -314,14 +314,12 @@ namespace web {
         return;
     }
 
-    ParseColor(str, css_str);
-    
-    return;
+    *this = ParseColor(str, css_str);
 
   }
   
   // Handle all color detection and parsing from the string
-  Color & Color::ParseColor(const std::string& str, const std::string& css_str) {
+  Color Color::ParseColor(const std::string& str, const std::string& css_str) {
       // #abc and #abc123 syntax.
     if (DetectSyntaxABC(str)) {
         return ParseABC(str, css_str);
@@ -341,89 +339,82 @@ namespace web {
         } else if (fname == "hsla" || fname == "hsl") {
             return ParseHSL(str, css_str, fname, color_tokens, alpha);
         }
-        return *this;
     }
-
-    emp_assert( false, css_str );
-    return *this;
+    emp_always_assert( false, css_str );
+    __builtin_unreachable();
   }
 
-  bool Color::DetectSyntaxABC(const std::string& str) {
-      if (str.length() && str.front() == '#')
-          return true;
-      return false;
-  }
-  Color & Color::ParseABC(const std::string& str, const std::string& css_str){
+  Color Color::ParseABC(const std::string& str, const std::string& css_str){
       if (str.length() == 4) {
             const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xfff)) {
                 emp_assert( false, css_str );
-                return *this;
+                __builtin_unreachable();
             } else {
-                *this = {
+                Color* col = new Color(
                     static_cast<uint8_t>(((iv & 0xf00) >> 4) | ((iv & 0xf00) >> 8)),
                     static_cast<uint8_t>((iv & 0xf0) | ((iv & 0xf0) >> 4)),
                     static_cast<uint8_t>((iv & 0xf) | ((iv & 0xf) << 4)),
                     1
-                };
-                return *this;
+                );
+                return *col;
             }
         } else if (str.length() == 7) {
             const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xffffff)) {
               emp_assert( false, css_str );
-              return *this;  // Covers NaN.
+              __builtin_unreachable();
             } else {
-                *this = {
+                Color* col = new Color(
                     static_cast<uint8_t>((iv & 0xff0000) >> 16),
                     static_cast<uint8_t>((iv & 0xff00) >> 8),
                     static_cast<uint8_t>(iv & 0xff),
                     1
-                };
-                return *this;
+                );
+                return *col;
             }
         }
 
         emp_assert( false, css_str );
-        return *this;
+        __builtin_unreachable();
   }
   
-  Color & Color::ParseRGB(const std::string& str, const std::string& css_str, 
+  Color Color::ParseRGB(const std::string& str, const std::string& css_str, 
     const std::string& fname, const std::vector<std::string>& color_tokens, float alpha){
       if (fname == "rgba") {
             if (color_tokens.size() != 4) {
                 emp_assert( false, css_str );
-                return *this;
+                __builtin_unreachable();
             }
             alpha = color_impl::parse_css_float(color_tokens.back());
         } else {
             if (color_tokens.size() != 3) {
                 emp_assert( false, css_str );
-                return *this;
+                __builtin_unreachable();
             }
         }
 
-        *this = {
+        emp::web::Color* col = new emp::web::Color(
             color_impl::parse_css_int(color_tokens[0]),
             color_impl::parse_css_int(color_tokens[1]),
             color_impl::parse_css_int(color_tokens[2]),
             alpha
-        };
-        return *this;
+        );
+        return *col;
   }
 
-  Color& Color::ParseHSL(const std::string& str, const std::string& css_str, 
+  Color Color::ParseHSL(const std::string& str, const std::string& css_str, 
     const std::string& fname, const std::vector<std::string>& color_tokens, float alpha){
             if (fname == "hsla") {
                 if (color_tokens.size() != 4) {
                     emp_assert( false, css_str );
-                    return *this;
+                    __builtin_unreachable();
                 }
                 alpha = color_impl::parse_css_float(color_tokens.back());
             } else {
                 if (color_tokens.size() != 3) {
                     emp_assert( false, css_str );
-                    return *this;
+                    __builtin_unreachable();
                 }
             }
 
@@ -440,13 +431,13 @@ namespace web {
             float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
             float m1 = l * 2.0f - m2;
 
-            *this = {
+            Color* col = new Color(
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h + 1.0f / 3.0f) * 255.0f),
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h) * 255.0f),
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h - 1.0f / 3.0f) * 255.0f),
                 alpha
-            };
-            return *this;
+            );
+            return *col;
         }
 
 }
