@@ -31,18 +31,11 @@ test-web-%: %.cpp
 
 test: $(addprefix test-native-, $(NATIVE_TEST_NAMES)) test-color_map
 
-<<<<<<< HEAD
 test-native-%: %.cpp 
 	$(CXX) $(CFLAGS_all) $< -lsfml-graphics -lsfml-window -lsfml-system -lstdc++fs -o $@.out
-	# execute test
-	./$@.out
-=======
-test-native-%: %.cpp
-	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
 	# execute test; on fail, run again and backtrace
 	./$@.out \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
->>>>>>> 7b3fbbeaee4aa4bafe023dfa34c31accceff3afc
 
 test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	g++ $(CFLAGS_all) color_map.cpp -o color_map.out
