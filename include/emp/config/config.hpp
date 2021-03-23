@@ -48,6 +48,7 @@
 #include "../base/errors.hpp"
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
+#include "../data/DataFile.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
 #include "../data/DataFile.hpp"
@@ -492,39 +493,38 @@ namespace emp {
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void Write(std::string filename) const {
+    void Write(const std::string & filename) const {
       std::ofstream out(filename);
       Write(out);
       out.close();
     }
 
     // Generate a text representation (typically a file) for the state of Config
+    void WriteCSV(emp::DataFile& df) const {
+
+      for (const auto& group : group_set) {
+        for (size_t i{}; i < group->GetSize(); ++i) {
+          const auto& entry = group->GetEntry(i);
+          df.AddVal( entry->GetValue(), entry->GetName() );
+        }
+      }
+
+      df.PrintHeaderKeys();
+      df.Update();
+
+    }
+
+
+    // Generate a text representation (typically a file) for the state of Config
     void WriteCSV(std::ostream & out) const {
-      // @CAO Start by printing some file header information?
 
-      // Next print each group and its information.
-      for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        const size_t entry_count = (*it)->GetSize();
+      emp::DataFile df( out );
+      WriteCSV( df );
 
-        // Loop through values
-        for (size_t i = 0; i < entry_count; i++) {
-          out << (*it)->GetEntry(i)->GetName();
-          if (it != group_set.end()-1  || i < entry_count - 1) out << ",";
-        }
-      }
-      out << std::endl;
-      for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        const size_t entry_count = (*it)->GetSize();
-        for (size_t i = 0; i < entry_count; i++) {
-            out << (*it)->GetEntry(i)->GetValue();
-            if (it != group_set.end()-1  || i < entry_count - 1) out << ",";
-        }
-      }
-      out << std::endl;
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void WriteCSV(std::string filename) const {
+    void WriteCSV(const std::string & filename) const {
       std::ofstream out(filename);
       WriteCSV(out);
       out.close();
