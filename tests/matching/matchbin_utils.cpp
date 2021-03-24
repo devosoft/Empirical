@@ -43,403 +43,403 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     std::cout << "Checkpoint 2" << std::endl;
   }
 
-  // // test ApproxSingleStreakMetric
-  // {
-  //   std::cout << "Checkpoint 3" << std::endl;
-
-  //   emp::ApproxSingleStreakMetric<4> metric;
-
-  //   REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
-  //   REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
-  //   // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,1}) == 1.0 ); // in lieu
-  //   REQUIRE( metric({0,0,0,0},{1,1,1,1}) == 1.0 ); // in lieu
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
-  //   // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,1}) == 1.0 ); // in lieu
-  //   REQUIRE( metric({0,0,0,0},{1,1,1,0}) == 1.0 ); // in lieu
-  //   REQUIRE( metric({0,0,0,0},{0,0,1,1}) == metric({0,0,0,0},{0,0,1,0}) );
-
-  //   emp::Random rand(1);
-  //   for (size_t i = 0; i < 1000; ++i) {
-  //     emp::BitSet<4> a(rand);
-  //     emp::BitSet<4> b(rand);
-  //     REQUIRE(metric(a,b) <= 1.0);
-  //     REQUIRE(metric(a,b) >= 0.0);
-  //   }
-
-  //   std::cout << "Checkpoint 4" << std::endl;
-  // }
-
-  // // test ApproxDualStreakMetric
-  // emp::ExactDualStreakMetric<4> metric;
-
-  // REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
-  // REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
-  // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
-  // REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
-  // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
-  // REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
-
-  // emp::Random rand(1);
-  // for (size_t i = 0; i < 1000; ++i) {
-  //   emp::BitSet<4> a(rand);
-  //   emp::BitSet<4> b(rand);
-  //   REQUIRE(metric(a,b) <= 1.0);
-  //   REQUIRE(metric(a,b) >= 0.0);
-  // }
-
-
-  // // test ExactSingleStreakMetric
-  // {
-  //   std::cout << "Checkpoint 5" << std::endl;
-
-  //   emp::ExactSingleStreakMetric<4> metric;
-
-  //   REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
-  //   REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,1}) == metric({0,0,0,0},{1,1,1,0}) );
-  //   REQUIRE( metric({0,0,0,0},{0,0,1,1}) == metric({0,0,0,0},{0,0,1,0}) );
-
-  //   emp::Random rand(1);
-  //   for (size_t i = 0; i < 1000; ++i) {
-  //     emp::BitSet<4> a(rand);
-  //     emp::BitSet<4> b(rand);
-  //     REQUIRE(metric(a,b) <= 1.0);
-  //     REQUIRE(metric(a,b) >= 0.0);
-  //   }
-
-  //   std::cout << "Checkpoint 6" << std::endl;
-  // }
-
-  // // test ExactDualStreakMetric
-  // {
-
-  //   emp::ExactDualStreakMetric<4> metric;
-
-  //   REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
-  //   REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
-  //   REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
-  //   REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
-
-  //   emp::Random rand(1);
-  //   for (size_t i = 0; i < 1000; ++i) {
-  //     emp::BitSet<4> a(rand);
-  //     emp::BitSet<4> b(rand);
-  //     REQUIRE(metric(a,b) <= 1.0);
-  //     REQUIRE(metric(a,b) >= 0.0);
-  //   }
-
-  //   std::cout << "Checkpoint 7" << std::endl;
-  // }
-
-  // // test SieveSelector with auto adjust
-  // {
-  // emp::Random rand(1);
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::NextUpMetric<>,
-  //   emp::SieveSelector<>,
-  //   emp::AdditiveCountdownRegulator<>
-  // > bin(rand);
+  // test ApproxSingleStreakMetric
+  {
+    std::cout << "Checkpoint 3" << std::endl;
+
+    emp::ApproxSingleStreakMetric<4> metric;
+
+    REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+    // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{1,1,1,1}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+    // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{1,1,1,0}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{0,0,1,1}) == metric({0,0,0,0},{0,0,1,0}) );
+
+    emp::Random rand(1);
+    for (size_t i = 0; i < 1000; ++i) {
+      emp::BitSet<4> a(rand);
+      emp::BitSet<4> b(rand);
+      REQUIRE(metric(a,b) <= 1.0);
+      REQUIRE(metric(a,b) >= 0.0);
+    }
+
+    std::cout << "Checkpoint 4" << std::endl;
+  }
+
+  // test ApproxDualStreakMetric
+  emp::ExactDualStreakMetric<4> metric;
+
+  REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+  REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+  REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
+
+  emp::Random rand(1);
+  for (size_t i = 0; i < 1000; ++i) {
+    emp::BitSet<4> a(rand);
+    emp::BitSet<4> b(rand);
+    REQUIRE(metric(a,b) <= 1.0);
+    REQUIRE(metric(a,b) >= 0.0);
+  }
+
+
+  // test ExactSingleStreakMetric
+  {
+    std::cout << "Checkpoint 5" << std::endl;
+
+    emp::ExactSingleStreakMetric<4> metric;
+
+    REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) == metric({0,0,0,0},{1,1,1,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,1,1}) == metric({0,0,0,0},{0,0,1,0}) );
+
+    emp::Random rand(1);
+    for (size_t i = 0; i < 1000; ++i) {
+      emp::BitSet<4> a(rand);
+      emp::BitSet<4> b(rand);
+      REQUIRE(metric(a,b) <= 1.0);
+      REQUIRE(metric(a,b) >= 0.0);
+    }
+
+    std::cout << "Checkpoint 6" << std::endl;
+  }
+
+  // test ExactDualStreakMetric
+  {
+
+    emp::ExactDualStreakMetric<4> metric;
+
+    REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
+
+    emp::Random rand(1);
+    for (size_t i = 0; i < 1000; ++i) {
+      emp::BitSet<4> a(rand);
+      emp::BitSet<4> b(rand);
+      REQUIRE(metric(a,b) <= 1.0);
+      REQUIRE(metric(a,b) >= 0.0);
+    }
+
+    std::cout << "Checkpoint 7" << std::endl;
+  }
+
+  // test SieveSelector with auto adjust
+  {
+  emp::Random rand(1);
+  emp::MatchBin<
+    std::string,
+    emp::NextUpMetric<>,
+    emp::SieveSelector<>,
+    emp::AdditiveCountdownRegulator<>
+  > bin(rand);
 
-  // bin.Put("one", 1);
+  bin.Put("one", 1);
 
-  // bin.Put("two-two-seven", 227);
+  bin.Put("two-two-seven", 227);
 
-  // bin.Put("nine-two-eight", 928);
+  bin.Put("nine-two-eight", 928);
 
-  // bin.Put("fifteen", 15);
+  bin.Put("fifteen", 15);
 
-  // bin.Put("one-fifteen", 115);
+  bin.Put("one-fifteen", 115);
 
-  // std::cout << "Checkpoint 8" << std::endl;
+  std::cout << "Checkpoint 8" << std::endl;
 
-  // const size_t nrep = 1000;
+  const size_t nrep = 1000;
 
-  // std::unordered_map<std::string, size_t> res;
-  // for (size_t rep = 0; rep < nrep; ++rep) {
+  std::unordered_map<std::string, size_t> res;
+  for (size_t rep = 0; rep < nrep; ++rep) {
 
-  //   const auto matches = bin.GetVals(bin.Match(2));
-  //   REQUIRE(matches.size() >= 2);
+    const auto matches = bin.GetVals(bin.Match(2));
+    REQUIRE(matches.size() >= 2);
 
-  //   std::unordered_set<std::string> uniques;
+    std::unordered_set<std::string> uniques;
 
-  //   for (const auto & val : matches) {
-  //     ++res[val];
-  //     uniques.insert(val);
-  //   }
+    for (const auto & val : matches) {
+      ++res[val];
+      uniques.insert(val);
+    }
 
-  //   REQUIRE(uniques.size() == matches.size());
+    REQUIRE(uniques.size() == matches.size());
 
-  // }
+  }
 
-  // std::cout << "Checkpoint 9" << std::endl;
+  std::cout << "Checkpoint 9" << std::endl;
 
-  // REQUIRE(res["one"] == 0);
-  // REQUIRE(res["two-two-seven"] > 0);
-  // REQUIRE(res["two-two-seven"] < nrep);
-  // REQUIRE(res["nine-two-eight"] == 0);
-  // REQUIRE(res["one-fifteen"] == nrep);
-  // REQUIRE(res["fifteen"] == nrep);
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] > 0);
+  REQUIRE(res["two-two-seven"] < nrep);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
 
-  // bin.Put(emp::to_string(0), 0);
-  // for (size_t i = 0; i < 45; ++i) {
-  //   bin.Put(emp::to_string(i*10), i*10);
-  // }
+  bin.Put(emp::to_string(0), 0);
+  for (size_t i = 0; i < 45; ++i) {
+    bin.Put(emp::to_string(i*10), i*10);
+  }
 
-  // res.clear();
+  res.clear();
 
-  // for (size_t rep = 0; rep < nrep; ++rep) {
-  //   for (const auto & val : bin.GetVals(bin.Match(2))) {
-  //     ++res[val];
-  //   }
-  // }
+  for (size_t rep = 0; rep < nrep; ++rep) {
+    for (const auto & val : bin.GetVals(bin.Match(2))) {
+      ++res[val];
+    }
+  }
 
-  // REQUIRE(res["one"] == 0);
-  // REQUIRE(res["two-two-seven"] == 0);
-  // REQUIRE(res["nine-two-eight"] == 0);
-  // REQUIRE(res["one-fifteen"] > 0);
-  // REQUIRE(res["one-fifteen"] < nrep);
-  // REQUIRE(res["fifteen"] == nrep);
-  // }
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] == 0);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] > 0);
+  REQUIRE(res["one-fifteen"] < nrep);
+  REQUIRE(res["fifteen"] == nrep);
+  }
 
-  // std::cout << "Checkpoint 10" << std::endl;
+  std::cout << "Checkpoint 10" << std::endl;
 
-  // // test SieveSelector with no stochastic
-  // {
-  // emp::Random rand(1);
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::NextUpMetric<>,
-  //   emp::SieveSelector<std::ratio<0,1>>,
-  //   emp::AdditiveCountdownRegulator<>
-  // > bin(rand);
+  // test SieveSelector with no stochastic
+  {
+  emp::Random rand(1);
+  emp::MatchBin<
+    std::string,
+    emp::NextUpMetric<>,
+    emp::SieveSelector<std::ratio<0,1>>,
+    emp::AdditiveCountdownRegulator<>
+  > bin(rand);
 
-  // bin.Put("one", 1);
+  bin.Put("one", 1);
 
-  // bin.Put("two-two-seven", 227);
+  bin.Put("two-two-seven", 227);
 
-  // bin.Put("nine-two-eight", 928);
+  bin.Put("nine-two-eight", 928);
 
-  // bin.Put("fifteen", 15);
+  bin.Put("fifteen", 15);
 
-  // bin.Put("one-fifteen", 115);
+  bin.Put("one-fifteen", 115);
 
-  // const size_t nrep = 1000;
+  const size_t nrep = 1000;
 
-  // std::unordered_map<std::string, size_t> res;
-  // for (size_t rep = 0; rep < nrep; ++rep) {
+  std::unordered_map<std::string, size_t> res;
+  for (size_t rep = 0; rep < nrep; ++rep) {
 
-  //   const auto matches = bin.GetVals(bin.Match(2));
-  //   REQUIRE(matches.size() >= 2);
+    const auto matches = bin.GetVals(bin.Match(2));
+    REQUIRE(matches.size() >= 2);
 
-  //   std::unordered_set<std::string> uniques;
+    std::unordered_set<std::string> uniques;
 
-  //   for (const auto & val : matches) {
-  //     ++res[val];
-  //     uniques.insert(val);
-  //   }
+    for (const auto & val : matches) {
+      ++res[val];
+      uniques.insert(val);
+    }
 
-  //   REQUIRE(uniques.size() == matches.size());
+    REQUIRE(uniques.size() == matches.size());
 
-  // }
+  }
 
-  // REQUIRE(res["one"] == 0);
-  // REQUIRE(res["two-two-seven"] == 0);
-  // REQUIRE(res["nine-two-eight"] == 0);
-  // REQUIRE(res["one-fifteen"] == nrep);
-  // REQUIRE(res["fifteen"] == nrep);
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] == 0);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
 
-  // bin.Put(emp::to_string(0), 0);
-  // for (size_t i = 0; i < 45; ++i) {
-  //   bin.Put(emp::to_string(i*10), i*10);
-  // }
+  bin.Put(emp::to_string(0), 0);
+  for (size_t i = 0; i < 45; ++i) {
+    bin.Put(emp::to_string(i*10), i*10);
+  }
 
-  // std::cout << "Checkpoint 11" << std::endl;
+  std::cout << "Checkpoint 11" << std::endl;
 
 
-  // res.clear();
+  res.clear();
 
-  // for (size_t rep = 0; rep < nrep; ++rep) {
-  //   for (const auto & val : bin.GetVals(bin.Match(2))) {
-  //     ++res[val];
-  //   }
-  // }
+  for (size_t rep = 0; rep < nrep; ++rep) {
+    for (const auto & val : bin.GetVals(bin.Match(2))) {
+      ++res[val];
+    }
+  }
 
-  // REQUIRE(res["one"] == 0);
-  // REQUIRE(res["two-two-seven"] == 0);
-  // REQUIRE(res["nine-two-eight"] == 0);
-  // REQUIRE(res["one-fifteen"] == 0);
-  // REQUIRE(res["fifteen"] == nrep);
-  // }
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] == 0);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == 0);
+  REQUIRE(res["fifteen"] == nrep);
+  }
 
-  // // test SieveSelector with no auto adjust
-  // {
-  // emp::Random rand(1);
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::NextUpMetric<>,
-  //   emp::SieveSelector<
-  //     std::ratio<1, 10>,
-  //     std::ratio<1, 5>
-  //   >,
-  //   emp::AdditiveCountdownRegulator<>
-  // > bin(rand);
+  // test SieveSelector with no auto adjust
+  {
+  emp::Random rand(1);
+  emp::MatchBin<
+    std::string,
+    emp::NextUpMetric<>,
+    emp::SieveSelector<
+      std::ratio<1, 10>,
+      std::ratio<1, 5>
+    >,
+    emp::AdditiveCountdownRegulator<>
+  > bin(rand);
 
-  // bin.Put("one", 1);
+  bin.Put("one", 1);
 
-  // bin.Put("two-two-seven", 227);
+  bin.Put("two-two-seven", 227);
 
-  // bin.Put("nine-two-eight", 928);
+  bin.Put("nine-two-eight", 928);
 
-  // bin.Put("fifteen", 15);
+  bin.Put("fifteen", 15);
 
-  // bin.Put("one-fifteen", 115);
+  bin.Put("one-fifteen", 115);
 
-  // const size_t nrep = 1000;
+  const size_t nrep = 1000;
 
-  // std::cout << "Checkpoint 12" << std::endl;
+  std::cout << "Checkpoint 12" << std::endl;
 
-  // std::unordered_map<std::string, size_t> res;
-  // for (size_t rep = 0; rep < nrep; ++rep) {
+  std::unordered_map<std::string, size_t> res;
+  for (size_t rep = 0; rep < nrep; ++rep) {
 
-  //   const auto matches = bin.GetVals(bin.Match(2));
-  //   REQUIRE(matches.size() >= 2);
+    const auto matches = bin.GetVals(bin.Match(2));
+    REQUIRE(matches.size() >= 2);
 
-  //   std::unordered_set<std::string> uniques;
+    std::unordered_set<std::string> uniques;
 
-  //   for (const auto & val : matches) {
-  //     ++res[val];
-  //     uniques.insert(val);
-  //   }
+    for (const auto & val : matches) {
+      ++res[val];
+      uniques.insert(val);
+    }
 
-  //   REQUIRE(uniques.size() == matches.size());
+    REQUIRE(uniques.size() == matches.size());
 
-  // }
+  }
 
-  // REQUIRE(res["one"] == 0);
-  // REQUIRE(res["two-two-seven"] > 0);
-  // REQUIRE(res["two-two-seven"] < nrep);
-  // REQUIRE(res["nine-two-eight"] == 0);
-  // REQUIRE(res["one-fifteen"] == nrep);
-  // REQUIRE(res["fifteen"] == nrep);
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] > 0);
+  REQUIRE(res["two-two-seven"] < nrep);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
 
-  // bin.Put(emp::to_string(0), 0);
-  // for (size_t i = 0; i < 45; ++i) {
-  //   bin.Put(emp::to_string(i*10), i*10);
-  // }
+  bin.Put(emp::to_string(0), 0);
+  for (size_t i = 0; i < 45; ++i) {
+    bin.Put(emp::to_string(i*10), i*10);
+  }
 
-  // res.clear();
+  res.clear();
 
-  // for (size_t rep = 0; rep < nrep; ++rep) {
-  //   for (const auto & val : bin.GetVals(bin.Match(2))) {
-  //     ++res[val];
-  //   }
-  // }
+  for (size_t rep = 0; rep < nrep; ++rep) {
+    for (const auto & val : bin.GetVals(bin.Match(2))) {
+      ++res[val];
+    }
+  }
 
-  // REQUIRE(res["one"] == 0);
-  // REQUIRE(res["two-two-seven"] > 0);
-  // REQUIRE(res["two-two-seven"] < nrep);
-  // REQUIRE(res["nine-two-eight"] == 0);
-  // REQUIRE(res["one-fifteen"] == nrep);
-  // REQUIRE(res["fifteen"] == nrep);
-  // }
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] > 0);
+  REQUIRE(res["two-two-seven"] < nrep);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
+  }
 
-  // std::cout << "Checkpoint 13" << std::endl;
+  std::cout << "Checkpoint 13" << std::endl;
 
-  // // test PowMod, LogMod
-  // {
-  // emp::HammingMetric<4> baseline;
+  // test PowMod, LogMod
+  {
+  emp::HammingMetric<4> baseline;
 
-  // emp::PowMod<emp::HammingMetric<4>, std::ratio<3>> squish_pow;
-  // emp::PowMod<emp::HammingMetric<4>, std::ratio<1>> same_pow;
-  // emp::PowMod<emp::HammingMetric<4>, std::ratio<1,3>> stretch_pow;
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<3>> squish_pow;
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<1>> same_pow;
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<1,3>> stretch_pow;
 
-  // emp::LogMod<emp::HammingMetric<4>, std::ratio<1,3>> squish_log;
-  // emp::LogMod<emp::HammingMetric<4>, std::ratio<1>> same_log;
-  // emp::LogMod<emp::HammingMetric<4>, std::ratio<3>> stretch_log;
+  emp::LogMod<emp::HammingMetric<4>, std::ratio<1,3>> squish_log;
+  emp::LogMod<emp::HammingMetric<4>, std::ratio<1>> same_log;
+  emp::LogMod<emp::HammingMetric<4>, std::ratio<3>> stretch_log;
 
-  // REQUIRE( squish_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( squish_pow({0,0,0,0},{0,0,0,1}) > baseline({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( squish_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( squish_pow({0,0,0,0},{0,1,1,1}) < baseline({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( squish_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,0,0,1}) > baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,1,1,1}) < baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
 
-  // REQUIRE( same_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( same_pow({0,0,0,0},{0,0,0,1}) == baseline({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( same_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( same_pow({0,0,0,0},{0,1,1,1}) == baseline({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( same_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( same_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( same_pow({0,0,0,0},{0,0,0,1}) == baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( same_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( same_pow({0,0,0,0},{0,1,1,1}) == baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( same_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
 
-  // REQUIRE( stretch_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( stretch_pow({0,0,0,0},{0,0,0,1}) < baseline({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( stretch_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( stretch_pow({0,0,0,0},{0,1,1,1}) > baseline({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( stretch_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,0,0,1}) < baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,1,1,1}) > baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
 
-  // REQUIRE( squish_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( squish_log({0,0,0,0},{0,0,0,1}) > baseline({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( squish_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( squish_log({0,0,0,0},{0,1,1,1}) < baseline({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( squish_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( squish_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish_log({0,0,0,0},{0,0,0,1}) > baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish_log({0,0,0,0},{0,1,1,1}) < baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
 
-  // REQUIRE( same_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( same_log({0,0,0,0},{0,0,0,1}) == baseline({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( same_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( same_log({0,0,0,0},{0,1,1,1}) == baseline({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( same_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( same_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( same_log({0,0,0,0},{0,0,0,1}) == baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( same_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( same_log({0,0,0,0},{0,1,1,1}) == baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( same_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
 
-  // REQUIRE( stretch_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( stretch_log({0,0,0,0},{0,0,0,1}) < baseline({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( stretch_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( stretch_log({0,0,0,0},{0,1,1,1}) > baseline({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( stretch_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
-  // }
+  REQUIRE( stretch_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( stretch_log({0,0,0,0},{0,0,0,1}) < baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( stretch_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( stretch_log({0,0,0,0},{0,1,1,1}) > baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( stretch_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  }
 
-  // std::cout << "Checkpoint 14" << std::endl;
+  std::cout << "Checkpoint 14" << std::endl;
 
-  // // more tests for PowMod, LogMod
-  // {
+  // more tests for PowMod, LogMod
+  {
 
-  // emp::PowMod<emp::HashMetric<32>, std::ratio<5>> squish_pow;
-  // emp::PowMod<emp::HashMetric<32>, std::ratio<1>> same_pow;
-  // emp::PowMod<emp::HashMetric<32>, std::ratio<1,5>> stretch_pow;
+  emp::PowMod<emp::HashMetric<32>, std::ratio<5>> squish_pow;
+  emp::PowMod<emp::HashMetric<32>, std::ratio<1>> same_pow;
+  emp::PowMod<emp::HashMetric<32>, std::ratio<1,5>> stretch_pow;
 
-  // emp::LogMod<emp::HashMetric<32>, std::ratio<1,5>> squish_log;
-  // emp::LogMod<emp::HashMetric<32>, std::ratio<1>> same_log;
-  // emp::LogMod<emp::HashMetric<32>, std::ratio<5>> stretch_log;
+  emp::LogMod<emp::HashMetric<32>, std::ratio<1,5>> squish_log;
+  emp::LogMod<emp::HashMetric<32>, std::ratio<1>> same_log;
+  emp::LogMod<emp::HashMetric<32>, std::ratio<5>> stretch_log;
 
-  // emp::Random rand(1);
-  // for (size_t rep = 0; rep < 1000; ++rep) {
-  //   emp::BitSet<32> a(rand);
-  //   emp::BitSet<32> b(rand);
-  //   REQUIRE(squish_pow(a,b) >= 0.0);
-  //   REQUIRE(squish_pow(a,b) <= 1.0);
+  emp::Random rand(1);
+  for (size_t rep = 0; rep < 1000; ++rep) {
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
+    REQUIRE(squish_pow(a,b) >= 0.0);
+    REQUIRE(squish_pow(a,b) <= 1.0);
 
-  //   REQUIRE(same_pow(a,b) >= 0.0);
-  //   REQUIRE(same_pow(a,b) <= 1.0);
+    REQUIRE(same_pow(a,b) >= 0.0);
+    REQUIRE(same_pow(a,b) <= 1.0);
 
-  //   REQUIRE(stretch_pow(a,b) >= 0.0);
-  //   REQUIRE(stretch_pow(a,b) <= 1.0);
+    REQUIRE(stretch_pow(a,b) >= 0.0);
+    REQUIRE(stretch_pow(a,b) <= 1.0);
 
-  //   REQUIRE(squish_log(a,b) >= 0.0);
-  //   REQUIRE(squish_log(a,b) <= 1.0);
+    REQUIRE(squish_log(a,b) >= 0.0);
+    REQUIRE(squish_log(a,b) <= 1.0);
 
-  //   REQUIRE(same_log(a,b) >= 0.0);
-  //   REQUIRE(same_log(a,b) <= 1.0);
+    REQUIRE(same_log(a,b) >= 0.0);
+    REQUIRE(same_log(a,b) <= 1.0);
 
-  //   REQUIRE(stretch_log(a,b) >= 0.0);
-  //   REQUIRE(stretch_log(a,b) <= 1.0);
-  // }
+    REQUIRE(stretch_log(a,b) >= 0.0);
+    REQUIRE(stretch_log(a,b) <= 1.0);
+  }
 
-  // }
+  }
 
-  // std::cout << "Checkpoint 15" << std::endl;
+  std::cout << "Checkpoint 15" << std::endl;
 
   // // test CacheMod
   // // test PowMod, LogMod
