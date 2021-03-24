@@ -30,7 +30,7 @@ int main()
             << " id4 = " << id4
             << " id5 = " << id5
             << " id6 = " << id6
-            << std::endl;
+            << '\n';
 
   dmap.Get<std::string>("name") = "FirstOrg";
   dmap.Get<std::string>(id4) = "Org TWO!";
@@ -38,24 +38,24 @@ int main()
   dmap.Get<double>("fitness") = 1000000.1;
   dmap.Get<emp::BitVector>(id6).Set(3).Set(10).Set(22);
 
-  std::cout << "fitness = " << dmap.Get<double>("fitness") << std::endl;
-  std::cout << "do_muts = " << dmap.Get<bool>("do_muts") << std::endl;
+  std::cout << "fitness = " << dmap.Get<double>("fitness") << '\n';
+  std::cout << "do_muts = " << dmap.Get<bool>("do_muts") << '\n';
 
-  std::cout << "Name 1 = " << dmap.Get<std::string>("name") << std::endl;
-  std::cout << "Name 2 = " << dmap.Get<std::string>("name2") << std::endl;
-  std::cout << "Name 3 = " << dmap.Get<std::string>("name3") << std::endl;
-  std::cout << "Name 3 = " << dmap.Get<std::string>(id5) << std::endl;
-  std::cout << "Name 3 = " << dmap.Get<std::string>( dmap.GetID("name3") ) << std::endl;
+  std::cout << "Name 1 = " << dmap.Get<std::string>("name") << '\n';
+  std::cout << "Name 2 = " << dmap.Get<std::string>("name2") << '\n';
+  std::cout << "Name 3 = " << dmap.Get<std::string>("name3") << '\n';
+  std::cout << "Name 3 = " << dmap.Get<std::string>(id5) << '\n';
+  std::cout << "Name 3 = " << dmap.Get<std::string>( dmap.GetID("name3") ) << '\n';
 
-  std::cout << "bit_vector = " << dmap.Get<emp::BitVector>("bit_vector") << std::endl;
+  std::cout << "bit_vector = " << dmap.Get<emp::BitVector>("bit_vector") << '\n';
 
   std::cout << "\nTypes:\n";
-  std::cout << "fitness:    " << dmap.GetType("fitness") << std::endl;
-  std::cout << "do_muts:    " << dmap.GetType("do_muts") << std::endl;
-  std::cout << "name:       " << dmap.GetType("name") << std::endl;
-  std::cout << "name2:      " << dmap.GetType("name2") << std::endl;
-  std::cout << "name3:      " << dmap.GetType("name3") << std::endl;
-  std::cout << "bit_vector: " << dmap.GetType("bit_vector") << std::endl;
+  std::cout << "fitness:    " << dmap.GetType("fitness") << '\n';
+  std::cout << "do_muts:    " << dmap.GetType("do_muts") << '\n';
+  std::cout << "name:       " << dmap.GetType("name") << '\n';
+  std::cout << "name2:      " << dmap.GetType("name2") << '\n';
+  std::cout << "name3:      " << dmap.GetType("name3") << '\n';
+  std::cout << "bit_vector: " << dmap.GetType("bit_vector") << '\n';
 
 
   // -------------- Examples of MULTIPLE DataMaps --------------
@@ -63,7 +63,7 @@ int main()
   emp::DataMap data_map;
 
   std::cout << "\nAt start:\n  data_map.GetSize() == " << data_map.GetSize()
-            << std::endl;
+            << '\n';
 
   // Add some values...
 
@@ -80,7 +80,7 @@ int main()
             << "\n  (C) data_map : " << data_map.Get<std::string>(idC)
             << "\n  (D) data_map : " << data_map.Get<std::string>(idD)
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>(idE)
-            << std::endl;
+            << '\n';
 
   std::cout << "\nAnd calling by NAME rather than ID:"
             << "\n  data_map.GetSize() == " << data_map.GetSize()
@@ -89,7 +89,7 @@ int main()
             << "\n  (C) data_map : " << data_map.Get<std::string>("short_string")
             << "\n  (D) data_map : " << data_map.Get<std::string>("long_string")
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>("bits!")
-            << std::endl;
+            << '\n';
 
   emp::DataMap data_map2(data_map);
 
@@ -106,7 +106,7 @@ int main()
             << "\n      data_map2: " << data_map2.Get<std::string>(idD)
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>(idE)
             << "\n      data_map2: " << data_map2.Get<emp::BitVector>(idE)
-            << std::endl;
+            << '\n';
 
   data_map.Set<int>("test_int", 20);
   data_map.Set<double>(idB, 222.222);
@@ -125,7 +125,7 @@ int main()
             << "\n      data_map2: " << data_map2.Get<std::string>(idD)
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>(idE)
             << "\n      data_map2: " << data_map2.Get<emp::BitVector>(idE)
-            << std::endl;
+            << '\n';
 
   data_map2.Get<std::string>(idC)[6] = '2';
 
@@ -142,7 +142,7 @@ int main()
             << "\n      data_map2: " << data_map2.Get<std::string>(idD)
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>(idE)
             << "\n      data_map2: " << data_map2.Get<emp::BitVector>(idE)
-            << std::endl;
+            << '\n';
 
 
   emp::DataMap data_map3(data_map);
@@ -166,7 +166,7 @@ int main()
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>(idE)
             << "\n      data_map2: " << data_map2.Get<emp::BitVector>(idE)
             << "\n      data_map3: " << data_map3.Get<emp::BitVector>(idE)
-            << std::endl;
+            << '\n';
 
   data_map2.Get<std::string>(idD)[6] = '2';
 
@@ -189,6 +189,6 @@ int main()
             << "\n  (E) data_map : " << data_map.Get<emp::BitVector>(idE)
             << "\n      data_map2: " << data_map2.Get<emp::BitVector>(idE)
             << "\n      data_map3: " << data_map3.Get<emp::BitVector>(idE)
-            << std::endl;
+            << '\n';
 
 }

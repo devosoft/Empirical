@@ -16,13 +16,13 @@ void print(
   const std::string& name,
   const Attrs<PopulationSizeValue<int>, DefaultGenomeValue<std::string>,
               GenerationLengthValue<int>>& args) {
-  std::cout << name << " = " << args << std::endl;
+  std::cout << name << " = " << args << '\n';
 }
 
 void printSubset(const std::string& name,
                  const Attrs<typename PopulationSize::value_t<int>,
                              typename GenerationLength::value_t<int>>& args) {
-  std::cout << name << " = " << args << std::endl;
+  std::cout << name << " = " << args << '\n';
 }
 
 int main() {
@@ -56,11 +56,11 @@ int main() {
 
   //
   // Example of compile time-unfolded runtime reflection:
-  std::cout << "Updating the whole USER settings:" << std::endl;
+  std::cout << "Updating the whole USER settings:" << '\n';
   user.Foreach([](auto& name, auto& value) {
     std::cout << "set " << name << " (" << value << "): ";
     std::cin >> value;
   });
 
-  std::cout << "New user settings: " << user << std::endl;
+  std::cout << "New user settings: " << user << '\n';
 }

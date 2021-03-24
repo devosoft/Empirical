@@ -59,7 +59,7 @@ int main()
   }
 
 
-  std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+  std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << '\n';
 
 
 
@@ -91,10 +91,10 @@ int main()
   grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
   RouletteSelect(grid_world, 500);
 
-  std::cout << std::endl;
+  std::cout << '\n';
   grid_world.PrintGrid();
   std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
-  //   std::cout << std::endl;
+  //   std::cout << '\n';
 
 }

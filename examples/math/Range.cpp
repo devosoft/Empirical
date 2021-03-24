@@ -13,15 +13,15 @@
 int main()
 {
   auto range = emp::MakeRange(20,30);
-  std::cout << "Lower = " << range.GetLower() << std::endl;
-  std::cout << "Upper = " << range.GetUpper() << std::endl;
+  std::cout << "Lower = " << range.GetLower() << '\n';
+  std::cout << "Upper = " << range.GetUpper() << '\n';
 
   for (int i = 10; i < 40; i += 5) {
-    std::cout << "Value " << i << " valid = " << range.Valid(i) << std::endl;
+    std::cout << "Value " << i << " valid = " << range.Valid(i) << '\n';
   }
 
   for (size_t s = 4; s <= 8; s++) {
     auto spread = range.Spread(s);
-    std::cout << "Spread(" << s << ") = " << emp::to_string(spread) << std::endl;
+    std::cout << "Spread(" << s << ") = " << emp::to_string(spread) << '\n';
   }
 }

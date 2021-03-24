@@ -106,12 +106,12 @@ struct NKWorld : public emp::World<BitOrg> {
   }
 
   void Run() {
-    std::cout << 0 << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
+    std::cout << 0 << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << '\n';
 
     // Loop through updates
     for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
       RunStep();
-      std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
+      std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << '\n';
     }
   }
 };

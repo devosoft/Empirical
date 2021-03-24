@@ -11,7 +11,7 @@
 
 int main()
 {
-  std::cout << "Ping!" << std::endl;
+  std::cout << "Ping!" << '\n';
 
   emp::NFA nfa(10);
   nfa.AddTransition(0, 1, 'a');

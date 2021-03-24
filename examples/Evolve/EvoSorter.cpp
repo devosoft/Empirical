@@ -31,7 +31,7 @@ void PrintOrg(size_t update, const SorterOrg & org)
   std::cout << (update+1) << " : " << org.AsString()
             << " : SolveCount=" << org.CountSortable()
             << "  Size=" << org.GetSize()
-            << std::endl;
+            << '\n';
 }
 
 int main(int argc, char* argv[])
@@ -129,13 +129,13 @@ int main(int argc, char* argv[])
     emp::LexicaseSelect<emp::BitSorter>(pop, fit_set, POP_SIZE-1);
 
     pop.Update();
-    // std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
+    // std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << '\n';
     PrintOrg(ud+1, pop[0]);
   }
 
   // pop.PrintLineage(0);
 
-  std::cout << MAX_GENS << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
+  std::cout << MAX_GENS << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << '\n';
 
   // pop.GetSignalControl().PrintNames();
 }

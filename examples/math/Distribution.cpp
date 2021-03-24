@@ -19,14 +19,14 @@ int main()
   for (size_t i = 0; i < 20; i++) {
     std::cout << "bi1000[" << i << "] = " << bi1000[i] << "\n";
   }
-  std::cout << "Total = " << bi1000.GetTotalProb() << std::endl;
+  std::cout << "Total = " << bi1000.GetTotalProb() << '\n';
 
   // Pick some random values...
   std::cout << "\nSome random values:";
   for (size_t i = 0; i < 100; i++) {
     std::cout << " " << bi1000.PickRandom(random);
   }
-  std::cout << std::endl;
+  std::cout << '\n';
 
   // And total some more random picks (to take a bit of time).
   size_t total = 0;
@@ -38,7 +38,7 @@ int main()
 
   std::cout << "Average of " << test_count << " = "
 	    << (((double) total) / (double) test_count)
-	    << std::endl;
+	    << '\n';
 
 
   //emp::NegativeBinomial nbi10(0.5, 2);
@@ -46,8 +46,8 @@ int main()
 
   std::cout << "\n-- Negative Binomial--\n";
 
-  std::cout << "size = " << nbi10.GetSize() << std::endl
-	    << "total_prob = " << nbi10.GetTotalProb() << std::endl;
+  std::cout << "size = " << nbi10.GetSize() << '\n'
+	    << "total_prob = " << nbi10.GetTotalProb() << '\n';
 
   // for (size_t i = 0; i < 10; i++) {
   for (size_t i = 9; i < 40; i++) {

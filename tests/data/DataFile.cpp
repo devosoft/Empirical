@@ -77,7 +77,7 @@ int test_fun() {
 //         data_cubes.Add(i*i*i);
 //         dfile.Update();
 
-//         // std::cout << i << std::endl;
+//         // std::cout << i << '\n';
 //     }
 
 //     dfile.SetupLine("[[",":", "]]\n");
@@ -87,7 +87,7 @@ int test_fun() {
 //         data_cubes.Add(i*i*i);
 //         dfile.Update();
 
-//         // std::cout << i << std::endl;
+//         // std::cout << i << '\n';
 //     }
 
 //     REQUIRE(compareFiles("new_test_file.dat", "test_file.dat"));
@@ -170,7 +170,7 @@ TEST_CASE("Test Container DataFile", "[data]") {
 //         data_cubes.Add(i*i*i);
 //         dfile.Update(i);
 
-//         // std::cout << i << std::endl;
+//         // std::cout << i << '\n';
 //     }
 
 //     dfile.SetTimingOnce(5);
@@ -181,7 +181,7 @@ TEST_CASE("Test Container DataFile", "[data]") {
 //         data_squares.Add((int)(i*i));
 //         data_cubes.Add(i*i*i);
 //         dfile.Update(i);
-//         // std::cout << i << std::endl;
+//         // std::cout << i << '\n';
 //     }
 
 //     dfile.SetTimingRange(2, 3, 9);
@@ -193,7 +193,7 @@ TEST_CASE("Test Container DataFile", "[data]") {
 //         data_cubes.Add(i*i*i);
 //         dfile.Update(i);
 
-//         // std::cout << i << std::endl;
+//         // std::cout << i << '\n';
 //     }
 
 //     dfile.SetTiming([](size_t ud){return (bool)floor(sqrt((double)ud) == ceil(sqrt((double)ud)));});
@@ -205,7 +205,7 @@ TEST_CASE("Test Container DataFile", "[data]") {
 //         data_cubes.Add(i*i*i);
 //         dfile.Update(i);
 
-//         // std::cout << i << std::endl;
+//         // std::cout << i << '\n';
 //     }
 
 //     REQUIRE(compareFiles("new_test_timing_file.dat", "test_timing_file.dat"));

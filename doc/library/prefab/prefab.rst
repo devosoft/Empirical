@@ -71,7 +71,7 @@ Example:
   std::string code_str =
     R"(
       int num = 9;
-      std::cout << num << " is a square number" << std::endl;
+      std::cout << num << " is a square number" << '\n';
     )";
   emp::prefab::CodeBlock code_block(code_str, "c++");
 

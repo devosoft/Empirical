@@ -28,8 +28,8 @@
     std::clock_t emp_tot_time = std::clock() - emp_start_time;               \
     std::cout << "Time: "                                                    \
               << 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC  \
-              << " ms" << std::endl;                                         \
-    std::cout << "Result: " << emp_result << std::endl;                      \
+              << " ms" << '\n';                                         \
+    std::cout << "Result: " << emp_result << '\n';                      \
   }
 
 /// A simple macro to time how long it takes for a function to complete.
@@ -39,7 +39,7 @@
     std::clock_t emp_tot_time = std::clock() - emp_start_time;               \
     std::cout << "Time: "                                                    \
               << 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC  \
-              << " ms" << std::endl;                                         \
+              << " ms" << '\n';                                         \
   }
 
 namespace emp {

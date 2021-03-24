@@ -1202,7 +1202,7 @@ namespace emp {
 
     // neighbors are in 27-sized neighborhood.
     fun_get_neighbor = [this](WorldPosition pos) {
-      std::cout << pos.GetIndex() << " " << pos.GetPopID() << std::endl;
+      std::cout << pos.GetIndex() << " " << pos.GetPopID() << '\n';
       emp_assert(random_ptr);
       emp_assert(pop_sizes.size() == 3);
 
@@ -1285,7 +1285,7 @@ namespace emp {
         }
 
         int p = random_ptr->GetInt(options.CountOnes());
-        std::cout << p << std::endl;
+        std::cout << p << '\n';
         while(p-- >= 0) {
           rand_pos = options.PopBit();
         }
@@ -1688,7 +1688,7 @@ namespace emp {
     for (auto x : org_counts) {
       ORG cur_org = x.first;
       fun_print_org(cur_org, os);
-      os << " : " << x.second << std::endl;
+      os << " : " << x.second << '\n';
     }
   }
 
@@ -1705,7 +1705,7 @@ namespace emp {
         else os << empty;
         os << spacer;
       }
-      os << std::endl;
+      os << '\n';
     }
   }
 

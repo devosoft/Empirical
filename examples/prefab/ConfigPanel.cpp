@@ -30,11 +30,11 @@ int main()
   if (am.HasUnused()) std::exit(EXIT_FAILURE);
 
   // log configuraiton settings
-  std::cout << "==============================" << std::endl;
-  std::cout << "|    How am I configured?    |" << std::endl;
-  std::cout << "==============================" << std::endl;
+  std::cout << "==============================" << '\n';
+  std::cout << "|    How am I configured?    |" << '\n';
+  std::cout << "==============================" << '\n';
   cfg.Write(std::cout);
-  std::cout << "==============================\n" << std::endl;
+  std::cout << "==============================\n" << '\n';
 
   // setup configuration panel
   config_panel.Setup();

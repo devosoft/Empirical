@@ -37,23 +37,23 @@ int Compute() {
 
 int main()
 {
-  std::cout << "Testing.  " << std::endl;
+  std::cout << "Testing.  " << '\n';
 
   emp::memo_function<double(int)> test_fun(F);
 
   for (int i = 0; i < 200; i++) {
     std::cout << i%100 << ":" << test_fun(i%100+10000000) << " ";
-    if (i%8 == 7) std::cout << std::endl;
+    if (i%8 == 7) std::cout << '\n';
   }
 
   // Change the test function; make sure we get a new set of results!
   // test_fun = std::function<double(int)>(G);
   test_fun = G;
 
-  std::cout << std::endl; // Skip a line...
+  std::cout << '\n'; // Skip a line...
   for (int i = 0; i < 200; i++) {
     std::cout << i%100 << ":" << test_fun(i%100+10000000) << " ";
-    if (i%8 == 7) std::cout << std::endl;
+    if (i%8 == 7) std::cout << '\n';
   }
 
   // Build a recursive memo_function...
@@ -62,30 +62,30 @@ int main()
     return test_fun(N-1) + test_fun(N-2);
   };
 
-  std::cout << std::endl; // Skip a line...
+  std::cout << '\n'; // Skip a line...
   for (int i = 80; i < 90; i++) {
     std::cout << i << ":" << test_fun(i) << " ";
-    if (i%8 == 7) std::cout << std::endl;
+    if (i%8 == 7) std::cout << '\n';
   }
 
   emp::memo_function<int(int,int)> test_fun2(Mult2);
   emp::Random random;
 
-  std::cout << std::endl; // Skip a line...
-  std::cout << std::endl << "Multi-argument functions!";
+  std::cout << '\n'; // Skip a line...
+  std::cout << '\n' << "Multi-argument functions!";
   for (int i = 0; i < 1000; i++) {
-    if (i % 20 == 0) std::cout << std::endl;
+    if (i % 20 == 0) std::cout << '\n';
     int x = random.GetInt(30);
     int y = random.GetInt(30);
     std::cout << test_fun2(x,y) << " ";
   }
-  std::cout << std::endl;
+  std::cout << '\n';
 
   emp::memo_function<double()> no_arg_fun(Compute);
 
-  std::cout << no_arg_fun() << "  Long..." << std::endl;
-  std::cout << no_arg_fun() << "  Quick!" << std::endl;
-  std::cout << no_arg_fun() << "  Quick!" << std::endl;
+  std::cout << no_arg_fun() << "  Long..." << '\n';
+  std::cout << no_arg_fun() << "  Quick!" << '\n';
+  std::cout << no_arg_fun() << "  Quick!" << '\n';
   no_arg_fun = Compute;
-  std::cout << no_arg_fun() << "  Long..." << std::endl;
+  std::cout << no_arg_fun() << "  Long..." << '\n';
 }
