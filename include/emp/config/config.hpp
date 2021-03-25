@@ -48,6 +48,7 @@
 #include "../base/errors.hpp"
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
+#include "../data/DataFile.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
 #include "../data/DataFile.hpp"
@@ -158,14 +159,14 @@ namespace emp {
         if (in_val != GetValue()) {
           warnings << "Trying to adjust locked setting '"
                    << name << "' from '" << GetValue()
-                   << "' to '" << in_val << "'. Ignoring." << std::endl;
+                   << "' to '" << in_val << "'. Ignoring." << '\n';
         }
         return *this;
       }
       bool IsConst() const { return true; }
     };
 
-    /// Special settings entry for settings created during the run (only accissibly dynamically)
+    /// Special settings entry for settings created during the run (only accessible dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
       ConfigLiveEntry(const std::string& _name, const std::string& _type,
@@ -207,13 +208,13 @@ namespace emp {
 
       void Write(std::ostream & out) const {
         // Print header information with the group name.
-        out << "### " << name << " ###" << std::endl;
+        out << "### " << name << " ###" << '\n';
         // Print group description.
         auto desc_lines = slice(desc);
         for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
-          out << "# " << desc_lines[comment_line] << std::endl;
+          out << "# " << desc_lines[comment_line] << '\n';
         }
-        out << std::endl;
+        out << '\n';
 
         const size_t entry_count = entry_set.size();
         emp::vector<std::string> setting_info(entry_count);
@@ -239,12 +240,12 @@ namespace emp {
           size_t start_col = setting_info[i].size();
           for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
             for (size_t ws = start_col; ws < max_length; ws++) out << ' ';
-            out << "# " << desc_lines[comment_line] << std::endl;
+            out << "# " << desc_lines[comment_line] << '\n';
             start_col = 0;
           }
         }
 
-        out << std::endl; // Skip a line after each group.
+        out << '\n'; // Skip a line after each group.
       }
 
       void WriteMacros(std::ostream & out, bool as_const) const {
@@ -269,7 +270,7 @@ namespace emp {
           }
         }
 
-        out << std::endl; // Skip a line after each group.
+        out << '\n'; // Skip a line after each group.
       }
     };
 
@@ -343,7 +344,7 @@ namespace emp {
             pos += new_val.size();                                // Skip new text.
           } else {
             std::stringstream ss;
-            ss << "Unable to process config setting '$" << var_name << "'. Ignoring." << std::endl;
+            ss << "Unable to process config setting '$" << var_name << "'. Ignoring." << '\n';
             emp::NotifyError(ss.str());
           }
           // @CAO CONTINUE
@@ -429,7 +430,7 @@ namespace emp {
                   const std::string & in_desc="") {
       if (!ResolveAlias(setting_name)) {
         // This setting is not currently in the map!  We should put it in, but let user know.
-        warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
+        warnings << "Unknown setting '" << setting_name << "'.  Creating." << '\n';
         var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
         GetActiveGroup()->Add(var_map[setting_name]);
       }
@@ -492,39 +493,38 @@ namespace emp {
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void Write(std::string filename) const {
+    void Write(const std::string & filename) const {
       std::ofstream out(filename);
       Write(out);
       out.close();
     }
 
     // Generate a text representation (typically a file) for the state of Config
+    void WriteCSV(emp::DataFile& df) const {
+
+      for (const auto& group : group_set) {
+        for (size_t i{}; i < group->GetSize(); ++i) {
+          const auto& entry = group->GetEntry(i);
+          df.AddVal( entry->GetValue(), entry->GetName() );
+        }
+      }
+
+      df.PrintHeaderKeys();
+      df.Update();
+
+    }
+
+
+    // Generate a text representation (typically a file) for the state of Config
     void WriteCSV(std::ostream & out) const {
-      // @CAO Start by printing some file header information?
 
-      // Next print each group and its information.
-      for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        const size_t entry_count = (*it)->GetSize();
+      emp::DataFile df( out );
+      WriteCSV( df );
 
-        // Loop through values
-        for (size_t i = 0; i < entry_count; i++) {
-          out << (*it)->GetEntry(i)->GetName();
-          if (it != group_set.end()-1  || i < entry_count - 1) out << ",";
-        }
-      }
-      out << std::endl;
-      for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        const size_t entry_count = (*it)->GetSize();
-        for (size_t i = 0; i < entry_count; i++) {
-            out << (*it)->GetEntry(i)->GetValue();
-            if (it != group_set.end()-1  || i < entry_count - 1) out << ",";
-        }
-      }
-      out << std::endl;
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void WriteCSV(std::string filename) const {
+    void WriteCSV(const std::string & filename) const {
       std::ofstream out(filename);
       WriteCSV(out);
       out.close();
@@ -559,14 +559,14 @@ namespace emp {
           << "//   maintain backward compatibility if names change in newer software versions.\n"
           << "\n"
           << "EMP_BUILD_CONFIG(" << class_names.back() << ","
-          << std::endl;
+          << '\n';
 
       // Next print each group and it's information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->WriteMacros(out, as_const);
       }
 
-      out << ")" << std::endl;
+      out << ")" << '\n';
     }
 
     // If a string is passed into Write, treat it as a filename.
@@ -653,7 +653,7 @@ namespace emp {
         else {
           // We don't know this command... give an error and move on.
           std::stringstream ss;
-          ss << "Unknown configuration command '" << command << "'. Ignoring." << std::endl;
+          ss << "Unknown configuration command '" << command << "'. Ignoring." << '\n';
           emp::NotifyError(ss.str());
         }
       }
@@ -672,7 +672,7 @@ namespace emp {
       std::ifstream in_file(filename);
       if (in_file.fail()) {
         std::stringstream ss;
-        ss << "Unable to open config file '" << filename << "'. Ignoring." << std::endl;
+        ss << "Unable to open config file '" << filename << "'. Ignoring." << '\n';
         if (error_on_missing_file) emp::NotifyError(ss.str());
         return false;
       }
@@ -688,7 +688,7 @@ namespace emp {
     void AddCommand(const std::string & command_name, std::function<bool(std::string)> command_fun) {
       // Give a warning if we are re-defining an existing command.
       if (command_map.find(command_name) != command_map.end()) {
-        warnings << "Re-defining command '" << command_name << "'. Allowing." << std::endl;
+        warnings << "Re-defining command '" << command_name << "'. Allowing." << '\n';
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
           warnings.str(std::string()); // Clear the warnings.
@@ -700,7 +700,7 @@ namespace emp {
     void AddNewCallback(const std::string & type_name, std::function<bool(std::string)> new_fun) {
       // Give a warning if we are re-defining an existing command.
       if (new_map.find(type_name) != new_map.end()) {
-        warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
+        warnings << "Re-defining config type '" << type_name << "'. Allowing." << '\n';
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
           warnings.str(std::string()); // Clear the warnings.
@@ -712,7 +712,7 @@ namespace emp {
     void AddUseCallback(const std::string & type_name, std::function<bool(std::string)> use_fun) {
       // Give a warning if we are re-defining an existing command.
       if (emp::Has(use_map, type_name)) {
-        warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
+        warnings << "Re-defining config type '" << type_name << "'. Allowing." << '\n';
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
           warnings.str(std::string()); // Clear the warnings.
@@ -806,7 +806,7 @@ namespace emp {
   constexpr static TYPE NAME() { return VALUE; }                                \
   TYPE NAME(const TYPE & _in) {                                                 \
     std::stringstream ss;                                                       \
-    ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl;      \
+    ss << "Trying to set const '" << #NAME << "'. Ignoring." << '\n';      \
     emp::NotifyWarning(ss.str());                                               \
     return VALUE;                                                               \
   }                                                                             \

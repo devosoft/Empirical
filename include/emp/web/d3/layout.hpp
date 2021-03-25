@@ -136,7 +136,7 @@ namespace D3{
       int node_exit = NextD3ID();
       int link_enter = NextD3ID();
       int link_exit = NextD3ID();
-      std::cout << "Tree data id: " << data->GetID() << std::endl;
+      std::cout << "Tree data id: " << data->GetID() << '\n';
     //   make_line->Log();
       MAIN_THREAD_EMP_ASM({
 
@@ -186,7 +186,7 @@ namespace D3{
         js.objects[$6] = linkEnter;
         js.objects[$7] = linkExit;
     }, this->id, data->GetID(), make_line->GetID(), svg.GetID(), node_enter, node_exit, link_enter, link_exit);
-      std::cout << "Done generating" << std::endl;
+      std::cout << "Done generating" << '\n';
       return emp::array<Selection, 4>{{Selection(node_enter), Selection(node_exit),
                                        Selection(link_enter), Selection(link_exit)}};
     }

@@ -42,7 +42,7 @@ namespace emp {
 
             if (!parameters)
             {
-                std::cout << "Error - Invalid set of bloom filter parameters!" << std::endl;
+                std::cout << "Error - Invalid set of bloom filter parameters!" << '\n';
             }
 
             parameters.compute_optimal_parameters();

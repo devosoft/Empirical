@@ -286,7 +286,7 @@ namespace web {
 }
 catch(const std::exception& e)
 {
-    std::cout << "X11 Display not configured correctly." << std::endl;
+    std::cout << "X11 Display not configured correctly." << '\n';
 }
 */
 } // namespace web

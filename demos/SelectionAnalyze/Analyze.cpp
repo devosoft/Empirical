@@ -33,12 +33,12 @@ int main(int argc, char* argv[])
   if (verbose) data.SetVerbose();
 
   if (data.GetNumCriteria() == 0) {
-    std::cout << "Warning: No criteria data found." << std::endl;
+    std::cout << "Warning: No criteria data found." << '\n';
   }
 
   std::ofstream out_file;
   if (args.Get("output_file").size()) {
-    std::cout << "Opening output file: " << args.Get("output_file") << std::endl;
+    std::cout << "Opening output file: " << args.Get("output_file") << '\n';
     out_file.open(args.Get("output_file"));
   }
   std::ostream & out_stream = (args.Get("output_file").size()) ? out_file : std::cout;
@@ -47,13 +47,13 @@ int main(int argc, char* argv[])
     data.AnalyzeLexicase();
     data.CalcLexicaseProbs();
 
-    std::cout << "By organism (" << data.GetNumOrgs() << "):" << std::endl;
+    std::cout << "By organism (" << data.GetNumOrgs() << "):" << '\n';
     data.PrintOrgs();
-    std::cout << std::endl;
-    std::cout << "By criterion (" << data.GetNumCriteria() << "):" << std::endl;
+    std::cout << '\n';
+    std::cout << "By criterion (" << data.GetNumCriteria() << "):" << '\n';
     data.PrintCriteria();
 
-    std::cout << std::endl;
+    std::cout << '\n';
     data.PrintNewCriteria();
 
     data.PrintSelectProbs(out_stream, sort_output);
@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
       out_stream << result[i];
       total += result[i];
     }
-    out_stream << std::endl;
-    std::cout << "Total prob = " << total << std::endl;
+    out_stream << '\n';
+    std::cout << "Total prob = " << total << '\n';
   }
 
 }

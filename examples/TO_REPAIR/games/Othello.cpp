@@ -14,13 +14,13 @@ int main()
 {
   // Make a new othello board.
   emp::Othello othello(BOARD_SIZE);
-  std::cout << "---- Initial Board ----" << std::endl;
+  std::cout << "---- Initial Board ----" << '\n';
   othello.Print();
-  std::cout << "-----------------------" << std::endl;
+  std::cout << "-----------------------" << '\n';
 
   // Display neighbor network.
   for (size_t i = 0; i < othello.GetBoardSize(); ++i) {
-    std::cout << "Position: " << i << "(" << othello.GetPosX(i) << ", " << othello.GetPosY(i) << ")" << std::endl;
+    std::cout << "Position: " << i << "(" << othello.GetPosX(i) << ", " << othello.GetPosY(i) << ")" << '\n';
     int Nid = othello.GetNeighbor(i, emp::Othello::N());
     int NEid = othello.GetNeighbor(i, emp::Othello::NE());
     int Eid = othello.GetNeighbor(i, emp::Othello::E());
@@ -39,14 +39,14 @@ int main()
     std::cout << "SW: " << SWid << " (" << othello.GetPosX(SWid) << ", " << othello.GetPosY(SWid) << "); ";
     std::cout << "W:  " << Wid << " (" << othello.GetPosX(Wid) << ", " << othello.GetPosY(Wid) << "); ";
     std::cout << "NW: " << NWid << " (" << othello.GetPosX(NWid) << ", " << othello.GetPosY(NWid) << "); ";
-    std::cout << std::endl;
+    std::cout << '\n';
   }
 
   while (!othello.IsOver()) {
     size_t player = othello.GetCurPlayer();
     space_t disk_type = othello.GetDiskType(player);
-    if (disk_type == emp::Othello::DarkDisk()) std::cout << "Dark player's turn!" << std::endl;
-    else std::cout << "Light player's turn!" << std::endl;
+    if (disk_type == emp::Othello::DarkDisk()) std::cout << "Dark player's turn!" << '\n';
+    else std::cout << "Light player's turn!" << '\n';
 
     std::string raw_move;
     std::cin >> raw_move;
@@ -64,38 +64,38 @@ int main()
       moveY = raw_move[0] - 48;
     }
 
-    std::cout << "(move: " << moveX << ", " << moveY << ")" << std::endl;
+    std::cout << "(move: " << moveX << ", " << moveY << ")" << '\n';
 
     // Is input a valid position?
     if (!othello.IsValidPos(moveX, moveY)) {
-      std::cout << "Invalid position!" << std::endl;
+      std::cout << "Invalid position!" << '\n';
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
     }
 
     if (!(othello.GetPosValue(moveX, moveY) == emp::Othello::OpenSpace())) {
-      std::cout << "Invalid move! Cannot move to non-empty position!" << std::endl;
+      std::cout << "Invalid move! Cannot move to non-empty position!" << '\n';
       continue;
     }
     if (!othello.IsMoveValid(player, moveX, moveY)) {
-      std::cout << "Invalid move! Must flank at least one opponent disk." << std::endl;
+      std::cout << "Invalid move! Must flank at least one opponent disk." << '\n';
       continue;
     }
 
     othello.DoMove(player, moveX, moveY);
-    std::cout << "------- Board -------" << std::endl;
+    std::cout << "------- Board -------" << '\n';
     othello.Print();
-    std::cout << "Scores: {DARK: " << othello.GetScore(emp::Othello::DarkPlayerID()) << " , LIGHT: " << othello.GetScore(emp::Othello::LightPlayerID()) << "}" << std::endl;
-    std::cout << "Frontiers: {DARK: " << othello.GetFrontierPosCnt(emp::Othello::DarkPlayerID()) << ", LIGHT: " << othello.GetFrontierPosCnt(emp::Othello::LightPlayerID()) << "}" << std::endl;
-    std::cout << "---------------------" << std::endl;
+    std::cout << "Scores: {DARK: " << othello.GetScore(emp::Othello::DarkPlayerID()) << " , LIGHT: " << othello.GetScore(emp::Othello::LightPlayerID()) << "}" << '\n';
+    std::cout << "Frontiers: {DARK: " << othello.GetFrontierPosCnt(emp::Othello::DarkPlayerID()) << ", LIGHT: " << othello.GetFrontierPosCnt(emp::Othello::LightPlayerID()) << "}" << '\n';
+    std::cout << "---------------------" << '\n';
   }
 
   double dscore = othello.GetScore(emp::Othello::DarkPlayerID());
   double lscore = othello.GetScore(emp::Othello::LightPlayerID());
-  if (dscore == lscore) { std::cout << "Tie!" << std::endl; }
-  else if (dscore > lscore) { std::cout << "Dark wins!" << std::endl; }
-  else { std::cout << "Light wins!" << std::endl; }
+  if (dscore == lscore) { std::cout << "Tie!" << '\n'; }
+  else if (dscore > lscore) { std::cout << "Dark wins!" << '\n'; }
+  else { std::cout << "Light wins!" << '\n'; }
 
   return 0;
 }

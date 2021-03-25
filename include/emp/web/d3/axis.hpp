@@ -65,7 +65,7 @@ namespace D3 {
             js.objects[$0] = d3.axisTop(js.objects[$1]);
         }, this->id, scale.GetID());
       } else {
-          std::cout << "WARNING: Invalid type given to axis constructor" << std::endl;
+          std::cout << "WARNING: Invalid type given to axis constructor" << '\n';
           MAIN_THREAD_EMP_ASM({
               js.objects[$0] = d3.axisBottom(js.objects[$1]);
           }, this->id, scale.GetID());

@@ -140,7 +140,7 @@ void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
     std::cout << "[" << cpu.GetReg(i) << "] ";
   }
-  std::cout << " IP=" << cpu.GetIP() << std::endl;
+  std::cout << " IP=" << cpu.GetIP() << '\n';
 }
 
 constexpr size_t POP_SIZE = 1000;
@@ -196,7 +196,7 @@ int main()
     EliteSelect(world, 1, 1);
 
     std::cout << "  fitness[0] = " << world[0].GetScore()
-              << std::endl;
+              << '\n';
 
     // Run a tournament for the rest...
     TournamentSelect(world, 4, POP_SIZE-1);
@@ -208,16 +208,16 @@ int main()
     world.DoMutations(1);
   }
 
-  std::cout << "Final Fitness: " << world.CalcFitnessID(0) << std::endl;
+  std::cout << "Final Fitness: " << world.CalcFitnessID(0) << '\n';
   world[0].GetStateGrid().Print();
 
-  std::cout << std::endl;
+  std::cout << '\n';
   world[0].PrintGenome();
-  std::cout << std::endl;
+  std::cout << '\n';
   for (int i = 0; i < 16; i++) {
     std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   }
-  std::cout << std::endl;
+  std::cout << '\n';
 
   return 0;
 }

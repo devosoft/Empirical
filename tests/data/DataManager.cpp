@@ -35,7 +35,7 @@ TEST_CASE("Test DataManager", "[data]") {
 
     dataM.AddData("fidelity", 1.0, 0.8, 0.9);
 
-    // std::cout << std::endl;
+    // std::cout << '\n';
 
     // for (auto & x : dataM.GetNodes()) {
     //     auto & node = *(x.second);
@@ -45,7 +45,7 @@ TEST_CASE("Test DataManager", "[data]") {
     //             << " min=" << node.GetMin()
     //             << " max=" << node.GetMax()
     //             << " tot=" << node.GetTotal()
-    //             << std::endl;
+    //             << '\n';
     // }
 
     REQUIRE(dataM.Get("fitness").GetCurrent() == 10);

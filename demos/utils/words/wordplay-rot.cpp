@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
   if (args.size() != 3) {
-    std::cout << "Expected: " << args[0] << " [dict file] [rotation]" << std::endl;
+    std::cout << "Expected: " << args[0] << " [dict file] [rotation]" << '\n';
     exit(0);
   }
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     std::string test = file[i];
     Rot(test, rot);
     if (test.size() > 1 && emp::Has(words, test)) {
-      std::cout << file[i] << " -> " << test << std::endl;
+      std::cout << file[i] << " -> " << test << '\n';
     }
   }
 }

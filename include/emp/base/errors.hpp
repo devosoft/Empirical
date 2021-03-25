@@ -139,7 +139,7 @@ namespace emp {
       alert(msg);
     }, ss.str().c_str());
 #else
-    std::cerr << ss.str() << std::endl;
+    std::cerr << ss.str() << '\n';
 #endif
   }
 

@@ -37,6 +37,6 @@ int main()
               << " min=" << node.GetMin()
               << " max=" << node.GetMax()
               << " tot=" << node.GetTotal()
-              << std::endl;
+              << '\n';
   }
 }

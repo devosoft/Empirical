@@ -44,7 +44,7 @@ int main()
     data_cubes.Add(i*i*i);
     dfile.Update();
 
-    std::cout << i << std::endl;
+    std::cout << i << '\n';
   }
 
   dfile.SetupLine("[[",":", "]]\n");
@@ -54,6 +54,6 @@ int main()
     data_cubes.Add(i*i*i);
     dfile.Update();
 
-    std::cout << i << std::endl;
+    std::cout << i << '\n';
   }
 }
