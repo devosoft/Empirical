@@ -32,14 +32,12 @@ jobs:
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
       - run: ${CXX} --version
-      - run: |
-          source third-party/emsdk/emsdk_env.sh
-          export DISPLAY=":$$"
-          rm -f "/tmp/.X$$-lock"
-          Xvfb "${DISPLAY}" -auth /dev/null/ &
-          export XVFB_PID=$!
-          echo "DISPLAY: " ${DISPLAY}
-          make ${TEST_SET} CXX=${CXX}
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: |
+            source third-party/emsdk/emsdk_env.sh
+            make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
     runs-on: ubuntu-18.04
