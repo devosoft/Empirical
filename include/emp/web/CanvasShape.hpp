@@ -21,6 +21,9 @@
 
 #include "_NativeCanvasShape.hpp"
 
+#else
+static_assert(false, "Neither Emscripten nor SFML exist");
+
 #endif // #ifdef __EMSCRIPTEN__
 
 #endif // #ifndef EMP_WEB_CANVAS_HPP
