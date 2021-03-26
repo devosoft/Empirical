@@ -20,6 +20,7 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../datastructs/vector_utils.hpp"
 
 #include "type_traits.hpp"
 #include "TypePack.hpp"
@@ -187,6 +188,10 @@ namespace emp {
         // If this variable is a numeric value, use to_string.
         else if constexpr (std::is_arithmetic<T>::value) {
           return std::to_string( *ptr.ReinterpretCast<const base_t>() );
+        }
+
+        else if constexpr (emp::is_emp_vector<T>::value) {
+          return emp::ToString( *ptr.ReinterpretCast<const base_t>() );
         }
 
         // If we made it this far, we don't know how to convert...
