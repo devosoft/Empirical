@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2021.
  *
  *  @file  type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -86,6 +86,11 @@ namespace emp {
   template <typename T> struct remove_std_function_type { using type = T; };
   template <typename T> struct remove_std_function_type<std::function<T>> { using type = T; };
   template <typename T> using remove_std_function_t = typename remove_std_function_type<T>::type;
+
+  /// Determine if we have an emp::vector.
+  template <typename> struct is_emp_vector : std::false_type { };
+  template <typename... Ts> struct is_emp_vector<emp::vector<Ts...>> : std::true_type { };
+  
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
