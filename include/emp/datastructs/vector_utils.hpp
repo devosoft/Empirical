@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2020.
+ *  @date 2017-2021.
  *
  *  @file vector_utils.hpp
  *  @brief A set of simple functions to manipulate emp::vector
@@ -93,6 +93,13 @@ namespace emp {
       if (id) os << spacer; // Put a space before second element and beyond.
       os << v[id];
     }
+  }
+
+  template <typename T>
+  std::string ToString(const emp::vector<T> & v, const std::string & spacer=" ") {
+    std::stringstream ss;
+    Print(v, ss, spacer);
+    return ss.str();
   }
 
   /// Find the first index where the provided function returns true; return -1 otherwise.
