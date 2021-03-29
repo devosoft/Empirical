@@ -1,4 +1,4 @@
-import numpy as np
+#import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 import sys
@@ -17,11 +17,19 @@ imageA = plt.imread(args["first"])
 imageB = plt.imread(args["second"])
 
 # Mean squared error
-err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+err = (sum(imageA.astype("float")) - sum(imageB.astype("float"))) ** 2
 err /= float(imageA.shape[0] * imageA.shape[1])
-print("MSE ", args["first"], " to ", args["second"], ": ", err)
+print("MSE ", args["first"], " to ", args["second"], ": ", sum(sum(err)))
 tolerance = 0.01    # A 1% differences is acceptable
-if err <= tolerance:
+if sum(sum(err)) <= tolerance:
     sys.exit(0)
+
+# right now our python version doesn't support numpy
+#err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+#err /= float(imageA.shape[0] * imageA.shape[1])
+#print("MSE ", args["first"], " to ", args["second"], ": ", err))
+#tolerance = 0.01    # A 1% differences is acceptable
+#if err <= tolerance:
+#    sys.exit(0)
     
 sys.exit(1)
