@@ -26,6 +26,7 @@
 #include "../geometry/Circle2D.hpp"
 #include "../tools/string_utils.hpp"
 #include "color_logic_utils.hpp"
+#include "color_map.hpp"
 
 namespace emp {
 namespace web {
@@ -35,12 +36,13 @@ namespace web {
     private:       
         unsigned char r{}, g{}, b{};
         float a{ 1.0f };
+        std::string css_str = "";
     public:
         Color() = default;
 
         Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
         : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
-        { }
+        { css_str = emp::ColorRGB(r, g, b, a); }
 
         // defined out of body
         Color( const std::string& css_str );
@@ -51,6 +53,10 @@ namespace web {
         } == std::tuple{
             rhs.r, rhs.g, rhs.b, rhs.a
         };
+        }
+
+        std::string ToCss_str() {
+            return css_str;
         }
 
         bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
@@ -311,6 +317,7 @@ namespace web {
 
     if (namedColor->name == str){
         *this = namedColor->color;
+        (*this).css_str = emp::ColorRGB(r, g, b, a);
         return;
     }
 
