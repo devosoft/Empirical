@@ -31,40 +31,40 @@ namespace emp {
 namespace web {
 
   /// Represents RGBA color.
-  struct Color {
+  class Color {
+    private:       
+        unsigned char r{}, g{}, b{};
+        float a{ 1.0f };
+    public:
+        Color() = default;
 
-    unsigned char r{}, g{}, b{};
-    float a{ 1.0f };
+        Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
+        : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
+        { }
 
-    Color() = default;
+        // defined out of body
+        Color( const std::string& css_str );
 
-    Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
-    : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
-    { }
+        bool operator==( const Color& rhs ) const {
+        return std::tuple{
+            r, g, b, a
+        } == std::tuple{
+            rhs.r, rhs.g, rhs.b, rhs.a
+        };
+        }
 
-    // defined out of body
-    Color( const std::string& css_str );
+        bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
 
-    bool operator==( const Color& rhs ) const {
-      return std::tuple{
-        r, g, b, a
-      } == std::tuple{
-        rhs.r, rhs.g, rhs.b, rhs.a
-      };
-    }
-
-    bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
-
-    #if __has_include(<SFML/Graphics.hpp>)
-    operator sf::Color() const { return sf::Color( r, g, b, a * 255 ); }
-    #endif
-
-    static Color ParseColor(const std::string& str, const std::string& css_str);
-    static Color ParseABC(const std::string& str, const std::string& css_str);
-    static Color ParseRGB(const std::string& str, const std::string& css_str, const std::string& fname,
-        const std::vector<std::string>& color_tokens, const float alpha);
-    static Color ParseHSL(const std::string& str, const std::string& css_str, const std::string& fname,
-        const std::vector<std::string>& color_tokens, const float alpha);
+        #if __has_include(<SFML/Graphics.hpp>)
+        operator sf::Color() const { return sf::Color( r, g, b, a * 255 ); }
+        #endif
+    private:
+        static Color ParseColor(const std::string& str);
+        static Color ParseABC(const std::string& str);
+        static Color ParseRGB(const std::string& str, const std::string& fname,
+            const std::vector<std::string>& color_tokens, const float alpha);
+        static Color ParseHSL(const std::string& str, const std::string& fname,
+            const std::vector<std::string>& color_tokens, const float alpha);
   };
 
   namespace color_impl {
@@ -314,15 +314,15 @@ namespace web {
         return;
     }
 
-    *this = ParseColor(str, css_str);
+    *this = ParseColor(str);
 
   }
   
   // Handle all color detection and parsing from the string
-  Color Color::ParseColor(const std::string& str, const std::string& css_str) {
+  Color Color::ParseColor(const std::string& str) {
       // #abc and #abc123 syntax.
     if (DetectSyntaxABC(str)) {
-        return ParseABC(str, css_str);
+        return ParseABC(str);
     }
 
     size_t open_paren = str.find_first_of('(');
@@ -334,21 +334,21 @@ namespace web {
 
         float alpha = 1.0f;
         if (fname == "rgba" || fname == "rgb") {
-            return ParseRGB(str, css_str, fname, color_tokens, alpha);
+            return ParseRGB(str, fname, color_tokens, alpha);
 
         } else if (fname == "hsla" || fname == "hsl") {
-            return ParseHSL(str, css_str, fname, color_tokens, alpha);
+            return ParseHSL(str, fname, color_tokens, alpha);
         }
     }
-    emp_always_assert( false, css_str );
+    emp_always_assert( false, str);
     __builtin_unreachable();
   }
 
-  Color Color::ParseABC(const std::string& str, const std::string& css_str){
+  Color Color::ParseABC(const std::string& str){
       if (str.length() == 4) {
             const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xfff)) {
-                emp_assert( false, css_str );
+                emp_assert( false, str );
                 __builtin_unreachable();
             } else {
                 Color* col = new Color(
@@ -362,7 +362,7 @@ namespace web {
         } else if (str.length() == 7) {
             const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xffffff)) {
-              emp_assert( false, css_str );
+              emp_assert( false, str );
               __builtin_unreachable();
             } else {
                 Color* col = new Color(
@@ -375,21 +375,21 @@ namespace web {
             }
         }
 
-        emp_assert( false, css_str );
+        emp_assert( false, str );
         __builtin_unreachable();
   }
   
-  Color Color::ParseRGB(const std::string& str, const std::string& css_str, 
-    const std::string& fname, const std::vector<std::string>& color_tokens, float alpha){
+  Color Color::ParseRGB(const std::string& str, const std::string& fname, 
+    const std::vector<std::string>& color_tokens, float alpha){
       if (fname == "rgba") {
             if (color_tokens.size() != 4) {
-                emp_assert( false, css_str );
+                emp_assert( false, str );
                 __builtin_unreachable();
             }
             alpha = color_impl::parse_css_float(color_tokens.back());
         } else {
             if (color_tokens.size() != 3) {
-                emp_assert( false, css_str );
+                emp_assert( false, str );
                 __builtin_unreachable();
             }
         }
@@ -403,17 +403,17 @@ namespace web {
         return *col;
   }
 
-  Color Color::ParseHSL(const std::string& str, const std::string& css_str, 
-    const std::string& fname, const std::vector<std::string>& color_tokens, float alpha){
+  Color Color::ParseHSL(const std::string& str, const std::string& fname, 
+    const std::vector<std::string>& color_tokens, float alpha){
             if (fname == "hsla") {
                 if (color_tokens.size() != 4) {
-                    emp_assert( false, css_str );
+                    emp_assert( false, str );
                     __builtin_unreachable();
                 }
                 alpha = color_impl::parse_css_float(color_tokens.back());
             } else {
                 if (color_tokens.size() != 3) {
-                    emp_assert( false, css_str );
+                    emp_assert( false, str );
                     __builtin_unreachable();
                 }
             }
