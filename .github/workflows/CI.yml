@@ -35,7 +35,7 @@ jobs:
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: bash -c "source third-party/emsdk/emsdk_env.sh; make ${{ matrix.test-set }} CXX=${{ matrix.cxx }};"
+          run: bash -c "echo ${DISPLAY}; source third-party/emsdk/emsdk_env.sh; make ${{ matrix.test-set }} CXX=${{ matrix.cxx }};"
   test-web:
     name: Web Tests
     runs-on: ubuntu-18.04
@@ -74,7 +74,7 @@ jobs:
       - name: Run coverage test with headless xvfb
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: export CXX=clang++-7 && make coverage
+          run: bash -c "export CXX=clang++-7; make coverage;"
       - run: curl -s https://codecov.io/bash | bash
   test-documentation:
     name: Test Documentation Build
