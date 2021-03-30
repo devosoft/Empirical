@@ -36,8 +36,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: |
-            . third-party/emsdk/emsdk_env.sh
-            make ${{ matrix.test-set }} CXX=${{ matrix.cxx }}
+            bash -c 'source third-party/emsdk/emsdk_env.sh; make ${{ matrix.test-set }} CXX=${{ matrix.cxx }};'
   test-web:
     name: Web Tests
     runs-on: ubuntu-18.04
