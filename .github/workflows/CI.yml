@@ -73,7 +73,10 @@ jobs:
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
       - run: export CXX=clang++-7 && make install-coverage-dependencies
-      - run: export CXX=clang++-7 && make coverage
+      - name: Run coverage test with headless xvfb
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: export CXX=clang++-7 && make coverage
       - run: curl -s https://codecov.io/bash | bash
   test-documentation:
     name: Test Documentation Build

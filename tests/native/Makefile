@@ -33,16 +33,16 @@ coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../cov
 coverage: test-prep $(addprefix cov-, $(TEST_NAMES))
 
 # Test optimized version without debug features
-opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
+opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 # Test in debug mode with pointer tracking
-fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi) -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
 fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi) -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
