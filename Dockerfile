@@ -159,7 +159,7 @@ RUN \
   && \
   n 12.18.2 \
   && \
-  export python="/usr/bin/python" \
+  export python="/usr/bin/python3" \
   && \
   npm install source-map \
   && \
