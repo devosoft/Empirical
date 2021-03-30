@@ -18,7 +18,7 @@ build-doxygen: download-doxygen
 	mkdir -p doxygen/build && cd doxygen/build && cmake -g "Unix makefiles" .. && make
 
 prepare-virtualenv:
-	python -m virtualenv env
+	python3 -m virtualenv env
 
 install-pip-deps: prepare-virtualenv
 	bash ./install_pip_deps.sh
