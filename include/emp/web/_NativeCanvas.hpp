@@ -84,17 +84,29 @@ namespace web {
 
     /// Add a Circle to this canvas; provide constructor for the CanvasCircle with a position and radius
     /// as well as optional face color, line color, and line width.
-    Canvas & Circle(Point center, double _r, const std::string& fc="white", const std::string& lc="black", const float thickness=2) {
+    Canvas & Circle(Point center, double _r, const std::string& fc, const std::string& lc, const float thickness=2) {
+      double x = center.GetX() - _r;
+      double y = center.GetY() - _r;
+      return this->Circle(x, y, _r, emp::web::Color(fc), emp::web::Color(lc), thickness);
+    }
+
+    Canvas & Circle(double _x, double _y, double _r, const std::string& fc, const std::string& lc, const float thickness=2) {
+      return this->Circle(_x, _y, _r, emp::web::Color(fc), emp::web::Color(lc), thickness);
+    }
+
+    Canvas & Circle(Point center, double _r, const emp::web::Color fc=emp::web::Color("white"),
+        const emp::web::Color lc=emp::web::Color("black"), const float thickness=2) {
       double x = center.GetX() - _r;
       double y = center.GetY() - _r;
       return this->Circle(x, y, _r, fc, lc, thickness);
     }
 
-    Canvas & Circle(double _x, double _y, double _r, const std::string& fc="white", const std::string& lc="black", const float thickness=2) {
+    Canvas & Circle(double _x, double _y, double _r, const emp::web::Color fc=emp::web::Color("white"),
+        const emp::web::Color lc=emp::web::Color("black"), const float thickness=2) {
       sf::CircleShape circle(_r);
       circle.setPosition(_x, _y);
-      circle.setFillColor((sf::Color) emp::web::Color( fc ));
-      circle.setOutlineColor((sf::Color) emp::web::Color( lc ));
+      circle.setFillColor((sf::Color)fc);
+      circle.setOutlineColor((sf::Color)lc);
       circle.setOutlineThickness(thickness);
       window->draw( circle );
       return *this;
@@ -106,17 +118,32 @@ namespace web {
       Point corner, const double w, const double h,
       const std::string& fc="white", const std::string& lc="black", const double lw=1.0
     ) {
+      return this->Rect(corner.GetX(),corner.GetY(), w, h, emp::web::Color(fc), emp::web::Color(lc), lw);
+    }
+
+    Canvas & Rect(
+      const double x, const double y, const double w, const double h,
+      const std::string& fc, const std::string& lc, const double lw=1.0
+    ) {
+      return this->Rect(x, y, w, h, emp::web::Color(fc), emp::web::Color(lc), lw);
+    }
+    Canvas & Rect(
+      Point corner, const double w, const double h,
+      const emp::web::Color fc=emp::web::Color("white"),
+      const emp::web::Color lc=emp::web::Color("black"), const double lw=1.0
+    ) {
       return this->Rect(corner.GetX(),corner.GetY(), w, h, fc, lc, lw);
     }
 
     Canvas & Rect(
       const double x, const double y, const double w, const double h,
-      const std::string& fc="white", const std::string& lc="black", const double lw=1.0
+      const emp::web::Color fc=emp::web::Color("white"),
+      const emp::web::Color lc=emp::web::Color("black"), const double lw=1.0
     ) {
       sf::RectangleShape shape( sf::Vector2f(w, h) );
       shape.setPosition(x, y);
-      shape.setFillColor( (sf::Color) emp::web::Color( fc ) );
-      shape.setOutlineColor( (sf::Color) emp::web::Color( lc ) );
+      shape.setFillColor( (sf::Color)fc );
+      shape.setOutlineColor( (sf::Color)lc );
       shape.setOutlineThickness( lw );
 
       window->draw( shape );
@@ -140,12 +167,27 @@ namespace web {
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
     Canvas & Line(
       const double x1, const double y1, const double x2, const double y2,
-      const std::string& fc="", const std::string& lc="", const double lw=1.0
+      const std::string& fc, const std::string& lc, const double lw=1.0
+    ) {
+      return this->Line(x1, y1, x2, y2, emp::web::Color(fc), emp::web::Color(lc), lw);
+    }
+
+    Canvas & Line(
+      emp::Point p1, emp::Point p2, const std::string& fc,
+      const std::string& lc, const double lw=1.0
+      ) {
+      return this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), emp::web::Color(fc), emp::web::Color(lc), lw);
+    }
+
+    Canvas & Line(
+      const double x1, const double y1, const double x2, const double y2,
+      const emp::web::Color fc=emp::web::Color(""),
+      const emp::web::Color lc=emp::web::Color(""), const double lw=1.0
     ) {
 
       sf::LineShape shape( sf::Vector2f(x1, y1), sf::Vector2f(x2, y2) );
-      shape.setFillColor( (sf::Color) emp::web::Color( fc ) );
-      shape.setOutlineColor( (sf::Color) emp::web::Color( lc ) );
+      shape.setFillColor( (sf::Color)fc );
+      shape.setOutlineColor( (sf::Color)lc );
       shape.setOutlineThickness( lw );
 
       window->draw( shape );
@@ -153,8 +195,8 @@ namespace web {
     }
 
     Canvas & Line(
-      emp::Point p1, emp::Point p2, const std::string& fc="",
-      const std::string& lc="", const double lw=1.0
+      emp::Point p1, emp::Point p2, const emp::web::Color fc=emp::web::Color(""),
+      const emp::web::Color lc=emp::web::Color(""), const double lw=1.0
       ) {
       return this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
     }
@@ -163,6 +205,13 @@ namespace web {
     template <typename... Ts>
     Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string& fc="",
       const std::string& lc="", const double lw=1.0) {
+      return this->MultiLine(p1, points, emp::web::Color(fc), emp::web::Color(lc), lw);
+    }
+
+    template <typename... Ts>
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, 
+      const emp::web::Color fc=emp::web::Color(""),
+      const emp::web::Color lc=emp::web::Color(""), const double lw=1.0) {
           for (auto p2 : points) {
               this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
           }
@@ -171,13 +220,24 @@ namespace web {
 
     /// Add a string to this canvas at x,y with specified text.  Optional face color,
     /// line color, size, and thickness.
-    Canvas & Text(emp::Point p, const std::string& words="", const std::string& fc="black",
-      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+    Canvas & Text(emp::Point p, const std::string& words, const std::string& fc,
+      const std::string& lc, const float size = 15, const float thickness=0.5) {
+      return this->Text(p.GetX(), p.GetY(), words, emp::web::Color(fc), emp::web::Color(lc), size, thickness);
+    }
+
+    Canvas & Text(double x, double y, const std::string& words, const std::string& fc,
+      const std::string& lc, const float size = 15, const float thickness=0.5) {
+        return this->Text(x, y, words, emp::web::Color(fc), emp::web::Color(lc), size, thickness);
+
+    }
+
+    Canvas & Text(emp::Point p, const std::string& words="", const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const float size = 15, const float thickness=0.5) {
       return this->Text(p.GetX(), p.GetY(), words, fc, lc, size, thickness);
     }
 
-    Canvas & Text(double x, double y, const std::string& words="", const std::string& fc="black",
-      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+    Canvas & Text(double x, double y, const std::string& words="", const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const float size = 15, const float thickness=0.5) {
 
         // Declare and load a font
         sf::Font font;
@@ -187,8 +247,8 @@ namespace web {
         sf::Text message(words, font);
         message.setPosition(x, y);
         message.setCharacterSize(size);
-        message.setFillColor((sf::Color) emp::web::Color( fc ));
-        message.setOutlineColor((sf::Color) emp::web::Color( lc ));
+        message.setFillColor((sf::Color)fc);
+        message.setOutlineColor((sf::Color)lc);
         message.setOutlineThickness(thickness);
 
         // draw the message on the canvas
@@ -199,14 +259,25 @@ namespace web {
 
     /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
     /// line color.
-    Canvas & CenterText(emp::Point p, const std::string& words="", const std::string& fc="black",
-      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+    Canvas & CenterText(emp::Point p, const std::string& words, const std::string& fc,
+      const std::string& lc, const float size = 15, const float thickness=0.5) {
+      this->CenterText(p.GetX(), p.GetY(), words, emp::web::Color(fc), emp::web::Color(lc), size, thickness);
+      return *this;
+    }
+
+    Canvas & CenterText(double x, double y, const std::string& words, const std::string& fc,
+      const std::string& lc, const float size = 15, const float thickness=0.5) {
+        return this->CenterText(x, y, words, emp::web::Color(fc), emp::web::Color(lc), size, thickness);
+    }
+
+    Canvas & CenterText(emp::Point p, const std::string& words="", const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const float size = 15, const float thickness=0.5) {
       this->CenterText(p.GetX(), p.GetY(), words, fc, lc, size, thickness);
       return *this;
     }
 
-    Canvas & CenterText(double x, double y, const std::string& words="", const std::string& fc="black",
-      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+    Canvas & CenterText(double x, double y, const std::string& words="", const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const float size = 15, const float thickness=0.5) {
       // Declare and load a font
         sf::Font font;
         font.loadFromMemory(LiberationSans_Regular_ttf, LiberationSans_Regular_ttf_len);
@@ -217,8 +288,8 @@ namespace web {
         y += message.getLocalBounds().height/2;
         message.setPosition(x, y);
         message.setCharacterSize(size);
-        message.setFillColor((sf::Color) emp::web::Color( fc ));
-        message.setOutlineColor((sf::Color) emp::web::Color( lc ));
+        message.setFillColor((sf::Color)fc );
+        message.setOutlineColor((sf::Color)lc);
         message.setOutlineThickness(thickness);
         window->draw( message );
         return *this;
@@ -233,6 +304,11 @@ namespace web {
     /// Draw a circle onto this canvas.
     Canvas & Draw(const emp::Circle & circle,
                   const std::string & fc="white", const std::string & lc="black") {
+                    return this->Draw(circle, emp::web::Color(fc), emp::web::Color(lc));
+    }
+    Canvas & Draw(const emp::Circle & circle,
+                  const emp::web::Color fc=emp::web::Color("white"), 
+                  const emp::web::Color lc=emp::web::Color("black")) {
                     this->Circle(width/2, height/2, 5, fc, lc);
       return *this;
     }
