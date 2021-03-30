@@ -18,6 +18,7 @@ jobs:
           - test-native-opt
           - test-examples
           # - test-cookiecutter
+      fail-fast: false
     env:
       CXX: ${{ matrix.cxx }}
       TEST_SET: ${{ matrix.test-set }}
