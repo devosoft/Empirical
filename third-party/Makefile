@@ -23,7 +23,7 @@ prepare-virtualenv:
 install-pip-deps: prepare-virtualenv
 	bash ./install_pip_deps.sh
 
-install-npm-deps: 
+install-npm-deps:
 	npm install
 
 clean:
