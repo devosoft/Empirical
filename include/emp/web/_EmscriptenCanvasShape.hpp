@@ -23,6 +23,7 @@
 #include "../geometry/Circle2D.hpp"
 
 #include "CanvasAction.hpp"
+#include "Color.hpp"
 
 namespace emp {
 namespace web {
