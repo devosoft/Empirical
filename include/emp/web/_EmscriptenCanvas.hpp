@@ -20,6 +20,7 @@
 
 #include "CanvasAction.hpp"
 #include "CanvasShape.hpp"
+#include "Color.hpp"
 
 namespace emp {
 namespace web {
@@ -244,6 +245,12 @@ namespace web {
     /// Draw a circle onto this canvas.
     Canvas & Draw(const emp::Circle & circle,
                   const std::string & fc="", const std::string & lc="") {
+      Info()->AddAction( new CanvasCircle(circle, fc, lc) );
+      return *this;
+    }
+    /// Draw a circle onto this canvas.
+    Canvas & Draw(const emp::Circle & circle,
+                  const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color("")) {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
       return *this;
     }
