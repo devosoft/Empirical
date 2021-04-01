@@ -42,9 +42,9 @@ namespace web {
     CanvasShape(Point _p, const std::string & fc, const std::string & lc, double lw=1.0)
       : p(_p), fill_color(emp::web::Color(fc)), line_color(emp::web::Color(lc)), line_width(lw) { ; }
 
-    CanvasShape(double _x, double _y, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+    CanvasShape(double _x, double _y, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : p(_x,_y), fill_color(fc), line_color(lc), line_width(lw) { ; }
-    CanvasShape(Point _p, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+    CanvasShape(Point _p, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : p(_p), fill_color(fc), line_color(lc), line_width(lw) { ; }
 
     virtual ~CanvasShape() { ; }
@@ -73,8 +73,8 @@ namespace web {
     /// Actually change the color on screen.
     void ApplyColor() {
       LineWidth(line_width);
-      Fill(fill_color.ToCss_str());
-      Stroke(line_color.ToCss_str());
+      Fill(fill_color);
+      Stroke(line_color);
     }
   };
 
@@ -94,13 +94,13 @@ namespace web {
       , radius(circle.GetRadius()) { ; }
 
     CanvasCircle(double _x, double _y, double _r,
-                 const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+                 const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : CanvasShape(_x, _y, fc, lc, lw), radius(_r) { ; }
 
-    CanvasCircle(Point _p, double _r, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+    CanvasCircle(Point _p, double _r, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : CanvasShape(_p, fc, lc, lw), radius(_r) { ; }
 
-    CanvasCircle(emp::Circle circle, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+    CanvasCircle(emp::Circle circle, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc, lw)
       , radius(circle.GetRadius()) { ; }
 
@@ -128,11 +128,11 @@ namespace web {
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
 
     CanvasRect(Point _p, double _w, double _h,
-               const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+               const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(_p, fc, lc), w(_w), h(_h) { ; }
 
     CanvasRect(double _x, double _y, double _w, double _h,
-               const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+               const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
 
     void Apply() {
@@ -175,13 +175,13 @@ namespace web {
     CanvasPolygon(double _x, double _y, const std::string & fc, const std::string & lc)
       : CanvasShape(_x, _y, fc, lc) { ; }
 
-    CanvasPolygon(const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+    CanvasPolygon(const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(0, 0, fc, lc) { ; }
-    CanvasPolygon(const emp::vector<Point> & p, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+    CanvasPolygon(const emp::vector<Point> & p, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(0, 0, fc, lc), points(p) { ; }
-    CanvasPolygon(Point _p, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+    CanvasPolygon(Point _p, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(_p, fc, lc) { ; }
-    CanvasPolygon(double _x, double _y, const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+    CanvasPolygon(double _x, double _y, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(_x, _y, fc, lc) { ; }
 
     CanvasPolygon & AddPoint(double x, double y) { points.emplace_back(x,y); return *this; }
@@ -220,9 +220,9 @@ namespace web {
       : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
 
     CanvasLine(double _x1, double _y1, double _x2, double _y2,
-               const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
-      : CanvasShape(_x1, _y1, emp::web::Color(""), lc, lw), x2(_x2), y2(_y2) { ; }
-    CanvasLine(Point p1, Point p2, const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+               const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+      : CanvasShape(_x1, _y1, "", lc, lw), x2(_x2), y2(_y2) { ; }
+    CanvasLine(Point p1, Point p2, const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
 
     void Apply() {
@@ -234,7 +234,7 @@ namespace web {
       }, p.GetX(), p.GetY(), x2, y2);
       // ApplyColor();
       LineWidth(line_width);
-      Stroke(line_color.ToCss_str());
+      Stroke(line_color);
     }
     CanvasAction * Clone() const { return new CanvasLine(*this); }
   };
@@ -254,10 +254,10 @@ namespace web {
       : CanvasMultiLine(p1.GetX(), p1.GetY(), _points, lc, lw) { ; }
 
     CanvasMultiLine(double _x1, double _y1, const emp::vector<Point> & _points,
-                    const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
-      : CanvasShape(_x1, _y1, emp::web::Color(""), lc, lw), points(_points) { ; }
+                    const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+      : CanvasShape(_x1, _y1, "", lc, lw), points(_points) { ; }
     CanvasMultiLine(Point p1, const emp::vector<Point> & _points,
-                    const emp::web::Color lc=emp::web::Color("black"), double lw=1.0)
+                    const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
       : CanvasMultiLine(p1.GetX(), p1.GetY(), _points, lc, lw) { ; }
 
     void Apply() {
@@ -272,7 +272,7 @@ namespace web {
       }
 
       LineWidth(line_width);
-      Stroke(line_color.ToCss_str());
+      Stroke(line_color);
     }
     CanvasAction * Clone() const { return new CanvasMultiLine(*this); }
   };
@@ -288,7 +288,7 @@ namespace web {
       : CanvasShape(p, fc, lc), text(_text), center(false) { ; }
 
     CanvasText(Point p, const std::string & _text,
-               const emp::web::Color fc=emp::web::Color("white"), const emp::web::Color lc=emp::web::Color("black"))
+               const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
       : CanvasShape(p, fc, lc), text(_text), center(false) { ; }
 
     void Apply() {
