@@ -10,6 +10,7 @@ cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -o $@.out
 	#echo "running $@.out"
 	# execute test
+	test -f ../../third-party/env/bin/activate && source ../../third-party/env/bin/activate; \
 	./$@.out
 	llvm-profdata merge default.profraw -o default.profdata
 	llvm-cov show ./$@.out -instr-profile=default.profdata > coverage_$@.txt
@@ -21,6 +22,7 @@ test-prep:
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
 	# execute test
+	test -f ../../third-party/env/bin/activate && source ../../third-party/env/bin/activate; \
 	./$@.out \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
 
