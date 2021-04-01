@@ -403,7 +403,7 @@ namespace web {
             }
         }
 
-        Color* col = new Color(
+        emp::web::Color* col = new emp::web::Color(
             color_impl::parse_css_int(color_tokens[0]),
             color_impl::parse_css_int(color_tokens[1]),
             color_impl::parse_css_int(color_tokens[2]),

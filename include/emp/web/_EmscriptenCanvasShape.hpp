@@ -32,21 +32,15 @@ namespace web {
   class CanvasShape : public CanvasAction {
   protected:
     Point p;                 ///< Anchor point for this shape.
-    emp::web::Color fill_color;  ///< Internal color to fill shape with.
-    emp::web::Color line_color;  ///< Border color for shape.
+    std::string fill_color;  ///< Internal color to fill shape with.
+    std::string line_color;  ///< Border color for shape.
     double line_width;       ///< How wide should lines be?
 
   public:
-    CanvasShape(double _x, double _y, const std::string & fc, const std::string & lc, double lw=1.0)
-      : p(_x,_y), fill_color(emp::web::Color(fc)), line_color(emp::web::Color(lc)), line_width(lw) { ; }
-    CanvasShape(Point _p, const std::string & fc, const std::string & lc, double lw=1.0)
-      : p(_p), fill_color(emp::web::Color(fc)), line_color(emp::web::Color(lc)), line_width(lw) { ; }
-
-    CanvasShape(double _x, double _y, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+    CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="", double lw=1.0)
       : p(_x,_y), fill_color(fc), line_color(lc), line_width(lw) { ; }
-    CanvasShape(Point _p, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+    CanvasShape(Point _p, const std::string & fc="", const std::string & lc="", double lw=1.0)
       : p(_p), fill_color(fc), line_color(lc), line_width(lw) { ; }
-
     virtual ~CanvasShape() { ; }
 
     /// Shift the position of this shape to a point.
@@ -59,16 +53,10 @@ namespace web {
     void SetLineWidth(double lw = 1.0) { line_width = lw; }
 
     /// Change the fill color of this shape.
-    void SetFillColor(const std::string & color) { fill_color = emp::web::Color(color); }
+    void SetFillColor(const std::string & color) { fill_color = color; }
 
     /// Change the stroke color of this shape.
-    void SetLineColor(const std::string & color) { line_color = emp::web::Color(color); }
-
-    /// Change the fill color of this shape.
-    void SetFillColor(emp::web::Color color) { fill_color = color; }
-
-    /// Change the stroke color of this shape.
-    void SetLineColor(emp::web::Color color) { line_color = color; }
+    void SetLineColor(const std::string & color) { line_color = color; }
 
     /// Actually change the color on screen.
     void ApplyColor() {
@@ -83,24 +71,13 @@ namespace web {
     double radius;  ///< Circle radius
   public:
     CanvasCircle(double _x, double _y, double _r,
-                 const std::string & fc, const std::string & lc, double lw=1.0)
+                 const std::string & fc="", const std::string & lc="", double lw=1.0)
       : CanvasShape(_x, _y, fc, lc, lw), radius(_r) { ; }
 
-    CanvasCircle(Point _p, double _r, const std::string & fc, const std::string & lc, double lw=1.0)
+    CanvasCircle(Point _p, double _r, const std::string & fc="", const std::string & lc="", double lw=1.0)
       : CanvasShape(_p, fc, lc, lw), radius(_r) { ; }
 
-    CanvasCircle(emp::Circle circle, const std::string & fc, const std::string & lc, double lw=1.0)
-      : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc, lw)
-      , radius(circle.GetRadius()) { ; }
-
-    CanvasCircle(double _x, double _y, double _r,
-                 const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
-      : CanvasShape(_x, _y, fc, lc, lw), radius(_r) { ; }
-
-    CanvasCircle(Point _p, double _r, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
-      : CanvasShape(_p, fc, lc, lw), radius(_r) { ; }
-
-    CanvasCircle(emp::Circle circle, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+    CanvasCircle(emp::Circle circle, const std::string & fc="", const std::string & lc="", double lw=1.0)
       : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc, lw)
       , radius(circle.GetRadius()) { ; }
 
@@ -120,19 +97,11 @@ namespace web {
     double h;  ///< Rectangle height.
   public:
     CanvasRect(Point _p, double _w, double _h,
-               const std::string & fc, const std::string & lc)
+               const std::string & fc="", const std::string & lc="")
       : CanvasShape(_p, fc, lc), w(_w), h(_h) { ; }
 
     CanvasRect(double _x, double _y, double _w, double _h,
-               const std::string & fc, const std::string & lc)
-      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
-
-    CanvasRect(Point _p, double _w, double _h,
-               const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
-      : CanvasShape(_p, fc, lc), w(_w), h(_h) { ; }
-
-    CanvasRect(double _x, double _y, double _w, double _h,
-               const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
+               const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
 
     void Apply() {
@@ -166,22 +135,13 @@ namespace web {
   private:
     emp::vector<Point> points;  ///< Series of points defining the perimiter of the Polygon.
   public:
-    CanvasPolygon(const std::string & fc, const std::string & lc)
+    CanvasPolygon(const std::string & fc="", const std::string & lc="")
       : CanvasShape(0, 0, fc, lc) { ; }
-    CanvasPolygon(const emp::vector<Point> & p, const std::string & fc, const std::string & lc)
+    CanvasPolygon(const emp::vector<Point> & p, const std::string & fc="", const std::string & lc="")
       : CanvasShape(0, 0, fc, lc), points(p) { ; }
-    CanvasPolygon(Point _p, const std::string & fc, const std::string & lc)
+    CanvasPolygon(Point _p, const std::string & fc="", const std::string & lc="")
       : CanvasShape(_p, fc, lc) { ; }
-    CanvasPolygon(double _x, double _y, const std::string & fc, const std::string & lc)
-      : CanvasShape(_x, _y, fc, lc) { ; }
-
-    CanvasPolygon(const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
-      : CanvasShape(0, 0, fc, lc) { ; }
-    CanvasPolygon(const emp::vector<Point> & p, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
-      : CanvasShape(0, 0, fc, lc), points(p) { ; }
-    CanvasPolygon(Point _p, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
-      : CanvasShape(_p, fc, lc) { ; }
-    CanvasPolygon(double _x, double _y, const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
+    CanvasPolygon(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc) { ; }
 
     CanvasPolygon & AddPoint(double x, double y) { points.emplace_back(x,y); return *this; }
@@ -214,15 +174,9 @@ namespace web {
     double y2;  /// Y-position for second point of line segment.
   public:
     CanvasLine(double _x1, double _y1, double _x2, double _y2,
-               const std::string & lc, double lw=1.0)
+               const std::string & lc="", double lw=1.0)
       : CanvasShape(_x1, _y1, "", lc, lw), x2(_x2), y2(_y2) { ; }
-    CanvasLine(Point p1, Point p2, const std::string & lc, double lw=1.0)
-      : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
-
-    CanvasLine(double _x1, double _y1, double _x2, double _y2,
-               const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
-      : CanvasShape(_x1, _y1, "", lc, lw), x2(_x2), y2(_y2) { ; }
-    CanvasLine(Point p1, Point p2, const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+    CanvasLine(Point p1, Point p2, const std::string & lc="", double lw=1.0)
       : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
 
     void Apply() {
@@ -247,17 +201,10 @@ namespace web {
 
   public:
     CanvasMultiLine(double _x1, double _y1, const emp::vector<Point> & _points,
-                    const std::string & lc, double lw=1.0)
+                    const std::string & lc="", double lw=1.0)
       : CanvasShape(_x1, _y1, "", lc, lw), points(_points) { ; }
     CanvasMultiLine(Point p1, const emp::vector<Point> & _points,
-                    const std::string & lc, double lw=1.0)
-      : CanvasMultiLine(p1.GetX(), p1.GetY(), _points, lc, lw) { ; }
-
-    CanvasMultiLine(double _x1, double _y1, const emp::vector<Point> & _points,
-                    const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
-      : CanvasShape(_x1, _y1, "", lc, lw), points(_points) { ; }
-    CanvasMultiLine(Point p1, const emp::vector<Point> & _points,
-                    const emp::web::Color lc=emp::web::Color(""), double lw=1.0)
+                    const std::string & lc="", double lw=1.0)
       : CanvasMultiLine(p1.GetX(), p1.GetY(), _points, lc, lw) { ; }
 
     void Apply() {
@@ -284,11 +231,7 @@ namespace web {
     bool center;       ///< Should this text be centered (or is anchor on left side)?
   public:
     CanvasText(Point p, const std::string & _text,
-               const std::string & fc, const std::string & lc)
-      : CanvasShape(p, fc, lc), text(_text), center(false) { ; }
-
-    CanvasText(Point p, const std::string & _text,
-               const emp::web::Color fc=emp::web::Color(""), const emp::web::Color lc=emp::web::Color(""))
+               const std::string & fc="", const std::string & lc="")
       : CanvasShape(p, fc, lc), text(_text), center(false) { ; }
 
     void Apply() {
@@ -300,7 +243,7 @@ namespace web {
         emp_i.ctx.fillStyle = UTF8ToString($3);
         var text = UTF8ToString($2);
         emp_i.ctx.fillText(text,$0,$1);
-      }, p.GetX(), p.GetY(), text.c_str(), fill_color.ToCss_str().c_str());
+      }, p.GetX(), p.GetY(), text.c_str(), fill_color.c_str());
     }
 
     /// Center this text.
