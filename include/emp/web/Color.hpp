@@ -58,7 +58,9 @@ namespace web {
         std::string ToCss_str() {
             return css_str;
         }
-
+        //implicit conversion
+        operator std::string() const { return ToCss_str(); }
+        
         bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
 
         #if __has_include(<SFML/Graphics.hpp>)
