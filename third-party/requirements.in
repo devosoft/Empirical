@@ -2,5 +2,5 @@ gcovr
 diff
 cookiecutter
 numpy
-matplotlib
+matplotlib==3.3.4
 argparse
