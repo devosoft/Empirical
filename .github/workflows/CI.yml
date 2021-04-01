@@ -29,6 +29,8 @@ jobs:
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-8 cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libsfml-dev libc6-dbg gdb
+      - run: sudo apt-get install python3-wheel -y
+      - run: pip3 install wheel
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
@@ -45,6 +47,8 @@ jobs:
         with:
           submodules: 'recursive'
       - run: sudo apt-get install -qq g++-8 cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: sudo apt-get install python3-wheel -y
+      - run: pip3 install wheel
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: make install-test-dependencies
       - name: Run headless test
@@ -65,6 +69,8 @@ jobs:
       - run: sudo apt-get install -qq g++-8
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
+      - run: sudo apt-get install python3-wheel -y
+      - run: pip3 install wheel
       - run: sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-7 90
       - run: sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-7 90
       - run: sudo update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-7 90
