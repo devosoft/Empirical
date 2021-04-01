@@ -7,7 +7,7 @@ FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field
 default: test
 
 cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -o $@.out
+	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
 	#echo "running $@.out"
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
