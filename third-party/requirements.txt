@@ -45,7 +45,7 @@ markupsafe==1.1.1
     # via
     #   cookiecutter
     #   jinja2
-matplotlib==3.4.0
+matplotlib==3.3.4
     # via -r requirements.in
 numpy==1.20.2
     # via
@@ -58,7 +58,9 @@ poyo==0.5.0
 pyparsing==2.4.7
     # via matplotlib
 python-dateutil==2.8.1
-    # via matplotlib
+    # via
+    #   arrow
+    #   matplotlib
 python-slugify==4.0.1
     # via cookiecutter
 requests==2.25.1
@@ -74,5 +76,6 @@ urllib3==1.26.4
     # via requests
 zope.interface==5.3.0
     # via diff
+
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
