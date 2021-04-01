@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2020.
+ *  @date 2018-2021.
  *
  *  @file  DataMap.hpp
  *  @brief A DataMap links names to arbitrary object types.
@@ -100,8 +100,8 @@ namespace emp {
 
   class DataMap {
   protected:
-    MemoryImage memory;              ///< Memory status for this Map.
-    emp::Ptr<DataLayout> layout_ptr; ///< Which layout are we using?
+    MemoryImage memory;              ///< Memory contents for this Map.
+    emp::Ptr<DataLayout> layout_ptr; ///< Layout we are using (shared across maps w/ same format)
 
     DataMap(emp::Ptr<DataLayout> in_layout_ptr, size_t in_size)
       : memory(in_size), layout_ptr(in_layout_ptr) { ; }
@@ -288,6 +288,11 @@ namespace emp {
                const std::string & notes="") {
       MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
+    }
+
+    /// Test if this DataMap uses the specified layout.
+    bool HasLayout(const emp::DataLayout & in_layout) const {
+      return layout_ptr == &in_layout;
     }
 
     /// Test if this DataMap is using the identical layout as another DataMap.
