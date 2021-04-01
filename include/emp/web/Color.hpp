@@ -58,8 +58,12 @@ namespace web {
         std::string ToCss_str() {
             return css_str;
         }
+
         //implicit conversion
-        operator std::string() const { return ToCss_str(); }
+        operator std::string() const { return css_str; }
+
+        //implicit conversion
+        operator const std::string&() const { return css_str; }
         
         bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
 
