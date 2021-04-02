@@ -64,6 +64,7 @@ namespace emp {
       virtual bool IsPointer() const { return false; }
       virtual bool IsReference() const { return false; }
       virtual bool IsTrivial() const { return false; }
+      virtual bool IsVoid() const { return false; }
       virtual bool IsVolatile() const { return false; }
 
       virtual bool IsTypePack() const { return false; }
@@ -111,6 +112,7 @@ namespace emp {
       bool IsPointer() const override { return emp::is_pointer<T>(); } // Not std::is_pointer<T>() to deal with emp::Ptr.
       bool IsReference() const override { return std::is_reference<T>(); }
       bool IsTrivial() const override { return std::is_trivial<T>(); }
+      bool IsVoid() const override { return std::is_same<T,void>(); }
       bool IsVolatile() const override { return std::is_volatile<T>(); }
 
       bool IsTypePack() const override { return emp::is_TypePack<T>(); }
@@ -275,22 +277,23 @@ namespace emp {
     /// Update the name for ALL instances of this TypeID.
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
-    bool IsInitialized() const { return info_ptr->init ; }
+    bool IsInitialized() const { return info_ptr->init; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
     bool IsAbstract() const { return info_ptr->IsAbstract(); }
     bool IsArithmetic() const { return info_ptr->IsArithmetic(); }
-    bool IsArray() const { return info_ptr->IsArray() ; }
-    bool IsClass() const { return info_ptr->IsClass() ; }
-    bool IsConst() const { return info_ptr->IsConst() ; }
-    bool IsEmpty() const { return info_ptr->IsEmpty() ; }
-    bool IsObject() const { return info_ptr->IsObject() ; }
-    bool IsPointer() const { return info_ptr->IsPointer() ; }
-    bool IsReference() const { return info_ptr->IsReference() ; }
-    bool IsTrivial() const { return info_ptr->IsTrivial() ; }
-    bool IsVolatile() const { return info_ptr->IsVolatile() ; }
+    bool IsArray() const { return info_ptr->IsArray(); }
+    bool IsClass() const { return info_ptr->IsClass(); }
+    bool IsConst() const { return info_ptr->IsConst(); }
+    bool IsEmpty() const { return info_ptr->IsEmpty(); }
+    bool IsObject() const { return info_ptr->IsObject(); }
+    bool IsPointer() const { return info_ptr->IsPointer(); }
+    bool IsReference() const { return info_ptr->IsReference(); }
+    bool IsTrivial() const { return info_ptr->IsTrivial(); }
+    bool IsVoid() const { return info_ptr->IsVoid(); }
+    bool IsVolatile() const { return info_ptr->IsVolatile(); }
 
-    bool IsTypePack() const { return info_ptr->IsTypePack() ; }
+    bool IsTypePack() const { return info_ptr->IsTypePack(); }
 
     TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
     TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
