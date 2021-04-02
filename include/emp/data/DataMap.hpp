@@ -301,6 +301,9 @@ namespace emp {
       // @CAO: Should we also see if it's using a different layout object, but otherwise identical?
     }
 
+    /// Get the DataLayout so that it can be used elsewhere.
+    const emp::DataLayout & GetLayout() { return *layout_ptr; }
+
     /// Test if this layout is locked (i.e., it cannot be changed.)
     bool IsLocked() const { return layout_ptr && layout_ptr->IsLocked(); }
 
