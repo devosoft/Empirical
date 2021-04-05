@@ -21,8 +21,8 @@
 
 #include "_NativeCanvasShape.hpp"
 
-#else
-static_assert(false, "Neither Emscripten nor SFML exist");
+#else  // Must have SFML and environment variable DISPLAY set
+static_assert(false, "Can't compile Canvas features without SFML available.");
 
 #endif // #ifdef __EMSCRIPTEN__
 
