@@ -36,13 +36,17 @@ namespace web {
     private:       
         unsigned char r{}, g{}, b{};
         float a{ 1.0f };
-        std::string css_str = "";
+        std::string cached_css_str = "";
+        sf::Color cached_sf_color;
     public:
         Color() = default;
 
         Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
         : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
-        { css_str = emp::ColorRGB(r, g, b, a); }
+        {
+            cached_css_str = emp::ColorRGB(r, g, b, a);
+            cached_sf_color = (sf::Color)*this;
+        }
 
         // defined out of body
         Color( const std::string& css_str );
@@ -56,14 +60,18 @@ namespace web {
         }
 
         std::string ToCss_str() {
-            return css_str;
+            return cached_css_str;
+        }
+
+        sf::Color ToSfColor() {
+            return cached_sf_color;
         }
 
         //implicit conversion
-        operator std::string() const { return css_str; }
+        operator std::string() const { return cached_css_str; }
 
         //implicit conversion
-        operator const std::string&() const { return css_str; }
+        operator const std::string&() const { return cached_css_str; }
         
         bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
 
@@ -273,15 +281,12 @@ namespace web {
             h += 1.0f;
         } else if (h > 1.0f) {
             h -= 1.0f;
-        }
-
-        if (h * 6.0f < 1.0f) {
+        } else if (h * 6.0f < 1.0f) {
             return m1 + (m2 - m1) * h * 6.0f;
-        }
-        if (h * 2.0f < 1.0f) {
+        } else if (h * 2.0f < 1.0f) {
             return m2;
         }
-        if (h * 3.0f < 2.0f) {
+        else if (h * 3.0f < 2.0f) {
             return m1 + (m2 - m1) * (2.0f / 3.0f - h) * 6.0f;
         }
         return m1;
@@ -323,7 +328,8 @@ namespace web {
 
     if (namedColor->name == str){
         *this = namedColor->color;
-        (*this).css_str = emp::ColorRGB(r, g, b, a);
+        (*this).cached_css_str = emp::ColorRGB(r, g, b, a);
+        (*this).cached_sf_color = (sf::Color)*this;
         return;
     }
 
@@ -338,8 +344,8 @@ namespace web {
         return ParseABC(str);
     }
 
-    size_t open_paren = str.find_first_of('(');
-    size_t close_paren = str.find_first_of(')');
+    size_t open_paren = str.find_first_of( '(' );
+    size_t close_paren = str.find_first_of( ')' );
     if (open_paren != std::string::npos && close_paren + 1 == str.length()) {
         const std::string fname = str.substr(0, open_paren);
         const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
@@ -353,7 +359,7 @@ namespace web {
             return ParseHSL(str, fname, color_tokens, alpha);
         }
     }
-    emp_always_assert( false, str);
+    emp_assert( false, str);
     __builtin_unreachable();
   }
 
@@ -364,13 +370,12 @@ namespace web {
                 emp_assert( false, str );
                 __builtin_unreachable();
             } else {
-                Color* col = new Color(
+                return Color(
                     static_cast<uint8_t>(((iv & 0xf00) >> 4) | ((iv & 0xf00) >> 8)),
                     static_cast<uint8_t>((iv & 0xf0) | ((iv & 0xf0) >> 4)),
                     static_cast<uint8_t>((iv & 0xf) | ((iv & 0xf) << 4)),
                     1
                 );
-                return *col;
             }
         } else if (str.length() == 7) {
             const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
@@ -378,13 +383,12 @@ namespace web {
               emp_assert( false, str );
               __builtin_unreachable();
             } else {
-                Color* col = new Color(
+                return Color(
                     static_cast<uint8_t>((iv & 0xff0000) >> 16),
                     static_cast<uint8_t>((iv & 0xff00) >> 8),
                     static_cast<uint8_t>(iv & 0xff),
                     1
                 );
-                return *col;
             }
         }
 
@@ -400,20 +404,17 @@ namespace web {
                 __builtin_unreachable();
             }
             alpha = color_impl::parse_css_float(color_tokens.back());
-        } else {
-            if (color_tokens.size() != 3) {
+        } else if (color_tokens.size() != 3) {
                 emp_assert( false, str );
                 __builtin_unreachable();
-            }
         }
 
-        emp::web::Color* col = new emp::web::Color(
+        return Color(
             color_impl::parse_css_int(color_tokens[0]),
             color_impl::parse_css_int(color_tokens[1]),
             color_impl::parse_css_int(color_tokens[2]),
             alpha
         );
-        return *col;
   }
 
   Color Color::ParseHSL(const std::string& str, const std::string& fname, 
@@ -424,11 +425,9 @@ namespace web {
                     __builtin_unreachable();
                 }
                 alpha = color_impl::parse_css_float(color_tokens.back());
-            } else {
-                if (color_tokens.size() != 3) {
+            } else if (color_tokens.size() != 3) {
                     emp_assert( false, str );
                     __builtin_unreachable();
-                }
             }
 
             float h = color_impl::parseFloat(color_tokens[0]) / 360.0f;
@@ -438,19 +437,18 @@ namespace web {
 
             // NOTE(deanm): According to the CSS spec s/l should only be
             // percentages, but we don't bother and let float or percentage.
-            float s = color_impl::parse_css_float(color_tokens[1]);
-            float l = color_impl::parse_css_float(color_tokens[2]);
+            const float s = color_impl::parse_css_float(color_tokens[1]);
+            const float l = color_impl::parse_css_float(color_tokens[2]);
 
             float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
             float m1 = l * 2.0f - m2;
 
-            Color* col = new Color(
+            return Color(
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h + 1.0f / 3.0f) * 255.0f),
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h) * 255.0f),
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h - 1.0f / 3.0f) * 255.0f),
                 alpha
             );
-            return *col;
         }
 
 }
