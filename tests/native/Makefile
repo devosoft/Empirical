@@ -2,12 +2,12 @@ TEST_NAMES = CanvasShape Canvas CanvasImages Color
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 DISPLAY_ENV := ${DISPLAY}
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
+FLAGS = -std=c++17 -pthread -lsfml-graphics -lsfml-window -lsfml-system -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
 
 default: test
 
 cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
+	$(CXX) $(FLAGS) $< -o $@.out
 	#echo "running $@.out"
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
@@ -20,7 +20,7 @@ test-prep:
 	mkdir -p temp
 
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
+	$(CXX) $(FLAGS) $< -o $@.out
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
 	./$@.out \
