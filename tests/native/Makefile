@@ -11,7 +11,7 @@ cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	#echo "running $@.out"
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
-	./$@.out
+	until ./$@.out; do ((++fail > 5)) && echo "too many fails" && exit 1; done
 	llvm-profdata merge default.profraw -o default.profdata
 	llvm-cov show ./$@.out -instr-profile=default.profdata > coverage_$@.txt
 	python ../../third-party/force-cover/fix_coverage.py coverage_$@.txt
@@ -23,12 +23,12 @@ test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
-	./$@.out \
+	until ./$@.out; do ((++fail > 5)) && echo "too many fails" && exit 1; done; \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
 
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+	rm -rf test*.out test_*.png
 
 coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi) -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 coverage: test-prep $(addprefix cov-, $(TEST_NAMES))
@@ -36,16 +36,16 @@ coverage: test-prep $(addprefix cov-, $(TEST_NAMES))
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+	rm -rf test*.out test_*.png
 
 # Test in debug mode with pointer tracking
 fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
 fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+	rm -rf test*.out test_*.png
 
 cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+	rm -rf test*.out test_*.png
 
 ../../third-party/Catch/single_include/catch2/catch.hpp:
 	git submodule init
