@@ -23,7 +23,7 @@ test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
-	until ./$@.out; do ((++fail > 5)) && echo "too many fails" && exit 1; done; \
+	until ./$@.out; do ((++fail > 5)) && echo "too many fails" && exit 1; done \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
 
 # Test in debug mode without pointer tracker
