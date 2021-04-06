@@ -68,7 +68,7 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-8
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-      - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
+      - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libsfml-dev libstdc++-7-dev # might have to happen after we update g++
       - run: sudo apt-get install python3-wheel -y
       - run: pip3 install wheel
       - run: sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-7 90
