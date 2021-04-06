@@ -8,7 +8,8 @@
  *  @note Status: BETA
  *
  *
- *  @note consider adding a work-around to avoid vector<bool> ?
+ *  @todo consider adding a work-around to avoid vector<bool> ?
+ *  @todo speed up Append to count all additions at once, resize, and fill them in.
  */
 
 #ifndef EMP_VECTOR_UTILS_H
@@ -51,7 +52,7 @@ namespace emp {
   /// Concatonate two or more vectors together, creating a new vector.
   template <typename T, typename... Vs>
   emp::vector<T> Concat(const emp::vector<T> & v1, const Vs &... vs) {
-    emp::vector<T> out_v = v1;
+    emp::vector<T> out_v(v1);
     Append(out_v, vs...);
     return out_v;
   }
