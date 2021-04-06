@@ -37,7 +37,7 @@ namespace web {
         unsigned char r{}, g{}, b{};
         float a{ 1.0f };
         std::string cached_css_str = "";
-        sf::Color cached_sf_color;
+        // sf::Color cached_sf_color;
     public:
         Color() = default;
 
@@ -45,7 +45,7 @@ namespace web {
         : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
         {
             cached_css_str = emp::ColorRGB(r, g, b, a);
-            cached_sf_color = (sf::Color)*this;
+            //cached_sf_color = (sf::Color)*this;
         }
 
         // defined out of body
@@ -62,10 +62,11 @@ namespace web {
         std::string ToCss_str() {
             return cached_css_str;
         }
-
+        /*
         sf::Color ToSfColor() {
             return cached_sf_color;
         }
+        */
 
         //implicit conversion
         operator std::string() const { return cached_css_str; }
@@ -329,7 +330,7 @@ namespace web {
     if (namedColor->name == str){
         *this = namedColor->color;
         (*this).cached_css_str = emp::ColorRGB(r, g, b, a);
-        (*this).cached_sf_color = (sf::Color)*this;
+        //(*this).cached_sf_color = (sf::Color)*this;
         return;
     }
 
