@@ -61,6 +61,7 @@ RUN \
     libstdc++-8-dev \
     cmake \
     python-virtualenv \
+    python3-venv \
     python-pip-whl \
     python-pip \
     python-setuptools \
