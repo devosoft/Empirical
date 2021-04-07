@@ -26,8 +26,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   // test ExactStreakDistribution
   {
-    std::cout << "Checkpoint 1" << std::endl;
-
     emp::ExactStreakDistribution<4> dist;
 
     REQUIRE( dist.GetStreakProbability(2,2) == 0.25 );
@@ -39,14 +37,10 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE( dist.GetStreakProbability(2) == 8.0/16.0 );
     REQUIRE( dist.GetStreakProbability(3) == 3.0/16.0 );
     REQUIRE( dist.GetStreakProbability(4) == 1.0/16.0 );
-
-    std::cout << "Checkpoint 2" << std::endl;
   }
 
   // test ApproxSingleStreakMetric
   {
-    std::cout << "Checkpoint 3" << std::endl;
-
     emp::ApproxSingleStreakMetric<4> metric;
 
     REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
@@ -67,8 +61,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) <= 1.0);
       REQUIRE(metric(a,b) >= 0.0);
     }
-
-    std::cout << "Checkpoint 4" << std::endl;
   }
 
   // test ApproxDualStreakMetric
@@ -92,8 +84,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   // test ExactSingleStreakMetric
   {
-    std::cout << "Checkpoint 5" << std::endl;
-
     emp::ExactSingleStreakMetric<4> metric;
 
     REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
@@ -110,8 +100,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) <= 1.0);
       REQUIRE(metric(a,b) >= 0.0);
     }
-
-    std::cout << "Checkpoint 6" << std::endl;
   }
 
   // test ExactDualStreakMetric
@@ -133,8 +121,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) <= 1.0);
       REQUIRE(metric(a,b) >= 0.0);
     }
-
-    std::cout << "Checkpoint 7" << std::endl;
   }
 
   // test SieveSelector with auto adjust
@@ -157,8 +143,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   bin.Put("one-fifteen", 115);
 
-  std::cout << "Checkpoint 8" << std::endl;
-
   const size_t nrep = 1000;
 
   std::unordered_map<std::string, size_t> res;
@@ -177,8 +161,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE(uniques.size() == matches.size());
 
   }
-
-  std::cout << "Checkpoint 9" << std::endl;
 
   REQUIRE(res["one"] == 0);
   REQUIRE(res["two-two-seven"] > 0);
@@ -207,8 +189,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE(res["one-fifteen"] < nrep);
   REQUIRE(res["fifteen"] == nrep);
   }
-
-  std::cout << "Checkpoint 10" << std::endl;
 
   // test SieveSelector with no stochastic
   {
@@ -260,9 +240,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     bin.Put(emp::to_string(i*10), i*10);
   }
 
-  std::cout << "Checkpoint 11" << std::endl;
-
-
   res.clear();
 
   for (size_t rep = 0; rep < nrep; ++rep) {
@@ -302,8 +279,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   bin.Put("one-fifteen", 115);
 
   const size_t nrep = 1000;
-
-  std::cout << "Checkpoint 12" << std::endl;
 
   std::unordered_map<std::string, size_t> res;
   for (size_t rep = 0; rep < nrep; ++rep) {
@@ -349,8 +324,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE(res["one-fifteen"] == nrep);
   REQUIRE(res["fifteen"] == nrep);
   }
-
-  std::cout << "Checkpoint 13" << std::endl;
 
   // test PowMod, LogMod
   {
@@ -401,8 +374,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   REQUIRE( stretch_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
   }
 
-  std::cout << "Checkpoint 14" << std::endl;
-
   // more tests for PowMod, LogMod
   {
 
@@ -439,278 +410,278 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-  std::cout << "Checkpoint 15" << std::endl;
+  std::cout << "START TEST TESTS.  Good above!" << std::endl;
 
-  // // test CacheMod
-  // // test PowMod, LogMod
-  // {
-  // emp::HammingMetric<4> baseline;
+  // test CacheMod
+  // test PowMod, LogMod
+  {
+  emp::HammingMetric<4> baseline;
 
-  // emp::PowMod<emp::HammingMetric<4>, std::ratio<3>> squish;
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<3>> squish;
 
-  // emp::CacheMod<emp::PowMod<
-  //   emp::HammingMetric<4>,
-  //   std::ratio<3>
-  // >> cache_squish;
+  emp::CacheMod<emp::PowMod<
+    emp::HammingMetric<4>,
+    std::ratio<3>
+  >> cache_squish;
 
-  // emp::CacheMod<emp::PowMod<
-  //   emp::HammingMetric<4>,
-  //   std::ratio<3>
-  // >, 2> small_cache_squish;
+  emp::CacheMod<emp::PowMod<
+    emp::HammingMetric<4>,
+    std::ratio<3>
+  >, 2> small_cache_squish;
 
-  // // put in cache
-  // REQUIRE( squish({0,0,0,0},{0,0,0,0}) == cache_squish({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( squish({0,0,0,0},{0,0,0,1}) == cache_squish({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( squish({0,0,0,0},{0,0,1,1}) == cache_squish({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( squish({0,0,0,0},{0,1,1,1}) == cache_squish({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( squish({0,0,0,0},{1,1,1,1}) == cache_squish({0,0,0,0},{1,1,1,1}) );
+  // put in cache
+  REQUIRE( squish({0,0,0,0},{0,0,0,0}) == cache_squish({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish({0,0,0,0},{0,0,0,1}) == cache_squish({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish({0,0,0,0},{0,0,1,1}) == cache_squish({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish({0,0,0,0},{0,1,1,1}) == cache_squish({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish({0,0,0,0},{1,1,1,1}) == cache_squish({0,0,0,0},{1,1,1,1}) );
 
-  // // hit cache
-  // REQUIRE( squish({0,0,0,0},{0,0,0,0}) == cache_squish({0,0,0,0},{0,0,0,0}) );
-  // REQUIRE( squish({0,0,0,0},{0,0,0,1}) == cache_squish({0,0,0,0},{0,0,0,1}) );
-  // REQUIRE( squish({0,0,0,0},{0,0,1,1}) == cache_squish({0,0,0,0},{0,0,1,1}) );
-  // REQUIRE( squish({0,0,0,0},{0,1,1,1}) == cache_squish({0,0,0,0},{0,1,1,1}) );
-  // REQUIRE( squish({0,0,0,0},{1,1,1,1}) == cache_squish({0,0,0,0},{1,1,1,1}) );
+  // hit cache
+  REQUIRE( squish({0,0,0,0},{0,0,0,0}) == cache_squish({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish({0,0,0,0},{0,0,0,1}) == cache_squish({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish({0,0,0,0},{0,0,1,1}) == cache_squish({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish({0,0,0,0},{0,1,1,1}) == cache_squish({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish({0,0,0,0},{1,1,1,1}) == cache_squish({0,0,0,0},{1,1,1,1}) );
 
-  // // put in cache
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,0,0,0}) == small_cache_squish({0,0,0,0},{0,0,0,0})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,0,0,1}) == small_cache_squish({0,0,0,0},{0,0,0,1})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,0,1,1}) == small_cache_squish({0,0,0,0},{0,0,1,1})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,1,1,1}) == small_cache_squish({0,0,0,0},{0,1,1,1})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{1,1,1,1}) == small_cache_squish({0,0,0,0},{1,1,1,1})
-  // );
+  // put in cache
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,0}) == small_cache_squish({0,0,0,0},{0,0,0,0})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,1}) == small_cache_squish({0,0,0,0},{0,0,0,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,1,1}) == small_cache_squish({0,0,0,0},{0,0,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,1,1,1}) == small_cache_squish({0,0,0,0},{0,1,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{1,1,1,1}) == small_cache_squish({0,0,0,0},{1,1,1,1})
+  );
 
-  // // hit cache
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,0,0,0}) == small_cache_squish({0,0,0,0},{0,0,0,0})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,0,0,1}) == small_cache_squish({0,0,0,0},{0,0,0,1})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,0,1,1}) == small_cache_squish({0,0,0,0},{0,0,1,1})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{0,1,1,1}) == small_cache_squish({0,0,0,0},{0,1,1,1})
-  // );
-  // REQUIRE(
-  //   squish({0,0,0,0},{1,1,1,1}) == small_cache_squish({0,0,0,0},{1,1,1,1})
-  // );
+  // hit cache
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,0}) == small_cache_squish({0,0,0,0},{0,0,0,0})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,1}) == small_cache_squish({0,0,0,0},{0,0,0,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,1,1}) == small_cache_squish({0,0,0,0},{0,0,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,1,1,1}) == small_cache_squish({0,0,0,0},{0,1,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{1,1,1,1}) == small_cache_squish({0,0,0,0},{1,1,1,1})
+  );
 
-  // }
+  }
 
-  // std::cout << "Checkpoint 16" << std::endl;
+  std::cout << "Checkpoint 16" << std::endl;
 
-  // // test UnifMod
-  // {
+  // test UnifMod
+  {
 
-  // emp::HashMetric<32> hash;
-  // emp::UnifMod<emp::HashMetric<32>> unif_hash;
-  // emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
+  emp::HashMetric<32> hash;
+  emp::UnifMod<emp::HashMetric<32>> unif_hash;
+  emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
 
-  // emp::HammingMetric<32> hamming;
-  // emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
-  // emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
+  emp::HammingMetric<32> hamming;
+  emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
+  emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
 
-  // emp::Random rand(1);
+  emp::Random rand(1);
 
-  // for (size_t rep = 0; rep < 5000; ++rep) {
+  for (size_t rep = 0; rep < 5000; ++rep) {
 
-  //   emp::BitSet<32> a(rand);
-  //   emp::BitSet<32> b(rand);
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
 
-  //   emp::BitSet<32> c(rand);
-  //   emp::BitSet<32> d(rand);
+    emp::BitSet<32> c(rand);
+    emp::BitSet<32> d(rand);
 
-  //   REQUIRE(unif_hash(a,b) >= 0.0);
-  //   REQUIRE(unif_hash(a,b) <= 1.0);
-  //   if (unif_hash(a,b) > unif_hash(c,d)) {
-  //     REQUIRE(hash(a,b) > hash(c,d));
-  //   } else if (unif_hash(a,b) < unif_hash(c,d)) {
-  //     REQUIRE(hash(a,b) < hash(c,d));
-  //   } else {
-  //     // unif_hash(a,b) == unif_hash(c,d)
-  //     REQUIRE(hash(a,b) == hash(c,d));
-  //   }
+    REQUIRE(unif_hash(a,b) >= 0.0);
+    REQUIRE(unif_hash(a,b) <= 1.0);
+    if (unif_hash(a,b) > unif_hash(c,d)) {
+      REQUIRE(hash(a,b) > hash(c,d));
+    } else if (unif_hash(a,b) < unif_hash(c,d)) {
+      REQUIRE(hash(a,b) < hash(c,d));
+    } else {
+      // unif_hash(a,b) == unif_hash(c,d)
+      REQUIRE(hash(a,b) == hash(c,d));
+    }
 
-  //   REQUIRE(unif_hash_small(a,b) >= 0.0);
-  //   REQUIRE(unif_hash_small(a,b) <= 1.0);
-  //   if (unif_hash_small(a,b) > unif_hash_small(c,d)) {
-  //     REQUIRE(hash(a,b) > hash(c,d));
-  //   } else if (unif_hash_small(a,b) < unif_hash_small(c,d)) {
-  //     REQUIRE(hash(a,b) < hash(c,d));
-  //   } else {
-  //     // unif_hash_small(a,b) == unif_hash_small(c,d)
-  //     REQUIRE(hash(a,b) == hash(c,d));
-  //   }
+    REQUIRE(unif_hash_small(a,b) >= 0.0);
+    REQUIRE(unif_hash_small(a,b) <= 1.0);
+    if (unif_hash_small(a,b) > unif_hash_small(c,d)) {
+      REQUIRE(hash(a,b) > hash(c,d));
+    } else if (unif_hash_small(a,b) < unif_hash_small(c,d)) {
+      REQUIRE(hash(a,b) < hash(c,d));
+    } else {
+      // unif_hash_small(a,b) == unif_hash_small(c,d)
+      REQUIRE(hash(a,b) == hash(c,d));
+    }
 
-  //   REQUIRE(unif_hamming(a,b) >= 0.0);
-  //   REQUIRE(unif_hamming(a,b) <= 1.0);
-  //   if (unif_hamming(a,b) > unif_hamming(c,d)) {
-  //     REQUIRE(hamming(a,b) > hamming(c,d));
-  //   } else if (unif_hamming(a,b) < unif_hamming(c,d)) {
-  //     REQUIRE(hamming(a,b) < hamming(c,d));
-  //   } else {
-  //     // unif_hamming(a,b) == unif_hamming(c,d)
-  //     REQUIRE(hamming(a,b) == hamming(c,d));
-  //   }
+    REQUIRE(unif_hamming(a,b) >= 0.0);
+    REQUIRE(unif_hamming(a,b) <= 1.0);
+    if (unif_hamming(a,b) > unif_hamming(c,d)) {
+      REQUIRE(hamming(a,b) > hamming(c,d));
+    } else if (unif_hamming(a,b) < unif_hamming(c,d)) {
+      REQUIRE(hamming(a,b) < hamming(c,d));
+    } else {
+      // unif_hamming(a,b) == unif_hamming(c,d)
+      REQUIRE(hamming(a,b) == hamming(c,d));
+    }
 
-  //   REQUIRE(unif_hamming_small(a,b) >= 0.0);
-  //   REQUIRE(unif_hamming_small(a,b) <= 1.0);
-  //   if (unif_hamming_small(a,b) > unif_hamming_small(c,d)) {
-  //     REQUIRE(hamming(a,b) > hamming(c,d));
-  //   } else if (unif_hamming_small(a,b) < unif_hamming_small(c,d)) {
-  //     REQUIRE(hamming(a,b) < hamming(c,d));
-  //   } else {
-  //     // unif_hamming_small(a,b) == unif_hamming_small(c,d)
-  //     REQUIRE(hamming(a,b) == hamming(c,d));
-  //   }
+    REQUIRE(unif_hamming_small(a,b) >= 0.0);
+    REQUIRE(unif_hamming_small(a,b) <= 1.0);
+    if (unif_hamming_small(a,b) > unif_hamming_small(c,d)) {
+      REQUIRE(hamming(a,b) > hamming(c,d));
+    } else if (unif_hamming_small(a,b) < unif_hamming_small(c,d)) {
+      REQUIRE(hamming(a,b) < hamming(c,d));
+    } else {
+      // unif_hamming_small(a,b) == unif_hamming_small(c,d)
+      REQUIRE(hamming(a,b) == hamming(c,d));
+    }
 
-  // }
+  }
 
-  // }
+  }
 
-  // std::cout << "Checkpoint 17" << std::endl;
+  std::cout << "Checkpoint 17" << std::endl;
 
-  // // test EuclideanDimMod
-  // {
-  // emp::Random rand(1);
+  // test EuclideanDimMod
+  {
+  emp::Random rand(1);
 
-  // emp::BitSet<32> a1(rand);
-  // emp::BitSet<32> b1(rand);
+  emp::BitSet<32> a1(rand);
+  emp::BitSet<32> b1(rand);
 
-  // emp::HammingMetric<32> hamming;
+  emp::HammingMetric<32> hamming;
 
-  // emp::FlatMod<
-  //   emp::MeanDimMod<
-  //     typename emp::HammingMetric<32>,
-  //     1
-  //   >
-  // > d_hamming1;
-  // REQUIRE(d_hamming1.width() == hamming.width());
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
 
-  // REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
-  // }
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  }
 
-  // // test EuclideanDimMod
-  // {
-  // emp::Random rand(1);
+  // test EuclideanDimMod
+  {
+  emp::Random rand(1);
 
-  // emp::BitSet<32> a1(rand);
-  // emp::BitSet<32> b1(rand);
+  emp::BitSet<32> a1(rand);
+  emp::BitSet<32> b1(rand);
 
-  // emp::HammingMetric<32> hamming;
+  emp::HammingMetric<32> hamming;
 
-  // emp::FlatMod<
-  //   emp::MeanDimMod<
-  //     typename emp::HammingMetric<32>,
-  //     1
-  //   >
-  // > d_hamming1;
-  // REQUIRE(d_hamming1.width() == hamming.width());
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
 
-  // REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
-  // }
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  }
 
-  // // more tests for EuclideanDimMod
-  // {
-  //   emp::HammingMetric<4> hamming;
+  // more tests for EuclideanDimMod
+  {
+    emp::HammingMetric<4> hamming;
 
-  //   emp::FlatMod<
-  //     emp::EuclideanDimMod<
-  //       typename emp::HammingMetric<2>,
-  //       2
-  //     >
-  //   > d_hamming2;
-  //   REQUIRE(d_hamming2.width() == hamming.width());
+    emp::FlatMod<
+      emp::EuclideanDimMod<
+        typename emp::HammingMetric<2>,
+        2
+      >
+    > d_hamming2;
+    REQUIRE(d_hamming2.width() == hamming.width());
 
-  //   REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
+    REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
 
-  //   REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
-  //   REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
-  //   REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
-  //   REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
 
-  //   REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
-  //   REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
-  //   REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
-  //   REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
 
-  //   REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
-  //   REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
-  // }
+    REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
+    REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
+  }
 
-  // std::cout << "Checkpoint 18" << std::endl;
+  std::cout << "Checkpoint 18" << std::endl;
 
-  // // more tests for EuclideanDimMod
-  // {
+  // more tests for EuclideanDimMod
+  {
 
-  //   emp::FlatMod<
-  //     emp::MeanDimMod<
-  //       typename emp::HammingMetric<8>,
-  //       4
-  //     >
-  //   > metric;
+    emp::FlatMod<
+      emp::MeanDimMod<
+        typename emp::HammingMetric<8>,
+        4
+      >
+    > metric;
 
-  // emp::Random rand(1);
-  // for (size_t rep = 0; rep < 1000; ++rep) {
-  //   emp::BitSet<32> a(rand);
-  //   emp::BitSet<32> b(rand);
-  //   REQUIRE(metric(a,b) >= 0.0);
-  //   REQUIRE(metric(a,b) <= 1.0);
-  // }
+  emp::Random rand(1);
+  for (size_t rep = 0; rep < 1000; ++rep) {
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
+    REQUIRE(metric(a,b) >= 0.0);
+    REQUIRE(metric(a,b) <= 1.0);
+  }
 
-  // }
+  }
 
-  // // tests for AdditiveCountdownRegulator
-  // {
+  // tests for AdditiveCountdownRegulator
+  {
 
-  //   // TODO:
-  //   // Fails with random seed 1, passes with other random seeds (2 & 3)
-  //   // Failure on seed 1 appears stochastic, but we should investigate further and
-  //   // clean up this test.
-  //   emp::Random rand(1);
+    // TODO:
+    // Fails with random seed 1, passes with other random seeds (2 & 3)
+    // Failure on seed 1 appears stochastic, but we should investigate further and
+    // clean up this test.
+    emp::Random rand(1);
 
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::AbsDiffMetric,
-  //   emp::RouletteSelector<>,
-  //   emp::AdditiveCountdownRegulator<>
-  // >bin(rand);
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::AdditiveCountdownRegulator<>
+  >bin(rand);
 
-  // const size_t ndraws = 100000;
+  const size_t ndraws = 100000;
 
-  // const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
-  // REQUIRE( bin.GetVal(hi) == "hi" );
-  // const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
-  // REQUIRE( bin.GetVal(salut) == "salut" );
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
+  REQUIRE( bin.GetVal(salut) == "salut" );
 
-  // REQUIRE( bin.Size() == 2 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
 
-  // // baseline, "salut" should match much better
-  // auto res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( count > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+  // baseline, "salut" should match much better
+  auto res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
-  // // downregulate "salut," now "hi" should match better
-  // bin.AdjRegulator(salut, 20.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 20.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+  // downregulate "salut," now "hi" should match better
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 20.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
 
   // std::cout << "Checkpoint 19" << std::endl;
 
