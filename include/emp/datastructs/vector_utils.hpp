@@ -92,7 +92,7 @@ namespace emp {
   void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
     for (size_t id = 0; id < v.size(); id++) {
       if (id) os << spacer; // Put a space before second element and beyond.
-      os << v[id];
+      os << ToString(v[id]);
     }
   }
 
