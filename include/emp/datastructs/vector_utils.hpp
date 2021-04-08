@@ -22,6 +22,7 @@
 #include <limits>
 
 #include "../base/vector.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 
@@ -92,7 +93,7 @@ namespace emp {
   void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
     for (size_t id = 0; id < v.size(); id++) {
       if (id) os << spacer; // Put a space before second element and beyond.
-      os << ToString(v[id]);
+      os << emp::to_string(v[id]);
     }
   }
 
