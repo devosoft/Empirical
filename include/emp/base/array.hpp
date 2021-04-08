@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2021.
  *
  *  @file array.hpp
  *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
@@ -23,7 +23,6 @@
 #include <array>
 
 #include "assert.hpp"
-#include "../meta/TypeID.hpp"
 
 #ifdef EMP_NDEBUG
 
