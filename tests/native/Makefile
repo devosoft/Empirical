@@ -12,7 +12,7 @@ cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	#echo "running $@.out"
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
-	until ./$@.out; do ((++fail > 5)) && echo "too many fails" && exit 1; done
+	until (./$@.out); do ((++fail > 5)) && echo "too many fails" && break || echo "failure ${fail}, retrying"; done
 	llvm-profdata merge default.profraw -o default.profdata
 	llvm-cov show ./$@.out -instr-profile=default.profdata > coverage_$@.txt
 	python ../../third-party/force-cover/fix_coverage.py coverage_$@.txt
@@ -24,8 +24,7 @@ test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
 	# execute test
 	test -f ../../third-party/env/bin/activate && . ../../third-party/env/bin/activate; \
-	until ./$@.out; do ((++fail > 5)) && echo "too many fails" && exit 1; done \
-		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
+	until (./$@.out); do ((++fail > 5)) && echo "too many fails" && break || echo "failure ${fail}, retrying"; done
 
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
