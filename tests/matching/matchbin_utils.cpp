@@ -953,7 +953,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   // ));
   // }
 
-  // }
+  }
 
-  // std::cout << "Checkpoint 23" << std::endl;
+  std::cout << "Checkpoint 23" << std::endl;
 }
