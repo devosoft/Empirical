@@ -21,15 +21,36 @@ struct FileInfo {
 
 int main(int argc, char * argv[])
 {
+  if (argc == 1) {
+    std::cerr << "No files listed.\nPlease run `" << argv[0] << " --help` for more info.\n";
+    exit(0);
+  }
+
   // Load in all of the files that we are working with.
-  size_t num_files = argc - 1;
+  const size_t num_files = argc - 1;
   emp::vector<std::string> files(num_files);
   for (size_t i = 0; i < num_files; i++) files[i] = argv[i+1];
 
+  // Check if we're just supposed to print the help info.
+  if (files[0] == "--help") {
+    std::cerr << "Format: " << argv[0] << " [args] {filename} [filenames...]\n"
+	      << "Available args:\n"
+	      << " -v : verbose output\n";
+    exit(0);
+  }
+
+  std::cerr << num_files << " files found.  Processing!" << std::endl;
+
+  bool verbose = false;
+  
   // Simplify to just the filenames (remove paths)
   std::map<std::string, FileInfo> file_map;
   emp::vector<std::string> filenames;
   for (std::string & file : files) {
+    if (file == "-v") {
+      verbose = true;
+      continue;
+    }
     emp::vector<std::string_view> dir_struct = emp::view_slices(file, '/');
     std::string filename(dir_struct.back());
     file_map[filename].filename = filename;
@@ -39,17 +60,27 @@ int main(int argc, char * argv[])
 
   // For each file, scan for its dependencies.
   for (auto & [filename, info] : file_map) {
+    if (verbose) {
+      std::cerr << "Scanning '" << filename << "' found at: "
+		<< info.path << std::endl;
+    }
+
     emp::File file(info.path);
     file.KeepIfContains("#include");      // Only scan through include lines.
     file.RemoveIfContains("third-party"); // Ignore includes from third-party directory (may duplicate names)
 
     // Now test which OTHER filenames it is including.  Search for the filename with
     // a " or / in front of it (to make sure it's not part of another name)
+    int include_count = 0;
     for (const std::string & filename : filenames) {
       if (file.Contains(emp::to_string("\"", filename)) ||
           file.Contains(emp::to_string("/", filename)) ) {
         info.depends.insert(filename);
+	include_count++;
       }
+    }
+    if (verbose) {
+      std::cerr << "...has " << include_count << " includes." << std::endl;
     }
   }
 
@@ -59,6 +90,10 @@ int main(int argc, char * argv[])
   while (progress) {
     progress = false;
 
+    if (verbose) {
+      std::cerr << "Processing!" << std::endl;
+    }
+    
     // Loop through each file to see if we can determine its level.
     for (auto & [filename, info] : file_map) {
       if (info.level != FileInfo::NO_LEVEL) continue;  // Already has a level!
@@ -80,7 +115,12 @@ int main(int argc, char * argv[])
 
       // If we have a level for this file now, use it an indicate progress!
       if (new_level != FileInfo::NO_LEVEL) {
+        if (verbose) {
+          std::cerr << "..." << info.filename << " assigned to level " << new_level << std::endl;
+        }
+
         info.level = new_level;
+
         if (new_level > max_level) max_level = new_level;
         progress = true;
       }
@@ -92,7 +132,6 @@ int main(int argc, char * argv[])
     std::cout << "============ LEVEL " << level << " ============\n";
     for (auto [filename, info] : file_map) {
       if (info.level != level) continue;
-  //    std::cout << emp::to_ansi_bold(filename)
       std::cout << filename << " " << " (" << info.path << ")\n";
       if (level == 0) continue;
       std::cout << " :";
@@ -102,4 +141,28 @@ int main(int argc, char * argv[])
       std::cout << std::endl;
     }
   }
+
+  // Identify any files that we were NOT able to handle, if any.
+  int unknown_count = 0;
+  for (auto & [filename, info] : file_map) {
+    if (info.level != FileInfo::NO_LEVEL) continue;  // Has a level!
+
+    // Only print a header for this section if it has entries.
+    if (unknown_count++ == 0) {
+      std::cout << "\n============ UNKNOWN LEVEL! ============\n";
+    }
+
+    std::cout << filename << " " << " (" << info.path << ")\n";
+    std::cout << " :";
+    for (const std::string & name : info.depends) {
+      std::string level = "Unknown";
+      if (file_map[name].level != FileInfo::NO_LEVEL) level = emp::to_string(file_map[name].level);
+      std::cout << " " << name << "(" << level << ")";
+    }
+    std::cout << std::endl;
+  }
+  if (verbose) {
+    std::cerr << "Number of files with unknown levels: " << unknown_count << std::endl;
+  }
+  
 }
