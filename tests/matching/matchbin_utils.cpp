@@ -492,76 +492,83 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   std::cout << "Checkpoint 16" << std::endl;
 
-  // test UnifMod
-  {
+  // // test UnifMod
+  // {
 
-  emp::HashMetric<32> hash;
-  emp::UnifMod<emp::HashMetric<32>> unif_hash;
-  emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
+  // emp::HashMetric<32> hash;
+  // emp::UnifMod<emp::HashMetric<32>> unif_hash;
+  // emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
 
-  emp::HammingMetric<32> hamming;
-  emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
-  emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
+  // emp::HammingMetric<32> hamming;
+  // emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
+  // emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
 
-  emp::Random rand(1);
+  // emp::Random rand(1);
 
-  for (size_t rep = 0; rep < 5000; ++rep) {
+  // for (size_t rep = 0; rep < 5000; ++rep) {
 
-    emp::BitSet<32> a(rand);
-    emp::BitSet<32> b(rand);
+  //   emp::BitSet<32> a(rand);
+  //   emp::BitSet<32> b(rand);
 
-    emp::BitSet<32> c(rand);
-    emp::BitSet<32> d(rand);
+  //   emp::BitSet<32> c(rand);
+  //   emp::BitSet<32> d(rand);
 
-    REQUIRE(unif_hash(a,b) >= 0.0);
-    REQUIRE(unif_hash(a,b) <= 1.0);
-    if (unif_hash(a,b) > unif_hash(c,d)) {
-      REQUIRE(hash(a,b) > hash(c,d));
-    } else if (unif_hash(a,b) < unif_hash(c,d)) {
-      REQUIRE(hash(a,b) < hash(c,d));
-    } else {
-      // unif_hash(a,b) == unif_hash(c,d)
-      REQUIRE(hash(a,b) == hash(c,d));
-    }
+  //   REQUIRE(unif_hash(a,b) >= 0.0);
+  //   REQUIRE(unif_hash(a,b) <= 1.0);
+  //   if (unif_hash(a,b) > unif_hash(c,d)) {
+  //     REQUIRE(hash(a,b) > hash(c,d));
+  //   } else if (unif_hash(a,b) < unif_hash(c,d)) {
+  //     REQUIRE(hash(a,b) < hash(c,d));
+  //   } else {
+  //     // unif_hash(a,b) == unif_hash(c,d)
+  //     REQUIRE(hash(a,b) == hash(c,d));
+  //   }
 
-    REQUIRE(unif_hash_small(a,b) >= 0.0);
-    REQUIRE(unif_hash_small(a,b) <= 1.0);
-    if (unif_hash_small(a,b) > unif_hash_small(c,d)) {
-      REQUIRE(hash(a,b) > hash(c,d));
-    } else if (unif_hash_small(a,b) < unif_hash_small(c,d)) {
-      REQUIRE(hash(a,b) < hash(c,d));
-    } else {
-      // unif_hash_small(a,b) == unif_hash_small(c,d)
-      REQUIRE(hash(a,b) == hash(c,d));
-    }
+  //   REQUIRE(unif_hash_small(a,b) >= 0.0);
+  //   REQUIRE(unif_hash_small(a,b) <= 1.0);
+  //   if (unif_hash_small(a,b) > unif_hash_small(c,d)) {
+  //     REQUIRE(hash(a,b) > hash(c,d));
+  //   } else if (unif_hash_small(a,b) < unif_hash_small(c,d)) {
+  //     REQUIRE(hash(a,b) < hash(c,d));
+  //   } else {
+  //     // unif_hash_small(a,b) == unif_hash_small(c,d)
+  //     REQUIRE(hash(a,b) == hash(c,d));
+  //   }
 
-    REQUIRE(unif_hamming(a,b) >= 0.0);
-    REQUIRE(unif_hamming(a,b) <= 1.0);
-    if (unif_hamming(a,b) > unif_hamming(c,d)) {
-      REQUIRE(hamming(a,b) > hamming(c,d));
-    } else if (unif_hamming(a,b) < unif_hamming(c,d)) {
-      REQUIRE(hamming(a,b) < hamming(c,d));
-    } else {
-      // unif_hamming(a,b) == unif_hamming(c,d)
-      REQUIRE(hamming(a,b) == hamming(c,d));
-    }
+  //   REQUIRE(unif_hamming(a,b) >= 0.0);
+  //   REQUIRE(unif_hamming(a,b) <= 1.0);
+  //   if (unif_hamming(a,b) > unif_hamming(c,d)) {
+  //     REQUIRE(hamming(a,b) > hamming(c,d));
+  //   } else if (unif_hamming(a,b) < unif_hamming(c,d)) {
+  //     REQUIRE(hamming(a,b) < hamming(c,d));
+  //   } else {
+  //     // unif_hamming(a,b) == unif_hamming(c,d)
+  //     REQUIRE(hamming(a,b) == hamming(c,d));
+  //   }
 
-    REQUIRE(unif_hamming_small(a,b) >= 0.0);
-    REQUIRE(unif_hamming_small(a,b) <= 1.0);
-    if (unif_hamming_small(a,b) > unif_hamming_small(c,d)) {
-      REQUIRE(hamming(a,b) > hamming(c,d));
-    } else if (unif_hamming_small(a,b) < unif_hamming_small(c,d)) {
-      REQUIRE(hamming(a,b) < hamming(c,d));
-    } else {
-      // unif_hamming_small(a,b) == unif_hamming_small(c,d)
-      REQUIRE(hamming(a,b) == hamming(c,d));
-    }
+  //   REQUIRE(unif_hamming_small(a,b) >= 0.0);
+  //   REQUIRE(unif_hamming_small(a,b) <= 1.0);
+  //   if (unif_hamming_small(a,b) > unif_hamming_small(c,d)) {
+  //     REQUIRE(hamming(a,b) > hamming(c,d));
+  //   } else if (unif_hamming_small(a,b) < unif_hamming_small(c,d)) {
+  //     REQUIRE(hamming(a,b) < hamming(c,d));
+  //   } else {
+  //     // unif_hamming_small(a,b) == unif_hamming_small(c,d)
+  //     REQUIRE(hamming(a,b) == hamming(c,d));
+  //   }
 
-  }
+  // }
 
-  }
+  // }
 
-  std::cout << "Checkpoint 17" << std::endl;
+  ////////////////////////////////////////////////////////////////////////////////////
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  std::cout << "END TEST TESTS.  Problem ABOVE!" << std::endl;
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  ////////////////////////////////////////////////////////////////////////////////////
+
 
   // // test EuclideanDimMod
   // {
@@ -693,14 +700,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   // res = bin.GetVals(bin.Match(0, ndraws));
   // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
   // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
-
-  ////////////////////////////////////////////////////////////////////////////////////
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  std::cout << "END TEST TESTS.  Problem ABOVE!" << std::endl;
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  ////////////////////////////////////////////////////////////////////////////////////
 
   // // upregulate both, "hi" should still match better
   // bin.AdjRegulator(hi, -20.0); // upregulate
