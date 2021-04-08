@@ -510,7 +510,10 @@ namespace emp {
     [[nodiscard]] emp::vector<size_t> GetOnes() const;
 
     /// Find the length of the longest continuous series of ones.
-    size_t LongestSegmentOnes() const;
+    [[nodiscard]] size_t LongestSegmentOnes() const;
+
+    /// Return true if any ones are in common with another BitVector.
+    [[nodiscard]] bool HasOverlap(const BitVector & in) const;
 
 
     // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
@@ -1819,6 +1822,16 @@ namespace emp {
       test_bits.AND_SELF(test_bits<<1);
     }
     return length;
+  }
+
+  /// Return true if any ones are in common with another BitVector.
+  bool BitVector::HasOverlap(const BitVector & in) const {
+    const size_t num_fields = std::min(NumFields(), in.NumFields());
+    for (size_t i = 0; i < num_fields; ++i) {
+      // Short-circuit if we find any overlap.
+      if (bits[i] & in.bits[i]) return true;
+    }
+    return false;
   }
 
 
