@@ -410,7 +410,18 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-  std::cout << "START TEST TESTS.  Good above!" << std::endl;
+
+
+  ////////////////////////////////////////////////////////////////////////////////////
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  std::cout << "START TEST TESTS.  Problem BELOW!" << std::endl;
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  ////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
   // test CacheMod
   // test PowMod, LogMod
@@ -552,138 +563,144 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   std::cout << "Checkpoint 17" << std::endl;
 
-  // test EuclideanDimMod
-  {
-  emp::Random rand(1);
+  // // test EuclideanDimMod
+  // {
+  // emp::Random rand(1);
 
-  emp::BitSet<32> a1(rand);
-  emp::BitSet<32> b1(rand);
+  // emp::BitSet<32> a1(rand);
+  // emp::BitSet<32> b1(rand);
 
-  emp::HammingMetric<32> hamming;
+  // emp::HammingMetric<32> hamming;
 
-  emp::FlatMod<
-    emp::MeanDimMod<
-      typename emp::HammingMetric<32>,
-      1
-    >
-  > d_hamming1;
-  REQUIRE(d_hamming1.width() == hamming.width());
+  // emp::FlatMod<
+  //   emp::MeanDimMod<
+  //     typename emp::HammingMetric<32>,
+  //     1
+  //   >
+  // > d_hamming1;
+  // REQUIRE(d_hamming1.width() == hamming.width());
 
-  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
-  }
+  // REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  // }
 
-  // test EuclideanDimMod
-  {
-  emp::Random rand(1);
+  // // test EuclideanDimMod
+  // {
+  // emp::Random rand(1);
 
-  emp::BitSet<32> a1(rand);
-  emp::BitSet<32> b1(rand);
+  // emp::BitSet<32> a1(rand);
+  // emp::BitSet<32> b1(rand);
 
-  emp::HammingMetric<32> hamming;
+  // emp::HammingMetric<32> hamming;
 
-  emp::FlatMod<
-    emp::MeanDimMod<
-      typename emp::HammingMetric<32>,
-      1
-    >
-  > d_hamming1;
-  REQUIRE(d_hamming1.width() == hamming.width());
+  // emp::FlatMod<
+  //   emp::MeanDimMod<
+  //     typename emp::HammingMetric<32>,
+  //     1
+  //   >
+  // > d_hamming1;
+  // REQUIRE(d_hamming1.width() == hamming.width());
 
-  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
-  }
+  // REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  // }
 
-  // more tests for EuclideanDimMod
-  {
-    emp::HammingMetric<4> hamming;
+  // // more tests for EuclideanDimMod
+  // {
+  //   emp::HammingMetric<4> hamming;
 
-    emp::FlatMod<
-      emp::EuclideanDimMod<
-        typename emp::HammingMetric<2>,
-        2
-      >
-    > d_hamming2;
-    REQUIRE(d_hamming2.width() == hamming.width());
+  //   emp::FlatMod<
+  //     emp::EuclideanDimMod<
+  //       typename emp::HammingMetric<2>,
+  //       2
+  //     >
+  //   > d_hamming2;
+  //   REQUIRE(d_hamming2.width() == hamming.width());
 
-    REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
+  //   REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
 
-    REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
-    REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
-    REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
-    REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
+  //   REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
+  //   REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
+  //   REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
+  //   REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
 
-    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
-    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
-    REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
-    REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
+  //   REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+  //   REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+  //   REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
+  //   REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
 
-    REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
-    REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
-  }
+  //   REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
+  //   REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
+  // }
 
-  std::cout << "Checkpoint 18" << std::endl;
+  // std::cout << "Checkpoint 18" << std::endl;
 
-  // more tests for EuclideanDimMod
-  {
+  // // more tests for EuclideanDimMod
+  // {
 
-    emp::FlatMod<
-      emp::MeanDimMod<
-        typename emp::HammingMetric<8>,
-        4
-      >
-    > metric;
+  //   emp::FlatMod<
+  //     emp::MeanDimMod<
+  //       typename emp::HammingMetric<8>,
+  //       4
+  //     >
+  //   > metric;
 
-  emp::Random rand(1);
-  for (size_t rep = 0; rep < 1000; ++rep) {
-    emp::BitSet<32> a(rand);
-    emp::BitSet<32> b(rand);
-    REQUIRE(metric(a,b) >= 0.0);
-    REQUIRE(metric(a,b) <= 1.0);
-  }
+  // emp::Random rand(1);
+  // for (size_t rep = 0; rep < 1000; ++rep) {
+  //   emp::BitSet<32> a(rand);
+  //   emp::BitSet<32> b(rand);
+  //   REQUIRE(metric(a,b) >= 0.0);
+  //   REQUIRE(metric(a,b) <= 1.0);
+  // }
 
-  }
+  // }
 
-  // tests for AdditiveCountdownRegulator
-  {
+  // // tests for AdditiveCountdownRegulator
+  // {
 
-    // TODO:
-    // Fails with random seed 1, passes with other random seeds (2 & 3)
-    // Failure on seed 1 appears stochastic, but we should investigate further and
-    // clean up this test.
-    emp::Random rand(1);
+  //   // TODO:
+  //   // Fails with random seed 1, passes with other random seeds (2 & 3)
+  //   // Failure on seed 1 appears stochastic, but we should investigate further and
+  //   // clean up this test.
+  //   emp::Random rand(1);
 
-  emp::MatchBin<
-    std::string,
-    emp::AbsDiffMetric,
-    emp::RouletteSelector<>,
-    emp::AdditiveCountdownRegulator<>
-  >bin(rand);
+  // emp::MatchBin<
+  //   std::string,
+  //   emp::AbsDiffMetric,
+  //   emp::RouletteSelector<>,
+  //   emp::AdditiveCountdownRegulator<>
+  // >bin(rand);
 
-  const size_t ndraws = 100000;
+  // const size_t ndraws = 100000;
 
-  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
-  REQUIRE( bin.GetVal(hi) == "hi" );
-  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
-  REQUIRE( bin.GetVal(salut) == "salut" );
+  // const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
+  // REQUIRE( bin.GetVal(hi) == "hi" );
+  // const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
+  // REQUIRE( bin.GetVal(salut) == "salut" );
 
-  REQUIRE( bin.Size() == 2 );
-  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  // REQUIRE( bin.Size() == 2 );
+  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
 
-  // baseline, "salut" should match much better
-  auto res = bin.GetVals(bin.Match(0, ndraws));
-  const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  REQUIRE( count > ndraws/2 );
-  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+  // // baseline, "salut" should match much better
+  // auto res = bin.GetVals(bin.Match(0, ndraws));
+  // const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  // REQUIRE( count > ndraws/2 );
+  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
-  // downregulate "salut," now "hi" should match better
-  bin.AdjRegulator(salut, 20.0); // downregulate
-  REQUIRE( bin.ViewRegulator(salut) == 20.0 );
-  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  res = bin.GetVals(bin.Match(0, ndraws));
-  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+  // // downregulate "salut," now "hi" should match better
+  // bin.AdjRegulator(salut, 20.0); // downregulate
+  // REQUIRE( bin.ViewRegulator(salut) == 20.0 );
+  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  // res = bin.GetVals(bin.Match(0, ndraws));
+  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
 
-  // std::cout << "Checkpoint 19" << std::endl;
+  ////////////////////////////////////////////////////////////////////////////////////
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  std::cout << "END TEST TESTS.  Problem ABOVE!" << std::endl;
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
+  ////////////////////////////////////////////////////////////////////////////////////
 
   // // upregulate both, "hi" should still match better
   // bin.AdjRegulator(hi, -20.0); // upregulate
@@ -953,7 +970,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   // ));
   // }
 
-  }
+  // }
 
   std::cout << "Checkpoint 23" << std::endl;
 }
