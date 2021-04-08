@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2020.
+//  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeID provides an easy way to convert types to strings.
@@ -21,6 +21,7 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/vector_utils.hpp"
+#include "../tools/string_utils.hpp"
 
 #include "type_traits.hpp"
 #include "TypePack.hpp"
