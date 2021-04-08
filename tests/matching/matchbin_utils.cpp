@@ -410,19 +410,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-
-
-  ////////////////////////////////////////////////////////////////////////////////////
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  std::cout << "START TEST TESTS.  Problem BELOW!" << std::endl;
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  ////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
   // test CacheMod
   // test PowMod, LogMod
   {
@@ -490,20 +477,31 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-  std::cout << "Checkpoint 16" << std::endl;
 
-  // // test UnifMod
-  // {
 
-  // emp::HashMetric<32> hash;
-  // emp::UnifMod<emp::HashMetric<32>> unif_hash;
-  // emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
+  ////////////////////////////////////////////////////////////////////////////////////
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  std::cout << "START TEST TESTS.  Problem BELOW!" << std::endl;
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
+  ////////////////////////////////////////////////////////////////////////////////////
 
-  // emp::HammingMetric<32> hamming;
-  // emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
-  // emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
 
-  // emp::Random rand(1);
+
+
+  // test UnifMod
+  {
+
+  emp::HashMetric<32> hash;
+  emp::UnifMod<emp::HashMetric<32>> unif_hash;
+  emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
+
+  emp::HammingMetric<32> hamming;
+  emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
+  emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
+
+  emp::Random rand(1);
 
   // for (size_t rep = 0; rep < 5000; ++rep) {
 
@@ -559,7 +557,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   // }
 
-  // }
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
