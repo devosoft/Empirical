@@ -82,10 +82,8 @@ namespace web {
     private:
         static Color ParseColor(const std::string& str);
         static Color ParseABC(const std::string& str);
-        static Color ParseRGB(const std::string& str, const std::string& fname,
-            const std::vector<std::string>& color_tokens, const float alpha);
-        static Color ParseHSL(const std::string& str, const std::string& fname,
-            const std::vector<std::string>& color_tokens, const float alpha);
+        static Color ParseRGB(const std::string& str, const std::string& fname);
+        static Color ParseHSL(const std::string& str, const std::string& fname);
   };
 
   namespace color_impl {
@@ -346,18 +344,14 @@ namespace web {
     }
 
     size_t open_paren = str.find_first_of( '(' );
-    size_t close_paren = str.find_first_of( ')' );
-    if (open_paren != std::string::npos && close_paren + 1 == str.length()) {
+    if (open_paren != std::string::npos) {
         const std::string fname = str.substr(0, open_paren);
-        const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
-            close_paren - (open_paren + 1)), ',');
 
-        float alpha = 1.0f;
         if (fname == "rgba" || fname == "rgb") {
-            return ParseRGB(str, fname, color_tokens, alpha);
+            return ParseRGB(str, fname);
 
         } else if (fname == "hsla" || fname == "hsl") {
-            return ParseHSL(str, fname, color_tokens, alpha);
+            return ParseHSL(str, fname);
         }
     }
     emp_assert( false, str);
@@ -397,29 +391,42 @@ namespace web {
         __builtin_unreachable();
   }
   
-  Color Color::ParseRGB(const std::string& str, const std::string& fname, 
-    const std::vector<std::string>& color_tokens, float alpha){
-      if (fname == "rgba") {
-            if (color_tokens.size() != 4) {
-                emp_assert( false, str );
-                __builtin_unreachable();
+  Color Color::ParseRGB(const std::string& str, const std::string& fname){
+        size_t open_paren = str.find_first_of( '(' );
+        size_t close_paren = str.find_first_of( ')' );
+        if (open_paren != std::string::npos && close_paren + 1 == str.length()) {
+            const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
+                close_paren - (open_paren + 1)), ',');
+            float alpha = 1.0f;
+            if (fname == "rgba") {
+                if (color_tokens.size() != 4) {
+                    emp_assert( false, str );
+                    __builtin_unreachable();
+                }
+                alpha = color_impl::parse_css_float(color_tokens.back());
+            } else if (color_tokens.size() != 3) {
+                    emp_assert( false, str );
+                    __builtin_unreachable();
             }
-            alpha = color_impl::parse_css_float(color_tokens.back());
-        } else if (color_tokens.size() != 3) {
-                emp_assert( false, str );
-                __builtin_unreachable();
+
+            return Color(
+                color_impl::parse_css_int(color_tokens[0]),
+                color_impl::parse_css_int(color_tokens[1]),
+                color_impl::parse_css_int(color_tokens[2]),
+                alpha
+            );
         }
+        emp_assert( false, str );
+        __builtin_unreachable();
+    }
 
-        return Color(
-            color_impl::parse_css_int(color_tokens[0]),
-            color_impl::parse_css_int(color_tokens[1]),
-            color_impl::parse_css_int(color_tokens[2]),
-            alpha
-        );
-  }
-
-  Color Color::ParseHSL(const std::string& str, const std::string& fname, 
-    const std::vector<std::string>& color_tokens, float alpha){
+  Color Color::ParseHSL(const std::string& str, const std::string& fname){
+        size_t open_paren = str.find_first_of( '(' );
+        size_t close_paren = str.find_first_of( ')' );
+        if (close_paren + 1 == str.length()) {
+            const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
+                close_paren - (open_paren + 1)), ',');
+            float alpha = 1.0f;
             if (fname == "hsla") {
                 if (color_tokens.size() != 4) {
                     emp_assert( false, str );
@@ -451,6 +458,9 @@ namespace web {
                 alpha
             );
         }
+        emp_assert( false, str );
+        __builtin_unreachable();
+    }
 
 }
 }
