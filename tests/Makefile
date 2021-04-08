@@ -1,5 +1,5 @@
-#TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matching math meta native scholar testing tools web
-TEST_NAMES := native
+TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matching math meta native scholar testing tools web
+
 CXX = clang++
 #CXX := g++
 
