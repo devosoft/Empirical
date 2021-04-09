@@ -16,7 +16,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "../base/Ptr.hpp"
 #include "../base/_is_streamable.hpp"
 //^ provides is_streamable implementation,
 // located in base directory to preserve levelization
@@ -24,6 +23,10 @@
 #include "meta.hpp"
 
 namespace emp {
+
+  // Predeclarations used below.
+  template <typename TYPE> class Ptr;
+  template <typename T, typename... Ts> class vector;
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
   // adapted from https://stackoverflow.com/a/29634934
