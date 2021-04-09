@@ -7,3 +7,4 @@ argparse
 
 # pinned to versions Docker pip knows about
 arrow==0.17.0
+kiwisolver==1.1.0
