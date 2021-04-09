@@ -477,6 +477,9 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
+  // test UnifMod
+  {
+  emp::HashMetric<32> hash;
 
 
   ////////////////////////////////////////////////////////////////////////////////////
@@ -487,14 +490,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
   ////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-  // test UnifMod
-  {
-
-  emp::HashMetric<32> hash;
-  // emp::UnifMod<emp::HashMetric<32>> unif_hash;
+  emp::UnifMod<emp::HashMetric<32>> unif_hash;
   // emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
 
   ////////////////////////////////////////////////////////////////////////////////////
