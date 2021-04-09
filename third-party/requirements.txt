@@ -6,8 +6,10 @@
 #
 argparse==1.4.0
     # via -r requirements.in
-arrow==1.0.3
-    # via jinja2-time
+arrow==0.17.0
+    # via
+    #   -r requirements.in
+    #   jinja2-time
 attrs==20.3.0
     # via diff
 binaryornot==0.4.4
