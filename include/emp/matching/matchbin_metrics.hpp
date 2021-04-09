@@ -996,7 +996,8 @@ namespace emp {
     using query_t = typename Metric::query_t;
     using tag_t = typename Metric::query_t;
 
-    inline const static internal::lookup_holder<Metric, Samples> held{};
+    static const internal::lookup_holder<Metric, Samples> held{};
+    //inline const static internal::lookup_holder<Metric, Samples> held{};
 
     std::string name() const override {
       return emp::to_string("Uniformified ", held.metric.name());
