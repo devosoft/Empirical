@@ -31,7 +31,7 @@
 
 // Seemlessly translate emp::vector to std::vector
 namespace emp {
-  template <typename... Ts> using vector = std::vector<Ts...>;
+  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
 }
 
 
