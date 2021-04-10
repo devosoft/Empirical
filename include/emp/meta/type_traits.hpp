@@ -96,7 +96,8 @@ namespace emp {
 
   /// Determine if we have an emp::vector.
   template <typename> struct is_emp_vector : std::false_type { };
-  template <typename... Ts> struct is_emp_vector<emp::vector<Ts...>> : std::true_type { };
+  template <typename T, typename... Ts>
+  struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
   
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
