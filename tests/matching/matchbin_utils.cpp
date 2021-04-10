@@ -615,8 +615,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
   }
 
-  std::cout << "Checkpoint 18" << std::endl;
-
   // more tests for EuclideanDimMod
   {
 
@@ -743,8 +741,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-  std::cout << "Checkpoint 20" << std::endl;
-
   // tests for MultiplicativeCountdownRegulator
   {
 
@@ -829,8 +825,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-  std::cout << "Checkpoint 21" << std::endl;
-
   // tests for NopRegulator
   {
 
@@ -905,8 +899,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   ));
   }
 
-  std::cout << "Checkpoint 22" << std::endl;
-
   bin.DecayRegulator(salut, 1);
   bin.DecayRegulator(hi, 0);
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
@@ -947,6 +939,4 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   }
 
   }
-
-  std::cout << "Checkpoint 23" << std::endl;
 }
