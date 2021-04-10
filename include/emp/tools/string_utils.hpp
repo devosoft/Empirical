@@ -801,7 +801,8 @@ namespace emp {
 
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
-  template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+  template <typename T, typename... Ts>
+  inline std::string ToString(const emp::vector<T, Ts...> & container);
 
   /// Join a container of strings with a delimiter.
   /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
@@ -872,8 +873,8 @@ namespace emp {
   }
 
   /// Setup emp::ToString to work on vectors.
-  template <typename... Ts>
-  inline std::string ToString(const emp::vector<Ts...> & container) {
+  template <typename T, typename... Ts>
+  inline std::string ToString(const emp::vector<T, Ts...> & container) {
     std::stringstream ss;
     ss << "[ ";
     for (const auto & el : container) {
