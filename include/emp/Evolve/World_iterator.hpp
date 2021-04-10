@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2021.
  *  @note Originally called PopulationIterator.h
  *
  *  @file  World_iterator.hpp
@@ -43,7 +43,7 @@ namespace emp {
   public:
     /// Create an iterator in the specified world pointing to the first occupied cell after the
     /// provided start position.
-    World_iterator(world_t * _w, size_t _p=0) : world_ptr(_w), pos(_p) { MakeValid(); }
+    World_iterator(Ptr<world_t> _w, size_t _p=0) : world_ptr(_w), pos(_p) { MakeValid(); }
 
     /// Create an iterator pointing to the same position as another iterator.
     World_iterator(const World_iterator & _in) : world_ptr(_in.world_ptr), pos(_in.pos) { MakeValid(); }
