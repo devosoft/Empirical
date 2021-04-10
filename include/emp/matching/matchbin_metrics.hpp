@@ -998,7 +998,7 @@ namespace emp {
 
     //inline const static internal::lookup_holder<Metric, Samples> held{};
 
-    static const internal::lookup_holder<Metric, Samples> GetLookupHolder() {
+    static const internal::lookup_holder<Metric, Samples> & GetLookupHolder() {
       static const internal::lookup_holder<Metric, Samples> held{};
       return held;
     }
