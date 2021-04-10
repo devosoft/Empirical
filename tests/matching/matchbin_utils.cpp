@@ -481,489 +481,472 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   {
   emp::HashMetric<32> hash;
 
-
-  ////////////////////////////////////////////////////////////////////////////////////
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  std::cout << "START TEST TESTS.  Problem BELOW!" << std::endl;
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv //
-  ////////////////////////////////////////////////////////////////////////////////////
-
   emp::UnifMod<emp::HashMetric<32>> unif_hash;
-  // emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
+  emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
 
-  ////////////////////////////////////////////////////////////////////////////////////
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  std::cout << "END TEST TESTS.  Problem ABOVE!" << std::endl;
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ //
-  ////////////////////////////////////////////////////////////////////////////////////
+  emp::HammingMetric<32> hamming;
+  emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
+  emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
 
-  // emp::HammingMetric<32> hamming;
-  // emp::UnifMod<emp::HammingMetric<32>> unif_hamming;
-  // emp::UnifMod<emp::HammingMetric<32>, 1> unif_hamming_small;
+  emp::Random rand(1);
 
-  // emp::Random rand(1);
+  for (size_t rep = 0; rep < 5000; ++rep) {
 
-  // for (size_t rep = 0; rep < 5000; ++rep) {
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
 
-  //   emp::BitSet<32> a(rand);
-  //   emp::BitSet<32> b(rand);
+    emp::BitSet<32> c(rand);
+    emp::BitSet<32> d(rand);
 
-  //   emp::BitSet<32> c(rand);
-  //   emp::BitSet<32> d(rand);
+    REQUIRE(unif_hash(a,b) >= 0.0);
+    REQUIRE(unif_hash(a,b) <= 1.0);
+    if (unif_hash(a,b) > unif_hash(c,d)) {
+      REQUIRE(hash(a,b) > hash(c,d));
+    } else if (unif_hash(a,b) < unif_hash(c,d)) {
+      REQUIRE(hash(a,b) < hash(c,d));
+    } else {
+      // unif_hash(a,b) == unif_hash(c,d)
+      REQUIRE(hash(a,b) == hash(c,d));
+    }
 
-  //   REQUIRE(unif_hash(a,b) >= 0.0);
-  //   REQUIRE(unif_hash(a,b) <= 1.0);
-  //   if (unif_hash(a,b) > unif_hash(c,d)) {
-  //     REQUIRE(hash(a,b) > hash(c,d));
-  //   } else if (unif_hash(a,b) < unif_hash(c,d)) {
-  //     REQUIRE(hash(a,b) < hash(c,d));
-  //   } else {
-  //     // unif_hash(a,b) == unif_hash(c,d)
-  //     REQUIRE(hash(a,b) == hash(c,d));
-  //   }
+    REQUIRE(unif_hash_small(a,b) >= 0.0);
+    REQUIRE(unif_hash_small(a,b) <= 1.0);
+    if (unif_hash_small(a,b) > unif_hash_small(c,d)) {
+      REQUIRE(hash(a,b) > hash(c,d));
+    } else if (unif_hash_small(a,b) < unif_hash_small(c,d)) {
+      REQUIRE(hash(a,b) < hash(c,d));
+    } else {
+      // unif_hash_small(a,b) == unif_hash_small(c,d)
+      REQUIRE(hash(a,b) == hash(c,d));
+    }
 
-  //   REQUIRE(unif_hash_small(a,b) >= 0.0);
-  //   REQUIRE(unif_hash_small(a,b) <= 1.0);
-  //   if (unif_hash_small(a,b) > unif_hash_small(c,d)) {
-  //     REQUIRE(hash(a,b) > hash(c,d));
-  //   } else if (unif_hash_small(a,b) < unif_hash_small(c,d)) {
-  //     REQUIRE(hash(a,b) < hash(c,d));
-  //   } else {
-  //     // unif_hash_small(a,b) == unif_hash_small(c,d)
-  //     REQUIRE(hash(a,b) == hash(c,d));
-  //   }
+    REQUIRE(unif_hamming(a,b) >= 0.0);
+    REQUIRE(unif_hamming(a,b) <= 1.0);
+    if (unif_hamming(a,b) > unif_hamming(c,d)) {
+      REQUIRE(hamming(a,b) > hamming(c,d));
+    } else if (unif_hamming(a,b) < unif_hamming(c,d)) {
+      REQUIRE(hamming(a,b) < hamming(c,d));
+    } else {
+      // unif_hamming(a,b) == unif_hamming(c,d)
+      REQUIRE(hamming(a,b) == hamming(c,d));
+    }
 
-  //   REQUIRE(unif_hamming(a,b) >= 0.0);
-  //   REQUIRE(unif_hamming(a,b) <= 1.0);
-  //   if (unif_hamming(a,b) > unif_hamming(c,d)) {
-  //     REQUIRE(hamming(a,b) > hamming(c,d));
-  //   } else if (unif_hamming(a,b) < unif_hamming(c,d)) {
-  //     REQUIRE(hamming(a,b) < hamming(c,d));
-  //   } else {
-  //     // unif_hamming(a,b) == unif_hamming(c,d)
-  //     REQUIRE(hamming(a,b) == hamming(c,d));
-  //   }
+    REQUIRE(unif_hamming_small(a,b) >= 0.0);
+    REQUIRE(unif_hamming_small(a,b) <= 1.0);
+    if (unif_hamming_small(a,b) > unif_hamming_small(c,d)) {
+      REQUIRE(hamming(a,b) > hamming(c,d));
+    } else if (unif_hamming_small(a,b) < unif_hamming_small(c,d)) {
+      REQUIRE(hamming(a,b) < hamming(c,d));
+    } else {
+      // unif_hamming_small(a,b) == unif_hamming_small(c,d)
+      REQUIRE(hamming(a,b) == hamming(c,d));
+    }
 
-  //   REQUIRE(unif_hamming_small(a,b) >= 0.0);
-  //   REQUIRE(unif_hamming_small(a,b) <= 1.0);
-  //   if (unif_hamming_small(a,b) > unif_hamming_small(c,d)) {
-  //     REQUIRE(hamming(a,b) > hamming(c,d));
-  //   } else if (unif_hamming_small(a,b) < unif_hamming_small(c,d)) {
-  //     REQUIRE(hamming(a,b) < hamming(c,d));
-  //   } else {
-  //     // unif_hamming_small(a,b) == unif_hamming_small(c,d)
-  //     REQUIRE(hamming(a,b) == hamming(c,d));
-  //   }
-
-  // }
+  }
 
   }
 
 
-  // // test EuclideanDimMod
-  // {
-  // emp::Random rand(1);
-
-  // emp::BitSet<32> a1(rand);
-  // emp::BitSet<32> b1(rand);
-
-  // emp::HammingMetric<32> hamming;
-
-  // emp::FlatMod<
-  //   emp::MeanDimMod<
-  //     typename emp::HammingMetric<32>,
-  //     1
-  //   >
-  // > d_hamming1;
-  // REQUIRE(d_hamming1.width() == hamming.width());
-
-  // REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
-  // }
-
-  // // test EuclideanDimMod
-  // {
-  // emp::Random rand(1);
-
-  // emp::BitSet<32> a1(rand);
-  // emp::BitSet<32> b1(rand);
-
-  // emp::HammingMetric<32> hamming;
-
-  // emp::FlatMod<
-  //   emp::MeanDimMod<
-  //     typename emp::HammingMetric<32>,
-  //     1
-  //   >
-  // > d_hamming1;
-  // REQUIRE(d_hamming1.width() == hamming.width());
-
-  // REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
-  // }
-
-  // // more tests for EuclideanDimMod
-  // {
-  //   emp::HammingMetric<4> hamming;
-
-  //   emp::FlatMod<
-  //     emp::EuclideanDimMod<
-  //       typename emp::HammingMetric<2>,
-  //       2
-  //     >
-  //   > d_hamming2;
-  //   REQUIRE(d_hamming2.width() == hamming.width());
-
-  //   REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
-
-  //   REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
-  //   REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
-  //   REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
-  //   REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
-
-  //   REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
-  //   REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
-  //   REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
-  //   REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
-
-  //   REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
-  //   REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
-  // }
-
-  // std::cout << "Checkpoint 18" << std::endl;
-
-  // // more tests for EuclideanDimMod
-  // {
-
-  //   emp::FlatMod<
-  //     emp::MeanDimMod<
-  //       typename emp::HammingMetric<8>,
-  //       4
-  //     >
-  //   > metric;
-
-  // emp::Random rand(1);
-  // for (size_t rep = 0; rep < 1000; ++rep) {
-  //   emp::BitSet<32> a(rand);
-  //   emp::BitSet<32> b(rand);
-  //   REQUIRE(metric(a,b) >= 0.0);
-  //   REQUIRE(metric(a,b) <= 1.0);
-  // }
-
-  // }
-
-  // // tests for AdditiveCountdownRegulator
-  // {
-
-  //   // TODO:
-  //   // Fails with random seed 1, passes with other random seeds (2 & 3)
-  //   // Failure on seed 1 appears stochastic, but we should investigate further and
-  //   // clean up this test.
-  //   emp::Random rand(1);
-
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::AbsDiffMetric,
-  //   emp::RouletteSelector<>,
-  //   emp::AdditiveCountdownRegulator<>
-  // >bin(rand);
-
-  // const size_t ndraws = 100000;
-
-  // const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
-  // REQUIRE( bin.GetVal(hi) == "hi" );
-  // const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
-  // REQUIRE( bin.GetVal(salut) == "salut" );
-
-  // REQUIRE( bin.Size() == 2 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-
-  // // baseline, "salut" should match much better
-  // auto res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( count > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // // downregulate "salut," now "hi" should match better
-  // bin.AdjRegulator(salut, 20.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 20.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
-
-  // // upregulate both, "hi" should still match better
-  // bin.AdjRegulator(hi, -20.0); // upregulate
-  // bin.AdjRegulator(salut, -20.0); // upregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == -20.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
-
-  // // set salut and hi regulators, salut hi should still match better
-  // bin.SetRegulator(salut, 2.0); // downregulate
-  // bin.SetRegulator(hi, -2.0); // upregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 2.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == -2.0 );
-
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
-
-  // // set salut and hi regulators, now salut should match better
-  // // and should match even better than it at the top
-  // bin.SetRegulator(salut, -1.0); // upregulate
-  // bin.SetRegulator(hi, 1.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == -1.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( hi_count > count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // // reverse-decay regulator, regulator values should be unaffected
-  // bin.DecayRegulator(salut, -2);
-  // REQUIRE( bin.ViewRegulator(salut) == -1.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-
-  // // salut should still match even better than it at the top
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // // decay the salut regulator but not the hi regulator
-  // bin.DecayRegulator(salut, 1);
-  // bin.DecayRegulator(hi, 0);
-  // REQUIRE( bin.ViewRegulator(salut) == -1.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-
-  // // salut should still match even better than it did at the top
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // // decay the regulators down to baseline
-  // bin.DecayRegulator(salut, 500);
-  // bin.DecayRegulators();
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // // salut should match better than hi, but not as well as it did when it was
-  // // upregulated
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // }
-
-  // std::cout << "Checkpoint 20" << std::endl;
-
-  // // tests for MultiplicativeCountdownRegulator
-  // {
-
-  // emp::Random rand(1);
-
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::AbsDiffMetric,
-  //   emp::RouletteSelector<>,
-  //   emp::MultiplicativeCountdownRegulator<>
-  // >bin(rand);
-
-  // const size_t ndraws = 1000000;
-
-  // const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
-  // REQUIRE( bin.GetVal(hi) == "hi" );
-  // const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
-  // REQUIRE( bin.GetVal(salut) == "salut" );
-
-  // REQUIRE( bin.Size() == 2 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-
-  // auto res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( count > ndraws/2);
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.AdjRegulator(salut, 20.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 20.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
-
-  // bin.AdjRegulator(hi, -20.0); // upregulate
-  // bin.AdjRegulator(salut, -20.0); // restore
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == -20.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
-
-  // bin.SetRegulator(salut, 5.0); // downregulate
-  // bin.SetRegulator(hi, -5.0); // upregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 5.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == -5.0 );
-
-  // bin.SetRegulator(salut, -1.0); // upregulate
-  // bin.SetRegulator(hi, 1.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == -1.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( hi_count > count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.DecayRegulator(salut, -2);
-  // REQUIRE( bin.ViewRegulator(salut) == -1.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.DecayRegulator(salut, 1);
-  // bin.DecayRegulator(hi, 0);
-  // REQUIRE( bin.ViewRegulator(salut) == -1.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.DecayRegulator(salut, 500);
-  // bin.DecayRegulator(hi, 1);
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // }
-
-  // std::cout << "Checkpoint 21" << std::endl;
-
-  // // tests for NopRegulator
-  // {
-
-  // emp::Random rand(1);
-
-  // emp::MatchBin<
-  //   std::string,
-  //   emp::AbsDiffMetric,
-  //   emp::RouletteSelector<>,
-  //   emp::NopRegulator
-  // >bin(rand);
-
-  // const size_t ndraws = 1000000;
-  // const size_t error = 5000;
-
-  // const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
-  // REQUIRE( bin.GetVal(hi) == "hi" );
-  // const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
-  // REQUIRE( bin.GetVal(salut) == "salut" );
-
-  // REQUIRE( bin.Size() == 2 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-
-  // auto res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( count > ndraws/2);
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.AdjRegulator(salut, 20.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.AdjRegulator(hi, -20.0); // upregulate
-  // bin.AdjRegulator(salut, -20.0); // restore
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.SetRegulator(salut, 5.0); // downregulate
-  // bin.SetRegulator(hi, -5.0); // upregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-
-  // bin.SetRegulator(salut, -1.0); // upregulate
-  // bin.SetRegulator(hi, 1.0); // downregulate
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( std::max(hi_count, count) - std::min(hi_count, count) < error );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // bin.DecayRegulator(salut, -2);
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-
-  // {
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
-  // const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
-  // REQUIRE((
-  //   std::max(h_count, ndraws - count)
-  //   - std::min(h_count, ndraws - count)
-  //   < error
-  // ));
-  // }
-
-  // std::cout << "Checkpoint 22" << std::endl;
-
-  // bin.DecayRegulator(salut, 1);
-  // bin.DecayRegulator(hi, 0);
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-
-  // {
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
-  // REQUIRE( std::max(s_count, hi_count) - std::min(s_count, hi_count) < error );
-  // const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
-  // REQUIRE((
-  //   std::max(h_count, ndraws - count)
-  //   - std::min(h_count, ndraws - count)
-  //   < error
-  // ));
-  // }
-
-  // bin.DecayRegulator(salut, 500);
-  // bin.DecayRegulator(hi, 1);
-  // REQUIRE( bin.ViewRegulator(salut) == 0.0 );
-  // REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
-  // REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
-
-  // {
-  // res = bin.GetVals(bin.Match(0, ndraws));
-  // const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
-  // REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
-  // REQUIRE( std::max(s_count, hi_count) - std::min(s_count, hi_count) < error );
-  // const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
-  // REQUIRE((
-  //   std::max(h_count, ndraws - count)
-  //   - std::min(h_count, ndraws - count)
-  //   < error
-  // ));
-  // }
-
-  // }
+  // test EuclideanDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+  emp::BitSet<32> b1(rand);
+
+  emp::HammingMetric<32> hamming;
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  }
+
+  // test EuclideanDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+  emp::BitSet<32> b1(rand);
+
+  emp::HammingMetric<32> hamming;
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  }
+
+  // more tests for EuclideanDimMod
+  {
+    emp::HammingMetric<4> hamming;
+
+    emp::FlatMod<
+      emp::EuclideanDimMod<
+        typename emp::HammingMetric<2>,
+        2
+      >
+    > d_hamming2;
+    REQUIRE(d_hamming2.width() == hamming.width());
+
+    REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
+
+    REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
+
+    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
+
+    REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
+    REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
+  }
+
+  std::cout << "Checkpoint 18" << std::endl;
+
+  // more tests for EuclideanDimMod
+  {
+
+    emp::FlatMod<
+      emp::MeanDimMod<
+        typename emp::HammingMetric<8>,
+        4
+      >
+    > metric;
+
+  emp::Random rand(1);
+  for (size_t rep = 0; rep < 1000; ++rep) {
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
+    REQUIRE(metric(a,b) >= 0.0);
+    REQUIRE(metric(a,b) <= 1.0);
+  }
+
+  }
+
+  // tests for AdditiveCountdownRegulator
+  {
+
+    // TODO:
+    // Fails with random seed 1, passes with other random seeds (2 & 3)
+    // Failure on seed 1 appears stochastic, but we should investigate further and
+    // clean up this test.
+    emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::AdditiveCountdownRegulator<>
+  >bin(rand);
+
+  const size_t ndraws = 100000;
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  // baseline, "salut" should match much better
+  auto res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  // downregulate "salut," now "hi" should match better
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 20.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  // upregulate both, "hi" should still match better
+  bin.AdjRegulator(hi, -20.0); // upregulate
+  bin.AdjRegulator(salut, -20.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -20.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  // set salut and hi regulators, salut hi should still match better
+  bin.SetRegulator(salut, 2.0); // downregulate
+  bin.SetRegulator(hi, -2.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 2.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -2.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  // set salut and hi regulators, now salut should match better
+  // and should match even better than it at the top
+  bin.SetRegulator(salut, -1.0); // upregulate
+  bin.SetRegulator(hi, 1.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( hi_count > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  // reverse-decay regulator, regulator values should be unaffected
+  bin.DecayRegulator(salut, -2);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  // salut should still match even better than it at the top
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  // decay the salut regulator but not the hi regulator
+  bin.DecayRegulator(salut, 1);
+  bin.DecayRegulator(hi, 0);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  // salut should still match even better than it did at the top
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  // decay the regulators down to baseline
+  bin.DecayRegulator(salut, 500);
+  bin.DecayRegulators();
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  // salut should match better than hi, but not as well as it did when it was
+  // upregulated
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  }
+
+  std::cout << "Checkpoint 20" << std::endl;
+
+  // tests for MultiplicativeCountdownRegulator
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::MultiplicativeCountdownRegulator<>
+  >bin(rand);
+
+  const size_t ndraws = 1000000;
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  auto res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > ndraws/2);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 20.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  bin.AdjRegulator(hi, -20.0); // upregulate
+  bin.AdjRegulator(salut, -20.0); // restore
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -20.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  bin.SetRegulator(salut, 5.0); // downregulate
+  bin.SetRegulator(hi, -5.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 5.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -5.0 );
+
+  bin.SetRegulator(salut, -1.0); // upregulate
+  bin.SetRegulator(hi, 1.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( hi_count > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, -2);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, 1);
+  bin.DecayRegulator(hi, 0);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, 500);
+  bin.DecayRegulator(hi, 1);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  }
+
+  std::cout << "Checkpoint 21" << std::endl;
+
+  // tests for NopRegulator
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::NopRegulator
+  >bin(rand);
+
+  const size_t ndraws = 1000000;
+  const size_t error = 5000;
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  auto res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > ndraws/2);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(hi, -20.0); // upregulate
+  bin.AdjRegulator(salut, -20.0); // restore
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.SetRegulator(salut, 5.0); // downregulate
+  bin.SetRegulator(hi, -5.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  bin.SetRegulator(salut, -1.0); // upregulate
+  bin.SetRegulator(hi, 1.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(hi_count, count) - std::min(hi_count, count) < error );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, -2);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  {
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
+  const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
+  REQUIRE((
+    std::max(h_count, ndraws - count)
+    - std::min(h_count, ndraws - count)
+    < error
+  ));
+  }
+
+  std::cout << "Checkpoint 22" << std::endl;
+
+  bin.DecayRegulator(salut, 1);
+  bin.DecayRegulator(hi, 0);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  {
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
+  REQUIRE( std::max(s_count, hi_count) - std::min(s_count, hi_count) < error );
+  const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
+  REQUIRE((
+    std::max(h_count, ndraws - count)
+    - std::min(h_count, ndraws - count)
+    < error
+  ));
+  }
+
+  bin.DecayRegulator(salut, 500);
+  bin.DecayRegulator(hi, 1);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  {
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
+  REQUIRE( std::max(s_count, hi_count) - std::min(s_count, hi_count) < error );
+  const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
+  REQUIRE((
+    std::max(h_count, ndraws - count)
+    - std::min(h_count, ndraws - count)
+    < error
+  ));
+  }
+
+  }
 
   std::cout << "Checkpoint 23" << std::endl;
 }
