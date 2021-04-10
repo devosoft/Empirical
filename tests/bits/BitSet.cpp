@@ -495,7 +495,7 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
 
   // Check if the counts are reasonable.
   for (size_t i = 0;   i < 100; i++)  { REQUIRE(one_counts[i] == 0); }
-  for (size_t i = 100; i < 250; i++)  { REQUIRE(one_counts[i] > 420);  REQUIRE(one_counts[i] < 580); }
+  for (size_t i = 100; i < 250; i++)  { REQUIRE(one_counts[i] > 410);  REQUIRE(one_counts[i] < 590); }
   for (size_t i = 250; i < 400; i++)  { REQUIRE(one_counts[i] > 190);  REQUIRE(one_counts[i] < 320); }
   for (size_t i = 400; i < 550; i++)  { REQUIRE(one_counts[i] > 680);  REQUIRE(one_counts[i] < 810); }
   for (size_t i = 550; i < 700; i++)  { REQUIRE(one_counts[i] >  60);  REQUIRE(one_counts[i] < 150); }
