@@ -26,7 +26,11 @@ namespace emp {
 
   // Predeclarations used below.
   template <typename TYPE> class Ptr;
+  #ifdef NDEBUG
+  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
+  #else
   template <typename T, typename... Ts> class vector;
+  #endif
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
   // adapted from https://stackoverflow.com/a/29634934
