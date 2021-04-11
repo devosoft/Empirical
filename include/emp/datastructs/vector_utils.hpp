@@ -97,13 +97,6 @@ namespace emp {
     }
   }
 
-  template <typename T>
-  std::string ToString(const emp::vector<T> & v, const std::string & spacer=" ") {
-    std::stringstream ss;
-    Print(v, ss, spacer);
-    return ss.str();
-  }
-
   /// Find the first index where the provided function returns true; return -1 otherwise.
   template <typename T, typename FUN>
   int FindEval(const emp::vector<T> & v, const FUN & fun, size_t start_pos=0) {
