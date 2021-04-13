@@ -240,25 +240,36 @@ namespace web {
         { "yellowgreen", { 154, 205, 50, 1 } }
     };
 
+    /// Clamp a value to an integer 0-255
+    /// @param i The value to clamp
     template <typename T>
     uint8_t clamp_css_byte(T i) {  // Clamp to integer 0 .. 255.
         i = ::round(i);  // Seems to be what Chrome does (vs truncation).
         return uint8_t(std::clamp(i,T(0),T(255)));
     }
 
+    /// Clamp a value to a float 0-1
+    /// @param f The value to clamp
     template <typename T>
     float clamp_css_float(T f) {  // Clamp to float 0.0 .. 1.0.
         return std::clamp(float(f),float(0.0),float(1.0));
     }
-
+    
+    /// Convert a string to float
+    /// @param str The string to convert
     float parseFloat(const std::string& str) {
         return strtof(str.c_str(), nullptr);
     }
 
+    /// Convert a string to integer in the given base
+    /// @param str The string to convert
+    /// @param base The base the string is in
     int64_t parseInt(const std::string& str, uint8_t base = 10) {
         return strtoll(str.c_str(), nullptr, base);
     }
 
+    /// Convert a string to an integer or percentage
+    /// @param str The string to convert
     uint8_t parse_css_int(const std::string& str) {  // int or percentage.
         if (str.length() && str.back() == '%') {
             return clamp_css_byte(parseFloat(str) / 100.0f * 255.0f);
@@ -266,7 +277,8 @@ namespace web {
             return clamp_css_byte(parseInt(str));
         }
     }
-
+    /// Convert a string to a float or percentage
+    /// @param str The string to convert
     float parse_css_float(const std::string& str) {  // float or percentage.
         if (str.length() && str.back() == '%') {
             return clamp_css_float(parseFloat(str) / 100.0f);
@@ -274,7 +286,10 @@ namespace web {
             return clamp_css_float(parseFloat(str));
         }
     }
-
+    /// Convert floats from hsl to rgb value
+    /// @param m1 Value calculated in ParseHSl
+    /// @param m2 Value calculated in ParseHSl
+    /// @param h Value calculated in ParseHSl
     float css_hue_to_rgb(const float m1, const float m2, float h) {
         if (h < 0.0f) {
             h += 1.0f;
@@ -290,7 +305,9 @@ namespace web {
         }
         return m1;
     }
-
+    /// Split a string into a vector of strings
+    /// @param s The string to split
+    /// @param delim The delimiter
     emp::vector<std::string> split(const std::string& s, char delim) {
         emp::vector<std::string> elems;
         std::stringstream ss(s);
@@ -303,6 +320,8 @@ namespace web {
 
   }
 
+  /// Color constructor
+  /// @param css_str The string to construct a color from
   Color::Color( const std::string& css_str ) {
    std::string str = css_str;
 
@@ -336,29 +355,32 @@ namespace web {
 
   }
   
-  // Handle all color detection and parsing from the string
-  Color Color::ParseColor(const std::string& str) {
-      // #abc and #abc123 syntax.
-    if (DetectSyntaxABC(str)) {
-        return ParseABC(str);
-    }
-
-    size_t open_paren = str.find_first_of( '(' );
-    if (open_paren != std::string::npos) {
-        const std::string fname = str.substr(0, open_paren);
-
-        if (fname == "rgba" || fname == "rgb") {
-            return ParseRGB(str, fname);
-
-        } else if (fname == "hsla" || fname == "hsl") {
-            return ParseHSL(str, fname);
+    /// Handle all color detection and parsing from the string
+    /// @param str The color string to be parsed
+    Color Color::ParseColor(const std::string& str) {
+        // #abc and #abc123 syntax.
+        if (DetectSyntaxABC(str)) {
+            return ParseABC(str);
         }
-    }
-    emp_assert( false, str);
-    __builtin_unreachable();
+
+        size_t open_paren = str.find_first_of( '(' );
+        if (open_paren != std::string::npos) {
+            const std::string fname = str.substr(0, open_paren);
+
+            if (fname == "rgba" || fname == "rgb") {
+                return ParseRGB(str, fname);
+
+            } else if (fname == "hsla" || fname == "hsl") {
+                return ParseHSL(str, fname);
+            }
+        }
+        emp_assert( false, str);
+        __builtin_unreachable();
   }
 
-  Color Color::ParseABC(const std::string& str){
+    /// Parse the ABC format color string
+    /// @param str The color string ex) "#fff"
+    Color Color::ParseABC(const std::string& str){
       if (str.length() == 4) {
             const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xfff)) {
@@ -391,7 +413,10 @@ namespace web {
         __builtin_unreachable();
   }
   
-  Color Color::ParseRGB(const std::string& str, const std::string& fname){
+    /// Parse the RGB or RGBA format color string
+    /// @param str The color string ex) "rgb(255,255,255)"
+    /// @param fname Format name rgba or rgb
+    Color Color::ParseRGB(const std::string& str, const std::string& fname){
         size_t open_paren = str.find_first_of( '(' );
         size_t close_paren = str.find_first_of( ')' );
         if (open_paren != std::string::npos && close_paren + 1 == str.length()) {
@@ -420,7 +445,10 @@ namespace web {
         __builtin_unreachable();
     }
 
-  Color Color::ParseHSL(const std::string& str, const std::string& fname){
+    /// Parse the HSL or HSLA format color string
+    /// @param str The color string ex) "hsl(100%,100%,100%)"
+    /// @param fname Format name hsla or hsl
+    Color Color::ParseHSL(const std::string& str, const std::string& fname){
         size_t open_paren = str.find_first_of( '(' );
         size_t close_paren = str.find_first_of( ')' );
         if (close_paren + 1 == str.length()) {
