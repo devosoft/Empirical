@@ -115,14 +115,14 @@ namespace web {
     /// line color.
     Canvas & Rect(
       Point corner, const double w, const double h,
-      const std::string& fc, const std::string& lc, const double lw=1.0
+      const std::string& fc, const std::string& lc="black", const double lw=1.0
     ) {
       return this->Rect(corner.GetX(),corner.GetY(), w, h, emp::web::Color(fc), emp::web::Color(lc), lw);
     }
 
     Canvas & Rect(
       const double x, const double y, const double w, const double h,
-      const std::string& fc, const std::string& lc, const double lw=1.0
+      const std::string& fc, const std::string& lc="black", const double lw=1.0
     ) {
       return this->Rect(x, y, w, h, emp::web::Color(fc), emp::web::Color(lc), lw);
     }
