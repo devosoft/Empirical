@@ -6,6 +6,17 @@
 
 #ifdef EMP_NATIVE_SUPPORT
 
+TEST_CASE("Test Canvas Attributes", "[native]") {
+    emp::web::Canvas canvas{ 500, 600 };
+    REQUIRE(canvas.GetWidth() == 500);
+    REQUIRE(canvas.GetHeight() == 600);
+
+    canvas.Draw(emp::Circle(20, 40, 20));
+    canvas.Draw(emp::Circle(20, 40, 20), "white", "black");
+    canvas.Clear("black");
+    canvas.DownloadPNG();
+}
+
 TEST_CASE("Test Circle Locations", "[native]") {
 
   emp::web::Canvas canvas{ 500, 500 };
@@ -13,9 +24,9 @@ TEST_CASE("Test Circle Locations", "[native]") {
   canvas.Circle(20, 40, 20);
   canvas.Circle(230, 40, 20);
   canvas.Circle(440, 40, 20);
-  canvas.Circle(20, 440, 20);
-  canvas.Circle(230, 440, 20);
-  canvas.Circle(440, 440, 20);
+  canvas.Circle(20, 440, 20, "white", "black");
+  canvas.Circle(230, 440, 20, "white", "black");
+  canvas.Circle(440, 440, 20, "white", "black");
   
   canvas.SavePNG("test_circle_location.png");
 
@@ -28,9 +39,9 @@ TEST_CASE("Test Circle Locations By Point", "[native]") {
   canvas.Circle(emp::Point(40,60), 20);
   canvas.Circle(emp::Point(250,60), 20);
   canvas.Circle(emp::Point(460,60), 20);
-  canvas.Circle(emp::Point(40,460), 20);
-  canvas.Circle(emp::Point(250,460), 20);
-  canvas.Circle(emp::Point(460,460), 20);
+  canvas.Circle(emp::Point(40,460), 20, "white", "black");
+  canvas.Circle(emp::Point(250,460), 20, "white", "black");
+  canvas.Circle(emp::Point(460,460), 20, "white", "black");
   
   canvas.SavePNG("test_circle_location2.png");
 
@@ -95,6 +106,21 @@ TEST_CASE("Test Rectangle Locations", "[native]") {
 
 }
 
+TEST_CASE("Test Rectangle Locations by Point", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+
+  canvas.Rect(emp::Point(20, 40), 20, 30);
+  canvas.Rect(emp::Point(230, 40), 20, 30);
+  canvas.Rect(emp::Point(440, 40), 20, 30);
+  canvas.Rect(emp::Point(20, 440), 20, 30, "white", "black");
+  canvas.Rect(emp::Point(230, 440), 20, 30, "white", "black");
+  canvas.Rect(emp::Point(440, 440), 20, 30, "white", "black");
+
+  canvas.SavePNG("test_rect_location2.png");
+
+}
+
 TEST_CASE("Test Rectangle Colors", "[native]") {
 
   emp::web::Canvas canvas{ 500, 500 };
@@ -125,6 +151,35 @@ TEST_CASE("Test Rectangle Size/Thickness", "[native]") {
 
 }
 
+TEST_CASE("Test Line Locations", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+
+  canvas.Line(20, 40, 20, 60);
+  canvas.Line(230, 40, 230, 60);
+  canvas.Line(440, 40, 440, 60);
+  canvas.Line(20, 400, 40, 400, "black", "black");
+  canvas.Line(230, 400, 250, 400, "black", "black");
+  canvas.Line(440, 400, 460, 400, "black", "black");
+
+  canvas.SavePNG("test_line_location.png");
+
+}
+
+TEST_CASE("Test Line Locations by Point", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+
+  canvas.Line(emp::Point(20, 40), emp::Point(20, 60));
+  canvas.Line(emp::Point(230, 40), emp::Point(230, 60));
+  canvas.Line(emp::Point(440, 40), emp::Point(440, 60));
+  canvas.Line(emp::Point(20, 400), emp::Point(40, 400), "black", "black");
+  canvas.Line(emp::Point(230, 400), emp::Point(250, 400), "black", "black");
+  canvas.Line(emp::Point(440, 400), emp::Point(460, 400), "black", "black");
+
+  canvas.SavePNG("test_line_location2.png");
+
+}
 
 TEST_CASE("Test Text Locations", "[native]") {
 
@@ -133,11 +188,26 @@ TEST_CASE("Test Text Locations", "[native]") {
   canvas.Text(20, 40, "upper left");
   canvas.Text(220, 40, "upper middle");
   canvas.Text(420, 40, "upper right");
-  canvas.Text(20, 440, "bottom left");
-  canvas.Text(220, 440, "bottom middle");
-  canvas.Text(420, 440, "bottom right");
+  canvas.Text(20, 440, "bottom left", "black", "black");
+  canvas.Text(220, 440, "bottom middle", "black", "black");
+  canvas.Text(420, 440, "bottom right", "black", "black");
 
   canvas.SavePNG("test_text_location.png");
+
+}
+
+TEST_CASE("Test Text Locations by Point", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+
+  canvas.Text(emp::Point(20, 40), "upper left");
+  canvas.Text(emp::Point(220, 40), "upper middle");
+  canvas.Text(emp::Point(420, 40), "upper right");
+  canvas.Text(emp::Point(20, 440), "bottom left", "black", "black");
+  canvas.Text(emp::Point(220, 440), "bottom middle", "black", "black");
+  canvas.Text(emp::Point(420, 440), "bottom right", "black", "black");
+
+  canvas.SavePNG("test_text_location2.png");
 
 }
 
@@ -162,11 +232,26 @@ TEST_CASE("Test CenterText Locations", "[native]") {
   canvas.CenterText(20, 40, "upper left");
   canvas.CenterText(220, 40, "upper middle");
   canvas.CenterText(420, 40, "upper right");
-  canvas.CenterText(20, 440, "bottom left");
-  canvas.CenterText(220, 440, "bottom middle");
-  canvas.CenterText(420, 440, "bottom right");
+  canvas.CenterText(20, 440, "bottom left", "black", "black");
+  canvas.CenterText(220, 440, "bottom middle", "black", "black");
+  canvas.CenterText(420, 440, "bottom right", "black", "black");
   
   canvas.SavePNG("test_centertext_location.png");
+
+}
+
+TEST_CASE("Test CenterText Locations by Point", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+
+  canvas.CenterText(emp::Point(20, 40), "upper left");
+  canvas.CenterText(emp::Point(220, 40), "upper middle");
+  canvas.CenterText(emp::Point(420, 40), "upper right");
+  canvas.CenterText(emp::Point(20, 440), "bottom left", "black", "black");
+  canvas.CenterText(emp::Point(220, 440), "bottom middle", "black", "black");
+  canvas.CenterText(emp::Point(420, 440), "bottom right", "black", "black");
+
+  canvas.SavePNG("test_centertext_location2.png");
 
 }
 
