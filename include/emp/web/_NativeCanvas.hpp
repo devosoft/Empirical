@@ -30,7 +30,6 @@
 
 namespace emp {
 namespace web {
-//try {
   /// Manage a SFML Canvas object.
   class Canvas {
 
@@ -116,7 +115,7 @@ namespace web {
     /// line color.
     Canvas & Rect(
       Point corner, const double w, const double h,
-      const std::string& fc="white", const std::string& lc="black", const double lw=1.0
+      const std::string& fc, const std::string& lc, const double lw=1.0
     ) {
       return this->Rect(corner.GetX(),corner.GetY(), w, h, emp::web::Color(fc), emp::web::Color(lc), lw);
     }
@@ -181,8 +180,8 @@ namespace web {
 
     Canvas & Line(
       const double x1, const double y1, const double x2, const double y2,
-      const emp::web::Color fc=emp::web::Color(""),
-      const emp::web::Color lc=emp::web::Color(""), const double lw=1.0
+      const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const double lw=1.0
     ) {
 
       sf::LineShape shape( sf::Vector2f(x1, y1), sf::Vector2f(x2, y2) );
@@ -195,8 +194,8 @@ namespace web {
     }
 
     Canvas & Line(
-      emp::Point p1, emp::Point p2, const emp::web::Color fc=emp::web::Color(""),
-      const emp::web::Color lc=emp::web::Color(""), const double lw=1.0
+      emp::Point p1, emp::Point p2, const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const double lw=1.0
       ) {
       return this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
     }
@@ -210,8 +209,8 @@ namespace web {
 
     template <typename... Ts>
     Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, 
-      const emp::web::Color fc=emp::web::Color(""),
-      const emp::web::Color lc=emp::web::Color(""), const double lw=1.0) {
+      const emp::web::Color fc=emp::web::Color("black"),
+      const emp::web::Color lc=emp::web::Color("black"), const double lw=1.0) {
           for (auto p2 : points) {
               this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
           }
@@ -303,7 +302,7 @@ namespace web {
 
     /// Draw a circle onto this canvas.
     Canvas & Draw(const emp::Circle & circle,
-                  const std::string & fc="white", const std::string & lc="black") {
+                  const std::string & fc, const std::string & lc) {
                     return this->Draw(circle, emp::web::Color(fc), emp::web::Color(lc));
     }
     Canvas & Draw(const emp::Circle & circle,
@@ -358,13 +357,6 @@ namespace web {
 
   };
 
-/*
-}
-catch(const std::exception& e)
-{
-    std::cout << "X11 Display not configured correctly." << '\n';
-}
-*/
 } // namespace web
 } // namespace emp
 

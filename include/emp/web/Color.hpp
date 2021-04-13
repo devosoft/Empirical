@@ -69,7 +69,7 @@ namespace web {
         */
 
         //implicit conversion
-        operator std::string() const { return cached_css_str; }
+        //operator std::string() const { return cached_css_str; }
 
         //implicit conversion
         operator const std::string&() const { return cached_css_str; }
