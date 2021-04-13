@@ -61,6 +61,12 @@ TEST_CASE("Test Color Construction", "[native]") {
     REQUIRE(white == white8);
     emp::web::Color notWhite7("hsl(50%,21%,0%)");
     REQUIRE(notWhite7 != white8);
+
+    std::string impl_string = white8;
+    REQUIRE(impl_string != css_str7);
+
+    const std::string impl_string2 = white7;
+    REQUIRE(impl_string2 != css_str6);
 }
 
 #endif
