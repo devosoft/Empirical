@@ -248,9 +248,9 @@ RUN \
   echo "installed karma-firefox-launcher"
 
 RUN \
-  pip install -r /opt/Empirical/third-party/requirements.txt \
+  pip3 install -r /opt/Empirical/third-party/requirements.txt \
     && \
-  echo "installed documentation build requirements"
+  echo "installed python3 requirements"
 
 # Perform any further action as an unprivileged user.
 # adapted from https://stackoverflow.com/a/27703359
