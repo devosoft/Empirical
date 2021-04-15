@@ -17,10 +17,8 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
+#include "Canvas.hpp"
 
-#if __has_include(<SFML/Color.hpp>)
-#include <SFML/Color.hpp>
-#endif
 
 #include "../base/vector.hpp"
 #include "../geometry/Circle2D.hpp"
@@ -37,36 +35,44 @@ namespace web {
         unsigned char r{}, g{}, b{};
         float a{ 1.0f };
         std::string cached_css_str = "";
-        // sf::Color cached_sf_color;
+
+        #ifdef EMP_HAS_SFML
+        sf::Color cached_sf_color;
+        #endif
     public:
         Color() = default;
 
-        Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
+        Color(const unsigned char r_, const unsigned char g_, const unsigned char b_, const float a_)
         : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
         {
             cached_css_str = emp::ColorRGB(r, g, b, a);
-            //cached_sf_color = (sf::Color)*this;
+            #ifdef EMP_HAS_SFML
+            cached_sf_color = (sf::Color)*this;
+            #endif
         }
 
         // defined out of body
         Color( const std::string& css_str );
 
+        /// == comparison operator
+        /// \param rhs Right hand Color to compare to
         bool operator==( const Color& rhs ) const {
-        return std::tuple{
-            r, g, b, a
-        } == std::tuple{
-            rhs.r, rhs.g, rhs.b, rhs.a
-        };
+            return std::tuple{
+                r, g, b, a
+            } == std::tuple{
+                rhs.r, rhs.g, rhs.b, rhs.a
+            };
         }
 
-        std::string ToCss_str() {
+        /// Convert to a css string
+        const std::string& ToString() {
             return cached_css_str;
         }
-        /*
-        sf::Color ToSfColor() {
+        #ifdef EMP_HAS_SFML
+        const sf::Color& ToSfColor() {
             return cached_sf_color;
         }
-        */
+        #endif
 
         //implicit conversion
         //operator std::string() const { return cached_css_str; }
@@ -76,14 +82,14 @@ namespace web {
         
         bool operator!=( const Color& rhs ) const { return !operator==( rhs ); }
 
-        #if __has_include(<SFML/Graphics.hpp>)
-        operator sf::Color() const { return sf::Color( r, g, b, a * 255 ); }
+        #ifdef EMP_HAS_SFML
+        operator const sf::Color&() const { return cached_sf_color; }
         #endif
     private:
         static Color ParseColor(const std::string& str);
         static Color ParseABC(const std::string& str);
-        static Color ParseRGB(const std::string& str, const std::string& fname);
-        static Color ParseHSL(const std::string& str, const std::string& fname);
+        static Color ParseRGB(const std::string& str, const std::string& format_name);
+        static Color ParseHSL(const std::string& str, const std::string& format_name);
   };
 
   namespace color_impl {
@@ -248,23 +254,23 @@ namespace web {
         return uint8_t(std::clamp(i,T(0),T(255)));
     }
 
-    /// Clamp a value to a float 0-1
+    /// Clamp to float 0.0 .. 1.0.
     /// @param f The value to clamp
     template <typename T>
-    float clamp_css_float(T f) {  // Clamp to float 0.0 .. 1.0.
-        return std::clamp(float(f),float(0.0),float(1.0));
+    float clamp_css_float(T f) {
+        return std::clamp(static_cast<float>(f),float(0.0),float(1.0));
     }
     
     /// Convert a string to float
     /// @param str The string to convert
-    float parseFloat(const std::string& str) {
+    float parse_float(const std::string& str) {
         return strtof(str.c_str(), nullptr);
     }
 
     /// Convert a string to integer in the given base
     /// @param str The string to convert
     /// @param base The base the string is in
-    int64_t parseInt(const std::string& str, uint8_t base = 10) {
+    int64_t parse_int(const std::string& str, const uint8_t base = 10) {
         return strtoll(str.c_str(), nullptr, base);
     }
 
@@ -272,18 +278,18 @@ namespace web {
     /// @param str The string to convert
     uint8_t parse_css_int(const std::string& str) {  // int or percentage.
         if (str.length() && str.back() == '%') {
-            return clamp_css_byte(parseFloat(str) / 100.0f * 255.0f);
+            return clamp_css_byte(parse_float(str) / 100.0f * 255.0f);
         } else {
-            return clamp_css_byte(parseInt(str));
+            return clamp_css_byte(parse_int(str));
         }
     }
     /// Convert a string to a float or percentage
     /// @param str The string to convert
     float parse_css_float(const std::string& str) {  // float or percentage.
         if (str.length() && str.back() == '%') {
-            return clamp_css_float(parseFloat(str) / 100.0f);
+            return clamp_css_float(parse_float(str) / 100.0f);
         } else {
-            return clamp_css_float(parseFloat(str));
+            return clamp_css_float(parse_float(str));
         }
     }
     /// Convert floats from hsl to rgb value
@@ -338,7 +344,7 @@ namespace web {
             return left.name < right.name;
         }));
     
-    auto namedColor = std::lower_bound(
+    const auto namedColor = std::lower_bound(
         std::begin(color_impl::namedColors), std::end(color_impl::namedColors), str,
         [](const auto& left, const auto& right){
             return left.name < right;
@@ -347,7 +353,9 @@ namespace web {
     if (namedColor->name == str){
         *this = namedColor->color;
         (*this).cached_css_str = emp::ColorRGB(r, g, b, a);
-        //(*this).cached_sf_color = (sf::Color)*this;
+        #ifdef EMP_HAS_SFML
+        (*this).cached_sf_color = (sf::Color)*this;
+        #endif
         return;
     }
 
@@ -363,15 +371,15 @@ namespace web {
             return ParseABC(str);
         }
 
-        size_t open_paren = str.find_first_of( '(' );
+        const size_t open_paren = str.find_first_of( '(' );
         if (open_paren != std::string::npos) {
-            const std::string fname = str.substr(0, open_paren);
+            const std::string format_name = str.substr(0, open_paren);
 
-            if (fname == "rgba" || fname == "rgb") {
-                return ParseRGB(str, fname);
+            if (format_name == "rgba" || format_name == "rgb") {
+                return ParseRGB(str, format_name);
 
-            } else if (fname == "hsla" || fname == "hsl") {
-                return ParseHSL(str, fname);
+            } else if (format_name == "hsla" || format_name == "hsl") {
+                return ParseHSL(str, format_name);
             }
         }
         emp_assert( false, str);
@@ -382,7 +390,7 @@ namespace web {
     /// @param str The color string ex) "#fff"
     Color Color::ParseABC(const std::string& str){
       if (str.length() == 4) {
-            const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
+            const int64_t iv = color_impl::parse_int(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xfff)) {
                 emp_assert( false, str );
                 __builtin_unreachable();
@@ -395,7 +403,7 @@ namespace web {
                 );
             }
         } else if (str.length() == 7) {
-            const int64_t iv = color_impl::parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
+            const int64_t iv = color_impl::parse_int(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xffffff)) {
               emp_assert( false, str );
               __builtin_unreachable();
@@ -415,15 +423,15 @@ namespace web {
   
     /// Parse the RGB or RGBA format color string
     /// @param str The color string ex) "rgb(255,255,255)"
-    /// @param fname Format name rgba or rgb
-    Color Color::ParseRGB(const std::string& str, const std::string& fname){
-        size_t open_paren = str.find_first_of( '(' );
-        size_t close_paren = str.find_first_of( ')' );
+    /// @param format_name Format name rgba or rgb
+    Color Color::ParseRGB(const std::string& str, const std::string& format_name){
+        const size_t open_paren = str.find_first_of( '(' );
+        const size_t close_paren = str.find_first_of( ')' );
         if (open_paren != std::string::npos && close_paren + 1 == str.length()) {
             const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
                 close_paren - (open_paren + 1)), ',');
             float alpha = 1.0f;
-            if (fname == "rgba") {
+            if (format_name == "rgba") {
                 if (color_tokens.size() != 4) {
                     emp_assert( false, str );
                     __builtin_unreachable();
@@ -447,15 +455,15 @@ namespace web {
 
     /// Parse the HSL or HSLA format color string
     /// @param str The color string ex) "hsl(100%,100%,100%)"
-    /// @param fname Format name hsla or hsl
-    Color Color::ParseHSL(const std::string& str, const std::string& fname){
-        size_t open_paren = str.find_first_of( '(' );
-        size_t close_paren = str.find_first_of( ')' );
+    /// @param format_name Format name hsla or hsl
+    Color Color::ParseHSL(const std::string& str, const std::string& format_name){
+        const size_t open_paren = str.find_first_of( '(' );
+        const size_t close_paren = str.find_first_of( ')' );
         if (close_paren + 1 == str.length()) {
             const std::vector<std::string> color_tokens = color_impl::split(str.substr(open_paren + 1, 
                 close_paren - (open_paren + 1)), ',');
             float alpha = 1.0f;
-            if (fname == "hsla") {
+            if (format_name == "hsla") {
                 if (color_tokens.size() != 4) {
                     emp_assert( false, str );
                     __builtin_unreachable();
@@ -466,7 +474,7 @@ namespace web {
                     __builtin_unreachable();
             }
 
-            float h = color_impl::parseFloat(color_tokens[0]) / 360.0f;
+            float h = color_impl::parse_float(color_tokens[0]) / 360.0f;
             float i;
             // Normalize the hue to [0..1]
             h = std::modf(h, &i);
@@ -476,8 +484,8 @@ namespace web {
             const float s = color_impl::parse_css_float(color_tokens[1]);
             const float l = color_impl::parse_css_float(color_tokens[2]);
 
-            float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
-            float m1 = l * 2.0f - m2;
+            const float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
+            const float m1 = l * 2.0f - m2;
 
             return Color(
                 color_impl::clamp_css_byte(color_impl::css_hue_to_rgb(m1, m2, h + 1.0f / 3.0f) * 255.0f),

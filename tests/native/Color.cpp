@@ -45,9 +45,9 @@ TEST_CASE("Test Color Construction", "[native]") {
     emp::web::Color notWhite5("rgb(221,21,0)");
     REQUIRE(notWhite5 != white6);
 
-    REQUIRE(white.ToCss_str() == white5.ToCss_str());
-    REQUIRE(css_str4 == white5.ToCss_str());
-    REQUIRE(notWhite4.ToCss_str() == "rgba(221,21,0,1)");
+    REQUIRE(white.ToString() == white5.ToString());
+    REQUIRE(css_str4 == white5.ToString());
+    REQUIRE(notWhite4.ToString() == "rgba(221,21,0,1)");
 
     /// HSL format
     const std::string css_str6 = "hsla(100%,100%,100%,1)";
