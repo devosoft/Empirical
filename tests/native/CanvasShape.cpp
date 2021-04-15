@@ -106,4 +106,23 @@ TEST_CASE("Test CanvasShape right", "[native]") {
 
 }
 
+TEST_CASE("Test CanvasCircle", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+
+  emp::web::CanvasCircle circ(25, 25, 5, "red", "blue");
+
+  emp::web::CanvasCircle circ2(emp::Point(0, 0), 5, "red", "blue");
+  circ2.MoveTo(emp::Point(50, 25));
+  circ2.SetLineWidth(0.5);
+  circ2.SetFillColor("green");
+  circ2.SetLineColor("black");
+
+  emp::web::CanvasCircle circ3(circ2);
+  circ3.MoveTo(75, 25);
+
+  canvas.SavePNG("circ.png");
+
+}
+
 #endif

@@ -79,6 +79,10 @@ namespace web {
       : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc, lw)
       , radius(circle.GetRadius()) { ; }
 
+    virtual void Apply( sf::RenderTexture& window ) const override {
+        emp_assert(false, "unimplemented");
+    }
+
   };
 
   /// Track a rectangle shape to be drawn on a canvas.
@@ -93,7 +97,9 @@ namespace web {
     CanvasRect(double _x, double _y, double _w, double _h,
                const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
-
+    virtual void Apply( sf::RenderTexture& window ) const override {
+        emp_assert(false, "unimplemented");
+    }
   };
 
   /// Clear a rectangular area in a canvas.
@@ -103,7 +109,9 @@ namespace web {
   public:
     CanvasClearRect(Point _p, double _w, double _h)
       : CanvasShape(_p), w(_w), h(_h) { ; }
-
+    virtual void Apply( sf::RenderTexture& window ) const override {
+        emp_assert(false, "unimplemented");
+    }
   };
 
   /// An arbitrary-sized polygon to be drawn on a canvas.
@@ -152,7 +160,9 @@ namespace web {
       : CanvasShape(_x1, _y1, "", lc, lw), x2(_x2), y2(_y2) { ; }
     CanvasLine(Point p1, Point p2, const std::string & lc="", double lw=1.0)
       : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
-
+    virtual void Apply( sf::RenderTexture& window ) const override {
+        emp_assert(false, "unimplemented");
+    }
   };
 
   /// A whole series of line segments on the canvas.
@@ -168,7 +178,9 @@ namespace web {
     CanvasMultiLine(Point p1, const emp::vector<Point> & _points,
                     const std::string & lc="", double lw=1.0)
       : CanvasMultiLine(p1.GetX(), p1.GetY(), _points, lc, lw) { ; }
-
+    virtual void Apply( sf::RenderTexture& window ) const override {
+        emp_assert(false, "unimplemented");
+    }
   };
 
   /// Text to be written on a canvas.
@@ -186,7 +198,9 @@ namespace web {
 
     /// Identify if text is centered.
     bool GetCenter() const { return center; }
-
+    virtual void Apply( sf::RenderTexture& window ) const override {
+        emp_assert(false, "unimplemented");
+    }
   };
 
 }
