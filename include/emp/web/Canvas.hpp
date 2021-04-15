@@ -19,7 +19,7 @@
 // https://stackoverflow.com/questions/4102351/test-for-empty-macro-definition/4127073#4127073
 #elif __has_include(<SFML/Graphics.hpp>) && (!defined(EMP_HAS_X11) || (EMP_HAS_X11 == 1))
 
-#define EMP_NATIVE_SUPPORT
+#define EMP_HAS_SFML
 #include "_NativeCanvas.hpp"
 
 #else  // Must have SFML and environment variable DISPLAY set

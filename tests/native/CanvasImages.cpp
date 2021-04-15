@@ -9,7 +9,7 @@
 
 #include "emp/web/Canvas.hpp"
 
-#ifdef EMP_NATIVE_SUPPORT
+#ifdef EMP_HAS_SFML
 
 
 TEST_CASE("Test Images MSE", "[native]") {

@@ -4,7 +4,7 @@
 #include "emp/web/Canvas.hpp"
 #include "emp/web/CanvasShape.hpp"
 
-#ifdef EMP_NATIVE_SUPPORT
+#ifdef EMP_HAS_SFML
 
 TEST_CASE("Test CanvasShape up", "[native]") {
 

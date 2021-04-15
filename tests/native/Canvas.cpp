@@ -4,7 +4,7 @@
 
 #include "emp/web/Canvas.hpp"
 
-#ifdef EMP_NATIVE_SUPPORT
+#ifdef EMP_HAS_SFML
 
 TEST_CASE("Test Canvas Attributes", "[native]") {
     emp::web::Canvas canvas{ 500, 600 };
