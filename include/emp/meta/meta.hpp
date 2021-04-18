@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018
+//  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A bunch of C++ Template Meta-programming tricks.
@@ -17,21 +17,62 @@
 #include <tuple>
 #include <utility>
 
+#include "../base/vector.hpp"
+
 namespace emp {
 
-  // A function that will take any number of argument and do nothing with them.
+  /// A function that will take any number of argument and do nothing with them.
   template <typename... Ts> void DoNothing(Ts...) { ; }
 
-  // Effectively create a function (via constructor) where all args are computed, then ignored.
+  /// Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 
-  // Trim off a specific type position from a pack.
+  /// Trim off a specific type position from a pack.
   template <typename T1, typename... Ts> using first_type = T1;
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
-  // Create a placeholder template to substitute for a real type.
+  /// Create a placeholder template to substitute for a real type.
   template <int> struct PlaceholderType;
+
+  /// Group types in a parameter pack to build a vector of a designated type.
+  template <typename OBJ_T> void BuildObjVector1(emp::vector<OBJ_T> &) { }
+  template <typename OBJ_T> void BuildObjVector2(emp::vector<OBJ_T> &) { }
+  template <typename OBJ_T> void BuildObjVector3(emp::vector<OBJ_T> &) { }
+  template <typename OBJ_T> void BuildObjVector4(emp::vector<OBJ_T> &) { }
+
+  template <typename OBJ_T, typename T1, typename... Ts>
+  void BuildObjVector1(emp::vector<OBJ_T>& v, T1& arg1, Ts&... extras)
+  { v.emplace_back( arg1 ); BuildObjVector1(v, extras...); }
+
+  template <typename OBJ_T, typename T1, typename T2, typename... Ts>
+  void BuildObjVector2(emp::vector<OBJ_T>& v, T1& arg1, T2& arg2, Ts&... extras)
+  { v.emplace_back( arg1, arg2 ); BuildObjVector2(v, extras...); }
+
+  template <typename OBJ_T, typename T1, typename T2, typename T3, typename... Ts>
+  void BuildObjVector3(emp::vector<OBJ_T>& v, T1& arg1, T2& arg2, T3& arg3, Ts&... extras)
+  { v.emplace_back( arg1, arg2, arg3 ); BuildObjVector3(v, extras...); }
+
+  template <typename OBJ_T, typename T1, typename T2, typename T3, typename T4, typename... Ts>
+  void BuildObjVector4(emp::vector<OBJ_T>& v, T1& arg1, T2& arg2, T3& arg3, T4& arg4, Ts&... extras)
+  { v.emplace_back( arg1, arg2, arg3, arg4 ); BuildObjVector4(v, extras...); }
+
+  template <typename OBJ_T, size_t NUM_ARGS, typename... Ts>
+  emp::vector<OBJ_T> BuildObjVector(Ts &... args) {
+    emp::vector<OBJ_T> out_v;
+    constexpr size_t TOTAL_ARGS = sizeof...(Ts);
+    static_assert((TOTAL_ARGS % NUM_ARGS) == 0,
+                  "emp::BuildObjVector() : Must have the same number of args for each object.");
+    out_v.reserve(TOTAL_ARGS / NUM_ARGS);
+
+    if constexpr (NUM_ARGS == 1) BuildObjVector1<OBJ_T>(out_v, args...);
+    else if constexpr (NUM_ARGS == 2) BuildObjVector2<OBJ_T>(out_v, args...);
+    else if constexpr (NUM_ARGS == 3) BuildObjVector3<OBJ_T>(out_v, args...);
+    else if constexpr (NUM_ARGS == 4) BuildObjVector4<OBJ_T>(out_v, args...);
+    static_assert(NUM_ARGS < 5, "BuildObjVector currently has a cap of 4 arguments per object.");
+
+    return out_v;
+  }
 
   // Index into a template parameter pack to grab a specific type.
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
