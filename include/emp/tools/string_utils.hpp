@@ -569,6 +569,15 @@ namespace emp {
     return string_get(in_string, " \n\r\t", start_pos);
   }
 
+  /// Test if a string has a given prefix.
+  inline bool has_prefix(const std::string & in_string, const std::string & prefix) {
+    if (prefix.size() > in_string.size()) return false;
+    for (size_t i = 0; i < prefix.size(); ++i) {
+      if (in_string[i] != prefix[i]) return false;      
+    }
+    return true;
+  }
+
   /// Remove a prefix of a string, up to the first newline, and return it.
   inline std::string string_pop_line(std::string & in_string) {
     return string_pop(in_string, '\n');
