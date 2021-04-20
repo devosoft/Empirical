@@ -599,6 +599,12 @@ namespace emp {
     while (is_whitespace(in_string.back())) in_string.pop_back();
   }
 
+  /// Remove all whitespace at both the beginning and the end of a string.
+  inline void justify(std::string & in_string) {
+    left_justify(in_string);
+    right_justify(in_string);
+  }
+
   /// Remove instances of characters from file.
   static inline void remove_chars(std::string & in_string, std::string chars) {
     size_t cur_pos = 0;
