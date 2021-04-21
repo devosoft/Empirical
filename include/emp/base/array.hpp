@@ -21,6 +21,7 @@
 
 #include <initializer_list>
 #include <array>
+#include <type_traits>
 
 #include "assert.hpp"
 #include "../meta/TypeID.hpp"
@@ -53,6 +54,12 @@ namespace emp {
       using this_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
       using vec_t = emp::array<T,N>;
+
+      /// Convenience functions to view self as wrapped_t object
+      wrapped_t& as_wrapped() { return *static_cast<wrapped_t*>(this); }
+      const wrapped_t& as_wrapped() const { return
+        *static_cast<const wrapped_t*>(this);
+      }
 
       /// What vector was this iterator created from?
       const vec_t * v_ptr{ nullptr };
@@ -104,8 +111,41 @@ namespace emp {
       this_t & operator--() { emp_assert(OK(false,true)); wrapped_t::operator--(); return *this; }
       this_t operator--(int x) { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(x), v_ptr); }
 
-      auto operator+(int in) { emp_assert(OK()); return this_t(wrapped_t::operator+(in), v_ptr); }
-      auto operator-(int in) { emp_assert(OK()); return this_t(wrapped_t::operator-(in), v_ptr); }
+      // some stl implementations use a free-function operator+(lhs, rhs)
+      // instead of an operator+(rhs) member, so we have to
+      //   1. use free-function + syntax
+      //      instead of calling wrapped_t::operator+()
+      //   2. provide exact type-matching function signatures to prevent
+      //      ambiguous overload errors
+      // (this problem observed w/ GCC with _GLIBCXX_DEBUG enabled)
+      template<
+        typename Addend,
+        typename = typename std::enable_if<
+          std::is_arithmetic<Addend>::value, Addend
+        >::type
+      >
+      auto operator+(const Addend in) {
+        emp_assert(OK());
+        return this_t(as_wrapped() + in, v_ptr);
+      }
+
+      // some stl implementations use a free-function operator-(lhs, rhs)
+      // instead of an operator-(rhs) member, so we have to
+      //   1. use free-function - syntax
+      //      instead of calling wrapped_t::operator-()
+      //   2. provide exact type-matching function signatures to prevent
+      //      ambiguous overload errors
+      // (this problem observed w/ GCC with _GLIBCXX_DEBUG enabled)
+      template<
+        typename Subtrahend,
+        typename = typename std::enable_if<
+          std::is_arithmetic<Subtrahend>::value, Subtrahend
+        >::type
+      >
+      auto operator-(Subtrahend in) {
+        emp_assert(OK());
+        return this_t(as_wrapped() - in, v_ptr);
+      }
       auto operator-(const this_t & in) { emp_assert(OK()); return ((wrapped_t) *this) - (wrapped_t) in; }
 
       this_t & operator+=(int in) { emp_assert(OK()); wrapped_t::operator+=(in); return *this; }
