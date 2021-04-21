@@ -313,10 +313,12 @@ namespace emp {
       return iterator(stdv_t::erase(first, last), this);
     }
 
+    // for implicit conversion of iterator -> base_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
     template <typename... ARGS>
-    iterator emplace(ARGS &&... args) {
+    iterator emplace(const const_iterator pos, ARGS &&... args) {
       ++revision;
-      return iterator( stdv_t::emplace(std::forward<ARGS>(args)...), this );
+      return iterator(stdv_t::emplace(pos, std::forward<ARGS>(args)...), this);
     }
 
     template <typename... ARGS>

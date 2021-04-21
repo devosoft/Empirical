@@ -88,6 +88,17 @@ namespace emp {
       operator ITERATOR_T() { return *this; }
       operator const ITERATOR_T() const { return *this; }
 
+      // enables the implicit conversion
+      // iterator_wrapper<iterator> -> iterator_wrapper<const_iterator>
+      template<typename It>
+      operator iterator_wrapper<It>() {
+        return iterator_wrapper<It>(as_wrapped(), v_ptr);
+      }
+      template<typename It>
+      operator const iterator_wrapper<It>() const {
+        return iterator_wrapper<It>(as_wrapped(), v_ptr);
+      }
+
       auto & operator*() {
         emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
         return wrapped_t::operator*();
@@ -210,22 +221,34 @@ namespace emp {
     void push_back(PB_Ts &&... args) { emp_assert(false, "invalid operation for array!"); }
     void pop_back() { emp_assert(false, "invalid operation for array!"); }
 
+    // for implicit conversion of iterator -> base_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
     template <typename... ARGS>
-    iterator insert(ARGS &&... args) {
+    iterator insert(const const_iterator pos, ARGS &&... args) {
       emp_assert(false, "invalid operation for array!");
-      return iterator( base_t::insert(std::forward<ARGS>(args)...), this );
+      return iterator(base_t::insert(pos, std::forward<ARGS>(args)...), this);
     }
 
-    template <typename... ARGS>
-    iterator erase(ARGS &&... args) {
+    // for implicit conversion of iterator -> base_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
+    iterator erase(const const_iterator pos) {
       emp_assert(false, "invalid operation for array!");
-      return iterator( base_t::erase(std::forward<ARGS>(args)...), this );
+      return iterator(base_t::erase(pos), this);
     }
 
-    template <typename... ARGS>
-    iterator emplace(ARGS &&... args) {
+    // for implicit conversion of iterator -> base_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
+    iterator erase(const const_iterator first, const const_iterator last) {
       emp_assert(false, "invalid operation for array!");
-      return iterator( base_t::emplace(std::forward<ARGS>(args)...), this );
+      return iterator(base_t::erase(first, last), this);
+    }
+
+    // for implicit conversion of iterator -> base_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
+    template <typename... ARGS>
+    iterator emplace(const const_iterator pos, ARGS &&... args) {
+      emp_assert(false, "invalid operation for array!");
+      return iterator(base_t::emplace(pos, std::forward<ARGS>(args)...), this);
     }
 
     template <typename... ARGS>
