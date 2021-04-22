@@ -71,8 +71,8 @@
 			// Delete given iterator from cache
 			// @param it cache_map iterator to element to be deleted from cache
 			void Delete(const typename cache_map_t::iterator it) {
-				cache_map.erase(it);
 				cache_list.erase(it->second);
+				cache_map.erase(it);
 			}
 
 		public:
