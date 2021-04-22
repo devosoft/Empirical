@@ -3,7 +3,7 @@ TEST_NAMES = CanvasShape Canvas CanvasImages Color
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 DISPLAY_ENV := ${DISPLAY}
-FLAGS = -std=c++17 -D_GLIBCXX_DEBUG -D_LIBCPP_DEBUG  -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
 
 default: test
 
@@ -39,11 +39,11 @@ opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out test_*.png
 
 # Test in debug mode with pointer tracking
-fulldebug: FLAGS := -std=c++17 -D_GLIBCXX_DEBUG -D_LIBCPP_DEBUG  -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
 fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out test_*.png
 
-cranky: FLAGS := -std=c++17 -D_GLIBCXX_DEBUG -D_LIBCPP_DEBUG  -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out test_*.png
 
