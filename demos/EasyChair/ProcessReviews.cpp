@@ -6,6 +6,11 @@
 #include "../../include/emp/io/File.hpp"
 #include "../../include/emp/tools/string_utils.hpp"
 
+
+///////////////////////
+//  ReviewInfo
+///////////////////////
+
 struct ReviewInfo
 {
   bool is_meta = false;
@@ -20,7 +25,32 @@ struct ReviewInfo
   int relevance = 0;
   int quality = 0;
   int confidence = 0;
+
+  void Write(std::ostream & os=std::cout) const {
+    if (is_meta) {
+      os << "METAREVIEW by " << reviewer_name << ": ";
+      if (overall == -1) os << "reject\n";
+      if (overall == 0) os << "UNDECIDED\n";
+      else os << "accept!\n";
+    }
+    else {
+      os << "REVIEW by " << reviewer_name << ":\n";
+      os << " Overall evaluation: " << overall << std::endl;
+      os << " Novelty/Originality: " << novelty << std::endl;
+      os << " Writing Clarity: " << writing << std::endl;
+      os << " Thoroughness of Literature Review: " << lit_review << std::endl;
+      os << " Thoroughness of Methods: " << methods << std::endl;
+      os << " Relevance to Artificial Life Conference: " << relevance << std::endl;
+      os << " Overall Quality of Work: " << quality << std::endl;
+      os << " Reviewer's confidence: " << confidence << std::endl;
+    }
+  }
 };
+
+
+///////////////////////
+//  PaperInfo
+///////////////////////
 
 struct PaperInfo
 {
@@ -56,10 +86,18 @@ struct PaperInfo
   void Write(std::ostream & os=std::cout) const {
     os << "PAPER ID: " << id << std::endl
        << "AUTHORS:  " << GetAuthors() << std::endl
-       << "TITLE:    " << title << std::endl
-       << std::endl;
+       << "TITLE:    " << title << std::endl;
+    for (const ReviewInfo & review : reviews) {
+      review.Write(os);
+    }
+    os << std::endl;
   }
 };
+
+
+///////////////////////
+//  PaperSet
+///////////////////////
 
 struct PaperSet {
   emp::vector<PaperInfo> papers;
@@ -80,25 +118,51 @@ struct PaperSet {
   // Process details about a meta-review
   void ProcessMeta(const emp::File & file) {
     const std::string & line = file[cur_line++];
-    papers[cur_id].reviews.push_back();
+    papers[cur_id].reviews.push_back(ReviewInfo{});
     ReviewInfo & info = papers[cur_id].reviews.back();
     info.is_meta = true;
-    info.reviewer_name = line.substr(23,line.size()-11);
+    info.reviewer_name = line.substr(23,line.size()-34);
 
     // Collect recommendation result (-1 = decline, 0 = undecided, 1 = accept)
     const std::string & result = file[cur_line++].substr(16);
     if (result == "accept") info.overall = 1;
     else if (result == "reject") info.overall = -1;
-    info.overall = 0;
+    else info.overall = 0;
 
     // Meta mode ends with an empty line.
     while (file[cur_line] != "") cur_line++;
   }
 
+  bool CheckRating(const std::string & line, const std::string & name, int & value) {
+    if (emp::has_prefix(line, name)) {
+      size_t pos = name.size() + 1;
+      value = emp::from_string<int>(emp::string_get_word(line, pos));
+      return true;
+    }
+    return false;
+  }
+
   // Process details about a meta-review
   void ProcessReview(const emp::File & file) {
+    const std::string & line = file[cur_line++];
+    papers[cur_id].reviews.push_back(ReviewInfo{});
+    ReviewInfo & info = papers[cur_id].reviews.back();
+    info.is_meta = false;
+    info.reviewer_name = line.substr(21,line.size()-32);
+
     // Reviews end with an empty line.
-    while (file[cur_line] != "") cur_line++;
+    while (file[cur_line] != "") {
+      CheckRating(file[cur_line], "Overall evaluation:", info.overall);
+      CheckRating(file[cur_line], "Novelty/Originality:", info.novelty);
+      CheckRating(file[cur_line], "Writing Clarity:", info.writing);
+      CheckRating(file[cur_line], "Thoroughness of Literature Review:", info.lit_review);
+      CheckRating(file[cur_line], "Thoroughness of Methods:", info.methods);
+      CheckRating(file[cur_line], "Relevance to Artificial Life Conference:", info.relevance);
+      CheckRating(file[cur_line], "Overall Quality of Work:", info.quality);
+      CheckRating(file[cur_line], "Reviewer's confidence:", info.confidence);
+
+      cur_line++;
+    }
   }
 
   void ProcessFile(const std::string & filename) {
@@ -160,14 +224,6 @@ struct PaperSet {
     }
   }
 
-  bool CheckRating(const std::string & line, const std::string & name, int & value) {
-    if (emp::has_prefix(line, name)) {
-      size_t pos = name.size() + 1;
-      value = emp::from_string<int>(emp::string_get_word(name, pos));
-      return true;
-    }
-    return false;
-  }
 };
 
 int main(int argc, char * argv[])
