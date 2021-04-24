@@ -63,7 +63,8 @@ struct PaperInfo
 
 struct PaperSet {
   emp::vector<PaperInfo> papers;
-  size_t cur_line = 0;
+  size_t cur_line = 0;             // File line being processed.
+  int cur_id = -1;                 // Current paper being setup.
 
   PaperSet(const std::string & filename)
   {
@@ -78,6 +79,18 @@ struct PaperSet {
 
   // Process details about a meta-review
   void ProcessMeta(const emp::File & file) {
+    const std::string & line = file[cur_line++];
+    papers[cur_id].reviews.push_back();
+    ReviewInfo & info = papers[cur_id].reviews.back();
+    info.is_meta = true;
+    info.reviewer_name = line.substr(23,line.size()-11);
+
+    // Collect recommendation result (-1 = decline, 0 = undecided, 1 = accept)
+    const std::string & result = file[cur_line++].substr(16);
+    if (result == "accept") info.overall = 1;
+    else if (result == "reject") info.overall = -1;
+    info.overall = 0;
+
     // Meta mode ends with an empty line.
     while (file[cur_line] != "") cur_line++;
   }
@@ -92,7 +105,6 @@ struct PaperSet {
     emp::File file(filename);
 
     // Scan through the file, loading each review.
-    int cur_id = -1;
     for (cur_line = 0; cur_line < file.size(); ++cur_line) {
       std::string line = file[cur_line];
 
