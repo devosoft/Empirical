@@ -62,26 +62,39 @@ struct PaperInfo
 };
 
 struct PaperSet {
-  std::string filename = "";
-  emp::File file;
   emp::vector<PaperInfo> papers;
+  size_t cur_line = 0;
 
-  enum class Mode { BASE, SUMMARY, META, REVIEW };
-
-  PaperSet(const std::string & in_filename)
-    : filename(in_filename), file(in_filename)
+  PaperSet(const std::string & filename)
   {
+    ProcessFile(filename);
+  }
+
+  // For the moment, summaries are not used - just fast-forward.
+  void ProcessSummary(const emp::File & file) {
+    // Summary mode ends with an empty line.
+    while (file[cur_line] != "") cur_line++;
+  }
+
+  // Process details about a meta-review
+  void ProcessMeta(const emp::File & file) {
+    // Meta mode ends with an empty line.
+    while (file[cur_line] != "") cur_line++;
+  }
+
+  // Process details about a meta-review
+  void ProcessReview(const emp::File & file) {
+    // Reviews end with an empty line.
+    while (file[cur_line] != "") cur_line++;
+  }
+
+  void ProcessFile(const std::string & filename) {
+    emp::File file(filename);
+
     // Scan through the file, loading each review.
     int cur_id = -1;
-    Mode mode = Mode::BASE;
-    for (std::string line : file) {
-      if (mode == Mode::SUMMARY) {
-        // Summary mode ends with an empty line.
-        if (line == "") {
-          mode = Mode::BASE;
-          continue;
-        }
-      }
+    for (cur_line = 0; cur_line < file.size(); ++cur_line) {
+      std::string line = file[cur_line];
 
       // New paper?
       if (emp::has_prefix(line, "*********************** PAPER")) {
@@ -109,22 +122,22 @@ struct PaperSet {
 
       // Is this a summary?
       if (line == "================== SUMMARY OF REVIEWS =================") {
-        mode = Mode::SUMMARY;
+        ProcessSummary(file);
         continue;
       }
 
       // Is this a metareview?
       if (emp::has_prefix(line, "++++++++++ METAREVIEW")) {
-        mode = Mode::META;
+        ProcessMeta(file);
         continue;
       }
 
       // Is this a regular review?
       if (emp::has_prefix(line, "++++++++++ REVIEW")) {
-        mode = Mode::REVIEW;
+        ProcessReview(file);
+        continue;
       }
     }
-
   }
 
   void Print() {
