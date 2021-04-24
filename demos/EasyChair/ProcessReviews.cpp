@@ -45,6 +45,34 @@ struct ReviewInfo
       os << " Reviewer's confidence: " << confidence << std::endl;
     }
   }
+
+  void WriteCSV(std::ostream & os=std::cout) const {
+    os << "\"" << reviewer_name << "\"," << overall;
+    if (!is_meta) {
+      os << "," << novelty
+         << "," << writing
+         << "," << lit_review
+         << "," << methods
+         << "," << relevance
+         << "," << quality
+         << "," << confidence;
+    }
+  }
+
+  static void WriteCSVMetaHeaders(std::ostream & os=std::cout) {
+    os << "Metareviewer,Recommendation";
+  }
+
+  static void WriteCSVHeaders(std::ostream & os=std::cout) {
+    os << "Reviewer,Overall"
+        << ",Novelty"
+        << ",Writing"
+        << ",Lit Review"
+        << ",Methods"
+        << ",Eelevance"
+        << ",Quality"
+        << ",Confidence";
+  }
 };
 
 
@@ -57,6 +85,7 @@ struct PaperInfo
   int id = -1;
   std::string title = "";
   emp::vector<std::string> authors;
+  ReviewInfo meta_review;
   emp::vector<ReviewInfo> reviews;
 
   void SetAuthors(std::string in_authors) {
@@ -87,9 +116,29 @@ struct PaperInfo
     os << "PAPER ID: " << id << std::endl
        << "AUTHORS:  " << GetAuthors() << std::endl
        << "TITLE:    " << title << std::endl;
+    meta_review.Write(os);
     for (const ReviewInfo & review : reviews) {
       review.Write(os);
     }
+    os << std::endl;
+  }
+
+  void WriteCSV(std::ostream & os=std::cout) const {
+    // One line for each review.
+    for (const ReviewInfo & review : reviews) {
+      os << id << ",\"" << GetAuthors() << "\",\"" << title << "\",";
+      meta_review.WriteCSV(os);
+      os << ",";
+      review.WriteCSV(os);
+      os << "\n";
+    }
+  }
+
+  void WriteCSVHeaders(std::ostream & os=std::cout) const {
+    os << "Paper ID,Authors,Title,";
+    ReviewInfo::WriteCSVMetaHeaders(os);
+    os << ",";
+    ReviewInfo::WriteCSVHeaders(os);
     os << std::endl;
   }
 };
@@ -118,8 +167,7 @@ struct PaperSet {
   // Process details about a meta-review
   void ProcessMeta(const emp::File & file) {
     const std::string & line = file[cur_line++];
-    papers[cur_id].reviews.push_back(ReviewInfo{});
-    ReviewInfo & info = papers[cur_id].reviews.back();
+    ReviewInfo & info = papers[cur_id].meta_review;
     info.is_meta = true;
     info.reviewer_name = line.substr(23,line.size()-34);
 
@@ -224,6 +272,19 @@ struct PaperSet {
     }
   }
 
+  void PrintCVS() {
+    // Find the first review and use it to print the headers.
+    size_t first = 0;
+    while (papers[first].id < 0) first++;
+    papers[first].WriteCSVHeaders();
+
+    // Now print all of the actual reviews.
+    for (const auto & paper : papers) {
+      if (paper.id < 0) continue;
+      paper.WriteCSV();
+    }
+  }
+
 };
 
 int main(int argc, char * argv[])
@@ -235,5 +296,5 @@ int main(int argc, char * argv[])
 
   std::string filename(argv[1]);
   PaperSet ps(filename);
-  ps.Print();
+  ps.PrintCVS();
 }
