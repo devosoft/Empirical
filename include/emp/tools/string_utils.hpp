@@ -529,8 +529,10 @@ namespace emp {
   /// Get a segment from the beginning of a string as another string, leaving original untouched.
   static inline std::string string_get_range(const std::string & in_string, std::size_t start_pos,
                                              std::size_t end_pos) {
-    if (end_pos == std::string::npos) end_pos = in_string.size() - start_pos;
-    return in_string.substr(start_pos, end_pos);
+    emp_assert(start_pos <= in_string.size());
+    if (end_pos == std::string::npos) end_pos = in_string.size();
+    emp_assert(end_pos <= in_string.size());
+    return in_string.substr(start_pos, end_pos - start_pos);
   }
 
   /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
@@ -554,6 +556,7 @@ namespace emp {
   /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
   /// modify it. If the delimeter is not found, return the entire input string.
   inline std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
+    emp_assert(start_pos <= in_string.size());
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
