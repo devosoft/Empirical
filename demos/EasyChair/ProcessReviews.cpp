@@ -87,6 +87,9 @@ struct PaperInfo
   emp::vector<std::string> authors;
   ReviewInfo meta_review;
   emp::vector<ReviewInfo> reviews;
+  std::string session = "";
+  std::string presentation = "";   // Type of presentation requested.
+  size_t length = 0;
 
   void SetAuthors(std::string in_authors) {
     authors = emp::slice(in_authors, ',');
@@ -126,7 +129,12 @@ struct PaperInfo
   void WriteCSV(std::ostream & os=std::cout) const {
     // One line for each review.
     for (const ReviewInfo & review : reviews) {
-      os << id << ",\"" << GetAuthors() << "\",\"" << title << "\",";
+      os << id << ",\""
+         << GetAuthors() << "\",\""
+         << title << "\","
+         << length << ",\""
+         << presentation << "\",\""
+         << session << "\",";
       meta_review.WriteCSV(os);
       os << ",";
       review.WriteCSV(os);
@@ -135,7 +143,7 @@ struct PaperInfo
   }
 
   void WriteCSVHeaders(std::ostream & os=std::cout) const {
-    os << "Paper ID,Authors,Title,";
+    os << "Paper ID,Authors,Title,Length,Presentation,Session,";
     ReviewInfo::WriteCSVMetaHeaders(os);
     os << ",";
     ReviewInfo::WriteCSVHeaders(os);
@@ -153,9 +161,10 @@ struct PaperSet {
   size_t cur_line = 0;             // File line being processed.
   int cur_id = -1;                 // Current paper being setup.
 
-  PaperSet(const std::string & filename)
+  PaperSet(const std::string & review_filename, const std::string & catagory_filename)
   {
-    ProcessFile(filename);
+    ProcessReviewFile(review_filename);
+    ProcessCatagoryFile(catagory_filename);
   }
 
   // For the moment, summaries are not used - just fast-forward.
@@ -213,7 +222,7 @@ struct PaperSet {
     }
   }
 
-  void ProcessFile(const std::string & filename) {
+  void ProcessReviewFile(const std::string & filename) {
     emp::File file(filename);
 
     // Scan through the file, loading each review.
@@ -241,6 +250,7 @@ struct PaperSet {
       if (emp::has_prefix(line, "TITLE:")) {
         emp::string_pop_word(line);
         papers[cur_id].title = line;
+        emp::justify(papers[cur_id].title);
         continue;
       }
 
@@ -261,6 +271,19 @@ struct PaperSet {
         ProcessReview(file);
         continue;
       }
+    }
+  }
+
+  void ProcessCatagoryFile(const std::string & filename) {
+    emp::File file(filename);
+
+    // Skip the first line; process the rest.
+    for (size_t i=1; i < file.size(); i++) {
+      auto row = file.ViewRowSlices(i);
+      size_t id = emp::from_string<size_t>(row[0]);
+      if (row.size() > 4) papers[id].length = emp::from_string<size_t>(row[3]);
+      if (row.size() > 4) papers[id].presentation = row[4];
+      if (row.size() > 5) papers[id].session = row[5];
     }
   }
 
@@ -289,12 +312,13 @@ struct PaperSet {
 
 int main(int argc, char * argv[])
 {
-  if (argc != 2) {
-    std::cerr << "Format: " << argv[0] << " [filename]\n";
+  if (argc != 3) {
+    std::cerr << "Format: " << argv[0] << " [review filename] [catagory filename]\n";
     exit(1);
   }
 
-  std::string filename(argv[1]);
-  PaperSet ps(filename);
+  std::string review_filename(argv[1]);
+  std::string catagory_filename(argv[2]);
+  PaperSet ps(review_filename, catagory_filename);
   ps.PrintCVS();
 }
