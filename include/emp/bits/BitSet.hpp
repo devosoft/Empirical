@@ -138,7 +138,7 @@ namespace emp {
       //static_assert( LAST_BIT == 0 );
       if constexpr (NUM_FIELDS != 1) {
         ShiftLeft(shift);
-      
+
       }
       else {
         if constexpr (LAST_BIT != 0)
