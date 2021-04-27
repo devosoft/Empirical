@@ -1414,7 +1414,7 @@ namespace emp {
         // in order for JSON serialization interoperability of native (64-bit)
         // and emscripten (32-bit) artifacts,
         // in 32-bit mode we have serialize as an array of 64-bit values
-        uint64_t buf[ sizeof(bit_set) / 8 ]{};
+        uint64_t buf[ (sizeof(bit_set) + 7) / 8 ]{};
         std::memcpy( buf, bit_set, sizeof(bit_set) ); // copy to buf
         ar( buf );
         std::memcpy( bit_set, buf, sizeof(bit_set) ); // copy from buf
