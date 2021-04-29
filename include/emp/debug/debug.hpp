@@ -35,6 +35,15 @@ namespace emp {
 #define EMP_DEBUG(...) __VA_ARGS__
 #endif
 
+  template<typename... Ts>
+  void emp_debug_print(Ts &&... args) {
+    (std::cerr <<  ... << std::forward<Ts>(args));
+    std::cerr << std::endl;
+  }
+
+  /// emp_debug() will print its contents as a message in debug mode and BLOCK release mode until it's removed.
+  #define emp_debug(...) BlockRelease(true); emp::emp_debug_print(__VA_ARGS__);
+
   /// Depricated() prints its contents exactly once to notify a user of a depricated function.
   static void Depricated(const std::string & name, const std::string & desc="") {
     static std::set<std::string> name_set;
