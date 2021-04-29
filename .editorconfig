@@ -20,12 +20,13 @@ insert_final_newline = true
 # Set default charset and tab width
 [*.{js,py}]
 charset = utf-8
-indent_style = tab
-tab_width = 2
+indent_style = space
+indent_size = 2
 
 # cpp and hpp file indentation
 [*.{cpp,hpp}]
-indent_style = tab
+indent_style = space
+indent_size = 2
 
 # Makefile indentation
 [Makefile]
@@ -33,5 +34,5 @@ indent_style = tab
 
 # Matches the exact files
 [{package.json,.travis.yml, CI.yml}]
-indent_style = tab
-tab_width = 2
+indent_style = space
+indent_size = 2
