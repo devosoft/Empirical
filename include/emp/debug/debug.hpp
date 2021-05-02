@@ -20,10 +20,16 @@
 
 namespace emp {
 
-  /// BlockRelease() will halt compilation if NDEBUG is on.  It is useful to include alongside
-  /// debug print code that you want to remember to remove when you are done debugging.
+  /// BlockRelease() will halt compilation if NDEBUG is on and EMP_NO_BLOCK is off.
+  /// It is useful to include alongside debug code that you want to remember to remove when you
+  /// are done debugging; it is automatically included with the emp_debug() function below.
+  /// If you want to intentionally compile in release mode, make sure to define EMP_NO_BLOCK.
 #ifdef NDEBUG
-  #define BlockRelease(BLOCK) static_assert(!BLOCK, "Release blocked due to debug material.")
+  #ifdef EMP_NO_BLOCK
+    #define BlockRelease(BLOCK)
+  #else
+    #define BlockRelease(BLOCK) static_assert(!BLOCK, "Release blocked due to debug material.")
+  #endif
 #else
   #define BlockRelease(BLOCK)
 #endif
