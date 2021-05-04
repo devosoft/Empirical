@@ -45,63 +45,63 @@ public:
 
   using const_iterator = typename storage_t::const_iterator;
 
-  iterator begin() { return storage.begin(); }
+  iterator begin() noexcept { return storage.begin(); }
 
-  const_iterator begin() const { return std::cbegin( storage ); }
+  const_iterator begin() const noexcept { return std::cbegin( storage ); }
 
-  const_iterator cbegin() const { return std::cbegin( storage ); }
+  const_iterator cbegin() const noexcept { return std::cbegin( storage ); }
 
-  iterator end() { return begin() + size(); }
+  iterator end() noexcept { return begin() + size(); }
 
-  const_iterator end() const { return cbegin() + size(); }
+  const_iterator end() const noexcept { return cbegin() + size(); }
 
-  const_iterator cend() const { return cbegin() + size(); }
+  const_iterator cend() const noexcept { return cbegin() + size(); }
 
   /// How many key-value pairs are in the cache?
-  size_t size() const { return size_; }
+  size_t size() const noexcept { return size_; }
 
   /// Does the cache contain any key-value pairs?
-  bool empty() const { return size() == 0; }
+  bool empty() const noexcept { return size() == 0; }
 
   /// How many key-value pairs can the cache contain?
-  static constexpr size_t capacity() { return N; }
+  static constexpr size_t capacity() noexcept { return N; }
 
   /// Clear the cache.
-  void clear() { size_ = 0; oldest = 0; }
+  void clear() noexcept { size_ = 0; oldest = 0; }
 
   /// Find key-value pair iterator in cache.
-  iterator find(const Key& key) { return std::find_if(
+  iterator find(const Key& key) noexcept { return std::find_if(
     begin(),
     end(),
     [&key](const auto& kv){ const auto& [k, v] = kv; return k == key; }
   ); }
 
   /// Find key-value pair iterator in cache.
-  const_iterator find(const Key& key) const {
+  const_iterator find(const Key& key) const noexcept {
     return const_cast<SmallFifoMap*>(this)->find(key);
   }
 
   /// Get corresponding value from cache. Return nullptr if key not in cache.
-  Value* get(const Key& key) {
+  Value* get(const Key& key) noexcept {
     const auto it = find( key );
     if ( it == end() ) return nullptr;
     return std::addressof( it->second );
   }
 
   /// Get corresponding value from cache. Return nullptr if key not in cache.
-  Value const* get(const Key& key) const {
+  Value const* get(const Key& key) const noexcept {
     return const_cast<SmallFifoMap*>(this)->get( key );
   }
 
   /// Get corresponding value from cache.
-  Value& operator[](const Key& key) {
+  Value& operator[](const Key& key) noexcept {
     const auto it = find( key );
     emp_assert( it != end() );
     return it->second;
   }
 
   /// Get corresponding value from cache.
-  const Value& operator[](const Key& key) const {
+  const Value& operator[](const Key& key) const noexcept {
     return const_cast<SmallFifoMap*>(this)->operator[]( key );
   }
 
@@ -114,7 +114,7 @@ public:
       std::is_convertible< V, Value >{}
     >
   >
-  void set( K&& key, V&& val ) {
+  void set( K&& key, V&& val ) noexcept {
 
     emp_assert( find(key) == end() );
 
