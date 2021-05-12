@@ -1,5 +1,3 @@
-MIN_COPIED_LINES 0.5  # Code fraction which must be copied before divide.
-MIN_EXE_LINES 0.5     # Code fraction which must be executed before divide.
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -I../../include/
 CFLAGS_version := -std=c++17
