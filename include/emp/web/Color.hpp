@@ -43,7 +43,7 @@ namespace web {
         Color() = default;
 
         Color(const unsigned char r_, const unsigned char g_, const unsigned char b_, const float a_)
-        : r(r_), g(g_), b(b_), a(a_ > 1 ? 1 : a_ < 0 ? 0 : a_)
+        : r(r_), g(g_), b(b_), a(std::clamp(a_, 0.f, 1.f))
         {
             cached_css_str = emp::ColorRGB(r, g, b, a);
             #ifdef EMP_HAS_SFML
@@ -258,7 +258,7 @@ namespace web {
     /// @param f The value to clamp
     template <typename T>
     float clamp_css_float(T f) {
-        return std::clamp(static_cast<float>(f),float(0.0),float(1.0));
+        return std::clamp(static_cast<float>(f), 0.f, 1.f);
     }
 
     /// Convert a string to float
@@ -339,27 +339,24 @@ namespace web {
 
     // Ensure sorted and find named color match with lower_bound
     emp_assert(std::is_sorted(
-        std::begin(color_impl::namedColors), std::end(color_impl::namedColors), 
-        [](const auto& left, const auto& right){
-            return left.name < right.name;
-        }));
-    
+      std::begin(color_impl::namedColors), std::end(color_impl::namedColors),
+      [](const auto& left, const auto& right){
+          return left.name < right.name;
+      }
+    ));
+
     const auto namedColor = std::lower_bound(
-        std::begin(color_impl::namedColors), std::end(color_impl::namedColors), str,
-        [](const auto& left, const auto& right){
-            return left.name < right;
-        });
+      std::begin(color_impl::namedColors), std::end(color_impl::namedColors), str,
+      [](const auto& left, const auto& right){
+          return left.name < right;
+      }
+    );
 
-    if (namedColor->name == str){
-        *this = namedColor->color;
-        (*this).cached_css_str = emp::ColorRGB(r, g, b, a);
-        #ifdef EMP_HAS_SFML
-        (*this).cached_sf_color = (sf::Color)*this;
-        #endif
-        return;
-    }
-
-    *this = ParseColor(str);
+    if (
+      namedColor != std::end(color_impl::namedColors)
+      && namedColor->name == str
+    ) *this = namedColor->color;
+    else *this = ParseColor(str);
 
   }
 
