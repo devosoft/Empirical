@@ -223,8 +223,11 @@ namespace emp {
 
     /// Randomize a contiguous segment of memory between specified bit positions.
     template <Prob PROB>
-    void RandFillP(mem_ptr_t dest, const size_t num_bytes, size_t start_bit, size_t stop_bit) noexcept
+    void RandFillP(mem_ptr_t dest, [[maybe_unused]] const size_t num_bytes, size_t start_bit, size_t stop_bit) noexcept
     {
+      emp_assert(start_bit <= stop_bit);
+      emp_assert(stop_bit <= num_bytes*8);
+
       const size_t start_byte_id = start_bit >> 3;     // At which byte do we start?
       const size_t end_byte_id = stop_bit >> 3;        // At which byte do we stop?
       const size_t start_bit_id = start_bit & 7;       // Which bit to start at in byte?
@@ -249,7 +252,7 @@ namespace emp {
       // If we are not starting at the beginning of a byte, restore missing bits.
       if (start_bit_id) {
         const uint8_t mask = (uint8_t) ((1 << start_bit_id) - 1); // Signify how byte is divided.
-        (dest[start_byte_id] &= ~mask) |= (start_byte & mask);  // Stitch together byte parts.
+        (dest[start_byte_id] &= ~mask) |= (start_byte & mask);    // Stitch together byte parts.
       }
 
       // If we have a byte at the end to partially randomize, do so.
@@ -258,7 +261,7 @@ namespace emp {
         const uint8_t mask = (uint8_t) ((1 << end_bit_id) - 1); // Signify how byte is divided.
         end_byte &= ~mask;                                      // Clear out bits to be randomized.
         for (size_t i = 0; i < end_bit_id; i++) {               // Step through bits to flip.
-          if (P(p)) end_byte |= ((uint8_t) 1 << i);          // Set appropriate bits.
+          if (P(p)) end_byte |= ((uint8_t) 1 << i);             // Set appropriate bits.
         }
       }
     }
