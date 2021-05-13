@@ -61,7 +61,7 @@ TEST_CASE("Test Images MSE", "[native]") {
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f asets/text_location.png -s test_text_location2.png";
+  command = "python3 compare_images.py -f assets/text_location.png -s test_text_location2.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
