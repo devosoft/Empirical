@@ -47,7 +47,7 @@ namespace web {
         {
             cached_css_str = emp::ColorRGB(r, g, b, a);
             #ifdef EMP_HAS_SFML
-            cached_sf_color = (sf::Color)*this;
+            cached_sf_color = sf::Color(r, g, b, a * 255);;
             #endif
         }
 
