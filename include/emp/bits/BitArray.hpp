@@ -2064,7 +2064,7 @@ namespace emp {
     BitArray<NUM_BITS1+NUM_BITS2> out_bits;
     out_bits.Import(in2);
     out_bits <<= NUM_BITS1;
-    out_bits |= in2.template Export<NUM_BITS1+NUM_BITS2>();
+    out_bits |= in1.template Export<NUM_BITS1+NUM_BITS2>();
   }
 
   /// Computes simple matching coefficient (https://en.wikipedia.org/wiki/Simple_matching_coefficient).
