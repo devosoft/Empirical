@@ -108,14 +108,14 @@ namespace emp {
     void SetArray(size_t bytes) noexcept { array_bytes = bytes; status = PtrStatus::ARRAY; }
 
     /// Add one more pointer.
-    void Inc(const size_t id) {
+    void Inc([[maybe_unused]] const size_t id) {
       if (internal::ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
       emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!", id);
       count++;
     }
 
     /// Remove a pointer.
-    void Dec(const size_t id) {
+    void Dec([[maybe_unused]] const size_t id) {
       if (internal::ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
@@ -998,8 +998,8 @@ namespace emp {
   }
 
   /// Create a pointer to an array of objects.
-  template <typename T, typename... ARGS>
-  [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
+  template <typename T>
+  [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size) {
     auto ptr = new T[array_size];                     // Build a new raw pointer.
     // const size_t alloc_size = array_size * sizeof(T);
     // auto ptr = (T*) malloc (alloc_size);
