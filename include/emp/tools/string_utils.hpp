@@ -493,7 +493,7 @@ namespace emp {
 
 
   /// If no functions are provided to is_valid(), always return false as base case.
-  inline bool is_valid(char test_char) { return false; }
+  inline bool is_valid(char /* test_char */ ) { return false; }
 
   /// Determine if a character passes any of the test functions provided.
   template <typename... FUNS>

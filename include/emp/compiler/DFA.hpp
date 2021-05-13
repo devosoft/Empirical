@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2021.
  *
  *  @file  DFA.hpp
  *  @brief A Deterministic Finite Automata simulator.
@@ -83,7 +83,7 @@ namespace emp {
 
     // If a size_t is passed in, it can't be -1...
     stop_t GetStop(size_t state) const { return is_stop[state]; }
-    bool IsActive(size_t state) const { return true; }
+    bool IsActive(size_t /* state */) const { return true; }
     bool IsStop(size_t state) const { return is_stop[state]; }
 
     /// Return the new state after a symbol occurs.

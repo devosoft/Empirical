@@ -50,7 +50,7 @@ namespace emp {
 
       /// Compound assignement operator DIV using BitProxy as lvalue.
       /// @note Never use this function except for consistency in a template since must divide by 1.
-      BitProxy & operator /=(bool b) {
+      BitProxy & operator /=([[maybe_unused]] bool b) {
       emp_assert(b == true, "BitProxy Division by Zero error.");
       return *this;
       }

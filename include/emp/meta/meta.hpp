@@ -168,7 +168,7 @@ namespace emp {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <template <typename...> class FILTER, typename T>
-    constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> x) { return true; }
+    constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> ) { return true; }
     template <template <typename...> class FILTER, typename T>
     constexpr bool tt_exist_impl(...) { return false; }
   }

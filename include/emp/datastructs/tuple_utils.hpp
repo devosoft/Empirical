@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2021.
  *
  *  @file tuple_utils.hpp
  *  @brief Functions to simplify the use of std::tuple
@@ -59,7 +59,7 @@ namespace emp {
     // End case... we've already hit all elements in the tuple!
     template <typename TUPLE_T, typename FUN_T, size_t END_POS>
     struct TupleIterate_impl<TUPLE_T, FUN_T, END_POS, END_POS> {
-      static void Run(TUPLE_T & tup, const FUN_T & fun) { ; }
+      static void Run(TUPLE_T & /* tup */, const FUN_T & /* fun */) { ; }
     };
   }
   #endif // DOXYGEN_SHOULD_SKIP_THIS
