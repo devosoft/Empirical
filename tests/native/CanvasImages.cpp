@@ -13,67 +13,67 @@
 
 
 TEST_CASE("Test Images MSE", "[native]") {
-  std::string command = "python3 compare_images.py -f circle_location.png -s test_circle_location.png";
+  std::string command = "python3 compare_images.py -f assets/circle_location.png -s test_circle_location.png";
   int success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f circle_location2.png -s test_circle_location2.png";
+  command = "python3 compare_images.py -f assets/circle_location2.png -s test_circle_location2.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f circle_color.png -s test_circle_color.png";
+  command = "python3 compare_images.py -f assets/circle_color.png -s test_circle_color.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f circle_size.png -s test_circle_size.png";
+  command = "python3 compare_images.py -f assets/circle_size.png -s test_circle_size.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f circle_thickness.png -s test_circle_thickness.png";
+  command = "python3 compare_images.py -f assets/circle_thickness.png -s test_circle_thickness.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f rect_location.png -s test_rect_location.png";
+  command = "python3 compare_images.py -f assets/rect_location.png -s test_rect_location.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f rect_location.png -s test_rect_location2.png";
+  command = "python3 compare_images.py -f assets/rect_location.png -s test_rect_location2.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f rect_color.png -s test_rect_color.png";
+  command = "python3 compare_images.py -f assets/rect_color.png -s test_rect_color.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f rect_size.png -s test_rect_size.png";
-  success = std::system( command.c_str() );
-  REQUIRE(success == 0);
-  
-  command = "python3 compare_images.py -f line_location.png -s test_line_location.png";
+  command = "python3 compare_images.py -f assets/rect_size.png -s test_rect_size.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f line_location.png -s test_line_location2.png";
+  command = "python3 compare_images.py -f assets/line_location.png -s test_line_location.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f text_location.png -s test_text_location.png";
+  command = "python3 compare_images.py -f assets/line_location.png -s test_line_location2.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f text_location.png -s test_text_location2.png";
+  command = "python3 compare_images.py -f assets/text_location.png -s test_text_location.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f text_color.png -s test_text_color.png";
+  command = "python3 compare_images.py -f asets/text_location.png -s test_text_location2.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f centertext_location.png -s test_centertext_location.png";
+  command = "python3 compare_images.py -f assets/text_color.png -s test_text_color.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
-  command = "python3 compare_images.py -f centertext_location.png -s test_centertext_location2.png";
+  command = "python3 compare_images.py -f assets/centertext_location.png -s test_centertext_location.png";
+  success = std::system( command.c_str() );
+  REQUIRE(success == 0);
+
+  command = "python3 compare_images.py -f assets/centertext_location.png -s test_centertext_location2.png";
   success = std::system( command.c_str() );
   REQUIRE(success == 0);
 
