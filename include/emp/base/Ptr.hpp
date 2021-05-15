@@ -328,7 +328,7 @@ namespace emp {
   namespace {
     // @CAO: Build this for real!
     template <typename FROM, typename TO>
-    bool PtrIsConvertable(FROM * ptr) { return true; }
+    bool PtrIsConvertable(FROM * ptr) { (void) ptr; return true; }
     // emp_assert( (std::is_same<TYPE,T2>() || dynamic_cast<TYPE*>(in_ptr)) );
 
     // Debug information provided for each pointer type.
@@ -567,8 +567,9 @@ namespace emp {
     }
 
     /// Reallocate this Ptr to a newly allocated array using the size passed in.
-    template <typename... Ts>
-    void NewArray(size_t array_size, Ts &&... args) {
+    // template <typename... Ts>
+    // void NewArray(size_t array_size, Ts &&... args) {
+    void NewArray(size_t array_size) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
       // @CAO: This next portion of code is allocating an array of the appropriate type.
