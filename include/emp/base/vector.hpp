@@ -123,7 +123,7 @@ namespace emp {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }
-      const auto operator->() const {
+      auto operator->() const {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }

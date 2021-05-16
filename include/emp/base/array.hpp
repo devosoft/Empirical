@@ -93,7 +93,7 @@ namespace emp {
         emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
         return wrapped_t::operator->();
       }
-      const auto operator->() const {
+      auto operator->() const {
         emp_assert(OK(true, false));  // Ensure array is being pointed to properly.
         return wrapped_t::operator->();
       }
@@ -162,11 +162,11 @@ namespace emp {
 
     // Functions to make sure to throw an error on:
 
-    void resize(size_t new_size) { emp_assert(false, "invalid operation for array!"); }
-    void resize(size_t new_size, const T & val) { emp_assert(false, "invalid operation for array!"); }
+    void resize(size_t /* new_size */) { emp_assert(false, "invalid operation for array!"); }
+    void resize(size_t /* new_size */, const T & /* val */) { emp_assert(false, "invalid operation for array!"); }
 
     template <typename... PB_Ts>
-    void push_back(PB_Ts &&... args) { emp_assert(false, "invalid operation for array!"); }
+    void push_back(PB_Ts &&... /* args */) { emp_assert(false, "invalid operation for array!"); }
     void pop_back() { emp_assert(false, "invalid operation for array!"); }
 
     template <typename... ARGS>
@@ -188,7 +188,7 @@ namespace emp {
     }
 
     template <typename... ARGS>
-    void emplace_back(ARGS &&... args) {
+    void emplace_back(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
     }
   };
