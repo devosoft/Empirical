@@ -228,6 +228,16 @@ namespace emp {
       return Tokenize(ss);
     }
 
+    /// Turn a vector of strings into a vector of tokens.
+    emp::vector<Token> Tokenize(const emp::vector<std::string> & str_v) {
+      std::stringstream ss;
+      for (auto & str : str_v) {
+        ss << str;
+      }
+      
+      return Tokenize(ss);
+    }
+
     /// Get the lexeme associated with the last token identified.
     const std::string & GetLexeme() { return lexeme; }
 
