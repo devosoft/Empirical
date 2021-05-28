@@ -76,13 +76,24 @@ namespace emp {
       bool OK(const bool begin_ok=true, const bool end_ok=true) const {
         if (v_ptr == nullptr) return false;                // Invalid vector
         if (!v_ptr->valid) return false;                   // Vector has been deleted!
-        const int diff = &(*as_wrapped()) - &(*v_ptr->begin().as_wrapped());
-        if (diff < 0) return false; // Iterator not allowed past beginning.
 
-        const size_t pos = static_cast<size_t>( diff );
-        if (pos > v_ptr->size()) return false;             // Iterator out of range.
+        int64_t pos = 0;
+        if constexpr (
+          std::is_same<ITERATOR_T, typename base_t::reverse_iterator>()
+          || std::is_same<ITERATOR_T, typename base_t::const_reverse_iterator>()
+        ) {
+          pos = ((base_t *) v_ptr)->rend() - *((ITERATOR_T *) this) - 1;
+        }
+        else {
+          pos = *((ITERATOR_T *) this) - ((base_t *) v_ptr)->begin();
+        }
+
+
+        if (pos < 0) return false; // Iterator not allowed past beginning.
+        const size_t upos = static_cast<size_t>(pos);
+        if (upos > v_ptr->size()) return false;             // Iterator out of range.
         if (!begin_ok && pos == 0) return false;           // Iterator not allowed at beginning.
-        if (!end_ok && pos == v_ptr->size()) return false; // Iterator not allowed at end.
+        if (!end_ok && upos == v_ptr->size()) return false; // Iterator not allowed at end.
         return true;
       }
 
