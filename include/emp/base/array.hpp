@@ -19,6 +19,7 @@
 #ifndef EMP_ARRAY_H
 #define EMP_ARRAY_H
 
+#include <algorithm>
 #include <initializer_list>
 #include <array>
 #include <type_traits>
@@ -40,7 +41,7 @@ namespace emp {
   /// We are in debug mode, so emp::array has the same interface as std::array, but with extra
   /// bounds checking.  Using vector as our base since it has the right pieces and is dynamic.
   template <typename T, size_t N>
-  class array : public std::vector<T> {
+  class array : protected std::vector<T> {
   private:
     using this_t = emp::array<T,N>;
     using base_t = std::vector<T>;
@@ -72,10 +73,13 @@ namespace emp {
       ~iterator_wrapper() { ; }
 
       // Debug tools to make sure this iterator is okay.
-      bool OK(bool begin_ok=true, bool end_ok=true) const {
+      bool OK(const bool begin_ok=true, const bool end_ok=true) const {
         if (v_ptr == nullptr) return false;                // Invalid vector
         if (!v_ptr->valid) return false;                   // Vector has been deleted!
-        size_t pos = (size_t) (*this - v_ptr->begin());
+        const int diff = &(*as_wrapped()) - &(*v_ptr->begin().as_wrapped());
+        if (diff < 0) return false; // Iterator not allowed past beginning.
+
+        const size_t pos = static_cast<size_t>( diff );
         if (pos > v_ptr->size()) return false;             // Iterator out of range.
         if (!begin_ok && pos == 0) return false;           // Iterator not allowed at beginning.
         if (!end_ok && pos == v_ptr->size()) return false; // Iterator not allowed at end.
@@ -193,6 +197,11 @@ namespace emp {
     iterator end() noexcept { return iterator(base_t::end(), this); }
     const_iterator end() const noexcept { return const_iterator(base_t::end(), this); }
 
+    reverse_iterator rbegin() noexcept { return reverse_iterator(base_t::rbegin(), this); }
+    const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(base_t::rbegin(), this); }
+    iterator rend() noexcept { return reverse_iterator(base_t::rend(), this); }
+    const_reverse_iterator rend() const noexcept { return const_reverse_iterator(base_t::rend(), this); }
+
     this_t & operator=(const this_t &) = default;
 
     T & operator[](size_t pos) {
@@ -255,6 +264,24 @@ namespace emp {
     void emplace_back(ARGS &&... args) {
       emp_assert(false, "invalid operation for array!");
     }
+
+    T* data() { return base_t::data(); }
+    const T* data() const { return base_t::data(); }
+
+    T& at(const size_t i) { return base_t::at(i); }
+    const T& at(const size_t i) const { return base_t::at(i); }
+
+    bool operator==( const array& other ) const {
+      return std::equal(begin(), end(), other.begin());
+    }
+    bool operator!=( const array& other ) const { return !operator==(other); }
+
+    // previously, when we inherited from std::vector publicly
+    // cereal would try to do *vector* serialization (which is bad!)
+    // so, we have to write our own array serialization
+    template <class Archive>
+    void serialize( Archive & ar ) { for (auto & i : *this) ar( i ); }
+
   };
 
 
