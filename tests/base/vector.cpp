@@ -68,6 +68,14 @@ TEST_CASE("Another test vector", "[base]")
 
   REQUIRE(total == 2470);
 
+	// test forward and reverse iterators
+	REQUIRE( std::accumulate( std::begin( v ), std::end( v ), int{} ) == 2470 );
+	REQUIRE( std::accumulate( std::rbegin( v ), std::rend( v ), int{} ) == 2470 );
+	const auto& vc = v;
+	REQUIRE(std::accumulate( std::begin( vc ), std::end( vc ), int{} ) == 2470);
+	REQUIRE(std::accumulate( std::rbegin( vc ), std::rend( vc ), int{} ) == 2470);
+
+
   // Examine vector<bool> specialization.
   emp::vector<bool> vb(1000,false);
   for (size_t i = 0; i < vb.size(); i++) {

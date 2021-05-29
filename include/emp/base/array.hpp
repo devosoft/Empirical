@@ -82,18 +82,29 @@ namespace emp {
           std::is_same<ITERATOR_T, typename base_t::reverse_iterator>()
           || std::is_same<ITERATOR_T, typename base_t::const_reverse_iterator>()
         ) {
-          pos = ((base_t *) v_ptr)->rend() - *((ITERATOR_T *) this) - 1;
+          pos = *((ITERATOR_T *) this) - ((base_t *) v_ptr)->rbegin();
         }
         else {
           pos = *((ITERATOR_T *) this) - ((base_t *) v_ptr)->begin();
         }
 
+        if (pos < 0) {
+          // std::cout << "Iterator not allowed past beginning." << '\n';
+          return false;
+        }
 
-        if (pos < 0) return false; // Iterator not allowed past beginning.
-        const size_t upos = static_cast<size_t>(pos);
-        if (upos > v_ptr->size()) return false;             // Iterator out of range.
-        if (!begin_ok && pos == 0) return false;           // Iterator not allowed at beginning.
-        if (!end_ok && upos == v_ptr->size()) return false; // Iterator not allowed at end.
+        if (pos > static_cast<int>( v_ptr->size() )) {
+          // std::cout << "Iterator out of range." << '\n';
+          return false;
+        }
+        if (!begin_ok && pos == 0) {
+          // std::cout << "Iterator not allowed at beginning." << '\n';
+          return false;
+        }
+        if (!end_ok && pos == static_cast<int>(v_ptr->size())) {
+          // std::cout << "Iterator not allowed at end." << '\n';
+          return false;
+        }
         return true;
       }
 
@@ -208,10 +219,18 @@ namespace emp {
     iterator end() noexcept { return iterator(base_t::end(), this); }
     const_iterator end() const noexcept { return const_iterator(base_t::end(), this); }
 
-    reverse_iterator rbegin() noexcept { return reverse_iterator(base_t::rbegin(), this); }
-    const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(base_t::rbegin(), this); }
-    iterator rend() noexcept { return reverse_iterator(base_t::rend(), this); }
-    const_reverse_iterator rend() const noexcept { return const_reverse_iterator(base_t::rend(), this); }
+    reverse_iterator rbegin() noexcept {
+      return reverse_iterator(base_t::rbegin(), this);
+    }
+    const_reverse_iterator rbegin() const noexcept {
+      return const_reverse_iterator(base_t::rbegin(), this);
+    }
+    reverse_iterator rend() noexcept {
+      return reverse_iterator(base_t::rend(), this);
+    }
+    const_reverse_iterator rend() const noexcept {
+      return const_reverse_iterator(base_t::rend(), this);
+    }
 
     this_t & operator=(const this_t &) = default;
 

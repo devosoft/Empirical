@@ -92,7 +92,7 @@ namespace emp {
         if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
                       std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
           // pos = std::distance(*((ITERATOR_T *) this), ((stdv_t *) v_ptr)->rend()) - 1;
-          pos = ((stdv_t *) v_ptr)->rend() - *((ITERATOR_T *) this) - 1;
+          pos = *((ITERATOR_T *) this) - ((stdv_t *) v_ptr)->rbegin();
         }
         else {
           // pos = std::distance(((stdv_t *) v_ptr)->begin(), *((ITERATOR_T *) this));
