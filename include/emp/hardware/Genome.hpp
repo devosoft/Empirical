@@ -43,14 +43,8 @@ namespace emp {
 
     auto GetInstLib() const { return inst_lib; }
 
-    // INST_T & operator[](size_t id) { return sequence[id]; }
-    // const INST_T & operator[](size_t id) const { return sequence[id]; }
-
     size_t GetSize() const { return SEQUENCE_T::size(); }
-    // size_t size() const { return sequence.size(); }    // For compatability with std.
-
     void Resize(size_t new_size) { SEQUENCE_T::resize(new_size); }
-    // size_t resize(size_t new_size) { return sequence.resize(new_size); }    // For compatability with std.
 
     bool operator==(const Genome& other) const { return SEQUENCE_T::operator==(*this, other); }
     bool operator!=(const Genome& other) const { return SEQUENCE_T::operator!=(*this, other); }
@@ -58,24 +52,6 @@ namespace emp {
     bool operator<=(const Genome& other) const { return SEQUENCE_T::operator<=(*this, other); }
     bool operator> (const Genome& other) const { return SEQUENCE_T::operator>(*this,  other); }
     bool operator>=(const Genome& other) const { return SEQUENCE_T::operator>=(*this, other); }
-
-    // auto begin() { return sequence.begin(); }
-    // auto begin() const { return sequence.begin(); }
-    // auto end() { return sequence.end(); }
-    // auto end() const { return sequence.end(); }
-    
-    // auto rbegin() { return sequence.rbegin(); }
-    // auto rbegin() const { return sequence.rbegin(); }
-    // auto rend() { return sequence.rend(); }
-    // auto rend() const { return sequence.rend(); }
-
-    // auto cbegin() const { return sequence.cbegin(); }
-    // auto cend() const { return sequence.cend(); }
-    // auto crbegin() const { return sequence.crbegin(); }
-    // auto crend() const { return sequence.crend(); }
-
-    // template <typename... Ts>
-    // void emplace_back(Ts... args) { sequence.emplace_back(std::forward<Ts>(args)...); }
 
     size_t Hash() const {
       std::size_t seed = GetSize();
