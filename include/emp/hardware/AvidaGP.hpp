@@ -379,6 +379,9 @@ namespace emp {
     void PrintGenome(std::ostream & os=std::cout) const;
     void PrintGenome(const std::string & filename) const;
 
+    /// Print out a short version of the genome as a single string.
+    void PrintSymbols(std::ostream & os=std::cout) const;
+
     /// Figure out which instruction is going to actually be run next SingleProcess()
     size_t PredictNextInst() const;
 
@@ -453,6 +456,25 @@ namespace emp {
     std::ofstream of(filename);
     PrintGenome(of);
     of.close();
+  }
+
+  template <typename HARDWARE>
+  void AvidaCPU_Base<HARDWARE>::PrintSymbols(std::ostream & os=std::cout) const {
+    size_t cur_scope = 0;
+
+    // Example output: t(12)u()b(A5C)m(8)
+
+    for (const inst_t & inst : genome) {
+      os << GetInstLib()->GetSymbol(inst.id) << "[";
+      const size_t num_args = GetInstLib()->GetNumArgs(inst.id);
+      for (size_t i = 0; i < num_args; i++) {
+        size_t arg_id = inst.args[i];
+        if (arg_id < 10) os << arg_id;
+        else os << ('A' + (char) (arg_id - 10))
+      }
+      os << "]";
+    }
+    os << '\n'
   }
 
   template <typename HARDWARE>
