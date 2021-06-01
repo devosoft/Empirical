@@ -329,15 +329,28 @@ namespace emp {
 
     void RandomizeInst(size_t pos, Random & rand) { SetInst(pos, GetRandomInst(rand) ); }
 
+    /// Add a new instruction to the end of the genome, by ID and args.
     void PushInst(size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
       genome.emplace_back(id, a0, a1, a2);
     }
+
+    /// Add a new instruction to the end of the genome, by NAME and args.
     void PushInst(const std::string & name, size_t a0=0, size_t a1=0, size_t a2=0) {
-      size_t id = GetInstLib()->GetID(name);
-      genome.emplace_back(id, a0, a1, a2);
+      PushInst(GetInstLib()->GetID(name), a0, a1, a2);
     }
+
+    /// Add a specified new instruction to the end of the genome.
     void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
-    void PushInst(Instruction && inst) { genome.emplace_back(inst); }
+
+    /// Add multiple copies of a specified instruction to the end of the genome.
+    void PushInst(const Instruction & inst, size_t count) {
+      genome.reserve(genome.size() + count);
+      for (size_t i = 0; i < count; i++) genome.emplace_back(inst);
+    }
+
+    /// Add one or more default instructions to the end of the genome.
+    void PushDefaultInst(size_t count=1) { PushInst( Instruction(0), count ); }
+
     void PushInstString(std::string info) {
       size_t id = GetInstLib()->GetID( string_pop(info) );
       size_t arg1 = info.size() ? from_string<size_t>(string_pop(info)) : 0;
@@ -345,9 +358,9 @@ namespace emp {
       size_t arg3 = info.size() ? from_string<size_t>(string_pop(info)) : 0;
       PushInst(id, arg1, arg2, arg3);
     }
-    void PushRandom(Random & rand, const size_t count=1) {
+    void PushRandom(Random & random, const size_t count=1) {
       for (size_t i = 0; i < count; i++) {
-        PushInst(GetRandomInst(rand));
+        PushInst(GetRandomInst(random));
       }
     }
 
@@ -381,6 +394,13 @@ namespace emp {
 
     /// Print out a short version of the genome as a single string.
     void PrintSymbols(std::ostream & os=std::cout) const;
+
+    /// Convert the current state to a string.
+    std::string ToString() const {
+      std::stringstream ss;
+      PrintSymbols(ss);
+      return ss.str();
+    }
 
     /// Figure out which instruction is going to actually be run next SingleProcess()
     size_t PredictNextInst() const;
@@ -459,9 +479,7 @@ namespace emp {
   }
 
   template <typename HARDWARE>
-  void AvidaCPU_Base<HARDWARE>::PrintSymbols(std::ostream & os=std::cout) const {
-    size_t cur_scope = 0;
-
+  void AvidaCPU_Base<HARDWARE>::PrintSymbols(std::ostream & os) const {
     // Example output: t(12)u()b(A5C)m(8)
 
     for (const inst_t & inst : genome) {
@@ -470,11 +488,11 @@ namespace emp {
       for (size_t i = 0; i < num_args; i++) {
         size_t arg_id = inst.args[i];
         if (arg_id < 10) os << arg_id;
-        else os << ('A' + (char) (arg_id - 10))
+        else os << ('A' + (char) (arg_id - 10));
       }
       os << "]";
     }
-    os << '\n'
+    os << '\n';
   }
 
   template <typename HARDWARE>
