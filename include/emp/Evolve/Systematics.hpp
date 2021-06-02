@@ -924,13 +924,13 @@ namespace emp {
      *   origination of parent and origination of offspring
      * - Enable a paleontology compatibility mode where only branching points are calculated
      */
-    int GetPhylogeneticDiversity() const {
-      // As shown on page 5 of Faith 1992, when all branch lengths are equal the phylogenetic
-      // diversity is the number of internal nodes plus the number of extant taxa - 1.
-      //int phylodiversity = ancestor_taxa.size() + active_taxa.size() -1;
+    // int GetPhylogeneticDiversity() const {
+    //   // As shown on page 5 of Faith 1992, when all branch lengths are equal the phylogenetic
+    //   // diversity is the number of internal nodes plus the number of extant taxa - 1.
+    //   //int phylodiversity = ancestor_taxa.size() + active_taxa.size() -1;
 
-      return ancestor_taxa.size() + active_taxa.size() - 1;
-    }
+    //   return ancestor_taxa.size() + active_taxa.size() - 1;
+    // }
 
 
     /// @returns phylogenetic diversity if used without any arguments .
@@ -938,7 +938,7 @@ namespace emp {
     /// your tree has (multiples of 10 from 10 to 100 are allowed)
     /// you also need to specify a file with which to normalize your data. 
     /// If value is outside of the values in the file, 100th percentile will be returned
-    int GetPhylogeneticDiversityNormalize(int generation = 0, std::string filename = "") const;
+    int GetPhylogeneticDiversity(int generation = 0, std::string filename = "") const;
 
 
     /** This is a metric of how distinct \c tax is from the rest of the population.
@@ -1858,7 +1858,7 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPhylogeneticDiversityNormalize(int generation, std::string filename) const { 
+  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPhylogeneticDiversity(int generation, std::string filename) const { 
     int gen_value = ((generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
     bool percent_found = false; 
     int phylogenetic_diversity = ancestor_taxa.size() + active_taxa.size() - 1; 
