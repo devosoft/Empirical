@@ -332,7 +332,7 @@ namespace emp {
       constexpr
         typename AttrBase<Attr, Value>::make_t AttrBase<Attr, Value>::Make;
 
-    };  // namespace __impl_attr_base
+    }  // namespace __impl_attr_base
 
 #define DEFINE_ATTR(NAME)                                                      \
   template <class T>                                                           \
@@ -456,12 +456,12 @@ namespace emp {
           template <class... X>
           static copy_tag Detect(const Attrs<X...>&) {
             return {};
-          };
+          }
 
           template <class... X>
           static move_tag Detect(Attrs<X...>&&) {
             return {};
-          };
+          }
 
           static args_tag Detect(...) { return {}; }
 
@@ -912,7 +912,7 @@ namespace emp {
     template <class... T>
     constexpr Attrs<std::decay_t<T>...> MakeAttrs(T&&... props) {
       return {std::forward<T>(props)...};
-    };
+    }
 
     namespace __impl_attrs_merge {
       constexpr struct {
@@ -926,6 +926,7 @@ namespace emp {
     /// Creates a new attribute pack which has all the attributes of this
     /// pack and another pack. Values will be taken from other other pack
     /// preferentially.
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
     template <typename... U>
     constexpr auto Merge(U&&... packs)
       // This hint is required by some older compilers
@@ -934,6 +935,10 @@ namespace emp {
       return MergeReduce(Attrs<>{}, __impl_attrs_merge::attrs_merge,
                          std::forward<U>(packs)...);
     }
+    #else
+    template <typename... U>
+    constexpr auto Merge(U&&... packs) {;}
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
     namespace __attrs_impl {
       template <class...>

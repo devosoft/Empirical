@@ -163,6 +163,7 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 namespace emp {
 
   // Helper tools for SubsetCall.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
@@ -172,6 +173,7 @@ namespace emp {
       }
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Identify the number of parameters in a function and pass in correct number of argument.
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
@@ -179,7 +181,7 @@ namespace emp {
     return internal::SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Helper tools for type_if.
   namespace internal {
     template< typename T, bool match_ok > struct EMP_eval_type { };
@@ -191,6 +193,6 @@ namespace emp {
   /// This becomes T if the type is integral; it's undefined otherwise.
   template <typename T, template <typename...> class FILTER>
   using type_if = typename internal::EMP_eval_type< T, FILTER<T>::value >::type;
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 #endif

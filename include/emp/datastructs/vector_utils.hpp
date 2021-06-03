@@ -175,7 +175,7 @@ namespace emp {
   }
 
   /// Returns a vector containing a chunk of elements from @param vec
-  /// starting at @param start and going up to but not including @param stop.
+  /// starting at @param start and going up to but not including @param stop
   template <typename T>
   emp::vector<T> Slice(emp::vector<T> vec, int start, int stop) {
     emp_assert(start < stop, start, stop);
@@ -240,7 +240,7 @@ namespace emp {
 
   /// Return a new vector containing the same elements as @param v
   /// with any duplicate elements removed. 
-  /// Not guarunteed to preserve order
+  /// Not guaranteed to preserve order
   template <typename T>
   emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {
     std::set<T> temp_set(v.begin(), v.end());
@@ -305,7 +305,7 @@ namespace emp {
     while (id-- > 0) emp::Heapify(v, id);
   }
 
-  /// Extraxt maximum element from a heap.
+  /// Extract maximum element from a heap.
   template <typename T>
   T HeapExtract(emp::vector<T> & v) {
     emp_assert(v.size(), "Cannot extract from an empty heap!");

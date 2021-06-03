@@ -14,6 +14,7 @@ debug/debug
 functional/functional
 io/io
 math/math
+prefab/prefab
 testing/testing
 tools/tools
 web/web

@@ -1,3 +1,12 @@
+/*** @note This file is included in Empirical (https://github.com/devosoft/Empirical) for convenience.
+ * The Bloom filter class was written by Arash Partow (http://www.partow.net/programming/hashfunctions/index.html)
+ * and distributed under the MIT License.
+ * 
+ * @copyright Arash Partow, 2000 (modified slightly by Emily Dolson)
+ * @brief A Bloom filter implementation
+ * @file  BloomFilter.hpp
+*/ 
+
 /*
  *********************************************************************
  *                                                                   *
@@ -28,7 +37,7 @@
 #include <string>
 #include <vector>
 
-
+namespace emp {
 static const std::size_t bits_per_char = 0x08;    // 8 bits in 1 char(unsigned)
 
 static const unsigned char bit_mask[bits_per_char] = {
@@ -42,11 +51,12 @@ static const unsigned char bit_mask[bits_per_char] = {
                                                        0x80   //10000000
                                                      };
 
-class bloom_parameters
+/// This class keeps track of the parameters for a Bloom filter
+class BloomParameters
 {
 public:
 
-   bloom_parameters()
+   BloomParameters()
    : minimum_size(1),
      maximum_size(std::numeric_limits<unsigned long long int>::max()),
      minimum_number_of_hashes(1),
@@ -56,7 +66,7 @@ public:
      random_seed(0xA5A5A5A55A5A5A5AULL)
    {}
 
-   virtual ~bloom_parameters()
+   virtual ~BloomParameters()
    {}
 
    inline bool operator!()
@@ -72,22 +82,24 @@ public:
              (0xFFFFFFFFFFFFFFFFULL == random_seed);
    }
 
-   // Allowable min/max size of the bloom filter in bits
+   /// Allowable min size of the bloom filter in bits
    unsigned long long int minimum_size;
+   /// Allowable max size of the bloom filter in bits
    unsigned long long int maximum_size;
 
-   // Allowable min/max number of hash functions
+   /// Allowable min number of hash functions
    unsigned int minimum_number_of_hashes;
+   /// Allowable max number of hash functions
    unsigned int maximum_number_of_hashes;
 
-   // The approximate number of elements to be inserted
-   // into the bloom filter, should be within one order
-   // of magnitude. The default is 10000.
+   /// The approximate number of elements to be inserted
+   /// into the bloom filter, should be within one order
+   /// of magnitude. The default is 10000.
    unsigned long long int projected_element_count;
 
-   // The approximate false positive probability expected
-   // from the bloom filter. The default is assumed to be
-   // the reciprocal of the projected_element_count.
+   /// The approximate false positive probability expected
+   /// from the bloom filter. The default is assumed to be
+   /// the reciprocal of the projected_element_count.
    double false_positive_probability;
 
    unsigned long long int random_seed;
@@ -105,16 +117,12 @@ public:
 
    optimal_parameters_t optimal_parameters;
 
+   /// Attempt to find the number of hash functions
+   /// and minimum amount of storage bits required to construct a bloom
+   /// filter consistent with the user defined false positive probability
+   /// and estimated element insertion count.
    virtual bool compute_optimal_parameters()
    {
-      /*
-        Note:
-        The following will attempt to find the number of hash functions
-        and minimum amount of storage bits required to construct a bloom
-        filter consistent with the user defined false positive probability
-        and estimated element insertion count.
-      */
-
       if (!(*this))
          return false;
 
@@ -161,7 +169,12 @@ public:
 
 };
 
-class bloom_filter
+/// This class implements a Bloom filter, which is a 
+/// memory-efficient data structure for identifying
+/// values that have been seen before (with a tunable
+/// probability of a false positive - thinking that
+/// we have already seen a value when we actually haven't)
+class BloomFilter
 {
 protected:
 
@@ -171,7 +184,7 @@ protected:
 
 public:
 
-   bloom_filter()
+   BloomFilter()
    : salt_count_(0),
      table_size_(0),
      projected_element_count_(0),
@@ -180,7 +193,7 @@ public:
      desired_false_positive_probability_(0.0)
    {}
 
-   bloom_filter(const bloom_parameters& p)
+   BloomFilter(const BloomParameters& p)
    : projected_element_count_(p.projected_element_count),
      inserted_element_count_(0),
      random_seed_((p.random_seed * 0xA5A5A5A5) + 1),
@@ -194,12 +207,12 @@ public:
       bit_table_.resize(table_size_ / bits_per_char, static_cast<unsigned char>(0x00));
    }
 
-   bloom_filter(const bloom_filter& filter)
+   BloomFilter(const BloomFilter& filter)
    {
       this->operator=(filter);
    }
 
-   inline bool operator == (const bloom_filter& f) const
+   inline bool operator == (const BloomFilter& f) const
    {
       if (this != &f)
       {
@@ -218,12 +231,12 @@ public:
          return true;
    }
 
-   inline bool operator != (const bloom_filter& f) const
+   inline bool operator != (const BloomFilter& f) const
    {
       return !operator==(f);
    }
 
-   inline bloom_filter& operator = (const bloom_filter& f)
+   inline BloomFilter& operator = (const BloomFilter& f)
    {
       if (this != &f)
       {
@@ -243,7 +256,7 @@ public:
       return *this;
    }
 
-   virtual ~bloom_filter()
+   virtual ~BloomFilter()
    {}
 
    inline bool operator!() const
@@ -251,12 +264,14 @@ public:
       return (0 == table_size_);
    }
 
+   /// Resets table to starting conditions, as if nothing had been added
    inline void clear()
    {
       std::fill(bit_table_.begin(), bit_table_.end(), static_cast<unsigned char>(0x00));
       inserted_element_count_ = 0;
    }
 
+   /// Insert a value into the Bloom filter (i.e. indicate that we have seen it)
    inline void insert(const unsigned char* key_begin, const std::size_t& length)
    {
       std::size_t bit_index = 0;
@@ -272,6 +287,7 @@ public:
       ++inserted_element_count_;
    }
 
+   /// Insert a value into the Bloom filter (i.e. indicate that we have seen it)
    template <typename T>
    inline void insert(const T& t)
    {
@@ -279,16 +295,19 @@ public:
       insert(reinterpret_cast<const unsigned char*>(&t),sizeof(T));
    }
 
+   /// Insert a value into the Bloom filter (i.e. indicate that we have seen it)
    inline void insert(const std::string& key)
    {
       insert(reinterpret_cast<const unsigned char*>(key.data()),key.size());
    }
 
+   /// Insert a value into the Bloom filter (i.e. indicate that we have seen it)
    inline void insert(const char* data, const std::size_t& length)
    {
       insert(reinterpret_cast<const unsigned char*>(data),length);
    }
 
+   /// Insert a sequence of values into the Bloom filter (i.e. indicate that we have seen it)
    template <typename InputIterator>
    inline void insert(const InputIterator begin, const InputIterator end)
    {
@@ -300,6 +319,8 @@ public:
       }
    }
 
+   /// @returns true if it's possible that the specified element was previously added to the
+   /// Bloom filter.
    inline virtual bool contains(const unsigned char* key_begin, const std::size_t length) const
    {
       std::size_t bit_index = 0;
@@ -318,22 +339,31 @@ public:
       return true;
    }
 
+   /// @returns true if it's possible that the specified element was previously added to the
+   /// Bloom filter.
    template <typename T>
    inline bool contains(const T& t) const
    {
       return contains(reinterpret_cast<const unsigned char*>(&t),static_cast<std::size_t>(sizeof(T)));
    }
 
+   /// @returns true if it's possible that the specified element was previously added to the
+   /// Bloom filter.
    inline bool contains(const std::string& key) const
    {
       return contains(reinterpret_cast<const unsigned char*>(key.c_str()),key.size());
    }
 
+   /// @returns true if it's possible that the specified element was previously added to the
+   /// Bloom filter.
    inline bool contains(const char* data, const std::size_t& length) const
    {
       return contains(reinterpret_cast<const unsigned char*>(data),length);
    }
 
+   /// Checks whether its possible that the Bloom filter has seen all of the elements within
+   /// the specified range. If so, returns \c end. Otherwise returns an iterator to the first
+   /// element that has definitely not previously been added to the Bloom filter.
    template <typename InputIterator>
    inline InputIterator contains_all(const InputIterator begin, const InputIterator end) const
    {
@@ -352,6 +382,9 @@ public:
       return end;
    }
 
+   /// Checks whether its possible that the Bloom filter has seen none of the elements within
+   /// the specified range. If so, returns \c end. Otherwise returns an iterator to the first
+   /// element that has possible previously been added to the Bloom filter.
    template <typename InputIterator>
    inline InputIterator contains_none(const InputIterator begin, const InputIterator end) const
    {
@@ -370,16 +403,20 @@ public:
       return end;
    }
 
+   /// @returns the size of the Bloom filter's internal table
    inline virtual unsigned long long int size() const
    {
       return table_size_;
    }
 
+   /// @returns the number of elements that have been added 
+   /// to the Bloom filter
    inline unsigned long long int element_count() const
    {
       return inserted_element_count_;
    }
 
+   /// Calculate effective false positive probability
    inline double effective_fpp() const
    {
       /*
@@ -392,7 +429,8 @@ public:
       return std::pow(1.0 - std::exp(-1.0 * salt_.size() * inserted_element_count_ / size()), 1.0 * salt_.size());
    }
 
-   inline bloom_filter& operator &= (const bloom_filter& f)
+   /// Calculate the intersection of two Bloom filters
+   inline BloomFilter& operator &= (const BloomFilter& f)
    {
       /* intersection */
       if (
@@ -410,7 +448,8 @@ public:
       return *this;
    }
 
-   inline bloom_filter& operator |= (const bloom_filter& f)
+   /// Calculate the union of two Bloom filters
+   inline BloomFilter& operator |= (const BloomFilter& f)
    {
       /* union */
       if (
@@ -428,7 +467,8 @@ public:
       return *this;
    }
 
-   inline bloom_filter& operator ^= (const bloom_filter& f)
+   /// Calculate the difference of two Bloom filters
+   inline BloomFilter& operator ^= (const BloomFilter& f)
    {
       /* difference */
       if (
@@ -446,11 +486,14 @@ public:
       return *this;
    }
 
+   /// @returns the Bloom filter's internal bit table
    inline const cell_type* table() const
    {
       return bit_table_.data();
    }
 
+   /// @returns the number of hash functions being used by this
+   /// Bloom filter
    inline std::size_t hash_count()
    {
       return salt_.size();
@@ -617,42 +660,50 @@ protected:
    double                     desired_false_positive_probability_;
 };
 
-inline bloom_filter operator & (const bloom_filter& a, const bloom_filter& b)
+/// Calculate the intersection of two Bloom filters
+inline BloomFilter operator & (const BloomFilter& a, const BloomFilter& b)
 {
-   bloom_filter result = a;
+   BloomFilter result = a;
    result &= b;
    return result;
 }
 
-inline bloom_filter operator | (const bloom_filter& a, const bloom_filter& b)
+/// Calculate the union of two Bloom filters
+inline BloomFilter operator | (const BloomFilter& a, const BloomFilter& b)
 {
-   bloom_filter result = a;
+   BloomFilter result = a;
    result |= b;
    return result;
 }
 
-inline bloom_filter operator ^ (const bloom_filter& a, const bloom_filter& b)
+/// Calculate the difference of two Bloom filters
+inline BloomFilter operator ^ (const BloomFilter& a, const BloomFilter& b)
 {
-   bloom_filter result = a;
+   BloomFilter result = a;
    result ^= b;
    return result;
 }
 
-class compressible_bloom_filter : public bloom_filter
+/// A Bloom filter that can be compressed
+class CompressibleBloomFilter : public BloomFilter
 {
 public:
 
-   compressible_bloom_filter(const bloom_parameters& p)
-   : bloom_filter(p)
+   CompressibleBloomFilter(const BloomParameters& p)
+   : BloomFilter(p)
    {
       size_list.push_back(table_size_);
    }
 
+   /// @returns the current size of the bloom filter (i.e. the size of the internal table)
    inline unsigned long long int size() const
    {
       return size_list.back();
    }
 
+   /// Compress the Bloom filter
+   /// @param percentage the percentage of the Bloom filter's current size to compress to
+   /// (e.g. 50 would reduce the current size by half)
    inline bool compress(const double& percentage)
    {
       if (
@@ -718,6 +769,8 @@ private:
 
    std::vector<unsigned long long int> size_list;
 };
+
+}
 
 #endif
 

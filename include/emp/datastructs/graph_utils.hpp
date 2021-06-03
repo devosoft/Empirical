@@ -66,7 +66,7 @@ namespace emp {
   }
 
   /// Construct a random tree graph (new vertices are repeatedly attached to a random position
-  /// in a treee as it is constructed.)
+  /// in a tree as it is constructed.)
   Graph build_graph_tree(size_t v_count, Random & random) {
     Graph graph(v_count);
 
@@ -235,7 +235,7 @@ namespace emp {
   }
 
   /// Construct a random WEIGHTED tree graph (new vertices are repeatedly attached to a random
-  /// position in a treee as it is constructed.)
+  /// position in a tree as it is constructed.)
   WeightedGraph build_weighted_graph_tree(size_t v_count, size_t min_weight, size_t max_weight,
                                           Random & random) {
     WeightedGraph graph(v_count);
@@ -295,7 +295,7 @@ namespace emp {
 
 
 
-  /// Helper function for loading symetric graphs from an input stream.
+  /// Helper function for loading symmetric graphs from an input stream.
   /// sub1 indicates that verticies are numbered 1 to N instead of 0 to N-1.
   // @CAO Need some error checking here...
   Graph load_graph_sym(std::istream & is, bool sub1=false) {
@@ -320,7 +320,8 @@ namespace emp {
   }
 
   /// Load a graph from a connection matrix.
-  /// Format: #vertices followed by v^2 0's or 1's
+  /// Format: Number of vertices followed by v^2 0's or 1's
+  /// Example: "3 0 1 0 1 0 0 0 0 1"
   Graph load_graph_table(std::istream & is) {
     size_t n_vert;
     is >> n_vert;

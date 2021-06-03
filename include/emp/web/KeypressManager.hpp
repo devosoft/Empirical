@@ -1,3 +1,6 @@
+#ifndef EMP_WEB_KEYPRESS_MANAGER_H
+#define EMP_WEB_KEYPRESS_MANAGER_H
+
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
@@ -39,9 +42,6 @@
  *        This would require us to keep track of the function that it is calling so that we can
  *        pass it back in to trigger the removal.
  */
-
-#ifndef EMP_WEB_KEYPRESS_MANAGER_H
-#define EMP_WEB_KEYPRESS_MANAGER_H
 
 #include <functional>
 #include <map>

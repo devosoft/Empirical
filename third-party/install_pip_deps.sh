@@ -16,5 +16,5 @@
 #else
 #	pip install -r requirements.txt
 #fi
-env/bin/pip install -r requirements.txt
+env/bin/pip3 install -r requirements.txt
 source env/bin/activate

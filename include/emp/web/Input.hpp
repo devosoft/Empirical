@@ -4,14 +4,14 @@
  *  @date 2018
  *
  *  @file  Input.hpp
- *  @brief Create/control an HTML input and call a specified function when it recieves input.
+ *  @brief Create/control an HTML input and call a specified function when it receives input.
  *
  *  Use example:
  *
  *    emp::web::Input my_input(MyFun, "input type", "input Name", "html_id");
  *
  *  Where my_input is the C++ object linking to the input, MyFun is the
- *  function you want to call on chnages, "Input Name" is the label on the
+ *  function you want to call on changes, "Input Name" is the label on the
  *  input itself, and "html_id" is the optional id you want it to use in the
  *  HTML code (otherwise it will generate a unique name on its own.)
  *
@@ -40,7 +40,7 @@ namespace web {
   class Input : public internal::WidgetFacet<Input> {
     friend class InputInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // Inputs associated with the same DOM element share a single InputInfo object.
     class InputInfo : public internal::WidgetInfo {
       friend Input;
@@ -221,9 +221,9 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::InputInfo"; }
     }; // End of InputInfo definition
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     InputInfo * Info() { return (InputInfo *) info; }
     const InputInfo * Info() const { return (InputInfo *) info; }
 
@@ -236,6 +236,8 @@ namespace web {
     /// @param in_type The type of this input.
     /// @param in_label The label that should appear on the Input.
     /// @param in_id The HTML ID to use for this Input (leave blank for auto-generated)
+    /// @param show_value Do you want to add an output element to display to value of this input?
+    /// @param is_checked Should the is_checked attribute by set to true or false?
     Input(
       const std::function<void(std::string)> & in_cb,
       const std::string & in_type,
@@ -292,18 +294,22 @@ namespace web {
 
     /// Update the min
     Input & Min(const std::string & in_m) { Info()->UpdateMin(in_m); return *this; }
+    /// Update the min
     Input & Min(const double & in_m) { Info()->UpdateMin(in_m); return *this; }
 
     /// Update the max
     Input & Max(const std::string & in_m) { Info()->UpdateMax(in_m); return *this; }
+    /// Update the max
     Input & Max(const double & in_m) { Info()->UpdateMax(in_m); return *this; }
 
     /// Update the current value
     Input & Value(const std::string & in_m) { Info()->UpdateValue(in_m); return *this; }
+    /// Update the current value
     Input & Value(const double & in_m) { Info()->UpdateValue(in_m); return *this; }
 
     /// Update the current step size
     Input & Step(const std::string & in_m) { Info()->UpdateStep(in_m); return *this; }
+    /// Update the current step size
     Input & Step(const double & in_m) { Info()->UpdateStep(in_m); return *this; }
 
     /// Setup this Input to have autofocus (or remove it!)

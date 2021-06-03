@@ -31,12 +31,14 @@
 
 namespace emp {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /// An anonymous log2 calculator for hashing below.
     static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x/2) + 1); }
 
     static bool ptr_debug = false;
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   inline void SetPtrDebug(bool _d = true) { internal::ptr_debug = _d; }
   inline bool GetPtrDebug() { return internal::ptr_debug; }
 
@@ -90,14 +92,14 @@ namespace emp {
     void SetArray(size_t bytes) noexcept { array_bytes = bytes; status = PtrStatus::ARRAY; }
 
     /// Add one more pointer.
-    void Inc(size_t id) {
+    void Inc(const size_t id) {
       if (internal::ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
       emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!", id);
       count++;
     }
 
     /// Remove a pointer.
-    void Dec(size_t id) {
+    void Dec(const size_t id) {
       if (internal::ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
@@ -429,7 +431,7 @@ namespace emp {
       }
     }
 
-    /// Construct from a raw pointer of campatable ARRAY type.
+    /// Construct from a raw pointer of compatible ARRAY type.
     template <typename T2>
     Ptr(T2 * _ptr, size_t array_size, bool track) : BasePtr<TYPE>(_ptr, UNTRACKED_ID)
     {
@@ -452,7 +454,7 @@ namespace emp {
       }
     }
 
-    /// Construct from another Ptr<> object of compatable type.
+    /// Construct from another Ptr<> object of compatible type.
     template <typename T2>
     Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw(), _in.GetID()) {
       if (internal::ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
@@ -597,7 +599,7 @@ namespace emp {
                   << std::endl;
       }
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
-      if (ptr != _in.ptr) {        // Assignments only need to happen if ptrs are different.
+      if (id != _in.id || ptr != _in.ptr) {        // Assignments only need to happen if ptrs are different.
         if (internal::ptr_debug) std::cout << "...pointers differ -- copying!" << std::endl;
         Tracker().DecID(id);
         ptr = _in.ptr;
@@ -736,7 +738,7 @@ namespace emp {
 
   };
 
-#else
+#else // #ifdef EMP_TRACK_MEM
 
 
   template <typename TYPE>
@@ -858,7 +860,7 @@ namespace emp {
     bool OK() const { return true; }
   };
 
-#endif
+#endif // #ifdef EMP_TRACK_MEM
 
   // IO
   template <typename T>
@@ -929,6 +931,6 @@ namespace emp {
   }
 
 
-}
+} // namespace emp
 
 #endif // EMP_PTR_H

@@ -6,7 +6,7 @@
 #include "../datastructs/set_utils.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "Systematics.hpp"
-#include "bloom_filter.hpp"
+#include "../datastructs/BloomFilter.hpp"
 
 #include <deque>
 
@@ -26,13 +26,13 @@ namespace emp {
     };
 
     class SeenBloomFilter {
-        bloom_filter b;
+        BloomFilter b;
 
         public:
 
         using skel_t = std::string;
         SeenBloomFilter(int bloom_count = 200000, double false_positive = 0.0001) {
-            bloom_parameters parameters;
+            BloomParameters parameters;
 
             // How many elements roughly do we expect to insert?
             parameters.projected_element_count = bloom_count;
@@ -46,7 +46,7 @@ namespace emp {
             }
 
             parameters.compute_optimal_parameters();
-            b = bloom_filter(parameters);
+            b = BloomFilter(parameters);
         }
 
         void insert(const skel_t & val) {b.insert(val);}

@@ -1,9 +1,9 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
+ *  @date 2020.
  *
- *  @file  hash_namify.h
+ *  @file  hash_namify.hpp
  *  @brief A method for mapping hash values to intuitive names.
  */
 
@@ -18,6 +18,7 @@
 
 namespace emp {
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace internal {
 
   const emp::vector<std::string> adjectives{
@@ -2710,6 +2711,7 @@ namespace internal {
   };
 
 } // namespace internal
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   std::string hash_namify( const size_t hash ) {
 

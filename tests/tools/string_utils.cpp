@@ -145,7 +145,7 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE(emp::from_literal_char("'f'") == 'f');
   REQUIRE(emp::from_literal_char("'\n'") == '\n');
   REQUIRE(emp::is_literal_string("\"He llo!\""));
-  REQUIRE(!emp::is_literal_string("\"He\"llo!\""));
+  REQUIRE(!emp::is_literal_string("\"\\\\He\"llo!\""));
   REQUIRE(emp::is_literal_string("\"Hel\n\t\r\\\'lo!\""));
   REQUIRE(emp::is_literal_string("\"Hel\n \t \r \'lo!\""));
   REQUIRE(emp::from_literal_string("\"Hello!\"") == "Hello!");

@@ -1,7 +1,7 @@
-TEST_NAMES = array assert errors macros macro_math optional Ptr vector map MapProxy unordered_map
+TEST_NAMES = always_assert_warning always_assert array assert assert_warning errors macros macro_math optional Ptr vector map MapProxy unordered_map
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
+FLAGS = -std=c++17 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
 
 default: test
 
@@ -19,7 +19,9 @@ test-prep:
 
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -o $@.out
-	# execute test
+	# execute test; on fail, run again and backtrace
+	./$@.out \
+		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
 	./$@.out
 
 # Test in debug mode without pointer tracker

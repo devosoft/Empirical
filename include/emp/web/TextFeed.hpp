@@ -26,7 +26,7 @@ namespace web {
   class TextFeed : public internal::WidgetFacet<TextFeed> {
     friend class TextFeedInfo;
   protected:
-
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class TextFeedInfo : public internal::WidgetInfo {
       friend TextFeed;
     protected:
@@ -72,7 +72,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::TextFeedInfo"; }
     };  // End of TextFeedInfo
-
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of info.
     TextFeedInfo * Info() { return (TextFeedInfo *) info; }
@@ -99,6 +99,9 @@ namespace web {
 
     /// Erase current text.
     TextFeed & Clear() { Info()->strings.clear(); return *this; }
+
+    /// Remove last text item.
+    TextFeed & PopBack() { Info()->strings.pop_back(); return *this; }
   };
 
   /// Add new text to this string.

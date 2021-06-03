@@ -8,13 +8,59 @@
 
 #include "emp/bits/BitVector.hpp"
 #include "emp/base/vector.hpp"
+#include "emp/tools/timing.hpp"
 
 #include <sstream>
 #include <map>
 #include <limits>
+#include <ratio>
+
+TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+	// Expected timing: 38 ms Optimized, 2150 ms Non-optimized
+	emp::BitVector bv(0);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+	bv.Insert(0, true, 4096);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+	std::cout << "Bit Magic Insert: ";
+	EMP_VOID_FUNCTION_TIMER([&bv](){
+		for ( size_t i{}; i <= std::mega::num; ++i ) {
+			#ifdef TDEBUG
+			REQUIRE(emp::assert_last_fail == 0);
+			#endif
+			auto bv1 = bv;
+			#ifdef TDEBUG
+			REQUIRE(emp::assert_last_fail == 0);
+			#endif
+			bv1.Insert(1, false);
+			#ifdef TDEBUG
+			REQUIRE(emp::assert_last_fail == 0);
+			#endif
+		}
+	}());
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+}
 
 TEST_CASE("Test BitVector", "[bits]")
 {
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	// Constructor
 	emp::BitVector bv(10);
 
@@ -31,15 +77,19 @@ TEST_CASE("Test BitVector", "[bits]")
 	// Assignment operator
 	emp::BitVector bv1(10);
 	bv1 = bv;
+	REQUIRE(bv1 == bv);
 	REQUIRE(bv1.Get(0));
 	emp::BitVector bv20(20);
 	emp::BitVector bv30(30);
 	bv20.Set(1);
 	REQUIRE(bv20.Get(1));
 	bv20 = bv;
+	REQUIRE(bv20 == bv);
+	REQUIRE(bv20.size()==bv.size());
 	REQUIRE(!bv20.Get(1));
 	bv20 = bv30;
 	REQUIRE(!bv20.Get(1));
+	REQUIRE(bv20 == bv30);
 
 	// Resize
 	bv1.Set(9);
@@ -259,10 +309,97 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_f.count() == 1);
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }
 
-TEST_CASE("Another Test BitVector", "[bits]")
-{
+TEST_CASE("Test MaskHigh, MaskLow", "[bits]") {
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+	// Test MaskHigh, MaskLow
+	emp::BitVector a(0);
+	a.Insert(0,true, 7);
+	REQUIRE(a.Get(0));
+	REQUIRE(a.Get(1));
+	REQUIRE(a.Get(2));
+	emp::BitVector b = a;
+	emp::BitVector c = a;
+	b.MaskHigh(0);
+	c.MaskLow(1);
+	REQUIRE(b.Get(1));
+	REQUIRE(!b.Get(0));
+	REQUIRE(b.Get(6));
+	REQUIRE(c.Get(0));
+	REQUIRE(!c.Get(1));
+	REQUIRE(!c.Get(2));
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+}
+
+TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+	// Pop Back and Push Back
+	emp::BitVector bv_g(0);
+	bv_g.PushBack(true);
+	bv_g.PushBack(true);
+	bv_g.PushBack(false);
+	REQUIRE(bv_g.Get(0));
+	REQUIRE(bv_g.Get(1));
+	REQUIRE(!bv_g.PopBack());
+	REQUIRE(bv_g.size() == 2);
+
+	// Insert and Delete
+	bv_g.Insert(1, true);
+	REQUIRE(bv_g.Get(0));
+	REQUIRE(bv_g.Get(1));
+	REQUIRE(bv_g.Get(2));
+	REQUIRE(bv_g.size() == 3);
+
+	bv_g.Insert(1, true);
+	REQUIRE(bv_g.Get(3));
+	REQUIRE(bv_g.Get(2));
+	REQUIRE(bv_g.Get(1));
+	REQUIRE(bv_g.Get(0));
+	REQUIRE(bv_g.size() == 4);
+
+	bv_g.Insert(1, false);
+	REQUIRE(bv_g.Get(0));
+	REQUIRE(!bv_g.Get(1));
+	REQUIRE(bv_g.Get(2));
+	REQUIRE(bv_g.Get(3));
+
+	bv_g.Delete(0);
+	REQUIRE(bv_g.size() == 4);
+	REQUIRE(!bv_g.Get(0));
+	bv_g.Delete(1, 2);
+	REQUIRE(bv_g.size() == 2);
+	REQUIRE(bv_g.Get(1));
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
+}
+
+TEST_CASE("Another Test BitVector", "[bits]") {
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
   emp::BitVector bv10(10);
   emp::BitVector bv32(32);
   emp::BitVector bv50(50);
@@ -286,10 +423,16 @@ TEST_CASE("Another Test BitVector", "[bits]")
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
 
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }
 
 TEST_CASE("BitVector padding bits protected", "[bits]") {
 #ifdef TDEBUG
+
+	REQUIRE(emp::assert_last_fail == 0);
 
   for (size_t i = 1; i < 32; ++i) {
 
@@ -312,6 +455,10 @@ TEST_CASE("BitVector padding bits protected", "[bits]") {
 }
 
 TEST_CASE("BitVector regression test for #277", "[bits]") {
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
   emp::BitVector vec1(4);
   emp::BitVector vec2(4);
 
@@ -321,4 +468,9 @@ TEST_CASE("BitVector regression test for #277", "[bits]") {
   vec2.SetUIntAtBit(0, 15);
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec1[i]);
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec2[i]);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }

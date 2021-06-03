@@ -1,11 +1,11 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2020.
  *
- *  @file  flex_function.hpp
- *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
- *  @note Status: BETA (though new functions are added frequently)
+ *  @file  timing.hpp
+ *  @brief A collection of tools to help measure timing of code.
+ *  @note Status: BETA
  */
 
 
@@ -30,6 +30,16 @@
               << 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC  \
               << " ms" << std::endl;                                         \
     std::cout << "Result: " << emp_result << std::endl;                      \
+  }
+
+/// A simple macro to time how long it takes for a function to complete.
+  #define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
+    std::clock_t emp_start_time = std::clock();                              \
+    TEST_FUN;                                                                \
+    std::clock_t emp_tot_time = std::clock() - emp_start_time;               \
+    std::cout << "Time: "                                                    \
+              << 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC  \
+              << " ms" << std::endl;                                         \
   }
 
 namespace emp {

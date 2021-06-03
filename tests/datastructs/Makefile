@@ -1,7 +1,7 @@
-TEST_NAMES = Bool Cache DynamicString Graph graph_utils hash_utils IndexMap map_utils QueueCache ra_set reference_vector set_utils SmallFifoMap SmallVector StringMap TimeQueue tuple_struct tuple_utils TypeMap UnorderedIndexMap valsort_map vector_utils
+TEST_NAMES = BloomFilter Bool Cache DynamicString Graph graph_utils hash_utils IndexMap map_utils QueueCache ra_set reference_vector set_utils SmallFifoMap SmallVector StringMap TimeQueue tuple_struct tuple_utils TypeMap UnorderedIndexMap valsort_map vector_utils
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
+FLAGS = -std=c++17 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
 
 default: test
 
@@ -19,8 +19,9 @@ test-prep:
 
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
-	# execute test
-	./$@.out
+	# execute test; on fail, run again and backtrace
+	./$@.out \
+		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
 
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))

@@ -113,7 +113,8 @@ namespace emp::internal {
     // in this case, we simply return the data from our logbuffer.
     emp::ContainerDataFile<logbuffer_t> datafile;
 
-    using datapoint_t = robin_hood::pair<const LogEntry, size_t>;
+    using datapoint_t = typename logbuffer_t::value_type;
+
     // setup getter functions
     std::function<query_t(const datapoint_t)> get_query_log = [](const datapoint_t datapoint){
       return datapoint.first.query;
