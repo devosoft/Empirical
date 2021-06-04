@@ -296,6 +296,15 @@ namespace emp {
 
     bool IsTypePack() const { return info_ptr->IsTypePack(); }
 
+    template <typename T> bool IsType() const { return *this == GetTypeID<T>(); }
+
+    template <typename T, typename... Ts>
+    bool IsTypeIn() const { 
+      if (IsType<T>()) return true;
+      if constexpr (sizeof...(Ts) > 0) return IsTypeIn<Ts...>();
+      else return false;
+    }
+ 
     TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
     TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
     TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
