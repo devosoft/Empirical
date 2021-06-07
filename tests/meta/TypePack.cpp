@@ -101,10 +101,12 @@ TEST_CASE("Test TypePack", "[meta]")
   using link2_t = emp::TypePack<double, int, size_t>;
   using merge_t = link1_t::merge<link2_t>;
   using union_t = link1_t::find_union<link2_t>;
+  using intersect_t = link1_t::find_intersect<link2_t>;
   REQUIRE(link1_t::GetSize() == 3);
   REQUIRE(link2_t::GetSize() == 3);
   REQUIRE(merge_t::GetSize() == 6);
   REQUIRE(union_t::GetSize() == 5);
+  REQUIRE(intersect_t::GetSize() == 1);
 
   // Test some manipulators on an empty typepack.
   using empty_t = emp::TypePack<>;
