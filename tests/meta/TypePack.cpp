@@ -24,10 +24,15 @@ TEST_CASE("Test TypePack", "[meta]")
 {
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
   // REQUIRE(emp::GetTypeID<test_t>().GetName() == "emp::TypePack<int32_t,std::string,float,bool,double>");
+  REQUIRE(test_t::Has<int>() == true);
+  REQUIRE(test_t::Has<std::string>() == true);
+  REQUIRE(test_t::Has<double>() == true);
+  REQUIRE(test_t::Has<char>() == false);
   REQUIRE(test_t::GetSize() == 5);
   REQUIRE(test_t::GetID<float>() == 2);
   REQUIRE(test_t::add<long long>::GetSize() == 6);
   REQUIRE(test_t::pop::GetID<float>() == 1);
+  REQUIRE(test_t::IsUnique() == true);
 
   using test2_t = emp::TypePackFill<int, 4>;
   using test3_t = emp::TypePack<uint64_t>;
@@ -90,6 +95,7 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(dup_test_t::make_unique::GetSize() == 5);
   REQUIRE(dup_test_t::Count<int>() == 5);
   REQUIRE(dup_test_t::CountUnique() == 5);
+  REQUIRE(dup_test_t::IsUnique() == false);
 
   using link1_t = emp::TypePack<bool, char, int>;
   using link2_t = emp::TypePack<double, int, size_t>;
@@ -99,6 +105,13 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(link2_t::GetSize() == 3);
   REQUIRE(merge_t::GetSize() == 6);
   REQUIRE(union_t::GetSize() == 5);
+
+  // Test some manipulators on an empty typepack.
+  using empty_t = emp::TypePack<>;
+  REQUIRE(empty_t::GetSize() == 0);
+  REQUIRE(empty_t::Count<int>() == 0);
+  REQUIRE(empty_t::IsUnique() == true);
+  REQUIRE(empty_t::IsEmpty() == true);
 
   // Make sure the type trait works...
   REQUIRE(emp::is_TypePack<test_t>() == true);
