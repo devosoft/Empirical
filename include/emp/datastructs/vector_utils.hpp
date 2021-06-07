@@ -147,6 +147,13 @@ namespace emp {
   template <typename T>
   T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
+  /// Find the intersection between this vector and another container.
+  template <typename T, typename C2>
+  emp::vector<T> FindIntersect(const emp::vector<T> & in1, const C2 & in2) {
+    emp::vector<T> out;
+    for (const auto & x : in1) if (emp::Has(in2, x)) out.push_back(x);
+    return out;
+  }
 
   /// Sum all of the contents of a vector.
   template <typename T>
