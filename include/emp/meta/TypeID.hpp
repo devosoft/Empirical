@@ -268,6 +268,10 @@ namespace emp {
     operator bool() const noexcept { return info_ptr->init; }
     bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
     bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
+    bool operator< (TypeID in) const { return info_ptr < in.info_ptr; }
+    bool operator<=(TypeID in) const { return info_ptr <=in.info_ptr; }
+    bool operator> (TypeID in) const { return info_ptr > in.info_ptr; }
+    bool operator>=(TypeID in) const { return info_ptr >= in.info_ptr; }
 
     /// Get a unique numerical ID for this TypeID object.
     size_t GetID() const { return (size_t) info_ptr.Raw(); }
