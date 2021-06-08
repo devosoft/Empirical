@@ -66,14 +66,17 @@ namespace emp {
 
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
-      bool operator<(const Instruction & other) const {
-          return std::tie(id, args) < std::tie(other.id, other.args);
+      bool operator<(const Instruction & in) const {
+          return std::tie(id, args) < std::tie(in.id, in.args);
       }
+      bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
+      bool operator!=(const Instruction & in) const { return !(*this == in); }
+      bool operator>(const Instruction & in) const { return in < *this; }
+      bool operator>=(const Instruction & in) const { return !(*this < in); }
+      bool operator<=(const Instruction & in) const { return !(in < *this); }
 
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
 	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
-
-      bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
     };
 
     struct ScopeInfo {
@@ -264,8 +267,8 @@ namespace emp {
     inst_t GetInst(size_t pos) const { return genome[pos]; }
     inst_t& operator[](size_t pos) {return genome[pos]; } // Alias for compatability with tools
     const genome_t & GetGenome() const { return genome; }
-    const size_t GetSize() const { return genome.GetSize(); }
-    const size_t size() const { return GetSize(); } // Alias for compatability with tools
+    size_t GetSize() const { return genome.GetSize(); }
+    size_t size() const { return GetSize(); } // Alias for compatability with tools
     double GetReg(size_t id) const { return regs[id]; }
     double GetInput(int id) const { return Find(inputs, id, 0.0); }
     const std::unordered_map<int,double> & GetInputs() const { return inputs; }
