@@ -46,12 +46,34 @@ namespace emp {
     size_t GetSize() const { return SEQUENCE_T::size(); }
     void Resize(size_t new_size) { SEQUENCE_T::resize(new_size); }
 
-    bool operator==(const Genome& other) const { return SEQUENCE_T::operator==(*this, other); }
-    bool operator!=(const Genome& other) const { return SEQUENCE_T::operator!=(*this, other); }
-    bool operator< (const Genome& other) const { return SEQUENCE_T::operator<(*this,  other); }
-    bool operator<=(const Genome& other) const { return SEQUENCE_T::operator<=(*this, other); }
-    bool operator> (const Genome& other) const { return SEQUENCE_T::operator>(*this,  other); }
-    bool operator>=(const Genome& other) const { return SEQUENCE_T::operator>=(*this, other); }
+    bool operator==(const Genome& other) const {
+      if (SEQUENCE_T::size() != other.size()) return false;
+      auto it1 = SEQUENCE_T::begin();
+      auto it2 = other.begin();
+      while (it1 != SEQUENCE_T::end() && it2 != other.end()) {
+        if (*it1 != *it2) return false;
+        ++it1; ++it2;
+      }
+      return true;
+    }
+    bool operator!=(const Genome& other) const { return !(*this == other); }
+
+    /// Compare genomes using an equivilent of alphabetical order.
+    bool operator< (const Genome& other) const {
+      // Step through the instructions
+      auto it1 = SEQUENCE_T::begin();
+      auto it2 = other.begin();
+      while (it1 != SEQUENCE_T::end() && it2 != other.end()) {
+        if (*it1 != *it2) return *it1 < *it2;  // The first difference determines result
+        ++it1; ++it2;
+      }
+      // If sequences have been identical so far, shorter comes first (tie is false)
+      return SEQUENCE_T::size() < other.size();
+    }
+
+    bool operator> (const Genome& other) const { return other < *this; }
+    bool operator<=(const Genome& other) const { return !(other > *this); }
+    bool operator>=(const Genome& other) const { return !(other < *this); }
 
     size_t Hash() const {
       std::size_t seed = GetSize();
