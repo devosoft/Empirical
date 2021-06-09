@@ -34,7 +34,7 @@ namespace emp {
   /// std::string type_string = type_map[typeid(T).name()];
   ///
   /// Now we can pass type_string.c_str() into MAIN_THREAD_EM_ASM:
-  /// `MAIN_THREAD_EM_ASM({
+  /// `MAIN_THREAD_EMP_ASM({
   ///    var value = getValue($0, $1);
   /// }, pointer, type_string.c_str();`
 
@@ -88,10 +88,10 @@ namespace emp {
 
     // Clear array, if this isn't a recursive call
     if (recursive_el.size() == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__incoming_array = [];});
+      MAIN_THREAD_EMP_ASM({emp_i.__incoming_array = [];});
     }
 
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
 
@@ -116,10 +116,10 @@ namespace emp {
   {
     // Clear array, if this isn't a recursive call
     if (recursive_el.size() == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__incoming_array = [];});
+      MAIN_THREAD_EMP_ASM({emp_i.__incoming_array = [];});
     };
 
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       emp_i.__curr_array = emp_i.__incoming_array;
       var depth = 0;
 
@@ -134,12 +134,12 @@ namespace emp {
     // Iterate over array, get values, and add them to incoming array.
     for (auto val : values) {
       (void) val;
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         emp_i.__curr_array.push(UTF8ToString($0));
       }, val.c_str());
     };
 
-    MAIN_THREAD_EM_ASM({delete emp_i.__curr_array;});
+    MAIN_THREAD_EMP_ASM({delete emp_i.__curr_array;});
   }
 
   // Handle user-defined JSON_TYPE
@@ -150,11 +150,11 @@ namespace emp {
     std::map<std::string, std::string> map_type_names = get_type_to_string_map();
     // Initialize array in Javascript
     if (recursive_el.size() == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__incoming_array = [];});
+      MAIN_THREAD_EMP_ASM({emp_i.__incoming_array = [];});
     }
 
     // Initialize objects in Javascript
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
 
@@ -183,7 +183,7 @@ namespace emp {
       		    != map_type_names.end()), values[j].var_types[i].name());
 
         // Load data into array of objects
-        MAIN_THREAD_EM_ASM({
+        MAIN_THREAD_EMP_ASM({
     	    var curr_array = emp_i.__incoming_array;
     	    var depth = 0;
 
@@ -223,11 +223,11 @@ namespace emp {
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__incoming_array = [];});
+      MAIN_THREAD_EMP_ASM({emp_i.__incoming_array = [];});
     }
 
     // Append empty arrays to array that we are currently handling in recursion
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
     	while (curr_array.length > 0) {
@@ -257,11 +257,11 @@ namespace emp {
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__incoming_array = [];});
+      MAIN_THREAD_EMP_ASM({emp_i.__incoming_array = [];});
     }
 
     // Append empty arrays to array that we are currently handling in recursion
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
     	while (curr_array.length > 0) {
@@ -557,23 +557,23 @@ namespace emp {
 
     // Create temp array to hold whole array while pieces are passed in
     if (recurse == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__temp_array = [emp_i.__outgoing_array];});
+      MAIN_THREAD_EMP_ASM({emp_i.__temp_array = [emp_i.__outgoing_array];});
     } else {
       // This is a little wasteful of space, but the alternatives are
       // surprisingly ugly
-      MAIN_THREAD_EM_ASM({emp_i.__temp_array.push(emp_i.__outgoing_array);});
+      MAIN_THREAD_EMP_ASM({emp_i.__temp_array.push(emp_i.__outgoing_array);});
     }
 
     for (size_t i = 0; i < arr.size(); i++) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
 	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
 	    }, i);
       pass_array_to_cpp(arr[i], true);
     }
 
     // Clear temp array
-    if (recurse == 0) { MAIN_THREAD_EM_ASM({emp_i.__temp_array = [];}); }
-    else { MAIN_THREAD_EM_ASM({emp_i.__temp_array.pop();}); }
+    if (recurse == 0) { MAIN_THREAD_EMP_ASM({emp_i.__temp_array = [];}); }
+    else { MAIN_THREAD_EMP_ASM({emp_i.__temp_array.pop();}); }
   }
   #else
   template <std::size_t SIZE, std::size_t SIZE2, typename T>
@@ -589,17 +589,17 @@ namespace emp {
     int size = MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length});
 
     if (recurse == 0) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         emp_i.__temp_array = [emp_i.__outgoing_array];
       });
     } else {
       // This is a little wasteful of space, but the alternatives are
       // surprisingly ugly
-      MAIN_THREAD_EM_ASM({emp_i.__temp_array.push(emp_i.__outgoing_array);});
+      MAIN_THREAD_EMP_ASM({emp_i.__temp_array.push(emp_i.__outgoing_array);});
     }
 
     for (int i = 0; i < size; i++) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
 	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
       }, i);
       while ((int)arr.size() <= i) {
@@ -610,9 +610,9 @@ namespace emp {
 
     // Clear temp array
     if (recurse == 0) {
-      MAIN_THREAD_EM_ASM({emp_i.__temp_array = [];});
+      MAIN_THREAD_EMP_ASM({emp_i.__temp_array = [];});
     } else {
-      MAIN_THREAD_EM_ASM({emp_i.__temp_array.pop();});
+      MAIN_THREAD_EMP_ASM({emp_i.__temp_array.pop();});
     }
   }
   #else
@@ -639,7 +639,7 @@ namespace emp {
 
     // pass in extracted keys vector to JS
     emp::pass_array_to_javascript(keys);
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       emp_i.__incoming_map_keys = emp_i.__incoming_array;
     });
 
@@ -656,7 +656,7 @@ namespace emp {
 
     // pass in extracted values vector to JS
     emp::pass_array_to_javascript(values);
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       emp_i.__incoming_map_values = emp_i.__incoming_array;
 
       // create dictionary
@@ -683,7 +683,7 @@ namespace emp {
 
     // pass in keys vector to JS
     emp::pass_array_to_javascript(keys);
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       emp_i.__incoming_map_keys = emp_i.__incoming_array;
     });
 
@@ -700,7 +700,7 @@ namespace emp {
 
     // pass in values vector to JS
     emp::pass_array_to_javascript(values);
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       emp_i.__incoming_map_values = emp_i.__incoming_array;
 
       // create dictionary

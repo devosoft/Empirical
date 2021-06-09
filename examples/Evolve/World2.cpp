@@ -21,58 +21,58 @@ int main() {
   // Inject from 100 to 199.
   for (int i = 0; i < 100; i++) { world.Inject(i+200); }
 
-  std::cout << "Start Size = " << world.GetSize() << std::endl << std::endl;
+  std::cout << "Start Size = " << world.GetSize() << '\n' << '\n';
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  std::cout << std::endl;
+  std::cout << '\n';
 
   std::cout << "Num Ptr<int> = " << emp::Ptr<int>::DebugInfo().current
             << "  (total = " << emp::Ptr<int>::DebugInfo().total << ")"
-            << std::endl;
+            << '\n';
   std::cout << "Num Ptr<emp::Taxon<int>> = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().current
             << "  (total = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().total << ")"
-            << std::endl;
+            << '\n';
 
   for (size_t UD = 0; UD < 2; UD++) {
 
-    std::cout << "UD = " << UD << std::endl;
+    std::cout << "UD = " << UD << '\n';
 
     EliteSelect(world, 50, 4);
 
-    std::cout << "Post EliteSelect(50,4)" << std::endl;
+    std::cout << "Post EliteSelect(50,4)" << '\n';
     for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-    std::cout << std::endl;
+    std::cout << '\n';
 
     std::cout << "Num Ptr<int> = " << emp::Ptr<int>::DebugInfo().current
               << "  (total = " << emp::Ptr<int>::DebugInfo().total << ")"
-              << std::endl;
+              << '\n';
     std::cout << "Num Ptr<emp::Taxon<int>> = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().current
               << "  (total = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().total << ")"
-              << std::endl;
+              << '\n';
 
     world.Update();
 
-    std::cout << "Post Update()" << std::endl;
+    std::cout << "Post Update()" << '\n';
     for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-    std::cout << std::endl;
+    std::cout << '\n';
 
     std::cout << "Num Ptr<int> = " << emp::Ptr<int>::DebugInfo().current
               << "  (total = " << emp::Ptr<int>::DebugInfo().total << ")"
-              << std::endl;
+              << '\n';
     std::cout << "Num Ptr<emp::Taxon<int>> = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().current
               << "  (total = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().total << ")"
-              << std::endl;
+              << '\n';
   }
 
   // world.TournamentSelect(5, 100);
   // world.Update();
-  // std::cout << "\nPost-Tourney Size = " << world.GetSize() << std::endl << std::endl;
+  // std::cout << "\nPost-Tourney Size = " << world.GetSize() << '\n' << '\n';
   // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  // std::cout << std::endl;
+  // std::cout << '\n';
   //
   // EliteSelect(world, 10, 10);
   // world.Update();
-  // std::cout << "\nPost-Elite Size = " << world.GetSize() << std::endl << std::endl;
+  // std::cout << "\nPost-Elite Size = " << world.GetSize() << '\n' << '\n';
   // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  // std::cout << std::endl << std::endl;
+  // std::cout << '\n' << '\n';
 
 }

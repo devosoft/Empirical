@@ -128,6 +128,25 @@ namespace emp {
       std::memcpy(bit_set, in_set, sizeof(bit_set));
     }
 
+    template<size_t shift>
+    void ShiftLeft() {
+      // profiled this templated, special case variant
+      // and did see a difference in runtime MAM
+
+      // TODO currently only implemented for NUM_FIELDS == 1
+      //static_assert( NUM_FIELDS == 1 );
+      //static_assert( LAST_BIT == 0 );
+      if constexpr (NUM_FIELDS != 1) {
+        ShiftLeft(shift);
+
+      }
+      else {
+        if constexpr (LAST_BIT != 0)
+            bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        bit_set[0] <<= shift;
+      }
+    }
+
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
 
@@ -781,7 +800,15 @@ namespace emp {
     static constexpr double MaxDouble() { return emp::Pow2(NUM_BITS) - 1.0; }
 
     /// Return true if ANY bits in the BitSet are one, else return false.
-    bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+    bool Any() const {
+      // profiled the if constexpr else
+      // and did see a difference on perf reports and in runtime MAM
+      if constexpr (NUM_FIELDS == 1) return bit_set[0];
+      else {
+        for (auto i : bit_set) if (i) return true;
+        return false;
+      }
+    }
 
     /// Return true if NO bits in the BitSet are one, else return false.
     bool None() const { return !Any(); }
@@ -900,8 +927,14 @@ namespace emp {
       size_t length = 0;
       BitSet out_set(*this);
       while(out_set.Any()){
-        out_set.AND_SELF(out_set<<1);
+        BitSet temp( out_set );
+        // optimization currently only implemented for NUM_FIELDS == 1
+        if constexpr (NUM_FIELDS == 1) temp.template ShiftLeft<1>();
+        else temp <<= 1;
+
+        out_set.AND_SELF(temp);
         ++length;
+
       }
       return length;
     }
@@ -910,67 +943,73 @@ namespace emp {
     /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.NOT_SELF();
       return out_set;
     }
 
     /// Perform a Boolean AND with a second BitSet and return the result.
     BitSet AND(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
+      out_set.AND_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean OR with a second BitSet and return the result.
     BitSet OR(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
+      out_set.OR_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean NAND with a second BitSet and return the result.
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.NAND_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean NOR with a second BitSet and return the result.
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.NOR_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean XOR with a second BitSet and return the result.
     BitSet XOR(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+      out_set.XOR_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean EQU with a second BitSet and return the result.
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.EQU_SELF( set2 );
       return out_set;
     }
 
 
     /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF() {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      if constexpr (NUM_FIELDS == 1) bit_set[0] = ~bit_set[0];
+      else for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
+
+      if constexpr (LAST_BIT > 0) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
       return *this;
     }
 
     /// Perform a Boolean AND with a second BitSet, store result here, and return this object.
+    __attribute__ ((hot))
     BitSet & AND_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
+      if constexpr ( NUM_FIELDS == 1 ) {
+        bit_set[0] = bit_set[0] & set2.bit_set[0];
+      } else for (size_t i = 0; i < NUM_FIELDS; i++) {
+        bit_set[i] = bit_set[i] & set2.bit_set[i];
+      }
       return *this;
     }
 
@@ -983,14 +1022,18 @@ namespace emp {
     /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
     BitSet & NAND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      if constexpr (LAST_BIT > 0) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
       return *this;
     }
 
     /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
     BitSet & NOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      if constexpr (LAST_BIT > 0) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
       return *this;
     }
 
@@ -1003,7 +1046,9 @@ namespace emp {
     /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
     BitSet & EQU_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      if constexpr (LAST_BIT > 0) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
       return *this;
     }
 
@@ -1373,7 +1418,17 @@ namespace emp {
     template <class Archive>
     void serialize( Archive & ar )
     {
-      ar( bit_set );
+      if constexpr ( sizeof(field_t) != sizeof(uint64_t) ) {
+        // in order for JSON serialization interoperability of native (64-bit)
+        // and emscripten (32-bit) artifacts,
+        // in 32-bit mode we have serialize as an array of 64-bit values
+        uint64_t buf[ (sizeof(bit_set) + 7) / 8 ]{};
+        std::memcpy( buf, bit_set, sizeof(bit_set) ); // copy to buf
+        ar( buf );
+        std::memcpy( bit_set, buf, sizeof(bit_set) ); // copy from buf
+      } else {
+        ar( bit_set );
+      }
     }
 
   };

@@ -45,53 +45,52 @@ int test_fun() {
   return val += 3;
 }
 
-// TEST_CASE("Test DataFile", "[data]") {
-//     int test_int = 5;
+TEST_CASE("Test DataFile", "[data]") {
+     int test_int = 5;
 
-//     emp::DataFile dfile("new_test_file.dat");
+     emp::DataFile dfile("new_test_file.dat");
 
-//     REQUIRE(dfile.GetFilename() == "new_test_file.dat");
+     REQUIRE(dfile.GetFilename() == "new_test_file.dat");
 
-//     emp::DataMonitor<double> data_fracs;
-//     emp::DataMonitor<int> data_squares;
-//     emp::DataMonitor<uint64_t> data_cubes;
+     emp::DataMonitor<double> data_fracs;
+     emp::DataMonitor<int> data_squares;
+     emp::DataMonitor<uint64_t> data_cubes;
 
-//     dfile.AddCurrent(data_fracs);
-//     dfile.AddCurrent(data_squares);
-//     dfile.AddCurrent(data_cubes);
-//     dfile.AddMean(data_cubes);
-//     dfile.AddTotal(data_cubes);
-//     dfile.AddMin(data_cubes);
-//     dfile.AddMax(data_cubes);
-//     dfile.AddStandardDeviation(data_cubes);
-//     dfile.AddSkew(data_cubes);
-//     dfile.AddKurtosis(data_cubes);
-//     dfile.AddFun<int>(test_fun);
-//     dfile.AddVar<int>(test_int);
+     dfile.AddCurrent(data_fracs);
+     dfile.AddCurrent(data_squares);
+     dfile.AddCurrent(data_cubes);
+     dfile.AddMean(data_cubes);
+     dfile.AddTotal(data_cubes);
+     dfile.AddMin(data_cubes);
+     dfile.AddMax(data_cubes);
+     dfile.AddStandardDeviation(data_cubes);
+     dfile.AddSkew(data_cubes);
+     dfile.AddKurtosis(data_cubes);
+     dfile.AddFun<int>(test_fun);
+     dfile.AddVar<int>(test_int);
 
-//     double frac = 0.0;
-//     for (size_t i = 0; i < 10; i++) {
-//         test_int += i;
-//         data_fracs.Add(frac += 0.01);
-//         data_squares.Add((int)(i*i));
-//         data_cubes.Add(i*i*i);
-//         dfile.Update();
+     double frac = 0.0;
+     for (size_t i = 0; i < 10; i++) {
+         test_int += i;
+         data_fracs.Add(frac += 0.01);
+         data_squares.Add((int)(i*i));
+         data_cubes.Add(i*i*i);
+         dfile.Update();
 
-//         // std::cout << i << std::endl;
-//     }
+         std::cout << i << '\n';
+     }
 
-//     dfile.SetupLine("[[",":", "]]\n");
-//     for (size_t i = 10; i < 20; i++) {
-//         data_fracs.Add(frac += 0.01);
-//         data_squares.Add((int)(i*i));
-//         data_cubes.Add(i*i*i);
-//         dfile.Update();
+     dfile.SetupLine("[[",":", "]]\n");
+     for (size_t i = 10; i < 20; i++) {
+         data_fracs.Add(frac += 0.01);
+         data_squares.Add((int)(i*i));
+         data_cubes.Add(i*i*i);
+         dfile.Update();
+         std::cout << i << '\n';
+     }
 
-//         // std::cout << i << std::endl;
-//     }
-
-//     REQUIRE(compareFiles("new_test_file.dat", "test_file.dat"));
-// }
+     REQUIRE(compareFiles("new_test_file.dat", "test_file.dat"));
+ }
 
 TEST_CASE("Test Container DataFile", "[data]") {
 
@@ -140,73 +139,89 @@ TEST_CASE("Test Container DataFile", "[data]") {
     REQUIRE(compareFiles("new_test_make_container_file.dat", "test_make_container_file.dat"));
 }
 
-// TEST_CASE("Test timing", "[data]") {
-//     int test_int = 5;
+TEST_CASE("Test timing", "[data]") {
+    int test_int = 5;
 
-//     emp::DataFile dfile("new_test_timing_file.dat");
+    emp::DataFile dfile("new_test_timing_file.dat");
 
-//     emp::DataMonitor<double> data_fracs;
-//     emp::DataMonitor<int> data_squares;
-//     emp::DataMonitor<uint64_t> data_cubes;
+    emp::DataMonitor<double> data_fracs;
+    emp::DataMonitor<int> data_squares;
+    emp::DataMonitor<uint64_t> data_cubes;
 
-//     dfile.AddVar<int>(test_int);
-//     dfile.AddCurrent(data_fracs);
-//     dfile.AddCurrent(data_squares);
-//     dfile.AddCurrent(data_cubes);
-//     dfile.AddMean(data_cubes);
-//     dfile.AddTotal(data_cubes);
-//     dfile.AddMin(data_cubes);
-//     dfile.AddMax(data_cubes);
-//     dfile.AddFun<int>(test_fun);
+    dfile.AddVar<int>(test_int);
+    dfile.AddCurrent(data_fracs);
+    dfile.AddCurrent(data_squares);
+    dfile.AddCurrent(data_cubes);
+    dfile.AddMean(data_cubes);
+    dfile.AddTotal(data_cubes);
+    dfile.AddMin(data_cubes);
+    dfile.AddMax(data_cubes);
+    dfile.AddFun<int>(test_fun);
 
-//     double frac = 0.0;
+    double frac = 0.0;
 
-//     dfile.SetTimingRepeat(2);
+    dfile.SetTimingRepeat(2);
 
-//     for (size_t i = 0; i < 10; i++) {
-//         test_int = i;
-//         data_fracs.Add(frac += 0.01);
-//         data_squares.Add((int)(i*i));
-//         data_cubes.Add(i*i*i);
-//         dfile.Update(i);
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
 
-//         // std::cout << i << std::endl;
-//     }
+        std::cout << i << '\n';
+    }
 
-//     dfile.SetTimingOnce(5);
+    dfile.SetTimingOnce(5);
 
-//     for (size_t i = 0; i < 10; i++) {
-//         test_int = i;
-//         data_fracs.Add(frac += 0.01);
-//         data_squares.Add((int)(i*i));
-//         data_cubes.Add(i*i*i);
-//         dfile.Update(i);
-//         // std::cout << i << std::endl;
-//     }
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+        std::cout << i << '\n';
+    }
 
-//     dfile.SetTimingRange(2, 3, 9);
+    dfile.SetTimingRange(2, 3, 9);
 
-//     for (size_t i = 0; i < 10; i++) {
-//         test_int = i;
-//         data_fracs.Add(frac += 0.01);
-//         data_squares.Add((int)(i*i));
-//         data_cubes.Add(i*i*i);
-//         dfile.Update(i);
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
 
-//         // std::cout << i << std::endl;
-//     }
+        std::cout << i << '\n';
+    }
 
-//     dfile.SetTiming([](size_t ud){return (bool)floor(sqrt((double)ud) == ceil(sqrt((double)ud)));});
+    dfile.SetTiming([](size_t ud){return (bool)floor(sqrt((double)ud) == ceil(sqrt((double)ud)));});
 
-//     for (size_t i = 0; i < 10; i++) {
-//         test_int = i;
-//         data_fracs.Add(frac += 0.01);
-//         data_squares.Add((int)(i*i));
-//         data_cubes.Add(i*i*i);
-//         dfile.Update(i);
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
 
-//         // std::cout << i << std::endl;
-//     }
+        std::cout << i << '\n';
+     }
 
-//     REQUIRE(compareFiles("new_test_timing_file.dat", "test_timing_file.dat"));
-// }
+     REQUIRE(compareFiles("new_test_timing_file.dat", "test_timing_file.dat"));
+ }
+
+TEST_CASE("Test DataFile AddVal", "[data]") {
+
+    emp::DataFile dfile("new_test_file_val.dat");
+
+    dfile.AddVal("Value 1");
+    dfile.AddVal("Value 2", "Key 2");
+    dfile.Update();
+    dfile.AddVal("Value 3", "Key 3", "Description 3");
+
+
+    dfile.AddVal(32);
+    dfile.Update();
+
+    REQUIRE(compareFiles("new_test_file_val.dat", "test_file_val.dat"));
+}

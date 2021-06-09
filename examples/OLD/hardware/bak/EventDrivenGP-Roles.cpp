@@ -341,16 +341,16 @@ int main() {
     world.DoMutations(1);
     // First agent is the best of the last generation.
     std::cout << "Update #" << ud;
-    std::cout << ", Max score: " << fit_fun(world.GetOrg(0)) << std::endl;
+    std::cout << ", Max score: " << fit_fun(world.GetOrg(0)) << '\n';
   }
 
-  std::cout << std::endl;
-  std::cout << "Best program (valid ids: " << world.GetOrg(0).valid_id_cnt << ", unique valid ids: "<< world.GetOrg(0).valid_uid_cnt <<"): " << std::endl;
-  world.GetOrg(0).GetGenome().PrintProgram(); std::cout << std::endl;
-  std::cout << "--- Evaluating best program. ---" << std::endl;
+  std::cout << '\n';
+  std::cout << "Best program (valid ids: " << world.GetOrg(0).valid_id_cnt << ", unique valid ids: "<< world.GetOrg(0).valid_uid_cnt <<"): " << '\n';
+  world.GetOrg(0).GetGenome().PrintProgram(); std::cout << '\n';
+  std::cout << "--- Evaluating best program. ---" << '\n';
   eval_deme.LoadAgent(&world.GetOrg(0));
   eval_deme.Advance(EVAL_TIME);
-  eval_deme.Print(); std::cout << std::endl;
+  eval_deme.Print(); std::cout << '\n';
 
   inst_lib.Delete();
   event_lib.Delete();

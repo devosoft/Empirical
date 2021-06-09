@@ -91,6 +91,6 @@ int main() {
   );
   emp_assert(!am.UseArg("_illegal"));
 
-  std::cout << "Success!" << std::endl;
+  std::cout << "Success!" << '\n';
 
 }

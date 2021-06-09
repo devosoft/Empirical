@@ -16,5 +16,6 @@
 #else
 #	pip install -r requirements.txt
 #fi
+env/bin/pip3 install wheel
 env/bin/pip3 install -r requirements.txt
 source env/bin/activate

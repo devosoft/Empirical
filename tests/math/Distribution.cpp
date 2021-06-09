@@ -53,13 +53,13 @@ TEST_CASE("Test Binomial", "[math]")
     REQUIRE(bi100[i] < ((double) counts[i]) / (double) num_tests + 0.02);
     REQUIRE(bi100[i] > ((double) counts[i]) / (double) num_tests - 0.02);
   }
-  // std::cout << "Total = " << bi100.GetTotalProb() << std::endl;
+  // std::cout << "Total = " << bi100.GetTotalProb() << '\n';
 
   // // Pick some random values...
   // std::cout << "\nSome random values:";
   // for (size_t i = 0; i < 100; i++) {
   //   std::cout << " " << bi100.PickRandom(random);
   // }
-  // std::cout << std::endl;
+  // std::cout << '\n';
   }
 }

@@ -26,7 +26,7 @@ namespace D3 {
     Dataset(int i) : D3_Base(i) {;};
 
     void CaptureIncoming(){
-        MAIN_THREAD_EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
+        MAIN_THREAD_EMP_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
     };
 
     template <typename T>
@@ -68,11 +68,11 @@ namespace D3 {
 
     JSONDataset(int i) : Dataset(i) {;}
     JSONDataset() {
-      MAIN_THREAD_EM_ASM({js.objects[$0] = [];}, this->id);
+      MAIN_THREAD_EMP_ASM({js.objects[$0] = [];}, this->id);
 
       //Useful function for dealing with nested JSON data structures
       //Assumes nested objects are stored in an array called children
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         //Inspired by Niels' answer to
         //http://stackoverflow.com/questions/12899609/how-to-add-an-object-to-a-nested-javascript-object-using-a-parent-id/37888800#37888800
         js.objects[$0] = function(root, id) {
@@ -116,7 +116,7 @@ namespace D3 {
 
     void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
-      std::cout << filename.c_str() << std::endl;
+      std::cout << filename.c_str() << '\n';
       MAIN_THREAD_EM_ASM ({
         var filename = UTF8ToString($1);
         d3.json(filename, function(data){
@@ -129,7 +129,7 @@ namespace D3 {
 
 
     void Append(std::string json) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         js.objects[$0].push(JSON.parse(UTF8ToString($1)));
       }, this->id, json.c_str());
     }
@@ -193,7 +193,7 @@ namespace D3 {
 
 
     void LoadDataFromFile(std::string location, std::string callback, bool header=true) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         var acc = function(d){
             return ([+d[0], +d[1]]);
         };
@@ -235,7 +235,7 @@ namespace D3 {
     /// Put the last row of the array into arr
     template <std::size_t N, typename T>
     void GetLastRow(emp::array<T, N> & arr) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1];
       }, GetID());
       emp::pass_array_to_cpp(arr);

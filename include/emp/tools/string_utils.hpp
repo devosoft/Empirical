@@ -13,8 +13,10 @@
 #define EMP_STRING_UTILS_H
 
 #include <cstdio>
+#include <cctype>
 #include <functional>
 #include <initializer_list>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -29,6 +31,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/optional.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
@@ -128,6 +131,58 @@ namespace emp {
     web_safe = std::regex_replace(web_safe, double_quote, "&quot");
 
     return web_safe;
+  }
+
+
+  /// Returns url encoding of value.
+  /// See https://en.wikipedia.org/wiki/Percent-encoding
+  // adapted from https://stackoverflow.com/a/17708801
+  template<bool encode_space=false>
+  std::string url_encode(const std::string &value) {
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
+
+    for (const auto c : value) {
+
+      // If encoding space, replace with +
+      if ( encode_space && c == ' ' ) escaped << '+';
+      // Keep alphanumeric and other accepted characters intact
+      else if (
+        std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~'
+      ) escaped << c;
+      // Any other characters are percent-encoded
+      else {
+        escaped << std::uppercase;
+        escaped << '%' << std::setw(2) << static_cast<unsigned char>(c);
+        escaped << std::nouppercase;
+      }
+
+    }
+
+    return escaped.str();
+  }
+
+  /// Returns url decoding of string.
+  /// See https://en.wikipedia.org/wiki/Percent-encoding
+  // adapted from https://stackoverflow.com/a/29962178
+  template<bool decode_plus=false>
+  std::string url_decode(const std::string& str){
+    std::string res;
+
+    for (size_t i{}; i < str.size(); ++i) {
+      if (str[i] == '%') {
+        int hex_code;
+        std::sscanf(str.substr(i + 1, 2).c_str(), "%x", &hex_code);
+        res += static_cast<char>(hex_code);
+        i += 2;
+      } else res += ( decode_plus && str[i] == '+' )
+        ? ' '
+        : str[i]
+      ;
+    }
+
+    return res;
   }
 
   /// Take a value and convert it to a C++-style literal.
@@ -656,8 +711,14 @@ namespace emp {
   static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
-    remove_punctuation(res);
+
+    // replace punctuation with whitespace
+    std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
+      return (is_alphanumeric(ch)) ? ch : ' ';
+    });
+
     compress_whitespace(res);
+
     std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
       return (ch == ' ') ? '-' : ch;
     });
@@ -803,6 +864,7 @@ namespace emp {
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
   template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+  template <typename T> inline std::string ToString(const emp::optional<T> & container);
 
   /// Join a container of strings with a delimiter.
   /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
@@ -883,6 +945,13 @@ namespace emp {
     }
     ss << "]";
     return ss.str();
+  }
+
+  /// Setup emp::ToString to work on optionals.
+  template <typename T>
+  inline std::string ToString(const emp::optional<T> & container) {
+    if ( container.has_value() ) return emp::to_string( *container );
+    else return std::string{};
   }
 
   /// This function tries to convert a string into any type you're looking for...  You just

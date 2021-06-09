@@ -54,7 +54,7 @@ namespace web {
         res.first->second.Activate();
       }
 
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         jQuery.ready();
       });
 
@@ -75,9 +75,9 @@ namespace web {
     void Require(bool result, const std::string & msg="") {
       if (result) return;
       if (msg == "") {
-        MAIN_THREAD_EM_ASM({ chai.assert.fail(); });
+        MAIN_THREAD_EMP_ASM({ chai.assert.fail(); });
       } else {
-        MAIN_THREAD_EM_ASM({ chai.assert.fail(UTF8ToString($0)); }, msg.c_str());
+        MAIN_THREAD_EMP_ASM({ chai.assert.fail(UTF8ToString($0)); }, msg.c_str());
       }
     }
 
@@ -198,7 +198,7 @@ namespace web {
           auto & test_name = cur_runner.test_name;
 
           // Queue cleanup for this test.
-          MAIN_THREAD_EM_ASM({
+          MAIN_THREAD_EMP_ASM({
             const test_name = UTF8ToString($0);
             // Queue cleanup for this test
             describe(`Cleanup ${test_name}`, function() {
@@ -212,7 +212,7 @@ namespace web {
           // otherwise, queue up a cleanup
           if (test_runners.size() > 1) {
             auto & next_test_name = this->test_runners[1].test_name;
-            MAIN_THREAD_EM_ASM({
+            MAIN_THREAD_EMP_ASM({
               const next_test_name = UTF8ToString($0);
               // Queue up next test
               describe(`Queue ${next_test_name}` , function() {
@@ -222,7 +222,7 @@ namespace web {
               });
             }, next_test_name.c_str());
           } else {
-            MAIN_THREAD_EM_ASM({
+            MAIN_THREAD_EMP_ASM({
               describe("Finished running tests.", function() {
                 it("should cleanup test manager", function() {
                   emp.CleanupTestRunners();
@@ -248,6 +248,9 @@ namespace web {
 
           // Did the error count increase after running this test? If so, force failure.
           if (post_test_error_cnt != cur_runner.before_test_error_count) {
+            // changed to EM instead of EMP to fix syntax error
+            // in file https://gist.github.com/perryk12/099709aee2bbf59d6b55054db543dd0c#file-test-web-configpanel-js-L1569
+            // error: https://github.com/devosoft/Empirical/runs/2068220642?check_suite_focus=true
             MAIN_THREAD_EM_ASM({
               const test_name = UTF8ToString($0);
               describe(`${test_name} failed`, function() {
@@ -294,7 +297,7 @@ namespace web {
         // container div where test HTML components can live.
         // Remember, Karma is generating our HTML file, so we need to attach any
         // pre-requisite HTML using javascript.
-        MAIN_THREAD_EM_ASM(
+        MAIN_THREAD_EMP_ASM(
           {
             const id = UTF8ToString($0);
             $("body").append(`<div id="${id}"></div>`);
@@ -304,7 +307,7 @@ namespace web {
 
         // Before each test, we want to clear out our container div
         OnBeforeEachTest([id](){
-          MAIN_THREAD_EM_ASM(
+          MAIN_THREAD_EMP_ASM(
             {
               const id = UTF8ToString($0);
               $(`#${id}`).empty();

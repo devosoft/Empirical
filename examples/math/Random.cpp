@@ -14,7 +14,7 @@ int main()
 {
   emp::Random random;
 
-  std::cout << "Digits in random orders:" << std::endl;
+  std::cout << "Digits in random orders:" << '\n';
 
   size_t num_samples = 10;
   for (size_t s  = 0; s < num_samples; s++) {
@@ -22,6 +22,6 @@ int main()
     for (size_t i = 0; i < 10; i++) {
       std::cout << permut[i];
     }
-    std::cout << std::endl;
+    std::cout << '\n';
   }
 }

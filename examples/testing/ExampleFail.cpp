@@ -27,7 +27,7 @@
 
 void emp_test_main()
 {
-  std::cout << "Run with --verbose flag in order to get more detailed output." << std::endl;
+  std::cout << "Run with --verbose flag in order to get more detailed output." << '\n';
 
   int x = 5;
 

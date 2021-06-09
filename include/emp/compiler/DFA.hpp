@@ -107,9 +107,9 @@ namespace emp {
 
     /// Print details about this DFA.
     void Print(std::ostream & os=std::cout) {
-      os << "Num states = " << GetSize() << std::endl << "Stop IDs:";
+      os << "Num states = " << GetSize() << '\n' << "Stop IDs:";
       for (size_t i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
-      os << std::endl;
+      os << '\n';
 
       for (size_t i = 0; i < transitions.size(); i++) {
         os << " " << i << " ->";
@@ -118,7 +118,7 @@ namespace emp {
           os << " " << to_literal((char) s) << ":" << transitions[i][s];
         }
         if (IsStop(i)) os << " [STOP=" << ((int) GetStop(i)) << "]";
-        os << std::endl;
+        os << '\n';
       }
 
     }

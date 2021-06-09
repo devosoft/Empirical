@@ -7,7 +7,8 @@ TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitc
 NATIVE_TEST_NAMES = ConfigPanel LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo Element TextFeed js_utils JSWrap Widget
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -g -I../../include/ -I../../
+DISPLAY_ENV := ${DISPLAY}
+CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -g -I../../include/ -I../../ -DEMP_HAS_X11=$(shell if test -z "${DISPLAY_ENV}" ; then echo 0; else echo 1; fi)
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -17,7 +18,7 @@ OFLAGS_web := -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEM
 #initializer lists - to compile files with them, we need to remove -Werror
 OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback', '_empDoCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 test-web: $(addprefix test-web-, $(TEST_NAMES)) test-GetUrlParams
 
@@ -30,8 +31,8 @@ test-web-%: %.cpp
 
 test: $(addprefix test-native-, $(NATIVE_TEST_NAMES)) test-color_map
 
-test-native-%: %.cpp
-	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
+test-native-%: %.cpp 
+	$(CXX) $(CFLAGS_all) $< -lsfml-graphics -lsfml-window -lsfml-system -lstdc++fs -o $@.out
 	# execute test; on fail, run again and backtrace
 	./$@.out \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
@@ -45,12 +46,17 @@ test-GetUrlParams: GetUrlParams.cpp
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	node $@.js
 
+test-CanvasShape: CanvasShape.cpp
+	source ../../third-party/emsdk/emsdk_env.sh; \
+	$(CXX_web) $(CFLAGS_web) $< -o $@.js
+	node $@.js
+
 ../../third-party/Catch/single_include/catch2/catch.hpp:
 	git submodule init
 	git submodule update
 
 cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
+	$(CXX) $(CFLAGS_all) $< -lsfml-graphics -lsfml-window -lsfml-system -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
@@ -71,7 +77,7 @@ opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../incl
 opt: $(addprefix test-native-, $(NATIVE_TEST_NAMES))
 	rm -rf test*.out
 
-cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: FLAGS := -std=c++17 -D_GLIBCXX_DEBUG -D_LIBCPP_DEBUG  -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: $(addprefix test-native-, $(NATIVE_TEST_NAMES))
 	rm -rf test*.out
 

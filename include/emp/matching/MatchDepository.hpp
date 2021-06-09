@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <limits>
 
+#include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
+
 #include "../datastructs/SmallFifoMap.hpp"
 #include "../datastructs/SmallVector.hpp"
 
@@ -27,7 +29,7 @@ template<
   typename Metric,
   typename Selector,
   typename Regulator,
-  size_t RawCacheSize=0,
+  bool UseRawCache=1,
   size_t RegulatedCacheSize=0
 > class MatchDepository {
 
@@ -46,13 +48,13 @@ private:
   emp::vector< emp::internal::DepositoryEntry<Val, tag_t, Regulator> > data;
 
   // Cache of match results without regulation.
-  emp::SmallFifoMap< query_t, res_t, RawCacheSize > cache_raw;
+  robin_hood::unordered_flat_map< query_t, res_t > cache_raw;
 
   // Cache of match results with regulation.
   emp::SmallFifoMap< query_t, res_t, RegulatedCacheSize > cache_regulated;
 
   /// Perform matching with regulation.
-  res_t DoRegulatedMatch( const query_t& query ) {
+  res_t DoRegulatedMatch( const query_t& query ) noexcept {
 
     thread_local emp::vector< float > scores;
     scores.reserve( data.size() );
@@ -67,16 +69,21 @@ private:
       }
     );
 
-    return Selector::select( scores );
+    const auto res = Selector::select( scores );
+
+    if constexpr (RegulatedCacheSize > 0) cache_regulated.set( query, res );
+
+    return res;
+
   }
 
   /// Return ptr to cached regulated result on success, nullptr on failure.
-  res_t* DoRegulatedLookup( const query_t& query ) {
+  res_t* DoRegulatedLookup( const query_t& query ) noexcept {
     return cache_regulated.get( query );
   }
 
   /// Perform matching without regulation.
-  res_t DoRawMatch( const query_t& query ) {
+  res_t DoRawMatch( const query_t& query ) noexcept {
 
     thread_local emp::vector< float > scores;
     scores.reserve( data.size() );
@@ -89,15 +96,23 @@ private:
       [&](const auto& entry){ return Metric::calculate(query, entry.tag); }
     );
 
-    return Selector::select( scores );
+    const auto res = Selector::select( scores );
+
+    if constexpr ( UseRawCache ) cache_raw.emplace( query, res );
+
+    return res;
   }
 
   /// Return ptr to cached raw result on success, nullptr on failure.
-  res_t* DoRawLookup( const query_t& query ) { return cache_raw.get( query ); }
+  res_t* DoRawLookup( const query_t& query ) noexcept {
+    const auto res = cache_raw.find( query );
+    return (res == std::end( cache_raw )) ? nullptr : &(res->second);
+  }
 
   /// Clear cached raw, regulated results.
-  void ClearCache() {
-    if constexpr ( RawCacheSize > 0 ) cache_raw.clear();
+  void ClearCache() noexcept {
+    // clear is an expensive operation on robin_hood::unordered_flat_map
+    if constexpr ( UseRawCache ) if ( cache_raw.size() ) cache_raw.clear();
     if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
   }
 
@@ -107,7 +122,7 @@ public:
   /// function and return a vector of unique IDs chosen by the selector
   /// function.
   __attribute__ ((hot))
-  res_t MatchRegulated( const query_t& query ) {
+  res_t MatchRegulated( const query_t& query ) noexcept {
 
     if constexpr ( RegulatedCacheSize > 0 ) {
       if (const auto res = DoRegulatedLookup( query ); res != nullptr) {
@@ -123,9 +138,9 @@ public:
   /// function and return a vector of unique IDs chosen by the selector
   /// function. Ignore regulators.
   __attribute__ ((hot))
-  res_t MatchRaw( const query_t& query ) {
+  res_t MatchRaw( const query_t& query ) noexcept {
 
-    if constexpr ( RawCacheSize > 0 ) {
+    if constexpr ( UseRawCache ) {
       if (const auto res = DoRawLookup( query ); res != nullptr) return *res;
     }
 
@@ -137,54 +152,56 @@ public:
   const Val& GetVal( const size_t uid ) const { return data[uid].val; }
 
   /// Store a value.
-  uid_t Put(const Val &v, const tag_t& t) {
+  uid_t Put(const Val &v, const tag_t& t) noexcept {
     ClearCache();
     data.emplace_back(v, t);
     return data.size() - 1;
   }
 
   /// Get number of stored values.
-  size_t GetSize() const { return data.size(); }
+  size_t GetSize() const noexcept { return data.size(); }
 
   /// Clear stored values.
-  void Clear() { ClearCache(); data.clear(); }
+  void Clear() noexcept { ClearCache(); data.clear(); }
 
   using adj_t = typename Regulator::adj_t;
-  void AdjRegulator( const uid_t uid, const adj_t amt ) {
+  void AdjRegulator( const uid_t uid, const adj_t amt ) noexcept {
     if ( data.at(uid).reg.Adj(amt) ) {
       if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
     }
   }
 
   using set_t = typename Regulator::set_t;
-  void SetRegulator( const uid_t uid, const set_t set ) {
+  void SetRegulator( const uid_t uid, const set_t set ) noexcept {
     if ( data.at(uid).reg.Set(set) ) {
       if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
     }
   }
 
-  void SetRegulator( const uid_t uid, const Regulator& set ) {
+  void SetRegulator( const uid_t uid, const Regulator& set ) noexcept {
     if (set != std::exchange( data.at(uid).reg, set )) {
       if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
     }
   }
 
-  const Regulator& GetRegulator( const uid_t uid ) { return data.at(uid).reg; }
+  const Regulator& GetRegulator( const uid_t uid ) noexcept {
+    return data.at(uid).reg;
+  }
 
   using view_t = typename Regulator::view_t;
-  const view_t& ViewRegulator( const uid_t uid ) const {
+  const view_t& ViewRegulator( const uid_t uid ) const noexcept {
     return data.at(uid).reg.View();
   }
 
   /// Apply decay to a regulator.
-  void DecayRegulator(const uid_t uid, const int steps=1) {
+  void DecayRegulator(const uid_t uid, const int32_t steps=1) noexcept {
     if ( data.at(uid).reg.Decay(steps) ) {
       if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
     }
   }
 
   /// Apply decay to all regulators.
-  void DecayRegulators(const int steps=1) {
+  void DecayRegulators(const int steps=1) noexcept {
     for (auto & pack : data ) {
       if ( pack.reg.Decay(steps) ) {
         if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
@@ -192,7 +209,7 @@ public:
     }
   }
 
-  bool HasVal( const Val& val ) const {
+  bool HasVal( const Val& val ) const noexcept {
     const auto found = std::find_if(
       std::begin( data ),
       std::end( data ),
@@ -202,7 +219,7 @@ public:
     return found != std::end( data );
   }
 
-  uid_t GetUid( const Val& val ) const {
+  uid_t GetUid( const Val& val ) const noexcept {
 
     const auto found = std::find_if(
       std::begin( data ),
@@ -215,7 +232,7 @@ public:
     return std::distance( std::begin( data ), found );
   }
 
-  uid_t GetUid( const tag_t& tag ) const {
+  uid_t GetUid( const tag_t& tag ) const noexcept {
 
     const auto found = std::find_if(
       std::begin( data ),

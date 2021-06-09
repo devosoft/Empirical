@@ -85,9 +85,7 @@ struct RankedSelector {
 
   static res_t select_pick( const emp::vector< float>& scores ) {
 
-    res_t res;
-
-    if ( scores.empty() ) return res;
+    if ( scores.empty() ) return res_t{};
 
     const auto best_it = std::min_element(
       std::begin( scores ),
@@ -95,11 +93,12 @@ struct RankedSelector {
     );
 
     // if constexpr threshold is finite, then if best was better than thresh
-    if constexpr ( ThreshRatio::num >= 0 ) if (*best_it > thresh) return res;
+    if constexpr ( ThreshRatio::num >= 0 ) {
+      if (*best_it > thresh) return res_t{};
+    }
 
-    res.push_back( std::distance( std::begin( scores ), best_it ) );
-
-    return res;
+    const size_t idx = std::distance( std::begin( scores ), best_it );
+    return res_t{ idx };
 
   }
 

@@ -22,6 +22,7 @@
 
 #include <initializer_list>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -60,6 +61,12 @@ namespace emp {
       using wrapped_t = ITERATOR_T;
       using vec_t = emp::vector<T,Ts...>;
 
+      /// Convenience functions to view self as wrapped_t object
+      wrapped_t& as_wrapped() { return *static_cast<wrapped_t*>(this); }
+      const wrapped_t& as_wrapped() const { return
+        *static_cast<const wrapped_t*>(this);
+      }
+
       /// What vector and revision was this iterator created from?
       const vec_t * v_ptr;
       int revision;
@@ -85,7 +92,7 @@ namespace emp {
         if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
                       std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
           // pos = std::distance(*((ITERATOR_T *) this), ((stdv_t *) v_ptr)->rend()) - 1;
-          pos = ((stdv_t *) v_ptr)->rend() - *((ITERATOR_T *) this) - 1;
+          pos = *((ITERATOR_T *) this) - ((stdv_t *) v_ptr)->rbegin();
         }
         else {
           // pos = std::distance(((stdv_t *) v_ptr)->begin(), *((ITERATOR_T *) this));
@@ -110,20 +117,23 @@ namespace emp {
       operator ITERATOR_T() { return *this; }
       operator const ITERATOR_T() const { return *this; }
 
-      auto & operator*() {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
-        return wrapped_t::operator*();
+      // enables the implicit conversion
+      // iterator_wrapper<iterator> -> iterator_wrapper<const_iterator>
+      template<typename It>
+      operator iterator_wrapper<It>() {
+        return iterator_wrapper<It>(as_wrapped(), v_ptr);
       }
-      const auto & operator*() const {
+      template<typename It>
+      operator const iterator_wrapper<It>() const {
+        return iterator_wrapper<It>(as_wrapped(), v_ptr);
+      }
+
+      decltype(auto) operator*() const {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
 
-      auto operator->() {
-        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
-        return wrapped_t::operator->();
-      }
-      const auto operator->() const {
+      decltype(auto) operator->() const {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }
@@ -147,8 +157,46 @@ namespace emp {
         return this_t(wrapped_t::operator--(x), v_ptr);
       }
 
-      auto operator+(int in) { emp_assert(OK(), ErrorCode()); return this_t(wrapped_t::operator+(in), v_ptr); }
-      auto operator-(int in) { emp_assert(OK(), ErrorCode()); return this_t(wrapped_t::operator-(in), v_ptr); }
+
+      // some stl implementations use a free-function operator+(lhs, rhs)
+      // instead of an operator+(rhs) member, so we have to
+      //   1. use free-function + syntax
+      //      instead of calling wrapped_t::operator+()
+      //   2. provide exact type-matching function signatures to prevent
+      //      ambiguous overload errors
+      // (this problem observed w/ GCC with _GLIBCXX_DEBUG enabled)
+      template<
+        typename Addend,
+        typename = typename std::enable_if<
+          std::is_arithmetic<Addend>::value, Addend
+        >::type
+      >
+      auto operator+(const Addend in) {
+        emp_assert(OK(), ErrorCode());
+        return this_t(as_wrapped() + in, v_ptr);
+      }
+
+      // some stl implementations use a free-function operator-(lhs, rhs)
+      // instead of an operator-(rhs) member, so we have to
+      //   1. use free-function - syntax
+      //      instead of calling wrapped_t::operator-()
+      //   2. provide exact type-matching function signatures to prevent
+      //      ambiguous overload errors
+      // (this problem observed w/ GCC with _GLIBCXX_DEBUG enabled)
+      template<
+        typename Subtrahend,
+        typename = typename std::enable_if<
+          std::is_arithmetic<Subtrahend>::value, Subtrahend
+        >::type
+      >
+      auto operator-(Subtrahend in) {
+        emp_assert(OK(), ErrorCode());
+        return this_t(as_wrapped() - in, v_ptr);
+      }
+
+      auto operator-(long int in) { emp_assert(OK(), ErrorCode()); return this_t(as_wrapped() - in, v_ptr); }
+      // #endif // #ifndef _GLIBCXX_DEBUG
+
       auto operator-(const this_t & in) { emp_assert(OK(), ErrorCode()); return ((wrapped_t) *this) - (wrapped_t) in; }
 
       this_t & operator+=(int in) { emp_assert(OK(), ErrorCode()); wrapped_t::operator+=(in); return *this; }
@@ -243,22 +291,34 @@ namespace emp {
       revision++;           // Technically reducing size can cause memory reallocation, but less likely.
     }
 
+    // for implicit conversion of iterator -> stdv_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
     template <typename... ARGS>
-    iterator insert(ARGS &&... args) {
+    iterator insert(const const_iterator pos, ARGS &&... args) {
       ++revision;
-      return iterator( stdv_t::insert(std::forward<ARGS>(args)...), this );
+      return iterator(stdv_t::insert(pos, std::forward<ARGS>(args)...), this);
     }
 
-    template <typename... ARGS>
-    iterator erase(ARGS &&... args) {
+    // for implicit conversion of iterator -> stdv_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
+    iterator erase(const const_iterator pos) {
       ++revision;
-      return iterator( stdv_t::erase(std::forward<ARGS>(args)...), this );
+      return iterator(stdv_t::erase(pos), this);
     }
 
-    template <typename... ARGS>
-    iterator emplace(ARGS &&... args) {
+    // for implicit conversion of iterator -> stdv_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
+    iterator erase(const const_iterator first, const const_iterator last) {
       ++revision;
-      return iterator( stdv_t::emplace(std::forward<ARGS>(args)...), this );
+      return iterator(stdv_t::erase(first, last), this);
+    }
+
+    // for implicit conversion of iterator -> base_t::const_iterator to work
+    // we have to explicitly take const_iterator argument
+    template <typename... ARGS>
+    iterator emplace(const const_iterator pos, ARGS &&... args) {
+      ++revision;
+      return iterator(stdv_t::emplace(pos, std::forward<ARGS>(args)...), this);
     }
 
     template <typename... ARGS>

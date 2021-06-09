@@ -22,7 +22,8 @@ struct DepositoryEntry {
   Val val;
   Tag tag;
 
-  DepositoryEntry(const Val& val_, const Tag& tag_) : val(val_), tag(tag_) { ; }
+  DepositoryEntry(const Val& val_, const Tag& tag_) noexcept
+  : val(val_), tag(tag_) { ; }
 
 };
 

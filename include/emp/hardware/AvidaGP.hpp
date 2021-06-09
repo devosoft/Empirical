@@ -535,7 +535,7 @@ namespace emp {
     os << "\n OUTPUTS: ";
     //for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, (int)i, 0.0) << "] ";
     for (auto & x : outputs) os << "[" << x.first << "," << x.second << "] ";
-    os << std::endl;
+    os << '\n';
 
     os << "IP:" << inst_ptr;
     if (inst_ptr != next_inst) os << "(-> " << next_inst << ")";
@@ -546,7 +546,7 @@ namespace emp {
     }
     os << ")"
        << " errors: " << errors
-       << std::endl;
+       << '\n';
 
     // @CAO Still need:
     // emp::array< emp::vector<double>, CPU_SIZE > stacks;

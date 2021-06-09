@@ -47,7 +47,7 @@ namespace D3 {
     /// Default constructor - adds placeholder to js.objects array in Javascript
     D3_Base(){
       this->id = NextD3ID();
-    //   std::cout << "Default constructor: " << this->id << std::endl;
+    //   std::cout << "Default constructor: " << this->id << '\n';
       EM_ASM_ARGS({
           js.counts[$0] = 1;
       }, this->id);
@@ -57,7 +57,7 @@ namespace D3 {
     /// Warning: This trusts that you know what you're doing in choosing an id.
     D3_Base(int id){
       this->id = id;
-    //   std::cout << "Int constructor: " << id << std::endl;
+    //   std::cout << "Int constructor: " << id << '\n';
       emp_assert(EM_ASM_INT({return $0 in js.counts;}, this->id));
 
       EM_ASM_ARGS({
@@ -67,20 +67,20 @@ namespace D3 {
 
     D3_Base(const D3_Base & other) {
         //TODO: Make this a deep copy
-        // std::cout << "Copying: " << other.id << std::endl;
+        // std::cout << "Copying: " << other.id << '\n';
         this->id = other.id;
         EM_ASM_ARGS({js.counts[$0]++;}, this->id);
     }
 
     D3_Base& operator= (const D3_Base & other) {
-        // std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
+        // std::cout << "Calling assingment: " << this->id << " " << other.id << '\n';
         this->id = other.id;
         EM_ASM_ARGS({js.counts[$0]++;}, this->id);
         return (*this);
     }
 
     ~D3_Base() {
-        // std::cout << "Destructing: " <<this->id << std::endl;
+        // std::cout << "Destructing: " <<this->id << '\n';
         EM_ASM_ARGS({
             js.counts[$0]--;
             if (js.counts[$0] == 0) {

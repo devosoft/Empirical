@@ -15,12 +15,12 @@ void TestDFA(const std::string & test_str)
 {
   std::cout << "String " << test_str << ": ";
   int state = dfa.Next(0, test_str);
-  std::cout << state << std::endl;
+  std::cout << state << '\n';
 }
 
 int main()
 {
-  std::cout << "Ping!" << std::endl;
+  std::cout << "Ping!" << '\n';
 
   dfa.SetTransition(0, 1, 'a');
   dfa.SetTransition(1, 2, 'a');
@@ -28,13 +28,13 @@ int main()
   dfa.SetTransition(0, 3, 'b');
 
   int state = 0;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'a')) << '\n';
+  std::cout << (state = dfa.Next(state, 'a')) << '\n';
+  std::cout << (state = dfa.Next(state, 'a')) << '\n';
+  std::cout << (state = dfa.Next(state, 'b')) << '\n';
+  std::cout << (state = dfa.Next(state, 'b')) << '\n';
+  std::cout << (state = dfa.Next(state, 'b')) << '\n';
+  std::cout << (state = dfa.Next(state, 'b')) << '\n';
 
   TestDFA("aaaaaab");
   TestDFA("aaaaab");

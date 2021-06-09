@@ -187,7 +187,7 @@ public:
       os << " (prob = " << org_info[org_id].select_prob << ")";
       if (is_dominated[org_id]) os << "  DOMINATED";
       else if (is_active[org_id] == false) os << "  DUPLICATE";
-      os << std::endl;
+      os << '\n';
     }
   }
 
@@ -199,7 +199,7 @@ public:
         os << fit << " ";
       }
       if (is_discrim[fit_id] == false) os << "  NON-DISCIMINATORY";
-      os << std::endl;
+      os << '\n';
     }
   }
 
@@ -212,7 +212,7 @@ public:
         if (is_active[org_id] == false) continue;
         os << crit[org_id] << " ";
       }
-      os << std::endl;
+      os << '\n';
     }
   }
 
@@ -231,7 +231,7 @@ public:
       if (i) os << ',';
       os << probs[i];
     }
-    os << std::endl;
+    os << '\n';
   }
 
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
@@ -386,7 +386,7 @@ public:
       std::cout << "Starting AnalyzeLexicase.\n"
                 << "Before: org count=" << is_active.CountOnes()
                 << ";  criteria count=" << is_discrim.CountOnes()
-                << std::endl;
+                << '\n';
     }
 
     size_t progress = 1;
@@ -402,7 +402,7 @@ public:
         std::cout << "After RemoveDominated, progress count = " << progress
                   << ";  active count = " << is_active.CountOnes()
                   << ";  criteria count = " << is_discrim.CountOnes()
-                  << std::endl;
+                  << '\n';
       }
 
       emp_assert(is_active.Any());
@@ -413,7 +413,7 @@ public:
         std::cout << "After RemoveNonDiscriminatory, progress count = " << progress
                   << ";  active count = " << is_active.CountOnes()
                   << ";  criteria count = " << is_discrim.CountOnes()
-                  << std::endl;
+                  << '\n';
       }
 
       emp_assert(is_active.Any());
@@ -424,7 +424,7 @@ public:
         std::cout << "After RemoveHopelessOrgs, progress count = " << progress
                   << ";  active count = " << is_active.CountOnes()
                   << ";  criteria count = " << is_discrim.CountOnes()
-                  << std::endl;
+                  << '\n';
       }
 
       emp_assert(is_active.Any());
@@ -435,7 +435,7 @@ public:
         std::cout << "After RemoveDuplicateCriteria, progress count = " << progress
                   << ";  active count = " << is_active.CountOnes()
                   << ";  criteria count = " << is_discrim.CountOnes()
-                  << std::endl;
+                  << '\n';
       }
 
       emp_assert(is_active.Any());
@@ -568,11 +568,11 @@ public:
     emp::vector<double> total_probs(GetNumOrgs(), 0.0);
     emp::vector<double> cur_probs;
     for (size_t test_id = 0; test_id < num_tests; test_id++) {
-      std::cout << "Running test #" << test_id << std::endl;
+      std::cout << "Running test #" << test_id << '\n';
       Reset();
       SampleOrgs(orgs_used, random);
       SampleCriteria(fits_used, random);
-      if (verbose) std::cout << "End-subsample, orgs=" << is_active << " ; fits=" << is_discrim << std::endl;
+      if (verbose) std::cout << "End-subsample, orgs=" << is_active << " ; fits=" << is_discrim << '\n';
       emp_assert(is_active.Any());
       emp_assert(is_discrim.Any());
       AnalyzeLexicase(false);      // Run an analysis, but do not reset the population (to keep sample).
@@ -583,7 +583,7 @@ public:
         if (verbose) std::cout << cur_probs[i] << " ";
         total_probs[i] += cur_probs[i];
       }
-      if (verbose) std::cout << std::endl << std::endl;
+      if (verbose) std::cout << '\n' << '\n';
     }
 
     // Convert the totals into an average and return the vector.

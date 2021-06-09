@@ -114,7 +114,7 @@ namespace emp {
     void SetSpacer(const std::string & _in) { line_spacer = _in; }
     /// Print a string at the end of each line. @param _in the string to print
     void SetLineEnd(const std::string & _in) { line_end = _in; }
-    /// Set line begin, delimeter, and line end characters. 
+    /// Set line begin, delimeter, and line end characters.
     /// @param b line-begin character. @param s column delimeter @param e line end character
     void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
       line_begin = b;
@@ -136,7 +136,7 @@ namespace emp {
     /// Print a header containing comments describing all of the columns
     virtual void PrintHeaderComment(const std::string & cstart = "# ") {
       for (size_t i = 0; i < keys.size(); i++) {
-        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << '\n';
       }
       os->flush();
     }
@@ -196,6 +196,13 @@ namespace emp {
     template <typename T>
     size_t AddVar(const T & var, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&var](std::ostream & os){ os << var; };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always prints the value @param.
+    template <typename T>
+    size_t AddVal(const T & val, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [val](std::ostream & os){ os << val; };
       return Add(in_fun, key, desc);
     }
 
@@ -404,7 +411,7 @@ namespace emp {
     /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
     /// \c key and \c desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic 
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -414,7 +421,7 @@ namespace emp {
     /// @param desc Full description of this data (used by \c PrintHeaderComment)
     /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
-    /// @param pull Should the node pull data before this statistic is calculated?    
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       AddMean(node, "mean_" + key, "mean of " + desc, false, pull);
@@ -429,7 +436,7 @@ namespace emp {
     /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
     /// \c key and \c desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic 
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -470,7 +477,7 @@ namespace emp {
 
     /// Add a set of functions that always pull the count of each bin of the histogram
     /// from \c node. Requires that \c node have the \c data::Histogram modifier.
-    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic 
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -612,10 +619,10 @@ namespace emp {
     /// Print a header containing comments describing all of the columns
     void PrintHeaderComment(const std::string & cstart = "# ") override {
       for (size_t i = 0; i < keys.size(); i++) {
-        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << '\n';
       }
       for (size_t i = 0; i < container_keys.size(); i++) {
-        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")" << std::endl;
+        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")" << '\n';
       }
 
       os->flush();
@@ -676,7 +683,7 @@ namespace emp {
   /// @param filename is the name of the file to output to
   /// @param b character to print at the beggininning of each line
   /// @param s delimeter (i.e. what character to print between entries on each line)
-  /// @param e character to print at the end of each line  
+  /// @param e character to print at the end of each line
   template <typename CONTAINER>
   ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
                                                     const std::string & filename,

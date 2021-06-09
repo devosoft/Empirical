@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
   int N = 15;
   int S = 1000;
-  std::cout << N << std::endl;
+  std::cout << N << '\n';
 
   emp::Random random;
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     std::string str;
     for (int i = 0; i < S; i++) str += (char) (random.GetInt(26) + 'A');
 
-    std::cout << str << std::endl;
+    std::cout << str << '\n';
 
     for (int s=0; s<S; s++) {
       switch(random.GetInt(10)) {
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
         std::cout << str[s];
       }
     }
-    std::cout << std::endl;
+    std::cout << '\n';
   }
 
   return 0;

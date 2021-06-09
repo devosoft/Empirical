@@ -35,11 +35,11 @@ size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream &
 
   // Request a move from the human.
   char move;
-  os << "Move?" << std::endl;
+  os << "Move?" << '\n';
   is >> move;
 
   while (move < 'A' || move > 'F' || game.GetCurSide()[(size_t)(move-'A')] == 0) {
-    os << "Invalid move! (choose a value 'A' to 'F')" <<  std::endl;
+    os << "Invalid move! (choose a value 'A' to 'F')" <<  '\n';
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     is >> move;
@@ -95,14 +95,14 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
     size_t best_move = play_fun(game);
 
     if (verbose) {
-      std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
+      std::cout << "round = " << round++ << "   errors = " << errors << '\n';
       game.Print();
       char move_sym = (char) ('A' + best_move);
       std::cout << "Move = " << move_sym;
       if (game.GetCurSide()[best_move] == 0) {
         std::cout << " (illegal!)";
       }
-      std::cout << std::endl << std::endl;
+      std::cout << '\n' << '\n';
     }
 
     // If the chosen move is illegal, shift through other options.
@@ -119,7 +119,7 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
   if (verbose) {
     std::cout << "Final scores -- A: " << game.ScoreA()
               << "   B: " << game.ScoreB()
-              << std::endl;
+              << '\n';
   }
 
   return ((double) game.ScoreA()) - ((double) game.ScoreB()) - ((double) errors * 10.0);
@@ -513,7 +513,7 @@ int main(int argc, char* argv[])
         world.LexicaseSelect(lexicase_fit_set, POP_SIZE-1);
     }
     world.Update();
-    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
+    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << '\n';
 
     // Mutate all but the first organism.
     world.MutatePop(1);
@@ -521,7 +521,7 @@ int main(int argc, char* argv[])
 
   fit_fun(&(world[0]));
 
-  std::cout << std::endl;
+  std::cout << '\n';
   emp::Mancala game(0);
   world[0].PrintGenome("mancala_save.org");
 

@@ -6,9 +6,9 @@ int main()
 //   const double steps = 1024.0;
 //   for (double i = 0.0; i < steps; i += 1.0) {
 //     double val = i/steps;
-//     // std::cout << i << " " << steps << " " << val << " : " << std::log2(val) << std::endl;
+//     // std::cout << i << " " << steps << " " << val << " : " << std::log2(val) << '\n';
 //     std::cout << std::pow(2, val) << ",";
-//     if (((int) i) % 8 == 7) std::cout << std::endl;
+//     if (((int) i) % 8 == 7) std::cout << '\n';
 //     else std::cout << " ";
 //   }
 
@@ -23,5 +23,5 @@ int main()
   }
 
 
-  std::cout << std::endl;
+  std::cout << '\n';
 }

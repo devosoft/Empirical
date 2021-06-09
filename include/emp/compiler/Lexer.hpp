@@ -46,7 +46,7 @@ namespace emp {
          << "  ID:" << id
          << "  save_lexeme:" << save_lexeme
          << "  save_token:" << save_token
-         << std::endl;
+         << '\n';
     }
   };
 
@@ -246,7 +246,7 @@ namespace emp {
       emp::Token token = 1;
       while (token > 0) {
         token = Process(ss);
-        std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
+        std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << '\n';
       }
     }
 

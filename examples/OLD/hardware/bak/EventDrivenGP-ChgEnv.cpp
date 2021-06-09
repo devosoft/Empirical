@@ -288,12 +288,12 @@ int main() {
     // First agent is best of last generation, print fitness.
     best_score = fit_fun(world.GetOrg(0));
     std::cout << "Update # " << ud;
-    std::cout << ", Max agent score: " << best_score << "(" << best_score/max_score << ")"<< std::endl;
+    std::cout << ", Max agent score: " << best_score << "(" << best_score/max_score << ")"<< '\n';
   }
   // Run and print out best agent from last generation:
-  std::cout << std::endl;
-  std::cout << "Best program (score: "<< fit_fun(world.GetOrg(0)) << "):" << std::endl;
-  std::cout << "--- Evaluating the best program. ---" << std::endl;
+  std::cout << '\n';
+  std::cout << "Best program (score: "<< fit_fun(world.GetOrg(0)) << "):" << '\n';
+  std::cout << "--- Evaluating the best program. ---" << '\n';
   hardware.ResetHardware();
   hardware.SetProgram(world[0].program);
   hardware.SetTrait(TRAIT_ID__RES_SENSOR, 0);
@@ -303,8 +303,8 @@ int main() {
   for (cur_time = 0; cur_time < EVAL_TIME; ++cur_time) {
     hardware.SingleProcess();
   }
-  hardware.PrintProgram(); std::cout << std::endl;
-  hardware.PrintState(); std::cout << std::endl;
+  hardware.PrintProgram(); std::cout << '\n';
+  hardware.PrintState(); std::cout << '\n';
 
   return 0;
 }

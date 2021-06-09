@@ -100,4 +100,26 @@ TEST_CASE("Another test array", "[base]")
 
   REQUIRE(sum == 40425);
 
+	REQUIRE( std::accumulate(
+		std::begin( test_array ), std::end( test_array ),
+		int{}
+	) == 40425 );
+
+	REQUIRE( std::accumulate(
+		std::rbegin( test_array ), std::rend( test_array ),
+		int{}
+	) == 40425 );
+
+	const auto& const_array = test_array;
+
+	REQUIRE( std::accumulate(
+		std::begin( const_array ), std::end( const_array ),
+		int{}
+	) == 40425 );
+
+	REQUIRE( std::accumulate(
+		std::rbegin( const_array ), std::rend( const_array ),
+		int{}
+	) == 40425 );
+
 }

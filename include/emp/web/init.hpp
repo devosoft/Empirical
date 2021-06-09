@@ -5,12 +5,12 @@
  *
  *  @file  init.hpp
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
- * 
- * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It 
+ *
+ * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It
  * handles making sure that behind the scenes stuff is all set up properly. It also defines some
  * useful stubs and dummy functions so that your code will still be possible to comple with a normal
  * C++ compiler (although the web part won't do anything, of course). These stubs are also helpful
- * for avoiding confusion in linters and IDEs. 
+ * for avoiding confusion in linters and IDEs.
  */
 
 #ifndef EMP_INIT_H
@@ -19,7 +19,7 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS // This file is just going to confuse doxygen
 
 #include <type_traits>
-#include "emp/base/assert_warning.hpp"
+#include "../base/assert_warning.hpp"
 
 /// If __EMSCRIPTEN__ is defined, initialize everything.  Otherwise create useful stubs.
 #ifdef __EMSCRIPTEN__
@@ -30,6 +30,12 @@
 #ifdef  __EMSCRIPTEN_PTHREADS__
 #include <pthread.h>
 #endif //  __EMSCRIPTEN_PTHREADS__
+
+// temporary patch for https://github.com/emscripten-core/emscripten/issues/11539
+#define MAIN_THREAD_EMP_ASM(...) [&](){ \
+  [[maybe_unused]] volatile int no_optimize{}; \
+  MAIN_THREAD_EM_ASM(__VA_ARGS__); \
+}()
 
 extern "C" {
   extern void EMP_Initialize();
@@ -42,7 +48,7 @@ namespace emp {
     thread_local bool init = false;      // Make sure we only initialize once!
     if (!init) {
       // Setup the animation callback in Javascript
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         window.requestAnimFrame = (function(callback) {
             return window.requestAnimationFrame
               || window.webkitRequestAnimationFrame
@@ -66,7 +72,7 @@ namespace emp {
       return typeof WorkerGlobalScope !== 'undefined'
         && self instanceof WorkerGlobalScope;
     }) ) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         console.assert( Object.keys( PThread.pthreads ).length === 1 );
         Object.values(PThread.pthreads)[0].worker.addEventListener(
           'message',
@@ -136,7 +142,7 @@ namespace emp {
       InitializeAnim();
 
       #ifdef __EMSCRIPTEN_PTHREADS__
-      MAIN_THREAD_EM_ASM({ _EMP_Initialize(); });
+      MAIN_THREAD_EMP_ASM({ _EMP_Initialize(); });
       InitializeBitmapListener();
       InitializeOffscreenCanvasRegistries();
       #endif
@@ -188,6 +194,8 @@ namespace emp {
 #define EM_ASM_ARGS(...)
 #define MAIN_THREAD_EM_ASM(...)
 #define MAIN_THREAD_ASYNC_EM_ASM(...)
+#define MAIN_THREAD_EMP_ASM(...)
+#define MAIN_THREAD_EMP_ASM(...)
 #define MAIN_THREAD_EM_ASM_INT(...) 0
 #define MAIN_THREAD_EM_ASM_DOUBLE(...) 0.0
 #define MAIN_THREAD_EM_ASM_INT_V(...) 0
@@ -198,7 +206,7 @@ namespace emp {
 #include <fstream>
 
 namespace emp {
-  
+
   std::ofstream debug_file("debug_file");
   bool init = false;      // Make sure we only initialize once!
 

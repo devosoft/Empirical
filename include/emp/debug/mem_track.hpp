@@ -69,7 +69,7 @@ namespace emp {
 
       std::stringstream ss;
       for (auto stat : mem_map) {
-        ss << "[" << stat.first << "] : " << stat.second << std::endl;
+        ss << "[" << stat.first << "] : " << stat.second << '\n';
       }
       return ss.str();
     }

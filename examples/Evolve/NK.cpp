@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
   pop.SetMutFun( mut_fun );
   pop.SetAutoMutate();
 
-  std::cout << 0 << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+  std::cout << 0 << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << '\n';
 
   std::function<double(BitOrg&)> fit_fun =
     [&landscape](BitOrg & org){ return landscape.GetFitness(org); };
@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
     // Print current state.
-    // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
-    // std::cout << std::endl;
+    // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << '\n';
+    // std::cout << '\n';
 
     // Keep the best individual.
     emp::EliteSelect(pop, 1, 1);
@@ -95,12 +95,12 @@ int main(int argc, char* argv[])
     // Run a tournament for the rest...
     TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
-    std::cout << (ud+1) << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+    std::cout << (ud+1) << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << '\n';
   }
 
   // pop.PrintLineage(0);
 
-//  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+//  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << '\n';
 
   // pop.GetSignalControl().PrintNames();
 }

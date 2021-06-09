@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
-  std::cout << "Hello World!" << std::endl;
+  std::cout << "Hello World!" << '\n';
 
   ArmWorld world;
   world.ResetDiverse();
@@ -38,11 +38,11 @@ int main(int argc, char* argv[])
   // Loop through updates
   for (size_t ud = 0; ud < MAX_GENS; ud++) {
     // Print current state.
-    std::cout << "UD " << ud << std::endl;
+    std::cout << "UD " << ud << '\n';
 
     //  << ": " << world[0].ToString()
     //           << "  pop_size = " << world.GetSize()
-    //           << std::endl;
+    //           << '\n';
     world.PrintGrid();
 
     emp::RandomSelect(world, POP_SIZE);
