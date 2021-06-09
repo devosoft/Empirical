@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include "../../include/emp/Evolve/Systematics.hpp"
+#include "include/emp/Evolve/Systematics.hpp"
 
 using namespace std;
 
