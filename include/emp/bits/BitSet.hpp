@@ -992,16 +992,24 @@ namespace emp {
 
     /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF() {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
+      if constexpr (NUM_FIELDS == 1) bit_set[0] = ~bit_set[0];
+      else for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
+
       if constexpr (LAST_BIT > 0) {
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
+
       return *this;
     }
 
     /// Perform a Boolean AND with a second BitSet, store result here, and return this object.
+    __attribute__ ((hot))
     BitSet & AND_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
+      if constexpr ( NUM_FIELDS == 1 ) {
+        bit_set[0] = bit_set[0] & set2.bit_set[0];
+      } else for (size_t i = 0; i < NUM_FIELDS; i++) {
+        bit_set[i] = bit_set[i] & set2.bit_set[i];
+      }
       return *this;
     }
 
