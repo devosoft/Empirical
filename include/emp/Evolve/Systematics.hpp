@@ -1860,21 +1860,18 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPhylogeneticDiversity(int generation, std::string filename) const { 
     int gen_value = ((generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
-    bool percent_found = false; 
     int phylogenetic_diversity = ancestor_taxa.size() + active_taxa.size() - 1; 
 
     if(filename == ""){ 
-      //std::cout << "Phylogenetic Diversity is " << phylogenetic_diversity << std::endl; 
       return phylogenetic_diversity; 
     } else{ 
 
       emp::File generation_percentiles(filename); //opens file
       emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
 
-      for(int j = 0; j <= percentile_data[gen_value].size() - 2; j++){ //searches through vector for slot where phylo diversity fits 
+      for(int j = 0; j <= (int) percentile_data[gen_value].size() - 2; j++){ //searches through vector for slot where phylo diversity fits 
 
         if((percentile_data[gen_value][j] <= phylogenetic_diversity) && (percentile_data[gen_value][j + 1] > phylogenetic_diversity)){
-          // std::cout << "phylogenetic diversity is in between: " << percentile_data[gen_value][j] << "and " << percentile_data[gen_value][j+1] << std::endl;
           std::cout << "The phylogenetic diversity value " << phylogenetic_diversity << " is in the " << j << " percentile, in the " << ((gen_value + 1)* 10) << " generation" << std::endl;
           return j;   
         }

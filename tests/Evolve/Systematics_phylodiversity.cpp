@@ -47,13 +47,13 @@ int chooseOrg(vector<Organism> &currentGen, emp::Random &randNum){
 void calcFitness(vector<Organism> &currentGen, vector<double> &fitnessVect, emp::Random &randNum) {
     fitnessVect.resize(0);
     vector<int> fitnessCalc;
-    fitnessCalc.reserve(currentGen.size());
-    for (int i = 0; i < currentGen.size(); i++) {
+    fitnessCalc.reserve((int) currentGen.size());
+    for (int i = 0; i < (int) currentGen.size(); i++) {
         fitnessCalc.push_back(currentGen[i].genotype);
     }
     map<int, int> CountMap;
 
-    for (int j = 0; j < fitnessCalc.size(); j++) {
+    for (int j = 0; j < (int) fitnessCalc.size(); j++) {
         if (emp::Has(CountMap, fitnessCalc[j])) {
             CountMap[fitnessCalc[j]]++;
         } else {
@@ -61,7 +61,7 @@ void calcFitness(vector<Organism> &currentGen, vector<double> &fitnessVect, emp:
         }
     }
 
-    for(int k = 0; k < fitnessCalc.size(); k++){
+    for(int k = 0; k < (int) fitnessCalc.size(); k++){
         fitnessVect.push_back(1.0/CountMap[fitnessCalc[k]]);
     }
 }
@@ -100,14 +100,13 @@ TEST_CASE("Test Systematics GetPhyloDiversity()", "[Evolve]"){
         if(i == TenGens - 1){
             CHECK(sys.GetPhylogeneticDiversity() == 5); 
             CHECK(sys.GetPhylogeneticDiversity(TenGens, "assets/TensChooseOrgGenotype.csv") == 91); 
-            CHECK((sys.ancestor_taxa.size() + sys.active_taxa.size()) == 6); 
+            CHECK(((int) sys.ancestor_taxa.size() + (int) sys.active_taxa.size()) == 6); 
             TenGens = TenGens + 10;
         }
 
-        for(int j = 0; j < currentGen.size(); j++){
+        for(int j = 0; j < (int) currentGen.size(); j++){
             sys.RemoveOrg(j);
         }
         switchGens(currentGen,childGen, sys);
     }
-    int total_orgs = numGens * numOrgs;
 };
