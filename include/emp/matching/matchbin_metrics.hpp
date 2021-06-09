@@ -537,17 +537,15 @@ namespace emp {
     }
 
     // TODO move to math utils
-    inline static double customPow(const size_t k) {
+    static constexpr double customPow(const size_t k) {
       // lookup table provides a big speedup in runtime MAM
-      static const emp::array<double, Width + 1> lookup = [](){
-        emp::array<double, Width + 1> res;
-        res[0] = 1.0;
-        for ( size_t i = 1; i <= Width; ++i ) res[i] = res[i - 1] * 0.5;
-        return res;
-      }();
-      return lookup[ k ];
+      double res = 1.0;
+      for ( size_t i{}; i < k; ++i ) res *= 0.5;
+
+      return res;
     }
 
+    __attribute__ ((hot))
     inline static double calculate(const query_t& a, const tag_t& b) {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
@@ -567,9 +565,18 @@ namespace emp {
 
     }
 
+    __attribute__ ((hot))
     inline static double ProbabilityKBitSequence(const size_t k) {
       // Bad Math
-      return static_cast<double>(Width - k + 1) * customPow(k);
+      static constexpr std::array<double, Width + 1> lookup = [](){
+        std::array<double, Width + 1> res{};
+        for ( size_t i{}; i <= Width; ++i ) {
+          res[i] = static_cast<double>(Width - i + 1) * customPow(i);
+        }
+        return res;
+      }();
+      emp_assert( k < lookup.size() );
+      return lookup[ k ];
     }
 
   };
