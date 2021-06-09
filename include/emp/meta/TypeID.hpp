@@ -73,6 +73,8 @@ namespace emp {
       virtual size_t GetDecayID() const { return 0; }
       virtual size_t GetRemoveConstID() const { return 0; }
       virtual size_t GetRemoveCVID() const { return 0; }
+      virtual size_t GetRemoveExtentID() const { return 0; }
+      virtual size_t GetRemoveAllExtentsID() const { return 0; }
       virtual size_t GetRemovePtrID() const { return 0; }
       virtual size_t GetRemoveRefID() const { return 0; }
       virtual size_t GetRemoveVolatileID() const { return 0; }
@@ -132,6 +134,16 @@ namespace emp {
         using remove_cv_t = std::remove_cv_t<T>;
         if constexpr (std::is_same<T, remove_cv_t>()) return (size_t) this;
         else return GetTypeID< remove_cv_t >();
+      }
+      size_t GetRemoveExtentID() const override {
+        using remove_extent_t = std::remove_extent_t<T>;
+        if constexpr (std::is_same<T, remove_extent_t>()) return (size_t) this;
+        else return GetTypeID< remove_extent_t >();
+      }
+      size_t GetRemoveAllExtentsID() const override {
+        using remove_all_extents_t = std::remove_all_extents_t<T>;
+        if constexpr (std::is_same<T, remove_all_extents_t>()) return (size_t) this;
+        else return GetTypeID< remove_all_extents_t >();
       }
       size_t GetRemovePtrID() const override {
         using remove_ptr_t = emp::remove_pointer_t<T>;
@@ -312,6 +324,8 @@ namespace emp {
     TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
     TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
     TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
+    TypeID GetRemoveExtentTypeID() const { return info_ptr->GetRemoveExtentID(); }
+    TypeID GetRemoveAllExtentsTypeID() const { return info_ptr->GetRemoveAllExtentsID(); }
     TypeID GetRemovePointerTypeID() const { return info_ptr->GetRemovePtrID(); }
     TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
     TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
@@ -373,16 +387,25 @@ namespace emp {
       info.name = typeid(T).name();
 
       // Now, fix the name if we can be more precise about it.
-      if (info.IsConst()) {
+      if constexpr (std::is_const<T>()) {
         info.name = "const "s + type_id.GetRemoveConstTypeID().GetName();
       }
-      else if (info.IsVolatile()) {
+      else if constexpr (std::is_volatile<T>()) {
         info.name = "volatile "s + type_id.GetRemoveVolatileTypeID().GetName();
       }
-      else if (info.IsPointer()) {
+      else if constexpr (std::is_array<T>()) {
+        info.name = type_id.GetRemoveAllExtentsTypeID().GetName();
+        if constexpr (std::rank<T>::value > 0) info.name += "[" + emp::to_string(std::extent<T,0>::value) + "]";
+        if constexpr (std::rank<T>::value > 1) info.name += "[" + emp::to_string(std::extent<T,1>::value) + "]";
+        if constexpr (std::rank<T>::value > 2) info.name += "[" + emp::to_string(std::extent<T,2>::value) + "]";
+        if constexpr (std::rank<T>::value > 3) info.name += "[" + emp::to_string(std::extent<T,3>::value) + "]";
+        if constexpr (std::rank<T>::value > 4) info.name += "[" + emp::to_string(std::extent<T,4>::value) + "]";
+        if constexpr (std::rank<T>::value > 5) info.name += "[...]";        
+      }
+      else if constexpr (emp::is_pointer<T>()) {
         info.name = type_id.GetRemovePointerTypeID().GetName() + '*';
       }
-      else if (info.IsReference()) {
+      else if constexpr (std::is_reference<T>()) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
       }
       else if constexpr (emp::is_TypePack<T>()) {
@@ -431,7 +454,7 @@ namespace emp {
 
 
 namespace std {
-  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
+  /// Hash function to allow TypeID to be used with maps and sets (must be in std).
   template <>
   struct hash<emp::TypeID> {
     std::size_t operator()(const emp::TypeID & id) const {
