@@ -94,6 +94,12 @@ namespace emp {
   template <typename T> struct remove_std_function_type<std::function<T>> { using type = T; };
   template <typename T> using remove_std_function_t = typename remove_std_function_type<T>::type;
 
+  // Collect the reference type for any container.
+  template <typename T> struct element_type { using type = T; };
+  template <template <typename...> class TMPL, typename T> struct element_type<TMPL<T>>  { using type = T; };
+  template <typename T> using element_t = typename element_type<T>::type;
+  // template<typename T> using element_type_t = std::remove_reference_t<decltype(*std::begin(std::declval<T&>()))>;
+
   /// Determine if we have an emp::vector.
   template <typename> struct is_emp_vector : std::false_type { };
   template <typename T, typename... Ts>
@@ -111,6 +117,7 @@ namespace emp {
 
   template <typename T> struct remove_ptr_type         { using type = T; };
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
+  template <typename T> struct remove_ptr_type<T* const> { using type = const T; };
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
