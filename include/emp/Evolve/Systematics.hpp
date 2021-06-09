@@ -412,7 +412,7 @@ namespace emp {
     virtual size_t GetTreeSize() const = 0;
     virtual size_t GetNumTaxa() const = 0;
     virtual int GetMaxDepth() = 0;
-    virtual int GetPhylogeneticDiversity() const = 0;
+    //virtual int GetPhylogeneticDiversity() const = 0;
     virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
     virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
     virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
@@ -477,7 +477,7 @@ namespace emp {
     using parent_t::GetNumOutside;
     using parent_t::GetTreeSize;
     using parent_t::GetNumTaxa;
-    using parent_t::GetPhylogeneticDiversity;
+    //using parent_t::GetPhylogeneticDiversity;
     using parent_t::GetMeanPairwiseDistance;
     using parent_t::GetSumPairwiseDistance;
     using parent_t::GetVariancePairwiseDistance;
@@ -1875,7 +1875,7 @@ namespace emp {
 
         if((percentile_data[gen_value][j] <= phylogenetic_diversity) && (percentile_data[gen_value][j + 1] > phylogenetic_diversity)){
           // std::cout << "phylogenetic diversity is in between: " << percentile_data[gen_value][j] << "and " << percentile_data[gen_value][j+1] << std::endl;
-          // std::cout << "The phylogenetic diversity value " << phylogenetic_diversity << " is in the " << j << " percentile, in the " << ((gen_value + 1)* 10) << " generation" << std::endl;
+          std::cout << "The phylogenetic diversity value " << phylogenetic_diversity << " is in the " << j << " percentile, in the " << ((gen_value + 1)* 10) << " generation" << std::endl;
           return j;   
         }
       }
