@@ -3,7 +3,7 @@
 	#define TDEBUG
 #endif
 
-#include "../../third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -99,7 +99,7 @@ TEST_CASE("Test Systematics GetPhyloDiversity()", "[Evolve]"){
 
         if(i == TenGens - 1){
             CHECK(sys.GetPhylogeneticDiversity() == 5); 
-            CHECK(sys.GetPhylogeneticDiversity(TenGens, "/mnt/c/Users/abbys/miniphylotrees/GenTrees/TensChooseOrgGenotype.csv") == 91); 
+            CHECK(sys.GetPhylogeneticDiversity(TenGens, "assets/TensChooseOrgGenotype.csv") == 91); 
             CHECK((sys.ancestor_taxa.size() + sys.active_taxa.size()) == 6); 
             TenGens = TenGens + 10;
         }
