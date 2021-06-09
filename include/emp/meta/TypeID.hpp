@@ -71,6 +71,7 @@ namespace emp {
       virtual bool IsTypePack() const { return false; }
 
       virtual size_t GetDecayID() const { return 0; }
+      virtual size_t GetElementID() const { return 0; }
       virtual size_t GetRemoveConstID() const { return 0; }
       virtual size_t GetRemoveCVID() const { return 0; }
       virtual size_t GetRemoveExtentID() const { return 0; }
@@ -124,6 +125,11 @@ namespace emp {
         using decay_t = std::decay_t<T>;
         if constexpr (std::is_same<T, decay_t>()) return (size_t) this;
         else return GetTypeID< decay_t >();
+      }
+      size_t GetElementID() const override {
+        using element_t = emp::element_t<T>;
+        if constexpr (std::is_same<T, element_t>()) return (size_t) this;
+        else return GetTypeID< element_t >();
       }
       size_t GetRemoveConstID() const override {
         using remove_const_t = std::remove_const_t<T>;
@@ -322,6 +328,7 @@ namespace emp {
     }
  
     TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
+    TypeID GetElementTypeID() const { return info_ptr->GetElementID(); }
     TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
     TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
     TypeID GetRemoveExtentTypeID() const { return info_ptr->GetRemoveExtentID(); }
@@ -407,6 +414,9 @@ namespace emp {
       }
       else if constexpr (std::is_reference<T>()) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
+      }
+      else if constexpr (emp::is_emp_vector<T>()) {
+        info.name = "vector<"s + type_id.GetElementTypeID().GetName() + '>';
       }
       else if constexpr (emp::is_TypePack<T>()) {
         emp::vector<TypeID> ids = GetTypePackIDs<T>();
