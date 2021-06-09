@@ -561,6 +561,10 @@ namespace emp {
       // Note also: 0.0 < match < 1.0
       // So, we subtract match score from 1.0 to get a distance.
       return 1.0 - match;
+      // TODO
+      // 1 - pd / (ps + pd) == ps / (ps + pd)
+      // return fastDivide(ps, ps + pd);
+
     }
 
     inline static double ProbabilityKBitSequence(const size_t k) {
