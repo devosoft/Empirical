@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2021.
  *
  *  @file  World_select.hpp
  *  @brief Functions for popular selection methods applied to worlds.
@@ -15,11 +15,11 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../base/macros.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/IndexMap.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "../math/Random.hpp"
+#include "../meta/macros.hpp"
 #include "../meta/reflection.hpp"
 
 namespace emp {

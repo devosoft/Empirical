@@ -104,11 +104,11 @@ namespace emp {
     static void Inst_Call(hardware_t & hw, const inst_t & inst) {
       // Make sure function exists and is still in place.
       size_t def_pos = (size_t) hw.fun_starts[inst.args[0]];
-      if (def_pos >= hw.genome.sequence.size()
-          || hw.GetScopeType(hw.genome.sequence[def_pos].id) != ScopeType::FUNCTION) return;
+      if (def_pos >= hw.genome.size()
+          || hw.GetScopeType(hw.genome[def_pos].id) != ScopeType::FUNCTION) return;
 
       // Go back into the function's original scope (call is in that scope)
-      size_t fun_scope = hw.genome.sequence[def_pos].args[1];
+      size_t fun_scope = hw.genome[def_pos].args[1];
       if (hw.UpdateScope(fun_scope, ScopeType::FUNCTION) == false) return;
       hw.call_stack.push_back(hw.inst_ptr+1);        // Back up the call position
       hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)

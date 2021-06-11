@@ -356,7 +356,7 @@ namespace emp {
           1,
           "Command name.",
           {},
-          [](emp::optional<emp::vector<std::string>> res){ /*no-op*/ }
+          [](emp::optional<emp::vector<std::string>> /* res */ ){ /*no-op*/ }
         )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
         {"gen", ArgSpec(

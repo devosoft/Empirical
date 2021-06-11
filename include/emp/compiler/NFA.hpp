@@ -128,16 +128,26 @@ namespace emp {
     size_t AddNewState() { size_t new_state = GetSize(); Resize(new_state+1); return new_state; }
 
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbol.
-    void AddTransition(size_t from, size_t to, size_t sym) {
+    void AddTransitionSymbol(size_t from, size_t to, size_t sym) {
       emp_assert(from < states.size(), from, states.size());
       emp_assert(to < states.size(), to, states.size());
 
       states[from].trans[to].symbols[sym] = true;
     }
 
+    /// Add a transition between states 'from' and 'to' that can be taken with a char symbol.
+    void AddTransition(size_t from, size_t to, const char sym) {
+      AddTransitionSymbol(from, to, sym);
+    }
+
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
     void AddTransition(size_t from, size_t to, const std::string & sym_set) {
-      for (char x : sym_set) AddTransition(from, to, (size_t) x);
+      for (char x : sym_set) AddTransitionSymbol(from, to, (size_t) x);
+    }
+
+    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
+    void AddTransition(size_t from, size_t to, const char * sym_set) {
+      AddTransition(from, to, std::string(sym_set));
     }
 
     /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.

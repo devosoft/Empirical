@@ -1,11 +1,11 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <iostream>
 
+#include "emp/meta/macros.hpp"
 #include "emp/meta/reflection.hpp"
-#include "emp/base/macros.hpp"
 
 
 #define SHOW_MACRO(...) #__VA_ARGS__ " = " EMP_STRINGIFY( __VA_ARGS__ )

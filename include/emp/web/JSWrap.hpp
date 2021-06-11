@@ -395,9 +395,10 @@ namespace emp {
         // And finally, do the actual callback.
 
         RET_TYPE return_val;
-        emp::ApplyTuple([&return_val, this](ARG_TYPES... in_args){
-            return_val = fun(in_args...);
-          }, args);
+        std::apply(
+          [&return_val, this](ARG_TYPES... in_args){ return_val = fun(in_args...); },
+          args
+        );
 
         // And save the return value for JS.
         StoreReturn(return_val);
@@ -434,7 +435,7 @@ namespace emp {
         Collect_impl<args_t, num_args>::CollectArgs(args);
 
         // And finally, do the actual callback.
-        emp::ApplyTuple(fun, args);
+        std::apply(fun, args);
 
         // And save a return value for JS.
         StoreReturn(0);

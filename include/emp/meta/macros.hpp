@@ -363,7 +363,7 @@
   EMP_EVAL_G( EMP_WRAP_EACH_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
-/// imilar to EMP_WRAP_ARGS, but puts a COMMA between each arg pair.
+/// Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
 #define EMP_WRAP_ARGS(W, ...) EMP_POP_ARGS_1( ~ EMP_CALL_BY_PACKS(EMP_WRAP_ARGS_, W, __VA_ARGS__) )
 /// @cond MACROS
 #define EMP_WRAP_ARGS_1(W, A, ...) , W(A)

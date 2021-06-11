@@ -1,5 +1,4 @@
 #define CATCH_CONFIG_MAIN
-#define EMP_NDEBUG
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -79,17 +78,13 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world1.size() == 0);
 
 	emp::World<double> world2("World 2");
-	world2.SetPopStruct_Grid(1, 1, true);
+	world2.SetPopStruct_Grid(1, 2, true);
 	REQUIRE(world2.GetWidth() == 1);
-	REQUIRE(world2.GetHeight() == 1);
-	world2.Inject(3.0);
+	REQUIRE(world2.GetHeight() == 2);
+	world2.InjectAt(3.0, 0);
 	REQUIRE(world2.GetNumOrgs() == 1);
 	world2.DoBirth(2.5, 0);
-	world2.DoDeath();
-	REQUIRE(world2.GetNumOrgs() == 0);
-	world2.Update();
-	REQUIRE(world2.GetNumOrgs() == 1);
-	REQUIRE(world2[0] == 2.5);
+	REQUIRE(world2[0] == 3.0);
 	world2.DoDeath();
 
 	REQUIRE(world2.IsSynchronous());

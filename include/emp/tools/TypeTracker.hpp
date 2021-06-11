@@ -117,7 +117,7 @@ namespace emp {
 
     // Destructor!
     ~TypeTracker() {
-      for (auto x : fun_map) delete x.second;  // Clear out Functions.
+      for (auto x : fun_map) x.second.Delete();  // Clear out Functions.
     }
 
     using this_t = TypeTracker<TYPES...>;
@@ -224,7 +224,7 @@ namespace emp {
         fun( (args.ptr. template Cast<wrap_t<Ts>>())->value... );
       };
 
-      fun_map[ID] = new Function<void(var_decoy<Ts> &...)>(fun_wrap);
+      fun_map[ID] = emp::NewPtr<Function<void(var_decoy<Ts> &...)>>(fun_wrap);
 
       return *this;
     }

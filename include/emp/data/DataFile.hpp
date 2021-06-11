@@ -663,8 +663,12 @@ namespace emp {
 
     /// Add a function that returns a value to be printed to the file.
     template <typename T>
-    size_t AddContainerFun(const std::function<T(const data_t)> & fun, const std::string & key="", const std::string & desc="") {
-      std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t data){ os << fun(data); };
+    size_t AddContainerFun(const std::function<T(const data_t)> & fun,
+                           const std::string & key="",
+                           const std::string & desc="")
+    {
+      std::function<container_fun_t> in_fun =
+        [fun](std::ostream & os, const data_t data){ os << fun(data); };
       return Add(in_fun, key, desc);
     }
 
@@ -679,10 +683,10 @@ namespace emp {
   /// @param e character to print at the end of each line  
   template <typename CONTAINER>
   ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
-                                                    const std::string & filename,
-                                                    const std::string & b="",
-                                                    const std::string & s=",",
-                                                    const std::string & e="\n") {
+                                                     const std::string & filename,
+                                                     const std::string & b="",
+                                                     const std::string & s=",",
+                                                     const std::string & e="\n") {
     ContainerDataFile<CONTAINER> dfile(filename, b, s, e);
     dfile.SetUpdateContainerFun(fun);
     return dfile;

@@ -44,6 +44,7 @@
  *    resize<N,D>        - Resize pack to N types; if N greater than current size, pad with D.
  *    merge<P>           - Append all of pack P to the end of this pack.
  *    find_union<P>      - Join this pack to P, keeping only one of each type.
+ *    find_intersect<P>  - Limit to only common types between this pack and P
  *    reverse            - Reverse the order of types in this pack.
  *    rotate             - Move the first type in pack to the end.
  *
@@ -56,6 +57,8 @@
  *                         a FILTER<T>::value == false.
  *    find<FILTER>       - Convert to first type, T, that can legally form FILTER<T> and does not
  *                         have a FILTER<T>::value == false.
+ *    remove_t<T>        - Remove type T from anywhere in the pack.
+ *    make_unique        - Remove all type duplications.
  *    wrap<WRAPPER>      - Convert to TypePack where all members are run through WRAPPER
  *
  *
@@ -206,7 +209,10 @@ namespace emp {
   template <typename T1, typename... Ts>
   struct TypePack<T1, Ts...> {
     /// Return a bool indicating whether the specified type is present.
-    template <typename T> constexpr static bool Has() { return has_type<T,T1,Ts...>(); }
+    template <typename T> constexpr static bool Has() { return emp::has_type<T,T1,Ts...>(); }
+
+    /// Return a type indicating whether the specified type is present.
+    template <typename T> using has_type = typename std::integral_constant<bool, Has<T>()>;
 
     /// Count the number of instances of the specified type.
     template <typename T> constexpr static size_t Count() { return count_type<T,T1,Ts...>(); }
@@ -278,6 +284,9 @@ namespace emp {
 
     /// Join this TypePack with another, keeping only one of each type.
     template <typename IN> using find_union = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1::make_unique;
+
+    /// Limit to only common types between this TypePack and another
+    template <typename IN> using find_intersect = typename internal::tp_filter_t<this_t, IN::template has_type>;
 
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
