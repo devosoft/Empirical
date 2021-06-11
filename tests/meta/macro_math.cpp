@@ -6,8 +6,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/macro_math.hpp"
-#include "emp/base/macros.hpp"
+#include "emp/meta/macro_math.hpp"
+#include "emp/meta/macros.hpp"
 
 #include <sstream>
 #include <iostream>

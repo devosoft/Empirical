@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2021
  *
  *  @file  BitMatrix.hpp
  *  @brief A COL x ROW matrix of bits and provides easy indexing and manipulation
@@ -115,9 +115,9 @@ namespace emp {
     size_t CountOnes() const { return bits.count(); }
 
     // Find the position of the first non-zero bit.
-    // size_t FindBit() const { return (~bits & (bits - 1)).count(); }
+    // size_t FindOne() const { return (~bits & (bits - 1)).count(); }
 
-    int FindBit() const { return bits.FindBit(); }
+    int FindOne() const { return bits.FindOne(); }
 
     // Shift the whole matrix in the specified direction.
     BitMatrix LeftShift() const { return ((bits & ~MaskCol<0>()) >> 1); }
@@ -150,7 +150,7 @@ namespace emp {
     BitMatrix GetRegion(size_t col, size_t row) const { return GetRegion(ToID(col,row)); }
 
     // Does this bit matrix represent a connected set of ones?
-    bool IsConnected() const { return GetRegion((size_t)FindBit()) == *this; }
+    bool IsConnected() const { return GetRegion((size_t)FindOne()) == *this; }
 
     // Does this bit matrix have any 2x2 square of ones in it?
     bool Has2x2() const { return (*this & UpShift() & LeftShift() & ULShift()).Any(); }

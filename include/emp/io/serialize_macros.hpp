@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2021.
  *
  *  @file serialize_macros.hpp
  *  @brief Macros for simplifying to serialization of objects.
@@ -12,7 +12,7 @@
 #ifndef EMP_SERIALIZE_MACROS_H
 #define EMP_SERIALIZE_MACROS_H
 
-#include "../base/macros.hpp"
+#include "../meta/macros.hpp"
 
 #define EMP_SERIALIZE_INIT_VAR(VAR) VAR(emp::serialize::SetupLoad(pod, &VAR, true))
 

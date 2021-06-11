@@ -3,8 +3,8 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP.h
- *  @brief This is example code for using LinearCode.h
+ *  @file  LinearCode.cpp
+ *  @brief This is example code for using LinearCode.hpp
  */
 
 #include <iostream>

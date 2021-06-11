@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018
+//  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A bunch of C++ Template Meta-programming tricks.
@@ -17,21 +17,62 @@
 #include <tuple>
 #include <utility>
 
+#include "../base/vector.hpp"
+
 namespace emp {
 
-  // A function that will take any number of argument and do nothing with them.
+  /// A function that will take any number of argument and do nothing with them.
   template <typename... Ts> void DoNothing(Ts...) { ; }
 
-  // Effectively create a function (via constructor) where all args are computed, then ignored.
+  /// Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 
-  // Trim off a specific type position from a pack.
+  /// Trim off a specific type position from a pack.
   template <typename T1, typename... Ts> using first_type = T1;
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
-  // Create a placeholder template to substitute for a real type.
+  /// Create a placeholder template to substitute for a real type.
   template <int> struct PlaceholderType;
+
+  /// Group types in a parameter pack to build a vector of a designated type.
+  template <typename OBJ_T> void BuildObjVector1(emp::vector<OBJ_T> &) { }
+  template <typename OBJ_T> void BuildObjVector2(emp::vector<OBJ_T> &) { }
+  template <typename OBJ_T> void BuildObjVector3(emp::vector<OBJ_T> &) { }
+  template <typename OBJ_T> void BuildObjVector4(emp::vector<OBJ_T> &) { }
+
+  template <typename OBJ_T, typename T1, typename... Ts>
+  void BuildObjVector1(emp::vector<OBJ_T>& v, T1& arg1, Ts&... extras)
+  { v.emplace_back( arg1 ); BuildObjVector1(v, extras...); }
+
+  template <typename OBJ_T, typename T1, typename T2, typename... Ts>
+  void BuildObjVector2(emp::vector<OBJ_T>& v, T1& arg1, T2& arg2, Ts&... extras)
+  { v.emplace_back( arg1, arg2 ); BuildObjVector2(v, extras...); }
+
+  template <typename OBJ_T, typename T1, typename T2, typename T3, typename... Ts>
+  void BuildObjVector3(emp::vector<OBJ_T>& v, T1& arg1, T2& arg2, T3& arg3, Ts&... extras)
+  { v.emplace_back( arg1, arg2, arg3 ); BuildObjVector3(v, extras...); }
+
+  template <typename OBJ_T, typename T1, typename T2, typename T3, typename T4, typename... Ts>
+  void BuildObjVector4(emp::vector<OBJ_T>& v, T1& arg1, T2& arg2, T3& arg3, T4& arg4, Ts&... extras)
+  { v.emplace_back( arg1, arg2, arg3, arg4 ); BuildObjVector4(v, extras...); }
+
+  template <typename OBJ_T, size_t NUM_ARGS, typename... Ts>
+  emp::vector<OBJ_T> BuildObjVector(Ts &... args) {
+    emp::vector<OBJ_T> out_v;
+    constexpr size_t TOTAL_ARGS = sizeof...(Ts);
+    static_assert((TOTAL_ARGS % NUM_ARGS) == 0,
+                  "emp::BuildObjVector() : Must have the same number of args for each object.");
+    out_v.reserve(TOTAL_ARGS / NUM_ARGS);
+
+    if constexpr (NUM_ARGS == 1) BuildObjVector1<OBJ_T>(out_v, args...);
+    else if constexpr (NUM_ARGS == 2) BuildObjVector2<OBJ_T>(out_v, args...);
+    else if constexpr (NUM_ARGS == 3) BuildObjVector3<OBJ_T>(out_v, args...);
+    else if constexpr (NUM_ARGS == 4) BuildObjVector4<OBJ_T>(out_v, args...);
+    static_assert(NUM_ARGS < 5, "BuildObjVector currently has a cap of 4 arguments per object.");
+
+    return out_v;
+  }
 
   // Index into a template parameter pack to grab a specific type.
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -127,7 +168,7 @@ namespace emp {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <template <typename...> class FILTER, typename T>
-    constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> x) { return true; }
+    constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> ) { return true; }
     template <template <typename...> class FILTER, typename T>
     constexpr bool tt_exist_impl(...) { return false; }
   }
@@ -199,43 +240,6 @@ namespace emp {
       return [fun](ARGS... args, EXTRA_ARGS...){ return fun(args...); };
     }
   };
-
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    // Allow a hash to be determined by a GetHash() member function.
-    template <typename T>
-    auto Hash_impl(const T & x, bool) -> decltype(x.GetHash()) { return x.GetHash(); }
-
-    // By default, use std::hash if nothing else exists.
-    template <typename T>
-    auto Hash_impl(const T & x, int) -> decltype(std::hash<T>()(x)) { return std::hash<T>()(x); }
-
-    // Try direct cast to size_t if nothing else works.
-    template <typename T>
-    std::size_t Hash_impl(const T & x, ...) {
-      // @CAO Setup directory structure to allow the following to work:
-      // LibraryWarning("Resorting to casting to size_t for emp::Hash implementation.");
-      return (size_t) x;
-    }
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-  // Setup hashes to be dynamically determined.
-  template <typename T>
-  std::size_t Hash(const T & x) { return internal::Hash_impl(x, true); }
-
-  // Combine multiple keys into a single hash value.
-  template <typename T>
-  //std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
-  std::size_t CombineHash(const T & x) { return Hash<T>(x); }
-
-  template<typename T1, typename T2, typename... EXTRA>
-  std::size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
-    const std::size_t hash2 = CombineHash(x2, x_extra...);
-    //return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
-    return Hash<T1>(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
-  }
-
 
 
   // Change the internal type arguments on a template...

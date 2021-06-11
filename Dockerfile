@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:18.04
+FROM ubuntu:bionic-20210416
 
 COPY . /opt/Empirical
 
@@ -21,7 +21,16 @@ RUN \
 # Install apt packages
 # xvfb nonsense adapted from https://github.com/samgiles/docker-xvfb
 # remove -backports, -updates, -proposed, -security repositories
+# looks like we have to grab libxxhash0 from -updates now
 RUN \
+  apt-get update -y \
+    && \
+  apt-get install --no-install-recommends libxxhash0 \
+    && \
+  apt-get clean \
+    && \
+  rm -rf /var/lib/apt/lists/* \
+    && \
   find /etc/apt -type f -name '*.list' -exec sed -i 's/\(^deb.*-backports.*\)/#\1/; s/\(^deb.*-updates.*\)/#\1/; s/\(^deb.*-proposed.*\)/#\1/; s/\(^deb.*-security.*\)/#\1/' {} + \
     && \
   apt-get update -y \
@@ -159,7 +168,7 @@ RUN \
   && \
   n 12.18.2 \
   && \
-  export python="/usr/bin/python" \
+  export python="/usr/bin/python3" \
   && \
   npm install source-map \
   && \

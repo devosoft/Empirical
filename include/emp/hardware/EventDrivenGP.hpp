@@ -2057,7 +2057,7 @@ namespace emp {
       const auto & tag = inst.affinity;
 
       const double val = (
-        tag.GetDouble() / tag.MaxDouble()
+        tag.GetValue() / tag.GetNumStates()
       ) * (max - min) - min;
 
       state.SetLocal(inst.args[0], val);

@@ -421,7 +421,6 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
   sys.SetUpdate(6);
   auto id7 = sys.AddOrg(30, id1);
   
-
   // std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
   sys.RemoveOrg(id2);
@@ -848,7 +847,7 @@ TEST_CASE("Run world", "[evo]") {
 
   // Setup the mutation function.
   world.SetMutFun( [&world, &on_mutate_sig](emp::AvidaGP & org, emp::Random & random) {
-
+      (void) world;
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(20);

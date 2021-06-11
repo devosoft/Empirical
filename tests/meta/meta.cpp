@@ -12,11 +12,6 @@
 #include "emp/meta/meta.hpp"
 
 
-char result_char;
-void TestFun(int x, int y, char z) {
-  result_char = z + (char) (x*y);
-}
-
 struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
 struct HasA2 { static char A; };
 template <typename T> using MemberA = decltype(T::A);
@@ -25,7 +20,6 @@ template <typename A, typename B>
 struct MetaTestClass { A a; B b; };
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
-
 
 
 TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
@@ -42,11 +36,6 @@ TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
   REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
   REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
 
-
-  std::tuple<int, int, char> test_tuple(3,2,'a');
-  emp::ApplyTuple(TestFun, test_tuple);
-
-  REQUIRE(result_char == 'g');
 
   using meta1_t = MetaTestClass<int, double>;
   using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
@@ -75,11 +64,11 @@ TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
   REQUIRE( emp::CombineHash(2) == std::hash<int>()(2) );
 	REQUIRE( emp::CombineHash(3) == std::hash<int>()(3) );
 	REQUIRE( emp::CombineHash(4) == std::hash<int>()(4) );
-	REQUIRE( emp::CombineHash(2,3) == 0x9e4f79bb );
-	REQUIRE( emp::CombineHash(3,2) == 0x9e4779bc);
-	REQUIRE( emp::CombineHash(1,2) == 0x9e4779ba);
-	REQUIRE( emp::CombineHash(3,4) == 0x9e5779bc);
-	REQUIRE( emp::CombineHash(2,3,4) == 0x4f2bc6c1c6c76 );
+	REQUIRE( emp::CombineHash(2,3) == 0x9e377a3e );
+	REQUIRE( emp::CombineHash(3,2) == 0x9e377a78);
+	REQUIRE( emp::CombineHash(1,2) == 0x9e3779fa);
+	REQUIRE( emp::CombineHash(3,4) == 0x9e377a7e);
+	REQUIRE( emp::CombineHash(2,3,4) == 0x13c6ef4fc );
 
 }
 

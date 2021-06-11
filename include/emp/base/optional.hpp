@@ -7,9 +7,8 @@
  *  @brief Audited implementation of std::optional.
  *  @note Status: RELEASE
  *
- *  In release mode, functions identically to std::optional.
- *  In debug mode, operator * and operator-> value accesses are
- *  checked for undefined behavior.
+ *  Drop-in replacements for std::optional.
+ *  In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
  */
 
 #ifndef EMP_OPTIONAL_H
