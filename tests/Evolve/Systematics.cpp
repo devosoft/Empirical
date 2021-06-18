@@ -392,6 +392,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
   sys.RemoveOrg(id2);
 
   double mpd = sys.GetMeanPairwiseDistance();
+  std::cout << "Mean Pairwise Distance = " << mpd << "\n";
 
   std::cout << "\nAddOrg 31 (id8; parent id7)\n";
   auto id8 = sys.AddOrg(31, id7, 11);
@@ -721,7 +722,7 @@ TEST_CASE("Run world", "[evo]") {
 
   // Setup the mutation function.
   world.SetMutFun( [&world, &on_mutate_sig](emp::AvidaGP & org, emp::Random & random) {
-
+      (void) world;
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(20);

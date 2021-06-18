@@ -44,13 +44,13 @@ TEST_CASE("Test SolveState", "[tools]")
 	emp::BitVector vecOut = ss1.GetOutVector();
 	REQUIRE( (vecIn | vecUnk | vecOut).All() );
 	std::stringstream ss;
-	vecIn.Print(ss);
+	vecIn.PrintBinary(ss);
 	REQUIRE(ss.str() == "0000000110");
 	ss.str(std::string());
-	vecUnk.Print(ss);
+	vecUnk.PrintBinary(ss);
 	REQUIRE(ss.str() == "1111000000");
 	ss.str(std::string());
-	vecOut.Print(ss);
+	vecOut.PrintBinary(ss);
 	REQUIRE(ss.str() == "0000111001");
 	ss.str(std::string());
 

@@ -8,7 +8,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/macros.hpp"
+#include "emp/meta/macros.hpp"
 
 #include <array>
 #include <sstream>

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2019
+ *  @date 2015-2021.
  *
  *  @file serialize.hpp
  *  @brief Tools to save and load data from classes.

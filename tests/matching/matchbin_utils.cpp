@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
+//  Copyright (C) Michigan State University, 2020-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #define CATCH_CONFIG_MAIN
@@ -37,12 +37,10 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE( dist.GetStreakProbability(2) == 8.0/16.0 );
     REQUIRE( dist.GetStreakProbability(3) == 3.0/16.0 );
     REQUIRE( dist.GetStreakProbability(4) == 1.0/16.0 );
-
   }
 
   // test ApproxSingleStreakMetric
   {
-
     emp::ApproxSingleStreakMetric<4> metric;
 
     REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
@@ -63,7 +61,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) <= 1.0);
       REQUIRE(metric(a,b) >= 0.0);
     }
-
   }
 
   // test ApproxDualStreakMetric
@@ -87,7 +84,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   // test ExactSingleStreakMetric
   {
-
     emp::ExactSingleStreakMetric<4> metric;
 
     REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
@@ -104,7 +100,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) <= 1.0);
       REQUIRE(metric(a,b) >= 0.0);
     }
-
   }
 
   // test ExactDualStreakMetric
@@ -126,7 +121,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
       REQUIRE(metric(a,b) <= 1.0);
       REQUIRE(metric(a,b) >= 0.0);
     }
-
   }
 
   // test SieveSelector with auto adjust
@@ -483,11 +477,10 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 
-
   // test UnifMod
   {
-
   emp::HashMetric<32> hash;
+
   emp::UnifMod<emp::HashMetric<32>> unif_hash;
   emp::UnifMod<emp::HashMetric<32>, 1> unif_hash_small;
 
@@ -552,6 +545,7 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   }
 
   }
+
 
   // test EuclideanDimMod
   {
@@ -945,6 +939,4 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   }
 
   }
-
-
 }

@@ -1652,7 +1652,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
   // test SymmetricNoWrapMetric
   {
-  const double norm = 15.0;
+  const double norm = 16.0;
   const emp::BitSet<4> bs_0{0,0,0,0};
   const emp::BitSet<4> bs_1{0,0,0,1};
   const emp::BitSet<4> bs_7{0,1,1,1};
@@ -1710,7 +1710,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
   // test AsymmetricWrapMetric
   {
-  const double norm = 15.0;
+  const double norm = 16.0;
   const emp::BitSet<4> bs_0{0,0,0,0};
   const emp::BitSet<4> bs_1{0,0,0,1};
   const emp::BitSet<4> bs_7{0,1,1,1};

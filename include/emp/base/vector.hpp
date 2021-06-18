@@ -31,7 +31,7 @@
 
 // Seemlessly translate emp::vector to std::vector
 namespace emp {
-  template <typename... Ts> using vector = std::vector<Ts...>;
+  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
 }
 
 
@@ -123,7 +123,7 @@ namespace emp {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }
-      const auto operator->() const {
+      auto operator->() const {
         emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }

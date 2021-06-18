@@ -257,13 +257,15 @@ namespace emp {
 
     /// How many cells wide is the world? (assumes grids are active.)
     size_t GetWidth() const { 
-      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "Grid"); 
+      emp_assert(HasAttribute("PopStruct"));
+      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid"); 
       return pop_sizes[0]; 
     }
 
     /// How many cells tall is the world? (assumes grids are active.)
     size_t GetHeight() const { 
-      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "Grid"); 
+      emp_assert(HasAttribute("PopStruct"));
+      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid"); 
       return pop_sizes[1]; 
     }
 
@@ -1098,6 +1100,8 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen) {
+    emp_assert(width * height >= 2, width, height, "A 2D Grid must have at least 2 cells.");
+
     Resize(width, height);
     is_synchronous = synchronous_gen;
     is_space_structured = true;
@@ -1120,17 +1124,21 @@ namespace emp {
       const size_t size_y = pop_sizes[1];
       const size_t id = pos.GetIndex();
 
-      // fancy footwork to exclude self (4) from consideration
-      const int offset = (random_ptr->GetInt(8) * 5) % 9;
-      const int rand_x = (int) (id%size_x) + offset%3 - 1;
-      const int rand_y = (int) (id/size_x) + offset/3 - 1;
+      // Determine x and y for a random neighbor.
+      int offset = random_ptr->GetInt(8);               // Eight possible neighbors.
+      if (offset >= 4) ++offset;                        // Option 4 is self; we want 0-3 or 5-8
+      const int offset_x = offset%3 - 1;                // Set x offset as -1 through +1
+      const int offset_y = offset/3 - 1;                // Set y offset as -1 through +1
+      const int rand_x = (int) (id%size_x) + offset_x;  // Shift x by start position.
+      const int rand_y = (int) (id/size_x) + offset_y;  // Shift y by start position.
+      const int neighbor_x = emp::Mod(rand_x, (int) size_x); // Ensure new x pos is on grid.
+      const int neighbor_y = emp::Mod(rand_y, (int) size_y); // Ensure new y pos is on grid.
 
-      const auto neighbor_id = (
-        emp::Mod(rand_x, (int) size_x)
-        + emp::Mod(rand_y, (int) size_y) * (int)size_x
-      );
+      // Combine into the new neighbor id.
+      const int neighbor_id = neighbor_x + neighbor_y * (int)size_x;
 
-      emp_assert((int)pos.GetIndex() != neighbor_id);
+      // The new ID should never be the old one.
+      emp_assert((int)pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id);
 
       return pos.SetIndex(neighbor_id);
     };
@@ -1287,7 +1295,7 @@ namespace emp {
         int p = random_ptr->GetInt(options.CountOnes());
         std::cout << p << std::endl;
         while(p-- >= 0) {
-          rand_pos = options.PopBit();
+          rand_pos = options.PopOne();
         }
       }
       
@@ -1545,7 +1553,7 @@ namespace emp {
     else new_org.Delete();                      // Otherwise delete the organism.
   }
 
-  // Give birth to (potentially) multiple offspring; return position of last placed.
+  // Give birth to (potentially multiple) offspring; return position of last placed.
   // Triggers 'before repro' signal on parent (once) and 'offspring ready' on each offspring.
   // Additional signal triggers occur in AddOrgAt.
   template <typename ORG>

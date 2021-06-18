@@ -48,6 +48,7 @@
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../meta/macros.hpp"
 #include "../tools/string_utils.hpp"
 #include "ConfigManager.hpp"
 

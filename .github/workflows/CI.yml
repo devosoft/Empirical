@@ -5,11 +5,14 @@ on:
   pull_request:
     branches:
       - '**'
+  schedule:
+    - cron: '0 0 * * 0'
 jobs:
   test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
+      fail-fast: false
       matrix:
         cxx: [clang++, g++]
         test-set:
@@ -27,7 +30,7 @@ jobs:
           submodules: 'recursive'
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: sudo apt-get install -qq g++-8 cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
@@ -37,12 +40,12 @@ jobs:
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: sudo apt-get install -qq g++-8 cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: make install-test-dependencies
       - name: Run headless test
@@ -51,7 +54,7 @@ jobs:
           run: make test-web
   test-coverage:
     name: Measure Test Coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -62,7 +65,7 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-8
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-      - run: sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
+      - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
       - run: sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-7 90
       - run: sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-7 90
       - run: sudo update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-7 90
@@ -74,7 +77,7 @@ jobs:
       - run: curl -s https://codecov.io/bash | bash
   test-documentation:
     name: Test Documentation Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -88,10 +91,10 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           src: doc-coverage.json
-          dst: stats/doc-coverage.json          
+          dst: stats/doc-coverage.json
   deploy-dockerhub:
     name: Deploy to DockerHub
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: github.ref == 'refs/heads/master'
     needs:
       - test
