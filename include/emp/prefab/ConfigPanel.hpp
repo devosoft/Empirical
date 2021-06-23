@@ -229,16 +229,19 @@ namespace prefab {
           [this,name, name_input_number, name_input_mobile_slider](std::string val) {
           config.Set(name, val);
           SyncForm(val, name_input_number, name_input_mobile_slider);
+          DoOnChangeFun(val);
           });
         number.Callback(
           [this,name, name_input_slider, name_input_mobile_slider](std::string val) {
           config.Set(name, val);
           SyncForm(val, name_input_slider, name_input_mobile_slider);
+          DoOnChangeFun(val);
           });
         mobile_slider.Callback(
           [this,name, name_input_number, name_input_slider](std::string val) {
           config.Set(name, val);
           SyncForm(val, name_input_number, name_input_slider);
+          DoOnChangeFun(val);
           });
         // Set initial values
         slider.Value(config.Get(name));
