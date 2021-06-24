@@ -36,6 +36,7 @@ api/library_root
 :caption: Contributing to Empirical
 :maxdepth: 0
 
+dev/empirical-development-practices
 dev/getting-started
 dev/contribution-guidelines-and-review
 dev/adding-documentation
