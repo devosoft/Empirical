@@ -1,5 +1,9 @@
 # Empirical Development Practices
 
+
+```{contents}
+```
+
 Although the Empirical project is primarily maintained by the Primary Investigator of the Digital Evolution laboratory at Michigan State University, Dr. Charles Ofria, a large, rotating menagerie of graduate students, undergraduate students, alumni, and collaborators also regularly contribute to the library.
 Several active research projects depend on the library.
 The scope of the project and the continuous turnover of our developer base have necessitated investment in extensive social and technical tooling on our part.
