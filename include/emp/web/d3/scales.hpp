@@ -112,40 +112,45 @@ namespace D3 {
     // template<typename RETURN_T, typename INPUT_T>
     // RETURN_T ApplyScale(INPUT_T input) { ; }
 
-    template<typename RETURN_T, typename INPUT_T>
-    RETURN_T ApplyScale(INPUT_T input) {
-      if constexpr (std::is_same<std::string, RETURN_T>::value && std::is_same<std::string, INPUT_T>::value) {
+    template<typename RETURN_T>
+    RETURN_T ApplyScale(double input) {
+      if constexpr (std::is_same<std::string, RETURN_T>::value) {
         MAIN_THREAD_EM_ASM({
-          const resultStr = emp_d3.objects[$0](UTF8ToString($1));
-          emp.PassStringToCpp(resultStr);
-        }, this->id, input.c_str());
-        return emp::pass_str_to_cpp();
-        
-      } else if constexpr (std::is_same<std::string, RETURN_T>::value) {
-        MAIN_THREAD_EM_ASM({
-          const resultStr = emp_d3.objects[$0](UTF8ToString($1));
+          const resultStr = emp_d3.objects[$0]($1);
           emp.PassStringToCpp(resultStr);
         }, this->id, input);
         return emp::pass_str_to_cpp();
-
-      } else if constexpr (std::is_same<int, RETURN_T>::value && std::is_same<std::string, INPUT_T>::value) {
-        return MAIN_THREAD_EM_ASM_INT({
-          return emp_d3.objects[$0](UTF8ToString($1));
-        }, this->id, input.c_str());
       } else if constexpr (std::is_same<int, RETURN_T>::value) {
         return MAIN_THREAD_EM_ASM_INT({
-          return emp_d3.objects[$0](UTF8ToString($1));
+          return emp_d3.objects[$0]($1);
         }, this->id, input);
-      } else if constexpr (std::is_same<double, RETURN_T>::value && std::is_same<std::string, INPUT_T>::value) {
+      } else if constexpr (std::is_same<double, RETURN_T>::value) {
         return MAIN_THREAD_EM_ASM_DOUBLE({
+          return emp_d3.objects[$0]($1);
+        }, this->id, input);
+      } else {
+        emp_assert_warning(false && "Invalid return type to ApplyScale");
+      }
+    }
+
+    template<typename RETURN_T>
+    RETURN_T ApplyScale(std::string input) {
+      if constexpr (std::is_same<std::string, RETURN_T>::value) {
+        MAIN_THREAD_EM_ASM({
+          const resultStr = emp_d3.objects[$0](UTF8ToString($1));
+          emp.PassStringToCpp(resultStr);
+        }, this->id, input.c_str());
+        return emp::pass_str_to_cpp();        
+      } else if constexpr (std::is_same<int, RETURN_T>::value) {
+        return MAIN_THREAD_EM_ASM_INT({
           return emp_d3.objects[$0](UTF8ToString($1));
         }, this->id, input.c_str());
       } else if constexpr (std::is_same<double, RETURN_T>::value) {
         return MAIN_THREAD_EM_ASM_DOUBLE({
           return emp_d3.objects[$0](UTF8ToString($1));
-        }, this->id, input);
+        }, this->id, input.c_str());
       } else {
-        static_assert(false && "Invalid return type to ApplyScale");
+        emp_assert_warning(false && "Invalid return type to ApplyScale");
       }
 
     }
@@ -492,8 +497,6 @@ namespace D3 {
     Scale & SetDomain(const std::string & lower, const std::string & upper) = delete;
     template <typename T>
     double Invert(T y) = delete;
-    template<typename RETURN_T, typename INPUT_T>
-    RETURN_T ApplyScale(INPUT_T input) = delete;
 
 
     // special SetDomain to deal with Dates
@@ -526,7 +529,7 @@ namespace D3 {
     }
 
     template<typename RETURN_T>
-    RETURN_T ApplyScale<RETURN_T>(const Date & dateInput) {
+    RETURN_T ApplyScale(const Date & dateInput) {
       if constexpr (std::is_same<double, RETURN_T>::value) {
         return MAIN_THREAD_EM_ASM_DOUBLE({
           const id = $0;
@@ -573,7 +576,7 @@ namespace D3 {
 
         return emp::pass_str_to_cpp();
       } else {
-        static_assert(false && "Invalid return type to ApplyScale");
+        emp_assert_warning(false && "Invalid return type to ApplyScale");
       }
     }
 

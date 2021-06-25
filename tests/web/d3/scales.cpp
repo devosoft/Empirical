@@ -1297,9 +1297,9 @@ struct TestBandScale: emp::web::BaseTest {
     emp::array<std::string, 5> domainArr = {"Mon", "Tue", "Wed", "Thu", "Fri"};
     testBandScale1.SetDomain(domainArr);
     testBandScale1.SetRange(0, 200);
-    testBandScale1_val1 = testBandScale1.ApplyScale<int, std::string>("Mon");
-    testBandScale1_val2 = testBandScale1.ApplyScale<int, std::string>("Tue");
-    testBandScale1_val3 = testBandScale1.ApplyScale<int, std::string>("Fri");
+    testBandScale1_val1 = testBandScale1.ApplyScale<int>("Mon");
+    testBandScale1_val2 = testBandScale1.ApplyScale<int>("Tue");
+    testBandScale1_val3 = testBandScale1.ApplyScale<int>("Fri");
     testBandScale1_bandwidth = testBandScale1.GetBandwidth();
     testBandScale1_step = testBandScale1.GetStep();
   } 
@@ -1349,9 +1349,9 @@ struct TestPointScale: emp::web::BaseTest {
     emp::array<std::string, 5> domainArr = {"Mon", "Tue", "Wed", "Thu", "Fri"};
     testPointScale1.SetDomain(domainArr);
     testPointScale1.SetRange(0, 500);
-    testPointScale1_val1 = testPointScale1.ApplyScale<int, std::string>("Mon");
-    testPointScale1_val2 = testPointScale1.ApplyScale<int, std::string>("Tue");
-    testPointScale1_val3 = testPointScale1.ApplyScale<int, std::string>("Fri");
+    testPointScale1_val1 = testPointScale1.ApplyScale<int>("Mon");
+    testPointScale1_val2 = testPointScale1.ApplyScale<int>("Tue");
+    testPointScale1_val3 = testPointScale1.ApplyScale<int>("Fri");
     testPointScale1_bandwidth = testPointScale1.GetBandwidth();
     testPointScale1_step = testPointScale1.GetStep();
   } 
