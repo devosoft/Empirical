@@ -1,13 +1,13 @@
-#include "web/JSWrap.h"
-#include "web/d3/d3_init.h"
-#include "web/Document.h"
-#include "web/_MochaTestRunner.h"
+#include "web/JSWrap.hpp"
+#include "web/d3/d3_init.hpp"
+#include "web/Document.hpp"
+#include "web/_MochaTestRunner.hpp"
 #include <iostream>
 #include <functional>
 #include <type_traits>
 #include <utility>
 
-#include "d3_testing_utils.h"
+#include "d3_testing_utils.hpp"
 
 // This file tests:
 // - D3_Base

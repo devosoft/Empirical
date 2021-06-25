@@ -28,6 +28,7 @@ namespace internal {
   // Stub so compiler doesn't throw errors if we aren't in emscripten
   #ifndef __EMSCRIPTEN__
   size_t NextD3ID() {return 0;}
+  void get_emp_d3() {;}
   #endif
 
 }
@@ -63,8 +64,10 @@ namespace internal {
       InitializeEmpD3();
       this->id = id;
 
+      #ifdef __EMSCRIPTEN__
       emp_assert(MAIN_THREAD_EM_ASM_INT({ return $0 in emp_d3.counts;}, this->id));
-
+      #endif
+      
       MAIN_THREAD_EM_ASM({
         emp_d3.counts[$0]++;
       }, this->id);

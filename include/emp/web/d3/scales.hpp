@@ -10,7 +10,7 @@
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
 
-#include "d3_init.h"
+#include "d3_init.hpp"
 
 #include <iostream>
 #include <string>
@@ -19,7 +19,6 @@
 #include <array>
 #include "../../base/vector.hpp"
 #include "../../base/array.hpp"
-#include "utils.h"
 
 #include "../../base/assert.hpp"
 #include "../js_utils.hpp"

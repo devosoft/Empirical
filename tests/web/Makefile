@@ -20,7 +20,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 test-web: $(addprefix test-web-, $(TEST_NAMES)) test-GetUrlParams
-	cd d3 && make
+	cd d3 && make test-web
 
 test-web-%: %.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
@@ -61,6 +61,7 @@ cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 
 coverage: CFLAGS_all := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 coverage: $(addprefix cov-, $(NATIVE_TEST_NAMES))
+	cd d3 && make coverage
 
 # Test in debug mode with pointer tracking
 fulldebug: CFLAGS_all := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation

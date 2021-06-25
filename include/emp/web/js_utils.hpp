@@ -678,6 +678,10 @@ namespace emp {
   /// @endcond
 
   std::string pass_str_to_cpp() {
+    #ifndef __EMSCRIPTEN__
+    return "";
+    #endif
+
     char * buffer = (char *)MAIN_THREAD_EM_ASM_INT({
       return emp_i.__outgoing_string;
     });

@@ -6,8 +6,6 @@
 #define __EMP_D3_SELECTION_H__
 
 #include "d3_init.hpp"
-#include "utils.hpp"
-#include "dataset.hpp"
 
 #include <iostream>
 #include <string>

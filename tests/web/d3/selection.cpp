@@ -1,8 +1,8 @@
-#include "web/Document.h"
-#include "web/d3/d3_init.h"
-#include "web/d3/selection.h"
-#include "web/_MochaTestRunner.h"
-#include "d3_testing_utils.h"
+#include "web/Document.hpp"
+#include "web/d3/d3_init.hpp"
+#include "web/d3/selection.hpp"
+#include "web/_MochaTestRunner.hpp"
+#include "d3_testing_utils.hpp"
 
 // namespace UI = emp::web;
 // UI::Document doc("emp_d3_test");

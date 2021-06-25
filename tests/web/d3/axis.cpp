@@ -1,11 +1,11 @@
-#include "web/Document.h"
-#include "web/_MochaTestRunner.h"
-#include "d3_testing_utils.h"
+#include "web/Document.hpp"
+#include "web/_MochaTestRunner.hpp"
+#include "d3_testing_utils.hpp"
 
-#include "web/d3/d3_init.h"
-#include "web/d3/selection.h"
-#include "web/d3/scales.h"
-#include "web/d3/axis.h"
+#include "web/d3/d3_init.hpp"
+#include "web/d3/selection.hpp"
+#include "web/d3/scales.hpp"
+#include "web/d3/axis.hpp"
 
 #include <iostream>
 

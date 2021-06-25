@@ -1,8 +1,8 @@
-#include "web/Document.h"
-#include "web/d3/d3_init.h"
-#include "web/d3/scales.h"
-#include "web/_MochaTestRunner.h"
-#include "d3_testing_utils.h"
+#include "web/Document.hpp"
+#include "web/d3/d3_init.hpp"
+#include "web/d3/scales.hpp"
+#include "web/_MochaTestRunner.hpp"
+#include "d3_testing_utils.hpp"
 
 // To run these tests call `cd d3 && make scales.js && .. && ../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename d3/scales` from tests/web
 

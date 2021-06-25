@@ -1,10 +1,10 @@
 #ifndef D3_WEB_TESTING_UTILS_H
 #define D3_WEB_TESTING_UTILS_H
 
-#include "control/Signal.h"
-#include "base/vector.h"
-#include "web/JSWrap.h"
-#include "web/Animate.h"
+#include "control/Signal.hpp"
+#include "base/vector.hpp"
+#include "web/JSWrap.hpp"
+#include "web/Animate.hpp"
 #include <functional>
 #include <type_traits>
 #include <utility>
