@@ -21,6 +21,7 @@ default: test-web
 test-web: $(addprefix test-web-, $(TEST_NAMES))
 
 test-web-%: %.cpp
+	source ../../../third-party/emsdk/emsdk_env.sh
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	cd ../../../ && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js --filename d3/$@
 	
