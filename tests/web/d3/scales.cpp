@@ -56,8 +56,8 @@ struct TestLinearScale : emp::web::BaseTest {
   void Setup() { 
     testLinearInt.SetDomain(10, 130);
     testLinearInt.SetRange(0, 960);
-    linearInt_1 = testLinearInt.ApplyScale<int>(20);
-    linearInt_2 = testLinearInt.ApplyScale<int>(50);
+    linearInt_1 = testLinearInt.ApplyScale<int, int>(20);
+    linearInt_2 = testLinearInt.ApplyScale<int, int>(50);
     linearInt_3 = testLinearInt.Invert<int>(80);
     linearInt_4 = testLinearInt.Invert<int>(320); 
     testLinearIntDomain = testLinearInt.GetDomain<int>();
@@ -71,8 +71,8 @@ struct TestLinearScale : emp::web::BaseTest {
     testLinearColor.SetDomain(10, 100);
     emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
     testLinearColor.SetRange(colorArray);
-    linearColor_1 = testLinearColor.ApplyScale<std::string>(20);
-    linearColor_2 = testLinearColor.ApplyScale<std::string>(50);
+    linearColor_1 = testLinearColor.ApplyScale<std::string, int>(20);
+    linearColor_2 = testLinearColor.ApplyScale<std::string, int>(50);
     testLinearColorDomain = testLinearColor.GetDomain<int>(); 
     testLinearColorRange = testLinearColor.GetRange<std::string>();
   }
@@ -174,25 +174,25 @@ struct TestPowScale : emp::web::BaseTest {
     testPow1.SetExponent(0.5);
     testPow1.SetDomain(0, 2e9);
     testPow1.SetRange(0, 300);
-    testPow1_val1 = testPow1.ApplyScale<double>(1.386e9);
-    testPow1_val2 = testPow1.ApplyScale<double>(127e6);
-    testPow1_val3 = testPow1.ApplyScale<double>(427e3);
+    testPow1_val1 = testPow1.ApplyScale<double, double>(1.386e9);
+    testPow1_val2 = testPow1.ApplyScale<double, double>(127e6);
+    testPow1_val3 = testPow1.ApplyScale<double, double>(427e3);
     testPow1_Domain = testPow1.GetDomain<int>();
     testPow1_Range = testPow1.GetRange<int>();
 
     testPow2.SetExponent(1.5);
     testPow2.SetDomain(0, 2e9);
     testPow2.SetRange(0, 300);
-    testPow2_val1 = testPow2.ApplyScale<double>(1.386e9);
-    testPow2_val2 = testPow2.ApplyScale<double>(127e6);
-    testPow2_val3 = testPow2.ApplyScale<double>(427e3);
+    testPow2_val1 = testPow2.ApplyScale<double, double>(1.386e9);
+    testPow2_val2 = testPow2.ApplyScale<double, double>(127e6);
+    testPow2_val3 = testPow2.ApplyScale<double, double>(427e3);
 
     testPow3.SetDomain(0, 2e9);
     emp::array<std::string, 2> colorArray = {"yellow", "red"};
     testPow3.SetRange(colorArray);
-    testPow3_val1 = testPow3.ApplyScale<std::string>(1.386e9);
-    testPow3_val2 = testPow3.ApplyScale<std::string>(127e6);
-    testPow3_val3 = testPow3.ApplyScale<std::string>(427e3);
+    testPow3_val1 = testPow3.ApplyScale<std::string, double>(1.386e9);
+    testPow3_val2 = testPow3.ApplyScale<std::string, double>(127e6);
+    testPow3_val3 = testPow3.ApplyScale<std::string, double>(427e3);
   }
 
   void Describe() override {
@@ -274,14 +274,14 @@ struct TestSqrtScale : emp::web::BaseTest {
   void Setup() {
     testSqrt1.SetDomain(0, 2e9);
     testSqrt1.SetRange(0, 300);
-    testSqrt1_val1 = testSqrt1.ApplyScale<double>(1.386e9);
-    testSqrt1_val2 = testSqrt1.ApplyScale<double>(127e6);
-    testSqrt1_val3 = testSqrt1.ApplyScale<double>(427e3);
+    testSqrt1_val1 = testSqrt1.ApplyScale<double, double>(1.386e9);
+    testSqrt1_val2 = testSqrt1.ApplyScale<double, double>(127e6);
+    testSqrt1_val3 = testSqrt1.ApplyScale<double, double>(427e3);
 
     D3::SqrtScale testSqrtCopy(testSqrt1);
-    testSqrtCopy_val1 = testSqrtCopy.ApplyScale<double>(1.386e9);
-    testSqrtCopy_val2 = testSqrtCopy.ApplyScale<double>(127e6);
-    testSqrtCopy_val3 = testSqrtCopy.ApplyScale<double>(427e3);
+    testSqrtCopy_val1 = testSqrtCopy.ApplyScale<double, double>(1.386e9);
+    testSqrtCopy_val2 = testSqrtCopy.ApplyScale<double, double>(127e6);
+    testSqrtCopy_val3 = testSqrtCopy.ApplyScale<double, double>(427e3);
   }
 
   void Describe() override {
@@ -334,21 +334,21 @@ struct TestLogScale : emp::web::BaseTest {
 
   void Setup() {
     testLog1.SetDomain(10, 100000).SetRange(0, 700);
-    testLog1_val1 = testLog1.ApplyScale<double>(1000);
-    testLog1_val2 = testLog1.ApplyScale<double>(1234);
-    testLog1_val3 = testLog1.ApplyScale<double>(100000);
+    testLog1_val1 = testLog1.ApplyScale<double, double>(1000);
+    testLog1_val2 = testLog1.ApplyScale<double, double>(1234);
+    testLog1_val3 = testLog1.ApplyScale<double, double>(100000);
 
     testLog2.SetBase(2);
     testLog2.SetDomain(16, 1048576);
     testLog2.SetRange(0, 700);
-    testLog2_val1 = testLog2.ApplyScale<double>(64);
-    testLog2_val2 = testLog2.ApplyScale<double>(1234);
-    testLog2_val3 = testLog2.ApplyScale<double>(1048576);
-    testLog2_Unclamped = testLog2.ApplyScale<double>(5000000);
+    testLog2_val1 = testLog2.ApplyScale<double, double>(64);
+    testLog2_val2 = testLog2.ApplyScale<double, double>(1234);
+    testLog2_val3 = testLog2.ApplyScale<double, double>(1048576);
+    testLog2_Unclamped = testLog2.ApplyScale<double, double>(5000000);
     
     // now clamp TestScale2 to test the SetClamp method
     testLog2.SetClamp(true);
-    testLog2_Clamped = testLog2.ApplyScale<double>(5000000);
+    testLog2_Clamped = testLog2.ApplyScale<double, double>(5000000);
   }
 
   void Describe() override {
@@ -419,20 +419,20 @@ struct TestSymlogScale : emp::web::BaseTest {
   void Setup() {
     testSymlog1.SetDomain(-100000, 100000);
     testSymlog1.SetRange(-100, 100);
-    testSymlog1_val1 = testSymlog1.ApplyScale<double>(-80000);
-    testSymlog1_val2 = testSymlog1.ApplyScale<double>(-50);
-    testSymlog1_val3 = testSymlog1.ApplyScale<double>(1.5); 
-    testSymlog1_val4 = testSymlog1.ApplyScale<double>(50);
-    testSymlog1_val5 = testSymlog1.ApplyScale<double>(80000);
+    testSymlog1_val1 = testSymlog1.ApplyScale<double, double>(-80000);
+    testSymlog1_val2 = testSymlog1.ApplyScale<double, double>(-50);
+    testSymlog1_val3 = testSymlog1.ApplyScale<double, double>(1.5); 
+    testSymlog1_val4 = testSymlog1.ApplyScale<double, double>(50);
+    testSymlog1_val5 = testSymlog1.ApplyScale<double, double>(80000);
 
     testSymlog2.SetDomain(-100000, 100000);
     testSymlog2.SetRange(-100, 100);
     testSymlog2.SetConstant(0.01);
-    testSymlog2_val1 = testSymlog2.ApplyScale<double>(-80000);
-    testSymlog2_val2 = testSymlog2.ApplyScale<double>(-50);
-    testSymlog2_val3 = testSymlog2.ApplyScale<double>(1.5); 
-    testSymlog2_val4 = testSymlog2.ApplyScale<double>(50);
-    testSymlog2_val5 = testSymlog2.ApplyScale<double>(80000);
+    testSymlog2_val1 = testSymlog2.ApplyScale<double, double>(-80000);
+    testSymlog2_val2 = testSymlog2.ApplyScale<double, double>(-50);
+    testSymlog2_val3 = testSymlog2.ApplyScale<double, double>(1.5); 
+    testSymlog2_val4 = testSymlog2.ApplyScale<double, double>(50);
+    testSymlog2_val5 = testSymlog2.ApplyScale<double, double>(80000);
   }
 
   void Describe() override {
@@ -489,9 +489,9 @@ struct TestIdentityScale : emp::web::BaseTest {
 
   void Setup() {
     testIdentity1.SetDomain(12, 1234.5);
-    testIdentity1_val1 = testIdentity1.ApplyScale<double>(12);
-    testIdentity1_val2 = testIdentity1.ApplyScale<double>(50.6789);
-    testIdentity1_val3 = testIdentity1.ApplyScale<double>(1234);
+    testIdentity1_val1 = testIdentity1.ApplyScale<double, double>(12);
+    testIdentity1_val2 = testIdentity1.ApplyScale<double, double>(50.6789);
+    testIdentity1_val3 = testIdentity1.ApplyScale<double, double>(1234);
   }
 
   void Describe() override {
@@ -537,15 +537,15 @@ struct TestTimeScale : emp::web::BaseTest {
     D3::Date date1(2000, 0, 1, 5);
     D3::Date date2(2000, 0, 1, 16);
 
-    testTime1_val1 = testTime1.ApplyScale<double>(date1);
-    testTime1_val2 = testTime1.ApplyScale<int>(date2);
+    testTime1_val1 = testTime1.ApplyScale<double, D3::Date>(date1);
+    testTime1_val2 = testTime1.ApplyScale<int, D3::Date>(date2);
     testTime1_val1_i = testTime1.Invert(200);
     testTime1_val2_i = testTime1.Invert(640);
 
     testTime2.SetDomain(dateMin, dateMax);
     testTime2.SetRange("red", "yellow");
-    testTime2_val1 = testTime2.ApplyScale<std::string>(date1);
-    testTime2_val2 = testTime2.ApplyScale<std::string>(date2);
+    testTime2_val1 = testTime2.ApplyScale<std::string, D3::Date>(date1);
+    testTime2_val2 = testTime2.ApplyScale<std::string, D3::Date>(date2);
   }
 
   void Describe() override {
@@ -608,9 +608,9 @@ struct TestSequentialScale : emp::web::BaseTest {
   void Setup() {
     testSequentialScale1.SetDomain(0, 100);
     testSequentialScale1.SetInterpolator("interpolateRainbow");
-    testSequentialScale1_val1 = testSequentialScale1.ApplyScale<std::string>(0);
-    testSequentialScale1_val2 = testSequentialScale1.ApplyScale<std::string>(50);
-    testSequentialScale1_val3 = testSequentialScale1.ApplyScale<std::string>(100);
+    testSequentialScale1_val1 = testSequentialScale1.ApplyScale<std::string, int>(0);
+    testSequentialScale1_val2 = testSequentialScale1.ApplyScale<std::string, int>(50);
+    testSequentialScale1_val3 = testSequentialScale1.ApplyScale<std::string, int>(100);
   }
 
   void Describe() override {
@@ -646,9 +646,9 @@ struct TestSequentialLogScale : emp::web::BaseTest {
   void Setup() {
     testSeqLogScale1.SetDomain(1e-8, 1e8);
     testSeqLogScale1.SetInterpolator("interpolatePuBuGn");
-    testSeqLogScale1_val1 = testSeqLogScale1.ApplyScale<std::string>(1e-8);
-    testSeqLogScale1_val2 = testSeqLogScale1.ApplyScale<std::string>(100.1234);
-    testSeqLogScale1_val3 = testSeqLogScale1.ApplyScale<std::string>(1e8);
+    testSeqLogScale1_val1 = testSeqLogScale1.ApplyScale<std::string, double>(1e-8);
+    testSeqLogScale1_val2 = testSeqLogScale1.ApplyScale<std::string, double>(100.1234);
+    testSeqLogScale1_val3 = testSeqLogScale1.ApplyScale<std::string, double>(1e8);
   }
 
   void Describe() override {
@@ -685,9 +685,9 @@ struct TestSequentialPowScale : emp::web::BaseTest {
     testSeqPowScale1.SetExponent(0);
     testSeqPowScale1.SetDomain(1e-8, 1e8);
     testSeqPowScale1.SetInterpolator("interpolatePuBuGn");
-    testSeqPowScale1_val1 = testSeqPowScale1.ApplyScale<std::string>(1e-8);
-    testSeqPowScale1_val2 = testSeqPowScale1.ApplyScale<std::string>(1e5);
-    testSeqPowScale1_val3 = testSeqPowScale1.ApplyScale<std::string>(1e8);
+    testSeqPowScale1_val1 = testSeqPowScale1.ApplyScale<std::string, double>(1e-8);
+    testSeqPowScale1_val2 = testSeqPowScale1.ApplyScale<std::string, double>(1e5);
+    testSeqPowScale1_val3 = testSeqPowScale1.ApplyScale<std::string, double>(1e8);
   }
 
   void Describe() override {
@@ -724,9 +724,9 @@ struct TestSequentialSqrtScale : emp::web::BaseTest {
   void Setup() {
     testSeqSqrtScale1.SetDomain(1e-8, 1e8);
     testSeqSqrtScale1.SetInterpolator("interpolatePuBuGn");
-    testSeqSqrtScale1_val1 = testSeqSqrtScale1.ApplyScale<std::string>(1e-8);
-    testSeqSqrtScale1_val2 = testSeqSqrtScale1.ApplyScale<std::string>(1e5);
-    testSeqSqrtScale1_val3 = testSeqSqrtScale1.ApplyScale<std::string>(1e7);
+    testSeqSqrtScale1_val1 = testSeqSqrtScale1.ApplyScale<std::string, double>(1e-8);
+    testSeqSqrtScale1_val2 = testSeqSqrtScale1.ApplyScale<std::string, double>(1e5);
+    testSeqSqrtScale1_val3 = testSeqSqrtScale1.ApplyScale<std::string, double>(1e7);
   }
 
   void Describe() override {
@@ -763,9 +763,9 @@ struct TestSequentialSymlogScale : emp::web::BaseTest {
     testSeqSymlogScale1.SetConstant(5);
     testSeqSymlogScale1.SetDomain(1e-8, 1e8);
     testSeqSymlogScale1.SetInterpolator("interpolatePuBuGn");
-    testSeqSymlogScale1_val1 = testSeqSymlogScale1.ApplyScale<std::string>(1e-7);
-    testSeqSymlogScale1_val2 = testSeqSymlogScale1.ApplyScale<std::string>(1e5);
-    testSeqSymlogScale1_val3 = testSeqSymlogScale1.ApplyScale<std::string>(1e7);
+    testSeqSymlogScale1_val1 = testSeqSymlogScale1.ApplyScale<std::string, double>(1e-7);
+    testSeqSymlogScale1_val2 = testSeqSymlogScale1.ApplyScale<std::string, double>(1e5);
+    testSeqSymlogScale1_val3 = testSeqSymlogScale1.ApplyScale<std::string, double>(1e7);
   }
 
   void Describe() override {
@@ -803,10 +803,10 @@ struct TestSequentialQuantileScale: emp::web::BaseTest {
   void Setup() {
     emp::array<int, 3> domainArr = {100, 1, 13};
     testSeqQuantScale1.SetDomain(domainArr);
-    testSeqQuantScale1_val1 = testSeqQuantScale1.ApplyScale<double>(1);
-    testSeqQuantScale1_val2 = testSeqQuantScale1.ApplyScale<double>(13);
-    testSeqQuantScale1_val3 = testSeqQuantScale1.ApplyScale<double>(99.99);
-    testSeqQuantScale1_val4 = testSeqQuantScale1.ApplyScale<double>(100);
+    testSeqQuantScale1_val1 = testSeqQuantScale1.ApplyScale<double, double>(1);
+    testSeqQuantScale1_val2 = testSeqQuantScale1.ApplyScale<double, double>(13);
+    testSeqQuantScale1_val3 = testSeqQuantScale1.ApplyScale<double, double>(99.99);
+    testSeqQuantScale1_val4 = testSeqQuantScale1.ApplyScale<double, double>(100);
   }
 
   void Describe() override {
@@ -845,9 +845,9 @@ struct TestDivergingScale: emp::web::BaseTest {
     emp::array<double, 3> domainArr = {-0.78, 0, 1.35};
     testDivergingScale1.SetDomain(domainArr);
     testDivergingScale1.SetInterpolator("interpolatePuOr");
-    testDivergingScale1_val1 = testDivergingScale1.ApplyScale<std::string>(-0.5);
-    testDivergingScale1_val2 = testDivergingScale1.ApplyScale<std::string>(0);
-    testDivergingScale1_val3 = testDivergingScale1.ApplyScale<std::string>(1.01);
+    testDivergingScale1_val1 = testDivergingScale1.ApplyScale<std::string, double>(-0.5);
+    testDivergingScale1_val2 = testDivergingScale1.ApplyScale<std::string, double>(0);
+    testDivergingScale1_val3 = testDivergingScale1.ApplyScale<std::string, double>(1.01);
 
     testDivergingScale1_Domain = testDivergingScale1.GetDomain<double>();
   }
@@ -894,9 +894,9 @@ struct TestDivergingLogScale: emp::web::BaseTest {
   void Setup() {
     testDivergingLogScale1.SetDomain(1e-8, 1e8);
     testDivergingLogScale1.SetInterpolator("interpolatePuOr");
-    testDivergingLogScale1_val1 = testDivergingLogScale1.ApplyScale<std::string>(1e-5);
-    testDivergingLogScale1_val2 = testDivergingLogScale1.ApplyScale<std::string>(0);
-    testDivergingLogScale1_val3 = testDivergingLogScale1.ApplyScale<std::string>(1e5);
+    testDivergingLogScale1_val1 = testDivergingLogScale1.ApplyScale<std::string, double>(1e-5);
+    testDivergingLogScale1_val2 = testDivergingLogScale1.ApplyScale<std::string, double>(0);
+    testDivergingLogScale1_val3 = testDivergingLogScale1.ApplyScale<std::string, double>(1e5);
   }
 
   void Describe() override {
@@ -932,9 +932,9 @@ struct TestDivergingPowScale: emp::web::BaseTest {
   void Setup() {
     testDivergingPowScale1.SetDomain(1e-8, 1e8);
     testDivergingPowScale1.SetInterpolator("interpolatePuOr");
-    testDivergingPowScale1_val1 = testDivergingPowScale1.ApplyScale<std::string>(1e-5);
-    testDivergingPowScale1_val2 = testDivergingPowScale1.ApplyScale<std::string>(1e6);
-    testDivergingPowScale1_val3 = testDivergingPowScale1.ApplyScale<std::string>(1.9e7);
+    testDivergingPowScale1_val1 = testDivergingPowScale1.ApplyScale<std::string, double>(1e-5);
+    testDivergingPowScale1_val2 = testDivergingPowScale1.ApplyScale<std::string, double>(1e6);
+    testDivergingPowScale1_val3 = testDivergingPowScale1.ApplyScale<std::string, double>(1.9e7);
   }
 
   void Describe() override {
@@ -970,9 +970,9 @@ struct TestDivergingSqrtScale: emp::web::BaseTest {
   void Setup() {
     testDivergingSqrtScale1.SetDomain(1e-8, 1e8);
     testDivergingSqrtScale1.SetInterpolator("interpolatePuOr");
-    testDivergingSqrtScale1_val1 = testDivergingSqrtScale1.ApplyScale<std::string>(1e-5);
-    testDivergingSqrtScale1_val2 = testDivergingSqrtScale1.ApplyScale<std::string>(1e6);
-    testDivergingSqrtScale1_val3 = testDivergingSqrtScale1.ApplyScale<std::string>(1.9e7);
+    testDivergingSqrtScale1_val1 = testDivergingSqrtScale1.ApplyScale<std::string, double>(1e-5);
+    testDivergingSqrtScale1_val2 = testDivergingSqrtScale1.ApplyScale<std::string, double>(1e6);
+    testDivergingSqrtScale1_val3 = testDivergingSqrtScale1.ApplyScale<std::string, double>(1.9e7);
   }
 
   void Describe() override {
@@ -1008,9 +1008,9 @@ struct TestDivergingSymlogScale: emp::web::BaseTest {
   void Setup() {
     testDivergingSymlogScale1.SetDomain(1e-8, 1e8);
     testDivergingSymlogScale1.SetInterpolator("interpolatePuOr");
-    testDivergingSymlogScale1_val1 = testDivergingSymlogScale1.ApplyScale<std::string>(1e-5);
-    testDivergingSymlogScale1_val2 = testDivergingSymlogScale1.ApplyScale<std::string>(1e6);
-    testDivergingSymlogScale1_val3 = testDivergingSymlogScale1.ApplyScale<std::string>(1.9e7);
+    testDivergingSymlogScale1_val1 = testDivergingSymlogScale1.ApplyScale<std::string, double>(1e-5);
+    testDivergingSymlogScale1_val2 = testDivergingSymlogScale1.ApplyScale<std::string, double>(1e6);
+    testDivergingSymlogScale1_val3 = testDivergingSymlogScale1.ApplyScale<std::string, double>(1.9e7);
   }
 
   void Describe() override {
@@ -1057,18 +1057,18 @@ struct TestQuantizeScale: emp::web::BaseTest {
     testQuantizeScale1.SetDomain(0, 100);
     emp::array<std::string, 4> rangeArr = {"lightblue", "orange", "lightgreen", "pink"};
     testQuantizeScale1.SetRange(rangeArr);
-    testQuantizeScale1_val1 = testQuantizeScale1.ApplyScale<std::string>(10);
-    testQuantizeScale1_val2 = testQuantizeScale1.ApplyScale<std::string>(30);
-    testQuantizeScale1_val3 = testQuantizeScale1.ApplyScale<std::string>(90);
+    testQuantizeScale1_val1 = testQuantizeScale1.ApplyScale<std::string, int>(10);
+    testQuantizeScale1_val2 = testQuantizeScale1.ApplyScale<std::string, int>(30);
+    testQuantizeScale1_val3 = testQuantizeScale1.ApplyScale<std::string, int>(90);
     testQuantizeScale1_invert = testQuantizeScale1.InvertExtent("orange");
     testQuantizeScale1_thresholds = testQuantizeScale1.GetThresholds();
 
     testQuantizeScale2.SetDomain(10, 100);
     emp::array<int, 3> rangeArr2 = {1, 2, 4};
     testQuantizeScale2.SetRange(rangeArr2);
-    testQuantizeScale2_val1 = testQuantizeScale2.ApplyScale<int>(20);
-    testQuantizeScale2_val2 = testQuantizeScale2.ApplyScale<int>(50);
-    testQuantizeScale2_val3 = testQuantizeScale2.ApplyScale<int>(80);
+    testQuantizeScale2_val1 = testQuantizeScale2.ApplyScale<int, int>(20);
+    testQuantizeScale2_val2 = testQuantizeScale2.ApplyScale<int, int>(50);
+    testQuantizeScale2_val3 = testQuantizeScale2.ApplyScale<int, int>(80);
     testQuantizeScale2_invert = testQuantizeScale2.InvertExtent(4);
     testQuantizeScale2_thresholds = testQuantizeScale2.GetThresholds();
   }
@@ -1152,10 +1152,10 @@ struct TestQuantileScale: emp::web::BaseTest {
     testQuantileScale1.SetDomain(domainArr);
     emp::array<std::string, 4> rangeArr = {"lightblue", "orange", "lightgreen", "purple"};
     testQuantileScale1.SetRange(rangeArr);
-    testQuantileScale1_val1 = testQuantileScale1.ApplyScale<std::string>(0);
-    testQuantileScale1_val2 = testQuantileScale1.ApplyScale<std::string>(20);
-    testQuantileScale1_val3 = testQuantileScale1.ApplyScale<std::string>(65);
-    testQuantileScale1_val4 = testQuantileScale1.ApplyScale<std::string>(70);
+    testQuantileScale1_val1 = testQuantileScale1.ApplyScale<std::string, int>(0);
+    testQuantileScale1_val2 = testQuantileScale1.ApplyScale<std::string, int>(20);
+    testQuantileScale1_val3 = testQuantileScale1.ApplyScale<std::string, int>(65);
+    testQuantileScale1_val4 = testQuantileScale1.ApplyScale<std::string, int>(70);
     testQuantileScale1_quantiles = testQuantileScale1.GetQuantiles();
   }
 
@@ -1208,10 +1208,10 @@ struct TestThresholdScale: emp::web::BaseTest {
     testThresholdScale1.SetDomain(domainArr);
     emp::array<std::string, 4> rangeArr = {"#ccc", "lightblue", "orange", "#ccc"};
     testThresholdScale1.SetRange(rangeArr);
-    testThresholdScale1_val1 = testThresholdScale1.ApplyScale<std::string>(-10);
-    testThresholdScale1_val2 = testThresholdScale1.ApplyScale<std::string>(20);
-    testThresholdScale1_val3 = testThresholdScale1.ApplyScale<std::string>(70);
-    testThresholdScale1_val4 = testThresholdScale1.ApplyScale<std::string>(110);
+    testThresholdScale1_val1 = testThresholdScale1.ApplyScale<std::string, int>(-10);
+    testThresholdScale1_val2 = testThresholdScale1.ApplyScale<std::string, int>(20);
+    testThresholdScale1_val3 = testThresholdScale1.ApplyScale<std::string, int>(70);
+    testThresholdScale1_val4 = testThresholdScale1.ApplyScale<std::string, int>(110);
   }
 
   void Describe() override {
@@ -1252,10 +1252,10 @@ struct TestOrdinalScale: emp::web::BaseTest {
     testOrdinalScale1.SetDomain(domainArr);
     emp::array<std::string, 3> rangeArr = {"black", "#ccc", "#ccc"};
     testOrdinalScale1.SetRange(rangeArr);
-    testOrdinalScale1_val1 = testOrdinalScale1.ApplyScale<std::string>(-10);
-    testOrdinalScale1_val2 = testOrdinalScale1.ApplyScale<std::string>(20);
-    testOrdinalScale1_val3 = testOrdinalScale1.ApplyScale<std::string>(70);
-    testOrdinalScale1_val4 = testOrdinalScale1.ApplyScale<std::string>(110);
+    testOrdinalScale1_val1 = testOrdinalScale1.ApplyScale<std::string, int>(-10);
+    testOrdinalScale1_val2 = testOrdinalScale1.ApplyScale<std::string, int>(20);
+    testOrdinalScale1_val3 = testOrdinalScale1.ApplyScale<std::string, int>(70);
+    testOrdinalScale1_val4 = testOrdinalScale1.ApplyScale<std::string, int>(110);
   }
 
   void Describe() override {
@@ -1275,7 +1275,7 @@ struct TestOrdinalScale: emp::web::BaseTest {
           chai.assert.equal(testOrdinalScale1_val1, ordinalScale("Jan"));    // "black"
           chai.assert.equal(testOrdinalScale1_val2, ordinalScale("Feb"));    // "#ccc"
           chai.assert.equal(testOrdinalScale1_val3, ordinalScale("Mar"));    // "#ccc"
-          chai.assert.equal(testOrdinalScale1_val4, ordinalScale("Apr"));    // "blac"
+          chai.assert.equal(testOrdinalScale1_val4, ordinalScale("Apr"));    // "black"
         });
       });
     }, testOrdinalScale1_val1.c_str(), testOrdinalScale1_val2.c_str(), testOrdinalScale1_val3.c_str(), testOrdinalScale1_val4.c_str());

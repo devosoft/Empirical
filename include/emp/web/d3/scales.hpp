@@ -109,11 +109,11 @@ namespace D3 {
     // Note that when passing in an std::string as an input you must explicitly specify it 
     // in the template (but when pasing in a double or an int it will match to the proper
     // template automatically so you only need to specify the return type)
-    template<typename RETURN_T, typename INPUT_T>
+    template<typename RETURN_T, typename INPUT_T, typename fake = void >
     RETURN_T ApplyScale(INPUT_T input) { ; }
 
-    template<>
-    std::string ApplyScale<std::string, std::string>(std::string input) {
+    template<typename fake=void>
+    std::string ApplyScale<std::string, std::string, fake>(std::string input) {
       MAIN_THREAD_EM_ASM({
         const resultStr = emp_d3.objects[$0](UTF8ToString($1));
         emp.PassStringToCpp(resultStr);
@@ -121,8 +121,8 @@ namespace D3 {
       return emp::pass_str_to_cpp();
     }
 
-    template<>
-    std::string ApplyScale<std::string, double>(double input) {
+    template<typename fake=void>
+    std::string ApplyScale<std::string, double, fake>(double input) {
       MAIN_THREAD_EM_ASM({
         const resultStr = emp_d3.objects[$0]($1);
         emp.PassStringToCpp(resultStr);
@@ -130,8 +130,8 @@ namespace D3 {
       return emp::pass_str_to_cpp();
     }
 
-    template<>
-    std::string ApplyScale<std::string, int>(int input) {
+    template<typename fake=void>
+    std::string ApplyScale<std::string, int, fake>(int input) {
       MAIN_THREAD_EM_ASM({
         const resultStr = emp_d3.objects[$0]($1);
         emp.PassStringToCpp(resultStr);
@@ -139,43 +139,43 @@ namespace D3 {
       return emp::pass_str_to_cpp();
     }
 
-    template<>
-    double ApplyScale<double, std::string>(std::string input) {
+    template<typename fake=void>
+    double ApplyScale<double, std::string, fake>(std::string input) {
       return MAIN_THREAD_EM_ASM_DOUBLE({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
     }
 
-    template<>
-    double ApplyScale<double, double>(double input) {
+    template<typename fake=void>
+    double ApplyScale<double, double, fake>(double input) {
       return MAIN_THREAD_EM_ASM_DOUBLE({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
 
-    template<>
-    double ApplyScale<double, int>(int input) {
+    template<typename fake=void>
+    double ApplyScale<double, int, fake>(int input) {
       return MAIN_THREAD_EM_ASM_DOUBLE({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
 
-    template<>
-    int ApplyScale<int, std::string>(std::string input) {
+    template<typename fake=void>
+    int ApplyScale<int, std::string, fake>(std::string input) {
       return MAIN_THREAD_EM_ASM_INT({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
     }
 
-    template<>
-    int ApplyScale<int, double>(double input) {
+    template<typename fake=void>
+    int ApplyScale<int, double, fake>(double input) {
       return MAIN_THREAD_EM_ASM_INT({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
 
-    template<>
-    int ApplyScale<int, int>(int input) {
+    template<typename fake=void>
+    int ApplyScale<int, int, fake>(int input) {
       return MAIN_THREAD_EM_ASM_INT({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
@@ -498,11 +498,11 @@ namespace D3 {
       return *this;
     }
 
-    template<typename T>
+    template<typename T, typename fake = void>
     T ApplyScale(const Date & dateInput) { ; }
 
-    template<>
-    double ApplyScale<double>(const Date & dateInput) {
+    template<typename fake=void>
+    double ApplyScale<double, fake>(const Date & dateInput) {
       return MAIN_THREAD_EM_ASM_DOUBLE({
         const id = $0;
         const year = $1;
@@ -518,8 +518,8 @@ namespace D3 {
       }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
     }
 
-    template<>
-    int ApplyScale<int>(const Date & dateInput) {
+    template<typename fake=void>
+    int ApplyScale<int, fake>(const Date & dateInput) {
       return MAIN_THREAD_EM_ASM_INT({
         const id = $0;
         const year = $1;
@@ -536,8 +536,8 @@ namespace D3 {
     }
 
     // ApplyScale that returns a string
-    template<>
-    std::string ApplyScale<std::string>(const Date & dateInput) {
+    template<typename fake=void>
+    std::string ApplyScale<std::string, fake>(const Date & dateInput) {
       MAIN_THREAD_EM_ASM({
         const id = $0;
         const year = $1;
