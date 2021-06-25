@@ -4,18 +4,19 @@ Empirical is a library of tools for developing efficient, reliable, and accessib
 software.  The provided code is header-only and encapsulated into the emp namespace, so it
 is simple to incorporate into existing projects.
 
-[![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563) [![codecov](https://codecov.io/gh/devosoft/Empirical/branch/master/graph/badge.svg)](https://codecov.io/gh/devosoft/Empirical)
-[![DockerHub](https://img.shields.io/docker/build/devosoft/empirical.svg)](https://hub.docker.com/r/devosoft/empirical)
-
+[![CI](https://github.com/devosoft/Empirical/workflows/CI/badge.svg)](https://github.com/devosoft/Empirical/actions?query=workflow%3ACI+branch%3Amaster) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563) [![codecov](https://codecov.io/gh/devosoft/Empirical/branch/master/graph/badge.svg)](https://codecov.io/gh/devosoft/Empirical)
+[![DockerHub](https://img.shields.io/badge/DockerHub-Hosted-blue)](https://hub.docker.com/r/devosoft/empirical)
+![Documentation Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdevosoft%2FEmpirical%2Fgh-storage%2Fstats%2Fdoc-coverage.json)
 
 See our [Built With Empirical Gallery](https://empirical.readthedocs.io/en/latest/BuiltWithEmpiricalGallery) for examples of web tools built with Empirical.
 
 See our [Quick Start Guides](https://empirical.readthedocs.io/en/latest/QuickStartGuides) to start using the library.
 
 Starting out on a new project that will use Empirical?
-Take a look at the [cookiecutter Empirical project template](https://github.com/devosoft/cookiecutter-empirical-project) for automarically setting up a directory structure with all the files you need to get started -- step-by-step instructions included!
+Take a look at the [cookiecutter Empirical project template](https://github.com/devosoft/cookiecutter-empirical-project) for automatically setting up a directory structure with all the files you need to get started -- step-by-step instructions included!
 
 Tools in Empirical include:
+
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,
   using Mozilla's Emscripten compiler (from C++ to high-efficiency JavaScript).
 * Debug tools to facilitate audited memory management; these tools are turned off outside of
@@ -28,39 +29,47 @@ Tools in Empirical include:
 * A signal-action system that allows for efficient customization of tools, and flexible
   software that can easily facilitate plug-in functionality.
 
-See https://empirical.readthedocs.io/en/latest for more detailed documentation
+See <https://empirical.readthedocs.io/en/latest> for more detailed documentation
 on the available source files.
 
 # Directory Structure
 
 | Folder       | Description
 | ------------ | ----
-| apps/        | mini projects using Empirical with broad utility
+| demos/       | examples of mini projects using Empirical
 | doc/         | Documentation files (including for auto generation of docs)
 | examples/    | Example code for many of the above tools (sub-directory structure parallels source/)
+| include/     | Header files that make up the Empirical library (see below for details)
 | Planning/    | Scattered notes about future development (most notes found in GitHub issue tracker)
-| source/      | Header files that make up the Empirical library (see below for details)
 | tests/       | Unit tests
 | third-party/ | Non-empirical dependencies
 
-
-# Sub-folders in source/ directory
+# Sub-folders in include/emp directory
 
 | Sub-Folder  | Description
 | ----------- | ----
 | base/       | Debug tools used throughout Empirical for fast and efficient memory management
+| bits/       | Tools for conveniently and efficiently working with bit representations
 | config/     | Tools to build a simple configuration system (including compile-time optimizations)
-| control/    | Signialing tools allowing for fast and dynamic interaction across components
+| control/    | Signaling tools allowing for fast and dynamic interaction across components
+| compiler/   | Components for compiling code
 | data/       | Tools for easy data management and output
+| datastructs/| A variety of useful data structures and tools for using data structures
+| debug/      | Tools to facilitate debugging (particularly of emscripten-generated web code)
+| functional/ | Tools for handling functions, sets of functions, and memoization
+| games/      | Implementations of simple games
 | geometry/   | Geometry and physics-based tools for implementing simple virtual worlds
 | hardware/   | Implementation of basic virtual hardware that is easy to configure
+| io/         | Tools for handling input/output
+| matching/   | Tools for tag-based matching
+| math/       | Generally useful tools for math and randomness
 | meta/       | Helpful tools for template meta-programming
+| prefab/     | Prefabricated web elements to drop onto web pages
 | scholar/    | Tools for tracking authors, citations, and bibliographies
-| tools/      | Many basic tools that are generally useful for scientific software
-| web/        | Tools for building web interfaces
-| Evolve/        | Specialized tools for building Artificial Life or Evolutionary Computation projects
-| in_progress/ | Tools that are being worked on, but not at all ready for public consumption
-
+| tools/      | Basic tools that are generally useful for scientific software
+| web/        | Tools for building web interfaces (more low-level than in prefab)
+| Evolve/     | Specialized tools for building Artificial Life or Evolutionary Computation projects
+| in_progress/| Tools that are being worked on, but not at all ready for public consumption
 
 # Development Status
 
@@ -80,7 +89,6 @@ following statuses:
 | CLEANUP | At least BETA, but needs code cleanup, fixing of warnings, etc
 | DEPRECATED | Functionality has been replaced and should shift to replacement.
 | EXTERNAL | Part of another project (cited above); not developed as part of Empirical
-
 
 # Levelization
 

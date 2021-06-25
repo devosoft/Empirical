@@ -1,27 +1,52 @@
 # Pull base image.
-FROM ubuntu:16.04
+FROM ubuntu:bionic-20210416
 
 COPY . /opt/Empirical
 
 SHELL ["/bin/bash", "-c"]
 
-# Install.
+# Prevent interactive time zone config.
+# adapted from https://askubuntu.com/a/1013396
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN \
+  echo 'Acquire::http::Timeout "60";' >> "/etc/apt/apt.conf.d/99timeout" \
+    && \
+  echo 'Acquire::ftp::Timeout "60";' >> "/etc/apt/apt.conf.d/99timeout" \
+    && \
+  echo 'Acquire::Retries "100";' >> "/etc/apt/apt.conf.d/99timeout" \
+    && \
+  echo "buffed apt-get resiliency"
+
+# Install apt packages
+# xvfb nonsense adapted from https://github.com/samgiles/docker-xvfb
+# remove -backports, -updates, -proposed, -security repositories
+# looks like we have to grab libxxhash0 from -updates now
 RUN \
   apt-get update -y \
     && \
-  apt-get install -y software-properties-common \
+  apt-get install --no-install-recommends libxxhash0 \
+    && \
+  apt-get clean \
+    && \
+  rm -rf /var/lib/apt/lists/* \
+    && \
+  find /etc/apt -type f -name '*.list' -exec sed -i 's/\(^deb.*-backports.*\)/#\1/; s/\(^deb.*-updates.*\)/#\1/; s/\(^deb.*-proposed.*\)/#\1/; s/\(^deb.*-security.*\)/#\1/' {} + \
+    && \
+  apt-get update -y \
+    && \
+  apt-get install -y software-properties-common=0.96.24.32.1 \
     && \
   add-apt-repository -y ppa:ubuntu-toolchain-r/test \
     && \
   apt-get update -y \
     && \
-  apt-get -y upgrade \
-    && \
-  echo "configured packaging system"
-
-# xvfb nonsense adapted from https://github.com/samgiles/docker-xvfb
-RUN \
-  apt-get install -y \
+  apt-get install --no-install-recommends --allow-downgrades -y \
+    dpkg-dev \
+    libc6=2.27-3ubuntu1 \
+    libc6-dev \
+    libc6-dbg \
+    build-essential \
     xvfb \
     x11vnc \
     x11-xkb-utils \
@@ -30,8 +55,54 @@ RUN \
     xfonts-scalable \
     xfonts-cyrillic \
     x11-apps \
+    gtk2-engines-pixbuf \
+    firefox \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
+    g++-8=8-20180414-1ubuntu2 \
+    gcc-8-base=8-20180414-1ubuntu2 \
+    cpp-8=8-20180414-1ubuntu2 \
+    gcc-8=8-20180414-1ubuntu2 \
+    gcc-8-base=8-20180414-1ubuntu2 \
+    libgcc-8-dev \
+    libstdc++-8-dev \
+    cmake \
+    python-virtualenv \
+    python-pip-whl \
+    python-pip \
+    python-setuptools \
+    python3-setuptools \
+    python3-virtualenv \
+    python3-pip \
+    nodejs \
+    npm \
+    tar \
+    gzip \
+    libpthread-stubs0-dev \
+    gdb \
+    doxygen \
+    curl \
+    perl \
+    perl-base=5.26.1-6 \
+    git \
+    htop \
+    man \
+    unzip \
+    vim-common \
+    vim-runtime \
+    vim \
+    nano \
+    wget \
+    ssh-client \
+    libasound2 \
+    gpg-agent \
     && \
-  echo "installed xvfb"
+  apt-get clean \
+    && \
+  rm -rf /var/lib/apt/lists/* \
+    && \
+  echo "installed apt packages"
 
 RUN \
   echo $' \n\
@@ -87,42 +158,8 @@ RUN \
 
 ENV DISPLAY :99
 
-RUN \
-  apt-get install -y \
-    gtk2-engines-pixbuf \
-    firefox \
-    && \
-  echo "installed headless firefox dependencies"
-
-RUN \
-  apt-get install -y \
-    g++-8 \
-    cmake \
-    build-essential \
-    python-virtualenv \
-    python-pip \
-    nodejs \
-    npm \
-    tar \
-    gzip \
-    libpthread-stubs0-dev \
-    libc6-dbg \
-    gdb \
-    && \
-  echo "installed core dependencies"
-
-RUN \
-  apt-get install -y \
-    curl \
-    git \
-    htop \
-    man \
-    unzip \
-    vim \
-    nano \
-    wget \
-    && \
-  echo "installed creature comforts"
+# magic from https://github.com/puppeteer/puppeteer/issues/3451#issuecomment-523961368
+RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
 
 RUN \
   update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90 \
@@ -131,11 +168,20 @@ RUN \
   && \
   n 12.18.2 \
   && \
-  export python="/usr/bin/python" \
+  export python="/usr/bin/python3" \
   && \
   npm install source-map \
   && \
   echo "finalized set up dependency versions"
+
+RUN \
+  pip install wheel==0.30.0 \
+    && \
+  pip3 install wheel==0.30.0 \
+    && \
+  pip3 install -r /opt/Empirical/doc/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
 
 RUN \
   cd /opt/Empirical \
@@ -193,11 +239,6 @@ RUN \
     && \
   echo "make entrypoint script executable"
 
-# Define default entrypoint.
-ENTRYPOINT ["/opt/entrypoint.sh"]
-
-CMD ["bash"]
-
 # Adapted from https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
 # Maybe important for container compatability running on Windows?
 RUN \
@@ -212,3 +253,31 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
+
+RUN \
+  pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
+
+# Perform any further action as an unprivileged user.
+# adapted from https://stackoverflow.com/a/27703359
+# and https://superuser.com/a/235398
+RUN \
+  useradd --create-home --shell /bin/bash user \
+    && \
+  groupadd group \
+    && \
+  gpasswd -a user group \
+    && \
+  chgrp --recursive user /opt \
+    && \
+  chmod --recursive g+rwx /opt \
+    && \
+  echo "user added and granted permissions to /opt"
+
+USER user
+
+# Define default entrypoint.
+ENTRYPOINT ["/opt/entrypoint.sh"]
+
+CMD ["bash"]

@@ -2,9 +2,15 @@
 // Javascript files in karma will cause horrible problems.
 
 
+<<<<<<< HEAD:tests/web/d3/visualizations.cc
 #include "web/Document.h"
 #include "web/d3-old/visualizations.h"
 #include "tools/tuple_struct.h"
+=======
+#include "emp/web/d3/visualizations.hpp"
+#include "emp/datastructs/tuple_struct.hpp"
+#include "emp/web/Document.hpp"
+>>>>>>> devolab/master:tests/web/visualizations.cpp
 
 #include <iostream>
 #include <functional>

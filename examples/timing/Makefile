@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -I../../source/
+CFLAGS_all := -Wall -Wno-unused-function -I../../include/
 CFLAGS_version := -std=c++17
 
 # Emscripten compiler information
@@ -16,11 +16,11 @@ OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := IndexMap Othello pointers short_strings
+TARGETS := bit_timings IndexMap Othello pointers Random_timings
 
 default: native
 
@@ -42,13 +42,13 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc
+$(TARGETS): % : %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-opt-%: %.cc
+opt-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc
+debug-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:
