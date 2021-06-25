@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2020.
+//  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #ifndef __EMP_D3_SELECTION_H__
@@ -610,7 +610,7 @@ namespace internal {
   };
 }
 
-#include "transition.h"
+#include "transition.hpp"
 
 namespace D3 {
 
@@ -1176,7 +1176,7 @@ namespace D3 {
 
     Transition MakeTransition(Transition & t) {
       const int new_id =internal::NextD3ID();
-      MAIN_THREAD_EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var transition = emp_d3.objects[$0].transition(emp_d3.objects[$1]);
         emp_d3.objects[$2] = transition;
       }, this->id, t.GetID(), new_id);
@@ -1186,7 +1186,7 @@ namespace D3 {
 
     /// Interrupt the transition with the name [name] on the current selection
     Selection & Interrupt(const std::string & name="") {
-      MAIN_THREAD_EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         emp_d3.objects[$0].interrupt(UTF8ToString($1));
       }, this->id, name.c_str());
       return *this;

@@ -5,7 +5,7 @@
 #ifndef __EMP_D3_TRANSITION_H__
 #define __EMP_D3_TRANSITION_H__
 
-#include "d3_init.h"
+#include "d3_init.hpp"
 
 #include <iostream>
 #include <string>
@@ -13,10 +13,10 @@
 #include <map>
 #include <array>
 
-#include "../../base/assert.h"
-#include "../js_utils.h"
-#include "../JSWrap.h"
-#include "selection.h"
+#include "../../base/assert.hpp"
+#include "../js_utils.hpp"
+#include "../JSWrap.hpp"
+#include "selection.hpp"
 
 namespace D3 {
 
@@ -307,7 +307,7 @@ namespace D3 {
         return emp_d3.is_function(func_string);
       }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
 
-      MAIN_THREAD_EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         const id = $0;
         const arg1 = UTF8ToString($1);
         var func_string = UTF8ToString($2);

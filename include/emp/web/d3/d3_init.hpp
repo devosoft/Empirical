@@ -1,7 +1,7 @@
 #ifndef D3_INIT_H
 #define D3_INIT_H
 
-#include "../web.h"
+#include "../web.hpp"
 
 namespace D3 {
 namespace internal {
@@ -24,6 +24,11 @@ namespace internal {
     emp_d3.objects[id] = -1;
     return id;
   });
+
+  // Stub so compiler doesn't throw errors if we aren't in emscripten
+  #ifndef __EMSCRIPTEN__
+  size_t NextD3ID() {return 0;}
+  #endif
 
 }
 
