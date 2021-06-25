@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../../include/emp/ -I../../../include/
 
