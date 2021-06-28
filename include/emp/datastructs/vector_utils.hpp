@@ -58,6 +58,52 @@ namespace emp {
     return out_v;
   }
 
+  /// Convert a map to a vector.
+  template <typename T, typename INDEX_T=size_t>
+  emp::vector<T> ToVector(const std::map<INDEX_T, T> & in_map, T default_val=T()) {
+    INDEX_T max_index = in_map.back().second;
+    if (max_index < 0) max_index = 0; // In case all entries are negative...
+    emp::vector<T> out_vec;
+    out_vec.resize(max_index+1, default_val);
+    for (auto [index, val] : in_map) {
+      if (index < 0) continue; // Skip entries that can't go into a vector...
+      out_vec[index] = val;
+    }
+    return out_vec;
+  }
+
+  /// Convert an unordered map to a vector.
+  template <typename T, typename INDEX_T=size_t>
+  emp::vector<T> ToVector(const std::unordered_map<INDEX_T, T> & in_map, T default_val=T()) {
+    emp::vector<T> out_vec;
+    for (auto [index, val] : in_map) {
+      if (index < 0) continue; // Skip entries that can't go into a vector...
+      if (((size_t) index) >= out_vec.size()) out_vec.resize(index+1, default_val);
+      out_vec[index] = val;
+    }
+    return out_vec;
+  }
+
+  /// Convert a vector into a map.
+  template <typename T>
+  std::map<size_t, T> ToMap(const emp::vector<T> & in_vec) {
+    std::map<size_t, T> out_map;
+    for (size_t i=0; i < in_vec.size(); i++) {
+      out_map[i] = in_vec[i];
+    }
+    return out_map;
+  }
+
+  /// Convert a vector into a map.
+  template <typename INDEX_T=size_t, typename T>
+  std::unordered_map<INDEX_T, T> ToUMap(const emp::vector<T> & in_vec) {
+    std::unordered_map<INDEX_T, T> out_map;
+    for (size_t i=0; i < in_vec.size(); i++) {
+      out_map[(INDEX_T) i] = in_vec[i];
+    }
+    return out_map;
+  }
+
   /// Return the first position of a value in a vector (or -1 if none exists)
   template <typename T>
   int FindValue(const emp::vector<T> & v, const T & val, size_t start_pos=0) {
