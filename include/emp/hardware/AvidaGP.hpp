@@ -299,6 +299,7 @@ namespace emp {
     void SetInput(int input_id, double value) { inputs[input_id] = value; }
     void SetInputs(const std::unordered_map<int,double> & vals) { inputs = vals; }
     void SetInputs(std::unordered_map<int,double> && vals) { inputs = std::move(vals); }
+    void SetInputs(const emp::vector<double> & vals) { inputs = emp::ToUMap<int,double>(vals); }
     void SetOutput(int output_id, double value) { outputs[output_id] = value; }
     void SetOutputs(const std::unordered_map<int,double> & vals) { outputs = vals; }
     void SetOutputs(std::unordered_map<int,double> && vals) { outputs = std::move(vals); }
