@@ -474,10 +474,13 @@ namespace prefab {
           }
         }
         web::Button reset_button{ [this](){ 
-          config.Write(std::cout);
-          EM_ASM(
-            window.location.href = '#';
-          );
+          std::stringstream ss;
+          config.WriteUrlQueryString(ss);
+          const std::string& tmp = ss.str().;
+          const char* cstr = tmp.c_str();
+          EM_ASM({
+            window.location.href = '?' + UTF8ToString($0)
+          }, cstr);
          }, "Reset with changes", "settings_reset"};
         reset_button.SetAttr("class", "btn btn-danger");
         reset_button.SetCSS("order", "1", "margin-left", "auto");

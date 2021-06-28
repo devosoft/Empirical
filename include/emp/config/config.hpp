@@ -238,6 +238,17 @@ namespace emp {
         out << std::endl; // Skip a line after each group.
       }
 
+      void WriteUrlQueryString(std::ostream & out) const {
+        const size_t entry_count = entry_set.size();
+        emp::vector<std::string> setting_info(entry_count);
+        for (size_t i = 0; i < entry_count; i++) {
+          out << entry_set[i]->GetName();
+          out << "=";
+          out << entry_set[i]->GetValue();
+          out << "&";
+        }
+      }
+
       void WriteMacros(std::ostream & out, bool as_const) const {
         // Print header information to register group.
         out << "  GROUP(" << name << ", \"" << desc << "\"),\n";
@@ -468,6 +479,13 @@ namespace emp {
       std::ofstream out(filename);
       Write(out);
       out.close();
+    }
+
+    // Generates url query parameters for the state of Config
+    void WriteUrlQueryString(std::ostream & out) const {
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
+        (*it)->WriteUrlQueryString(out);
+      }
     }
 
     // Generate a text representation (typically a file) for the state of Config
