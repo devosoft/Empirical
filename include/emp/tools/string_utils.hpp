@@ -152,7 +152,7 @@ namespace emp {
       // Any other characters are percent-encoded
       else {
         escaped << std::uppercase;
-        escaped << '%' << std::setw(2) << static_cast<unsigned char>(c);
+        escaped << '%' << std::setw(2) << (static_cast<int>(c) & 0x000000FF);
         escaped << std::nouppercase;
       }
 
