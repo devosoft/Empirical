@@ -242,10 +242,10 @@ namespace emp {
         const size_t entry_count = entry_set.size();
         emp::vector<std::string> setting_info(entry_count);
         for (size_t i = 0; i < entry_count; i++) {
+          out << "&";
           out << entry_set[i]->GetName();
           out << "=";
-          out << entry_set[i]->GetValue();
-          out << "&";
+          out << url_encode<false>(entry_set[i]->GetValue());
         }
       }
 
@@ -486,6 +486,8 @@ namespace emp {
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->WriteUrlQueryString(out);
       }
+      out.seekp(0);
+      out << '?';
     }
 
     // Generate a text representation (typically a file) for the state of Config

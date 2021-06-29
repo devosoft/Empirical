@@ -476,10 +476,10 @@ namespace prefab {
         web::Button reset_button{ [this](){ 
           std::stringstream ss;
           config.WriteUrlQueryString(ss);
-          const std::string& tmp = ss.str().;
+          const std::string tmp(ss.str());
           const char* cstr = tmp.c_str();
           EM_ASM({
-            window.location.href = '?' + UTF8ToString($0)
+            window.location.href = UTF8ToString($0);
           }, cstr);
          }, "Reset with changes", "settings_reset"};
         reset_button.SetAttr("class", "btn btn-danger");
