@@ -34,7 +34,7 @@ namespace web {
       ).map(
         p => p[0].includes(" ") ? ["_illegal", p[0] + " " + p[1]] : p
       ).map(
-        p => [p[0]].concat(p[1].split(" "))
+        p => [p[0]].concat(p[1].split(p[1][0] == "\"" ? "\"" : " "))
       ).map(
         p => p.filter(w => w.length > 0)
       );

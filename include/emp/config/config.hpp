@@ -247,7 +247,6 @@ namespace emp {
           out << "=";
           if(entry_set[i]->GetType() == "std::string") {
             out << url_encode<false>("\"" + entry_set[i]->GetValue() + "\"");
-            std::cout << "String encountered\n";
           } else {
             out << url_encode<false>(entry_set[i]->GetValue());
           }
