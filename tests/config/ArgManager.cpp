@@ -185,6 +185,118 @@ TEST_CASE("Test ArgManager", "[config]")
     REQUIRE(am.HasUnused());
   }
 
+  // test with spaces in values
+  {
+
+    MyConfig config;
+
+    emp::vector<std::string> arguments = {
+      "./command",
+      "-unspecified",
+      "unspec",
+      "unspec",
+      "-RANDOM_SEED",
+      "32",
+      "--dir",
+      "/some path",
+      "-d",
+      "/other path",
+      "pos 1",
+      "pos 2",
+      "-unspecified",
+      "-help",
+      "pos 3",
+      "--duo",
+      "b",
+      "--duo",
+      "-a",
+      "b",
+      "--duo",
+      "a",
+      "b",
+      "pos 4",
+      "--", // in POSIX, -- means treat subsequent words as literals
+      "--duo",
+      "-a",
+      "b"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs(&config);
+    specs["dir"] = emp::ArgSpec(
+      1,
+      "some information 'n stuff",
+      std::unordered_set<std::string>{"d"}
+    );
+    specs["duo"] = emp::ArgSpec(2, "two things");
+    specs["nope"] = emp::ArgSpec(0, "not here");
+
+    emp::ArgManager am(
+      argv.size() - 1,
+      argv.data(),
+      specs
+    );
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(am.HasUnused());
+
+    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some path"} );
+    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/other path"} );
+    REQUIRE(!am.UseArg("dir"));
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"./command"});
+
+    REQUIRE(!am.ProcessBuiltin(&config));
+    REQUIRE(!am.UseArg("help"));
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.UseArg("duo"));
+
+    REQUIRE(
+      *am.UseArg("_positional")
+      == ((emp::vector<std::string>) {
+        "pos 1", "pos 2", "pos 3", "pos 4", "--duo", "-a", "b"
+      })
+    );
+    REQUIRE(!am.UseArg("_positional"));
+
+    REQUIRE(!am.ProcessBuiltin(&config));
+    REQUIRE(
+      *am.UseArg("_unknown")
+      == ((emp::vector<std::string>) {"-unspecified", "unspec", "unspec"})
+    );
+    REQUIRE(
+      *am.UseArg("_unknown")
+      == (emp::vector<std::string>) {"-unspecified"}
+    );
+    REQUIRE(*am.UseArg("_unknown") == ((emp::vector<std::string>) {"-a", "b"}));
+    REQUIRE(!am.UseArg("_unknown"));
+
+    REQUIRE(config.RANDOM_SEED() == 0);
+    REQUIRE(am.ProcessBuiltin(&config));
+    REQUIRE(config.RANDOM_SEED() == 32);
+
+    REQUIRE(
+      am.ViewArg("duo")
+      == ((emp::vector<emp::vector<std::string>>) {{"b"},{},{"a","b"}})
+    );
+
+    REQUIRE(am.ViewArg("nope") == (emp::vector<emp::vector<std::string>>) {});
+    REQUIRE(
+      am.ViewArg("extra_nope")
+      == (emp::vector<emp::vector<std::string>>) {}
+    );
+    REQUIRE(!am.UseArg("nope"));
+    REQUIRE(!am.UseArg("extra_nope"));
+
+    REQUIRE(am.HasUnused());
+  }
+
   // when no spec is provided (e.g., default builtins are used)
   {
 
