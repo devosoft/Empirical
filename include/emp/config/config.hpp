@@ -243,9 +243,15 @@ namespace emp {
         emp::vector<std::string> setting_info(entry_count);
         for (size_t i = 0; i < entry_count; i++) {
           out << "&";
-          out << entry_set[i]->GetName();
+          out << url_encode<false>(entry_set[i]->GetName());
           out << "=";
-          out << url_encode<false>(entry_set[i]->GetValue());
+          if(entry_set[i]->GetType() == "std::string") {
+            out << url_encode<false>("\"" + entry_set[i]->GetValue() + "\"");
+            std::cout << "String encountered\n";
+          } else {
+            out << url_encode<false>(entry_set[i]->GetValue());
+          }
+          
         }
       }
 
@@ -704,6 +710,24 @@ namespace emp {
 
   };
 
+  /// Template specialization for std::string of ConfigEntry class to manage settings.
+  template<> class Config::tConfigEntry<std::string> : public ConfigEntry {
+  protected:
+    std::string & entry_ref;
+  public:
+    tConfigEntry(const std::string _name, const std::string _type,
+                  const std::string _d_val, const std::string _desc,
+                  std::string & _ref)
+      : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
+    ~tConfigEntry() { ; }
+
+    std::string GetValue() const { return emp::to_string(entry_ref); }
+    std::string GetLiteralValue() const { return to_literal(entry_ref); }
+    ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
+      entry_ref = in_val; return *this;
+    }
+    bool IsConst() const { return false; }
+  };
 }
 
 // Below are macros that help build the config classes.
