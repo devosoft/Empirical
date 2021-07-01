@@ -487,3 +487,11 @@ TEST_CASE("Test repeat", "[tools]") {
 	REQUIRE( emp::repeat("abc", 2) == "abcabc" );
 
 }
+
+TEST_CASE("Test url-encode", "[tools]") {
+  REQUIRE( emp::url_encode<false>("шеллы") == "%D1%88%D0%B5%D0%BB%D0%BB%D1%8B" );
+  REQUIRE( emp::url_decode("%D1%88%D0%B5%D0%BB%D0%BB%D1%8B") == "шеллы" );
+  REQUIRE( emp::url_encode<false>(" ") == "%20" );
+  REQUIRE( emp::url_encode<true>(" ") == "+" );
+  REQUIRE( emp::url_decode("%20+") == "  " );
+}
