@@ -34,6 +34,7 @@ EMP_BUILD_CONFIG( MyConfig,
   VALUE(TEST_STRING, std::string, "default", "This is a string!"),
   CONST(TEST_CONST, int, 91, "This is an unchanging const!"),
   VALUE(TEST_STRING_SPACE, std::string, "abc def   ghi", "This is a string with spaces."),
+  VALUE(TEST_STRING_WHITESPACE, std::string, "What about...\n\t...whitespace in values?", "This is a string with newlines and tabs."),
   //VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate.", MUT_RATE),
   VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate."),
 )
