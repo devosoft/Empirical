@@ -36,8 +36,8 @@ namespace web {
       ).map(
         p => p[0].includes(" ") ? ["_illegal", p[0] + " " + p[1]] : p
       ).map(
-        p => [p[0]].concat(p[1].split(p[1][0] == "\t" ? "\t": " "))
-        // Don't split tab flagged parameters by spaces (they are string parameters)
+        p => (p[1][0] == "\"") ? [p[0], p[1].substring(1, p[1].length - 1)] : [p[0]].concat(p[1].split(" "))
+        // Strip off quotes or split by spaces
       ).map(
         p => p.filter(w => w.length > 0)
       );

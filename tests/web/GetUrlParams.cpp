@@ -37,7 +37,7 @@ int main() {
       "&bad++bad=illegal" +
       "&+bad=illegal" +
       "&bad+=illegal" +
-      "&tabflagged=\tNo breaks"
+      "&enquoted=\"no break\""
     );
   });
 
@@ -90,8 +90,8 @@ int main() {
   emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"bad","illegal"})
   );
-  emp_assert(*am.UseArg("tabflagged") == emp::vector<std::string>({"No breaks"}));
-  emp_assert(!am.UseArg("tabflagged"));
+  emp_assert(*am.UseArg("enquoted") == emp::vector<std::string>({"no break"}));
+  emp_assert(!am.UseArg("enquoted"));
 
   std::cout << "Success!" << std::endl;
 

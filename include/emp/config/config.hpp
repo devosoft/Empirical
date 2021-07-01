@@ -246,11 +246,11 @@ namespace emp {
           out << url_encode<false>(entry_set[i]->GetName());
           out << "=";
           if (entry_set[i]->GetType() == "std::string") {
-            out << "\t"; 
-            // Mark strings with a tab to ensure correct parsing
-            // (see UrlParams.hpp for why)
+            out << url_encode<false>("\"" + entry_set[i]->GetValue() + "\"");
+          } else {
+            out << url_encode<false>(entry_set[i]->GetValue());
           }
-          out << url_encode<false>(entry_set[i]->GetValue());
+          
         }
       }
 
