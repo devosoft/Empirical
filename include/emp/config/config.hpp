@@ -248,7 +248,6 @@ namespace emp {
       void WriteUrlQueryString(std::ostream & out) const {
         const size_t entry_count = entry_set.size();
         for (size_t i = 0; i < entry_count; i++) {
-          out << "&";
           out << url_encode<false>(entry_set[i]->GetName());
           out << "=";
           if (entry_set[i]->GetType() == "std::string") {
@@ -256,7 +255,7 @@ namespace emp {
           } else {
             out << url_encode<false>(entry_set[i]->GetValue());
           }
-          
+          out << "&";
         }
       }
 
@@ -494,11 +493,14 @@ namespace emp {
 
     // Generates url query parameters for the state of Config
     void WriteUrlQueryString(std::ostream & out) const {
+      std::stringstream ss;
+      ss << "?";
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        (*it)->WriteUrlQueryString(out);
+        (*it)->WriteUrlQueryString(ss);
       }
-      out.seekp(0);
-      out << '?';
+      std::string query(ss.str());
+      query.erase(query.end()-1);
+      out << query;
     }
 
     // Generate a text representation (typically a file) for the state of Config
