@@ -34,6 +34,8 @@ TEST_CASE("Test config", "[config]"){
     std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
 
     REQUIRE(config.RANDOM_SEED() == 123);
+    REQUIRE(config.TEST_STRING_SPACE() == "abc def   ghi");
+    REQUIRE(config.TEST_STRING_QUOTE() == "\"Quote\"andonemore\"soit'sodd");
 
   }
 
