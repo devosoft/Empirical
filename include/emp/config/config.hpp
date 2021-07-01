@@ -126,7 +126,14 @@ namespace emp {
       std::string GetValue() const { return emp::to_string(entry_ref); }
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
       ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
-        std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
+        if constexpr (std::is_same<VAR_TYPE, std::string>::value) {
+          // Must right trim values (no trailing whitespace)
+          size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
+          entry_ref = in_val.substr(0, end+1);
+        } else {
+          std::stringstream ss; ss << in_val; ss >> entry_ref; 
+        }
+        return *this;
       }
       bool IsConst() const { return false; }
     };
@@ -240,7 +247,6 @@ namespace emp {
 
       void WriteUrlQueryString(std::ostream & out) const {
         const size_t entry_count = entry_set.size();
-        emp::vector<std::string> setting_info(entry_count);
         for (size_t i = 0; i < entry_count; i++) {
           out << "&";
           out << url_encode<false>(entry_set[i]->GetName());
@@ -708,28 +714,7 @@ namespace emp {
     }
 
   };
-
-  /// Template specialization for std::string of ConfigEntry class to manage settings.
-  template<> class Config::tConfigEntry<std::string> : public ConfigEntry {
-  protected:
-    std::string & entry_ref;
-  public:
-    tConfigEntry(const std::string _name, const std::string _type,
-                  const std::string _d_val, const std::string _desc,
-                  std::string & _ref)
-      : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
-    ~tConfigEntry() { ; }
-
-    std::string GetValue() const { return emp::to_string(entry_ref); }
-    std::string GetLiteralValue() const { return to_literal(entry_ref); }
-    ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
-      // Must right trim values (no trailing whitespace)
-      size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
-      entry_ref = in_val.substr(0, end+1);
-      return *this;
-    }
-    bool IsConst() const { return false; }
-  };
+  
 }
 
 // Below are macros that help build the config classes.
