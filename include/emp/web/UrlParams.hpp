@@ -41,10 +41,6 @@ namespace web {
       ).map(
         p => p.filter(w => w.length > 0)
       );
-      console.log(Array.from(
-        params.entries()
-      ));
-      console.log(emp_i.__outgoing_array);
     });
 
     emp::pass_vector_to_cpp(incoming);
