@@ -25,6 +25,8 @@ namespace web {
     emp::vector<emp::vector<std::string>> incoming;
 
     MAIN_THREAD_EM_ASM({
+      // Consider: writing custom parser to distinguish between %20 and + spaces
+      // to fix string splitting issue (want to split by + not %20)
       const params = new URLSearchParams(location.search);
       emp_i.__outgoing_array = Array.from(
         params.entries()
@@ -34,8 +36,15 @@ namespace web {
       ).map(
         p => p[0].includes(" ") ? ["_illegal", p[0] + " " + p[1]] : p
       ).map(
+        p => [p[0]].concat(p[1].split(p[1][0] == "\t" ? "\t": " "))
+        // Don't split tab flagged parameters by spaces (they are string parameters)
+      ).map(
         p => p.filter(w => w.length > 0)
       );
+      console.log(Array.from(
+        params.entries()
+      ));
+      console.log(emp_i.__outgoing_array);
     });
 
     emp::pass_vector_to_cpp(incoming);
