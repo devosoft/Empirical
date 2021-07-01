@@ -718,7 +718,10 @@ namespace emp {
     std::string GetValue() const { return emp::to_string(entry_ref); }
     std::string GetLiteralValue() const { return to_literal(entry_ref); }
     ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
-      entry_ref = in_val; return *this;
+      // Must right trim values (no trailing whitespace)
+      size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
+      entry_ref = in_val.substr(0, end+1);
+      return *this;
     }
     bool IsConst() const { return false; }
   };
