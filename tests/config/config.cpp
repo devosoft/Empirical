@@ -50,6 +50,8 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(config.RANDOM_SEED() == 123);
 
+    REQUIRE(config.TEST_STRING_WHITESPACE() == "What about...\n\t...whitespace in values?");
+
   }
 
 }
