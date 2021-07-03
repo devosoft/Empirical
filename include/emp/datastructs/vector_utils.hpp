@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <functional>
 #include <limits>
+#include <map>
 
 #include "../base/vector.hpp"
 #include "../tools/string_utils.hpp"
