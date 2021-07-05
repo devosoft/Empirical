@@ -25,21 +25,22 @@ namespace web {
     emp::vector<emp::vector<std::string>> incoming;
 
     MAIN_THREAD_EM_ASM({
-      // Consider: writing custom parser to distinguish between %20 and + spaces
-      // to fix string splitting issue (want to split by + not %20)
-      const params = new URLSearchParams(location.search);
-      emp_i.__outgoing_array = Array.from(
-        params.entries()
+      // Custom parsing of query string to use '+' as key separator
+      // and %20 as regular space so that strings can have spaces
+      emp_i.__outgoing_array = location.search.substring(1).split('&'
       ).map(
-        p => p[0].replace(" ", "").length == 0
-          ?  ["_illegal", "_empty" + " " + p[1]] : p
+        expr => expr.split("=")
       ).map(
-        p => p[0].includes(" ") ? ["_illegal", p[0] + " " + p[1]] : p
+        (list) => [list[0].split("+").join(" ")].concat(!list[1] ? [""] : list[1].split('+'))
       ).map(
-        p => (p[1][0] == "\"") ? [p[0], p[1].substring(1, p[1].length - 1)] : [p[0]].concat(p[1].split(" "))
-        // Strip off quotes or split by spaces
+        list => list.map(decodeURIComponent)
       ).map(
-        p => p.filter(w => w.length > 0)
+        p => p[0].split(" ").join("").length == 0
+          ?  ["_illegal", "_empty=" + p[1]] : p
+      ).map(
+        p => p[0].includes(" ") ? ["_illegal", p[0] + "=" + p[1]] : p
+      ).map(
+        p => p.filter(Boolean)
       );
     });
 

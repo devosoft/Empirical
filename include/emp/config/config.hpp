@@ -250,11 +250,7 @@ namespace emp {
         for (size_t i = 0; i < entry_count; i++) {
           out << url_encode<false>(entry_set[i]->GetName());
           out << "=";
-          if (entry_set[i]->GetType() == "std::string") {
-            out << url_encode<false>("\"" + entry_set[i]->GetValue() + "\"");
-          } else {
-            out << url_encode<false>(entry_set[i]->GetValue());
-          }
+          out << url_encode<false>(entry_set[i]->GetValue());
           out << "&";
         }
       }
