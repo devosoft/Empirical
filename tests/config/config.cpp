@@ -40,14 +40,16 @@ TEST_CASE("Test config", "[config]"){
     std::stringstream query_stream;
     config.WriteUrlQueryString(query_stream);
     std::string query(query_stream.str());
+    std::cout << query << std::endl;
     REQUIRE(query[0] == '?');
     REQUIRE(query.find("DEBUG_MODE=0") != std::string::npos);
     REQUIRE(query.find("RANDOM_SEED=123") != std::string::npos);
     REQUIRE(query.find("&TEST_BOOL=0") != std::string::npos);
     REQUIRE(query.find("TEST_CONST=91") != std::string::npos);
-    REQUIRE(query.find("TEST_STRING_SPACE=%22abc%20def%20%20%20ghi%22") != std::string::npos);
-    REQUIRE(query.find("TEST_STRING_QUOTE=%22%22Quote%22andonemore%22soit%27sodd%22") != std::string::npos);
+    REQUIRE(query.find("TEST_STRING_SPACE=abc%20def%20%20%20ghi") != std::string::npos);
+    REQUIRE(query.find("TEST_STRING_QUOTE=%22Quote%22andonemore%22soit%27sodd") != std::string::npos);
     REQUIRE(query.find("MUTATION_RATE=0.025") != std::string::npos);
+
   }
 
 }
