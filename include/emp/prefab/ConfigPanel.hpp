@@ -107,7 +107,6 @@ namespace prefab {
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
       Config & config;
-      web::Div settings_div;
       std::set<std::string> exclude;
       std::map<std::string, web::Div> group_divs;
       std::map<std::string, web::Div> input_divs;
@@ -127,9 +126,9 @@ namespace prefab {
        * @param input2 ID of the second input that needs its value updated
        */
       void SyncForm(const std::string val, const std::string input1, const std::string input2) {
-          emp::web::Input div1(settings_div.Find(input1));
+          emp::web::Input div1(this->Find(input1));
           div1.Value(val);
-          emp::web::Input div2(settings_div.Find(input2));
+          emp::web::Input div2(this->Find(input2));
           div2.Value(val);
           div1.Redraw();
           div2.Redraw();
@@ -408,7 +407,7 @@ namespace prefab {
         for (auto group : config.GetGroupSet()) {
           std::string group_name = group->GetName();
           group_divs[group_name] = web::Div(id_prefix + group_name);
-          settings_div << group_divs[group_name];
+          (*this) << group_divs[group_name];
 
           // Prefab Card
           prefab::Card card("INIT_OPEN");
@@ -471,8 +470,10 @@ namespace prefab {
         }
       }
 
-      /// @return Div containing the entire config panel
-      web::Div & GetConfigPanelDiv() { return settings_div; }
+      /** @return Div containing the entire config panel
+       * \deprecated Can directly stream this component
+       */
+      web::Div & GetConfigPanelDiv() { return (*this); }
 
   };
 }
