@@ -428,11 +428,11 @@ namespace prefab {
        */
       void Setup(const std::string & id_prefix = "settings_") {
         for (auto group : config.GetGroupSet()) {
-          std::string group_name = group->GetName()
+          std::string group_name = group->GetName();
           if (Has(excluded_groups, group_name)) {
             continue;
           }
-          std::string group_name = group->GetName();
+    
           group_divs[group_name] = web::Div(id_prefix + group_name);
           (*this) << group_divs[group_name];
 
@@ -448,7 +448,7 @@ namespace prefab {
 
           for (size_t i = 0; i < group->GetSize(); i++) {
             std::string name = group->GetEntry(i)->GetName();
-            if (Has(excluded_individual, name)) {
+            if (Has(excluded_individuals, name)) {
               continue;
             }
             std::string type = group->GetEntry(i)->GetType();
