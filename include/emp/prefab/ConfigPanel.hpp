@@ -107,7 +107,8 @@ namespace prefab {
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
       Config & config;
-      std::set<std::string> exclude;
+      std::set<std::string> excluded_individuals;
+      std::set<std::string> excluded_groups;
       std::map<std::string, web::Div> group_divs;
       std::map<std::string, web::Div> input_divs;
 
@@ -394,8 +395,30 @@ namespace prefab {
         // Otherwise val is 0 and we have nothing to go on
       }
 
-      void ExcludeConfig(const std::string setting) {
-        exclude.insert(setting);
+
+      void ExcludeConfig(const std::string & setting) {
+        excluded_individuals.insert(setting);
+        excluded_groups.insert(setting);
+      }
+
+      /**
+       * Excludes a specific setting from the config panel
+       *
+       * @param setting name of the setting that should not be
+       * displayed in the config panel
+       */
+      void ExcludeSetting(const std::string & setting) {
+        excluded_individuals.insert(setting);
+      }
+
+      /**
+       * Excludes an entire group of settings from the config panel
+       *
+       * @param setting_group name of the group that should not be
+       * displayed in the config panel
+       */
+      void ExcludeGroup(const std::string & setting_group) {
+        excluded_groups.insert(setting_group);
       }
 
       /**
@@ -405,6 +428,10 @@ namespace prefab {
        */
       void Setup(const std::string & id_prefix = "settings_") {
         for (auto group : config.GetGroupSet()) {
+          std::string group_name = group->GetName()
+          if (Has(excluded_groups, group_name)) {
+            continue;
+          }
           std::string group_name = group->GetName();
           group_divs[group_name] = web::Div(id_prefix + group_name);
           (*this) << group_divs[group_name];
@@ -421,7 +448,7 @@ namespace prefab {
 
           for (size_t i = 0; i < group->GetSize(); i++) {
             std::string name = group->GetEntry(i)->GetName();
-            if (Has(exclude, name)) {
+            if (Has(excluded_individual, name)) {
               continue;
             }
             std::string type = group->GetEntry(i)->GetType();
