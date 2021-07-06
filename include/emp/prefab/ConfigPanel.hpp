@@ -488,7 +488,7 @@ namespace prefab {
       }
 
       /** @return Div containing the entire config panel
-       * \deprecated Can directly stream this component
+       *  @deprecated Can directly stream this component
        */
       web::Div & GetConfigPanelDiv() { return (*this); }
 
