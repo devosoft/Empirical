@@ -39,8 +39,8 @@ namespace prefab {
 
       AddBootstrap();
       if (state == "STATIC") { // static card with no toggle enabled
-        ((emp::web::Widget) *this) << card_header; // Widget cast prevents trying to add to body
-        ((emp::web::Widget) *this) << card_body;
+        ((emp::web::Div) *this) << card_header; // Div cast prevents trying to add to body
+        ((emp::web::Div) *this) << card_body;
       } else {
         // card is collapsible, make the collapse link the head of the card
         prefab::CollapseCoupling accordion(card_header,
@@ -48,8 +48,8 @@ namespace prefab {
           state == "INIT_OPEN",
           emp::to_string(card_base+ "_card_collapse")
         );
-        ((emp::web::Widget) *this) << accordion.GetControllerDiv();
-        ((emp::web::Widget) *this) << accordion.GetTargetDiv();
+        ((emp::web::Div) *this) << accordion.GetControllerDiv();
+        ((emp::web::Div) *this) << accordion.GetTargetDiv();
 
         if (show_glyphs) { // by default add glyphs to a collapsible card
           prefab::FontAwesomeIcon up("fa-angle-double-up");
