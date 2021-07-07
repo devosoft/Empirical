@@ -109,7 +109,6 @@ namespace prefab {
       Config & config;
       std::set<std::string> excluded_individuals;
       std::set<std::string> excluded_groups;
-      std::map<std::string, web::Div> group_divs;
       std::map<std::string, web::Div> input_divs;
 
       std::function<std::string(std::string val)> format_label_fun = [](std::string name) {
@@ -437,13 +436,10 @@ namespace prefab {
           if (Has(excluded_groups, group_name)) {
             continue;
           }
-    
-          group_divs[group_name] = web::Div(id_prefix + group_name);
-          (*this) << group_divs[group_name];
 
           // Prefab Card
-          prefab::Card card("INIT_OPEN");
-          group_divs[group_name] << card;
+          prefab::Card card("INIT_OPEN", true, id_prefix + group_name);
+          (*this) << card;
 
           // Header content
           web::Div setting_heading;
