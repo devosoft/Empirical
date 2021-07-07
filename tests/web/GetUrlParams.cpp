@@ -47,54 +47,54 @@ int main() {
   emp::ArgManager am(emp::web::GetUrlParams());
 
   am.PrintDiagnostic();
-  
 
-   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val1"}));
-   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val2","val3"}));
-   emp_assert(!am.UseArg("test1"));
 
-   emp_assert(*am.UseArg("test2") == emp::vector<std::string>({"val1"}));
-   emp_assert(!am.UseArg("test2"));
+  emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val1"}));
+  emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val2","val3"}));
+ emp_assert(!am.UseArg("test1"));
 
-   emp_assert(am.UseArg("test3") == emp::vector<std::string>({"1","23"}));
-   emp_assert(!am.UseArg("test3"));
+  emp_assert(*am.UseArg("test2") == emp::vector<std::string>({"val1"}));
+  emp_assert(!am.UseArg("test2"));
 
-   emp_assert(*am.UseArg("test4") == emp::vector<std::string>());
-   emp_assert(!am.UseArg("test4"));
+  emp_assert(am.UseArg("test3") == emp::vector<std::string>({"1","23"}));
+  emp_assert(!am.UseArg("test3"));
 
-   emp_assert(
+  emp_assert(*am.UseArg("test4") == emp::vector<std::string>());
+  emp_assert(!am.UseArg("test4"));
+
+  emp_assert(
     *am.UseArg("_positional") == emp::vector<std::string>({"p1","p2","p3"})
   );
-   emp_assert(!am.UseArg("_positional"));
+  emp_assert(!am.UseArg("_positional"));
 
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"_empty=bad"})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"_empty="})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"_empty="})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"_empty="})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"_empty="})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"_empty="})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"bad bad=illegal"})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"bad  bad=illegal"})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({" bad=illegal"})
   );
-   emp_assert(
+  emp_assert(
     *am.UseArg("_illegal") == emp::vector<std::string>({"bad =illegal"})
   );
   emp_assert(*am.UseArg("string1") == emp::vector<std::string>({"no break"}));

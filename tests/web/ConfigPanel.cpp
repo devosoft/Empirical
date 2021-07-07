@@ -201,7 +201,6 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
           it('should have child #settings_TREATMENT', function() {
             chai.assert.equal(config_panel.children[2].id, "settings_TREATMENT");
           });
-
           it('should have child #settings_reset', function() {
             chai.assert.equal(config_panel.children[3].id, "settings_reset");
           });

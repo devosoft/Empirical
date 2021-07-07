@@ -12,22 +12,21 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
-#include <cstdio>
+#include <algorithm>
 #include <cctype>
+#include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
+#include <memory>
+#include <numeric>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
-#include <algorithm>
-#include <iterator>
-#include <limits>
-#include <regex>
-#include <memory>
-#include <numeric>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -174,10 +173,9 @@ namespace emp {
         std::sscanf(str.substr(i + 1, 2).c_str(), "%x", &hex_code);
         res += static_cast<char>(hex_code);
         i += 2;
-      } else res += ( decode_plus && str[i] == '+' )
-        ? ' '
-        : str[i]
-      ;
+      } else {
+        res += ( decode_plus && str[i] == '+' ) ? ' ' : str[i];
+      }
     }
 
     return res;
@@ -630,7 +628,7 @@ namespace emp {
   inline bool has_prefix(const std::string & in_string, const std::string & prefix) {
     if (prefix.size() > in_string.size()) return false;
     for (size_t i = 0; i < prefix.size(); ++i) {
-      if (in_string[i] != prefix[i]) return false;      
+      if (in_string[i] != prefix[i]) return false;
     }
     return true;
   }

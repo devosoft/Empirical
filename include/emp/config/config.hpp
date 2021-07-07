@@ -21,6 +21,7 @@
  *  load settings from a file:         config.Read(filename);
  *  save settings to a stream:         config.Write(stream);
  *  save settings to a file:           config.Write(filename);
+ *  generate a query string:           config.WriteUrlQueryString(stream)
  *
  *  write settings macros to a stream: config.WriteMacros(stream);
  *  write settings macros to a file:   config.WriteMacros(filename);
@@ -127,11 +128,15 @@ namespace emp {
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
       ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
         if constexpr (std::is_same<VAR_TYPE, std::string>::value) {
-          // Must right trim values (no trailing whitespace)
+          // Using a stringstream on a string with whitespace will only get
+          // first word, so only right trim for extra white space
           size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
-          entry_ref = in_val.substr(0, end+1);
+          std::cout << in_val << ": " << end << std::endl;
+          entry_ref = (end == std::string::npos) ? " " : in_val.substr(0, end+1);
         } else {
-          std::stringstream ss; ss << in_val; ss >> entry_ref; 
+          // For other values, use the power of a stringstream to do a quick
+          // conversion
+          std::stringstream ss; ss << in_val; ss >> entry_ref;
         }
         return *this;
       }
@@ -246,11 +251,10 @@ namespace emp {
       }
 
       void WriteUrlQueryString(std::ostream & out) const {
-        const size_t entry_count = entry_set.size();
-        for (size_t i = 0; i < entry_count; i++) {
-          out << url_encode<false>(entry_set[i]->GetName());
+        for (auto entry : entry_set) {
+          out << url_encode<false>(entry->GetName());
           out << "=";
-          out << url_encode<false>(entry_set[i]->GetValue());
+          out << url_encode<false>(entry->GetValue());
           out << "&";
         }
       }
@@ -495,6 +499,7 @@ namespace emp {
         (*it)->WriteUrlQueryString(ss);
       }
       std::string query(ss.str());
+      // Erase the trailing & to prevent parsing as an illegal (empty) argument to query
       query.erase(query.end()-1);
       out << query;
     }
@@ -712,7 +717,7 @@ namespace emp {
     }
 
   };
-  
+
 }
 
 // Below are macros that help build the config classes.
