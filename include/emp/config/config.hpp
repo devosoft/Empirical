@@ -131,7 +131,6 @@ namespace emp {
           // Using a stringstream on a string with whitespace will only get
           // first word, so only right trim for extra white space
           size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
-          std::cout << in_val << ": " << end << std::endl;
           entry_ref = (end == std::string::npos) ? "" : in_val.substr(0, end+1);
         } else {
           // For other values, use the power of a stringstream to do a quick

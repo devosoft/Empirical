@@ -21,14 +21,14 @@ namespace emp {
 namespace web {
   /**
    * Extracts the query portion of a url and parses for key value pairs.
-   * 
+   *
    * @note In a query space encoded by "%20" is interpreted as a space character
    * while the space encoded by "+" is used to separate a list of values for a key.
    * For example querying "?seed=100&strings=hi%20there+blah" will be parsed
    * to the parameter array [["seed", "100"], ["strings", "hi there", "blah"]]
    * then converted to a multimap.
-   * 
-   * Note this also means that the queries, "?string=this+that" and 
+   *
+   * Note this also means that the queries, "?string=this+that" and
    * "?string=this&string=that" have different meanings and may result
    * in different behavior.
    */
@@ -56,7 +56,6 @@ namespace web {
           p => p.filter(Boolean)
         )
       : [];
-      console.log(emp_i.__outgoing_array);
     });
 
     emp::pass_vector_to_cpp(incoming);
