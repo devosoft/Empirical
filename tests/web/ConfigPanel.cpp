@@ -186,8 +186,8 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "emp_test_container");
           });
 
-          it('should have 3 children', function() {
-            chai.assert.equal(config_panel.childElementCount, 3);
+          it('should have 4 children (3 groups, 1 reset button)', function() {
+            chai.assert.equal(config_panel.childElementCount, 4);
           });
 
           it('should have child #settings_MAIN', function() {
@@ -200,6 +200,9 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
 
           it('should have child #settings_TREATMENT', function() {
             chai.assert.equal(config_panel.children[2].id, "settings_TREATMENT");
+          });
+          it('should have child #settings_reset', function() {
+            chai.assert.equal(config_panel.children[3].id, "settings_reset");
           });
         });
 

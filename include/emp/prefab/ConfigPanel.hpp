@@ -229,16 +229,19 @@ namespace prefab {
           [this,name, name_input_number, name_input_mobile_slider](std::string val) {
           config.Set(name, val);
           SyncForm(val, name_input_number, name_input_mobile_slider);
+          DoOnChangeFun(val);
           });
         number.Callback(
           [this,name, name_input_slider, name_input_mobile_slider](std::string val) {
           config.Set(name, val);
           SyncForm(val, name_input_slider, name_input_mobile_slider);
+          // DoOnChange will be triggered by SyncForm
           });
         mobile_slider.Callback(
           [this,name, name_input_number, name_input_slider](std::string val) {
           config.Set(name, val);
           SyncForm(val, name_input_number, name_input_slider);
+          // DoOnChange will be triggered by SyncForm
           });
         // Set initial values
         slider.Value(config.Get(name));
@@ -343,8 +346,10 @@ namespace prefab {
       ConfigPanel(
         Config & c,
         const std::string & div_name = "settings_div"
-      ) : config(c)
-      { info = new internal::ConfigPanelInfo(div_name); }
+      ) : config(c) {
+        info = new internal::ConfigPanelInfo(div_name);
+        settings_div.SetCSS("display", "flex", "flex-direction", "column");
+      }
 
       /**
        * Sets on-update callback for a ConfigPanel.
@@ -469,6 +474,18 @@ namespace prefab {
             }
           }
         }
+        web::Button reset_button{ [this](){
+          std::stringstream ss;
+          config.WriteUrlQueryString(ss);
+          const std::string tmp(ss.str());
+          const char* cstr = tmp.c_str();
+          EM_ASM({
+            window.location.href = UTF8ToString($0);
+          }, cstr);
+         }, "Reset with changes", "settings_reset"};
+        reset_button.SetAttr("class", "btn btn-danger");
+        reset_button.SetCSS("order", "1", "margin-left", "auto");
+        settings_div << reset_button;
       }
 
       /// @return Div containing the entire config panel
