@@ -98,13 +98,14 @@ namespace prefab {
      * @deprecated Use stream operator instead
      */
     template <typename T>
+    [[deprecated("Use the stream operator (<<) to add to card body")]]
     void AddBodyContent(T val) {
       card_body << val;
     }
 
     /**
      * Add content to the body section of the card
-     * 
+     *
      * @param in_val can be a web element or primitive type
      */
     template <typename IN_TYPE> emp::prefab::Card & operator<<(IN_TYPE && in_val) {

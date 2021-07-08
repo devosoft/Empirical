@@ -455,7 +455,7 @@ namespace prefab {
             std::string type = group->GetEntry(i)->GetType();
             std::string value = group->GetEntry(i)->GetValue();
 
-            card.AddBodyContent(input_divs[name]);
+            card << input_divs[name];
 
             // Setting element label
             web::Div setting_element(name + "_row");
@@ -513,6 +513,7 @@ namespace prefab {
       /** @return Div containing the entire config panel
        *  @deprecated Can directly stream this component
        */
+      [[deprecated("Can directly stream this component into another")]]
       web::Div & GetConfigPanelDiv() { return (*this); }
 
   };
