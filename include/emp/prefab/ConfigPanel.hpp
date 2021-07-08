@@ -347,7 +347,7 @@ namespace prefab {
         const std::string & div_name = "settings_div"
       ) : config(c) {
         info = new internal::ConfigPanelInfo(div_name);
-        settings_div.SetCSS("display", "flex", "flex-direction", "column");
+        this->SetCSS("display", "flex", "flex-direction", "column");
       }
 
       /**
@@ -507,7 +507,7 @@ namespace prefab {
          }, "Reset with changes", "settings_reset"};
         reset_button.SetAttr("class", "btn btn-danger");
         reset_button.SetCSS("order", "1", "margin-left", "auto");
-        settings_div << reset_button;
+        (*this) << reset_button;
       }
 
       /** @return Div containing the entire config panel
