@@ -23,7 +23,8 @@ int main() {
     global.location.search = (
       "?test1=val1" +
       "&test4" +
-      "&test2=++val1" +
+      "&test5=" +
+      "&test2=val1+" +
       "&test3=1+23" +
       "&=bad" +
       "&=" +
@@ -51,19 +52,22 @@ int main() {
 
   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val1"}));
   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val2","val3"}));
- emp_assert(!am.UseArg("test1"));
+  emp_assert(!am.UseArg("test1"));
 
-  emp_assert(*am.UseArg("test2") == emp::vector<std::string>({"val1"}));
+  emp_assert(*am.UseArg("test2") == emp::vector<std::string>({"val1", ""}));
   emp_assert(!am.UseArg("test2"));
 
-  emp_assert(am.UseArg("test3") == emp::vector<std::string>({"1","23"}));
+  emp_assert(*am.UseArg("test3") == emp::vector<std::string>({"1","23"}));
   emp_assert(!am.UseArg("test3"));
 
   emp_assert(*am.UseArg("test4") == emp::vector<std::string>());
   emp_assert(!am.UseArg("test4"));
 
+  emp_assert(*am.UseArg("test5") == emp::vector<std::string>({""}));
+  emp_assert(!am.UseArg("test5"));
+
   emp_assert(
-    *am.UseArg("_positional") == emp::vector<std::string>({"p1","p2","p3"})
+    *am.UseArg("_positional") == emp::vector<std::string>({"p1","","p2","p3",""})
   );
   emp_assert(!am.UseArg("_positional"));
 

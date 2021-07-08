@@ -251,15 +251,10 @@ namespace emp {
 
       void WriteUrlQueryString(std::ostream & out) const {
         for (auto entry : entry_set) {
-          std::string val(entry->GetValue());
-          // Excluding empty values should be excluded from query string
-          // and will result in default values populated
-          if(!val.empty()) {
-            out << url_encode<false>(entry->GetName());
-            out << "=";
-            out << url_encode<false>(val);
-            out << "&";
-          }
+          out << url_encode<false>(entry->GetName());
+          out << "=";
+          out << url_encode<false>(entry->GetValue());
+          out << "&";
         }
       }
 

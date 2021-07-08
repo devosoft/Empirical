@@ -28,23 +28,26 @@ namespace web {
    * to the parameter array [["seed", "100"], ["strings", "hi there", "blah"]]
    * then converted to a multimap.
    *
-   * Note this also means that the queries, "?string=this+that" and
-   * "?string=this&string=that" have different meanings and may result
-   * in different behavior.
+   * Some esoterica: "?string=this+that" and "?string=this&string=that"
+   * have different meanings and may result in different behavior.
+   * Similarly "?test" becomes [["test"]] while "?test=" becomes
+   * [["test", ""]].
    */
   std::multimap<std::string, emp::vector<std::string>> GetUrlParams() {
 
     emp::vector<emp::vector<std::string>> incoming;
 
     MAIN_THREAD_EM_ASM({
-      // Custom parsing of query string to use '+' as key separator
-      // and %20 as regular space so that strings can have spaces
       emp_i.__outgoing_array = location.search.includes('?')
       ? location.search.substring(1).split('&'
         ).map(
           expr => expr.split("=")
         ).map(
-          (list) => [list[0].split("+").join(" ")].concat(!list[1] ? [""] : list[1].split('+'))
+          (list) => [list[0].split("+").join(" ")].concat(
+            list[1] && list[1].split('+')
+          ).filter(
+            item => item !== undefined
+          )
         ).map(
           list => list.map(decodeURIComponent)
         ).map(
@@ -52,8 +55,6 @@ namespace web {
             ?  ["_illegal", "_empty=" + p[1]] : p
         ).map(
           p => p[0].includes(" ") ? ["_illegal", p[0] + "=" + p[1]] : p
-        ).map(
-          p => p.filter(Boolean)
         )
       : [];
     });
