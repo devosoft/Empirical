@@ -111,14 +111,15 @@ public:
 
   void Reset() { Setup(r,u,N,E); }
 
-  void Run(size_t steps=-1) {
-    if (steps > E) steps = E;
-    // Run the organisms!
-    size_t end_epoch = epoch + steps;
-    while (epoch < end_epoch) {
+  void Run(size_t steps=1) {
+
+    for (size_t i = 0; i < steps; i++) {
       for (size_t o = 0; o < N; o++) Repro();
-      epoch++;
     }
+  }
+
+  void RunStep() {
+    for (size_t o = 0; o < N; o++) Repro();
   }
 
   size_t CountCoop();

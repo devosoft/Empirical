@@ -52,6 +52,7 @@ namespace emp {
       virtual bool SetValueID(size_t) {return false; }       ///< Setup cur value in linked variable
       virtual bool IsComboSetting() { return false; }        ///< Do we have a combo setting?
       virtual size_t GetID() const { return (size_t) -1; }   ///< Combination ID for this setting.
+      virtual emp::Ptr<SettingBase> Clone() const = 0;
 
       bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
       bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
@@ -69,6 +70,18 @@ namespace emp {
                   const std::string & _arg,   ///< Label for option argument (for help)
                   emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
         : SettingBase(_name, _desc, _flag, _arg), var_ptr(_var) { }
+
+      ~SettingInfo(){if(var_ptr){var_ptr.Delete();}}
+
+      emp::Ptr<SettingBase> Clone() const override {
+        emp::Ptr<T> new_var_ptr = nullptr;
+        if (var_ptr) {
+          new_var_ptr = NewPtr<T>(*var_ptr);
+        }
+        emp::Ptr<SettingInfo<T>> setting_info_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, flag, args_label, new_var_ptr);
+        setting_info_ptr->value = this->value;
+        return setting_info_ptr;
+      }
 
       size_t GetSize() const override { return 1; }
       std::string AsString() const override { return emp::to_string(value); }
@@ -99,6 +112,19 @@ namespace emp {
                        emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
         : SettingBase(_name, _desc, _flag, _args), var_ptr(_var) { }
 
+        ~ComboSettingInfo(){if(var_ptr){var_ptr.Delete();}}
+
+        emp::Ptr<SettingBase> Clone() const override {
+            emp::Ptr<T> new_var_ptr = nullptr;
+            if (var_ptr) {
+                new_var_ptr = NewPtr<T>(*var_ptr);
+            }
+            auto csi_ptr = emp::NewPtr<ComboSettingInfo<T>>(name, desc, flag, args_label, new_var_ptr);
+            csi_ptr->values = this->values;
+            csi_ptr->id = this->id;
+            return csi_ptr;
+        }
+
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
         std::stringstream ss;
@@ -108,8 +134,11 @@ namespace emp {
         }
         return ss.str();
       }
+
       std::string AsString(size_t id) const override {
-        return emp::to_string(values[id]);
+        std::stringstream ss;
+        ss << values[id];
+        return ss.str();
       }
 
       bool FromString(const std::string_view & input) override {
@@ -172,6 +201,23 @@ namespace emp {
   public:
     SettingConfig() = default;
 
+    SettingConfig(const SettingConfig &other) {
+      combo_settings.resize(other.combo_settings.size());
+      for (const auto &entry : other.setting_map) {
+        setting_map[entry.first] = other.setting_map.at(entry.first)->Clone();
+      }
+      for (size_t i = 0; i < combo_settings.size(); i++) {
+        combo_settings[i] = setting_map[other.combo_settings[i]->name];
+      }
+
+      action_map = other.action_map;
+      cur_combo = other.cur_combo;
+      combo_id = other.combo_id;
+      unused_args = other.unused_args;
+      errors = other.errors;
+      exe_name = other.exe_name;
+    }
+
     ~SettingConfig() {
       for (auto [name,ptr] : setting_map) ptr.Delete();
     }
@@ -183,6 +229,24 @@ namespace emp {
 
     bool HasUnusedArgs() const { return unused_args.size(); }
     bool HasErrors() const { return errors.size(); }
+
+    /// Retrieves all of the setting names in config and places into std::vector
+    std::vector<std::string> GetSettingMapNames() const {
+      std::vector<std::string> result;
+      for (const auto &p : setting_map) {
+        result.push_back(p.first);
+      }
+      return result;
+    }
+
+    /// Retrieves all of the setting names in config and places into std::vector
+    std::vector<emp::Ptr<SettingBase>> GetSettingMapBase() const {
+      std::vector<emp::Ptr<SettingBase>> result;
+      for (const auto &p : setting_map) {
+        result.push_back(p.second);
+      }
+      return result;
+    }
 
     /// Get the current value of a specified setting.
     template <typename T>
@@ -231,6 +295,18 @@ namespace emp {
     {
       emp_assert(!emp::Has(setting_map, name));
       auto new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, args_label, &var);
+      setting_map[name] = new_ptr;
+      return new_ptr->value;
+    }
+
+    /// Add a new setting not linked to a variable
+
+    template <typename T>
+    T &AddSetting(const std::string &name,
+                  const std::string &desc = "",
+                  const char option_flag = '\0') {
+      emp_assert(!emp::Has(setting_map, name));
+      auto new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, "Value");
       setting_map[name] = new_ptr;
       return new_ptr->value;
     }

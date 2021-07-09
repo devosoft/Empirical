@@ -16,12 +16,13 @@
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
+#include "../meta/meta.hpp"
 
 namespace emp {
 
   /// Take any map type, and run find to determine if a key is present.
   template <class MAP_T, class KEY_T>
-  inline bool Has( const MAP_T & in_map, const KEY_T & key ) {
+  inline auto Has( const MAP_T & in_map, const KEY_T & key ) -> emp::sfinae_decoy<bool, decltype(in_map.find(key))> {
     return in_map.find(key) != in_map.end();
   }
 
