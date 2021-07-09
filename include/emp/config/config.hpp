@@ -21,7 +21,7 @@
  *  load settings from a file:         config.Read(filename);
  *  save settings to a stream:         config.Write(stream);
  *  save settings to a file:           config.Write(filename);
- *  generate a query string:           config.WriteUrlQueryString(stream)
+ *  generate a query string:           config.WriteUrlQueryString(stream);
  *
  *  write settings macros to a stream: config.WriteMacros(stream);
  *  write settings macros to a file:   config.WriteMacros(filename);

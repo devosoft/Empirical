@@ -107,9 +107,8 @@ namespace prefab {
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
       Config & config;
-      web::Div settings_div;
-      std::set<std::string> exclude;
-      std::map<std::string, web::Div> group_divs;
+      std::set<std::string> excluded_settings;
+      std::set<std::string> excluded_groups;
       std::map<std::string, web::Div> input_divs;
 
       std::function<std::string(std::string val)> format_label_fun = [](std::string name) {
@@ -127,9 +126,9 @@ namespace prefab {
        * @param input2 ID of the second input that needs its value updated
        */
       void SyncForm(const std::string val, const std::string input1, const std::string input2) {
-          emp::web::Input div1(settings_div.Find(input1));
+          emp::web::Input div1(this->Find(input1));
           div1.Value(val);
-          emp::web::Input div2(settings_div.Find(input2));
+          emp::web::Input div2(this->Find(input2));
           div2.Value(val);
           div1.Redraw();
           div2.Redraw();
@@ -348,7 +347,7 @@ namespace prefab {
         const std::string & div_name = "settings_div"
       ) : config(c) {
         info = new internal::ConfigPanelInfo(div_name);
-        settings_div.SetCSS("display", "flex", "flex-direction", "column");
+        this->SetCSS("display", "flex", "flex-direction", "column");
       }
 
       /**
@@ -400,8 +399,37 @@ namespace prefab {
         // Otherwise val is 0 and we have nothing to go on
       }
 
-      void ExcludeConfig(const std::string setting) {
-        exclude.insert(setting);
+      /**
+       * Excludes a setting or group of settings, recommend using ExcludeSetting
+       * or ExcludeGroup instead
+       *
+       * @param setting The name of a single setting or group of settings that should not be
+       * displayed in the config panel
+       *
+       */
+      void ExcludeConfig(const std::string & setting) {
+        excluded_settings.insert(setting);
+        excluded_groups.insert(setting);
+      }
+
+      /**
+       * Excludes a specific setting from the config panel
+       *
+       * @param setting name of the setting that should not be
+       * displayed in the config panel
+       */
+      void ExcludeSetting(const std::string & setting) {
+        excluded_settings.insert(setting);
+      }
+
+      /**
+       * Excludes an entire group of settings from the config panel
+       *
+       * @param setting_group name of the group that should not be
+       * displayed in the config panel
+       */
+      void ExcludeGroup(const std::string & setting_group) {
+        excluded_groups.insert(setting_group);
       }
 
       /**
@@ -412,12 +440,13 @@ namespace prefab {
       void Setup(const std::string & id_prefix = "settings_") {
         for (auto group : config.GetGroupSet()) {
           std::string group_name = group->GetName();
-          group_divs[group_name] = web::Div(id_prefix + group_name);
-          settings_div << group_divs[group_name];
+          if (Has(excluded_groups, group_name)) {
+            continue;
+          }
 
           // Prefab Card
-          prefab::Card card("INIT_OPEN");
-          group_divs[group_name] << card;
+          prefab::Card card("INIT_OPEN", true, id_prefix + group_name);
+          (*this) << card;
 
           // Header content
           web::Div setting_heading;
@@ -427,13 +456,13 @@ namespace prefab {
 
           for (size_t i = 0; i < group->GetSize(); i++) {
             std::string name = group->GetEntry(i)->GetName();
-            if (Has(exclude, name)) {
+            if (Has(excluded_settings, name)) {
               continue;
             }
             std::string type = group->GetEntry(i)->GetType();
             std::string value = group->GetEntry(i)->GetValue();
 
-            card.AddBodyContent(input_divs[name]);
+            card << input_divs[name];
 
             // Setting element label
             web::Div setting_element(name + "_row");
@@ -485,11 +514,14 @@ namespace prefab {
          }, "Reset with changes", "settings_reset"};
         reset_button.SetAttr("class", "btn btn-danger");
         reset_button.SetCSS("order", "1", "margin-left", "auto");
-        settings_div << reset_button;
+        (*this) << reset_button;
       }
 
-      /// @return Div containing the entire config panel
-      web::Div & GetConfigPanelDiv() { return settings_div; }
+      /** @return Div containing the entire config panel
+       *  @deprecated Can directly stream this component
+       */
+      [[deprecated("Can directly stream this component into another")]]
+      web::Div & GetConfigPanelDiv() { return (*this); }
 
   };
 }

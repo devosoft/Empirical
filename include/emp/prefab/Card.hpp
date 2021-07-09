@@ -39,8 +39,8 @@ namespace prefab {
 
       AddBootstrap();
       if (state == "STATIC") { // static card with no toggle enabled
-        *this << card_header;
-        *this << card_body;
+        ((emp::web::Div) *this) << card_header; // Div cast prevents trying to add to body
+        ((emp::web::Div) *this) << card_body;
       } else {
         // card is collapsible, make the collapse link the head of the card
         prefab::CollapseCoupling accordion(card_header,
@@ -48,8 +48,8 @@ namespace prefab {
           state == "INIT_OPEN",
           emp::to_string(card_base+ "_card_collapse")
         );
-        *this << accordion.GetControllerDiv();
-        *this << accordion.GetTargetDiv();
+        ((emp::web::Div) *this) << accordion.GetControllerDiv();
+        ((emp::web::Div) *this) << accordion.GetTargetDiv();
 
         if (show_glyphs) { // by default add glyphs to a collapsible card
           prefab::FontAwesomeIcon up("fa-angle-double-up");
@@ -95,17 +95,24 @@ namespace prefab {
      * Add content to body section of card
      *
      * @param val can be a web element or primitive type
+     * @deprecated Use stream operator instead
      */
     template <typename T>
+    [[deprecated("Use the stream operator (<<) to add to card body")]]
     void AddBodyContent(T val) {
       card_body << val;
     }
 
-    /*
-     * TODO: override operator<< so that it streams into body of card
-     * Methods tried so far (without success) are listed in
-     * Issue #345 (https://github.com/devosoft/Empirical/issues/345)
+    /**
+     * Add content to the body section of the card
+     *
+     * @param in_val can be a web element or primitive type
      */
+    template <typename IN_TYPE> emp::prefab::Card & operator<<(IN_TYPE && in_val) {
+      card_body << std::forward<IN_TYPE>(in_val);
+      return (*this);
+    }
+
   };
 }
 }
