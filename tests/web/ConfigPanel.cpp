@@ -1001,6 +1001,52 @@ struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
   }
 };
 
+struct Test_Config_Panel_Exclusion_HTMLLayout : public emp::web::BaseTest {
+
+  emp::prefab::ConfigPanel config_panel{cfg};
+
+  Test_Config_Panel_Exclusion_HTMLLayout()
+  : BaseTest({"emp_test_container"}) // we can tell BaseTest that we want to create a set of emp::web::Document
+                                     // objects for each given html element ids.
+  {
+    // apply configuration query params and config files to Config
+    auto specs = emp::ArgManager::make_builtin_specs(&cfg);
+    emp::ArgManager am(emp::web::GetUrlParams(), specs);
+    // cfg.Read("config.cfg");
+    am.UseCallbacks();
+    if (am.HasUnused()) std::exit(EXIT_FAILURE);
+
+    // setup configuration panel
+    config_panel.Setup();
+    config_panel.ExcludeConfig("SEED");
+    config_panel.ExcludeSetting("RADIATION_PRESCRIPTION_FILE");
+    config_panel.ExcludeGroup("TREATMENT");
+
+    Doc("emp_test_container") << config_panel;
+    emp::prefab::CloseLoadingModal();
+  }
+
+  void Describe() override {
+    EM_ASM({
+      describe('Excluded settings and groups', function() {
+        const config_panel = document.getElementById('settings_div');
+        it('should have only 3 children (only 2 groups now, 1 reset button)', function() {
+          chai.assert(config_panel.childElementCount, 3);
+        });
+
+        describe('MAIN group', function() {
+          const main_card_body = document.getElementById("settings_MAIN").children[1];
+          it('should have only 1 child (2 excluded)', function() {
+            chai.assert(main_card_body.childElementCount, 1);
+          });
+        });
+      });
+    });
+  }
+};
+
+
+
 emp::web::MochaTestRunner test_runner;
 
 int main() {
@@ -1011,6 +1057,7 @@ int main() {
   test_runner.AddTest<Test_Config_Panel_Double_HTMLLayout>("Test ConfigPanel Double Input HTML Layout");
   test_runner.AddTest<Test_Config_Panel_Text_HTMLLayout>("Test ConfigPanel Text Input HTML Layout");
   test_runner.AddTest<Test_Config_Panel_Bool_HTMLLayout>("Test ConfigPanel Boolean Input HTML Layout");
+  test_runner.AddTest<Test_Config_Panel_Exclusion_HTMLLayout>("Test ConfigPanel Boolean Exclusion HTML Layout");
 
   test_runner.Run();
 }

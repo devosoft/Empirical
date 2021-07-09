@@ -107,7 +107,7 @@ namespace prefab {
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
       Config & config;
-      std::set<std::string> excluded_individuals;
+      std::set<std::string> excluded_settings;
       std::set<std::string> excluded_groups;
       std::map<std::string, web::Div> input_divs;
 
@@ -399,9 +399,16 @@ namespace prefab {
         // Otherwise val is 0 and we have nothing to go on
       }
 
-
+      /**
+       * Excludes a setting or group of settings, recommend using ExcludeSetting
+       * or ExcludeGroup instead
+       *
+       * @param setting The name of a single setting or group of settings that should not be
+       * displayed in the config panel
+       *
+       */
       void ExcludeConfig(const std::string & setting) {
-        excluded_individuals.insert(setting);
+        excluded_settings.insert(setting);
         excluded_groups.insert(setting);
       }
 
@@ -412,7 +419,7 @@ namespace prefab {
        * displayed in the config panel
        */
       void ExcludeSetting(const std::string & setting) {
-        excluded_individuals.insert(setting);
+        excluded_settings.insert(setting);
       }
 
       /**
@@ -449,7 +456,7 @@ namespace prefab {
 
           for (size_t i = 0; i < group->GetSize(); i++) {
             std::string name = group->GetEntry(i)->GetName();
-            if (Has(excluded_individuals, name)) {
+            if (Has(excluded_settings, name)) {
               continue;
             }
             std::string type = group->GetEntry(i)->GetType();

@@ -49,7 +49,9 @@ int main() {
 
   am.PrintDiagnostic();
 
-
+ // TODO: rewrite this to use catch/REQUIRE
+ // (since this breaks without rhyme or reason and just crashes to indicate
+ //  a failed test rather than failing gracefully for some checks)
   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val1"}));
   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val2","val3"}));
   emp_assert(!am.UseArg("test1"));
