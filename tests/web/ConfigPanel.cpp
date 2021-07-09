@@ -27,7 +27,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
    * Construct the following HTML structure:
    *
    * <div id="emp_base">
-   *  <div id="emp__1">
+   *  <div id="settings">
    *    <div id="settings_MAIN">
    *      <div id="emp__3" class="card">
    *        <div id="emp__3_card_header" aria-controls=".emp__3_card_collapse" aria-expanded="true" class="card-header , collapse_toggle , collapse_toggle_card_header" data-target=".emp__3_card_collapse" data-toggle="collapse" role="button">
@@ -135,6 +135,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
    *
    *    <div id="emp__56"><div id="ASYMMETRIC_DIVISION_PROB_row" class="setting_element">
    *      ....
+   *    <button> Reset with changes </button>
    * </div>
    */
 
@@ -152,7 +153,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
+    Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
 
   }
@@ -173,8 +174,8 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        // user doesn't define config panel ID, find object here
-        const config_panel = document.getElementById('emp_test_container').children[0];
+        // Default config panel has id 'settings_div'
+        const config_panel = document.getElementById('settings_div');
 
         describe("ConfigPanel (div#emp_test_container Child)", function() {
           it('should exist', function() {
@@ -207,182 +208,161 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
         });
 
         describe("#settings_MAIN", function() {
-          const main =  document.getElementById("settings_MAIN");
+          const main_card =  document.getElementById("settings_MAIN");
           it('should have parent ConfigPanel', function() {
-            const parent_id = main.parentElement.id;
+            const parent_id = main_card.parentElement.id;
             chai.assert.equal(parent_id, config_panel.id);
           });
 
-          it('should have 1 child ', function() {
-            chai.assert.equal(main.childElementCount, 1);
+          it('should have class card', function() {
+            chai.assert.isTrue(main_card.classList.contains("card"));
           });
 
-          const card = main.children[0];
-          describe("Basic card layout", function() {
-            it('should have class card', function() {
-              chai.assert.isTrue(card.classList.contains("card"));
+          it('should have 2 child (card header and body)', function() {
+            chai.assert.equal(main_card.childElementCount, 2);
+          });
+
+          it('should have card header child', function() {
+            chai.assert.isTrue(main_card.children[0].classList.contains("card-header"));
+          });
+
+          it('should have card body child', function() {
+            chai.assert.isTrue(main_card.children[1].classList.contains("card-body"));
+          });
+
+          // Note: Not checking card toggle functionality here because
+          // it is tested in Card.cc mocha tests
+
+          describe("Card Header", function() {
+            const card_header = main_card.children[0];
+            it('should have 3 children', function() {
+              chai.assert.equal(card_header.childElementCount, 3);
             });
 
-            it('should have 2 children', function() {
-              chai.assert.equal(card.childElementCount, 2);
+            it('should have an arrow up glyph', function() {
+              chai.assert.isTrue(card_header.children[0].classList.contains("fa-angle-double-up"));
             });
 
-            it('should have card header child', function() {
-              chai.assert.isTrue(card.children[0].classList.contains("card-header"));
+            it('should have an arrow down glyph', function() {
+              chai.assert.isTrue(card_header.children[1].classList.contains("fa-angle-double-down"));
             });
 
-            it('should have card body child', function() {
-              chai.assert.isTrue(card.children[1].classList.contains("card-body"));
+            it('should have a title with class setting_heading', function() {
+              chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
             });
+          });
 
-            // Note: Not checking card toggle functionality here because
-            // it is tested in Card.cc mocha tests
-
-            describe("Card Header", function() {
-              const card_header = card.children[0];
-              it('should have 3 children', function() {
-                chai.assert.equal(card_header.childElementCount, 3);
-              });
-
-              it('should have an arrow up glyph', function() {
-                chai.assert.isTrue(card_header.children[0].classList.contains("fa-angle-double-up"));
-              });
-
-              it('should have an arrow down glyph', function() {
-                chai.assert.isTrue(card_header.children[1].classList.contains("fa-angle-double-down"));
-              });
-
-              it('should have a title with class setting_heading', function() {
-                chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
-              });
-            });
-
-            describe("Card Body", function() {
-              const card_body = card.children[1];
-              it('should have 3 settings', function() {
-                chai.assert.equal(card_body.childElementCount, 3);
-              });
+          describe("Card Body", function() {
+            const card_body = main_card.children[1];
+            it('should have 3 settings', function() {
+              chai.assert.equal(card_body.childElementCount, 3);
             });
           });
         });
 
         describe("#setting_CELL", function() {
-          const cell  =  document.getElementById("settings_CELL");
+          const cell_card  =  document.getElementById("settings_CELL");
           it('should have parent Config Panel div', function() {
-            chai.assert.equal(cell.parentElement.id, config_panel.id);
+            chai.assert.equal(cell_card.parentElement.id, config_panel.id);
           });
 
-          it('should have 1 child', function() {
-            chai.assert.equal(cell.childElementCount, 1);
+          it('should have card class', function() {
+              chai.assert.isTrue(cell_card.classList.contains("card"));
           });
 
-          const card = cell.children[0];
-          describe("Basic card layout", function() {
-            it('should have card class', function() {
-              chai.assert.isTrue(card.classList.contains("card"));
+          it('should have 2 children', function() {
+            chai.assert.equal(cell_card.childElementCount, 2);
+          });
+
+          it('should have card header child', function() {
+            chai.assert.isTrue(cell_card.children[0].classList.contains("card-header"));
+          });
+
+          it('should have card body child', function() {
+            chai.assert.isTrue(cell_card.children[1].classList.contains("card-body"));
+          });
+
+          // Note: Not checking card toggle functionality here because
+          // it is tested in Card.cc mocha tests
+
+          describe("Card Header", function() {
+            const card_header = cell_card.children[0];
+            it('should have 3 children', function() {
+              chai.assert.equal(card_header.childElementCount, 3);
             });
 
-            it('should have 2 children', function() {
-              chai.assert.equal(card.childElementCount, 2);
+            it('should have an arrow up glyph', function() {
+              chai.assert.isTrue(card_header.children[0].classList.contains("fa-angle-double-up"));
             });
 
-            it('should have card header child', function() {
-              chai.assert.isTrue(card.children[0].classList.contains("card-header"));
+            it('should have an arrow down glyph', function() {
+              chai.assert.isTrue(card_header.children[1].classList.contains("fa-angle-double-down"));
             });
 
-            it('should have card body child', function() {
-              chai.assert.isTrue(card.children[1].classList.contains("card-body"));
-            });
-
-            // Note: Not checking card toggle functionality here because
-            // it is tested in Card.cc mocha tests
-
-            describe("Card Header", function() {
-              const card_header = card.children[0];
-              it('should have 3 children', function() {
-                chai.assert.equal(card_header.childElementCount, 3);
-              });
-
-              it('should have an arrow up glyph', function() {
-                chai.assert.isTrue(card_header.children[0].classList.contains("fa-angle-double-up"));
-              });
-
-              it('should have an arrow down glyph', function() {
-                chai.assert.isTrue(card_header.children[1].classList.contains("fa-angle-double-down"));
-              });
-
-              it('should have a title with class setting_heading', function() {
-                chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
-              });
-            });
-
-            describe("Card Body", function() {
-              const card_body = card.children[1];
-              it('should have 2 settings', function() {
-                chai.assert.equal(card_body.childElementCount, 2);
-              });
+            it('should have a title with class setting_heading', function() {
+              chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
             });
           });
 
+          describe("Card Body", function() {
+            const card_body = cell_card.children[1];
+            it('should have 2 settings', function() {
+              chai.assert.equal(card_body.childElementCount, 2);
+            });
+          });
         });
 
         describe("#setting_TREATMENT", function() {
-          const treatment = document.getElementById("settings_TREATMENT");
+          const treatment_card = document.getElementById("settings_TREATMENT");
           it('should have parent Config Panel div', function() {
-            chai.assert.equal(treatment.parentElement.id, config_panel.id);
+            chai.assert.equal(treatment_card.parentElement.id, config_panel.id);
           });
 
-          it('should have 1 child', function() {
-            chai.assert.equal(treatment.childElementCount, 1);
+          it('should have card class', function() {
+            chai.assert.isTrue(treatment_card.classList.contains("card"));
           });
 
-          const card = treatment.children[0];
-          describe("Basic card layout", function() {
-            it('should have card class', function() {
-              chai.assert.isTrue(card.classList.contains("card"));
+          it('should have 2 children', function() {
+            chai.assert.equal(treatment_card.childElementCount, 2);
+          });
+
+          it('should have card header child', function() {
+            chai.assert.isTrue(treatment_card.children[0].classList.contains("card-header"));
+          });
+
+          it('should have card body child', function() {
+            chai.assert.isTrue(treatment_card.children[1].classList.contains("card-body"));
+          });
+
+          // Note: Not checking card toggle functionality here because
+          // it is tested in Card.cc mocha tests
+
+          describe("Card Header", function() {
+            const card_header = treatment_card.children[0];
+            it('should have 3 children', function() {
+              chai.assert.equal(card_header.childElementCount, 3);
             });
 
-            it('should have 2 children', function() {
-              chai.assert.equal(card.childElementCount, 2);
+            it('should have an arrow up glyph', function() {
+              chai.assert.isTrue(card_header.children[0].classList.contains("fa-angle-double-up"));
             });
 
-            it('should have card header child', function() {
-              chai.assert.isTrue(card.children[0].classList.contains("card-header"));
+            it('should have an arrow down glyph', function() {
+              chai.assert.isTrue(card_header.children[1].classList.contains("fa-angle-double-down"));
             });
 
-            it('should have card body child', function() {
-              chai.assert.isTrue(card.children[1].classList.contains("card-body"));
-            });
-
-            // Note: Not checking card toggle functionality here because
-            // it is tested in Card.cc mocha tests
-
-            describe("Card Header", function() {
-              const card_header = card.children[0];
-              it('should have 3 children', function() {
-                chai.assert.equal(card_header.childElementCount, 3);
-              });
-
-              it('should have an arrow up glyph', function() {
-                chai.assert.isTrue(card_header.children[0].classList.contains("fa-angle-double-up"));
-              });
-
-              it('should have an arrow down glyph', function() {
-                chai.assert.isTrue(card_header.children[1].classList.contains("fa-angle-double-down"));
-              });
-
-              it('should have a title with class setting_heading', function() {
-                chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
-              });
-            });
-
-            describe("Card Body", function() {
-              const card_body = card.children[1];
-              it('should have 2 settings', function() {
-                chai.assert.equal(card_body.childElementCount, 2);
-              });
+            it('should have a title with class setting_heading', function() {
+              chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
             });
           });
+
+          describe("Card Body", function() {
+            const card_body = treatment_card.children[1];
+            it('should have 2 settings', function() {
+              chai.assert.equal(card_body.childElementCount, 2);
+            });
+          });
+
         });
       });
     });
@@ -435,7 +415,7 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
+    Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
   }
 
@@ -445,7 +425,7 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
       describe("emp::prefab::ConfigPanel Integer Setting", function() {
         // Must use "children chain" because we rely on emscripten to generate
         // IDs for setting elements.
-        const setting = document.getElementById("settings_MAIN").children[0].children[1].children[1];
+        const setting = document.getElementById("settings_MAIN").children[1].children[1];
         it('should have 2 children', function() {
           chai.assert.equal(setting.childElementCount, 2);
         });
@@ -618,7 +598,7 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
+    Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
   }
 
@@ -626,7 +606,7 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
 
     EM_ASM({
       describe("Double Setting", function() {
-      const setting = document.getElementById("settings_CELL").children[0].children[1].children[0];
+      const setting = document.getElementById("settings_CELL").children[1].children[0];
       it('should have 2 children', function() {
         chai.assert.equal(setting.childElementCount, 2);
       });
@@ -793,7 +773,7 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
+    Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
   }
 
@@ -801,7 +781,7 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
 
     EM_ASM({
       describe("Text Setting", function() {
-      const setting = document.getElementById("settings_MAIN").children[0].children[1].children[2];
+      const setting = document.getElementById("settings_MAIN").children[1].children[2];
       it('should have 2 children', function() {
         chai.assert.equal(setting.childElementCount, 2);
       });
@@ -927,7 +907,7 @@ struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
+    Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
   }
 
@@ -935,7 +915,7 @@ struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
 
     EM_ASM({
       describe("Boolean setting", function() {
-        const setting = document.getElementById("settings_MAIN").children[0].children[1].children[0];
+        const setting = document.getElementById("settings_MAIN").children[1].children[0];
         it('should have 2 children', function() {
           chai.assert.equal(setting.childElementCount, 2);
         });
