@@ -1,12 +1,12 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
 //  A simple Malcala game state handler.
 
-#ifndef EMP_GAME_MANCALA_H
-#define EMP_GAME_MANCALA_H
+#ifndef EMP_GAME_MANCALA_HPP
+#define EMP_GAME_MANCALA_HPP
 
 #include <fstream>
 #include <iostream>
@@ -79,6 +79,17 @@ namespace emp {
       return input_map;
     }
 
+    emp::vector<double> AsVectorInput(size_t player_id) const {
+      emp::vector<double> input_map(14);                   // 14 bins, 7 for each player.
+      const size_t offset = player_id * 7;                 // Player 0 has offset zero; player 1 has offset 7.
+      for (size_t i = 0; i < 7; i++) {
+        input_map[(int)(i+offset)] = (double) boardA[i];
+        input_map[(int)(i+7-offset)] = (double) boardB[i];
+      }
+
+      return input_map;
+    }
+
     // Returns bool indicating whether player can go again
     bool DoMove(move_t cell) {
       emp_assert(cell < 6);                // You cannot choose a cell out of bounds.
@@ -121,7 +132,7 @@ namespace emp {
     }
 
     // Setup a DoMove from either player's viewpoint.
-    bool DoMove(size_t player, move_t cell) {
+    bool DoMove([[maybe_unused]] size_t player, move_t cell) {
       emp_assert(player != is_A_turn);  // Verify that we agree on player who goes next!
       return DoMove(cell);
     }
@@ -163,31 +174,31 @@ namespace emp {
     }
 
     void Print(std::ostream & os=std::cout) {
-      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player B";
-      if (is_A_turn == false) std::cout << " ***";
-      std::cout << "\n"
-                << "|                                                 | \n"
-                << "|       (" << std::setw(2) << boardB[5]
-                << " ) (" << std::setw(2) << boardB[4]
-                << " ) (" << std::setw(2) << boardB[3]
-                << " ) (" << std::setw(2) << boardB[2]
-                << " ) (" << std::setw(2) << boardB[1]
-                << " ) (" << std::setw(2) << boardB[0]
-                << " )       |\n";
-      std::cout << "v [" << std::setw(2) << boardB[6]
-                << " ]                                     ["
-                << std::setw(2) << boardA[6] << " ] ^\n";
-      std::cout << "|       (" << std::setw(2) << boardA[0]
-                << " ) (" << std::setw(2) << boardA[1]
-                << " ) (" << std::setw(2) << boardA[2]
-                << " ) (" << std::setw(2) << boardA[3]
-                << " ) (" << std::setw(2) << boardA[4]
-                << " ) (" << std::setw(2) << boardA[5]
-                << " )       |\n";
-      std::cout << "|                                                 |\n"
-                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player A";
-      if (is_A_turn == true) std::cout << " ***";
-      std::cout << std::endl << std::endl;
+      os << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player B";
+      if (is_A_turn == false) os << " ***";
+      os << "\n"
+         << "|                                                 | \n"
+         << "|       (" << std::setw(2) << boardB[5]
+         << " ) (" << std::setw(2) << boardB[4]
+         << " ) (" << std::setw(2) << boardB[3]
+         << " ) (" << std::setw(2) << boardB[2]
+         << " ) (" << std::setw(2) << boardB[1]
+         << " ) (" << std::setw(2) << boardB[0]
+         << " )       |\n";
+      os << "v [" << std::setw(2) << boardB[6]
+         << " ]                                     ["
+         << std::setw(2) << boardA[6] << " ] ^\n";
+      os << "|       (" << std::setw(2) << boardA[0]
+         << " ) (" << std::setw(2) << boardA[1]
+         << " ) (" << std::setw(2) << boardA[2]
+         << " ) (" << std::setw(2) << boardA[3]
+         << " ) (" << std::setw(2) << boardA[4]
+         << " ) (" << std::setw(2) << boardA[5]
+         << " )       |\n";
+      os << "|                                                 |\n"
+         << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player A";
+      if (is_A_turn == true) os << " ***";
+      os << std::endl << std::endl;
     }
 
     size_t GetCurPlayer() const { return !is_A_turn; }
