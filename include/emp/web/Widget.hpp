@@ -48,6 +48,16 @@
 namespace emp {
 namespace web {
 
+  // To allow vectorized appending of components
+  // see: https://stackoverflow.com/questions/40626433/c-how-to-specialize-a-template-using-vectort
+  template<typename T>
+  struct is_vector{ static constexpr bool value = false; };
+
+  template<template<typename...> class C, typename U>
+  struct is_vector<C<U>> {
+      static constexpr bool value = std::is_same<C<U>,std::vector<U>>::value;
+  };
+
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Setup some types we will need later
   namespace internal {
@@ -207,7 +217,7 @@ namespace web {
     /// Debug...
     std::string GetInfoType() const;
   };
-  
+
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
@@ -325,6 +335,17 @@ namespace web {
         else if constexpr ( std::is_invocable<T>() ) {
           std::function<std::string()> fun_val( val );
           return Append(fun_val);
+        }
+
+        // If we are given a vector, we should try and add each element individually.
+        // Allows one to stream ___.Children() to get similar behavior to display: contents
+        // which is unsupported on some browsers
+        else if constexpr ( is_vector<T>::value ) {
+          Widget last(this);
+          for (auto item : val) {
+            last = Append(item);
+          }
+          return last;
         }
 
         // Anything else we should just try to convert to a string, and used that.
