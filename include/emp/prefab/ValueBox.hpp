@@ -77,13 +77,16 @@ namespace emp::prefab {
 
   class ValueControl : public ValueBox {
     public:
+    web::Input mainCtrl;
     ValueControl(
       const std::string & label,
       const std::string & desc,
+      const std::string & inital_value,
       web::Input input,
       const std::string & id=""
-    ) : ValueBox(label, desc, id) {
-      view << input;
+    ) : ValueBox(label, desc, id), mainCtrl(input) {
+      view << mainCtrl;
+      mainCtrl.Value(inital_value);
     }
   };
 
@@ -95,7 +98,7 @@ namespace emp::prefab {
       const std::string & value,
       const std::function<void(const std::string & val)> & onChange = [](std::string val) { ; },
       const std::string & id=""
-    ) : ValueControl(label, desc, web::Input(onChange, "text", ""), id) { ; }
+    ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) { ; }
   };
 
   class BoolValueControl : public ValueBox {
@@ -104,7 +107,7 @@ namespace emp::prefab {
       const std::string & label,
       const std::string & desc,
       const bool is_checked,
-      const std::function<void(const std::string & val)> & onChange,
+      const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
       const std::string & id=""
     ) : ValueBox(label, desc, id) {
       prefab::ToggleSwitch toggle(onChange, "", is_checked);
@@ -112,30 +115,27 @@ namespace emp::prefab {
     }
   };
 
-  class NumericValueControl : public ValueBox {
+  class NumericValueControl : public ValueControl {
     public:
-
     NumericValueControl(
       const std::string & label,
       const std::string & desc,
       const std::string & value,
-      const std::function<void(const std::string & val)> & onChange = [](std::string val) { ; },
+      const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
       const std::string & id=""
-    ) : ValueBox(label, desc, id) {
-      web::Input slider([](const std::string & value){ ; }, "range", "");
-      web::Input number_box([slider, onChange](const std::string & val) mutable {
+    ) : ValueControl(label, desc, value, web::Input([](const std::string & val){ ; }, "range", ""), id) {
+      web::Input temp(mainCtrl);
+      web::Input number_box([slider=temp, onChange](const std::string & val) mutable {
         // Lambdas must be marked mutable since .Value is not a const function
         // Warning: referenced components/functions must be captured by value at
         // this lowest level or dangling references (and broken components) result!
-        onChange(val);
         slider.Value(val);
       }, "number", "");
-      slider.Callback([number_box, onChange](const std::string & val) mutable {
+      mainCtrl.Callback([number_box, onChange](const std::string & val) mutable {
+        onChange(val);
         number_box.Value(val);
       });
-      slider.Value(value);
       number_box.Value(value);
-      view << slider;
       view << number_box;
     }
   };
