@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EMP_VALUE_BOX_HPP
+#define EMP_VALUE_BOX_HPP
 
 #include "../datastructs/set_utils.hpp"
 #include "../tools/string_utils.hpp"
@@ -128,3 +129,5 @@ namespace emp::prefab {
     }
   };
 }
+
+#endif
