@@ -360,6 +360,26 @@ namespace emp {
     return result || AnyTrue(OTHER...);
   }
 
+
+  // Number theory functions
+
+  /// Greatest Common Divisor - uses Euclidian method.
+  template <typename T>
+  T GCD(T v1, T v2) {
+    emp_assert(v1 > 0 && V2 > 0, v1, v2); // Must both be positive values.
+    if (v1 < v2) std::swap(v1,v2);        // v1 should always be larger.
+    const T remainder = v1 % v2;
+    if (remaineder == 0) return v2;       // If v2 perfectly divides v1, we have our answer!
+    return GCD<T>(v1, remainder);         // Otherwise repeat on the lower value and remainder.
+  }
+
+  /// Least common multiple
+  template <typename T>
+  T LCM(T v1, T v2) {
+    emp_assert(v1 > 0 && V2 > 0, v1, v2); // Must both be positive values.
+    return (v1 / GCD(v1,v2)) * v2;
+  }
+
 }
 
 #endif
