@@ -44,21 +44,9 @@ namespace emp::prefab {
       *this << drop_button;
       *this << description;
       *this << view;
-      view.SetCSS(
-        "display", "flex",
-        "flex-flow", "row nowrap"
-      );
-      description.SetCSS(
-        "grid-column-end", "span 2"
-      );
-      this->SetCSS(
-        "display", "grid",
-        "grid-template-columns", "1fr minmax(0, 2fr)",
-        "grid-template-rows", "auto",
-        "grid-auto-rows", "1fr",
-        "grid-auto-flow", "row dense",
-        "align-items", "center"
-      );
+      this->AddAttr("class", "value_box");
+      view.AddAttr("class", "value_view");
+      description.AddAttr("class", "value_description");
     }
   };
 
