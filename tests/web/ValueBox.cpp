@@ -104,7 +104,7 @@ struct Test_Bool_Value_Control_HTMLLayout : public emp::web::BaseTest {
 
   Test_Bool_Value_Control_HTMLLayout()
   : BaseTest({"emp_test_container"}) {
-    Doc("emp_test_container") << emp::prefab::ValueDisplay(
+    Doc("emp_test_container") << emp::prefab::BoolValueControl(
       "label",
       "description",
       true,
