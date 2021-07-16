@@ -122,17 +122,32 @@
 
 /* Mobile adjustments */
 // TODO: it would be much better to avoid media
-// break points and
+// break points
 @media screen and (max-width: 768px) {
   .settings_group {
+    grid-template-columns: auto;
+  }
+  .value_box {
     grid-template-columns: auto;
   }
 }
 
 /* Value Box, Control and Display */
+
 .value_box {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-auto-rows: auto;
+  grid-auto-flow: row dense;
+  align-items: center;
+  justify-items: stretch;
+}
+
+.settings_group .value_box:not(.excluded) {
   display: contents;
 }
+
+
 
 .value_view {
   padding: 6px 12px;
@@ -162,4 +177,3 @@
 .excluded {
   display: none;
 }
-

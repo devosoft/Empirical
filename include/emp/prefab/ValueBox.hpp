@@ -87,7 +87,9 @@ namespace emp::prefab {
       const std::string & value,
       const std::function<void(const std::string & val)> & onChange = [](std::string val) { ; },
       const std::string & id=""
-    ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) { ; }
+    ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) {
+      mainCtrl.AddAttr("class", "form-control");
+    }
   };
 
   class BoolValueControl : public ValueBox {
@@ -113,6 +115,7 @@ namespace emp::prefab {
       const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input([](const std::string & val){ ; }, "range", ""), id) {
+      mainCtrl.AddAttr("class", "form-range");
       web::Input temp(mainCtrl);
       web::Input number_box([slider=temp, onChange](const std::string & val) mutable {
         // Lambdas must be marked mutable since .Value is not a const function
@@ -125,6 +128,7 @@ namespace emp::prefab {
         number_box.Value(val);
       });
       number_box.Value(value);
+      number_box.AddAttr("class", "form-control");
       view << number_box;
     }
   };
