@@ -279,8 +279,6 @@ struct Test_Numeric_Value_Control_HTMLLayout : public emp::web::BaseTest {
   }
 };
 
-
-
 emp::web::MochaTestRunner test_runner;
 
 int main() {

@@ -6,7 +6,6 @@
 #include "../datastructs/set_utils.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "../config/config.hpp"
 #include "../web/Div.hpp"
 #include "../web/Element.hpp"
 #include "../web/Input.hpp"
@@ -22,16 +21,19 @@ namespace emp::prefab {
 
   class ValueBox : public web::Div {
 
-    public:
-    CommentBox description;
-    Div view;
+    protected:
+    std::string box_base = this->GetID();
 
+    CommentBox description{emp::to_string(box_base, "_descr")};
+    Div view{emp::to_string(box_base, "_view")};
+
+    public:
     ValueBox(
       const std::string & label,
       const std::string & desc,
       const std::string & id=""
-    ) : Div(id) {
-      web::Element drop_button("button");
+    ) : Div(id), description() {
+      web::Element drop_button("button", emp::to_string(box_base, "_label"));
       drop_button.AddAttr("class", "btn btn-link");
 
       FontAwesomeIcon arrow_right("fa-angle-double-right");
