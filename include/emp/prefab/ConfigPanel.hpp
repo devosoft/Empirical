@@ -167,7 +167,7 @@ namespace prefab {
             // Add a different control depending on the config types
             if (Has(numeric_types, type)) {
               settings << NumericValueControl(
-                pretty_name, desc, value, handleChange, setting_base
+                pretty_name, desc, value, type, handleChange, setting_base
               );
             } else if (type == "std::string") {
               settings << TextValueControl(

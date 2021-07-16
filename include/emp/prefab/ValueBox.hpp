@@ -1,6 +1,8 @@
 #ifndef EMP_VALUE_BOX_HPP
 #define EMP_VALUE_BOX_HPP
 
+#include <cmath>
+
 #include "../datastructs/set_utils.hpp"
 #include "../tools/string_utils.hpp"
 
@@ -107,11 +109,42 @@ namespace emp::prefab {
   };
 
   class NumericValueControl : public ValueControl {
+
+    // Determine the default range by finding the next highest order of magnitude (base 10)
+    inline static std::function<void(
+      const std::string &,
+      const std::string &,
+      emp::web::Input &
+    )> applyDefaultRange = [](
+      const std::string & value,
+      const std::string & type,
+      emp::web::Input & in
+    ) {
+      if(type == "float" || type == "double") {
+        double val = emp::from_string<double>(value);
+        int max = (abs(val) <= 1) ? 1 : (int)pow(10, ceil(log10(abs(val))));
+        int min = (val >= 0) ? 0 : -max;
+        double step = max/100.0;
+        in.Max(max);
+        in.Min(min);
+        in.Step(step);
+      } else {
+        int val = emp::from_string<int>(value);
+        int max = (abs(val) <= 10) ? 10 : (int)pow(10, ceil(log10(abs(val))));
+        int min = (val >= 0) ? 0 : -max;
+        int step = (int)fmax(max/100.0, 1);
+        in.Max(max);
+        in.Min(min);
+        in.Step(step);
+      }
+    };
+
     public:
     NumericValueControl(
       const std::string & label,
       const std::string & desc,
       const std::string & value,
+      const std::string & type,
       const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input([](const std::string & val){ ; }, "range", ""), id) {
@@ -130,6 +163,16 @@ namespace emp::prefab {
       number_box.Value(value);
       number_box.AddAttr("class", "form-control");
       view << number_box;
+      NumericValueControl::applyDefaultRange(value, type, mainCtrl);
+      NumericValueControl::applyDefaultRange(value, type, number_box);
+    }
+
+    static void setDefaultRangeMaker(std::function<void(
+      const std::string & value,
+      const std::string & type,
+      emp::web::Input & in)> det
+    ) {
+      applyDefaultRange = det;
     }
   };
 }
