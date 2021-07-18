@@ -17,6 +17,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <unordered_map>
 
 #include "../base/Ptr.hpp"
@@ -28,6 +29,7 @@ namespace emp {
   class StreamManager {
   protected:
     std::unordered_map<std::string, emp::Ptr<std::ostream>> out_streams;
+    std::unordered_map<std::string, emp::Ptr<std::stringstream>> string_streams;
 
   public:
     StreamManager() : out_streams() { ; }
@@ -43,7 +45,18 @@ namespace emp {
       return *out_streams[filename];
     }
 
-    bool HasStream(const std::string & filename) { return emp::Has(out_streams, filename); }
+    std::stringstream & GetStringStream(const std::string & name) {
+      if (!emp::Has(string_streams, name)) {
+        string_streams[name] = emp::NewPtr<std::stringstream>();
+      }
+      return *string_streams[name];
+    }
+
+    bool HasOutputStream(const std::string & filename) { return emp::Has(out_streams, filename); }
+    bool HasStringStream(const std::string & name) { return emp::Has(string_streams, name); }
+    bool HasStream(const std::string & name) {
+      return HasOutputStream(name) || HasStringStream(name);
+    }
 
     std::ostream & get_ostream(const std::string & filename="cout", const std::string & stdout_name="cout") {
       return GetOutputStream(filename, stdout_name);
