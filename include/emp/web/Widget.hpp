@@ -39,6 +39,7 @@
 #include "../base/vector.hpp"
 #include "../control/Signal.hpp"
 #include "../debug/mem_track.hpp"
+#include "../meta/meta.hpp"
 
 #include "events.hpp"
 #include "Font.hpp"
@@ -47,16 +48,6 @@
 
 namespace emp {
 namespace web {
-
-  // To allow vectorized appending of components
-  // see: https://stackoverflow.com/questions/40626433/c-how-to-specialize-a-template-using-vectort
-  template<typename T>
-  struct is_vector{ static constexpr bool value = false; };
-
-  template<template<typename...> class C, typename U>
-  struct is_vector<C<U>> {
-      static constexpr bool value = std::is_same<C<U>,std::vector<U>>::value;
-  };
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Setup some types we will need later
@@ -342,7 +333,7 @@ namespace web {
         // which is unsupported on some browsers
         else if constexpr ( is_vector<T>::value ) {
           Widget last(this);
-          for (auto item : val) {
+          for (auto & item : val) {
             last = Append(item);
           }
           return last;
