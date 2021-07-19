@@ -17,23 +17,33 @@
 
 namespace emp::prefab {
 
-  const int min_slider_width = 100;
 
+  /**
+   * ValueBox is the base class for a component to show information.
+   * At its core it has a label, a description, and a value to display.
+   *
+   * ValueBoxes and derived classes placed in component with the "settings_group"
+   * or "display_group" class will align to a grid.
+   */
   class ValueBox : public web::Div {
 
     protected:
-    std::string box_base = this->GetID();
 
-    CommentBox description{emp::to_string(box_base, "_descr")};
-    Div view{emp::to_string(box_base, "_view")};
+    CommentBox description{emp::to_string(GetID(), "_descr")};
+    Div view{emp::to_string(GetID(), "_view")};
 
     public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     */
     ValueBox(
       const std::string & label,
       const std::string & desc,
       const std::string & id=""
-    ) : Div(id), description() {
-      web::Element drop_button("button", emp::to_string(box_base, "_label"));
+    ) : Div(id) {
+      web::Element drop_button("button", emp::to_string(GetID(), "_label"));
       drop_button.AddAttr("class", "btn btn-link");
 
       FontAwesomeIcon arrow_right("fa-angle-double-right");
@@ -55,22 +65,48 @@ namespace emp::prefab {
     }
   };
 
+  /**
+   * Use a ValueDisplay component to display a labeled, static value with
+   * a nice description of what this value means.
+   *
+   * We suggest adding the "display_group" class to the enclosing tag around
+   * multiple ValueDisplays to align labels and values along a common grid.
+   */
   class ValueDisplay : public ValueBox {
 
     public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param value the piece of information or data being displayed
+     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     */
     ValueDisplay(
       const std::string & label,
-      const std::string & value,
       const std::string & desc,
+      const std::string & value,
       const std::string & id=""
     ) : ValueBox(label, desc, id) {
       view << value;
     }
   };
 
+  /**
+   * ValueControl is the base class for components the user should be
+   * able to interact with. The view will contain the Input object for
+   * controlling the value.
+   */
   class ValueControl : public ValueBox {
-    public:
+    protected:
     web::Input mainCtrl;
+    public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param initial_value the initial value
+     * @param input Input component that user can interact with
+     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     */
     ValueControl(
       const std::string & label,
       const std::string & desc,
@@ -83,26 +119,48 @@ namespace emp::prefab {
     }
   };
 
+  /**
+   * Use a TextValueControl to display a boolean value with a label,
+   * description, and a text input to manipulate the value.
+   */
   class TextValueControl : public ValueControl {
     public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param value the initial value
+     * @param onChange function to be called when the user changes this value
+     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     */
     TextValueControl(
       const std::string & label,
       const std::string & desc,
       const std::string & value,
-      const std::function<void(const std::string & val)> & onChange = [](std::string val) { ; },
+      const std::function<void(const std::string &)> & onChange = [](const std::string &) { ; },
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) {
       mainCtrl.AddAttr("class", "form-control");
     }
   };
 
+  /**
+   * Use a BoolValueControl to display a boolean value with a label,
+   * description, and a switch to toggle the value.
+   */
   class BoolValueControl : public ValueBox {
     public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param value the initial value
+     * @param onChange function to be called when the user changes this value
+     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     */
     BoolValueControl(
       const std::string & label,
       const std::string & desc,
       const bool is_checked,
-      const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
+      const std::function<void(const std::string &)> & onChange = [](const std::string &) { ; },
       const std::string & id=""
     ) : ValueBox(label, desc, id) {
       prefab::ToggleSwitch toggle(onChange, "", is_checked);
@@ -110,6 +168,11 @@ namespace emp::prefab {
     }
   };
 
+  /**
+   * Use a NumericValueControl to display a number with a label,
+   * description, synchronized slider and number box to change the
+   * value.
+   */
   class NumericValueControl : public ValueControl {
 
     // Determine the default range by finding the next highest order of magnitude (base 10)
@@ -123,18 +186,18 @@ namespace emp::prefab {
       emp::web::Input & in
     ) {
       if(type == "float" || type == "double") {
-        double val = emp::from_string<double>(value);
-        int max = (abs(val) <= 1) ? 1 : (int)pow(10, ceil(log10(abs(val))));
-        int min = (val >= 0) ? 0 : -max;
-        double step = max/100.0;
+        const double val = emp::from_string<double>(value);
+        const int max = (abs(val) <= 1) ? 1 : static_cast<int>(pow(10, ceil(log10(abs(val)))));
+        const int min = (val >= 0) ? 0 : -max;
+        const double step = max/100.0;
         in.Max(max);
         in.Min(min);
         in.Step(step);
       } else {
-        int val = emp::from_string<int>(value);
-        int max = (abs(val) <= 10) ? 10 : (int)pow(10, ceil(log10(abs(val))));
-        int min = (val >= 0) ? 0 : -max;
-        int step = (int)fmax(max/100.0, 1);
+        const int val = emp::from_string<int>(value);
+        const int max = (abs(val) <= 10) ? 10 : static_cast<int>(pow(10, ceil(log10(abs(val)))));
+        const int min = (val >= 0) ? 0 : -max;
+        const int step = (int)fmax(max/100.0, 1);
         in.Max(max);
         in.Min(min);
         in.Step(step);
@@ -142,6 +205,14 @@ namespace emp::prefab {
     };
 
     public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param type the numeric type ('float', 'double' or 'int')
+     * @param value the initial value
+     * @param onChange function to be called when the user changes this value
+     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     */
     NumericValueControl(
       const std::string & label,
       const std::string & desc,
@@ -154,7 +225,7 @@ namespace emp::prefab {
       web::Input temp(mainCtrl);
       web::Input number_box([slider=temp, onChange](const std::string & val) mutable {
         // Lambdas must be marked mutable since .Value is not a const function
-        // Warning: referenced components/functions must be captured by value at
+        // Note: referenced components/functions must be captured by value at
         // this lowest level or dangling references (and broken components) result!
         slider.Value(val);
       }, "number", "");
@@ -169,6 +240,10 @@ namespace emp::prefab {
       NumericValueControl::applyDefaultRange(value, type, number_box);
     }
 
+    /**
+     * @param det a function that based on the value and type provided sets,
+     * a slider input's min, max and step values appropriately.
+     */
     static void setDefaultRangeMaker(std::function<void(
       const std::string & value,
       const std::string & type,

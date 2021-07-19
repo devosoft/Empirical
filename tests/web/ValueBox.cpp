@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
+//  Copyright (C) Michigan State University, 2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <functional>
@@ -10,7 +10,6 @@
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
 #include "emp/web/web.hpp"
-
 #include "emp/prefab/ValueBox.hpp"
 
 // Test that the ValueBox class is constructed correctly
@@ -264,6 +263,15 @@ struct Test_Numeric_Value_Control_HTMLLayout : public emp::web::BaseTest {
               it('should have type "range"', function() {
                 chai.assert.equal(range.getAttribute("type"), "range");
               });
+              it('should have min "0"', function() {
+                chai.assert.equal(range.getAttribute("min"), "0");
+              });
+              it('should have max "1"', function() {
+                chai.assert.equal(range.getAttribute("max"), "1");
+              });
+              it('should have step "0.01"', function() {
+                chai.assert.equal(range.getAttribute("step"), "0.01");
+              });
               const number = value_view.children[1];
               it("second should be an input", function() {
                 chai.assert(number.nodeName, "INPUT");
@@ -279,6 +287,53 @@ struct Test_Numeric_Value_Control_HTMLLayout : public emp::web::BaseTest {
   }
 };
 
+// Test that the NumericValueControl class is constructed correctly
+struct Test_Numeric_Value_Control_Override_Default_Ranges : public emp::web::BaseTest {
+
+  Test_Numeric_Value_Control_Override_Default_Ranges()
+  : BaseTest({"emp_test_container"}) {
+    emp::prefab::NumericValueControl::setDefaultRangeMaker(
+      [](const std::string & value, const std::string & type, emp::web::Input & in) {
+        const double val = emp::from_string<double>(value);
+        in.Min(-val);
+        in.Max(val);
+        in.Step(val/100);
+      }
+    );
+    Doc("emp_test_container") << emp::prefab::NumericValueControl(
+      "label",
+      "description",
+      ".1",
+      "float",
+      [](std::string val) { ; },
+      "numeric_value_control"
+    );
+  }
+
+  void Describe() override {
+    EM_ASM({
+      describe("emp::prefab::NumericValueControl with different default range maker", function() {
+        const range = document.getElementById("numeric_value_control_view").children[0];
+        it("first should be an input", function() {
+          chai.assert(range.nodeName, "INPUT");
+        });
+        it('should have type "range"', function() {
+          chai.assert.equal(range.getAttribute("type"), "range");
+        });
+        it('should have min "-0.1"', function() {
+          chai.assert.equal(range.getAttribute("min"), "-0.1");
+        });
+        it('should have max "0.1"', function() {
+          chai.assert.equal(range.getAttribute("max"), "0.1");
+        });
+        it('should have step "0.001"', function() {
+          chai.assert.equal(range.getAttribute("step"), "0.001");
+        });
+      });
+    });
+  }
+};
+
 emp::web::MochaTestRunner test_runner;
 
 int main() {
@@ -288,6 +343,9 @@ int main() {
   test_runner.AddTest<Test_Value_Display_HTMLLayout>("Test ValueDisplay HTML Layout");
   test_runner.AddTest<Test_Text_Value_Control_HTMLLayout>("Test TextValueControl HTML Layout");
   test_runner.AddTest<Test_Numeric_Value_Control_HTMLLayout>("Test NumericValueControl HTML Layout");
+  test_runner.AddTest<Test_Numeric_Value_Control_Override_Default_Ranges>(
+    "Test NumericValueControl Override of Default Ranges"
+  );
 
   test_runner.Run();
 }
