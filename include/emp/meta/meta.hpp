@@ -326,6 +326,16 @@ namespace emp {
   template <typename T, size_t N>
   constexpr size_t GetSize(T (&)[N]) { return N; }
 
+  // Detect vectors (for streaming in widgets)
+  // see: https://stackoverflow.com/questions/40626433/c-how-to-specialize-a-template-using-vectort
+  template<typename T>
+  struct is_vector{ static constexpr bool value = false; };
+
+  template<template<typename...> class C, typename U>
+  struct is_vector<C<U>> {
+      static constexpr bool value = std::is_same<C<U>,std::vector<U>>::value;
+  };
+
 }
 
 

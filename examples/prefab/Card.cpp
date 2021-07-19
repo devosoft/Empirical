@@ -16,19 +16,19 @@ int main()
   // Plain Card
   emp::prefab::Card pCard("STATIC");
   pCard.AddHeaderContent("Plain card");
-  pCard.AddBodyContent("Plain body content");
+  pCard << "Plain body content";
   doc << pCard;
 
   // Collapsible Card, default open
   emp::prefab::Card openCard("INIT_OPEN", true);
   // Header content with bootstrap link properties
   openCard.AddHeaderContent("Open card", true);
-  openCard.AddBodyContent("Open body content <br> Glyphs <br> Linked title");
+  openCard << "Open body content <br> Glyphs <br> Linked title";
   doc << openCard;
 
   // Collapsible Card, default closed
   emp::prefab::Card closedCard("INIT_CLOSED", false);
   closedCard.AddHeaderContent("Closed card");
-  closedCard.AddBodyContent("Closed body content <br>No Glyphs <br> Plain title");
+  closedCard << "Closed body content <br>No Glyphs <br> Plain title";
   doc << closedCard;
 }
