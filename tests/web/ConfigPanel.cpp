@@ -32,9 +32,12 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
     // cfg.Read("config.cfg");
     am.UseCallbacks();
     if (am.HasUnused()) std::exit(EXIT_FAILURE);
-      emp::prefab::ConfigPanel config_panel{cfg, true, "settings"};
+
+    emp::prefab::ConfigPanel config_panel{cfg, true, "settings"};
     config_panel.ExcludeSetting("BOOL_EX");
     config_panel.ExcludeGroup("TREATMENT");
+    config_panel.SetRange("SEED", "-1");
+    config_panel.SetRange("NEUTRAL_MUTATION_RATE", "DEFAULT", "0.1", "0.001");
 
     Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
@@ -288,7 +291,34 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
           it('#setting_BOOL_EX_outer (whole card) should be excluded', function() {
             chai.assert.isTrue(treatment_group.classList.contains("excluded"));
           });
+        });
 
+        // Test that default ranges have been overriden correctly
+        describe("explicit range setting", function() {
+          const seed_range = document.getElementById("settings_SEED_view").children[0];
+          describe("#settings_SEED's range slider", function() {
+            it('should have min "-1"', function() {
+              chai.assert.equal(seed_range.getAttribute("min"), "-1");
+            });
+            it('should have max "10"', function() {
+              chai.assert.equal(seed_range.getAttribute("max"), "10");
+            });
+            it('should have step "1"', function() {
+              chai.assert.equal(seed_range.getAttribute("step"), "1");
+            });
+          });
+          const rate_range = document.getElementById("settings_NEUTRAL_MUTATION_RATE_view").children[0];
+          describe("#settings_SEED's range slider", function() {
+            it('should have min "0"', function() {
+              chai.assert.equal(rate_range.getAttribute("min"), "0");
+            });
+            it('should have max "0.1"', function() {
+              chai.assert.equal(rate_range.getAttribute("max"), "0.1");
+            });
+            it('should have step "0.001"', function() {
+              chai.assert.equal(rate_range.getAttribute("step"), "0.001");
+            });
+          });
         });
       });
     });

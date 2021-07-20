@@ -68,8 +68,9 @@ namespace prefab {
    * panel to your web app. Users can interact with the config panel
    * by updating values.
    *
-   * The ConfigPanel is constructed using subcomponents. Groups are
-   * Cards containing ValueControls.
+   * The ConfigPanel is constructed using subcomponents. Groups of
+   * settings are placed in Cards, and individual settings are represented
+   * by ValueControls.
    */
   class ConfigPanel : public web::Div {
     public:
@@ -216,6 +217,40 @@ namespace prefab {
        */
       void SetOnChangeFun(const on_change_fun_t& fun) {
         Info()->SetOnChangeFun(fun);
+      }
+
+      /**
+       * Sets the range of a slider for a numeric setting.
+       *
+       * @param setting the numeric config value which will have its range slider updated
+       * @param min minimum value of the slider for this config value (use "DEFAULT"
+       * to leave unchanged)
+       * @param max maximum value of the slider for this config value (use "DEFAULT"
+       * to leave unchanged)
+       * @param step step size of the slider for this config value (use "DEFAULT"
+       * to leave unchanged)
+       */
+      void SetRange(
+        const std::string & setting,
+        const std::string & min,
+        const std::string & max = "DEFAULT",
+        const std::string & step = "DEFAULT"
+      ) {
+        const std::string target_id{emp::to_string(GetID(), "_", setting, "_view")};
+        Div target(this->Find(target_id));
+        web::Input slider{target.Children()[0]};
+        if (slider.GetType() != "range") {
+          return;
+        }
+        if (min != "DEFAULT") {
+          slider.Min(min);
+        }
+        if (max != "DEFAULT") {
+          slider.Max(max);
+        }
+        if (step != "DEFAULT") {
+          slider.Step(step);
+        }
       }
 
       /**
