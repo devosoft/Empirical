@@ -27,22 +27,32 @@ namespace emp {
 
   /// A class to maintain files and other streams.
   class StreamManager {
+  public:
+    enum stream_t {
+      FILE_STREAM, STRING_STREAM, STD_STREAM
+    };
   protected:
-    std::unordered_map<std::string, emp::Ptr<std::ostream>> out_streams;
+    std::unordered_map<std::string, emp::Ptr<std::ostream>> of_streams;
     std::unordered_map<std::string, emp::Ptr<std::stringstream>> string_streams;
 
+    stream_t default_input_type = STD_STREAM;
+    stream_t default_output_type = STD_STREAM;    
+
   public:
-    StreamManager() : out_streams() { ; }
+    StreamManager() : of_streams() { ; }
     StreamManager(const StreamManager &) = default;
     StreamManager(StreamManager &&) = default;
-    ~StreamManager() { ; }
+    ~StreamManager() {
+      for (auto [name, ptr] : of_streams) ptr.Delete();
+      for (auto [name, ptr] : string_streams) ptr.Delete();
+    }
 
     std::ostream & GetOutputStream(const std::string & filename="cout", const std::string & stdout_name="cout") {
       if (filename == "" || filename == stdout_name) return std::cout;
-      if (!emp::Has(out_streams, filename)) {
-        out_streams[filename] = emp::NewPtr<std::ofstream>(filename);
+      if (!emp::Has(of_streams, filename)) {
+        of_streams[filename] = emp::NewPtr<std::ofstream>(filename);
       }
-      return *out_streams[filename];
+      return *of_streams[filename];
     }
 
     std::stringstream & GetStringStream(const std::string & name) {
@@ -52,7 +62,7 @@ namespace emp {
       return *string_streams[name];
     }
 
-    bool HasOutputStream(const std::string & filename) { return emp::Has(out_streams, filename); }
+    bool HasOutputStream(const std::string & filename) { return emp::Has(of_streams, filename); }
     bool HasStringStream(const std::string & name) { return emp::Has(string_streams, name); }
     bool HasStream(const std::string & name) {
       return HasOutputStream(name) || HasStringStream(name);
