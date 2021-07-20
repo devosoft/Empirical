@@ -331,7 +331,7 @@ namespace web {
         // If we are given a vector, we should try and add each element individually.
         // Allows one to stream ___.Children() to get similar behavior to display: contents
         // which is unsupported on some browsers
-        else if constexpr ( is_vector<T>::value ) {
+        else if constexpr ( is_emp_vector<T>::value ) {
           Widget last(this);
           for (auto & item : val) {
             last = Append(item);

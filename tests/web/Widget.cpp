@@ -143,24 +143,32 @@ struct Test_TemplatedAppending : emp::web::BaseTest {
       describe("Widget::Append templated handling", function() {
         describe("#widgets", function() {
           const widgets = document.getElementById("widgets");
+          // Divs remain distinct
           it("should have 3 children", function() {
             chai.assert.equal(widgets.childElementCount, 3);
           });
         });
         describe("#strings", function() {
           const strings = document.getElementById("strings");
-          it("should have 3 children", function() {
-            chai.assert.equal(strings.childElementCount, 3);
+          // Strings get appended together in the span
+          it("should have 1 child", function() {
+            chai.assert.equal(strings.childElementCount,1);
+          });
+          const child = strings.children[0];
+          describe("child", function() {
+            it("should be a span", function() {
+              chai.assert.equal(child.nodeName, "SPAN");
+            });
           });
         });
         describe("#invoked", function() {
           const invoked = document.getElementById("invoked");
           it("should have 1 child", function() {
-            chai.assert.equal(widgets.childElementCount, 1);
+            chai.assert.equal(invoked.childElementCount, 1);
           });
           const child = invoked.children[0];
           describe("child", function() {
-            it("should have a span", function() {
+            it("should be a span", function() {
               chai.assert.equal(child.nodeName, "SPAN");
             });
           });
