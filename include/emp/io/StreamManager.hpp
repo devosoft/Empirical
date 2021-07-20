@@ -28,30 +28,65 @@ namespace emp {
   /// A class to maintain files and other streams.
   class StreamManager {
   public:
-    enum stream_t {
-      FILE_STREAM, STRING_STREAM, STD_STREAM
-    };
+    enum stream_t { FILE_STREAM, STRING_STREAM, STD_STREAM };
+    enum access_t { INPUT, OUTPUT, IO }
+
   protected:
-    std::unordered_map<std::string, emp::Ptr<std::ostream>> of_streams;
-    std::unordered_map<std::string, emp::Ptr<std::stringstream>> string_streams;
+    template <typename T>
+    struct StreamInfo {
+      stream_t type;
+      emp::Ptr<T> ptr;
+      bool owned = true;
+    }
+
+    std::unordered_map<std::string, StreamInfo<std::istream>> input_streams;
+    std::unordered_map<std::string, StreamInfo<std::ostream>> output_streams;
+    std::unordered_map<std::string, StreamInfo<std::iostream>> io_streams;
 
     stream_t default_input_type = STD_STREAM;
     stream_t default_output_type = STD_STREAM;    
+    stream_t default_io_type = STD_STREAM;    
 
+    // Helper functions.
+    template <access_t ACCESS, typename T>
+    T & AddInfo(const std::string & name, emp::Ptr<T> ptr) {
+      emp_assert(!Has(name));
+      StreamInfo<T> info{FILE_STREAM, ptr, true};
+      if constexpr (access == INPUT) input_streams[name] = info;
+      if constexpr (access == OUTPUT) output_streams[name] = info;
+      if constexpr (access == IO) io_streams[name] = info;
+      return *(output_streams[name].ptr);
+    }
   public:
-    StreamManager() : of_streams() { ; }
-    StreamManager(const StreamManager &) = default;
+    StreamManager() { ; }
+    StreamManager(const StreamManager &) = delete;
     StreamManager(StreamManager &&) = default;
     ~StreamManager() {
-      for (auto [name, ptr] : of_streams) ptr.Delete();
-      for (auto [name, ptr] : string_streams) ptr.Delete();
+      for (auto [name, info] : input_streams) if (info.owned) info.ptr.Delete();
+      for (auto [name, info] : output_streams) if (info.owned) info.ptr.Delete();
+      for (auto [name, info] : io_streams) if (info.owned) info.ptr.Delete();
     }
+
+    // Check to see if certain streams are being managed.
+    bool HasInputStream(const std::string & name) { return emp::Has(input_streams, name); }
+    bool HasOutputStream(const std::string & name) { return emp::Has(output_streams, name); }
+    bool HasIOStream(const std::string & name) { return emp::Has(io_streams, name); }
+    bool Has(const std::string & name) {
+      return HasInputStream(name) || HasOutputStream(name) || HasIOStream(name);
+    }
+
+    // Add streams of specific types.
+
+    std::istream & AddInputFile(std::string name) { return AddInfo<INPUT>(name, NewPtr<std::ifstream>(name)); }
+
+    std::istream & AddInputFile(std::string name) { return AddFileInfo<std::ifstream,INPUT>(name); }
+    std::ostream & AddOutputFile(std::string name) { return AddFileInfo<std::ofstream,OUTPUT>(name); }
+    std::iostream & AddFile(std::string name) { return AddFileInfo<std::fstream,IO>(name); }
+    std::iostream & AddStringStream(std::string name)
 
     std::ostream & GetOutputStream(const std::string & filename="cout", const std::string & stdout_name="cout") {
       if (filename == "" || filename == stdout_name) return std::cout;
-      if (!emp::Has(of_streams, filename)) {
-        of_streams[filename] = emp::NewPtr<std::ofstream>(filename);
-      }
+      if (!emp::Has(of_streams, filename)) return AddOutputFile(filename);
       return *of_streams[filename];
     }
 
@@ -60,12 +95,6 @@ namespace emp {
         string_streams[name] = emp::NewPtr<std::stringstream>();
       }
       return *string_streams[name];
-    }
-
-    bool HasOutputStream(const std::string & filename) { return emp::Has(of_streams, filename); }
-    bool HasStringStream(const std::string & name) { return emp::Has(string_streams, name); }
-    bool HasStream(const std::string & name) {
-      return HasOutputStream(name) || HasStringStream(name);
     }
 
     std::ostream & get_ostream(const std::string & filename="cout", const std::string & stdout_name="cout") {
