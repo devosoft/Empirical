@@ -39,16 +39,22 @@ namespace emp {
       bool owned;
     }
 
-    // Struct to hold all streams of a given type.
-    template <typename T, bool CONSTRUCT_WITH_NAME=false>
     struct StreamCollection {
       stream_t type;
       access_t access;
+
+      StreamCollection(stream_t in_type, access_t in_access) : type(in_type), access(in_access) {}
+    };
+
+    // Struct to hold all streams of a given type.
+    template <typename T, bool CONSTRUCT_WITH_NAME=false>
+    struct TypedStreamCollection : public StreamCollection {
       using info_t = StreamInfo<T>;
       std::unordered_map<std::string, info_t> streams;
 
-      StreamCollection(stream_t in_type, access_t in_access) : type(in_type), access(in_access) { }
-      ~StreamCollection() {
+      TypedStreamCollection(stream_t in_type, access_t in_access)
+        : StreamCollection(in_type, in_access) { }
+      ~TypedStreamCollection() {
         for (auto & [name, info] : streams) if (info.owned) info.ptr.Delete();
       }
 
@@ -73,17 +79,17 @@ namespace emp {
     };
 
     // File streams
-    StreamCollection<std::ifstream,true> ifstream_collect;
-    StreamCollection<std::ofstream,true> ofstream_collect;
-    StreamCollection<std::fstream,true> fstream_collect;
+    TypedStreamCollection<std::ifstream,true> ifstream_collect;
+    TypedStreamCollection<std::ofstream,true> ofstream_collect;
+    TypedStreamCollection<std::fstream,true> fstream_collect;
 
     // String streams
-    StreamCollection<std::stringstream> sstream_collect;
+    TypedStreamCollection<std::stringstream> sstream_collect;
 
     // Other streams
-    StreamCollection<std::istream> istream_collect;
-    StreamCollection<std::ostream> ostream_collect;
-    StreamCollection<std::iostream> iostream_collect;
+    TypedStreamCollection<std::istream> istream_collect;
+    TypedStreamCollection<std::ostream> ostream_collect;
+    TypedStreamCollection<std::iostream> iostream_collect;
 
     stream_t default_input_type = STD_STREAM;
     stream_t default_output_type = STD_STREAM;    
@@ -120,6 +126,13 @@ namespace emp {
     }
     bool HasIOStream(const std::string & name) {
       return HasIOFileStream(name) || HasStringStream(name) || HasStdIOStream(name);
+    }
+
+    bool HasInputStream(const std::string & name) {
+      return HasInputOnlyStream(name) || HasIOStream(name);
+    }
+    bool HasOutputStream(const std::string & name) {
+      return HasOutputOnlyStream(name) || HasIOStream(name);
     }
     bool Has(const std::string & name) {
       return HasInputOnlyStream(name) || HasOutputOnlyStream(name) || HasIOStream(name);
