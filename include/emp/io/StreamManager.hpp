@@ -36,7 +36,7 @@ namespace emp {
     struct StreamInfo {
       stream_t type;
       emp::Ptr<T> ptr;
-      bool owned = true;
+      bool owned;
     }
 
     // Struct to hold all streams of a given type.
@@ -46,6 +46,11 @@ namespace emp {
       access_t access;
       using info_t = StreamInfo<T>;
       std::unordered_map<std::string, info_t> streams;
+
+      StreamCollection(stream_t in_type, access_t in_access) : type(in_type), access(in_access) { }
+      ~StreamCollection() {
+        for (auto & [name, info] : streams) if (info.owned) info.ptr.Delete();
+      }
 
       bool Has(const std::string & name) const { return emp::Has(streams, name); }
  
@@ -58,49 +63,66 @@ namespace emp {
       T & Add(const std::string & name) {
         if constexpr (CONTRUCT_WITH_NAME) ptr = emp::Ptr<T>(name);
         else ptr = emp::Ptr<T>();
-        Add(name, ptr, true);
+        return Add(name, ptr, true);
       }
 
       T & Get(const std::string name) {
         emp_assert(Has(name));
         return *(streams[name].ptr);        
       }
-    }
+    };
 
-    std::unordered_map<std::string, StreamInfo<std::istream>> input_streams;
-    std::unordered_map<std::string, StreamInfo<std::ostream>> output_streams;
-    std::unordered_map<std::string, StreamInfo<std::iostream>> io_streams;
+    // File streams
+    StreamCollection<std::ifstream,true> ifstream_collect;
+    StreamCollection<std::ofstream,true> ofstream_collect;
+    StreamCollection<std::fstream,true> fstream_collect;
+
+    // String streams
+    StreamCollection<std::stringstream> sstream_collect;
+
+    // Other streams
+    StreamCollection<std::istream> istream_collect;
+    StreamCollection<std::ostream> ostream_collect;
+    StreamCollection<std::iostream> iostream_collect;
 
     stream_t default_input_type = STD_STREAM;
     stream_t default_output_type = STD_STREAM;    
     stream_t default_io_type = STD_STREAM;    
 
-    // Helper functions.
-    template <access_t ACCESS, typename T>
-    T & AddInfo(const std::string & name, emp::Ptr<T> ptr) {
-      emp_assert(!Has(name));
-      StreamInfo<T> info{FILE_STREAM, ptr, true};
-      if constexpr (access == INPUT) input_streams[name] = info;
-      if constexpr (access == OUTPUT) output_streams[name] = info;
-      if constexpr (access == IO) io_streams[name] = info;
-      return *(output_streams[name].ptr);
-    }
   public:
-    StreamManager() { ; }
+    StreamManager()
+      : ifstream_collect(FILE_STREAM, INPUT)
+      , ofstream_collect(FILE_STREAM, OUTPUT)
+      , fstream_collect(FILE_STREAM, IO)
+      , sstream_collect(STRING_STREAM, IO)
+      , istream_collect(STD_STREAM, INPUT)
+      , ostream_collect(STD_STREAM, OUTPUT)
+      , iostream_collect(STD_STREAM, IO)
+      { }
     StreamManager(const StreamManager &) = delete;
     StreamManager(StreamManager &&) = default;
-    ~StreamManager() {
-      for (auto [name, info] : input_streams) if (info.owned) info.ptr.Delete();
-      for (auto [name, info] : output_streams) if (info.owned) info.ptr.Delete();
-      for (auto [name, info] : io_streams) if (info.owned) info.ptr.Delete();
-    }
+    ~StreamManager() { }
 
     // Check to see if certain streams are being managed.
-    bool HasInputStream(const std::string & name) { return emp::Has(input_streams, name); }
-    bool HasOutputStream(const std::string & name) { return emp::Has(output_streams, name); }
-    bool HasIOStream(const std::string & name) { return emp::Has(io_streams, name); }
+    bool HasInputFileStream(const std::string & name) { return ifstream_collect.Has(name); }
+    bool HasOutputFileStream(const std::string & name) { return ofstream_collect.Has(name); }
+    bool HasIOFileStream(const std::string & name) { return fstream_collect.Has(name); }
+    bool HasStringStream(const std::string & name) { return sstream_collect.Has(name); }
+    bool HasStdInputStream(const std::string & name) { return istream_collect.Has(name); }
+    bool HasStdOutputStream(const std::string & name) { return ostream_collect.Has(name); }
+    bool HasStdIOStream(const std::string & name) { return iostream_collect.Has(name); }
+
+    bool HasInputOnlyStream(const std::string & name) {
+      return HasInputFileStream(name) || HasStdInputStream(name);
+    }
+    bool HasOutputOnlyStream(const std::string & name) {
+      return HasOutputFileStream(name) || HasStdOutputStream(name);
+    }
+    bool HasIOStream(const std::string & name) {
+      return HasIOFileStream(name) || HasStringStream(name) || HasStdIOStream(name);
+    }
     bool Has(const std::string & name) {
-      return HasInputStream(name) || HasOutputStream(name) || HasIOStream(name);
+      return HasInputOnlyStream(name) || HasOutputOnlyStream(name) || HasIOStream(name);
     }
 
     // Add streams of specific types.
