@@ -91,6 +91,34 @@ namespace emp::prefab {
   };
 
   /**
+   * Use a LiveValueDisplay component to display a labeled value which will
+   * change over the course of a simulation with a nice description of what
+   * this value means.
+   *
+   * We suggest adding the "display_group" class to the enclosing tag around
+   * multiple LiveValueDisplays to align labels and values along a common grid.
+   */
+  class LiveValueDisplay : public ValueBox {
+
+    public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param value the piece of information or data being displayed as a live value
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     */
+    template<typename IN_TYPE>
+    LiveValueDisplay(
+      const std::string & label,
+      const std::string & desc,
+      IN_TYPE && value,
+      const std::string & id=""
+    ) : ValueBox(label, desc, id) {
+      view << web::Live(value);
+    }
+  };
+
+  /**
    * ValueControl is the base class for components the user should be
    * able to interact with. The view will contain the Input object for
    * controlling the value.
