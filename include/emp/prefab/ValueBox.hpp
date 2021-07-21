@@ -17,7 +17,6 @@
 
 namespace emp::prefab {
 
-
   /**
    * ValueBox is the base class for a component to show information.
    * At its core it has a label, a description, and a value to display.
