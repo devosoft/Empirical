@@ -32,6 +32,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
     // cfg.Read("config.cfg");
     am.UseCallbacks();
     if (am.HasUnused()) std::exit(EXIT_FAILURE);
+    cfg["UNKNOWN"]->SetType("unknown");
 
     emp::prefab::ConfigPanel config_panel{cfg, true, "settings"};
     config_panel.ExcludeSetting("BOOL_EX");
@@ -247,8 +248,14 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
               chai.assert.isNotNull(treatment_settings_group);
             });
 
-            it('should have 2 settings', function() {
-              chai.assert.equal(treatment_settings_group.childElementCount, 2);
+            it('should have 3 settings', function() {
+              chai.assert.equal(treatment_settings_group.childElementCount, 3);
+            });
+
+            // Test whether ConfigPanel handles unsupported config types gracefully
+            const unsupported_view = document.getElementById("settings_UNKNOWN_view").children[0];
+            it('view of #settings_UNKNOWN has a span, not input', function() {
+              chai.assert.equal(unsupported_view.nodeName, "SPAN");
             });
           });
         });

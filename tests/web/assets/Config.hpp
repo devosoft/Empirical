@@ -19,4 +19,5 @@ EMP_BUILD_CONFIG( Config,
   GROUP(TREATMENT, "Treatment settings"),
   VALUE(RADIATION_DOSES, int, 1, "Number of radiation doses to apply (for use in web interface - use a radiation prescription file for command-line)"),
   VALUE(RADIATION_DOSE_SIZE, double, 2, "Dose size (Gy) (for use in web interface - use a radiation prescription file for command-line)"),
+  VALUE(UNKNOWN, std::string, "A unsupported type", "Type overridden later to simulate new config type"),
 );
