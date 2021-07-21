@@ -132,7 +132,7 @@ namespace prefab {
         this->AddAttr("class", "config_main");
 
         // Reset button redirects to a URL with the current config settings
-        web::Element reload_button{ "a", emp::to_string(GetID(), "_", "reload")};
+        web::Element reload_button{"a", emp::to_string(GetID(), "_", "reload")};
         reload_button.SetAttr("class", "btn btn-danger");
         std::stringstream query;
         config.WriteUrlQueryString(query);
@@ -239,18 +239,20 @@ namespace prefab {
         const std::string target_id{emp::to_string(GetID(), "_", setting, "_view")};
         if(this->HasChild(target_id)) {
           Div target(this->Find(target_id));
-          web::Input slider{target.Children()[0]};
-          if (slider.GetType() != "range") {
-            return;
-          }
-          if (min != "DEFAULT") {
-            slider.Min(min);
-          }
-          if (max != "DEFAULT") {
-            slider.Max(max);
-          }
-          if (step != "DEFAULT") {
-            slider.Step(step);
+          if(target.Children()[0].IsInput()) {
+            web::Input slider{target.Children()[0]};
+            if (slider.GetType() != "range") {
+              return;
+            }
+            if (min != "DEFAULT") {
+              slider.Min(min);
+            }
+            if (max != "DEFAULT") {
+              slider.Max(max);
+            }
+            if (step != "DEFAULT") {
+              slider.Step(step);
+            }
           }
         }
       }

@@ -41,7 +41,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
     config_panel.SetRange("BOOL_EX", "0.1");
     // ^ should silently do nothing since this is not numeric
     config_panel.ExcludeConfig("NONE");
-    // NONE does not exist, should gracefully do nothing
+    // ^ NONE does not exist, should gracefully do nothing
 
     Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
