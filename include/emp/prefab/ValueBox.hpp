@@ -36,7 +36,7 @@ namespace emp::prefab {
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
-     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
     ValueBox(
       const std::string & label,
@@ -79,7 +79,7 @@ namespace emp::prefab {
      * @param label name for this value
      * @param desc a more detailed description of what the value means
      * @param value the piece of information or data being displayed
-     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
     ValueDisplay(
       const std::string & label,
@@ -105,7 +105,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param initial_value the initial value
      * @param input Input component that user can interact with
-     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
     ValueControl(
       const std::string & label,
@@ -130,7 +130,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
     TextValueControl(
       const std::string & label,
@@ -154,7 +154,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
     BoolValueControl(
       const std::string & label,
@@ -175,12 +175,14 @@ namespace emp::prefab {
    */
   class NumericValueControl : public ValueControl {
 
-    // Determine the default range by finding the next highest order of magnitude (base 10)
-    inline static std::function<void(
-      const std::string &,
-      const std::string &,
+    using range_setter_t = std::function<void(
+      const std::string &, // value
+      const std::string &, // type
       emp::web::Input &
-    )> applyDefaultRange = [](
+    )>;
+
+    // Determine the default range by finding the next highest order of magnitude (base 10)
+    inline static range_setter_t applyDefaultRange = [](
       const std::string & value,
       const std::string & type,
       emp::web::Input & in
@@ -211,7 +213,7 @@ namespace emp::prefab {
      * @param type the numeric type ('float', 'double' or 'int')
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div, (default emscripten generated)
+     * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
     NumericValueControl(
       const std::string & label,
@@ -241,14 +243,10 @@ namespace emp::prefab {
     }
 
     /**
-     * @param det a function that based on the value and type provided sets,
+     * @param det a function that based on the value and type provided sets
      * a slider input's min, max and step values appropriately.
      */
-    static void setDefaultRangeMaker(std::function<void(
-      const std::string & value,
-      const std::string & type,
-      emp::web::Input & in)> det
-    ) {
+    static void setDefaultRangeMaker(const range_setter_t & det) {
       applyDefaultRange = det;
     }
   };
