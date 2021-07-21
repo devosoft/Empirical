@@ -39,6 +39,34 @@ namespace emp {
       bool owned = true;
     }
 
+    // Struct to hold all streams of a given type.
+    template <typename T, bool CONSTRUCT_WITH_NAME=false>
+    struct StreamCollection {
+      stream_t type;
+      access_t access;
+      using info_t = StreamInfo<T>;
+      std::unordered_map<std::string, info_t> streams;
+
+      bool Has(const std::string & name) const { return emp::Has(streams, name); }
+ 
+      T & Add(const std::string & name, emp::Ptr<T> ptr, bool owned=false) {
+        emp_assert(!Has(name));
+        streams[name] = info_t{type, ptr, owned};
+        return *(streams[name].ptr);
+      }
+
+      T & Add(const std::string & name) {
+        if constexpr (CONTRUCT_WITH_NAME) ptr = emp::Ptr<T>(name);
+        else ptr = emp::Ptr<T>();
+        Add(name, ptr, true);
+      }
+
+      T & Get(const std::string name) {
+        emp_assert(Has(name));
+        return *(streams[name].ptr);        
+      }
+    }
+
     std::unordered_map<std::string, StreamInfo<std::istream>> input_streams;
     std::unordered_map<std::string, StreamInfo<std::ostream>> output_streams;
     std::unordered_map<std::string, StreamInfo<std::iostream>> io_streams;
