@@ -134,6 +134,9 @@ namespace prefab {
         // Reset button redirects to a URL with the current config settings
         web::Element reload_button{ "a", emp::to_string(GetID(), "_", "reload")};
         reload_button.SetAttr("class", "btn btn-danger");
+        std::stringstream query;
+        config.WriteUrlQueryString(query);
+        reload_button.SetAttr("href", query.str());
         reload_button << "Reload with changes";
 
         on_change_fun_t & onChangeRef = GetOnChangeFun();
@@ -234,19 +237,21 @@ namespace prefab {
         const std::string & step = "DEFAULT"
       ) {
         const std::string target_id{emp::to_string(GetID(), "_", setting, "_view")};
-        Div target(this->Find(target_id));
-        web::Input slider{target.Children()[0]};
-        if (slider.GetType() != "range") {
-          return;
-        }
-        if (min != "DEFAULT") {
-          slider.Min(min);
-        }
-        if (max != "DEFAULT") {
-          slider.Max(max);
-        }
-        if (step != "DEFAULT") {
-          slider.Step(step);
+        if(this->HasChild(target_id)) {
+          Div target(this->Find(target_id));
+          web::Input slider{target.Children()[0]};
+          if (slider.GetType() != "range") {
+            return;
+          }
+          if (min != "DEFAULT") {
+            slider.Min(min);
+          }
+          if (max != "DEFAULT") {
+            slider.Max(max);
+          }
+          if (step != "DEFAULT") {
+            slider.Step(step);
+          }
         }
       }
 
@@ -271,8 +276,10 @@ namespace prefab {
        */
       void ExcludeSetting(const std::string & setting) {
         const std::string target_id(emp::to_string(GetID(), "_", setting));
-        Div target(this->Find(target_id));
-        target.AddAttr("class", "excluded");
+        if(this->HasChild(target_id)) {
+          Div target(this->Find(target_id));
+          target.AddAttr("class", "excluded");
+        }
       }
 
       /**
@@ -283,8 +290,10 @@ namespace prefab {
        */
       void ExcludeGroup(const std::string & setting_group) {
         const std::string target_id(emp::to_string(GetID(), "_", setting_group, "_outer"));
-        Div target(this->Find(target_id));
-        target.AddAttr("class", "excluded");
+        if(this->HasChild(target_id)) {
+          Div target(this->Find(target_id));
+          target.AddAttr("class", "excluded");
+        }
       }
 
       /**
