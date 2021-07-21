@@ -28,6 +28,7 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(config.RANDOM_SEED() == 333);
     REQUIRE(config.TEST_STRING() == "default");
+    REQUIRE(config.Get("TEST_STRING") == "default");
 
     config.RANDOM_SEED(123);
 
