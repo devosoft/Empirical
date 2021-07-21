@@ -38,6 +38,10 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
     config_panel.ExcludeGroup("TREATMENT");
     config_panel.SetRange("SEED", "-1");
     config_panel.SetRange("NEUTRAL_MUTATION_RATE", "DEFAULT", "0.1", "0.001");
+    config_panel.SetRange("BOOL_EX", "0.1");
+    // ^ should silently do nothing since this is not numeric
+    config_panel.ExcludeConfig("NONE");
+    // ^ does nothing, is deprecated, but need the test coverage *sigh*
 
     Doc("emp_test_container") << config_panel;
     emp::prefab::CloseLoadingModal();
@@ -264,18 +268,22 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
             chai.assert(controls.childElementCount, 1);
           });
 
-          describe('child #settings_reset', function() {
-            const reset = document.getElementById("settings_reset");
+          describe('child #settings_reload', function() {
+            const reload = document.getElementById("settings_reload");
             it('should exist', function() {
               chai.assert.isNotNull(controls);
             });
 
             it('should have parent #settings_controls', function() {
-              chai.assert.equal(reset.parentElement.id, controls.id);
+              chai.assert.equal(reload.parentElement.id, controls.id);
             });
 
-            it('should be a button', function() {
-              chai.assert.equal(reset.nodeName, "BUTTON");
+            it('should be an anchor', function() {
+              chai.assert.equal(reload.nodeName, "A");
+            });
+
+            it('should have an href (will be very long)', function() {
+              chai.assert.isNotNull(reload.getAttribute("href"));
             });
           });
 
