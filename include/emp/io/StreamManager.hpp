@@ -18,8 +18,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <type_traits>
 #include <unordered_map>
 
+#include "../base/assert.hpp"
+#include "../base/error.hpp"
 #include "../base/Ptr.hpp"
 #include "../datastructs/map_utils.hpp"
 
@@ -33,16 +36,16 @@ namespace emp {
 
   protected:
 
+    // Helper under error conditions.
+    static std::iostream & GetDefaultStream() {
+      static std::stringstream default_stream;
+      return default_stream;
+    }
+
     class StreamInfo {
     protected:
       std::string name;
       bool owned;
-
-      // Helper under error conditions.
-      static std::iostream & GetDefaultStream() {
-        static std::stringstream default_stream;
-        return default_stream;
-      }
 
     public:
       StreamInfo(const std::string & in_name, bool in_owned) : name(in_name), owned(in_owned) { }
@@ -85,13 +88,13 @@ namespace emp {
 
     public:
       // Constructor to build a NEW stream based on the details passed in.
-      TypedStreamInfo(const std::string & name) : StreamInfo(name, TYPE, ACCESS, true) {
+      TypedStreamInfo(const std::string & name) : StreamInfo(name, true) {
         ResetStream();
       }
 
       // Constructor to use an EXISTING stream that should be passed in.
       TypedStreamInfo(const std::string & name, emp::Ptr<T> in_ptr)
-        : StreamInfo(name, TYPE, ACCESS, false), ptr(in_ptr) { }
+        : StreamInfo(name, false), ptr(in_ptr) { }
 
       ~TypedStreamInfo() {
         if (owned) ptr.Delete();
@@ -99,16 +102,19 @@ namespace emp {
 
       Type GetType() const override { return TYPE; }
       Access GetAccess() const override { return ACCESS; }
+      static constexpr bool INPUT_OK = (ACCESS == Access::INPUT || ACCESS == Access::IO);
+      static constexpr bool OUTPUT_OK = (ACCESS == Access::OUTPUT || ACCESS == Access::IO);
+      T & GetStream() { return *ptr; }
 
       std::istream & GetInputStream() override {
-        if constexpr (ACCESS == Access::OUTPUT) {
+        if constexpr (!INPUT_OK) {
           emp_error("No input stream!");
           return GetDefaultStream();
         }
         else return *ptr;
       }
       std::ostream & GetOutputStream() override {
-        if constexpr (ACCESS == Access::INPUT) {
+        if constexpr (!OUTPUT_OK) {
           emp_error("No output stream!");
           return GetDefaultStream();
         }
@@ -138,8 +144,8 @@ namespace emp {
         // Otherwise use std::cin or std::cout
         else {
           owned = false;  // Use a pre-existing stream.
-          if constexpr (ACCESS == Access::INPUT)       ptr = NewPtr<&std::cin>();
-          else if constexpr (ACCESS == Access::OUTPUT) ptr = NewPtr<&std::cout>();
+          if constexpr (ACCESS == Access::INPUT)       ptr = &std::cin;
+          else if constexpr (ACCESS == Access::OUTPUT) ptr = &std::cout;
           else if constexpr (ACCESS == Access::IO) {
             emp_error("Disallowed stream type...");
             ptr = nullptr;
@@ -149,7 +155,9 @@ namespace emp {
     };
 
     // A default class for when we do not have a live stream.
-    struct StreamInfo_None : public StreamInfo("", false) {
+    struct StreamInfo_None : public StreamInfo {
+      StreamInfo_None() : StreamInfo("", false) { }
+      
       Type GetType() const override { return Type::NONE; }
       Access GetAccess() const override { return Access::NONE; }
       std::istream & GetInputStream() override { emp_error("No input stream!"); return GetDefaultStream(); }
@@ -172,11 +180,16 @@ namespace emp {
       if (Has(name)) return *(streams[name]);
       return info_none;
     }
+    const StreamInfo & GetInfo(const std::string & name) const {
+      auto it = streams.find(name);
+      if (it == streams.end()) return info_none;
+      return *(it->second);
+    }
 
   public:
     StreamManager() { }
     StreamManager(const StreamManager &) = delete;
-    StreamManager(StreamManager &&) = default;
+    // StreamManager(StreamManager &&) = default;
     ~StreamManager() {
       for (auto & [name, info_ptr] : streams) info_ptr.Delete();
     }
@@ -204,10 +217,10 @@ namespace emp {
     template <typename T, Type TYPE, Access ACCESS>
     T & AddStream(const std::string & name) {
       emp_assert(!Has(name), name);                          // Must be a new name.
-      using info_t = TypedStringInfo<T, TYPE, ACCESS>;       // Setup type for info about stream
+      using info_t = TypedStreamInfo<T, TYPE, ACCESS>;       // Setup type for info about stream
       emp::Ptr<info_t> info_ptr = emp::NewPtr<info_t>(name); // Build the info (& stream iteslf)
       streams[name] = info_ptr;                              // Store the info for the future
-      return *(info_ptr->ptr);                               // Return just the stream.
+      return info_ptr->GetStream();                          // Return just the stream.
     }
 
     std::ifstream & AddInputFile(std::string name) {
@@ -227,15 +240,17 @@ namespace emp {
     /// Add a stream maintained outside of manager (do not delete without removing first!)
     template <typename T>
     T & AddStream(const std::string & name, T & in_stream) {
-      constexpr bool input_ok = is_convertible<T,std::istream>();
-      constexpr bool output_ok = is_convertible<T,std::ostream>();
-      constexpr Access ACCESS = (Access) ((input_ok ? 1 : 0) + (output_ok ? 2 : 0));
+      constexpr bool input_ok = std::is_convertible<T,std::istream>();
+      constexpr bool output_ok = std::is_convertible<T,std::ostream>();
+      constexpr int ACCESS_IN = (int) (input_ok ? Access::INPUT : Access::NONE);
+      constexpr int ACCESS_OUT = (int) (output_ok ? Access::OUTPUT : Access::NONE);
+      constexpr Access ACCESS = (Access) (ACCESS_IN + ACCESS_OUT);
 
       emp_assert(!Has(name), name);                            // Must be a new name.
-      using info_t = TypedStringInfo<T, Type::OTHER, ACCESS>;  // Setup type for info about stream
+      using info_t = TypedStreamInfo<T, Type::OTHER, ACCESS>;  // Setup type for info about stream
       auto info_ptr = emp::NewPtr<info_t>(name, &in_stream);   // Build the info (& stream iteslf)
       streams[name] = info_ptr;                                // Store the info for the future
-      return *(info_ptr->ptr);                                 // Return just the stream.
+      return info_ptr->GetStream();                            // Return just the stream.
     }
 
     /// Build a default input stream.
@@ -269,7 +284,7 @@ namespace emp {
     std::iostream & AddIOStream(const std::string & name) {
       emp_assert(!Has(name));
       switch (default_io_type) {
-      case Type::FILE: return AddIOFile(name);
+      case Type::FILE: return AddFile(name);
       case Type::STRING: return AddStringStream(name);
       default:
         emp_error("Default output streams not allowed!", name);
@@ -280,23 +295,23 @@ namespace emp {
 
     std::istream & GetInputStream(const std::string & name) {
       if (!HasInputStream(name)) return AddInputStream(name);
-      return streams[name].GetInputStream();
+      return streams[name]->GetInputStream();
     }
 
     std::ostream & GetOutputStream(const std::string & name) {
       if (!HasOutputStream(name)) return AddOutputStream(name);
-      return streams[name].GetOutputStream();
+      return streams[name]->GetOutputStream();
     }
 
     std::iostream & GetIOStream(const std::string & name) {
       if (!HasIOStream(name)) return AddIOStream(name);
-      return streams[name].GetIOStream();
+      return streams[name]->GetIOStream();
     }
 
 
     std::ostream & get_ostream(const std::string & name="cout", const std::string & stdout_name="cout") {
       if (name == stdout_name && !Has(name)) AddStream(name, std::cout);
-      return GetOutputStream(name, stdout_name);
+      return GetOutputStream(name);
     }
 
   };
