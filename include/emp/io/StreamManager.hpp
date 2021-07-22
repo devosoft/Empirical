@@ -28,140 +28,275 @@ namespace emp {
   /// A class to maintain files and other streams.
   class StreamManager {
   public:
-    enum stream_t { FILE_STREAM, STRING_STREAM, STD_STREAM };
-    enum access_t { INPUT, OUTPUT, IO }
+    enum class Type { NONE=0, FILE, STRING, OTHER };
+    enum class Access { NONE=0, INPUT=1, OUTPUT=2, IO=3 };
 
   protected:
-    template <typename T>
-    struct StreamInfo {
-      stream_t type;
-      emp::Ptr<T> ptr;
+
+    class StreamInfo {
+    protected:
+      std::string name;
       bool owned;
-    }
 
-    struct StreamCollection {
-      stream_t type;
-      access_t access;
-
-      StreamCollection(stream_t in_type, access_t in_access) : type(in_type), access(in_access) {}
-    };
-
-    // Struct to hold all streams of a given type.
-    template <typename T, bool CONSTRUCT_WITH_NAME=false>
-    struct TypedStreamCollection : public StreamCollection {
-      using info_t = StreamInfo<T>;
-      std::unordered_map<std::string, info_t> streams;
-
-      TypedStreamCollection(stream_t in_type, access_t in_access)
-        : StreamCollection(in_type, in_access) { }
-      ~TypedStreamCollection() {
-        for (auto & [name, info] : streams) if (info.owned) info.ptr.Delete();
+      // Helper under error conditions.
+      static std::iostream & GetDefaultStream() {
+        static std::stringstream default_stream;
+        return default_stream;
       }
 
-      bool Has(const std::string & name) const { return emp::Has(streams, name); }
+    public:
+      StreamInfo(const std::string & in_name, bool in_owned) : name(in_name), owned(in_owned) { }
+      StreamInfo(const StreamInfo &) = delete;
+      virtual ~StreamInfo() {}
+
+      virtual Type GetType() const = 0;
+      virtual Access GetAccess() const = 0;
+
+      bool IsFile() const { return GetType() == Type::FILE; }
+      bool IsString() const { return GetType() == Type::STRING; }
+      bool IsOther() const { return GetType() == Type::OTHER; }
+
+      bool IsInput() const { return GetAccess() == Access::INPUT; }
+      bool IsOutput() const { return GetAccess() == Access::OUTPUT; }
+      bool IsIO() const { return GetAccess() == Access::IO; }
+
+      bool IsInputFile() const { return IsFile() && IsInput(); }
+      bool IsOutputFile() const { return IsFile() && IsOutput(); }
+      bool IsIOFile() const { return IsFile() && IsIO(); }
+
+      bool IsOtherInput() const { return IsOther() && IsInput(); }
+      bool IsOtherOutput() const { return IsOther() && IsOutput(); }
+      bool IsOtherIO() const { return IsOther() && IsIO(); }
+
+      bool InputOK() const { return IsInput() || IsIO(); }
+      bool OutputOK() const { return IsOutput() || IsIO(); }
+
+      bool IsOwned() const { return owned; }
+
+      virtual std::istream & GetInputStream() = 0;
+      virtual std::ostream & GetOutputStream() = 0;
+      virtual std::iostream & GetIOStream() = 0;
+    };
+
+    template <typename T, Type TYPE, Access ACCESS>
+    class TypedStreamInfo : public StreamInfo {
+    protected:
+      emp::Ptr<T> ptr = nullptr;
+
+    public:
+      // Constructor to build a NEW stream based on the details passed in.
+      TypedStreamInfo(const std::string & name) : StreamInfo(name, TYPE, ACCESS, true) {
+        ResetStream();
+      }
+
+      // Constructor to use an EXISTING stream that should be passed in.
+      TypedStreamInfo(const std::string & name, emp::Ptr<T> in_ptr)
+        : StreamInfo(name, TYPE, ACCESS, false), ptr(in_ptr) { }
+
+      ~TypedStreamInfo() {
+        if (owned) ptr.Delete();
+      }
+
+      Type GetType() const override { return TYPE; }
+      Access GetAccess() const override { return ACCESS; }
+
+      std::istream & GetInputStream() override {
+        if constexpr (ACCESS == Access::OUTPUT) {
+          emp_error("No input stream!");
+          return GetDefaultStream();
+        }
+        else return *ptr;
+      }
+      std::ostream & GetOutputStream() override {
+        if constexpr (ACCESS == Access::INPUT) {
+          emp_error("No output stream!");
+          return GetDefaultStream();
+        }
+        else return *ptr;
+      }
+      std::iostream & GetIOStream() override {
+        if constexpr (ACCESS != Access::IO) {
+          emp_error("No IO stream!");
+          return GetDefaultStream();
+        }
+        else return *ptr;
+      }
+
+      void ResetStream() {
+        if (ptr) ptr.Delete();
+
+        // Build file streams.
+        if constexpr (TYPE == Type::FILE) {
+          if constexpr (ACCESS == Access::INPUT)       ptr = NewPtr<std::ifstream>(name);
+          else if constexpr (ACCESS == Access::OUTPUT) ptr = NewPtr<std::ofstream>(name);
+          else if constexpr (ACCESS == Access::IO)     ptr = NewPtr<std::fstream>(name);
+        }
  
-      T & Add(const std::string & name, emp::Ptr<T> ptr, bool owned=false) {
-        emp_assert(!Has(name));
-        streams[name] = info_t{type, ptr, owned};
-        return *(streams[name].ptr);
-      }
-
-      T & Add(const std::string & name) {
-        if constexpr (CONTRUCT_WITH_NAME) ptr = emp::Ptr<T>(name);
-        else ptr = emp::Ptr<T>();
-        return Add(name, ptr, true);
-      }
-
-      T & Get(const std::string name) {
-        emp_assert(Has(name));
-        return *(streams[name].ptr);        
+        // Build string streams.
+        else if constexpr (TYPE == Type::STRING)       ptr = NewPtr<std::stringstream>();
+ 
+        // Otherwise use std::cin or std::cout
+        else {
+          owned = false;  // Use a pre-existing stream.
+          if constexpr (ACCESS == Access::INPUT)       ptr = NewPtr<&std::cin>();
+          else if constexpr (ACCESS == Access::OUTPUT) ptr = NewPtr<&std::cout>();
+          else if constexpr (ACCESS == Access::IO) {
+            emp_error("Disallowed stream type...");
+            ptr = nullptr;
+          }
+        }
       }
     };
 
-    // File streams
-    TypedStreamCollection<std::ifstream,true> ifstream_collect;
-    TypedStreamCollection<std::ofstream,true> ofstream_collect;
-    TypedStreamCollection<std::fstream,true> fstream_collect;
+    // A default class for when we do not have a live stream.
+    struct StreamInfo_None : public StreamInfo("", false) {
+      Type GetType() const override { return Type::NONE; }
+      Access GetAccess() const override { return Access::NONE; }
+      std::istream & GetInputStream() override { emp_error("No input stream!"); return GetDefaultStream(); }
+      std::ostream & GetOutputStream() override { emp_error("No output stream!"); return GetDefaultStream(); }
+      std::iostream & GetIOStream() override { emp_error("No IO stream!"); return GetDefaultStream(); }
+    };
 
-    // String streams
-    TypedStreamCollection<std::stringstream> sstream_collect;
+    // Track a map of all possible streams.
+    std::unordered_map<std::string, emp::Ptr<StreamInfo>> streams;
 
-    // Other streams
-    TypedStreamCollection<std::istream> istream_collect;
-    TypedStreamCollection<std::ostream> ostream_collect;
-    TypedStreamCollection<std::iostream> iostream_collect;
+    Type default_input_type = Type::OTHER;  // Use std::cin for default input.
+    Type default_output_type = Type::OTHER; // Use std::cout for default output.
+    Type default_io_type = Type::STRING;    // Use std::stringstream for default IO.
 
-    stream_t default_input_type = STD_STREAM;
-    stream_t default_output_type = STD_STREAM;    
-    stream_t default_io_type = STD_STREAM;    
+    // === Helper functions ===
+
+    // Return the correct StreamInfo, or none if it doesn't exist.
+    StreamInfo_None info_none;
+    StreamInfo & GetInfo(const std::string & name) {
+      if (Has(name)) return *(streams[name]);
+      return info_none;
+    }
 
   public:
-    StreamManager()
-      : ifstream_collect(FILE_STREAM, INPUT)
-      , ofstream_collect(FILE_STREAM, OUTPUT)
-      , fstream_collect(FILE_STREAM, IO)
-      , sstream_collect(STRING_STREAM, IO)
-      , istream_collect(STD_STREAM, INPUT)
-      , ostream_collect(STD_STREAM, OUTPUT)
-      , iostream_collect(STD_STREAM, IO)
-      { }
+    StreamManager() { }
     StreamManager(const StreamManager &) = delete;
     StreamManager(StreamManager &&) = default;
-    ~StreamManager() { }
-
-    // Check to see if certain streams are being managed.
-    bool HasInputFileStream(const std::string & name) { return ifstream_collect.Has(name); }
-    bool HasOutputFileStream(const std::string & name) { return ofstream_collect.Has(name); }
-    bool HasIOFileStream(const std::string & name) { return fstream_collect.Has(name); }
-    bool HasStringStream(const std::string & name) { return sstream_collect.Has(name); }
-    bool HasStdInputStream(const std::string & name) { return istream_collect.Has(name); }
-    bool HasStdOutputStream(const std::string & name) { return ostream_collect.Has(name); }
-    bool HasStdIOStream(const std::string & name) { return iostream_collect.Has(name); }
-
-    bool HasInputOnlyStream(const std::string & name) {
-      return HasInputFileStream(name) || HasStdInputStream(name);
-    }
-    bool HasOutputOnlyStream(const std::string & name) {
-      return HasOutputFileStream(name) || HasStdOutputStream(name);
-    }
-    bool HasIOStream(const std::string & name) {
-      return HasIOFileStream(name) || HasStringStream(name) || HasStdIOStream(name);
+    ~StreamManager() {
+      for (auto & [name, info_ptr] : streams) info_ptr.Delete();
     }
 
-    bool HasInputStream(const std::string & name) {
-      return HasInputOnlyStream(name) || HasIOStream(name);
-    }
-    bool HasOutputStream(const std::string & name) {
-      return HasOutputOnlyStream(name) || HasIOStream(name);
-    }
-    bool Has(const std::string & name) {
-      return HasInputOnlyStream(name) || HasOutputOnlyStream(name) || HasIOStream(name);
-    }
+    bool Has(const std::string & name) const { return emp::Has(streams, name); }
+ 
+    // Check to see if certain types of streams are being managed.
+    bool HasInputFileStream(const std::string & name) const { return GetInfo(name).IsInputFile(); }
+    bool HasOutputFileStream(const std::string & name) const { return GetInfo(name).IsOutputFile(); }
+    bool HasIOFileStream(const std::string & name) const { return GetInfo(name).IsIOFile(); }
+    bool HasStringStream(const std::string & name) const { return GetInfo(name).IsString(); }
+    bool HasStdInputStream(const std::string & name) const { return GetInfo(name).IsOtherInput(); }
+    bool HasStdOutputStream(const std::string & name) const { return GetInfo(name).IsOtherOutput(); }
+    bool HasStdIOStream(const std::string & name) const { return GetInfo(name).IsOtherIO(); }
 
-    // Add streams of specific types.
+    bool HasInputOnlyStream(const std::string & name) const { return GetInfo(name).IsInput(); }
+    bool HasOutputOnlyStream(const std::string & name) const { return GetInfo(name).IsOutput(); }
+    bool HasIOStream(const std::string & name) const { return GetInfo(name).IsIO(); }
 
-    std::istream & AddInputFile(std::string name) { return AddInfo<INPUT>(name, NewPtr<std::ifstream>(name)); }
+    bool HasInputStream(const std::string & name) const { return GetInfo(name).InputOK(); }
+    bool HasOutputStream(const std::string & name) const { return GetInfo(name).OutputOK(); }
 
-    std::istream & AddInputFile(std::string name) { return AddFileInfo<std::ifstream,INPUT>(name); }
-    std::ostream & AddOutputFile(std::string name) { return AddFileInfo<std::ofstream,OUTPUT>(name); }
-    std::iostream & AddFile(std::string name) { return AddFileInfo<std::fstream,IO>(name); }
-    std::iostream & AddStringStream(std::string name)
 
-    std::ostream & GetOutputStream(const std::string & filename="cout", const std::string & stdout_name="cout") {
-      if (filename == "" || filename == stdout_name) return std::cout;
-      if (!emp::Has(of_streams, filename)) return AddOutputFile(filename);
-      return *of_streams[filename];
-    }
-
-    std::stringstream & GetStringStream(const std::string & name) {
-      if (!emp::Has(string_streams, name)) {
-        string_streams[name] = emp::NewPtr<std::stringstream>();
-      }
-      return *string_streams[name];
+    // Build a new stream of specific types.
+    template <typename T, Type TYPE, Access ACCESS>
+    T & AddStream(const std::string & name) {
+      emp_assert(!Has(name), name);                          // Must be a new name.
+      using info_t = TypedStringInfo<T, TYPE, ACCESS>;       // Setup type for info about stream
+      emp::Ptr<info_t> info_ptr = emp::NewPtr<info_t>(name); // Build the info (& stream iteslf)
+      streams[name] = info_ptr;                              // Store the info for the future
+      return *(info_ptr->ptr);                               // Return just the stream.
     }
 
-    std::ostream & get_ostream(const std::string & filename="cout", const std::string & stdout_name="cout") {
-      return GetOutputStream(filename, stdout_name);
+    std::ifstream & AddInputFile(std::string name) {
+      return AddStream<std::ifstream, Type::FILE, Access::INPUT>(name);
+    }
+    std::ofstream & AddOutputFile(std::string name) {
+      return AddStream<std::ofstream, Type::FILE, Access::OUTPUT>(name);
+    }
+    std::fstream & AddFile(std::string name) {
+      return AddStream<std::fstream, Type::FILE, Access::IO>(name);
+    }
+
+    std::stringstream & AddStringStream(std::string name) {
+      return AddStream<std::stringstream, Type::STRING, Access::IO>(name);
+    }
+
+    /// Add a stream maintained outside of manager (do not delete without removing first!)
+    template <typename T>
+    T & AddStream(const std::string & name, T & in_stream) {
+      constexpr bool input_ok = is_convertible<T,std::istream>();
+      constexpr bool output_ok = is_convertible<T,std::ostream>();
+      constexpr Access ACCESS = (Access) ((input_ok ? 1 : 0) + (output_ok ? 2 : 0));
+
+      emp_assert(!Has(name), name);                            // Must be a new name.
+      using info_t = TypedStringInfo<T, Type::OTHER, ACCESS>;  // Setup type for info about stream
+      auto info_ptr = emp::NewPtr<info_t>(name, &in_stream);   // Build the info (& stream iteslf)
+      streams[name] = info_ptr;                                // Store the info for the future
+      return *(info_ptr->ptr);                                 // Return just the stream.
+    }
+
+    /// Build a default input stream.
+    std::istream & AddInputStream(const std::string & name) {
+      emp_assert(!Has(name));
+      switch (default_input_type) {
+      case Type::FILE: return AddInputFile(name);
+      case Type::STRING: return AddStringStream(name);
+      case Type::OTHER: return AddStream(name, std::cin);
+      default:
+        emp_error("Default input streams not allowed!", name);
+        return GetDefaultStream();
+      };
+      return GetDefaultStream();
+    }
+    
+    /// Build a default output stream.
+    std::ostream & AddOutputStream(const std::string & name) {
+      emp_assert(!Has(name));
+      switch (default_output_type) {
+      case Type::FILE: return AddOutputFile(name);
+      case Type::STRING: return AddStringStream(name);
+      case Type::OTHER: return AddStream(name, std::cout);
+      default:
+        emp_error("Default output streams not allowed!", name);
+        return GetDefaultStream();
+      };
+    }
+
+    /// Build a default IO stream.
+    std::iostream & AddIOStream(const std::string & name) {
+      emp_assert(!Has(name));
+      switch (default_io_type) {
+      case Type::FILE: return AddIOFile(name);
+      case Type::STRING: return AddStringStream(name);
+      default:
+        emp_error("Default output streams not allowed!", name);
+        return GetDefaultStream();
+      };
+    }
+
+
+    std::istream & GetInputStream(const std::string & name) {
+      if (!HasInputStream(name)) return AddInputStream(name);
+      return streams[name].GetInputStream();
+    }
+
+    std::ostream & GetOutputStream(const std::string & name) {
+      if (!HasOutputStream(name)) return AddOutputStream(name);
+      return streams[name].GetOutputStream();
+    }
+
+    std::iostream & GetIOStream(const std::string & name) {
+      if (!HasIOStream(name)) return AddIOStream(name);
+      return streams[name].GetIOStream();
+    }
+
+
+    std::ostream & get_ostream(const std::string & name="cout", const std::string & stdout_name="cout") {
+      if (name == stdout_name && !Has(name)) AddStream(name, std::cout);
+      return GetOutputStream(name, stdout_name);
     }
 
   };
