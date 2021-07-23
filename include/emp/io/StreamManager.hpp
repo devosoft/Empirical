@@ -292,6 +292,17 @@ namespace emp {
       };
     }
 
+    void SetInputDefaultFile() { default_input_type = Type::FILE; }
+    void SetOutputDefaultFile() { default_output_type = Type::FILE; }
+    void SetIODefaultFile() { default_io_type = Type::FILE; }
+
+    void SetInputDefaultString() { default_input_type = Type::STRING; }
+    void SetOutputDefaultString() { default_output_type = Type::STRING; }
+    void SetIODefaultString() { default_io_type = Type::STRING; }
+
+    void SetInputDefaultStandard() { default_input_type = Type::OTHER; }
+    void SetOutputDefaultStandard() { default_output_type = Type::OTHER; }
+
 
     std::istream & GetInputStream(const std::string & name) {
       if (!HasInputStream(name)) return AddInputStream(name);
