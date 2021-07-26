@@ -111,19 +111,35 @@ namespace emp::prefab {
      *
      * @return the readout panel for chaining calls
      */
+    template<typename T>
     ReadoutPanel & AddValue(
       const std::string & name,
       const std::string & desc,
-      const string_getter_t & value_getter
+      T && value
     ) {
       const std::string vd_name(emp::to_string(GetID(), "_", name));
-      LiveValueDisplay ldv(name, desc, value_getter, false, vd_name);
+      LiveValueDisplay ldv(name, desc, std::forward<T>(value), false, vd_name);
       data_collection << ldv;
       Div view(ldv.GetView());
       Info()->AddLiveDiv(view);
       return (*this);
     }
+
   };
 }
+
+// template<>
+// ReadoutPanel & emp::prefab::ReadoutPanel::AddValue(
+//   const std::string & name,
+//   const std::string & desc,
+//   const string_getter_t & value_getter
+// ) {
+//   const std::string vd_name(emp::to_string(GetID(), "_", name));
+//   LiveValueDisplay ldv(name, desc, value_getter, false, vd_name);
+//   data_collection << ldv;
+//   Div view(ldv.GetView());
+//   Info()->AddLiveDiv(view);
+//   return (*this);
+// }
 
 #endif

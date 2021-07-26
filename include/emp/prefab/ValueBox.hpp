@@ -107,15 +107,15 @@ namespace emp::prefab {
      * @param value_getter a function that returns the value to be displayed
      * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
-    using string_getter_t = std::function<std::string()>;
+    template<typename T>
     LiveValueDisplay(
       const std::string & label,
       const std::string & desc,
-      const string_getter_t & value_getter,
+      T && value,
       const bool & independent=true,
       const std::string & id=""
     ) : ValueBox(label, desc, id), animName(label) {
-      view << web::Live(value_getter);
+      view << web::Live(std::forward<T>(value));
       if (independent) {
         this->AddAnimation(label, [](){;}, view);
         this->Animate(label).Start();
