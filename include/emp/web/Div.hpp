@@ -305,6 +305,7 @@ namespace web {
     // Get a properly cast version of info.
     internal::DivInfo * Info() { return (internal::DivInfo *) info; }
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
+    Div(internal::DivInfo * info_ref) : WidgetFacet(info_ref) { ; }
 
   public:
     Div(const std::string & in_name="") : WidgetFacet(in_name) {

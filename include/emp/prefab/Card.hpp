@@ -9,9 +9,51 @@
 
 namespace emp {
 namespace prefab {
+
+  namespace internal {
+    class CardInfo : public web::internal::DivInfo {
+      // Boolean being true indicates the click toggles card open
+    public:
+      using on_toggle_fun_t = std::function<void()>;
+
+      on_toggle_fun_t toggleHandler;
+    public:
+      CardInfo(const std::string & in_id="")
+      : DivInfo(in_id), toggleHandler([]() {;}) { ; }
+
+      on_toggle_fun_t & GetToggle() {
+        return toggleHandler;
+      }
+
+      void SetToggle(on_toggle_fun_t toggle) {
+        toggleHandler = toggle;
+      }
+    };
+  }
+
   /// Use Card class to create Bootstrap style cards.
   class Card : public web::Div {
+    // Boolean being true indicates the click toggles card open
+    using on_toggle_fun_t = internal::CardInfo::on_toggle_fun_t;
+
   private:
+    /**
+     * Get shared info pointer, cast to Card-specific type.
+     * @return cast pointer
+     */
+    internal::CardInfo * Info() {
+      return dynamic_cast<internal::CardInfo *>(info);
+    }
+
+    /**
+     * Get shared info pointer, cast to const Card-specific type.
+     * @return cast pointer
+     */
+    const internal::CardInfo * Info() const {
+      return dynamic_cast<internal::CardInfo *>(info);
+    }
+
+  protected:
     // ID of card Div to be used in ID of associated card sub components
     std::string card_base = this->GetID();
     // all header content will be added here
@@ -25,22 +67,30 @@ namespace prefab {
       card_body.SetAttr("class", "card-body");
     }
 
-  public:
+
     /**
      * @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
      * @param id user defined ID for card Div, (default emscripten generated)
      */
+  public:
     Card(
       const std::string & state="STATIC",
       const bool & show_glyphs=true,
       const std::string & id=""
-    ): web::Div(id) {
+    ) : Card(state, show_glyphs, new internal::CardInfo(id)) { ; }
+
+  protected:
+    Card(
+      const std::string & state,
+      const bool & show_glyphs,
+      internal::CardInfo * info_ref
+    ) : Div(info_ref) {
 
       AddBootstrap();
       if (state == "STATIC") { // static card with no toggle enabled
-        ((emp::web::Div) *this) << card_header; // Div cast prevents trying to add to body
-        ((emp::web::Div) *this) << card_body;
+        static_cast<Div>(*this) << card_header; // Div cast prevents trying to add to body
+        static_cast<Div>(*this) << card_body;
       } else {
         // card is collapsible, make the collapse link the head of the card
         prefab::CollapseCoupling accordion(card_header,
@@ -48,8 +98,15 @@ namespace prefab {
           state == "INIT_OPEN",
           emp::to_string(card_base+ "_card_collapse")
         );
-        ((emp::web::Div) *this) << accordion.GetControllerDiv();
-        ((emp::web::Div) *this) << accordion.GetTargetDiv();
+
+        Div header_div{accordion.GetControllerDiv()};
+        static_cast<Div>(*this) << header_div;
+        static_cast<Div>(*this) << accordion.GetTargetDiv();
+
+        on_toggle_fun_t & tog = GetToggleHandler();
+        header_div.OnClick([header_div, &toggle = tog](){
+          toggle(/* TODO: toggle state boolean */);
+        });
 
         if (show_glyphs) { // by default add glyphs to a collapsible card
           prefab::FontAwesomeIcon up("fa-angle-double-up");
@@ -62,7 +119,7 @@ namespace prefab {
         card_header.AddAttr("class", "collapse_toggle_card_header");
       }
     }
-
+  public:
     /**
      * Add content to header section of card
      *
@@ -111,6 +168,14 @@ namespace prefab {
     template <typename IN_TYPE> emp::prefab::Card & operator<<(IN_TYPE && in_val) {
       card_body << std::forward<IN_TYPE>(in_val);
       return (*this);
+    }
+
+    void SetToggleHandler(on_toggle_fun_t toggle) {
+      Info()->SetToggle(toggle);
+    }
+
+    on_toggle_fun_t & GetToggleHandler() {
+      return Info()->GetToggle();
     }
 
   };
