@@ -99,23 +99,53 @@ namespace emp::prefab {
    * multiple LiveValueDisplays to align labels and values along a common grid.
    */
   class LiveValueDisplay : public ValueBox {
-
+    std::string animName;
     public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
-     * @param value the piece of information or data being displayed as a live value
+     * @param value_getter a function that returns the value to be displayed
      * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
-    template<typename IN_TYPE>
+    using string_getter_t = std::function<std::string()>;
     LiveValueDisplay(
       const std::string & label,
       const std::string & desc,
-      IN_TYPE && value,
+      const string_getter_t & value_getter,
+      const bool & independent=true,
       const std::string & id=""
-    ) : ValueBox(label, desc, id) {
-      view << web::Live(value);
+    ) : ValueBox(label, desc, id), animName(label) {
+      view << web::Live(value_getter);
+      if (independent) {
+        this->AddAnimation(label, [](){;}, view);
+        this->Animate(label).Start();
+      }
     }
+
+    /**
+     * Start polling the getter function for this live value.
+     */
+    void Start() {
+      this->Animate(animName).Start();
+    }
+
+    /**
+     * Stop polling the getter function for this live value.
+     */
+    void Stop() {
+      this->Animate(animName).Stop();
+    }
+
+    /**
+     * Returns the view div containing live values to animate
+     * (use this in an Animate instance).
+     *
+     * @return the view div
+     */
+    Div & GetView() {
+      return view;
+    }
+
   };
 
   /**

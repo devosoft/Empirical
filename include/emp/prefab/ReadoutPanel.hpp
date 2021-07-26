@@ -8,39 +8,60 @@
 #include "ValueBox.hpp"
 
 namespace emp::prefab {
+
+  namespace internal {
+    class ReadoutPanelInfo : public CardInfo {
+      using string_getter_t = std::function<std::string()>;
+      using check_pair_t = std::pair<string_getter_t, emp::web::Div>;
+      emp::vector<check_pair_t> refreshPairs;
+    public:
+      ReadoutPanelInfo(const std::string & in_id="") : CardInfo(in_id) { ; }
+
+
+    };
+  }
+
   class ReadoutPanel : public Card {
-    protected:
+  protected:
     Div data_holder{emp::to_string(GetID(), "_data")};
 
-    public:
+    ReadoutPanel(const std::string & group_name,
+      const std::string & state,
+      const bool & show_glyphs,
+      internal::ReadoutPanelInfo * info_ref
+    ) : Card(state, show_glyphs, info_ref) {
+      static_cast<Card>(*this) << data_holder;
+      AddHeaderContent(group_name);
+      data_holder.AddAttr("class", "display_group");
+
+      // Do other stuff here
+
+    }
+  public:
     ReadoutPanel(const std::string & group_name,
       const std::string & state="INIT_OPEN",
       const bool & show_glyphs=true,
       const std::string & id=""
-    ) : Card(state, show_glyphs, id) {
-      static_cast<Card>(*this) << data_holder;
-      AddHeaderContent(group_name);
-      data_holder.AddAttr("class", "display_group");
-    }
+    ) : ReadoutPanel(
+      group_name,
+      state,
+      show_glyphs,
+      new internal::ReadoutPanelInfo(id)
+    ) { ; }
 
-    template<typename IN_TYPE>
+    using string_getter_t = std::function<std::string()>;
+
     ReadoutPanel & AddValue(
       const std::string & name,
-      IN_TYPE && value,
-      const std::string & desc
+      const std::string & desc,
+      const string_getter_t & value_getter
     ) {
       const std::string vd_name(emp::to_string(GetID(), "_", name));
-      data_holder << LiveValueDisplay(name, std::forward<IN_TYPE>(value), desc, vd_name);
-      return (*this);
-    }
-
-    /**
-     * Add a LiveValueDisplay to the data holder portion of this readout
-     *
-     * @param in_val a LiveValueDisplay to add to the readout
-     */
-    ReadoutPanel & operator<<(LiveValueDisplay && in_val) {
-      data_holder << std::forward<LiveValueDisplay>(in_val);
+      LiveValueDisplay ldv(name, desc, value_getter, false, vd_name);
+      data_holder << ldv;
+      Div view(ldv.GetView());
+      this->AddAnimation(name, [](){;}, view);
+      this->Animate(name).Start();
       return (*this);
     }
   };
