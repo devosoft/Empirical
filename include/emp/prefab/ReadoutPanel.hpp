@@ -3,6 +3,7 @@
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"
+#include "../web/Animate.hpp"
 
 #include "Card.hpp"
 #include "ValueBox.hpp"
@@ -84,7 +85,16 @@ namespace emp::prefab {
           elapsed = 0;
         }
       });
-      Animate(GetID()).Start(); // Start the animation
+
+      auto * main = & this->Animate(GetID());
+      main->Start(); // Start the animation
+      if (state != "STATIC") {
+        // TODO: make this double-click safe
+        SetToggleHandler([main](){
+          main->ToggleActive();
+        });
+      }
+
     }
 
   public:
@@ -111,35 +121,34 @@ namespace emp::prefab {
      *
      * @return the readout panel for chaining calls
      */
-    template<typename T>
+    template<typename VALUE_TYPE>
     ReadoutPanel & AddValue(
       const std::string & name,
       const std::string & desc,
-      T && value
+      VALUE_TYPE && value
     ) {
       const std::string vd_name(emp::to_string(GetID(), "_", name));
-      LiveValueDisplay ldv(name, desc, std::forward<T>(value), false, vd_name);
-      data_collection << ldv;
-      Div view(ldv.GetView());
+      LiveValueDisplay lvd(name, desc, std::forward<VALUE_TYPE>(value), false, vd_name);
+      data_collection << lvd;
+      emp::web::Div view(lvd.GetView());
       Info()->AddLiveDiv(view);
       return (*this);
+    }
+    /**
+     * A version of AddValue that can take multiple name, description, value triples.
+     */
+    template<typename VALUE_TYPE, typename... OTHER_VALUES>
+    ReadoutPanel & AddValue(
+      const std::string & name,
+      const std::string & desc,
+      VALUE_TYPE && value,
+      OTHER_VALUES... others
+    ) {
+      AddValue(name, desc, value);
+      return AddValue(others...);
     }
 
   };
 }
-
-// template<>
-// ReadoutPanel & emp::prefab::ReadoutPanel::AddValue(
-//   const std::string & name,
-//   const std::string & desc,
-//   const string_getter_t & value_getter
-// ) {
-//   const std::string vd_name(emp::to_string(GetID(), "_", name));
-//   LiveValueDisplay ldv(name, desc, value_getter, false, vd_name);
-//   data_collection << ldv;
-//   Div view(ldv.GetView());
-//   Info()->AddLiveDiv(view);
-//   return (*this);
-// }
 
 #endif

@@ -369,7 +369,9 @@ namespace web {
     }
 
     // A quick way to retrieve Animate widgets by name.
-    web::Animate & Animate (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
+    // TODO: may want to change this to use .at() rather than [] since this default
+    // constructs an Animate object if one doesn't exist!
+    web::Animate & Animate(const std::string & in_id) { return *(Info()->anim_map[in_id]); }
   };
 
   // using Slate = Div;    // For backward compatability...

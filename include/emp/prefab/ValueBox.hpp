@@ -78,7 +78,7 @@ namespace emp::prefab {
      * @param label name for this value
      * @param desc a more detailed description of what the value means
      * @param value the piece of information or data being displayed
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for ValueDisplay div (default is emscripten generated)
      */
     ValueDisplay(
       const std::string & label,
@@ -99,13 +99,15 @@ namespace emp::prefab {
    * multiple LiveValueDisplays to align labels and values along a common grid.
    */
   class LiveValueDisplay : public ValueBox {
-    std::string animName;
+
     public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
-     * @param value_getter a function that returns the value to be displayed
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param value a value to display or function returning a string
+     * @param independent should this component be independently animated? Or will
+     * some other component manage its animation?
+     * @param id user defined ID for LiveValueDisplay div (default is emscripten generated)
      */
     template<typename T>
     LiveValueDisplay(
@@ -114,26 +116,12 @@ namespace emp::prefab {
       T && value,
       const bool & independent=true,
       const std::string & id=""
-    ) : ValueBox(label, desc, id), animName(label) {
+    ) : ValueBox(label, desc, id) {
       view << web::Live(std::forward<T>(value));
       if (independent) {
-        this->AddAnimation(label, [](){;}, view);
-        this->Animate(label).Start();
+        this->AddAnimation(GetID(), [](){;}, view);
+        this->Animate(GetID()).Start();
       }
-    }
-
-    /**
-     * Start polling the getter function for this live value.
-     */
-    void Start() {
-      this->Animate(animName).Start();
-    }
-
-    /**
-     * Stop polling the getter function for this live value.
-     */
-    void Stop() {
-      this->Animate(animName).Stop();
     }
 
     /**
@@ -162,7 +150,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param initial_value the initial value
      * @param input Input component that user can interact with
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for ValueControl div (default is emscripten generated)
      */
     ValueControl(
       const std::string & label,
@@ -187,7 +175,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for TextValueControl div (default is emscripten generated)
      */
     TextValueControl(
       const std::string & label,
@@ -211,7 +199,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for BoolValueControl div (default is emscripten generated)
      */
     BoolValueControl(
       const std::string & label,
@@ -270,7 +258,7 @@ namespace emp::prefab {
      * @param type the numeric type ('float', 'double' or 'int')
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for NumericValueControl div (default is emscripten generated)
      */
     NumericValueControl(
       const std::string & label,
