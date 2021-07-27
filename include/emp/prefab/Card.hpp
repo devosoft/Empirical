@@ -11,20 +11,40 @@ namespace emp {
 namespace prefab {
 
   namespace internal {
+    /**
+     * Shared pointer held by instances of Card class representing
+     * the same conceptual Card DOM object.
+     * Contains state that should persist while Card DOM object
+     * persists.
+     */
     class CardInfo : public web::internal::DivInfo {
-      // Boolean being true indicates the click toggles card open
+
     public:
       using on_toggle_fun_t = std::function<void()>;
-
+    protected:
       on_toggle_fun_t toggleHandler;
     public:
+      /**
+       * Construct a shared pointer to manage Card state.
+       * @param in_id HTML ID of Card div
+       */
       CardInfo(const std::string & in_id="")
       : DivInfo(in_id), toggleHandler([]() {;}) { ; }
 
+      /**
+       * Get the on-toggle function for this component
+       * @return the function called whenever the card's state
+       * is toggled open or closed
+       */
       on_toggle_fun_t & GetToggle() {
         return toggleHandler;
       }
 
+      /**
+       * Set the on-toggle function for this component
+       * @param toggle the function to be called whenever the
+       * card's state is toggled open or closed
+       */
       void SetToggle(on_toggle_fun_t toggle) {
         toggleHandler = toggle;
       }
@@ -67,13 +87,12 @@ namespace prefab {
       card_body.SetAttr("class", "card-body");
     }
 
-
+  public:
     /**
      * @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
      * @param id user defined ID for card Div, (default emscripten generated)
      */
-  public:
     Card(
       const std::string & state="STATIC",
       const bool & show_glyphs=true,
@@ -81,6 +100,13 @@ namespace prefab {
     ) : Card(state, show_glyphs, new internal::CardInfo(id)) { ; }
 
   protected:
+    /**
+     * A protected constructor for a Card.
+     * @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
+     * @param show_glyphs should toggle icons show in collapsible card header? (default true)
+     * @param info_ref a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
+     * or a pointer to a derived info object (simulating inheritance)
+     */
     Card(
       const std::string & state,
       const bool & show_glyphs,
