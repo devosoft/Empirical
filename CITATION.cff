@@ -2,29 +2,26 @@
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 cff-version: 1.0.3
 message: If you use this software, please cite it using these metadata.
-# FIXME title as repository name might not be the best name, please make human readable
-title: 'devosoft/Empirical: Before directory reorganization'
+title: 'Empirical'
 doi: 10.5281/zenodo.4141943
-# FIXME splitting of full names is error prone, please check if given/family name are correct
-authors:
 - given-names: Charles
   family-names: Ofria
   affiliation: Michigan State University
-- given-names: Matthew
+- given-names: Matthew Andres
   family-names: Moreno
-  name-particle: Andres
-  affiliation: '@devosoft'
+  affiliation: Michigan State University
+  orcid: 'https://orcid.org/0000-0003-4726-4479'
 - given-names: Emily
   family-names: Dolson
   affiliation: Michigan State University
 - given-names: Alex
   family-names: Lalejini
-- given-names: rodsan0
-  family-names: ''
+- given-names: Santiago
+  family-names: Rodriguez Papa
 - given-names: Jake
   family-names: Fenton
-- given-names: perryk12
-  family-names: ''
+- given-names: Katherine
+  family-names: Perry
 - given-names: Steven
   family-names: Jorgensen
 - given-names: hoffmanriley
@@ -57,4 +54,4 @@ authors:
 version: 0.0.4
 date-released: 2020-10-27
 repository-code: https://github.com/devosoft/Empirical
-license: other-open
+license: MIT
