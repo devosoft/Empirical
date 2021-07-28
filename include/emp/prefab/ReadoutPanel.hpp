@@ -93,7 +93,7 @@ namespace emp::prefab {
 
   protected:
     // The div to hold the
-    Div data_collection{emp::to_string(GetID(), "_data")};
+    Div data_collection{emp::to_string(GetID(), "_values")};
 
     /**
      * A protected constructor for a ReadoutPanel which sets up the necessary structures
@@ -151,8 +151,13 @@ namespace emp::prefab {
 
     }
 
+    /// A helper function to formate IDs generated for subcomponents
+    inline static std::string FormatName(const std::string & name) {
+      return to_lower(join(slice(name, ' '), "_"));
+    }
+
   public:
-    using string_getter_t = std::function<std::string()>;
+
     /**
      * Adds a LiveValueDisplay to this component and adds the value's
      * parent div to a list of divs to be redrawn at the refresh rate.
@@ -168,7 +173,7 @@ namespace emp::prefab {
       const std::string & desc,
       VALUE_TYPE && value
     ) {
-      const std::string vd_name(emp::to_string(GetID(), "_", name));
+      const std::string vd_name(emp::to_string(GetID(), "_", FormatName(name)));
       LiveValueDisplay lvd(name, desc, std::forward<VALUE_TYPE>(value), false, vd_name);
       data_collection << lvd;
       emp::web::Div view(lvd.GetView());
