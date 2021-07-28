@@ -189,10 +189,10 @@ namespace emp::prefab {
       const std::string & name,
       const std::string & desc,
       VALUE_TYPE && value,
-      OTHER_VALUES... others
+      OTHER_VALUES && ... others
     ) {
-      AddValue(name, desc, value);
-      return AddValue(others...);
+      AddValue(name, desc, std::forward<VALUE_TYPE>(value));
+      return AddValue(std::forward<OTHER_VALUES>(others)...);
     }
   };
 }
