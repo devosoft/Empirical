@@ -7,11 +7,12 @@ stylistic and design choices that might be useful in future development.
 ### Overriding Streaming
 
 Most components use the stream operator (`<<`) to append other components
-inside. However, may prefabricated components have multiple layers of divs and
+inside. However, many prefabricated components have multiple layers of divs and
 other tags so one might want to override this operator to have a different
-behavior. However, this may unintentionally cause an infinite loop if you're
-creating using something like `*this << sub_component;` to set up the component.
-The trick is to use `static_cast<BaseClass>(*this) << sub_component;` to prevent
+behavior. However, this may accidentally cause an infinite loop if you're
+using something like `*this << sub_component;` to set up the component.
+The trick is to use `static_cast<BaseClass>(*this) << sub_component;` where
+`BaseClass` is the class you're inheriting from (probably `Div`) to prevent
 using your newly overridden streaming operator in the initial construction.
 
 ### Inheritance
@@ -100,8 +101,12 @@ class Base {
   Derived() : Base(new internal::DerivedInfo()) { ; }
 }
 ```
+This way we maintain control over what `info` points to from any derived class
+while still ensuring constructors that add structure/attributes are called in
+the right order.
 
-So the TL;DR version is to allow for inheritance
-* Give your class a protected constructor that takes an `Info` pointer.
-* Have other constructors delegate to the protected constructor to ensure
-the same setup.
+So the TL;DR version is:
+
+to allow for inheritance,
+* Use a protected constructor that takes an `Info` pointer to do the setup
+* Have other constructors delegate to the protected constructor
