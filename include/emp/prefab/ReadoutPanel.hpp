@@ -18,7 +18,8 @@ namespace emp::prefab {
      * persists.
      */
     class ReadoutPanelInfo : public CardInfo {
-
+      // Holds the divs in the panel that are to be
+      // redrawn since they contain live objects
       emp::vector<emp::web::Div> live_divs;
     public:
       /**
@@ -79,21 +80,21 @@ namespace emp::prefab {
      * @param id a user defined ID for ReadoutPanel div (default is emscripten generated)
      */
     ReadoutPanel(const std::string & group_name,
-      double refresh_rate=250,
+      const double refresh_milliseconds=250,
       const std::string & state="INIT_OPEN",
       const bool & show_glyphs=true,
       const std::string & id=""
     ) : ReadoutPanel(
       group_name,
-      refresh_rate,
+      refresh_milliseconds,
       state,
       show_glyphs,
       new internal::ReadoutPanelInfo(id)
     ) { ; }
 
   protected:
-    // The div to hold the
-    Div data_collection{emp::to_string(GetID(), "_values")};
+    // The div to hold the LiveValueDisplays for when content is added
+    Div values{emp::to_string(GetID(), "_values")};
 
     /**
      * A protected constructor for a ReadoutPanel which sets up the necessary structures
@@ -101,14 +102,15 @@ namespace emp::prefab {
      * before causing subsequent modifications.
      *
      * @param group_name name for this collection of values, displayed in card header
-     * @param refresh_time the time in milliseconds between refreshes to the live values
+     * @param refresh_milliseconds the minimum time in milliseconds between refreshes to
+     * the live values
      * @param state initial state of the card, one of STAITC, INIT_OPEN, or INIT_CLOSED
      * @param show_glyphs whether the underlying card should show toggle icons in card header
      * @param info_ref a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
      * or a pointer to a derived info object (simulating inheritance)
      */
     ReadoutPanel(const std::string & group_name,
-      double refresh_time,
+      double refresh_milliseconds,
       const std::string & state,
       const bool & show_glyphs,
       internal::ReadoutPanelInfo * info_ref
@@ -116,27 +118,29 @@ namespace emp::prefab {
 
       // Best to cast to Card in case we decide to overload the stream
       // operator to do something special for this class later
-      static_cast<Card>(*this) << data_collection;
+      static_cast<Card>(*this) << values;
       AddHeaderContent(group_name);
-      data_collection.AddAttr("class", "display_group");
+      values.AddAttr("class", "display_group");
 
       auto & live_divs = Info()->GetLiveDivs();
       // Animation is referenced by this component's ID
       AddAnimation(GetID(), [
-        elapsed = 0, refresh_time, &live_divs
+        elapsed_milliseconds = 0, refresh_milliseconds, &live_divs
       ](double stepTime) mutable {
         // Accumulate steps, then redraw after enough time has elapsed
-        elapsed += stepTime;
-        if (elapsed > refresh_time) {
-          elapsed -= refresh_time;
+        elapsed_milliseconds += stepTime;
+        if (elapsed_milliseconds > refresh_milliseconds) {
+          elapsed_milliseconds -= refresh_milliseconds;
           for(emp::web::Div & div : live_divs) {
             div.Redraw();
           }
         }
-        // If we are running a full 2x slower than the refresh rate
-        // we'll have to skip refreshes to prevent overflow
-        if (elapsed > refresh_time) {
-          elapsed = 0;
+        // Might not be necessary, but if elapsed time got to 2x
+        // the refresh period, redraws are being severly delayed by
+        // something. Setting to zero in this case has the effect of
+        // dropping frames to prevent choking execution with redraws.
+        if (elapsed_milliseconds > refresh_milliseconds) {
+          elapsed_milliseconds = 0;
         }
       });
 
@@ -175,7 +179,7 @@ namespace emp::prefab {
     ) {
       const std::string vd_name(emp::to_string(GetID(), "_", FormatName(name)));
       LiveValueDisplay lvd(name, desc, std::forward<VALUE_TYPE>(value), false, vd_name);
-      data_collection << lvd;
+      values << lvd;
       emp::web::Div view(lvd.GetView());
       Info()->AddLiveDiv(view);
       return (*this);
@@ -185,15 +189,20 @@ namespace emp::prefab {
      * for ease of use when adding lots of values.
      */
     template<typename VALUE_TYPE, typename... OTHER_VALUES>
-    ReadoutPanel & AddValue(
+    ReadoutPanel & AddValues(
       const std::string & name,
       const std::string & desc,
       VALUE_TYPE && value,
       OTHER_VALUES && ... others
     ) {
       AddValue(name, desc, std::forward<VALUE_TYPE>(value));
-      return AddValue(std::forward<OTHER_VALUES>(others)...);
+      return AddValues(std::forward<OTHER_VALUES>(others)...);
     }
+    ReadoutPanel & AddValues() {
+      return (*this);
+    }
+
+
   };
 }
 

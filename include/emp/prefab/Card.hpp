@@ -53,7 +53,7 @@ namespace prefab {
 
   /// Use Card class to create Bootstrap style cards.
   class Card : public web::Div {
-    // Boolean being true indicates the click toggles card open
+
     using on_toggle_fun_t = internal::CardInfo::on_toggle_fun_t;
 
   private:
@@ -89,7 +89,7 @@ namespace prefab {
 
   public:
     /**
-     * @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
+     * @param state indicate whether card should be STATIC, INIT_OPEN, or INIT_CLOSED (default STATIC)
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
      * @param id user defined ID for card Div, (default emscripten generated)
      */
@@ -102,7 +102,7 @@ namespace prefab {
   protected:
     /**
      * A protected constructor for a Card.
-     * @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
+     * @param state indicate whether card should be STATIC, INIT_OPEN, or INIT_CLOSED (default STATIC)
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
      * @param info_ref a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
      * or a pointer to a derived info object (simulating inheritance)

@@ -27,7 +27,7 @@ CFLAGS_native := $(CFLAGS_native_opt)
 CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
 
-JS_TARGETS := Card.js CodeBlock.js Collapse.js CommentBox.js ConfigPanel.js FontAwesomeIcon.js LoadingIcon.js LoadingModal.js Modal.js ToggleSwitch.js
+JS_TARGETS := Card.js CodeBlock.js Collapse.js CommentBox.js ConfigPanel.js FontAwesomeIcon.js LoadingIcon.js LoadingModal.js Modal.js ReadoutPanel.js ToggleSwitch.js
 
 CXX := $(CXX_web)
 CFLAGS_web := $(CFLAGS_web_opt)

@@ -9,8 +9,14 @@
 #include "emp/web/web.hpp"
 #include "emp/prefab/ReadoutPanel.hpp"
 
-int count1;
-int count2;
+int num_anim_steps;
+int live_variable;
+ /*
+  * TODO: can't figure out which events happen in what order so unfortunately
+  * even with stopping animation, can't guarantee num_anim_steps is zero
+  * when asserts are called. Similarly for after updating live_variable, doesn't
+  * seem like asserts detect it.
+  */
 
 struct Test_Readout_Panel_HTMLLayout : public emp::web::BaseTest {
 
@@ -23,24 +29,20 @@ struct Test_Readout_Panel_HTMLLayout : public emp::web::BaseTest {
     // For the sake of control, manually step animation forward only
     readout_panel.Animate(readout_panel.GetID()).Stop();
     // Set flags since AdvanceFrame has been called at least once
-    count1 = 0;
-    count2 = 0;
+    num_anim_steps = 0;
+    live_variable = 0;
 
     Doc("emp_test_container") << readout_panel;
 
     // A function to test live variables in panel
-    std::function<std::string()> get_count1 =
+    std::function<std::string()> get_anim_steps =
     [&]() mutable {
-      return emp::to_string(++count1);
+      return emp::to_string(++num_anim_steps);
     };
-    readout_panel.AddValue(
-      "Counter function", "A function that counts upwards every call", get_count1,
-      "Counter variable", "A variable we increment", count2
+    readout_panel.AddValues(
+      "Counter function", "A function that counts upwards every call", get_anim_steps,
+      "Counter variable", "A variable we increment", live_variable
     );
-
-    // Note: can't figure out which events happen in what order so unfortunately
-    // even with stopping animation, can't guarantee count_1 is zero when component
-    // is created.
   }
 
   void Describe() override {

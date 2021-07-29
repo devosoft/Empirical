@@ -25,7 +25,7 @@ int main() {
     static emp::Random rand;
     return emp::to_string(rand.GetUInt());
   };
-  values.AddValue(
+  values.AddValues(
     "Random", "A randomly generated number", random_number,
     "Counter", "How many times you've clicked the button", counter
   );

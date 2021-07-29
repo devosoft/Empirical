@@ -93,7 +93,8 @@ namespace emp::prefab {
   /**
    * Use a LiveValueDisplay component to display a labeled value which will
    * change over the course of a simulation with a nice description of what
-   * this value means.
+   * this value means. Internally, it manages an Animator to redraw the
+   * view at the fastest possible framerate unless independent=false.
    *
    * We suggest adding the "display_group" class to the enclosing tag around
    * multiple LiveValueDisplays to align labels and values along a common grid.
