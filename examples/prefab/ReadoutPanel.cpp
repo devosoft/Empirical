@@ -2,13 +2,10 @@
 //  Copyright (C) Michigan State University, 2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include <iostream>
-
 #include "emp/math/Random.hpp"
-#include "emp/prefab/Card.hpp"
+#include "emp/prefab/ReadoutPanel.hpp"
 #include "emp/web/Button.hpp"
 #include "emp/web/web.hpp"
-
 
 namespace UI = emp::web;
 
@@ -18,7 +15,7 @@ int counter = 0;
 
 int main() {
 
-  emp::prefab::ReadoutPanel values("Readout Values", 100); // Refreshes 10 times a second
+  emp::prefab::ReadoutPanel values{"Readout Values", 100}; // Refreshes 10 times a second
 
   // A random number generator
   std::function<std::string()> random_number = [=]() mutable {
@@ -31,5 +28,7 @@ int main() {
   );
 
   doc << values;
-  doc << UI::Button([](){ ++counter; }, "Add one to counter");
+  UI::Button adder{[](){ ++counter; }, "Add one to counter"};
+  adder.SetAttr("class", "btn btn-primary");
+  doc << adder;
 }
