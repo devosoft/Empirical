@@ -24,7 +24,7 @@ int main()
   // Header content with bootstrap link properties
   openCard.AddHeaderContent("Open card", true);
   openCard << "Open body content <br> Glyphs <br> Linked title";
-  openCard.SetToggleHandler([](){
+  openCard.SetOnToggle([](){
     std::cout << "Card Toggled!" << std::endl;
   });
   doc << openCard;
@@ -33,7 +33,7 @@ int main()
   emp::prefab::Card closedCard("INIT_CLOSED", false);
   closedCard.AddHeaderContent("Closed card");
   closedCard << "Closed body content <br>No Glyphs <br> Plain title";
-  closedCard.SetToggleHandler(openCard.GetToggleHandler());
+  closedCard.SetOnToggle(openCard.GetOnToggle());
   doc << closedCard;
 
 }

@@ -22,31 +22,31 @@ namespace prefab {
     public:
       using on_toggle_fun_t = std::function<void()>;
     protected:
-      on_toggle_fun_t toggleHandler;
+      on_toggle_fun_t toggle_handler;
     public:
       /**
        * Construct a shared pointer to manage Card state.
        * @param in_id HTML ID of Card div
        */
       CardInfo(const std::string & in_id="")
-      : DivInfo(in_id), toggleHandler([]() {;}) { ; }
+      : DivInfo(in_id), toggle_handler([]() {;}) { ; }
 
       /**
-       * Get the on-toggle function for this component
+       * Get the on-toggle function for this component.
        * @return the function called whenever the card's state
        * is toggled open or closed
        */
-      on_toggle_fun_t & GetToggle() {
-        return toggleHandler;
+      on_toggle_fun_t & GetOnToggle() {
+        return toggle_handler;
       }
 
       /**
-       * Set the on-toggle function for this component
-       * @param toggle the function to be called whenever the
-       * card's state is toggled open or closed
+       * Set the on-toggle function for this component.
+       * @param on_toggle the function to be called whenever the
+       * card's state is toggled open or closed.
        */
-      void SetToggle(on_toggle_fun_t toggle) {
-        toggleHandler = toggle;
+      void SetOnToggle(on_toggle_fun_t on_toggle) {
+        toggle_handler = on_toggle;
       }
     };
   }
@@ -115,8 +115,8 @@ namespace prefab {
 
       AddBootstrap();
       if (state == "STATIC") { // static card with no toggle enabled
-        static_cast<Div>(*this) << card_header; // Div cast prevents trying to add to body
-        static_cast<Div>(*this) << card_body;
+        static_cast<Div>(*this) << card_header; // Cast to Div prevents redefined
+        static_cast<Div>(*this) << card_body;   // stream operator from being used
       } else {
         // card is collapsible, make the collapse link the head of the card
         prefab::CollapseCoupling accordion(card_header,
@@ -129,9 +129,13 @@ namespace prefab {
         static_cast<Div>(*this) << header_div;
         static_cast<Div>(*this) << accordion.GetTargetDiv();
 
-        on_toggle_fun_t & tog = GetToggleHandler();
+        on_toggle_fun_t & tog = GetOnToggle();
         header_div.OnClick([header_div, &toggle = tog](){
-          toggle(/* TODO: toggle state boolean */);
+          toggle();
+          // TODO: toggle really should accept boolean so the user can trigger
+          // different events on open/close to prevent double click issues
+          // but getting that state is currently impossible, see
+          // https://github.com/devosoft/Empirical/issues/440.
         });
 
         if (show_glyphs) { // by default add glyphs to a collapsible card
@@ -147,7 +151,7 @@ namespace prefab {
     }
   public:
     /**
-     * Add content to header section of card
+     * Add content to header section of card.
      *
      * @param val content to be added to header, can be a web element or primitive type
      * @param link_content indicates whether the content should have Bootstrap link properties (default false)
@@ -175,7 +179,7 @@ namespace prefab {
     }
 
     /**
-     * Add content to body section of card
+     * Add content to body section of card.
      *
      * @param val can be a web element or primitive type
      * @deprecated Use stream operator instead
@@ -187,21 +191,32 @@ namespace prefab {
     }
 
     /**
-     * Add content to the body section of the card
+     * Add content to the body section of the card.
      *
      * @param in_val can be a web element or primitive type
      */
-    template <typename IN_TYPE> emp::prefab::Card & operator<<(IN_TYPE && in_val) {
+    template <typename IN_TYPE>
+    emp::prefab::Card & operator<<(IN_TYPE && in_val) {
       card_body << std::forward<IN_TYPE>(in_val);
       return (*this);
     }
 
-    void SetToggleHandler(on_toggle_fun_t toggle) {
-      Info()->SetToggle(toggle);
+    /**
+     * Sets the on-toggle function for this component.
+     * @param on_toggle the function to be called whenever the card's state is
+     * toggled open or closed
+     */
+    void SetOnToggle(on_toggle_fun_t on_toggle) {
+      Info()->SetOnToggle(on_toggle);
     }
 
-    on_toggle_fun_t & GetToggleHandler() {
-      return Info()->GetToggle();
+    /**
+     * Get the on-toggle function for this component.
+     * @return the function to be called whenever the card's state is
+     * toggled open or closed
+     */
+    on_toggle_fun_t & GetOnToggle() {
+      return Info()->GetOnToggle();
     }
 
   };

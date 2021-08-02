@@ -88,6 +88,16 @@ namespace emp::prefab {
     ) : ValueBox(label, desc, id) {
       view << value;
     }
+
+    /**
+     * Returns the view div containing live values to animate
+     * (use this in an Animate instance).
+     *
+     * @return the view div
+     */
+    Div & GetView() {
+      return view;
+    }
   };
 
   /**
@@ -124,17 +134,6 @@ namespace emp::prefab {
         this->Animate(GetID()).Start();
       }
     }
-
-    /**
-     * Returns the view div containing live values to animate
-     * (use this in an Animate instance).
-     *
-     * @return the view div
-     */
-    Div & GetView() {
-      return view;
-    }
-
   };
 
   /**

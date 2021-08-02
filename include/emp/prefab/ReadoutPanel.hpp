@@ -19,7 +19,7 @@ namespace emp::prefab {
      */
     class ReadoutPanelInfo : public CardInfo {
       // Holds the divs in the panel that are to be
-      // redrawn since they contain live objects
+      // redrawn since they contain live objects.
       emp::vector<emp::web::Div> live_divs;
     public:
       /**
@@ -29,7 +29,7 @@ namespace emp::prefab {
       ReadoutPanelInfo(const std::string & in_id="") : CardInfo(in_id) { ; }
 
       /**
-       * Add a div to the list of divs redrawn every refresh period
+       * Add a div to the list of divs redrawn every refresh period.
        * @param liv a div (probably containing some Live value)
        */
       void AddLiveDiv(emp::web::Div & liv) {
@@ -37,9 +37,9 @@ namespace emp::prefab {
       }
 
       /**
-       * @return a vector of divs redrawn every refresh period
+       * @return a vector of divs redrawn every refresh period.
        */
-      emp::vector<emp::web::Div> & GetLiveDivs() {
+      const emp::vector<emp::web::Div> & GetLiveDivs() {
         return live_divs;
       }
 
@@ -72,7 +72,6 @@ namespace emp::prefab {
     }
   public:
     /**
-     * Constructor for a ReadoutPanel.
      * @param group_name name for this collection of values, displayed in card header
      * @param refresh_time the time in milliseconds between refreshes to the live values
      * @param state initial state of the card, one of STAITC, INIT_OPEN, or INIT_CLOSED
@@ -93,21 +92,24 @@ namespace emp::prefab {
     ) { ; }
 
   protected:
-    // The div to hold the LiveValueDisplays for when content is added
+    // The div to hold the LiveValueDisplays for when content is added.
     Div values{emp::to_string(GetID(), "_values")};
 
     /**
-     * A protected constructor for a ReadoutPanel which sets up the necessary structures
-     * for it to function. All other constructors should delegate to this one first
-     * before causing subsequent modifications.
+     * A protected constructor for a ReadoutPanel which sets up the necessary
+     * structures for it to function. All other constructors should delegate
+     * to this one first before causing subsequent modifications.
      *
-     * @param group_name name for this collection of values, displayed in card header
-     * @param refresh_milliseconds the minimum time in milliseconds between refreshes to
-     * the live values
-     * @param state initial state of the card, one of STAITC, INIT_OPEN, or INIT_CLOSED
-     * @param show_glyphs whether the underlying card should show toggle icons in card header
-     * @param info_ref a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
-     * or a pointer to a derived info object (simulating inheritance)
+     * @param group_name name for this collection of values, displayed in card
+     * header
+     * @param refresh_milliseconds the minimum time in milliseconds between
+     * refreshes to the live values
+     * @param state initial state of the card, one of STAITC, INIT_OPEN, or
+     * INIT_CLOSED
+     * @param show_glyphs whether the underlying card should show toggle icons
+     * in card header
+     * @param info_ref a pointer to the underlying ReadoutPanelInfo object for
+     * this ReadoutPanel or a pointer to a derived info object (simulating inheritance)
      */
     ReadoutPanel(const std::string & group_name,
       double refresh_milliseconds,

@@ -19,8 +19,7 @@ int main() {
 
   // A random number generator
   std::function<std::string()> random_number = [=]() mutable {
-    static emp::Random rand;
-    return emp::to_string(rand.GetUInt());
+    return emp::to_string(std::rand());
   };
   values.AddValues(
     "Random", "A randomly generated number", random_number,
