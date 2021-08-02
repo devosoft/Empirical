@@ -1,14 +1,19 @@
 # Prefab Components
 
-The prefabricated components in Empirical compose basic components and add features to make more complicated user interfaces. Here's a log of some stylistic and design choices that might be useful in future development.
+The prefabricated components in Empirical compose basic components and add features to make more complicated user interfaces.
+Here's a log of some stylistic and design choices that might be useful in future development.
 
 ### Overriding Streaming
 
-Most components use the stream operator (`<<`) to add user defined content. However, many prefabricated components have multiple layers of divs and other tags so one might want to override this operator to have a different behavior. However, this may accidentally cause an infinite loop if you're using something like `*this << sub_component;` to set up the component. The trick is to use `static_cast<BaseClass>(*this) << sub_component;` where `BaseClass` is the class you're inheriting from (probably `Div`) to prevent using your newly overridden streaming operator in the initial construction.
+Most components use the stream operator (`<<`) to add user defined content.
+However, many prefabricated components have multiple layers of divs and other tags so one might want to override this operator to have a different behavior.
+However, this may accidentally cause an infinite loop if you're using something like `*this << sub_component;` to set up the component.
+The trick is to use `static_cast<BaseClass>(*this) << sub_component;` where `BaseClass` is the class you're inheriting from (probably `Div`) to prevent using your newly overridden streaming operator in the initial construction.
 
 ### Inheritance
 
-Since web components are actually shells around shared pointers getting inheritance to work properly can be tricky. These components look something like this:
+Since web components are actually shells around shared pointers getting inheritance to work properly can be tricky.
+These components look something like this:
 
 ```cpp
 namespace internal {
@@ -32,7 +37,9 @@ class Base {
 }
 ```
 
-Manipulating things like styling and adding event listeners happens through an instance of `Base` but the real information is stored in the member `info`. Now suppose we want to create a component that has all the proprties of `Base` but has additional properties. So really we need a derived info object.
+Manipulating things like styling and adding event listeners happens through an instance of `Base` but the real information is stored in the member `info`.
+Now suppose we want to create a component that has all the proprties of `Base` but has additional properties.
+So really we need a derived info object:
 
 ```cpp
 namespace internal {
@@ -46,6 +53,7 @@ namespace internal {
 }
 
 ```
+
 But for the outer class if we do
 
 ```cpp
@@ -58,7 +66,9 @@ class Derived : public Base {
 }
 ```
 
-then we have overwritten any modifications done in the base class (and possibly created a memory leak)! Instead we should modify `Base` to have a protected constructor taking an `internal::BaseInfo` pointer. The default constructor then delegates to the protected one.
+then we have overwritten any modifications done in the base class (and possibly created a memory leak)!
+Instead we should modify `Base` to have a protected constructor taking an `internal::BaseInfo` pointer.
+The default constructor then delegates to the protected one.
 
 ```cpp
 class Base {
@@ -88,7 +98,7 @@ class Base {
 This way we maintain control over what `info` points to from any derived class while still ensuring constructors that add structure/attributes are called in the right order.
 
 So the TL;DR version is:
-
 to allow your prefab component to support inheritance,
+
 * Use a protected constructor that takes an `Info` pointer to do the setup
 * Have other constructors delegate to the protected constructor
