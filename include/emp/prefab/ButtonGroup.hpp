@@ -5,25 +5,27 @@ namespace emp::prefab {
 
   class ButtonGroup : public emp::web::Div {
 
-    public:
-    ButtonGroup(const std::string & in_id="") : Div(in_id) {
+    protected:
+    ButtonGroup(emp::web::DivInfo * info_ref) : Div(info_ref) {
       SetAttr("class", "btn-group");
     }
 
+    public:
+    ButtonGroup(const std::string & in_id="")
+    : ButtonGroup(new emp::web::DivInfo(in_id)) { ; }
+
+    /**
+     * Plus operator joins two button groups into one. Useful for joining
+     * multiple default constructed groups together if it makes sense.
+     * LHS ButtonGroup takes RHS ButtonGroup's children.
+     *
+     * @param btn_group a button group
+     */
+    ButtonGroup & operator+(const ButtonGroup & rhs) {
+      *this << rhs.Children();
+      return (*this);
+    }
   };
-
-  // /**
-  //  * Overridden stream operator causes a button group's contents to be
-  //  * appended to existing one rather than having nested button groups. Other
-  //  * streamed components should be nested like usual.
-  //  * @param btn_group a button group
-  //  */
-  // template<> ButtonGroup & ButtonGroup::operator<<(ButtonGroup && btn_group) {
-  //     static_cast<Div>(*this) << btn_group.Children();
-  //     return (*this);
-  // }
 }
-
-
 
 #endif
