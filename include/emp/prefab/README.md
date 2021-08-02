@@ -18,10 +18,10 @@ These components look something like this:
 ```cpp
 namespace internal {
   class BaseInfo {
-    ...
+    // basic members
     public:
     BaseInfo() {
-      ...
+      // setup for info
     }
   };
 }
@@ -30,9 +30,8 @@ class Base {
   internal::BaseInfo * info;
 
   public:
-  Base() {
-    info = new internal::BaseInfo()
-    ...
+  Base(), info(new internal::BaseInfo()) {
+    // basic setup
   }
 }
 ```
@@ -44,10 +43,10 @@ So really we need a derived info object:
 ```cpp
 namespace internal {
   class DerivedInfo : public BaseInfo {
-    ...
+    // additional members
     public:
     DerivedInfo() : BaseInfo() {
-      ...
+      // further setup
     }
   };
 }
@@ -62,6 +61,7 @@ class Derived : public Base {
   public:
   Derived() : Base() {
     info = new internal::DerivedInfo()
+    // Aah! lost the basic setup done in Base()
   }
 }
 ```
@@ -74,11 +74,12 @@ The default constructor then delegates to the protected one.
 class Base {
   internal::BaseInfo * info;
   protected:
-  Base(internal::BaseInfo * info_ref) {
-    info = info_ref;
+  Base(internal::BaseInfo * in_info), info(in_info) {
+    // basic setup
   }
+
   public:
-  Base() : Base(new internal::BaseInfo()) { ... }
+  Base() : Base(new internal::BaseInfo()) { ; }
 }
 ```
 
@@ -89,7 +90,7 @@ class Base {
   internal::BaseInfo * info;
   protected:
   Derived(internal::BaseInfo * info_ref) : Base(info_ref) {
-    ...
+    // extra fancy setup stuff
   }
   public:
   Derived() : Base(new internal::DerivedInfo()) { ; }
