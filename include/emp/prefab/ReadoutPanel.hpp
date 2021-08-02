@@ -115,8 +115,8 @@ namespace emp::prefab {
       double refresh_milliseconds,
       const std::string & state,
       const bool & show_glyphs,
-      internal::ReadoutPanelInfo * info_ref
-    ) : Card(state, show_glyphs, info_ref) {
+      internal::ReadoutPanelInfo * in_info
+    ) : Card(state, show_glyphs, in_info) {
 
       // Best to cast to Card in case we decide to overload the stream
       // operator to do something special for this class later

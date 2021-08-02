@@ -110,8 +110,8 @@ namespace prefab {
     Card(
       const std::string & state,
       const bool & show_glyphs,
-      internal::CardInfo * info_ref
-    ) : Div(info_ref) {
+      internal::CardInfo * in_info
+    ) : Div(in_info) {
 
       AddBootstrap();
       if (state == "STATIC") { // static card with no toggle enabled
