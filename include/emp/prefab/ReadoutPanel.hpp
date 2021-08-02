@@ -39,7 +39,7 @@ namespace emp::prefab {
       /**
        * @return a vector of divs redrawn every refresh period.
        */
-      const emp::vector<emp::web::Div> & GetLiveDivs() {
+      emp::vector<emp::web::Div> & GetLiveDivs() {
         return live_divs;
       }
 
@@ -150,7 +150,7 @@ namespace emp::prefab {
       main->Start(); // Start the animation
       if (state != "STATIC") {
         // TODO: make this double-click safe
-        SetToggleHandler([main](){
+        SetOnToggle([main](){
           main->ToggleActive();
         });
       }
