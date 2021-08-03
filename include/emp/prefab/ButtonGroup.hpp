@@ -15,14 +15,12 @@ namespace emp::prefab {
     : ButtonGroup(new web::internal::DivInfo(in_id)) { ; }
 
     /**
-     * Plus operator joins two button groups into one. Useful for joining
-     * multiple default constructed groups together if it makes sense.
-     * LHS ButtonGroup takes RHS ButtonGroup's children.
-     *
+     * A function useful for joining two button groups together into one unit.
      * @param btn_group a button group
      */
-    ButtonGroup & operator+(const ButtonGroup & rhs) {
-      *this << rhs.Children();
+    ButtonGroup & TakeChildren(ButtonGroup & btn_group) {
+      *this << btn_group.Children();
+      btn_group.Clear();
       return (*this);
     }
   };
