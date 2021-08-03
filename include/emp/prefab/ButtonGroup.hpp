@@ -3,16 +3,16 @@
 
 namespace emp::prefab {
 
-  class ButtonGroup : public emp::web::Div {
+  class ButtonGroup : public web::Div {
 
     protected:
-    ButtonGroup(emp::web::DivInfo * info_ref) : Div(info_ref) {
+    ButtonGroup(web::internal::DivInfo * info_ref) : web::Div(info_ref) {
       SetAttr("class", "btn-group");
     }
 
     public:
     ButtonGroup(const std::string & in_id="")
-    : ButtonGroup(new emp::web::DivInfo(in_id)) { ; }
+    : ButtonGroup(new web::internal::DivInfo(in_id)) { ; }
 
     /**
      * Plus operator joins two button groups into one. Useful for joining
