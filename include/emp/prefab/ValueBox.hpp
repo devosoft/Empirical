@@ -62,6 +62,16 @@ namespace emp::prefab {
       view.AddAttr("class", "value_view");
       description.AddAttr("class", "value_description");
     }
+
+    /**
+     * Returns the view div containing live values to animate
+     * (use this in an Animate instance).
+     *
+     * @return the view div
+     */
+    Div & GetView() {
+      return view;
+    }
   };
 
   /**
@@ -78,7 +88,7 @@ namespace emp::prefab {
      * @param label name for this value
      * @param desc a more detailed description of what the value means
      * @param value the piece of information or data being displayed
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for ValueDisplay div (default is emscripten generated)
      */
     ValueDisplay(
       const std::string & label,
@@ -87,6 +97,42 @@ namespace emp::prefab {
       const std::string & id=""
     ) : ValueBox(label, desc, id) {
       view << value;
+    }
+  };
+
+  /**
+   * Use a LiveValueDisplay component to display a labeled value which will
+   * change over the course of a simulation with a nice description of what
+   * this value means. Internally, it manages an Animator to redraw the
+   * view at the fastest possible framerate unless independent=false.
+   *
+   * We suggest adding the "display_group" class to the enclosing tag around
+   * multiple LiveValueDisplays to align labels and values along a common grid.
+   */
+  class LiveValueDisplay : public ValueBox {
+
+    public:
+    /**
+     * @param label name for this value
+     * @param desc a more detailed description of what the value means
+     * @param value a value to display or function returning a string
+     * @param independent should this component be independently animated? Or will
+     * some other component manage its animation?
+     * @param id user defined ID for LiveValueDisplay div (default is emscripten generated)
+     */
+    template<typename T>
+    LiveValueDisplay(
+      const std::string & label,
+      const std::string & desc,
+      T && value,
+      const bool & independent=true,
+      const std::string & id=""
+    ) : ValueBox(label, desc, id) {
+      view << web::Live(std::forward<T>(value));
+      if (independent) {
+        this->AddAnimation(GetID(), [](){;}, view);
+        this->Animate(GetID()).Start();
+      }
     }
   };
 
@@ -104,7 +150,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param initial_value the initial value
      * @param input Input component that user can interact with
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for ValueControl div (default is emscripten generated)
      */
     ValueControl(
       const std::string & label,
@@ -129,7 +175,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for TextValueControl div (default is emscripten generated)
      */
     TextValueControl(
       const std::string & label,
@@ -153,7 +199,7 @@ namespace emp::prefab {
      * @param desc a more detailed description of what the value means
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for BoolValueControl div (default is emscripten generated)
      */
     BoolValueControl(
       const std::string & label,
@@ -212,7 +258,7 @@ namespace emp::prefab {
      * @param type the numeric type ('float', 'double' or 'int')
      * @param value the initial value
      * @param onChange function to be called when the user changes this value
-     * @param id user defined ID for ValueBox Div (default is emscripten generated)
+     * @param id user defined ID for NumericValueControl div (default is emscripten generated)
      */
     NumericValueControl(
       const std::string & label,
