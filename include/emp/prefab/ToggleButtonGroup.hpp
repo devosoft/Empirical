@@ -83,6 +83,11 @@ namespace emp::prefab {
       );
       *this << activate_label;
       *this << deactivate_label;
+      if (!cassette_style) {
+        AddAttr("class", "hide_inactive");
+      } else if (grayout) {
+        AddAttr("class", "grayout");
+      }
 
       activate_label.AddAttr(
         "class", "btn",
