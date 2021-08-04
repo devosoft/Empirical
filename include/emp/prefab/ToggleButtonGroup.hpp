@@ -53,10 +53,18 @@ namespace emp::prefab {
 
     protected:
     /**
-     * @param activate_indicator a string or FontAwesomeIcon to indicate the
-     * active state of this toggle
-     * @param activate_indicator a string or FontAwesomeIcon to indicate the
-     * inactive state of this toggle
+     * @param activate_indicator a string, FontAwesomeIcon or other component
+     * indicating that the first button actives this toggle
+     * @param deactivate_indicator a string, FontAwesomeIcon or other component
+     * indicating that the second button deactives this toggle
+     * @param activate_style a bootstrap style (primary, secondary, etc) for
+     * the first button
+     * @param deactivate_style a bootstrap style (primary, secondary, etc) for
+     * the second button
+     * @param cassette_style whether the toggle should display in cassette style
+     * (both buttons visible) or do a swap on toggle (one button visible)
+     * @param grayout in cassette mode, whether buttons should be
+     * grayed out to further emphasize the current state
      */
     template<typename L1_TYPE, typename L2_TYPE>
     ToggleButtonGroup(
