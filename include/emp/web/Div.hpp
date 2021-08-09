@@ -37,6 +37,7 @@
 
 namespace emp::prefab {
   class ButtonGroup;
+  class ControlPanel;
 }
 
 namespace emp {
@@ -57,6 +58,7 @@ namespace web {
     class DivInfo : public internal::WidgetInfo {
       friend Element; friend Div; friend TableInfo;
       friend prefab::ButtonGroup;
+      friend prefab::ControlPanel;
     protected:
       double scroll_top;                              ///< Where should div scroll to? (0.0 to 1.0)
       emp::vector<Widget> m_children;                 ///< Widgets contained in this one.

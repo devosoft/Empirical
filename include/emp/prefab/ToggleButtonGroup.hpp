@@ -2,7 +2,6 @@
 #define EMP_TOGGLE_BUTTON_GROUP_HPP
 
 #include "emp/tools/string_utils.hpp"
-#include "emp/prefab/FontAwesomeIcon.hpp"
 #include "emp/web/Element.hpp"
 #include "emp/web/Input.hpp"
 
@@ -53,7 +52,7 @@ namespace emp::prefab {
      * @param activate_indicator a string, FontAwesomeIcon or other component
      * indicating that the first button actives this toggle
      * @param deactivate_indicator a string, FontAwesomeIcon or other component
-     * indicating that the second button deactives this toggle
+     * indicating that the second button deactivates this toggle
      * @param activate_style a bootstrap style (primary, secondary, etc) for
      * the first button
      * @param deactivate_style a bootstrap style (primary, secondary, etc) for
@@ -65,8 +64,8 @@ namespace emp::prefab {
      */
     template<typename L1_TYPE, typename L2_TYPE>
     ToggleButtonGroup(
-      L1_TYPE & activate_indicator,
-      L2_TYPE & deactivate_indicator,
+      L1_TYPE && activate_indicator,
+      L2_TYPE && deactivate_indicator,
       const std::string & activate_style,
       const std::string & deactivate_style,
       const bool & cassette_style,
@@ -99,7 +98,7 @@ namespace emp::prefab {
         false, false
       );
       activate_label << activate_radio;
-      activate_label << activate_indicator;
+      activate_label << std::forward<L1_TYPE>(activate_indicator);
 
       deactivate_label.AddAttr(
         "class", "active",
@@ -112,21 +111,22 @@ namespace emp::prefab {
         false, true
       );
       deactivate_label << deactivate_radio;
-      deactivate_label << deactivate_indicator;
+      deactivate_label << std::forward<L2_TYPE>(deactivate_indicator);
     }
 
     public:
     template<typename L1_TYPE, typename L2_TYPE>
     ToggleButtonGroup(
-      L1_TYPE & activate_indicator,
-      L2_TYPE & deactivate_indicator,
+      L1_TYPE && activate_indicator,
+      L2_TYPE && deactivate_indicator,
       const std::string & activate_style="success",
       const std::string & deactivate_style="warning",
       const bool & cassette_style=true,
       const bool & grayout=false,
       const std::string & in_id=""
     ) : ToggleButtonGroup(
-      activate_indicator, deactivate_indicator,
+      std::forward<L1_TYPE>(activate_indicator),
+      std::forward<L2_TYPE>(deactivate_indicator),
       activate_style, deactivate_style,
       cassette_style, grayout,
       new internal::ToggleButtonGroupInfo(in_id)
