@@ -48,9 +48,6 @@ namespace emp::prefab {
       return dynamic_cast<internal::ToggleButtonGroupInfo *>(info);
     }
 
-    web::Element activate_label;
-    web::Element deactivate_label;
-
     protected:
     /**
      * @param activate_indicator a string, FontAwesomeIcon or other component
@@ -75,14 +72,17 @@ namespace emp::prefab {
       const bool & cassette_style,
       const bool & grayout,
       web::internal::DivInfo * info_ref
-    ) : ButtonGroup(info_ref),
-    activate_label("label", emp::to_string(GetID(), "_activate")),
-    deactivate_label("label", emp::to_string(GetID(), "_deactivate")) {
+    ) : ButtonGroup(info_ref)
+    {
       AddAttr(
         "class", "btn-group-toggle", "data-toggle", "buttons"
       );
+
+      web::Element activate_label("label", emp::to_string(GetID(), "_activate"));
+      web::Element deactivate_label("label", emp::to_string(GetID(), "_deactivate"));
       *this << activate_label;
       *this << deactivate_label;
+
       if (!cassette_style) {
         AddAttr("class", "hide_inactive");
       } else if (grayout) {
