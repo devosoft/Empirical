@@ -10,8 +10,6 @@
 
 namespace emp::prefab {
 
-  class EndGroup {};
-
   class ControlPanel : public web::Div {
 
     ToggleButtonGroup play_pause_toggle;
@@ -41,13 +39,13 @@ namespace emp::prefab {
     : ControlPanel(new web::internal::DivInfo(in_id)) { ; }
 
     template <typename IN_TYPE>
-    emp::prefab::ControlPanel & operator<<(IN_TYPE && in_val) {
-      if constexpr(std::is_same<IN_TYPE, emp::prefab::ButtonGroup>::value) {
-        std::cout << "BG in!" << std::endl;
-        active_group = in_val;
+    ControlPanel & operator<<(IN_TYPE && in_val) {
+      // Took soooo long to figure out but if in_val is a r-value ref
+      // IN_TYPE is just the TYPE. If it's l-value then it's TYPE &.
+      // std::decay and forward help handle both.
+      if constexpr(std::is_same<typename std::decay<IN_TYPE>::type, ButtonGroup>::value) {
+        active_group.emplace(std::forward<ButtonGroup>(in_val));
         static_cast<Div>(*this) << *active_group;
-      } else if constexpr(std::is_same<IN_TYPE, emp::prefab::EndGroup>::value) {
-        active_group = {};
       } else {
         if(!active_group.has_value()) {
           active_group = ButtonGroup{};
