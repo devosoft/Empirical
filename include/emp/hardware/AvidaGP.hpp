@@ -27,6 +27,7 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "../io/File.hpp"
 #include "../math/Random.hpp"
 #include "../tools/string_utils.hpp"
