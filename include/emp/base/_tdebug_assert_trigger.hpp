@@ -28,8 +28,8 @@ namespace emp {
   bool assert_trigger(
     std::string filename, size_t line, std::string expr, EXTRA &&...
   ) {
-    emp::assert_fail_info.filename = __FILE__;
-    emp::assert_fail_info.line_num = __LINE__;
+    emp::assert_fail_info.filename = filename;
+    emp::assert_fail_info.line_num = line;
     emp::assert_fail_info.error = expr;
     emp::assert_last_fail = true;
 
