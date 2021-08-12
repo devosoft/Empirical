@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file _tdebug_assert_trigger.hpp
+ *  @file error.hpp
  *  @brief Universal error, to use in place of emp_assert(false, ...).
  *  Evaluated in both debug and release mode.
  */
