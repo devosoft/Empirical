@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2021.
  *
  *  @file  type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -16,7 +16,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "../base/Ptr.hpp"
 #include "../base/_is_streamable.hpp"
 //^ provides is_streamable implementation,
 // located in base directory to preserve levelization
@@ -24,6 +23,14 @@
 #include "meta.hpp"
 
 namespace emp {
+
+  // Predeclarations used below.
+  template <typename TYPE> class Ptr;
+  #ifdef NDEBUG
+  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
+  #else
+  template <typename T, typename... Ts> class vector;
+  #endif
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
   // adapted from https://stackoverflow.com/a/29634934
@@ -87,6 +94,18 @@ namespace emp {
   template <typename T> struct remove_std_function_type<std::function<T>> { using type = T; };
   template <typename T> using remove_std_function_t = typename remove_std_function_type<T>::type;
 
+  // Collect the reference type for any container.
+  template <typename T> struct element_type { using type = T; };
+  template <template <typename...> class TMPL, typename T> struct element_type<TMPL<T>>  { using type = T; };
+  template <typename T> using element_t = typename element_type<T>::type;
+  // template<typename T> using element_type_t = std::remove_reference_t<decltype(*std::begin(std::declval<T&>()))>;
+
+  /// Determine if we have an emp::vector.
+  template <typename> struct is_emp_vector : std::false_type { };
+  template <typename T, typename... Ts>
+  struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
+  
+
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
   template <typename T> struct is_ptr_type<T*> : public std::true_type { };
@@ -98,6 +117,7 @@ namespace emp {
 
   template <typename T> struct remove_ptr_type         { using type = T; };
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
+  template <typename T> struct remove_ptr_type<T* const> { using type = const T; };
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
@@ -110,6 +130,30 @@ namespace emp {
     if constexpr (is_ptr_type<T>::value) return *value;
     else return value;
   }
+
+  /// Figure out which type is an unsigned integer with a specified number of bits.
+  template <size_t BIT_COUNT, typename DEFAULT=void> struct uint_bit_count {
+    using type = DEFAULT;
+  };
+  template <> struct uint_bit_count<8> { using type = uint8_t; };
+  template <> struct uint_bit_count<16> { using type = uint16_t; };
+  template <> struct uint_bit_count<32> { using type = uint32_t; };
+  template <> struct uint_bit_count<64> { using type = uint64_t; };
+
+  template <size_t BIT_COUNT, typename DEFAULT=void>
+  using uint_bit_count_t = typename uint_bit_count<BIT_COUNT, DEFAULT>::type;
+
+  /// Figure out which type is an integer with a specified number of bits.
+  template <size_t BIT_COUNT, typename DEFAULT=void> struct int_bit_count {
+    using type = DEFAULT;
+  };
+  template <> struct int_bit_count<8> { using type = int8_t; };
+  template <> struct int_bit_count<16> { using type = int16_t; };
+  template <> struct int_bit_count<32> { using type = int32_t; };
+  template <> struct int_bit_count<64> { using type = int64_t; };
+
+  template <size_t BIT_COUNT, typename DEFAULT=void>
+  using int_bit_count_t = typename int_bit_count<BIT_COUNT, DEFAULT>::type;
 
   /// Match the constness of another type.
   template <typename T, typename MATCH_T>

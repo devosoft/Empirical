@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2021.
  *
  *  @file  InstLib.hpp
  *  @brief This file maintains information about instructions availabel in virtual hardware.
@@ -48,11 +48,14 @@ namespace emp {
       ScopeType scope_type;         ///< How does this instruction affect scoping?
       size_t scope_arg;             ///< Which arg indicates new scope (if any).
       inst_properties_t properties; ///< Are there any generic properties associated with this inst def?
+      char symbol;                  ///< Unique symbol for this instruction.
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
-              ScopeType _s_type, size_t _s_arg, const inst_properties_t & _properties = inst_properties_t())
+              ScopeType _s_type, size_t _s_arg,
+              const inst_properties_t & _properties = inst_properties_t(),
+              char _sym='?')
         : name(_n), fun_call(_fun), num_args(_args), desc(_d)
-        , scope_type(_s_type), scope_arg(_s_arg), properties(_properties) { ; }
+        , scope_type(_s_type), scope_arg(_s_arg), properties(_properties), symbol(_sym) { ; }
       InstDef(const InstDef &) = default;
     };
 
@@ -61,6 +64,11 @@ namespace emp {
     emp::vector<fun_t> inst_funs;            ///< Map of instruction IDs to their functions.
     std::map<std::string, size_t> name_map;  ///< How do names link to instructions?
     std::map<std::string, arg_t> arg_map;    ///< How are different arguments named?
+
+    /// Symbols to use when representing individual instructions (80).
+    std::string symbol_defaults = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*~_=,.|/\\><";
+    char extra_symbol = '+';            ///< Symbol for more instructions than fit above.
+    emp::array<size_t, 128> symbol_map; ///< Map of symbols back to instruction IDs.
 
   public:
     InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }  ///< Default Constructor
@@ -92,22 +100,16 @@ namespace emp {
     /// Return the set of properties for the provided instruction ID.
     const inst_properties_t & GetProperties(size_t id) const { return inst_lib[id].properties; }
 
+    char GetSymbol(size_t id) const { return inst_lib[id].symbol; }
+
     /// Does the given instruction ID have the given property value?
     bool HasProperty(size_t id, std::string property) const { return inst_lib[id].properties.count(property); }
 
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
-
-    /// Retrieve a unique letter associated with the specified instruction ID.
-    static constexpr char GetSymbol(size_t id) {
-      if (id < 26) return ('a' + id);
-      if (id < 52) return ('A' + (id - 26));
-      if (id < 62) return ('0' + (id - 52));
-      return '+';
-    }
-
+    
     bool IsInst(const std::string name) const {
-        return Has(name_map, name);
+      return Has(name_map, name);
     }
 
     /// Return the ID of the instruction that has the specified name.
@@ -117,11 +119,9 @@ namespace emp {
     }
 
     /// Return the ID of the instruction associated with the specified symbol.
-    static constexpr size_t GetID(char symbol) {
-      if (symbol >= 'a' && symbol <= 'z') return (size_t) (symbol - 'a');
-      if (symbol >= 'A' && symbol <= 'Z') return (size_t) (symbol - 'A' + 26);
-      if (symbol >= '0' && symbol <= '9') return (size_t) (symbol - '0' + 52);
-      return (size_t) 62;
+    size_t GetID(char symbol) {
+      emp_assert(symbol > 0);
+      return symbol_map[(size_t) symbol];
     }
 
     /// Return the argument value associated with the provided keyword.
@@ -136,7 +136,8 @@ namespace emp {
     /// @param num_args How many arguments does this function require? (default=0)
     /// @param desc A description of how this function operates. (default="")
     /// @param scope_type Type of scope does this instruction creates. (default=ScopeType::NONE)
-    /// @param scope_arg If instruction changes scope, which argument specified new scope? (default=-1)
+    /// @param scope_arg If instruction changes scope, which argument specifies new scope? (default=-1)
+    /// @param inst_properties Strings representing arbitrary properties associated with instruction
     void AddInst(const std::string & name,
                  const fun_t & fun_call,
                  size_t num_args=0,
@@ -146,9 +147,11 @@ namespace emp {
                  const inst_properties_t & inst_properties=inst_properties_t())
     {
       const size_t id = inst_lib.size();
-      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg, inst_properties);
+      const char symbol = (id < symbol_defaults.size()) ? symbol_defaults[id] : '+';
+      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg, inst_properties, symbol);
       inst_funs.emplace_back(fun_call);
       name_map[name] = id;
+      symbol_map[(size_t) symbol] = id;
     }
 
     /// Specify a keyword and arg value.

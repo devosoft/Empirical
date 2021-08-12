@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2015-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 
@@ -69,7 +69,7 @@
 #include <typeinfo>
 #include <typeindex>
 
-#include "../base/macros.hpp"
+#include "../meta/macros.hpp"
 #include "../meta/meta.hpp"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

@@ -28,7 +28,14 @@ namespace emp {
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
     if constexpr ( emp::is_streamable<decltype( std::cerr ), T>::value ) {
-      std::cerr << name << ": [" << val << "]" << std::endl;
+      // If we had a literal string fed in, print it as a message.
+      if (name[0] == '"') {
+        std::cerr << "MESSAGE: " << val << std::endl;
+      }
+      // Otherwise assume that we have a variable and print that.
+      else {
+        std::cerr << name << ": [" << val << "]" << std::endl;
+      }
     } else std::cerr << name << ": (non-streamable type)" << std::endl;
 
     assert_print(std::forward<EXTRA>(extra)...);

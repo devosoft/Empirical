@@ -50,6 +50,13 @@ namespace emp {
       return args;
     }
 
+    // Use an argument in a given position OR a default value of that arg doesn't exist.
+    template <typename T>
+    T read_arg_pos(const emp::vector<std::string> & args, size_t pos, T default_val=T()) {
+      if (args.size() <= pos) return default_val;
+      return emp::from_string<T>(args[pos]);
+    }
+
     // Search through args to find a specific value.
     int find_arg(const emp::vector<std::string> & args, const std::string & pattern) {
       for (size_t i = 0; i < args.size(); i++) {
@@ -103,6 +110,8 @@ namespace emp {
 
 
   }
+
+  using namespace cl;
 }
 
 #endif

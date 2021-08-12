@@ -18,8 +18,6 @@ UI::Document doc("emp_base");
 
 Config cfg;
 
-emp::prefab::ConfigPanel config_panel(cfg);
-
 int main()
 {
   // apply configuration query params and config files to Config
@@ -28,8 +26,9 @@ int main()
   // cfg.Read("config.cfg");
   am.UseCallbacks();
   if (am.HasUnused()) std::exit(EXIT_FAILURE);
+  emp::prefab::ConfigPanel config_panel(cfg);
 
-  // log configuraiton settings
+  // log configuration settings
   std::cout << "==============================" << std::endl;
   std::cout << "|    How am I configured?    |" << std::endl;
   std::cout << "==============================" << std::endl;
@@ -37,7 +36,6 @@ int main()
   std::cout << "==============================\n" << std::endl;
 
   // setup configuration panel
-  config_panel.Setup();
-  doc << config_panel.GetConfigPanelDiv();
+  doc << config_panel;
 
 }

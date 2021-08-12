@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 
-#include "../../base/macros.hpp"
+#include "../../meta/macros.hpp"
 #include "../init.hpp"
 #include "../js_utils.hpp"
 #include "../JSWrap.hpp"

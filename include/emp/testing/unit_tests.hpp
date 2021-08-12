@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include "../config/command_line.hpp"
+#include "../meta/macros.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {

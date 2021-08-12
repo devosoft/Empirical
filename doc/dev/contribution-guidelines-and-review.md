@@ -9,7 +9,7 @@ project](https://khmer.readthedocs.org/en/v1.4.1/dev/coding-guidelines-and-revie
 
 ## C++ standards
 
-We use C++11 features throughout the project and currently that is the
+We use C++17 features throughout the project and currently that is the
 de-facto standard version to use.
 
 All code should be in header files for ease of inclusion into Emscripten

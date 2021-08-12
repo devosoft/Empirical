@@ -11,6 +11,9 @@
  *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
  *  they point to valid memory and that memory is freed before pointers are released.
  *
+ *  If you want to prevent pointers to pointers (a common source of errors, but MAY be done
+ *  intentionally) you can define EMP_NO_PTR_TO_PTR
+ * 
  *  If you trip an assert, you can re-do the run a track a specific pointer by defining
  *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will
  *  allow you to track the pointer more easily in a debugger.
@@ -24,12 +27,25 @@
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
 
+#include <cstring>
 #include <unordered_map>
 
 #include "assert.hpp"
 #include "vector.hpp"
 
 namespace emp {
+
+  // ------------ Pre-declare some helper types and functions --------------
+
+  template <typename TYPE> class Ptr;
+
+
+  template <typename T>
+  inline void FillMemory(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_value);
+
+  /// Fill an array by repeatedly calling the provided fill functions.
+  template <typename T>
+  inline void FillMemoryFunction(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_fun);
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
@@ -92,14 +108,14 @@ namespace emp {
     void SetArray(size_t bytes) noexcept { array_bytes = bytes; status = PtrStatus::ARRAY; }
 
     /// Add one more pointer.
-    void Inc(const size_t id) {
+    void Inc([[maybe_unused]] const size_t id) {
       if (internal::ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
       emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!", id);
       count++;
     }
 
     /// Remove a pointer.
-    void Dec(const size_t id) {
+    void Dec([[maybe_unused]] const size_t id) {
       if (internal::ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
@@ -232,6 +248,8 @@ namespace emp {
     /// Is an ID associated with an array?
     bool IsArrayID(size_t id) {
       if (internal::ptr_debug) std::cout << "IsArrayID: " << id << std::endl;
+      if (id == UNTRACKED_ID) return false;
+      if (id >= id_info.size()) return false;
       return id_info[id].IsArray();
     }
 
@@ -310,7 +328,7 @@ namespace emp {
   namespace {
     // @CAO: Build this for real!
     template <typename FROM, typename TO>
-    bool PtrIsConvertable(FROM * ptr) { return true; }
+    bool PtrIsConvertable(FROM * ptr) { (void) ptr; return true; }
     // emp_assert( (std::is_same<TYPE,T2>() || dynamic_cast<TYPE*>(in_ptr)) );
 
     // Debug information provided for each pointer type.
@@ -330,7 +348,13 @@ namespace emp {
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
 
-    BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+    static constexpr size_t UNTRACKED_ID = (size_t) -1;
+
+    BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {
+      #ifdef EMP_NO_PTR_TO_PTR
+      emp_assert(!std::is_pointer_v<TYPE>, "Pointers to pointers are disallowed!");
+      #endif
+    }
 
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
@@ -353,8 +377,8 @@ namespace emp {
     /// Indexing into array
     TYPE & operator[](size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
-      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
+      emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
+      emp_assert(id == UNTRACKED_ID || Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
         "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
@@ -518,6 +542,9 @@ namespace emp {
     template <typename T2>
     [[nodiscard]] Ptr<T2> ReinterpretCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      #ifdef EMP_NO_PTR_TO_PTR
+      emp_assert(!std::is_pointer_v<TYPE>, "Reinterpreting as pointers to pointers is disallowed!");
+      #endif
       return reinterpret_cast<T2*>(ptr);
     }
 
@@ -540,8 +567,9 @@ namespace emp {
     }
 
     /// Reallocate this Ptr to a newly allocated array using the size passed in.
-    template <typename... Ts>
-    void NewArray(size_t array_size, Ts &&... args) {
+    // template <typename... Ts>
+    // void NewArray(size_t array_size, Ts &&... args) {
+    void NewArray(size_t array_size) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
       // @CAO: This next portion of code is allocating an array of the appropriate type.
@@ -585,12 +613,12 @@ namespace emp {
     }
 
     /// Convert this pointer to a hash value.
-    size_t Hash() const {
+    size_t Hash() const noexcept {
       // Chop off useless bits of pointer...
       static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
-    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     /// Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
@@ -653,7 +681,7 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id,
+      emp_assert(id != UNTRACKED_ID /*, typeid(TYPE).name() */, id,
                  "Use Raw() to convert to an untracked Ptr");
       return ptr;
     }
@@ -701,6 +729,38 @@ namespace emp {
     /// Does this Ptr point to a memory position after or equal to a raw pointer?
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
+    [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
+    [[nodiscard]] Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
+      // Make sure a pointer is active before we write to it.
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
+      emp_assert(id == UNTRACKED_ID || Tracker().GetArrayBytes(id) >= num_bytes,
+        "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+
+      emp::FillMemoryFunction(*this, num_bytes, fill_fun);
+    }
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemory(const size_t num_bytes, T fill_value) {
+      // Make sure a pointer is active before we write to it.
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(Tracker().IsArrayID(id) || id == UNTRACKED_ID, "Only arrays can fill memory.", id);
+      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes,
+        "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+
+      emp::FillMemory(*this, num_bytes, fill_value);
+    }
 
     /// Some debug testing functions
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
@@ -738,7 +798,7 @@ namespace emp {
 
   };
 
-#else // #ifdef EMP_TRACK_MEM
+#else  // EMP_MEM_TRACK off...
 
 
   template <typename TYPE>
@@ -817,11 +877,11 @@ namespace emp {
     void Delete() { delete ptr; }
     void DeleteArray() { delete [] ptr; }
 
-    size_t Hash() const {
+    size_t Hash() const noexcept {
       static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t)(ptr) >> shift;
     }
-    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     // Copy assignments
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
@@ -851,6 +911,27 @@ namespace emp {
     bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
     bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+
+    [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
+    [[nodiscard]] Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
+
+    // Extra functionality (not in raw pointers)
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
+      emp::FillMemoryFunction(*this, num_bytes, fill_fun);
+    }
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemory(const size_t num_bytes, T fill_value) {
+      emp::FillMemory(*this, num_bytes, fill_value);
+    }
 
     // Stubs for debug-related functions when outside debug mode.
     int DebugGetCount() const { return -1; }
@@ -918,8 +999,8 @@ namespace emp {
   }
 
   /// Create a pointer to an array of objects.
-  template <typename T, typename... ARGS>
-  [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
+  template <typename T>
+  [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size) {
     auto ptr = new T[array_size];                     // Build a new raw pointer.
     // const size_t alloc_size = array_size * sizeof(T);
     // auto ptr = (T*) malloc (alloc_size);
@@ -930,6 +1011,54 @@ namespace emp {
     return Ptr<T>(ptr, array_size, true);
   }
 
+  /// Fill an array with the provided fill_value.
+  /// If fill_value is a function, repeatedly call function.
+  template <typename T>
+  void FillMemory(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_value) {
+    // If the fill value is a function, call that function for each memory position.
+    if constexpr (std::is_invocable_v<T>) {
+      FillMemoryFunction(mem_ptr, num_bytes, std::forward<T>(fill_value));
+    }
+
+    constexpr size_t FILL_SIZE = sizeof(T);
+
+    const size_t leftover = num_bytes % FILL_SIZE;
+    const size_t limit = num_bytes - leftover;
+    unsigned char * dest = mem_ptr.Raw();
+
+    // Fill out random bytes in groups of FILL_SIZE.
+    for (size_t byte = 0; byte < limit; byte += FILL_SIZE) {
+      std::memcpy(dest+byte, &fill_value, FILL_SIZE);
+    }
+
+    // If we don't have a multiple of FILL_SIZE, fill in part of the remaining.
+    if (leftover) std::memcpy(dest+limit, &fill_value, leftover);
+  }
+
+  /// Fill an array by repeatedly calling the provided fill functions.
+  template <typename T>
+  void FillMemoryFunction(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_fun) {
+    static_assert(std::is_invocable_v<T>, "FillMemoryFunction requires an invocable fill_fun.");
+    using return_t = decltype(fill_fun());
+    constexpr size_t FILL_SIZE = sizeof(return_t);
+
+    const size_t leftover = num_bytes % FILL_SIZE;
+    const size_t limit = num_bytes - leftover;
+    unsigned char * dest = mem_ptr.Raw();
+
+    // Fill out random bytes in groups of FILL_SIZE.
+    return_t fill_value;
+    for (size_t byte = 0; byte < limit; byte += FILL_SIZE) {
+      fill_value = fill_fun();
+      std::memcpy(dest+byte, &fill_value, FILL_SIZE);
+    }
+
+    // If we don't have a multiple of FILL_SIZE, fill in part of the remaining.
+    if (leftover) {
+      fill_value = fill_fun();
+      std::memcpy(dest+limit, &fill_value, leftover);
+    }
+  }
 
 } // namespace emp
 
