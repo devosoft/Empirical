@@ -1,4 +1,4 @@
-TEST_NAMES = always_assert_warning always_assert array assert assert_warning errors optional Ptr vector map MapProxy unordered_map
+TEST_NAMES = error always_assert_warning always_assert array assert assert_warning errors optional Ptr vector map MapProxy unordered_map
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
