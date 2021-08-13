@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020.
+ *  @date 2021.
  *
  *  @file error.hpp
  *  @brief Nearly-universal error, to use in place of emp_assert(false, ...).
