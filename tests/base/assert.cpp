@@ -16,7 +16,7 @@
 TEST_CASE("Test assert", "[base]")
 {
 
-	// Asserts are tricky to test.  Here are a bunch that should PASS.
+  // Asserts are tricky to test.  Here are a bunch that should PASS.
   emp_assert(true);
   REQUIRE(emp::assert_last_fail == 0);
 
@@ -29,25 +29,25 @@ TEST_CASE("Test assert", "[base]")
   emp_assert((14 < 13)?0:1);
   REQUIRE(emp::assert_last_fail == 0);
 
-	// Best way to test different behavior of emp_assert based on compiler flags?
+  // Best way to test different behavior of emp_assert based on compiler flags?
 
   int expected_line_num = __LINE__ + 1; // This line must precede the assert for line num to pass
-	emp_assert(false);
-	REQUIRE(emp::assert_last_fail);
+  emp_assert(false);
+  REQUIRE(emp::assert_last_fail);
 
   // Test filename and line number
   // Trim the filename in case it runs from another directory
-	std::string filen = emp::assert_fail_info.filename;
-	std::string test_filen = "assert.cpp";
-	REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen);
-	REQUIRE(emp::assert_fail_info.line_num == expected_line_num);
+  std::string filen = emp::assert_fail_info.filename;
+  std::string test_filen = "assert.cpp";
+  REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen);
+  REQUIRE(emp::assert_fail_info.line_num == expected_line_num);
   // Error message
-	REQUIRE(emp::assert_fail_info.error == "false");
+  REQUIRE(emp::assert_fail_info.error == "false");
 
   // Can we clear the assert?
-	REQUIRE(emp::assert_last_fail);
-	emp::assert_clear();
-	REQUIRE_FALSE(emp::assert_last_fail);
+  REQUIRE(emp::assert_last_fail);
+  emp::assert_clear();
+  REQUIRE_FALSE(emp::assert_last_fail);
   
   // Run through similar tests to ensure no holdovers from cleared assert.
   emp_assert(true);
@@ -59,13 +59,13 @@ TEST_CASE("Test assert", "[base]")
 
   expected_line_num = __LINE__ + 1; // This line must precede the assert for line num to pass
   emp_assert(2 > 3); // False! Trigger the assert
-	REQUIRE(emp::assert_last_fail);
+  REQUIRE(emp::assert_last_fail);
   
 
-	filen = emp::assert_fail_info.filename;
-	test_filen = "assert.cpp";
-	REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen); // Trim filename again
-	REQUIRE(emp::assert_fail_info.line_num == expected_line_num);
+  filen = emp::assert_fail_info.filename;
+  test_filen = "assert.cpp";
+  REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen); // Trim filename again
+  REQUIRE(emp::assert_fail_info.line_num == expected_line_num);
   // Error message
-	REQUIRE(emp::assert_fail_info.error == "2 > 3");
+  REQUIRE(emp::assert_fail_info.error == "2 > 3");
 }
