@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2021.
  *
  *  @file  UnorderedIndexMap.hpp
  *  @brief A simple class to weight items differently within a container and return the correct index.
@@ -80,7 +80,11 @@ namespace emp {
     size_t GetSize() const { return num_items; }
 
     /// What is the total weight of all indices in this map?
-    double GetWeight() const { ResolveRefresh(); return weights[0]; }
+    double GetWeight() const {
+      if (num_items == 0) return 0.0;
+      ResolveRefresh();
+      return weights[0];
+    }
 
     /// What is the current weight of the specified index?
     double RawWeight(size_t id) const { return weights[id]; }

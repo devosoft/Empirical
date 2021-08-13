@@ -165,6 +165,6 @@ namespace emp {
         return seen.size();
     }
 
-};
+}
 
 #endif

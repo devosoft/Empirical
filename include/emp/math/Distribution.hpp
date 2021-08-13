@@ -48,6 +48,7 @@ namespace emp {
     }
 
     size_t PickRandom(Random & random) const {
+      emp_assert(weights.GetSize() > 0, "Distribution can only pick a random entry if it has at least one entry!");
       return weights.Index( random.GetDouble(GetTotalProb()) );
     }
   };

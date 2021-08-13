@@ -83,7 +83,8 @@ namespace emp {
       original_seed = weyl_state;
 
       weyl_state *= 2;  // Make sure starting state is even.
-
+      
+      Get(); // Prime the new sequence by skipping the first number.
     }
 
 

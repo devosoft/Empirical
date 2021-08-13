@@ -1114,34 +1114,53 @@ namespace emp {
       return WorldPosition(GetRandomCellID());
     };
 
-    // neighbors are in 8-sized neighborhood.
-    fun_get_neighbor = [this](WorldPosition pos) {
+    // If our world is 1-dimensional, consider only 2 neighbors.
+    if (width == 1 || height == 1) {
+      fun_get_neighbor = [this](WorldPosition pos) {
+        emp_assert(random_ptr);
+        emp_assert(pop_sizes.size() == 2);
 
-      emp_assert(random_ptr);
-      emp_assert(pop_sizes.size() == 2);
+        const size_t world_size = pop_sizes[0] * pop_sizes[1];
+        const size_t id = pos.GetIndex();
+        const int offset = random_ptr->P(0.5) ? -1 : 1;
+        const int neighbor_id = emp::Mod(id + offset, (int) world_size); // Ensure new id is on grid.
 
-      const size_t size_x = pop_sizes[0];
-      const size_t size_y = pop_sizes[1];
-      const size_t id = pos.GetIndex();
+        // The new ID should never be the old one.
+        emp_assert((int) pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id, world_size, offset);
 
-      // Determine x and y for a random neighbor.
-      int offset = random_ptr->GetInt(8);               // Eight possible neighbors.
-      if (offset >= 4) ++offset;                        // Option 4 is self; we want 0-3 or 5-8
-      const int offset_x = offset%3 - 1;                // Set x offset as -1 through +1
-      const int offset_y = offset/3 - 1;                // Set y offset as -1 through +1
-      const int rand_x = (int) (id%size_x) + offset_x;  // Shift x by start position.
-      const int rand_y = (int) (id/size_x) + offset_y;  // Shift y by start position.
-      const int neighbor_x = emp::Mod(rand_x, (int) size_x); // Ensure new x pos is on grid.
-      const int neighbor_y = emp::Mod(rand_y, (int) size_y); // Ensure new y pos is on grid.
+        return pos.SetIndex(neighbor_id);
+      };
+    }
 
-      // Combine into the new neighbor id.
-      const int neighbor_id = neighbor_x + neighbor_y * (int)size_x;
+    // Otherwise neighbors are in size-8 neighborhood.
+    else {
+      fun_get_neighbor = [this](WorldPosition pos) {
+        emp_assert(random_ptr);
+        emp_assert(pop_sizes.size() == 2);
 
-      // The new ID should never be the old one.
-      emp_assert((int)pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id);
+        const size_t size_x = pop_sizes[0];
+        const size_t size_y = pop_sizes[1];
+        const size_t id = pos.GetIndex();
 
-      return pos.SetIndex(neighbor_id);
-    };
+        // Determine x and y for a random neighbor.
+        int offset = random_ptr->GetInt(8);                    // Eight possible neighbors.
+        if (offset >= 4) ++offset;                             // In 2d world, 4 is self; we want 0-3 or 5-8
+        const int offset_x = offset%3 - 1;                     // Set x offset as -1 through +1
+        const int offset_y = offset/3 - 1;                     // Set y offset as -1 through +1
+        const int rand_x = (int) (id%size_x) + offset_x;       // Shift x by start position.
+        const int rand_y = (int) (id/size_x) + offset_y;       // Shift y by start position.
+        const int neighbor_x = emp::Mod(rand_x, (int) size_x); // Ensure new x pos is on grid.
+        const int neighbor_y = emp::Mod(rand_y, (int) size_y); // Ensure new y pos is on grid.
+
+        // Combine into the new neighbor id.
+        const int neighbor_id = neighbor_x + neighbor_y * (int)size_x;
+
+        // The new ID should never be the old one.
+        emp_assert((int)pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id, neighbor_x, neighbor_y, size_x, size_y);
+
+        return pos.SetIndex(neighbor_id);
+      };
+    }
 
     // Neighbors are in 8-sized neighborhood excluding self
     fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
@@ -1163,7 +1182,6 @@ namespace emp {
       if((row_diff <= 1 || row_diff == (size_y-1)) && 
         (col_diff <= 1 || col_diff == (size_x-1)))	return true;
       else return false;
-
     };
 
 

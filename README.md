@@ -1,8 +1,8 @@
 ![Empirical Logo](/doc/EmpiricalBanner.png)
 
-Empirical is a library of tools for developing efficient, reliable, and accessible scientific
-software.  The provided code is header-only and encapsulated into the emp namespace, so it
-is simple to incorporate into existing projects.
+Empirical is a library of tools for developing useful, efficient, reliable, and available
+scientific software.  The provided code is header-only and encapsulated into the emp
+namespace, so it is simple to incorporate into existing projects.
 
 [![CI](https://github.com/devosoft/Empirical/workflows/CI/badge.svg)](https://github.com/devosoft/Empirical/actions?query=workflow%3ACI+branch%3Amaster) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563) [![codecov](https://codecov.io/gh/devosoft/Empirical/branch/master/graph/badge.svg)](https://codecov.io/gh/devosoft/Empirical)
 [![DockerHub](https://img.shields.io/badge/DockerHub-Hosted-blue)](https://hub.docker.com/r/devosoft/empirical)
