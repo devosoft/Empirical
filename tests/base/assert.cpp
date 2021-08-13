@@ -31,15 +31,14 @@ TEST_CASE("Test assert", "[base]")
 
   // Best way to test different behavior of emp_assert based on compiler flags?
 
-  int expected_line_num = __LINE__ + 1; // This line must precede the assert for line num to pass
+  const int expected_line_num = __LINE__ + 1; // Line must precede the assert for line num to pass
   emp_assert(false);
   REQUIRE(emp::assert_last_fail);
 
   // Test filename and line number
   // Trim the filename in case it runs from another directory
-  std::string filen = emp::assert_fail_info.filename;
-  std::string test_filen = "assert.cpp";
-  REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen);
+  const std::string filename = emp::assert_fail_info.filename;
+  REQUIRE_THAT(filename, Catch::Matchers::EndsWith("assert.cpp"));
   REQUIRE(emp::assert_fail_info.line_num == expected_line_num);
   // Error message
   REQUIRE(emp::assert_fail_info.error == "false");
@@ -57,15 +56,14 @@ TEST_CASE("Test assert", "[base]")
   REQUIRE(emp::assert_last_fail == 0);
 
 
-  expected_line_num = __LINE__ + 1; // This line must precede the assert for line num to pass
+  const int expected_line_num_2 = __LINE__ + 1; // Line must precede the assert for line num to pass
   emp_assert(2 > 3); // False! Trigger the assert
   REQUIRE(emp::assert_last_fail);
   
 
-  filen = emp::assert_fail_info.filename;
-  test_filen = "assert.cpp";
-  REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen); // Trim filename again
-  REQUIRE(emp::assert_fail_info.line_num == expected_line_num);
+  const std::string filename_2 = emp::assert_fail_info.filename;
+  REQUIRE_THAT(filename_2, Catch::Matchers::EndsWith("assert.cpp"));
+  REQUIRE(emp::assert_fail_info.line_num == expected_line_num_2);
   // Error message
   REQUIRE(emp::assert_fail_info.error == "2 > 3");
 }
