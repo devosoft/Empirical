@@ -4,7 +4,7 @@
  *  @date 2020.
  *
  *  @file _tdebug_assert_trigger.hpp
- *  @brief Non-terminating asssert trigger implementation for unit testing.
+ *  @brief Non-terminating assert trigger implementation for unit testing.
  *  @note For internal use.
  */
 
