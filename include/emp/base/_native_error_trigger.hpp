@@ -17,11 +17,11 @@
 namespace emp {
   
   template <typename... Ts>
-  void trigger_emp_error(std::string filename, size_t line, Ts &&... args) {
+  void trigger_emp_error(const std::string& filename, const size_t line, Ts &&... args) {
     std::cerr << "Fatal Error (In " << filename << " line " << line
               <<  "): ";
     (std::cerr << ... << args);
-    std::cerr << std::endl;
+    std::cerr << "\n";
     abort();
   }
 

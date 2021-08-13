@@ -28,11 +28,11 @@ namespace emp {
   void error_clear() { emp::error_thrown = false; }
 
   template <typename... Ts>
-  void trigger_emp_error(std::string filename, const size_t line, Ts &&... args) {
+  void trigger_emp_error(const std::string& filename, const size_t line, Ts &&... args) {
     std::cout << "Would-be fatal error (In " << filename << " line " << line
               <<  "): ";
     (std::cout << ... << args);
-    std::cout << std::endl;
+    std::cout << "\n";
     std::stringstream tmp_stream;
     (tmp_stream << ... << args);
     emp::error_info.filename = filename;
