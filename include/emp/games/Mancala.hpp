@@ -159,9 +159,10 @@ namespace emp {
       return out_v;
     }
 
-    void PrintSmall(std::ostream & os=std::cout) {
+    void PrintSmall(const std::string & title="", std::ostream & os=std::cout) {
+      if (title.size()) os << title << ":\n";
       os << "  ";
-      for (size_t i = 5; i < 5; i--) {
+      for (size_t i = 5; i < 6; i--) {
         os << boardB[i] << " ";
       }
       os << std::endl;
