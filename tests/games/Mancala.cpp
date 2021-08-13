@@ -132,6 +132,32 @@ TEST_CASE("Test Mancala", "[games]")
 
   game.Print();
 
+  // Test using board state as input.
+  auto in_map = game.AsInput(0);
+  auto in_vec = game.AsVectorInput(0);
+
+  REQUIRE( in_map[0] == 0 );
+  REQUIRE( in_map[1] == 0 );
+  REQUIRE( in_map[2] == 0 );
+  REQUIRE( in_map[6] == 19 );
+  REQUIRE( in_map[7] == 0 );
+  REQUIRE( in_map[8] == 6 );
+
+  for (size_t i = 0; i < 14; i++) {
+    REQUIRE( in_map[i] == in_vec[i] );
+  }
+
+  in_map = game.AsInput(1);
+  in_vec = game.AsVectorInput(1);
+
+  REQUIRE( in_map[0] == 0 );
+  REQUIRE( in_map[1] == 6 );
+  REQUIRE( in_map[2] == 0 );
+
+  for (size_t i = 0; i < 14; i++) {
+    REQUIRE( in_map[i] == in_vec[i] );
+  }
+
 
   game.Reset();
 
