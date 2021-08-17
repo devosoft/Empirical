@@ -696,7 +696,7 @@ namespace emp {
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
     /// want to call one of the more specific ones.
-    size_t Add(const std::function<void(std::ostream &, data_t)> & fun, const std::string & key, const std::string & desc) {
+    size_t Add(const std::function<void(std::ostream &, const data_t&)> & fun, const std::string & key, const std::string & desc) {
       size_t id = container_funs.GetSize();
       container_funs.Add(fun);
       container_keys.emplace_back(key);
@@ -706,8 +706,8 @@ namespace emp {
 
     /// Add a function that returns a value to be printed to the file.
     template <typename T>
-    size_t AddContainerFun(const std::function<T(const data_t)> & fun, const std::string & key="", const std::string & desc="") {
-      std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t data){ os << fun(data); };
+    size_t AddContainerFun(const std::function<T(const data_t&)> & fun, const std::string & key="", const std::string & desc="") {
+      std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t& data){ os << fun(data); };
       return Add(in_fun, key, desc);
     }
 
