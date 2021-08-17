@@ -682,8 +682,8 @@ namespace emp {
     void Update() override {
       emp_assert(update_container_fun);
       emp_assert(lock_container_fun);
-      const auto lock{ lock_container_fun() };
       current_rows = update_container_fun();
+      const auto lock{ lock_container_fun(current_rows) };
       internal::update_impl<container_t>().Update(this);
       os->flush();
     }
