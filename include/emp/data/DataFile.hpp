@@ -13,6 +13,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <string>
 
 #include "../base/assert.hpp"
@@ -533,8 +534,9 @@ namespace emp {
     struct update_impl {
       void Update(ContainerDataFile<container_t> * df) {
         using data_t = typename container_t::value_type;
+
         for (const data_t & d : df->GetCurrentRows()) {
-          df->OutputLine(d);
+          df->FilterThenOutputLine(d);
         }
       }
     };
@@ -545,7 +547,7 @@ namespace emp {
         using data_t = typename remove_ptr_type<container_t>::type::value_type;
 
         for (const data_t & d : *(df->GetCurrentRows())) {
-          df->OutputLine(d);
+          df->FilterThenOutputLine(d);
         }
       }
     };
@@ -556,7 +558,7 @@ namespace emp {
         using data_t = typename remove_ptr_type<container_t>::type::value_type;
 
         for (const data_t & d : *(df->GetCurrentRows())) {
-          df->OutputLine(d);
+          df->FilterThenOutputLine(d);
         }
       }
     };
@@ -580,8 +582,14 @@ namespace emp {
     using data_t = typename raw_container_t::value_type;
     using container_fun_t = void(std::ostream &, data_t);
     using fun_update_container_t = std::function<container_t(void)>;
+    using fun_filter_container_t = std::function<bool(const data_t&)>;
+    using fun_lock_container_t = std::function<std::shared_ptr<void>(const container_t&)>;
 
     fun_update_container_t update_container_fun;
+    fun_filter_container_t filter_container_fun
+      = [](const data_t&){ return true; };
+    fun_lock_container_t lock_container_fun
+      = [](const container_t&){ return std::shared_ptr<void>{}; };
 
     container_t current_rows;
     FunctionSet<container_fun_t> container_funs;
@@ -599,6 +607,18 @@ namespace emp {
     /// container that data is being calculated on.
     void SetUpdateContainerFun(const fun_update_container_t fun) {
       update_container_fun = fun;
+    }
+
+    /// Tell this file what function to run to decide if a container entry
+    /// should be included in the data recorded.
+    void SetContainerFilterFun(const fun_filter_container_t fun) {
+      filter_container_fun = fun;
+    }
+
+    /// Tell this file what function to run to lock the container
+    /// before iterating through.
+    void SetLockContainerrFun(const fun_lock_container_t fun) {
+      lock_container_fun = fun;
     }
 
     /// Print a header containing the name of each column
@@ -630,7 +650,11 @@ namespace emp {
 
     const container_t GetCurrentRows() const { return current_rows; }
 
-    void OutputLine(const data_t d) {
+    void FilterThenOutputLine(const data_t& d) {
+      if ( filter_container_fun(d) ) OutputLine(d);
+    }
+
+    void OutputLine(const data_t& d) {
       *os << line_begin;
         for (size_t i = 0; i < funs.size(); i++) {
           if (i > 0) *os << line_spacer;
@@ -647,6 +671,8 @@ namespace emp {
     /// Run all of the functions and print the results as a new line in the file
     void Update() override {
       emp_assert(update_container_fun);
+      emp_assert(lock_container_fun);
+      const auto lock{ lock_container_fun() };
       current_rows = update_container_fun();
       internal::update_impl<container_t>().Update(this);
       os->flush();
