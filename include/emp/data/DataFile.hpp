@@ -190,6 +190,16 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
+    /// Add a function that returns a value to be printed to the file.
+    /// @param getter function to call to get the value to print
+    /// @param key Keyword associated with this column (gets used as a column name for this data)
+    /// @param desc Full description of this data (used by \c PrintHeaderComment)
+    /// @note conveneince interface to std::funciton AddFun
+    template <typename Getter>
+    size_t AddFun(Getter getter, const std::string & key="", const std::string & desc="") {
+      return AddFun(std::function{getter}, key, desc);
+    }
+
     /// Add a function that always prints the current value of \c var.
     /// @param var variable to print value of
     /// @param key Keyword associated with this column (gets used as a column name for this data)
