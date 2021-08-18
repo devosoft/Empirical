@@ -621,13 +621,13 @@ namespace emp {
 
     /// Tell this file what function to run to decide if a container entry
     /// should be included in the data recorded.
-    void SetContainerFilterFun(const fun_filter_container_t fun) {
+    void SetFilterContainerFun(const fun_filter_container_t fun) {
       filter_container_fun = fun;
     }
 
     /// Tell this file what function to run to lock the container
     /// before iterating through.
-    void SetLockContainerrFun(const fun_lock_container_t fun) {
+    void SetLockContainerFun(const fun_lock_container_t fun) {
       lock_container_fun = fun;
     }
 
