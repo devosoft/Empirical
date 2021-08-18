@@ -631,6 +631,14 @@ namespace emp {
       lock_container_fun = fun;
     }
 
+    /// Tell this file what function to run to lock the container
+    /// before iterating through.
+    /// @Note convenience overload.
+    template<typename LockMaker>
+    void SetLockContainerFun(LockMaker lock_maker) {
+      SetLockContainerFun( fun_lock_container_t{ lock_maker } );
+    }
+
     /// Print a header containing the name of each column
     void PrintHeaderKeys() override {
       *os << line_begin;
@@ -709,6 +717,16 @@ namespace emp {
     size_t AddContainerFun(const std::function<T(const data_t&)> & fun, const std::string & key="", const std::string & desc="") {
       std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t& data){ os << fun(data); };
       return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that returns a value to be printed to the file.
+    /// @note Convenience overload
+    template <typename Getter>
+    size_t AddContainerFun(Getter getter, const std::string & key="", const std::string & desc="") {
+      using ret_t = decltype(getter(std::declval<data_t>()));
+      return AddContainerFun(
+        std::function<ret_t(const data_t&)>{ getter }, key, desc
+      );
     }
 
 
