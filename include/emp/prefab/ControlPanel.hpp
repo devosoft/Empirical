@@ -17,13 +17,15 @@
 namespace emp::prefab {
 
   namespace internal {
+    using checker_func_t = std::function<bool(const web::Animate &)>;
 
     class ControlPanelInfo : public web::internal::DivInfo {
 
-      std::string refresh_unit = "MILLISECONDS";
+      std::string refresh_unit;
       std::map<std::string, int> refresh_rates{
         {"MILLISECONDS", 100}, {"FRAMES", 5}
       };
+      checker_func_t redraw_checker;
 
       emp::vector<web::Widget> refresh_list;
       std::function<void()> simulation;
@@ -31,6 +33,10 @@ namespace emp::prefab {
       public:
       ControlPanelInfo(const std::string & in_id="")
       : DivInfo(in_id), simulation([](){ ; }) { ; }
+
+      const checker_func_t & GetRedrawChecker() const {
+        return redraw_checker;
+      }
 
       void SetSimulation(std::function<void()> & sim) {
         simulation = sim;
@@ -42,18 +48,28 @@ namespace emp::prefab {
 
       void SetUnit(const std::string & unit) {
         refresh_unit = unit;
-      }
 
-      const std::string & GetUnit() const {
-        return refresh_unit;
+        const int & rate = refresh_rates[refresh_unit];
+        if (unit == "MILLISECONDS") {
+          redraw_checker = [elapsed_milliseconds = 0, rate]
+          (const web::Animate & anim) mutable {
+            elapsed_milliseconds += anim.GetStepTime();
+            if (elapsed_milliseconds > rate) {
+              elapsed_milliseconds -= rate;
+              if (elapsed_milliseconds > rate) elapsed_milliseconds = 0;
+              return true;
+            }
+            return false;
+          };
+        } else if (unit == "FRAMES") {
+          redraw_checker = [rate](const web::Animate & anim) {
+            return anim.GetFrameCount() % rate;
+          };
+        }
       }
 
       void SetRate(const int & rate) {
         refresh_rates[refresh_unit] = rate;
-      }
-
-      const int & GetRate() {
-        return refresh_rates[refresh_unit];
       }
 
       emp::vector<web::Widget> & GetRefreshList() {
@@ -97,7 +113,11 @@ namespace emp::prefab {
       emp::to_string(GetID(), "_run_toggle")
     },
     button_line(ButtonGroup{emp::to_string(GetID(), "_core")}),
-    step{[](){ ; }, "", emp::to_string(GetID(), "_step")}
+    step{
+      [](){ ; },
+      "<span class=\"fa fa-step-forward\" aria-hidden=\"true\"></span>",
+      emp::to_string(GetID(), "_step")
+    }
     {
       AddAttr(
         "class", "btn-toolbar",
@@ -105,56 +125,42 @@ namespace emp::prefab {
         "role", "toolbar",
         "aria-label", "Toolbar with simulation controls"
       );
-      SetUnit(refresh_mode);
-      SetRate(refresh_rate);
+      SetRefreshUnit(refresh_mode);
+      SetRefreshRate(refresh_rate);
 
-      step.SetAttr("class", "success");
-      step << FontAwesomeIcon{"fa-step-forward"};
-      button_line << toggle_run;
       static_cast<Div>(*this) << button_line;
+      button_line << toggle_run;
+      button_line << step;
+
+      step.AddAttr(
+        "class", "btn",
+        "class", "btn-success",
+        "disabled", true
+      );
 
       AddAnimation(GetID(),
-        [elapsed_milliseconds = 0,
-          &run_sim=GetSimulation(),
-          &refresh_list=Info()->GetRefreshList(),
-          &unit=GetUnit(),
-          &rate=GetRate()]
+        [&, run_sim=GetSimulation(),
+          refresh_list=Info()->GetRefreshList(),
+          check_redraw=Info()->GetRedrawChecker()]
         (const web::Animate & anim) mutable {
-
           // Run the simulation function every frame
           run_sim();
-
-          if (unit == "FRAMES") {
-            // Units of frames means redraw every <rate> # of frames
-            if (anim.GetFrameCount() % rate) {
-              for (emp::web::Widget & wid : refresh_list) {
-                wid.Redraw();
-              }
+          // Redraw widgets according to a rule
+          if(check_redraw(anim)) {
+            for (emp::web::Widget & wid : refresh_list) {
+              wid.Redraw();
             }
-          } else {
-            // Units of milliseconds means redraw every <rate> # of milliseconds
-            elapsed_milliseconds += anim.GetStepTime();
-            if (elapsed_milliseconds > rate) {
-              elapsed_milliseconds -= rate;
-              for (emp::web::Widget & wid : refresh_list) {
-                wid.Redraw();
-              }
-            }
-            // see ReadoutPanel for explanation of this pattern
-            if (elapsed_milliseconds > rate) elapsed_milliseconds = 0;
           }
         }
       );
 
       toggle_run.SetCallback(
         [&anim=Animate(GetID()), step=web::Button(step)]
-        (bool set_active) mutable {
-          if (set_active) {
+        (bool is_active) mutable {
+          if (is_active) {
             anim.Start();
-            step.SetAttr("disabled", true);
           } else {
             anim.Stop();
-            step.SetAttr("disabled", true);
           }
         }
       );
@@ -175,19 +181,23 @@ namespace emp::prefab {
       new internal::ControlPanelInfo(in_id)
     ) { ; }
 
-    void SetSimulation(std::function<void()> & sim) {
+    ControlPanel & SetSimulation(std::function<void()> & sim) {
       Info()->SetSimulation(sim);
+      return *this;
     }
 
-    const std::function<void()> & GetSimulation() const { return Info()->GetSimulation(); }
+    const std::function<void()> & GetSimulation() const {
+      return Info()->GetSimulation();
+    }
 
-    void SetUnit(const std::string & units) { Info()->SetUnit(units); }
+    ControlPanel & SetRefreshUnit(const std::string & units) {
+      Info()->SetUnit(units);
+      return *this;
+    }
 
-    const std::string & GetUnit() const { return Info()->GetUnit(); }
-
-    void SetRate(const int & val) { Info()->SetRate(val); }
-
-    const int & GetRate() { return Info()->GetRate(); }
+    void SetRefreshRate(const int & val) {
+      Info()->SetRate(val);
+    }
 
     void AddToRefreshList(Widget & area) {
       Info()->GetRefreshList().push_back(area);
