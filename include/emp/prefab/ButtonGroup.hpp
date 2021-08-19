@@ -1,6 +1,8 @@
 #ifndef EMP_BUTTON_GROUP_HPP
 #define EMP_BUTTON_GROUP_HPP
 
+#include "emp/web/Div.hpp"
+
 namespace emp::prefab {
 
   class ButtonGroup : public web::Div {

@@ -1,21 +1,33 @@
 #ifndef EMP_TOGGLE_BUTTON_GROUP_HPP
 #define EMP_TOGGLE_BUTTON_GROUP_HPP
 
+
 #include "emp/tools/string_utils.hpp"
+#include "emp/web/Div.hpp"
 #include "emp/web/Element.hpp"
 #include "emp/web/Input.hpp"
-
+#include "emp/prefab/ButtonGroup.hpp"
 
 namespace emp::prefab {
 
   namespace internal {
+    using on_toggle_t = std::function<void(bool)>;
 
     class ToggleButtonGroupInfo : public web::internal::DivInfo {
+      on_toggle_t callback;
       bool active;
 
       public:
       ToggleButtonGroupInfo(const std::string & in_id)
-      : web::internal::DivInfo(in_id), active(false) { ; }
+      : web::internal::DivInfo(in_id), callback([](bool){ ; }), active(false) { ; }
+
+      void UpdateCallback(const on_toggle_t & cb) {
+        callback = cb;
+      }
+
+      const on_toggle_t & GetCallback() const {
+        return callback;
+      }
 
       bool IsActive() const {
         return active;
@@ -28,6 +40,7 @@ namespace emp::prefab {
   }
 
   class ToggleButtonGroup : public ButtonGroup {
+    using on_toggle_t = internal::on_toggle_t;
 
     /**
      * Get shared info pointer, cast to ToggleButton-specific type.
@@ -93,7 +106,10 @@ namespace emp::prefab {
         "class", emp::to_string("btn-outline-", activate_style)
       );
       web::Input activate_radio(
-        [&, info=this->Info()](std::string) { info->SetActive(true); },
+        [&, info=this->Info()](std::string) {
+          info->SetActive(true);
+          info->GetCallback()(true);
+        },
         "radio", "", emp::to_string(GetID(), "_activate_radio"),
         false, false
       );
@@ -106,7 +122,10 @@ namespace emp::prefab {
         "class", emp::to_string("btn-outline-", deactivate_style)
       );
       web::Input deactivate_radio(
-        [&, info=this->Info()](std::string) { info->SetActive(false); },
+        [&, info=this->Info()](std::string) {
+          info->SetActive(false);
+          info->GetCallback()(false);
+        },
         "radio", "", emp::to_string(GetID(), "_deactivate_radio"),
         false, true
       );
@@ -134,6 +153,11 @@ namespace emp::prefab {
 
     bool IsActive() const {
       return Info()->IsActive();
+    }
+
+    ToggleButtonGroup & SetCallback(const on_toggle_t & cb) {
+      Info()->UpdateCallback(cb);
+      return (*this);
     }
   };
 }
