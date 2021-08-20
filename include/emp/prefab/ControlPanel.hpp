@@ -193,12 +193,6 @@ namespace emp::prefab {
       button_line << toggle_run;
       button_line << step;
 
-      step.AddAttr(
-        "class", "btn",
-        "class", "btn-success",
-        "disabled", true
-      );
-
       AddAnimation(GetID(),
         [&run_sim=GetSimulation(),
           &refresh_list=Info()->GetRefreshList(),
@@ -219,7 +213,6 @@ namespace emp::prefab {
         [&anim=Animate(GetID()), step=web::Button(step)]
         (bool is_active) mutable {
           if (is_active) {
-
             anim.Start();
           } else {
             anim.Stop();
