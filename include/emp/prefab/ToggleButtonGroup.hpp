@@ -101,15 +101,19 @@ namespace emp::prefab {
         AddAttr("class", "grayout");
       }
 
+      auto & on_toggle = GetCallback();
+
       activate_label.AddAttr(
         "class", "btn",
         "class", emp::to_string("btn-outline-", activate_style)
       );
+      activate_label.OnClick([tog=*this, &handle_toggle=on_toggle]() mutable {
+        tog.SetActive(true);
+        handle_toggle(true);
+      });
+
       web::Input activate_radio(
-        [&, info=this->Info()](std::string) {
-          info->SetActive(true);
-          info->GetCallback()(true);
-        },
+        [](std::string){ ; },
         "radio", "", emp::to_string(GetID(), "_activate_radio"),
         false, false
       );
@@ -121,11 +125,13 @@ namespace emp::prefab {
         "class", "btn",
         "class", emp::to_string("btn-outline-", deactivate_style)
       );
+      deactivate_label.OnClick([tog=*this, &handle_toggle=on_toggle]() mutable {
+        tog.SetActive(false);
+        handle_toggle(false);
+      });
+
       web::Input deactivate_radio(
-        [&, info=this->Info()](std::string) {
-          info->SetActive(false);
-          info->GetCallback()(false);
-        },
+        [](std::string){ ; },
         "radio", "", emp::to_string(GetID(), "_deactivate_radio"),
         false, true
       );
@@ -153,6 +159,14 @@ namespace emp::prefab {
 
     bool IsActive() const {
       return Info()->IsActive();
+    }
+
+    void SetActive(const bool & val) {
+      Info()->SetActive(val);
+    }
+
+    const on_toggle_t & GetCallback() const {
+      return Info()->GetCallback();
     }
 
     ToggleButtonGroup & SetCallback(const on_toggle_t & cb) {
