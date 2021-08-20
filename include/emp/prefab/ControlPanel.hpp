@@ -25,20 +25,44 @@ namespace emp::prefab {
       std::map<std::string, int> refresh_rates{
         {"MILLISECONDS", 100}, {"FRAMES", 5}
       };
-      checker_func_t redraw_checker;
+
+      const std::map<std::string, const checker_func_t> refresh_checkers{
+        { "MILLISECONDS",
+          [elapsed_milliseconds = 0, this]
+          (const web::Animate & anim) mutable {
+            int rate = this->refresh_rates[this->refresh_unit];
+            elapsed_milliseconds += anim.GetStepTime();
+            if (elapsed_milliseconds > rate) {
+              elapsed_milliseconds -= rate;
+              if (elapsed_milliseconds > rate) elapsed_milliseconds = 0;
+              return true;
+            }
+            return false;
+          }},
+        { "FRAMES",
+          [this](const web::Animate & anim) {
+            return anim.GetFrameCount() % this->refresh_rates[this->refresh_unit];
+          }
+        }
+      };
+
+      checker_func_t do_redraw;
 
       emp::vector<web::Widget> refresh_list;
       std::function<void()> simulation;
 
       public:
       ControlPanelInfo(const std::string & in_id="")
-      : DivInfo(in_id), simulation([](){ ; }) { ; }
+      : DivInfo(in_id),
+      refresh_unit("MILLISECONDS"),
+      do_redraw(refresh_checkers.at(refresh_unit)),
+      simulation([](){ ; })  { ; }
 
       const checker_func_t & GetRedrawChecker() const {
-        return redraw_checker;
+        return do_redraw;
       }
 
-      void SetSimulation(std::function<void()> & sim) {
+      void SetSimulation(const std::function<void()> & sim) {
         simulation = sim;
       }
 
@@ -48,24 +72,7 @@ namespace emp::prefab {
 
       void SetUnit(const std::string & unit) {
         refresh_unit = unit;
-
-        const int & rate = refresh_rates[refresh_unit];
-        if (unit == "MILLISECONDS") {
-          redraw_checker = [elapsed_milliseconds = 0, rate]
-          (const web::Animate & anim) mutable {
-            elapsed_milliseconds += anim.GetStepTime();
-            if (elapsed_milliseconds > rate) {
-              elapsed_milliseconds -= rate;
-              if (elapsed_milliseconds > rate) elapsed_milliseconds = 0;
-              return true;
-            }
-            return false;
-          };
-        } else if (unit == "FRAMES") {
-          redraw_checker = [rate](const web::Animate & anim) {
-            return anim.GetFrameCount() % rate;
-          };
-        }
+        do_redraw = refresh_checkers.at(refresh_unit);
       }
 
       void SetRate(const int & rate) {
@@ -139,15 +146,17 @@ namespace emp::prefab {
       );
 
       AddAnimation(GetID(),
-        [&, run_sim=GetSimulation(),
-          refresh_list=Info()->GetRefreshList(),
-          check_redraw=Info()->GetRedrawChecker()]
+        [&run_sim=GetSimulation(),
+          &refresh_list=Info()->GetRefreshList(),
+          &do_redraw=Info()->GetRedrawChecker()]
         (const web::Animate & anim) mutable {
           // Run the simulation function every frame
           run_sim();
           // Redraw widgets according to a rule
-          if(check_redraw(anim)) {
-            for (emp::web::Widget & wid : refresh_list) {
+          if(do_redraw(anim)) {
+            std::cout << "List size " << refresh_list.size() << std::endl;
+            for (auto & wid : refresh_list) {
+              std::cout << "Redrawing " << wid.GetID() << std::endl;
               wid.Redraw();
             }
           }
@@ -158,6 +167,7 @@ namespace emp::prefab {
         [&anim=Animate(GetID()), step=web::Button(step)]
         (bool is_active) mutable {
           if (is_active) {
+
             anim.Start();
           } else {
             anim.Stop();
@@ -181,7 +191,7 @@ namespace emp::prefab {
       new internal::ControlPanelInfo(in_id)
     ) { ; }
 
-    ControlPanel & SetSimulation(std::function<void()> & sim) {
+    ControlPanel & SetSimulation(const std::function<void()> & sim) {
       Info()->SetSimulation(sim);
       return *this;
     }
@@ -201,6 +211,7 @@ namespace emp::prefab {
 
     void AddToRefreshList(Widget & area) {
       Info()->GetRefreshList().push_back(area);
+      std::cout << Info()->GetRefreshList().size() << std::endl;
     }
 
     template <typename IN_TYPE>
