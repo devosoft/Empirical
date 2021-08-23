@@ -114,7 +114,7 @@ struct PlusCountdownRegulator {
   /// Return whether MatchBin should be updated
   bool Decay(const int32_t steps) {
 
-    const int64_t res = static_cast<int64_t>(timer) + steps;
+    const int64_t res = static_cast<int64_t>(timer) - steps;
     constexpr int64_t floor = std::numeric_limits<decltype(timer)>::lowest();
     constexpr int64_t ceil = std::numeric_limits<decltype(timer)>::max();
     timer = std::clamp( res, floor, ceil );
