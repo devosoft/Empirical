@@ -20,4 +20,8 @@ TEST_CASE("Test StreamManager", "[io]")
   test_stream_orig >> out_str;
   REQUIRE( out_str == "abc123def" );
 
+
+  std::istream & in_stream = sm.AddInputStream("in_stream");
+  std::ostream & out_stream = sm.AddOutputStream("out_stream");
+
 }
