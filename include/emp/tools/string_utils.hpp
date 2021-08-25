@@ -812,6 +812,29 @@ namespace emp {
     return result;
   }
 
+
+  /// View a section of a string with the properly matching nested blocks.
+  /// For example if ((abc(de))f(ghi)) would return "(abc(de))f(ghi)" at 0, "de" at 5, or
+  /// "" at 2 (since there is no start!)
+  std::string_view ViewNestedBlock(std::string_view str,
+                                   const std::string symbols="()",
+                                   size_t start=0) {
+    // Test if we are not starting at the beginning of a block, return empty.
+    if (str[start] != symbols[0]) return emp::view_string(str, 0, 0);
+
+    size_t depth = 0;
+    size_t stop = start;
+    while (++stop < str.size()) {
+      if (str[stop] == symbols[0]) depth++;
+      else if (str[stop] == symbols[1]) {
+        if (depth == 0) break;
+        depth--;
+      }
+    }
+
+    return emp::view_string(str, start+1, stop-start-1);
+  }
+
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   // The next functions are not efficient, but they will take any number of inputs and
