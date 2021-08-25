@@ -172,13 +172,13 @@ namespace emp::prefab {
       FontAwesomeIcon{"fa-play"}, FontAwesomeIcon{"fa-pause"},
       "success", "warning",
       true, false,
-      emp::to_string(GetID(), "_run_toggle")
+      emp::to_string(GetID(), "_main_toggle")
     },
-    button_line(ButtonGroup{emp::to_string(GetID(), "_core")}),
+    button_line(ButtonGroup{emp::to_string(GetID(), "_main")}),
     step{
       [](){ ; },
       "<span class=\"fa fa-step-forward\" aria-hidden=\"true\"></span>",
-      emp::to_string(GetID(), "_step")
+      emp::to_string(GetID(), "_main_step")
     }
     {
       AddAttr(
@@ -188,6 +188,10 @@ namespace emp::prefab {
         "aria-label", "Toolbar with simulation controls"
       );
       SetRefreshRate(refresh_rate, refresh_unit);
+      step.AddAttr(
+        "class", "btn",
+        "class", "btn-success"
+      );
 
       static_cast<Div>(*this) << button_line;
       button_line << toggle_run;
