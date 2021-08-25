@@ -44,19 +44,24 @@
  *    std::string to_web_safe_string(const std::string & value)
  *    std::string to_literal(...)
  *    char from_literal_char(const std::string & value)
- *    std::string repeat(const std::string& value, const size_t n)
  *    std::string from_literal_string(const std::string & value)
  *    std::string to_upper(std::string value)
  *    std::string to_lower(std::string value)
  *    std::string to_titlecase(std::string value)
  *    std::string to_roman_numeral(int val, const std::string & prefix="")
- *    void remove_chars(std::string & in_string, std::string chars)
  *    void compress_whitespace(std::string & in_string)
  *    void remove_whitespace(std::string & in_string)
  *    void remove_punctuation(std::string & in_string)
  *    std::string slugify(const std::string & in_string)
+ *    std::string to_english_list(const string_vec_t & strings)
+ *    string_vec_t transform_strings(const string_vec_t & in_strings, std::function<std::string(const std::string &)> fun)
+ *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
+ *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote) {
+ *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
+ *    std::string format_string( const std::string& format, Args... args )
  *
  *    -- EXTRACTIONS and CROPPING --
+ *    void remove_chars(std::string & in_string, std::string chars)
  *    std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
  *    std::string string_get_range(const std::string & in_string, std::size_t start_pos, std::size_t end_pos)
  *    std::string string_pop(std::string & in_string, const char delim=' ')
@@ -81,6 +86,7 @@
  *    std::string_view view_string_to(const std::string_view & in_string, const char delim, size_t start_pos=0)
  *
  *    -- OTHER MANIPULATIONS --
+ *    std::string repeat(const std::string& value, const size_t n)
  *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set, const char delim='\n', [size_t max_split])
  *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n', [size_t max_split])
  *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set, char delim='\n')
@@ -90,11 +96,6 @@
  *    std::string to_string(...)
  *    void from_string(const std::string & str, ...)
  *    std::string join(const emp::vector<T> & v, std::string join_str)
- *    std::string to_english_list(const string_vec_t & strings)
- *    string_vec_t transform_strings(const string_vec_t & in_strings, std::function<std::string(const std::string &)> fun)
- *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
- *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote) {
- *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
  *    
  *    -- ANSI TOOLS --
  *    char ANSI_ESC()
@@ -153,7 +154,6 @@
  *    to_ansi_blink(const std::string & _in)
  *    to_ansi_reverse(const std::string & _in)
  *    
- *    std::string format_string( const std::string& format, Args... args )
  */
 
 
@@ -567,15 +567,6 @@ namespace emp {
   }
 
 
-  /// Concatenate n copies of a string.
-  inline std::string repeat( const std::string& value, const size_t n ) {
-    const emp::vector<std::string> repeated( n, value );
-    return std::accumulate(
-      std::begin(repeated), std::end(repeated), std::string{}
-    );
-  }
-
-
   /// Convert a literal string representation to an actual string.
   static inline std::string from_literal_string(const std::string & value) {
     emp_assert(is_literal_string(value));
@@ -668,16 +659,6 @@ namespace emp {
     return ret_string;
   }
 
-  /// Remove instances of characters from file.
-  static inline void remove_chars(std::string & in_string, std::string chars) {
-    size_t cur_pos = 0;
-    for (size_t i = 0; i < in_string.size(); i++) {
-      if (is_one_of(in_string[i], chars)) continue;
-      in_string[cur_pos++] = in_string[i];
-    }
-    in_string.resize(cur_pos);
-  }
-
   /// Every time one or more whitespace characters appear replace them with a single space.
   static inline void compress_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
@@ -729,6 +710,16 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Remove instances of characters from file.
+  static inline void remove_chars(std::string & in_string, std::string chars) {
+    size_t cur_pos = 0;
+    for (size_t i = 0; i < in_string.size(); i++) {
+      if (is_one_of(in_string[i], chars)) continue;
+      in_string[cur_pos++] = in_string[i];
+    }
+    in_string.resize(cur_pos);
+  }
+
   /// Make a string safe(r)
   static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
@@ -739,6 +730,70 @@ namespace emp {
       return (ch == ' ') ? '-' : ch;
     });
     return res;
+  }
+
+  // -------- Functions that operate on VECTORS of strings --------
+
+  using string_vec_t = emp::vector<std::string>;
+
+  /// Convert a vector of strings to an English list, such as "one, two, three, and four."
+  static inline std::string to_english_list(const string_vec_t & strings) {
+    // If there are no input strings, return an empty string.
+    if (strings.size() == 0) { return ""; }
+
+    // If there is one string provided, return it by itself.
+    if (strings.size() == 1) { return strings[0]; }
+
+    // If two strings are provided, link them by an "and".
+    if (strings.size() == 2) { return strings[0] + " and " + strings[1]; }
+
+    // If MORE than two strings are provided, list the first n-1 followed by commas, ending
+    // with an "and" before the final one.
+    std::string out_str;
+    for (size_t i = 0; i < strings.size(); i++) {
+      if (i) {
+        out_str += ", ";
+        if (i == strings.size()-1) out_str += "and ";
+      }
+      out_str += strings[i];
+    }
+
+    return out_str;
+  }
+
+
+  /// Transform all strings in a vector.
+  static inline string_vec_t transform_strings(const string_vec_t & in_strings,
+                                               std::function<std::string(const std::string &)> fun) {
+    string_vec_t out_strings(in_strings.size());
+    for (size_t i = 0; i < in_strings.size(); i++) {
+      out_strings[i] = fun(in_strings[i]);
+    }
+    return out_strings;
+  }
+
+  /// Put all strings provided in quotes (Like 'this'), pre- and post-fixing another string if
+  /// provided.
+  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return transform_strings(in_strings, [quote](const std::string & str) {
+      return quote + str + quote;
+    });
+  }
+
+  /// Pre-pend and post-pend specified sequences to all strings provided.
+  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
+                                           const std::string open_quote,
+                                           const std::string close_quote) {
+    return transform_strings(in_strings, [open_quote, close_quote](const std::string & str) {
+      return open_quote + str + close_quote;
+    });
+  }
+
+  /// Take a vector of strings, put them in quotes, and then transform it into an English list.
+  static inline std::string to_quoted_list(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return to_english_list(quote_strings(in_strings, quote));
   }
 
 
@@ -832,6 +887,29 @@ namespace emp {
     right_justify(in_string);
   }
 
+  /// Apply sprintf-like formatting to a string.
+  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
+  /// Adapted from https://stackoverflow.com/a/26221725.
+  template<typename... Args>
+  std::string format_string( const std::string& format, Args... args ) {
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-security"
+
+    // Extra space for '\0'
+    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+    emp_assert( size >= 0 );
+
+    emp::vector<char> buf( size );
+    std::snprintf( buf.data(), size, format.c_str(), args... );
+
+     // We don't want the '\0' inside
+    return std::string( buf.data(), buf.data() + size - 1 );
+
+    #pragma GCC diagnostic pop
+
+  }
+
 
   /// Provide a string_view on a given string
   static inline std::string_view view_string(const std::string_view & str) {
@@ -884,6 +962,14 @@ namespace emp {
     size_t end_pos = start_pos;
     while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
     return view_string_range(in_string, start_pos, end_pos);
+  }
+
+  /// Concatenate n copies of a string.
+  inline std::string repeat( const std::string& value, const size_t n ) {
+    const emp::vector<std::string> repeated( n, value );
+    return std::accumulate(
+      std::begin(repeated), std::end(repeated), std::string{}
+    );
   }
 
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
@@ -1158,70 +1244,6 @@ namespace emp {
   }
 
 
-  // -------- Functions that operate on VECTORS of strings --------
-
-  using string_vec_t = emp::vector<std::string>;
-
-  /// Convert a vector of strings to an English list, such as "one, two, three, and four."
-  static inline std::string to_english_list(const string_vec_t & strings) {
-    // If there are no input strings, return an empty string.
-    if (strings.size() == 0) { return ""; }
-
-    // If there is one string provided, return it by itself.
-    if (strings.size() == 1) { return strings[0]; }
-
-    // If two strings are provided, link them by an "and".
-    if (strings.size() == 2) { return to_string(strings[0], " and ", strings[1]); }
-
-    // If MORE than two strings are provided, list the first n-1 followed by commas, ending
-    // with an "and" before the final one.
-    std::string out_str;
-    for (size_t i = 0; i < strings.size(); i++) {
-      if (i) {
-        out_str += ", ";
-        if (i == strings.size()-1) out_str += "and ";
-      }
-      out_str += strings[i];
-    }
-
-    return out_str;
-  }
-
-
-  /// Transform all strings in a vector.
-  static inline string_vec_t transform_strings(const string_vec_t & in_strings,
-                                               std::function<std::string(const std::string &)> fun) {
-    string_vec_t out_strings(in_strings.size());
-    for (size_t i = 0; i < in_strings.size(); i++) {
-      out_strings[i] = fun(in_strings[i]);
-    }
-    return out_strings;
-  }
-
-  /// Put all strings provided in quotes (Like 'this'), pre- and post-fixing another string if
-  /// provided.
-  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
-                                           const std::string quote="'") {
-    return transform_strings(in_strings, [quote](const std::string & str) {
-      return to_string(quote, str, quote);
-    });
-  }
-
-  /// Pre-pend and post-pend specified sequences to all strings provided.
-  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
-                                           const std::string open_quote,
-                                           const std::string close_quote) {
-    return transform_strings(in_strings, [open_quote, close_quote](const std::string & str) {
-      return to_string(open_quote, str, close_quote);
-    });
-  }
-
-  /// Take a vector of strings, put them in quotes, and then transform it into an English list.
-  static inline std::string to_quoted_list(const string_vec_t & in_strings,
-                                           const std::string quote="'") {
-    return to_english_list(quote_strings(in_strings, quote));
-  }
-
   // Some ANSI helper functions.
   inline constexpr char ANSI_ESC() { return (char) 27; }
   inline std::string ANSI_Reset() { return "\033[0m"; }
@@ -1301,30 +1323,6 @@ namespace emp {
   /// Make a string appear reverse when printed to the command line.
   inline std::string to_ansi_reverse(const std::string & _in) {
     return ANSI_Reverse() + _in + ANSI_NoReverse();
-  }
-
-
-  /// Apply sprintf-like formatting to a string.
-  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
-  /// Adapted from https://stackoverflow.com/a/26221725.
-  template<typename... Args>
-  std::string format_string( const std::string& format, Args... args ) {
-
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-security"
-
-    // Extra space for '\0'
-    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
-    emp_assert( size >= 0 );
-
-    emp::vector<char> buf( size );
-    std::snprintf( buf.data(), size, format.c_str(), args... );
-
-     // We don't want the '\0' inside
-    return std::string( buf.data(), buf.data() + size - 1 );
-
-    #pragma GCC diagnostic pop
-
   }
 
 }
