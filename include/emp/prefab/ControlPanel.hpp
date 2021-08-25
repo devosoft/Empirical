@@ -59,7 +59,7 @@ namespace emp::prefab {
       // The current redraw checker function
       checker_func_t do_redraw;
 
-      // A list of widget that should be redraw when do_redraw return true
+      // A list of widget that should be redrawn when do_redraw return true
       emp::vector<web::Widget> refresh_list;
 
       // A function to run every frame (as fast as possible)
@@ -131,7 +131,7 @@ namespace emp::prefab {
    * Use the ConfigPanel class to add a play/pause toggle button and a step
    * button to your application. You can add a simulation to be run, web
    * components to be redrawn, and more Buttons or ButtonGroups to add more
-   * functionality.
+   * functionality to the control panel.
    */
   class ControlPanel : public web::Div {
 
@@ -164,8 +164,8 @@ namespace emp::prefab {
      * @param in_info info object associated with this component
      */
     ControlPanel(
-      const std::string & refresh_mode,
       const int & refresh_rate,
+      const std::string & refresh_unit,
       web::internal::DivInfo * in_info
     ) : web::Div(in_info),
     toggle_run{
@@ -187,7 +187,7 @@ namespace emp::prefab {
         "role", "toolbar",
         "aria-label", "Toolbar with simulation controls"
       );
-      SetRefreshRate(refresh_rate, refresh_mode);
+      SetRefreshRate(refresh_rate, refresh_unit);
 
       static_cast<Div>(*this) << button_line;
       button_line << toggle_run;
@@ -228,17 +228,17 @@ namespace emp::prefab {
     public:
     /**
      * Contructor for a Control panel.
-     * @param refresh_mode units of "MILLISECONDS" or "FRAMES"
      * @param refresh_rate the number of milliseconds or frames between refreshes
+     * @param refresh_mode units of "MILLISECONDS" or "FRAMES"
      * @param in_id HTML ID of control panel div
      */
     ControlPanel(
-      const std::string & refresh_mode,
       const int & refresh_rate,
+      const std::string & refresh_unit,
       const std::string & in_id="")
     : ControlPanel(
-      refresh_mode,
       refresh_rate,
+      refresh_unit,
       new internal::ControlPanelInfo(in_id)
     ) { ; }
 
