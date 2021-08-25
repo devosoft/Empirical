@@ -329,6 +329,20 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE(slices[3] == "t ");
 
 
+  // Test ViewNestedBlock
+  std::string code = "abc(def(ghi(())j)k(lm(n))o)pq";
+  REQUIRE(emp::ViewNestedBlock(code) == "");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 0) == "");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 1) == "");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 3) == "def(ghi(())j)k(lm(n))o");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 7) == "ghi(())j");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 11) == "()");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 18) == "lm(n)");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 21) == "n");
+  REQUIRE(emp::ViewNestedBlock(code, "()", 22) == "");
+  REQUIRE(emp::ViewNestedBlock(code, "{}", 3) == "");
+  REQUIRE(emp::ViewNestedBlock(code, "aj") == "bc(def(ghi(())");
+
   // Some tests of to_string() function.
   REQUIRE(emp::to_string((int) 1) == "1");
   REQUIRE(emp::to_string("2") == "2");
