@@ -8,10 +8,10 @@
  *  @note Status: RELEASE
  * 
  *  Available Functions
- *    const std::string & empty_string();              - Reference to an empty string for null returns
+ *    const std::string & empty_string()               - Reference to an empty string for null returns
  * 
  *    -- ANALYSES --
- *    size_t count(const std::string & str, char c);   - Count the occurances of c in str.
+ *    size_t count(const std::string & str, char c)    - Count the occurances of c in str.
  *    bool is_literal_char(const std::string & value)
  *    bool is_literal_string(const std::string & value)
  *    bool is_whitespace(char test_char)
@@ -23,23 +23,23 @@
  *    bool is_idchar(char test_char)
  *    bool is_one_of(char test_char, const std::string & char_set)
  *    bool is_composed_of(const std::string & test_str, const std::string & char_set)
- *    bool has_whitespace(const std::string & test_str)
- *    bool has_upper_letter(const std::string & test_str)
- *    bool has_lower_letter(const std::string & test_str)
- *    bool has_letter(const std::string & test_str)
- *    bool has_digit(const std::string & test_str)
  *    bool is_digits(const std::string & test_str)
  *    bool is_alphanumeric(const std::string & test_str)
  *    bool is_valid(char test_char )
  *    bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
  *    bool is_valid(const std::string & test_str, FUNS... funs)
+ *    bool has_whitespace(const std::string & test_str)
+ *    bool has_upper_letter(const std::string & test_str)
+ *    bool has_lower_letter(const std::string & test_str)
+ *    bool has_letter(const std::string & test_str)
+ *    bool has_digit(const std::string & test_str)
  *    bool has_alphanumeric(const std::string & test_str)
  *    bool has_idchar(const std::string & test_str)
  *    bool has_one_of(const std::string & test_str, const std::string & char_set)
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
  * 
  *    -- FORMATTING --
- *    std::string to_escaped_string(char value);
+ *    std::string to_escaped_string(char value)
  *    std::string to_escaped_string(const std::string & value)
  *    std::string to_web_safe_string(const std::string & value)
  *    std::string to_literal(...)
@@ -56,7 +56,7 @@
  *    std::string to_english_list(const string_vec_t & strings)
  *    string_vec_t transform_strings(const string_vec_t & in_strings, std::function<std::string(const std::string &)> fun)
  *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
- *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote) {
+ *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote)
  *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
  *    std::string format_string( const std::string& format, Args... args )
  *
@@ -70,15 +70,15 @@
  *    std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0)
  *    std::string string_pop_word(std::string & in_string)
  *    std::string string_get_word(const std::string & in_string, size_t start_pos=0)
- *    std::string string_pop_line(std::string & in_string) {
- *    std::string string_get_line(const std::string & in_string, size_t start_pos=0) {
+ *    std::string string_pop_line(std::string & in_string)
+ *    std::string string_get_line(const std::string & in_string, size_t start_pos=0)
  *    std::string left_justify(std::string & in_string)
  *    void right_justify(std::string & in_string)
  *    void justify(std::string & in_string)
  *
  *    -- STRING_VIEW HELPERS --
- *    std::string_view view_string(const std::string_view & str) {
- *    std::string_view view_string(const std::string_view & str, size_t start) {
+ *    std::string_view view_string(const std::string_view & str)
+ *    std::string_view view_string(const std::string_view & str, size_t start)
  *    std::string_view view_string(const std::string_view & str, size_t start, size_t npos)
  *    std::string_view view_string_front(const std::string_view & str, size_t npos)
  *    std::string_view view_string_back(const std::string_view & str, size_t npos)
