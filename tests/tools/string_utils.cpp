@@ -270,6 +270,16 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE( emp::view_string_to(view_test, ' ') == "This" );
   REQUIRE( emp::view_string_to(view_test, ' ', 5) == "is" );
 
+  // Do some tests on quotes in strings...
+  std::string quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";
+  CHECK( emp::string_pop_quote(quotes) == "\"abc\"");
+  CHECK( emp::string_pop_quote(quotes) == "\"def\"");
+  CHECK( emp::string_pop_quote(quotes) == "");
+  CHECK( emp::string_pop_word(quotes) == "123");
+  CHECK( emp::string_pop_quote(quotes) == "\"\"");
+  CHECK( emp::string_pop_quote(quotes) == "\"long\\\"er\"");
+  CHECK( emp::string_pop_quote(quotes) == "");
+
   emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
   REQUIRE( slice_view.size() == 5 );
   REQUIRE( slice_view[0] == "This" );
