@@ -287,6 +287,21 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::string_pop_quote(quotes) == "\"long\\\"er\"");
   CHECK( emp::string_pop_quote(quotes) == "");
 
+  // Do some tests on parentheses matching...
+  std::string parens = "(()(()()))((())\")))))()\")";
+  CHECK( emp::find_paren_match(parens) == 9 );
+  CHECK( emp::find_paren_match(parens, 0) == 9 );
+  CHECK( emp::find_paren_match(parens, 1) == 2 );
+  CHECK( emp::find_paren_match(parens, 2) == 2 );
+  CHECK( emp::find_paren_match(parens, 3) == 8 );
+  CHECK( emp::find_paren_match(parens, 3) == 8 );
+  CHECK( emp::find_paren_match(parens, 10) == 24 );
+  CHECK( emp::find_paren_match(parens, 11) == 14 );
+  CHECK( emp::find_paren_match(parens, 21) == 22 ); // Works inside a quote if start there.
+  CHECK( emp::find_paren_match(parens, 10,'(',')',true) == 24 );  // Specify parens and show works.
+  CHECK( emp::find_paren_match(parens, 10,'(',')',false) == 16 ); // Do no ignore quotes.
+  CHECK( emp::find_paren_match(parens, 10,'a','b',false) == 10 ); // Using non-parens works.
+
   emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
   CHECK( slice_view.size() == 5 );
   CHECK( slice_view[0] == "This" );
