@@ -420,7 +420,7 @@ namespace emp {
   }
 
 
-  static inline size_t find_quote_end(const std::string & in_string, size_t start_pos=0) {
+  static inline size_t find_quote_end(const std::string & in_string, const size_t start_pos=0) {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (in_string.size() < start_pos+2) return start_pos;
     if (in_string[start_pos] != '"') return start_pos;
@@ -442,9 +442,23 @@ namespace emp {
     return start_pos;
   }
 
-  static inline size_t find_paren_match(const std::string & in_string,
-                                        size_t start_pos=0, bool ignore_quotes=true) {
-    return 0;
+  static inline size_t find_paren_match(const std::string & in_string, const size_t start_pos=0,
+                                        const char open='(', const char close=')',
+                                        const bool ignore_quotes=true) {
+    if (in_string[start_pos] != open) return start_pos;
+    size_t open_count = 1;
+    for (size_t pos = start_pos + 1; pos < in_string.size(); ++pos) {
+      if (in_string[pos] == open) ++open_count;
+      else if (in_string[pos] == close) {
+        --open_count;
+        if (open_count == 0) return pos;
+      }
+      else if (in_string[pos] == '"' && ignore_quotes) {
+        pos = emp::find_quote_end(in_string, pos) - 1;
+      }
+    }
+
+    return start_pos;
   }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
