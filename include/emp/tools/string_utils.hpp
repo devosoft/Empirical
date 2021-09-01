@@ -419,11 +419,11 @@ namespace emp {
     return true;
   }
 
-
-  static inline size_t find_quote_end(const std::string & in_string, const size_t start_pos=0) {
+  // Given the start position of a quote, find where it ends.
+  static inline size_t find_quote_end(const std::string & in_string, const size_t start_pos=0, char mark='"') {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (in_string.size() < start_pos+2) return start_pos;
-    if (in_string[start_pos] != '"') return start_pos;
+    if (in_string[start_pos] != mark) return start_pos;
 
     // Search for the close-quote.
     for (size_t pos = start_pos + 1; pos < in_string.size(); ++pos) {
@@ -433,7 +433,7 @@ namespace emp {
         continue;
       }
       // If we found the close-quote, pop to here.
-      if (in_string[pos] == '"') {
+      if (in_string[pos] == mark) {
         return pos+1;
       }
     }
@@ -455,6 +455,9 @@ namespace emp {
       }
       else if (in_string[pos] == '"' && ignore_quotes) {
         pos = emp::find_quote_end(in_string, pos) - 1;
+      }
+      else if (in_string[pos] == '\'' && ignore_quotes) {
+        pos = emp::find_quote_end(in_string, pos, '\'') - 1;
       }
     }
 
