@@ -10,7 +10,7 @@
  *  Available Functions
  *    const std::string & empty_string()               - Reference to an empty string for null returns
  * 
- *    -- ANALYSES --
+ *    -- CLASSIFICATION --
  *    size_t count(const std::string & str, char c)    - Count the occurances of c in str.
  *    bool is_literal_char(const std::string & value)
  *    bool is_literal_string(const std::string & value)
@@ -37,6 +37,10 @@
  *    bool has_idchar(const std::string & test_str)
  *    bool has_one_of(const std::string & test_str, const std::string & char_set)
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
+ * 
+ *    -- SEARCHING --
+ *    size_t find_quote_end(const std::string & in_string, size_t start_pos=0)
+ *    size_t find_paren_match(const std::string & in_string, size_t start_pos=0, bool ignore_quotes=true)
  * 
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
@@ -191,6 +195,12 @@ namespace emp {
   static inline const std::string & empty_string() {
     static std::string empty = "";
     return empty;
+  }
+
+  /// Count the number of times a specific character appears in a string
+  /// (a clean shortcut to std::count)
+  static inline size_t count(const std::string & str, char c) {
+    return (size_t) std::count(str.begin(), str.end(), c);
   }
 
   /// Test if an input string is properly formated as a literal character.
@@ -410,10 +420,31 @@ namespace emp {
   }
 
 
-  /// Count the number of times a specific character appears in a string
-  /// (a clean shortcut to std::count)
-  static inline size_t count(const std::string & str, char c) {
-    return (size_t) std::count(str.begin(), str.end(), c);
+  static inline size_t find_quote_end(const std::string & in_string, size_t start_pos=0) {
+    // A literal string must begin and end with a double quote and contain only valid characters.
+    if (in_string.size() < start_pos+2) return start_pos;
+    if (in_string[start_pos] != '"') return start_pos;
+
+    // Search for the close-quote.
+    for (size_t pos = start_pos + 1; pos < in_string.size(); ++pos) {
+      // If we have a backslash, does not end on this or next char.
+      if (in_string[pos] == '\\') {
+        ++pos;  
+        continue;
+      }
+      // If we found the close-quote, pop to here.
+      if (in_string[pos] == '"') {
+        return pos+1;
+      }
+    }
+
+    // If we made it here without a close-quote, no full quote is available!
+    return start_pos;
+  }
+
+  static inline size_t find_paren_match(const std::string & in_string,
+                                        size_t start_pos=0, bool ignore_quotes=true) {
+    return 0;
   }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
@@ -801,9 +832,10 @@ namespace emp {
   /// Pop a segment from the beginning of a string as another string, shortening original.
   static inline std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
   {
+    if (end_pos == 0) return "";                   // Not popping anything!
+
     std::string out_string = "";
-    if (end_pos == 0);                        // Not popping anything!
-    else if (end_pos == std::string::npos) {  // Popping whole string.
+    if (end_pos == std::string::npos) {            // Popping whole string.
       out_string = in_string;
       in_string = "";
     }
@@ -872,25 +904,8 @@ namespace emp {
   }
 
   inline std::string string_pop_quote(std::string & in_string) {
-    // A literal string must begin and end with a double quote and contain only valid characters.
-    if (in_string.size() < 2) return "";
-    if (in_string[0] != '"') return "";
-
-    // Search for the close-quote.
-    for (size_t pos = 1; pos < in_string.size(); ++pos) {
-      // If we have a backslash, cannot end on this or next char.
-      if (in_string[pos] == '\\') {
-        ++pos;  
-        continue;
-      }
-      // If we found the close-quote, pop to here.
-      if (in_string[pos] == '"') {
-        return string_pop_fixed(in_string, pos+1);
-      }
-    }
-
-    // If we made it here without a close-quote, no full quote is available!
-    return "";
+    const size_t end_pos = emp::find_quote_end(in_string);
+    return string_pop_fixed(in_string, end_pos);
   }
 
 
