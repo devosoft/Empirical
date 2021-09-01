@@ -302,6 +302,15 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::find_paren_match(parens, 10,'(',')',false) == 16 ); // Do no ignore quotes.
   CHECK( emp::find_paren_match(parens, 10,'a','b',false) == 10 ); // Using non-parens works.
 
+  // Extra tests with braces and single quotes.
+  std::string braces = "{{}{}}{'{}}'}";
+  CHECK( emp::find_paren_match(braces, 0) == 0 );
+  CHECK( emp::find_paren_match(braces, 0, '{', '}') == 5 );
+  CHECK( emp::find_paren_match(braces, 1, '{', '}') == 2 );
+  CHECK( emp::find_paren_match(braces, 3, '{', '}') == 4 );
+  CHECK( emp::find_paren_match(braces, 6, '{', '}') == 12 );  // Across single quotes
+  CHECK( emp::find_paren_match(braces, 6, '{', '}', false) == 10 ); // Don't ignore quotes.
+
   emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
   CHECK( slice_view.size() == 5 );
   CHECK( slice_view[0] == "This" );
