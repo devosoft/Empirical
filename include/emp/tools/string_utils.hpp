@@ -72,6 +72,7 @@
  *    std::string string_get_word(const std::string & in_string, size_t start_pos=0)
  *    std::string string_pop_line(std::string & in_string)
  *    std::string string_get_line(const std::string & in_string, size_t start_pos=0)
+ *    std::string string_pop_quote(std::string & in_string)
  *    std::string left_justify(std::string & in_string)
  *    void right_justify(std::string & in_string)
  *    void justify(std::string & in_string)
@@ -869,6 +870,29 @@ namespace emp {
   inline std::string string_get_line(const std::string & in_string, size_t start_pos=0) {
     return string_get(in_string, '\n', start_pos);
   }
+
+  inline std::string string_pop_quote(std::string & in_string) {
+    // A literal string must begin and end with a double quote and contain only valid characters.
+    if (in_string.size() < 2) return "";
+    if (in_string[0] != '"') return "";
+
+    // Search for the close-quote.
+    for (size_t pos = 1; pos < in_string.size(); ++pos) {
+      // If we have a backslash, cannot end on this or next char.
+      if (in_string[pos] == '\\') {
+        ++pos;  
+        continue;
+      }
+      // If we found the close-quote, pop to here.
+      if (in_string[pos] == '"') {
+        return string_pop_fixed(in_string, pos+1);
+      }
+    }
+
+    // If we made it here without a close-quote, no full quote is available!
+    return "";
+  }
+
 
   /// Remove all whitespace at the beginning of a string.  Return the whitespace removed.
   inline std::string left_justify(std::string & in_string) {
