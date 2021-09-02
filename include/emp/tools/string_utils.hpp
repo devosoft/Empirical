@@ -39,7 +39,7 @@
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
  * 
  *    -- SEARCHING --
- *    size_t find_quote_end(std::string_view in_string, size_t start_pos=0)
+ *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
  * 
  *    -- FORMATTING --
@@ -420,7 +420,7 @@ namespace emp {
   }
 
   // Given the start position of a quote, find where it ends.
-  static inline size_t find_quote_end(std::string_view in_string, const size_t start_pos=0, char mark='"') {
+  static inline size_t find_quote_match(std::string_view in_string, const size_t start_pos=0, char mark='"') {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (in_string.size() < start_pos+2) return start_pos;
     if (in_string[start_pos] != mark) return start_pos;
@@ -434,7 +434,7 @@ namespace emp {
       }
       // If we found the close-quote, pop to here.
       if (in_string[pos] == mark) {
-        return pos+1;
+        return pos;
       }
     }
 
@@ -454,10 +454,10 @@ namespace emp {
         if (open_count == 0) return pos;
       }
       else if (in_string[pos] == '"' && ignore_quotes) {
-        pos = emp::find_quote_end(in_string, pos) - 1;
+        pos = emp::find_quote_match(in_string, pos);
       }
       else if (in_string[pos] == '\'' && ignore_quotes) {
-        pos = emp::find_quote_end(in_string, pos, '\'') - 1;
+        pos = emp::find_quote_match(in_string, pos, '\'');
       }
     }
 
@@ -921,8 +921,8 @@ namespace emp {
   }
 
   inline std::string string_pop_quote(std::string & in_string) {
-    const size_t end_pos = emp::find_quote_end(in_string);
-    return string_pop_fixed(in_string, end_pos);
+    const size_t end_pos = emp::find_quote_match(in_string);
+    return end_pos ? string_pop_fixed(in_string, end_pos+1) : "";
   }
 
 
@@ -1049,10 +1049,11 @@ namespace emp {
     while (pos < test_size && out_count <= max_split) {
       while (pos < test_size && in_string[pos] != delim) {
         if (keep_quoted && (in_string[pos] == '"' || in_string[pos] == '\'')) {
-          pos = find_quote_end(in_string, pos, in_string[pos]);
-        } else pos++;
+          pos = find_quote_match(in_string, pos, in_string[pos]);
+        }
+        pos++;
       }
-      pos++; // Skip over deliminator
+      pos++; // Skip deliminator
       out_count++;  // Increment for each delim plus once at the end (so once if no delims).
     }
 
