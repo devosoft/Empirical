@@ -39,8 +39,8 @@
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
  * 
  *    -- SEARCHING --
- *    size_t find_quote_end(const std::string & in_string, size_t start_pos=0)
- *    size_t find_paren_match(const std::string & in_string, size_t start_pos=0, bool ignore_quotes=true)
+ *    size_t find_quote_end(std::string_view in_string, size_t start_pos=0)
+ *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
  * 
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
@@ -420,7 +420,7 @@ namespace emp {
   }
 
   // Given the start position of a quote, find where it ends.
-  static inline size_t find_quote_end(const std::string & in_string, const size_t start_pos=0, char mark='"') {
+  static inline size_t find_quote_end(std::string_view in_string, const size_t start_pos=0, char mark='"') {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (in_string.size() < start_pos+2) return start_pos;
     if (in_string[start_pos] != mark) return start_pos;
@@ -442,7 +442,7 @@ namespace emp {
     return start_pos;
   }
 
-  static inline size_t find_paren_match(const std::string & in_string, const size_t start_pos=0,
+  static inline size_t find_paren_match(std::string_view in_string, const size_t start_pos=0,
                                         const char open='(', const char close=')',
                                         const bool ignore_quotes=true) {
     if (in_string[start_pos] != open) return start_pos;
@@ -1033,11 +1033,13 @@ namespace emp {
   /// @param out_set destination
   /// @param delim delimiter to split on
   /// @param max_split defines the maximum number of splits
+  /// @param keep_quoted Should quoted text be kept together?
   static inline void slice(
     const std::string_view & in_string,
     emp::vector<std::string> & out_set,
     const char delim='\n',
-    const size_t max_split=std::numeric_limits<size_t>::max()
+    const size_t max_split=std::numeric_limits<size_t>::max(),
+    const bool keep_quoted=false
   ) {
     const size_t test_size = in_string.size();
 
@@ -1045,7 +1047,11 @@ namespace emp {
     size_t out_count = 0;
     size_t pos = 0;
     while (pos < test_size && out_count <= max_split) {
-      while (pos < test_size && in_string[pos] != delim) pos++;
+      while (pos < test_size && in_string[pos] != delim) {
+        if (keep_quoted && (in_string[pos] == '"' || in_string[pos] == '\'')) {
+          pos = find_quote_end(in_string, pos, in_string[pos]);
+        } else pos++;
+      }
       pos++; // Skip over deliminator
       out_count++;  // Increment for each delim plus once at the end (so once if no delims).
     }
