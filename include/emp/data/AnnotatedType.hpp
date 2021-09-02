@@ -12,10 +12,11 @@
 #ifndef EMP_ANNOTATED_TYPE_H
 #define EMP_ANNOTATED_TYPE_H
 
-#include "emp/base/assert.hpp"
-#include "emp/data/DataMap.hpp"
-#include "emp/meta/TypeID.hpp"
-#include "emp/tools/string_utils.hpp"
+#include "../base/assert.hpp"
+#include "../meta/TypeID.hpp"
+#include "../tools/string_utils.hpp"
+
+#include "DataMap.hpp"
 
 namespace emp {
 
