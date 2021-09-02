@@ -272,12 +272,12 @@ TEST_CASE("Another Test string_utils", "[tools]")
 
   // Do some tests on quotes in strings...
   std::string quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";  // "abc""def"123 """long\"er"
-  CHECK( emp::find_quote_end(quotes) == 5 );
-  CHECK( emp::find_quote_end(quotes, 1) == 1 );
-  CHECK( emp::find_quote_end(quotes, 5) == 10 );
-  CHECK( emp::find_quote_end(quotes, 10) == 10 );
-  CHECK( emp::find_quote_end(quotes, 14) == 16 );
-  CHECK( emp::find_quote_end(quotes, 16) == 26 );
+  CHECK( emp::find_quote_match(quotes) == 4 );
+  CHECK( emp::find_quote_match(quotes, 1) == 1 );
+  CHECK( emp::find_quote_match(quotes, 5) == 9 );
+  CHECK( emp::find_quote_match(quotes, 10) == 10 );
+  CHECK( emp::find_quote_match(quotes, 14) == 15 );
+  CHECK( emp::find_quote_match(quotes, 16) == 25 );
 
   CHECK( emp::string_pop_quote(quotes) == "\"abc\"");
   CHECK( emp::string_pop_quote(quotes) == "\"def\"");
