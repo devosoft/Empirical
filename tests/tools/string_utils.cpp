@@ -329,6 +329,23 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( slice_view[3] == "view" );
   CHECK( slice_view[4] == "test!" );
 
+  std::string quoted_text = "This is \"text with quotes in it\" that we can \"divide up\" in different ways.";
+  slice_view = emp::view_slices(quoted_text, ' ');
+  CHECK( slice_view.size() == 15 );
+  CHECK( slice_view[0] == "This" );
+  CHECK( slice_view[1] == "is" );
+  CHECK( slice_view[2] == "\"text" );
+  CHECK( slice_view[3] == "with" );
+  CHECK( slice_view[4] == "quotes" );
+
+  slice_view = emp::view_slices(quoted_text, ' ', true); // Don't break up quotes!
+  CHECK( slice_view.size() == 10 );
+  CHECK( slice_view[0] == "This" );
+  CHECK( slice_view[1] == "is" );
+  CHECK( slice_view[2] == "\"text with quotes in it\"" );
+  CHECK( slice_view[3] == "that" );
+  CHECK( slice_view[4] == "we" );
+
 
   auto slices = emp::slice(
     "This is a test of a different version of slice.",
