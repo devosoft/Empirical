@@ -41,6 +41,8 @@
  *    -- SEARCHING --
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
+ *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results, bool ignore_quoted=false)
+ *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool ignore_quoted=false)
  * 
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
@@ -462,6 +464,24 @@ namespace emp {
     }
 
     return start_pos;
+  }
+
+  static inline void find_all(std::string_view in_string, char target,
+                              emp::vector<size_t> & results, const bool ignore_quoted=false) {
+    results.resize(0);
+    for (size_t pos=0; pos < in_string.size(); pos++) {
+      if (ignore_quoted && (in_string[pos] == '"' || in_string[pos] == '\'')) {
+        pos = find_quote_match(in_string, pos, in_string[pos]);
+      }
+      else if (in_string[pos] == target) results.push_back(pos);
+    }
+  }
+
+  static inline emp::vector<size_t> find_all(std::string_view in_string, char target,
+                                             bool ignore_quoted=false) {
+    emp::vector<size_t> out;
+    find_all(in_string, target, out, ignore_quoted);
+    return out;
   }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
