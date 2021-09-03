@@ -311,6 +311,16 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::find_paren_match(braces, 6, '{', '}') == 12 );  // Across single quotes
   CHECK( emp::find_paren_match(braces, 6, '{', '}', false) == 10 ); // Don't ignore quotes.
 
+  // Test a multi-find.
+  emp::vector<size_t> found = emp::find_all(view_test, ' ');
+  CHECK( found == emp::vector<size_t>{4,7,10,15} );
+  emp::find_all(view_test, 'i', found);
+  CHECK( found == emp::vector<size_t>{2,5,12} );
+  emp::find_all(parens, ')', found);
+  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,16,17,18,19,20,22,24} );
+  emp::find_all(parens, ')', found, true); // Ignore items in quotes.
+  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,24} );
+
   emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
   CHECK( slice_view.size() == 5 );
   CHECK( slice_view[0] == "This" );
