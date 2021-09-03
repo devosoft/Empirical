@@ -1049,17 +1049,17 @@ namespace emp {
   }
 
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
-  /// @param in_string operand
+  /// @param in_string string to be sliced
   /// @param out_set destination
   /// @param delim delimiter to split on
   /// @param max_split defines the maximum number of splits
-  /// @param keep_quoted Should quoted text be kept together?
+  /// @param preserve_quotes Should quoted text be kept together?
   static inline void slice(
     const std::string_view & in_string,
     emp::vector<std::string> & out_set,
     const char delim='\n',
     const size_t max_split=std::numeric_limits<size_t>::max(),
-    const bool keep_quoted=false
+    const bool preserve_quotes=false
   ) {
     const size_t test_size = in_string.size();
 
@@ -1068,7 +1068,7 @@ namespace emp {
     size_t pos = 0;
     while (pos < test_size && out_count <= max_split) {
       while (pos < test_size && in_string[pos] != delim) {
-        if (keep_quoted && (in_string[pos] == '"' || in_string[pos] == '\'')) {
+        if (preserve_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
           pos = find_quote_match(in_string, pos, in_string[pos]);
         }
         pos++;
@@ -1097,39 +1097,56 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  /// @param in_string operand
+  /// @param in_string string to be sliced
   /// @param delim delimiter to split on
   /// @param max_split defines the maximum number of splits
+  /// @param preserve_quotes Should quoted text be kept together?
   static inline emp::vector<std::string> slice(
     const std::string_view & in_string,
     const char delim='\n',
-    const size_t max_split=std::numeric_limits<size_t>::max()
+    const size_t max_split=std::numeric_limits<size_t>::max(),
+    const bool preserve_quotes=false
   ) {
     emp::vector<std::string> result;
-    slice(in_string, result, delim, max_split);
+    slice(in_string, result, delim, max_split, preserve_quotes);
     return result;
   }
 
   /// Create a set of string_views based on the provided delimiter; fill them in to the provided vector.
-  static inline void view_slices(const std::string_view & in_string,
-                                 emp::vector<std::string_view> & out_set,
-                                 char delim='\n') {
-    const size_t in_size = in_string.size();
+  /// @param in_string string to be sliced
+  /// @param out_set destination vector
+  /// @param delim delimiter to split on
+  /// @param preserve_quotes Should quoted text be kept together?
+  static inline void view_slices(
+    const std::string_view & in_string,
+    emp::vector<std::string_view> & out_set,
+    char delim='\n',
+    bool preserve_quotes=false
+  ) {
     out_set.resize(0);
-
-    size_t pos = 0;
-    while (pos < in_size) {
-      out_set.push_back( view_string_to(in_string, delim, pos) );
-      pos += out_set.back().size() + 1;
+    size_t start_pos = 0;
+    for (size_t pos=0; pos < in_string.size(); pos++) {
+      if (preserve_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
+        pos = find_quote_match(in_string, pos, in_string[pos]);
+      }
+      else if (in_string[pos] == delim) {  // Hit an end point!
+        out_set.push_back( view_string_range(in_string, start_pos, pos) );
+        start_pos = pos+1;
+      }
     }
 
+    // Include the final segment.
+    out_set.push_back( view_string_range(in_string, start_pos, in_string.size()) );
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  static inline emp::vector<std::string_view> view_slices(const std::string_view & in_string,
-                                                          char delim='\n') {
+  static inline emp::vector<std::string_view> view_slices(
+    const std::string_view & in_string,
+    char delim='\n',
+    bool preserve_quotes=false
+  ) {
     emp::vector<std::string_view> result;
-    view_slices(in_string, result, delim);
+    view_slices(in_string, result, delim, preserve_quotes);
     return result;
   }
 
