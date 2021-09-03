@@ -397,6 +397,16 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK(slices[3] == "t ");
 
 
+  std::string CSV_line = "123.5,\"Smith,John\",\"123 ABC Street\",single_token,\"a,b,c,d\",DONE.";
+  auto CSV_data = emp::ViewCSV(CSV_line);
+  CHECK(CSV_data.size() == 6);
+  CHECK(CSV_data[0] == "123.5");
+  CHECK(CSV_data[1] == "\"Smith,John\"");
+  CHECK(CSV_data[2] == "\"123 ABC Street\"");
+  CHECK(CSV_data[3] == "single_token");
+  CHECK(CSV_data[4] == "\"a,b,c,d\"");
+  CHECK(CSV_data[5] == "DONE.");
+
   // Test ViewNestedBlock
   std::string code = "abc(def(ghi(())j)k(lm(n))o)pq";
   CHECK(emp::ViewNestedBlock(code) == "");
