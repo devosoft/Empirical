@@ -13,7 +13,7 @@
 // and ToggleButtonGroups
 struct Test_Control_Panel : emp::web::BaseTest {
 /*
- * Creates extra div + the following control panel structure
+ * Creates the following control panel structure
  *    +------------------+------+-----+-------------------+  +---+---+---+  +--+
  *    | +------+-------+ |      |     | +------+--------+ |  |   |   |   |  |  |
  *    | | Play | Pause | | Step |  C  | | Auto | Manual | |  | D | A | B |  |  |
@@ -50,7 +50,7 @@ struct Test_Control_Panel : emp::web::BaseTest {
     });
     emp::prefab::ButtonGroup real{"real"};
     real << emp::web::Button([](){;}, "D", "d_button");
-    real.TakeChildren(husk);
+    real.TakeChildren(std::forward<ButtonGroup>(husk));
     cp << real;
     cp << husk;
 
