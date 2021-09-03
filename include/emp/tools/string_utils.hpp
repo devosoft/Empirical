@@ -94,10 +94,11 @@
  *
  *    -- OTHER MANIPULATIONS --
  *    std::string repeat(const std::string& value, const size_t n)
- *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set, const char delim='\n', [size_t max_split])
- *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n', [size_t max_split])
- *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set, char delim='\n')
- *    emp::vector<std::string_view> view_slices(const std::string_view & in_string, char delim='\n')
+ *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
+ *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
+ *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set, char delim='\n', bool preserve_quotes=false)
+ *    emp::vector<std::string_view> view_slices(const std::string_view & in_string, char delim='\n', bool preserve_quotes=false)
+ *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
  *    std::string_view ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
  *    std::string join_on(Range const& elements, const char *const delimiter)
  *    std::string to_string(...)
@@ -1150,6 +1151,9 @@ namespace emp {
     return result;
   }
 
+  static inline emp::vector<std::string_view> ViewCSV( const std::string_view & in_string ) {
+    return view_slices(in_string, ',', true);
+  }
 
   /// View a section of a string with the properly matching nested blocks.
   /// For example if ((abc(de))f(ghi)) would return "(abc(de))f(ghi)" at 0, "de" at 5, or
