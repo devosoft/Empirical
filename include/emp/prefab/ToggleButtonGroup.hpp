@@ -121,10 +121,6 @@ namespace internal {
      * the first button
      * @param deactivate_style a bootstrap style (primary, secondary, etc) for
      * the second button
-     * @param cassette_style whether the toggle should display in cassette style
-     * (both buttons visible) or do a swap on toggle (one button visible)
-     * @param grayout in cassette mode, whether buttons should be
-     * grayed out to further emphasize the current state
      * @param info_ref shared pointer containing presistent state
      */
     template<typename L1_TYPE, typename L2_TYPE>
@@ -133,8 +129,6 @@ namespace internal {
       L2_TYPE && deactivate_indicator,
       const std::string & activate_style,
       const std::string & deactivate_style,
-      bool cassette_style,
-      bool grayout,
       web::internal::DivInfo * info_ref
     ) : ButtonGroup(info_ref)
     {
@@ -146,12 +140,6 @@ namespace internal {
       web::Element deactivate_label("label", emp::to_string(GetID(), "_deactivate"));
       *this << activate_label;
       *this << deactivate_label;
-
-      if (!cassette_style) {
-        AddAttr("class", "hide_inactive");
-      } else if (grayout) {
-        AddAttr("class", "grayout");
-      }
 
       auto & on_toggle = Info()->GetCallback();
 
@@ -204,10 +192,6 @@ namespace internal {
      * the first button
      * @param deactivate_style a bootstrap style (primary, secondary, etc) for
      * the second button
-     * @param cassette_style whether the toggle should display in cassette style
-     * (both buttons visible) or do a swap on toggle (one button visible)
-     * @param grayout whether a grayscale filter should be used to further
-     * emphasize which button has been pressed
      * @param in_id HTML ID of ToggleButtonGroup div
      */
     template<typename LABEL1_TYPE, typename LABEL2_TYPE>
@@ -216,14 +200,11 @@ namespace internal {
       LABEL2_TYPE && deactivate_indicator,
       const std::string & activate_style="success",
       const std::string & deactivate_style="warning",
-      const bool & cassette_style=true,
-      const bool & grayout=false,
       const std::string & in_id=""
     ) : ToggleButtonGroup(
       std::forward<LABEL1_TYPE>(activate_indicator),
       std::forward<LABEL2_TYPE>(deactivate_indicator),
       activate_style, deactivate_style,
-      cassette_style, grayout,
       new internal::ToggleButtonGroupInfo(in_id)
     ) { ; }
 
@@ -235,10 +216,16 @@ namespace internal {
       return Info()->IsActive();
     }
 
+    /**
+     * Sets the state of the toggle to active.
+     */
     void SetActive() {
       Info()->SetActive();
     }
 
+    /**
+     * Sets the state of the toggle to inactive.
+     */
     void SetInactive() {
       Info()->SetInactive();
     }
@@ -250,6 +237,23 @@ namespace internal {
      */
     ToggleButtonGroup & SetCallback(const on_toggle_t & cb) {
       Info()->UpdateCallback(cb);
+      return (*this);
+    }
+
+    /**
+     * Change styling from cassette style (buttons side-by-side) to single
+     * button style so that button will swap between the two indicators.
+     */
+    ToggleButtonGroup & Compress() {
+      AddAttr("class", "hide_inactive");
+      return (*this);
+    }
+
+    /**
+     * Add a grayscale filter to further emphasize the current state of the toggle.
+     */
+    ToggleButtonGroup & Grayout() {
+      AddAttr("class", "grayout");
       return (*this);
     }
   };

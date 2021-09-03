@@ -12,8 +12,7 @@ struct Test_Toggle_Button_Group : emp::web::BaseTest {
   : BaseTest({"emp_test_container"}) {
     emp::prefab::ToggleButtonGroup icon_and_string(
       emp::prefab::FontAwesomeIcon{"fa-play"}, "Pause",
-      "primary", "secondary",
-      true, false, "icon_and_string"
+      "primary", "secondary", "icon_and_string"
     );
     Doc("emp_test_container") << icon_and_string;
   }

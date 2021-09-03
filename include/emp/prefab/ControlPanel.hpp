@@ -54,12 +54,12 @@ namespace internal {
      */
     class RefreshChecker {
       protected:
-      int rate;
+      int rate = 0;
       public:
-      RefreshChecker(int r) { rate = r; }
       virtual bool operator()(const web::Animate &) {
+        std::cout << "Base" << std::endl;
         return true;
-      }
+      };
       void SetRate(int r) {
         rate = r;
       }
@@ -67,12 +67,12 @@ namespace internal {
     };
 
     // ControlPanelInfo holds contains two specific instances of a
-    // RefreshChecker for milliseconds and frames to keep rates independent
-    // for each.
+    // RefreshChecker for milliseconds and frames to keep independent rates
+    // for both.
     class : public RefreshChecker {
-      using RefreshChecker::RefreshChecker;
+      public:
       int elapsed_milliseconds = 0;
-      bool operator()(const web::Animate & anim) {
+      bool operator()(const web::Animate & anim) override {
         elapsed_milliseconds += anim.GetStepTime();
           if (elapsed_milliseconds > rate) {
             elapsed_milliseconds -= rate;
@@ -81,21 +81,21 @@ namespace internal {
           }
           return false;
       }
-    } millisecond_refresher{100};
+    } millisecond_refresher;
     class : public RefreshChecker {
-      using RefreshChecker::RefreshChecker;
-      bool operator()(const web::Animate & anim) {
+      public:
+      bool operator()(const web::Animate & anim) override {
         return anim.GetFrameCount() % rate;
       }
-    } frame_refresher{5};
+    } frame_refresher;
 
     // The current redraw checker function
-    RefreshChecker should_redraw;
+    RefreshChecker & should_redraw;
 
     // A list of widget that should be redrawn when do_redraw return true
     emp::vector<web::Widget> refresh_list;
 
-    // A function to run every frame (as fast as possible)
+    // A void callback function to run every frame (as fast as possible)
     std::function<void()> step_callback;
 
     /**
@@ -139,15 +139,6 @@ namespace internal {
      */
     emp::vector<web::Widget> & GetRefreshList() {
       return refresh_list;
-    }
-
-    public:
-    /**
-     * Set the redraw checker function
-     * @param check a redraw checker
-     */
-    void SetRefreshChecker(const RefreshChecker & check) {
-      should_redraw = check;
     }
 
     /**
@@ -224,7 +215,6 @@ namespace internal {
     toggle_run{
       FontAwesomeIcon{"fa-play"}, FontAwesomeIcon{"fa-pause"},
       "success", "warning",
-      true, false,
       emp::to_string(GetID(), "_main_toggle")
     },
     button_line(ButtonGroup{emp::to_string(GetID(), "_main")}),
@@ -342,15 +332,6 @@ namespace internal {
     void SetRefreshRate(const int & rate, const std::string & units) {
       SetRefreshUnit(units);
       SetRefreshRate(rate);
-    }
-    /**
-     * Give the control panel a custom method to determine what frames to
-     * refresh on.
-     * @param check an instance of a RefreshChecker
-     */
-    ControlPanel & SetRefreshChecker(const RefreshChecker & check) {
-      Info()->SetRefreshChecker(check);
-      return *this;
     }
 
     /**
