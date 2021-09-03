@@ -57,7 +57,6 @@ namespace internal {
       int rate = 0;
       public:
       virtual bool operator()(const web::Animate &) {
-        std::cout << "Base" << std::endl;
         return true;
       };
       void SetRate(int r) {
