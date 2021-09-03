@@ -4,14 +4,20 @@
  *  @date 2021
  *
  *  @file  ControlPanel.hpp
- *  @brief A ControlPanel manages ...
+ *  @brief A ControlPanel manages a container for buttons and an Animate instance
+ *  that can run a callback function every frame and redraw a list of Widgets
+ *  based on frames or milliseconds elapsed and a specified rate.
+ *
+ *  @todo The default control panel should eventually contain a select element
+ *  to choose the rate unit and a numeric input for the rate. The two rates
+ *  should be independent so that changing the unit to e.g. FRAMES will change
+ *  the input to the FRAMES rate.
  */
 
 #ifndef EMP_CONTROL_PANEL_HPP
 #define EMP_CONTROL_PANEL_HPP
 
 #include <functional>
-#include <unordered_map>
 #include <utility>
 
 #include "emp/base/optional.hpp"
