@@ -70,6 +70,58 @@ namespace emp {
     operator const std::string &() const { return lexeme; }
   };
 
+  class TokenStream {
+  private:
+    emp::vector<Token> tokens;
+
+  public:
+    TokenStream() = default;
+    TokenStream(const TokenStream &) = default;
+    TokenStream(TokenStream &&) = default;
+    TokenStream(const emp::vector<Token> & in_tokens) : tokens(in_tokens) { }
+
+    TokenStream & operator=(const TokenStream &) = default;
+    TokenStream & operator=(TokenStream &&) = default;
+
+    class Iterator {
+    private:
+      emp::Ptr<const TokenStream> ts;
+      size_t pos;
+
+    public:
+      Iterator(const Iterator &) = default;
+      Iterator(const TokenStream & in_ts, size_t in_pos) : ts(&in_ts), pos(in_pos) { }
+      Iterator & operator=(const Iterator &) = default;
+
+      const TokenStream & GetTokenStream() const { return *ts; }
+      size_t GetIndex() const { return pos; }
+      emp::Ptr<const Token> ToPtr() const { return &(ts->Get(pos)); }
+
+      Token operator*() const { return ts->tokens[pos]; }
+      const Token * operator->() const { return &(ts->tokens[pos]); }
+
+      bool operator==(const Iterator & in) const { return ToPtr() == in.ToPtr(); }
+      bool operator!=(const Iterator & in) const { return ToPtr() != in.ToPtr(); }
+      bool operator< (const Iterator & in) const { return ToPtr() <  in.ToPtr(); }
+      bool operator<=(const Iterator & in) const { return ToPtr() <= in.ToPtr(); }
+      bool operator> (const Iterator & in) const { return ToPtr() >  in.ToPtr(); }
+      bool operator>=(const Iterator & in) const { return ToPtr() >= in.ToPtr(); }
+
+      Iterator & operator++() { ++pos; return *this; }
+      Iterator operator++(int) { Iterator old(*this); ++pos; return old; }
+      Iterator & operator--() { --pos; return *this; }
+      Iterator operator--(int) { Iterator old(*this); --pos; return old; }
+
+      bool IsValid() const { return pos < ts->size(); }
+    };
+
+    size_t size() const { return tokens.size(); }
+    const Token & Get(size_t pos) const { return tokens[pos]; }
+    Iterator begin() const { return Iterator(*this, 0); }
+    Iterator end() const { return Iterator(*this, tokens.size()); }
+  };
+
+
   /// A lexer with a set of token types (and associated regular expressions)
   class Lexer {
   private:
@@ -208,7 +260,7 @@ namespace emp {
     }
 
     /// Turn an input stream of text into a vector of tokens.
-    emp::vector<Token> Tokenize(std::istream & is) {
+    TokenStream Tokenize(std::istream & is) {
       emp::vector<Token> out_tokens;
       size_t cur_line = 1;
       emp::Token token = Process(is);
@@ -222,14 +274,14 @@ namespace emp {
     }
 
     /// Turn an input string into a vector of tokens.
-    emp::vector<Token> Tokenize(const std::string & str) {
+    TokenStream Tokenize(const std::string & str) {
       std::stringstream ss;
       ss << str;
       return Tokenize(ss);
     }
 
     /// Turn a vector of strings into a vector of tokens.
-    emp::vector<Token> Tokenize(const emp::vector<std::string> & str_v) {
+    TokenStream Tokenize(const emp::vector<std::string> & str_v) {
       std::stringstream ss;
       for (auto & str : str_v) {
         ss << str;
