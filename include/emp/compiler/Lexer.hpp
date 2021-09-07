@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
+ *  @date 2016-2021.
  *
  *  @file  Lexer.hpp
  *  @brief A general-purpose, fast lexer.
@@ -11,6 +11,7 @@
 #ifndef EMP_LEXER_H
 #define EMP_LEXER_H
 
+#include <iostream>
 #include <map>
 #include <string>
 
@@ -119,6 +120,13 @@ namespace emp {
     const Token & Get(size_t pos) const { return tokens[pos]; }
     Iterator begin() const { return Iterator(*this, 0); }
     Iterator end() const { return Iterator(*this, tokens.size()); }
+
+    void Print(std::ostream & os=std::cout) const {
+      for (auto x : tokens) {
+        os << " [" << x.lexeme << "]";
+      }
+      os << std::endl;
+    }
   };
 
 
@@ -133,7 +141,7 @@ namespace emp {
     int cur_token_id = MAX_ID;              ///< Which ID should the next new token get?
     mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
-    std::string lexeme;                     ///< Current state of lexeme being generated.
+    mutable std::string lexeme;             ///< Current state of lexeme being generated.
 
     const TokenInfo ERROR_TOKEN{"", "", ERROR_ID, true, true, "Unable to parse input!"};
 
@@ -209,7 +217,7 @@ namespace emp {
     /// longest one we can find.)  Every time we do hit a valid lexeme, store it as the current
     /// "best" and keep going.  Once we hit a point where no other valid lexemes are possible,
     /// stop and return the best we've found so far.
-    Token Process(std::istream & is) {
+    Token Process(std::istream & is) const {
       // If we still need to generate the DFA for the lexer, do so.
       if (generate_lexer) Generate();
 
@@ -251,7 +259,7 @@ namespace emp {
     }
 
     /// Shortcut to process a string rather than a stream.
-    Token Process(std::string & in_str) {
+    Token Process(std::string & in_str) const {
       std::stringstream ss;
       ss << in_str;
       auto out_val = Process(ss);
@@ -260,7 +268,7 @@ namespace emp {
     }
 
     /// Turn an input stream of text into a vector of tokens.
-    TokenStream Tokenize(std::istream & is) {
+    TokenStream Tokenize(std::istream & is) const {
       emp::vector<Token> out_tokens;
       size_t cur_line = 1;
       emp::Token token = Process(is);
@@ -274,14 +282,14 @@ namespace emp {
     }
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(const std::string & str) {
+    TokenStream Tokenize(const std::string & str) const {
       std::stringstream ss;
       ss << str;
       return Tokenize(ss);
     }
 
     /// Turn a vector of strings into a vector of tokens.
-    TokenStream Tokenize(const emp::vector<std::string> & str_v) {
+    TokenStream Tokenize(const emp::vector<std::string> & str_v) const {
       std::stringstream ss;
       for (auto & str : str_v) {
         ss << str;
@@ -291,7 +299,7 @@ namespace emp {
     }
 
     /// Get the lexeme associated with the last token identified.
-    const std::string & GetLexeme() { return lexeme; }
+    const std::string & GetLexeme() const { return lexeme; }
 
     /// Print the full information about this lexer (for debugging)
     void Print(std::ostream & os=std::cout) const {
@@ -301,7 +309,7 @@ namespace emp {
     }
 
     /// Try out the lexer on a string and demonstrate how it's tokenized.
-    void DebugString(std::string test_string) {
+    void DebugString(std::string test_string) const {
       std::stringstream ss;
       ss << test_string;
 
