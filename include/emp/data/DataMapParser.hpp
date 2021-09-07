@@ -13,9 +13,11 @@
 
 #include <string>
 
+#include "../base/error.hpp"
+#include "../compiler/Lexer.hpp"
+
 #include "AnnotatedType.hpp"
 #include "DataMap.hpp"
-#include "../compiler/Lexer.hpp"
 
 namespace emp {
   struct DataMapParser {
@@ -76,7 +78,7 @@ namespace emp {
 
         // Symbols should have least priority.  They include any solitary character not listed
         // above, or pre-specified multi-character groups.
-        token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"&&\"|\"||\"|\"++\"|\"--\"");
+        token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
       }
 
       bool IsID(const emp::Token token) const noexcept { return token.token_id == token_identifier; }
@@ -93,12 +95,17 @@ namespace emp {
 
     struct ValueType {
       enum type_t { VALUE, FUNCTION };
+
       type_t type;
       double value;
       value_fun_t fun;
 
       ValueType(double in_val) : type(VALUE), value(in_val) { }
       ValueType(value_fun_t in_fun) : type(FUNCTION), fun(in_fun) { }
+
+      ValueType & operator=(const ValueType &) = default;
+      ValueType & operator=(double in_val) { type = VALUE; value = in_val; return *this; }
+      ValueType & operator=(value_fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
     };
 
     /// Helpers for parsing.
@@ -109,7 +116,8 @@ namespace emp {
 
       // Test if we should NEGATE!
       if (pos->lexeme == "-") {
-        pos++;
+        if constexpr (verbose) std::cout << "Found: UNARY NEGATION" << std::endl;
+        ++pos;
         ValueType val = ParseValue(dm, pos);
         if (val.type == ValueType::VALUE) { return -val.value; }
         else { return (value_fun_t) [fun=val.fun](emp::DataMap & dm){ return -fun(dm); }; }
@@ -117,21 +125,26 @@ namespace emp {
 
       // Test if we should NOT!
       if (pos->lexeme == "!") {
-        pos++;
+        if constexpr (verbose) std::cout << "Found: UNARY NOT" << std::endl;
+        ++pos;
         ValueType val = ParseValue(dm, pos);
         if (val.type == ValueType::VALUE) { return !val.value; }
         else { return (value_fun_t) [fun=val.fun](emp::DataMap & dm){ return !fun(dm); }; }
       }   
 
       // A unary PLUS does nothing...
-      if (pos->lexeme == "+") { pos++; return ParseValue(dm, pos); }
+      if (pos->lexeme == "+") {
+        if constexpr (verbose) std::cout << "Found: UNARY PLUS" << std::endl;
+        ++pos; return ParseValue(dm, pos);
+      }
 
       // If we have parentheses, process the contents
       if (pos->lexeme == "(") {
-        pos++;
+        if constexpr (verbose) std::cout << "Found: OPEN PAREN" << std::endl;
+        ++pos;
         ValueType val = ParseMath(dm, pos);
-        // @CAO: Should make sure the close is another paren...
-        pos++;
+        emp_assert(pos->lexeme == ")");
+        ++pos;
         return val;
       }
 
@@ -143,7 +156,7 @@ namespace emp {
       }
 
       // Otherwise it should be in the datamap!
-      emp_assert(dm.HasName(pos->lexeme));
+      emp_assert(dm.HasName(pos->lexeme), pos->lexeme);
       size_t id = dm.GetID(pos->lexeme);
       ++pos;
       return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
@@ -162,15 +175,18 @@ namespace emp {
       }
 
       while (pos.IsValid() && pos->lexeme != ")") {
+        if constexpr (verbose) {
+          std::cout << "...Scanning for operator... [" << pos->lexeme << "]" << std::endl;
+        }
 
         // Exponetiation
         if (pos->lexeme == "**") {
           if constexpr (verbose) std::cout << "Found: EXPONENTIATION" << std::endl;
           if (prec_limit >= Prec::POW_LOG) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::POW_LOG);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return emp::Pow(val1.value, val2.value); }
+            if (val2.type == ValueType::VALUE) { val1 = emp::Pow(val1.value, val2.value); }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return emp::Pow(val1_num, val2_fun(dm));
@@ -193,10 +209,10 @@ namespace emp {
         else if (pos->lexeme == "%%") {
           if constexpr (verbose) std::cout << "Found: LOG" << std::endl;
           if (prec_limit >= Prec::POW_LOG) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::POW_LOG);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return emp::Log(val1.value, val2.value); }
+            if (val2.type == ValueType::VALUE) { val1 = emp::Log(val1.value, val2.value); }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return emp::Log(val1_num, val2_fun(dm));
@@ -219,10 +235,10 @@ namespace emp {
         else if (pos->lexeme == "*") {
           if constexpr (verbose) std::cout << "Found: MULTIPLY" << std::endl;
           if (prec_limit >= Prec::MULTIPLY) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::MULTIPLY);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return val1.value * val2.value; }
+            if (val2.type == ValueType::VALUE) { val1 = val1.value * val2.value; }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return val1_num * val2_fun(dm);
@@ -245,10 +261,10 @@ namespace emp {
         else if (pos->lexeme == "/") {
           if constexpr (verbose) std::cout << "Found: DIVIDE" << std::endl;
           if (prec_limit >= Prec::MULTIPLY) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::MULTIPLY);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return val1.value / val2.value; }
+            if (val2.type == ValueType::VALUE) { val1 = val1.value / val2.value; }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return val1_num / val2_fun(dm);
@@ -271,10 +287,10 @@ namespace emp {
         else if (pos->lexeme == "%") {
           if constexpr (verbose) std::cout << "Found: MODULUS" << std::endl;
           if (prec_limit >= Prec::MULTIPLY) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::MULTIPLY);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return emp::Mod(val1.value, val2.value); }
+            if (val2.type == ValueType::VALUE) { val1 = emp::Mod(val1.value, val2.value); }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return emp::Mod(val1_num, val2_fun(dm));
@@ -297,10 +313,10 @@ namespace emp {
         else if (pos->lexeme == "+") {
           if constexpr (verbose) std::cout << "Found: ADDITION" << std::endl;
           if (prec_limit >= Prec::PLUS_MINUS) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::PLUS_MINUS);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return val1.value + val2.value; }
+            if (val2.type == ValueType::VALUE) { val1 = val1.value + val2.value; }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return val1_num + val2_fun(dm);
@@ -323,10 +339,10 @@ namespace emp {
         else if (pos->lexeme == "-") {
           if constexpr (verbose) std::cout << "Found: SUBTRACTION" << std::endl;
           if (prec_limit >= Prec::PLUS_MINUS) return val1;
-          pos++;
+          ++pos;
           ValueType val2 = ParseMath(dm, pos, Prec::PLUS_MINUS);
           if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { return val1.value - val2.value; }
+            if (val2.type == ValueType::VALUE) { val1 = val1.value - val2.value; }
             else {
               val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
                 return val1_num - val2_fun(dm);
@@ -350,6 +366,8 @@ namespace emp {
         // EQUALITY,   // Equality tests: x == y, x != y
         // AND,        // And: x && y
         // OR,         // Or: x || y
+
+        else emp_error("No operator [", pos->lexeme, "] found!");
       }
 
       // @CAO Make sure there's not a illegal lexeme here.
