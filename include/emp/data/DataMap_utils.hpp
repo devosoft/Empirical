@@ -140,16 +140,16 @@ namespace DataMapUtils {
     return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
   }
 
-  ValueType ParseMath(const DataMap & dm, pos_t & pos, Prec min_prec=Prec::UNKNOWN) {
+  ValueType ParseMath(const DataMap & dm, pos_t & pos, Prec prec_limit=Prec::UNKNOWN) {
     ValueType val1 = ParseValue(dm, pos);
 
     if (!pos.IsValid() || pos->lexeme == ")") return val1;
 
     // Exponetiation
     if (pos->lexeme == "**") {
-      if (min_prec > Prec::POW_LOG) return val1;
+      if (prec_limit >= Prec::POW_LOG) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::POW_LOG);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return emp::Pow(val1.value, val2.value); }
         else {
@@ -172,9 +172,9 @@ namespace DataMapUtils {
 
     // Log!
     if (pos->lexeme == "%%") {
-      if (min_prec > Prec::POW_LOG) return val1;
+      if (prec_limit >= Prec::POW_LOG) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::POW_LOG);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return emp::Log(val1.value, val2.value); }
         else {
@@ -197,9 +197,9 @@ namespace DataMapUtils {
 
     // Multiply!
     if (pos->lexeme == "*") {
-      if (min_prec > Prec::MULTIPLY) return val1;
+      if (prec_limit >= Prec::MULTIPLY) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::MULTIPLY);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value * val2.value; }
         else {
@@ -222,9 +222,9 @@ namespace DataMapUtils {
 
     // Divide!
     if (pos->lexeme == "/") {
-      if (min_prec > Prec::MULTIPLY) return val1;
+      if (prec_limit >= Prec::MULTIPLY) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::MULTIPLY);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value / val2.value; }
         else {
@@ -247,9 +247,9 @@ namespace DataMapUtils {
 
     // Remainder!
     if (pos->lexeme == "%") {
-      if (min_prec > Prec::MULTIPLY) return val1;
+      if (prec_limit >= Prec::MULTIPLY) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::MULTIPLY);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return emp::Mod(val1.value, val2.value); }
         else {
@@ -272,9 +272,9 @@ namespace DataMapUtils {
 
     // Addition!
     if (pos->lexeme == "*") {
-      if (min_prec > Prec::PLUS_MINUS) return val1;
+      if (prec_limit >= Prec::PLUS_MINUS) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::PLUS_MINUS);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value + val2.value; }
         else {
@@ -297,9 +297,9 @@ namespace DataMapUtils {
 
     // Subtraction!
     if (pos->lexeme == "-") {
-      if (min_prec > Prec::PLUS_MINUS) return val1;
+      if (prec_limit >= Prec::PLUS_MINUS) return val1;
       pos++;
-      ValueType val2 = ParseValue(dm, pos);
+      ValueType val2 = ParseMath(dm, pos, Prec::PLUS_MINUS);
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value - val2.value; }
         else {
@@ -336,6 +336,15 @@ namespace DataMapUtils {
   auto BuildMathFunction(const DataMap & dm, const std::string & fun_info) {
     emp::TokenStream tokens = GetDataMapLexer().Tokenize(fun_info);
     pos_t pos = tokens.begin();
+    ValueType val = ParseMath(dm, pos);
+
+    // If this value is fixed, turn it into a function.
+    if (val.type = ValueType::VALUE) {
+      return (value_fun_t) [out=val.value](emp::DataMap &){ return out; };
+    }
+
+    // Otherwise return the function produced.
+    return val.fun;
   }
 
 }
