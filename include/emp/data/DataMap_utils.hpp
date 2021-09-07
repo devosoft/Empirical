@@ -153,18 +153,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return emp::Pow(val1.value, val2.value); }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return emp::Pow(base, exp_fun(dm));
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return emp::Pow(val1_num, val2_fun(dm));
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return emp::Pow(base_fun(dm), exp);
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return emp::Pow(val1_fun(dm), val2_num);
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return emp::Pow(base_fun(dm), exp_fun(dm));
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return emp::Pow(val1_fun(dm), val2_fun(dm));
           };
         }
       }
@@ -178,18 +178,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return emp::Log(val1.value, val2.value); }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return emp::Log(base, exp_fun(dm));
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return emp::Log(val1_num, val2_fun(dm));
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return emp::Log(base_fun(dm), exp);
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return emp::Log(val1_fun(dm), val2_num);
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return emp::Log(base_fun(dm), exp_fun(dm));
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return emp::Log(val1_fun(dm), val2_fun(dm));
           };
         }
       }
@@ -203,18 +203,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value * val2.value; }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return base * exp_fun(dm);
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_num * val2_fun(dm);
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return base_fun(dm) * exp;
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return val1_fun(dm) * val2_num;
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return base_fun(dm) * exp_fun(dm);
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_fun(dm) * val2_fun(dm);
           };
         }
       }
@@ -228,18 +228,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value / val2.value; }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return base / exp_fun(dm);
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_num / val2_fun(dm);
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return base_fun(dm) / exp;
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return val1_fun(dm) / val2_num;
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return base_fun(dm) / exp_fun(dm);
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_fun(dm) / val2_fun(dm);
           };
         }
       }
@@ -253,18 +253,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return emp::Mod(val1.value, val2.value); }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return emp::Mod(base, exp_fun(dm));
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return emp::Mod(val1_num, val2_fun(dm));
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return emp::Mod(base_fun(dm), exp);
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return emp::Mod(val1_fun(dm), val2_num);
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return emp::Mod(base_fun(dm), exp_fun(dm));
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return emp::Mod(val1_fun(dm), val2_fun(dm));
           };
         }
       }
@@ -278,18 +278,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value + val2.value; }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return base + exp_fun(dm);
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_num + val2_fun(dm);
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return base_fun(dm) + exp;
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return val1_fun(dm) + val2_num;
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return base_fun(dm) + exp_fun(dm);
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_fun(dm) + val2_fun(dm);
           };
         }
       }
@@ -303,18 +303,18 @@ namespace DataMapUtils {
       if (val1.type == ValueType::VALUE) {
         if (val2.type == ValueType::VALUE) { return val1.value - val2.value; }
         else {
-          return (value_fun_t) [base=val1.value,exp_fun=val2.fun](emp::DataMap & dm){
-            return base - exp_fun(dm);
+          return (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_num - val2_fun(dm);
           };
         }
       } else {
         if (val2.type == ValueType::VALUE) {
-          return (value_fun_t) [base_fun=val1.fun,exp=val2.value](emp::DataMap & dm){
-            return base_fun(dm) - exp;
+          return (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value](emp::DataMap & dm){
+            return val1_fun(dm) - val2_num;
           };
         } else {
-          return (value_fun_t) [base_fun=val1.fun,exp_fun=val2.fun](emp::DataMap & dm){
-            return base_fun(dm) - exp_fun(dm);
+          return (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun](emp::DataMap & dm){
+            return val1_fun(dm) - val2_fun(dm);
           };
         }
       }
