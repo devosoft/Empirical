@@ -18,9 +18,53 @@ TEST_CASE("Test DataMap", "[data]")
   dmB.Get<int>("val3") = 4;
   dmB.Get<char>("char") = '%';
 
-  auto fun = emp::DataMapParser::BuildMathFunction(dmA, "5 * 5");
-  CHECK( fun(dmA) == 25.0 );
-  CHECK( fun(dmB) == 25.0 );
+  // Test a bunch of constant math.
+  auto fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 + 4");
+  CHECK( fun(dmA) == 9.5 );
+  CHECK( fun(dmB) == 9.5 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 - 4");
+  CHECK( fun(dmA) == 1.5 );
+  CHECK( fun(dmB) == 1.5 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 * 4");
+  CHECK( fun(dmA) == 22.0 );
+  CHECK( fun(dmB) == 22.0 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 / 4");
+  CHECK( fun(dmA) == 1.375 );
+  CHECK( fun(dmB) == 1.375 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 % 4");
+  CHECK( fun(dmA) == 1.5 );
+  CHECK( fun(dmB) == 1.5 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 ** 4");
+  CHECK( fun(dmA) == 915.0625 );
+  CHECK( fun(dmB) == 915.0625 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "30.25 ** 0.5");
+  CHECK( fun(dmA) == 5.5 );
+  CHECK( fun(dmB) == 5.5 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "64 %% 4");
+  CHECK( fun(dmA) == 3.0 );
+  CHECK( fun(dmB) == 3.0 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "1 + 2 * 2");
+  CHECK( fun(dmA) == 5.0 );
+  CHECK( fun(dmB) == 5.0 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "(1+2) * 2");
+  CHECK( fun(dmA) == 6.0 );
+  CHECK( fun(dmB) == 6.0 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "(3*3 + 4**2) ** 0.5");
+  CHECK( fun(dmA) == 5.0 );
+  CHECK( fun(dmB) == 5.0 );
+
+
+  // Now, try to use these with variables!
 
   fun = emp::DataMapParser::BuildMathFunction(dmA, "val1 + val2 + 2*val3");
   CHECK( fun(dmA) == 9.5 );
