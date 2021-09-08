@@ -50,6 +50,7 @@ namespace emp {
       int token_number;       ///< Token id for literal numbers
       int token_string;       ///< Token id for literal strings
       int token_char;         ///< Token id for literal characters
+      int token_external;     ///< Token id for strings to be evaluated externally.
       int token_symbol;       ///< Token id for other symbols
 
     public:
@@ -75,6 +76,23 @@ namespace emp {
         // A literal char must begin and end with a single quote.  It will always be treated as
         // its ascii value.
         token_char = AddToken("Literal Character", "'([^'\n\\\\]|\\\\.)+'");
+
+        // Setup a RegEx that can detect up to 4-deep nested parentheses.
+        const std::string no_parens = "[^()\n\r]*";
+        const std::string open = "\"(\"";
+        const std::string close = "\")\"";
+        const std::string matched_parens = open + no_parens + close;
+        const std::string multi_parens = no_parens + "("s + matched_parens + no_parens + ")*"s;
+        const std::string nested_parens2 = open + multi_parens + close;
+        const std::string multi_nested2 = no_parens + "("s + nested_parens2 + no_parens + ")*"s;
+        const std::string nested_parens3 = open + multi_nested2 + close;
+        const std::string multi_nested3 = no_parens + "("s + nested_parens3 + no_parens + ")*"s;
+        const std::string nested_parens4 = open + multi_nested3 + close;
+        const std::string multi_nested4 = no_parens + "("s + nested_parens4 + no_parens + ")*"s;
+
+        // An external value should be evaluated in a provided function.  If no such function
+        // exists, using it will be an error.
+        token_external = AddToken("External Evaluation", "\"$(\""s + multi_nested4 + "\")\""s);
 
         // Symbols should have least priority.  They include any solitary character not listed
         // above, or pre-specified multi-character groups.
