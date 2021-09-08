@@ -11,12 +11,15 @@ TEST_CASE("Test DataMap", "[data]")
   dmA.AddVar<double>("val2", 2.0);
   dmA.AddVar<int>("val3", 3);
   dmA.AddVar<char>("char", 'A');
+  dmA.AddVar<double>("val4", 256.0);
+  
 
   emp::DataMap dmB(dmA);
   dmB.Get<double>("val1") = 0.125;
   dmB.Get<double>("val2") = 64.25;
   dmB.Get<int>("val3") = 4;
   dmB.Get<char>("char") = '%';
+  dmB.Get<double>("val4") = 1024.0;
 
   // Test a bunch of constant math.
   auto fun = emp::DataMapParser::BuildMathFunction(dmA, "5.5 + 4");
@@ -89,4 +92,36 @@ TEST_CASE("Test DataMap", "[data]")
   fun = emp::DataMapParser::BuildMathFunction(dmA, "1.5*val3 - val1/0.5 - val2/64");
   CHECK( fun(dmA) == 1.46875 );
   CHECK( fun(dmB) == 4.74609375 );
+
+  // Pairs of variables with each operation
+
+  // 0.125, 64.25, 4, 1024.0;
+
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "val1*val2");
+  CHECK( fun(dmA) == 3.0 );
+  CHECK( fun(dmB) == 8.03125 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "val3/val1");
+  CHECK( fun(dmA) == 2.0 );
+  CHECK( fun(dmB) == 32.0 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "val2%val1");
+  CHECK( fun(dmA) == 0.5 );
+  CHECK( fun(dmB) == 0.0 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "val1**val3");
+  CHECK( fun(dmA) == 3.375 );
+  CHECK( fun(dmB) == 0.000244140625 );
+
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "val4%%(val3*2-4)");
+  CHECK( fun(dmA) == 8.0 );
+  CHECK( fun(dmB) == 5.0 );
+
+  // ...and all together now...
+  fun = emp::DataMapParser::BuildMathFunction(dmA, "val1*val2 + val3/val1 + val2%val1 + val1**val3 - val4%%(val3*2-4)");
+
+  CHECK( fun(dmA) == 0.875 );
+  CHECK( fun(dmB) == 35.031494140625 );
+
 }
