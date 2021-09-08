@@ -20,7 +20,7 @@
 #include "DataMap.hpp"
 
 namespace emp {
-  struct DataMapParser {
+  class DataMapParser {
 
     using value_fun_t = std::function<double(emp::DataMap &)>;
     using pos_t = emp::TokenStream::Iterator;
@@ -89,11 +89,6 @@ namespace emp {
       bool IsSymbol(const emp::Token token) const noexcept { return token.token_id == token_symbol; }
     };
 
-    static const DataMapLexer & GetDataMapLexer() {
-      static DataMapLexer dm_lexer;
-      return dm_lexer;
-    }
-
     struct ValueType {
       enum type_t { VALUE, FUNCTION };
 
@@ -116,33 +111,33 @@ namespace emp {
       void Set(size_t in_prec, fun_t in_fun) { prec = in_prec; fun = in_fun; }
     };
 
-    // Create map of binary operators to the functions they should call.
-    static const std::map<std::string, BinaryOperator> & GetBinaryOperators() {
-      static std::map<std::string, BinaryOperator> ops;
-      if (ops.size() == 0) {
-        size_t prec = 0;  // Precedence level of each operator...
-        ops["||"].Set( ++prec, [](double x, double y){ return (x!=0.0)||(y!=0.0); } );
-        ops["&&"].Set( ++prec, [](double x, double y){ return (x!=0.0)&&(y!=0.0); } );
-        ops["=="].Set( ++prec, [](double x, double y){ return x == y; } );
-        ops["!="].Set(   prec, [](double x, double y){ return x != y; } );
-        ops["<"] .Set( ++prec, [](double x, double y){ return x < y; } );
-        ops["<="].Set(   prec, [](double x, double y){ return x <= y; } );
-        ops[">"] .Set(   prec, [](double x, double y){ return x > y; } );
-        ops[">="].Set(   prec, [](double x, double y){ return x >= y; } );
-        ops["+"] .Set( ++prec, [](double x, double y){ return x + y; } );
-        ops["-"] .Set(   prec, [](double x, double y){ return x - y; } );
-        ops["*"] .Set( ++prec, [](double x, double y){ return x * y; } );
-        ops["/"] .Set(   prec, [](double x, double y){ return x / y; } );
-        ops["%"] .Set(   prec, [](double x, double y){ return emp::Mod(x, y); } );
-        ops["**"].Set( ++prec, [](double x, double y){ return emp::Pow(x, y); } );
-        ops["%%"].Set(   prec, [](double x, double y){ return emp::Log(x, y); } );
-      }
+    // --------- MEMBER VARIABLES -----------
+    DataMapLexer lexer;
+    std::unordered_map<std::string, BinaryOperator> binary_ops;
 
-      return ops;
+  public:
+    DataMapParser() {
+      // Setup the default binary operators for the parser.
+      size_t prec = 0;  // Precedence level of each operator...
+      binary_ops["||"].Set( ++prec, [](double x, double y){ return (x!=0.0)||(y!=0.0); } );
+      binary_ops["&&"].Set( ++prec, [](double x, double y){ return (x!=0.0)&&(y!=0.0); } );
+      binary_ops["=="].Set( ++prec, [](double x, double y){ return x == y; } );
+      binary_ops["!="].Set(   prec, [](double x, double y){ return x != y; } );
+      binary_ops["<"] .Set( ++prec, [](double x, double y){ return x < y; } );
+      binary_ops["<="].Set(   prec, [](double x, double y){ return x <= y; } );
+      binary_ops[">"] .Set(   prec, [](double x, double y){ return x > y; } );
+      binary_ops[">="].Set(   prec, [](double x, double y){ return x >= y; } );
+      binary_ops["+"] .Set( ++prec, [](double x, double y){ return x + y; } );
+      binary_ops["-"] .Set(   prec, [](double x, double y){ return x - y; } );
+      binary_ops["*"] .Set( ++prec, [](double x, double y){ return x * y; } );
+      binary_ops["/"] .Set(   prec, [](double x, double y){ return x / y; } );
+      binary_ops["%"] .Set(   prec, [](double x, double y){ return emp::Mod(x, y); } );
+      binary_ops["**"].Set( ++prec, [](double x, double y){ return emp::Pow(x, y); } );
+      binary_ops["%%"].Set(   prec, [](double x, double y){ return emp::Log(x, y); } );
     }
 
     /// Helpers for parsing.
-    static ValueType ParseValue(const DataMap & dm, pos_t & pos) {
+    ValueType ParseValue(const DataMap & dm, pos_t & pos) {
       if constexpr (verbose) {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
@@ -195,9 +190,8 @@ namespace emp {
       return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
 
-    static ValueType ParseMath(const DataMap & dm, pos_t & pos, size_t prec_limit=0) {
+    ValueType ParseMath(const DataMap & dm, pos_t & pos, size_t prec_limit=0) {
       ValueType val1 = ParseValue(dm, pos);
-      auto ops = GetBinaryOperators();
 
       if constexpr (verbose) {
         if (pos.IsValid()) {
@@ -213,8 +207,8 @@ namespace emp {
           std::cout << "...Scanning for operator... [" << pos->lexeme << "]" << std::endl;
         }
 
-        if (Has(ops, pos->lexeme)) {
-          const BinaryOperator & op = ops[pos->lexeme];
+        if (Has(binary_ops, pos->lexeme)) {
+          const BinaryOperator & op = binary_ops[pos->lexeme];
           if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
           ++pos;
           ValueType val2 = ParseMath(dm, pos, op.prec);
@@ -251,8 +245,8 @@ namespace emp {
     /// that takes a datamap (of the example type) loads in the values of "foo" and "bar", and
     /// returns the result of the above equation.
 
-    static value_fun_t BuildMathFunction(const DataMap & dm, const std::string & fun_info) {
-      emp::TokenStream tokens = GetDataMapLexer().Tokenize(fun_info);
+    value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
+      emp::TokenStream tokens = lexer.Tokenize(expression);
       if constexpr (verbose) tokens.Print();
       pos_t pos = tokens.begin();
       ValueType val = ParseMath(dm, pos);
