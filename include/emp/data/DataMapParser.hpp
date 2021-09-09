@@ -6,6 +6,14 @@
  *  @file  DataMapParser.hpp
  *  @brief Useful functions for working with DataMaps and AnnotatedTypes.
  *  @note Status: ALPHA
+ * 
+ *  Developer TODO:
+ *  - Add error system
+ *  - Make functions actually work
+ *  - Make ${ ... } actually work
+ *  - Setup operator RegEx to be built dynamically
+ *  - Allow new operators to be added externally
+ *  - Setup LVALUES as a type, and allow assignment
  */
 
 #ifndef EMP_DATA_MAP_PARSER_HPP
@@ -129,11 +137,17 @@ namespace emp {
 
     // --------- MEMBER VARIABLES -----------
     DataMapLexer lexer;
+    std::unordered_map<std::string, std::function<double(double)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
 
   public:
     DataMapParser() {
+      // Setup the unary operators for the parser.
+      unary_ops["+"] = [](double x) { return x; };
+      unary_ops["-"] = [](double x) { return -x; };
+      unary_ops["!"] = [](double x) { return (double) (x==0.0); };
+
       // Setup the default binary operators for the parser.
       size_t prec = 0;  // Precedence level of each operator...
       binary_ops["||"].Set( ++prec, [](double x, double y){ return (x!=0.0)||(y!=0.0); } );
@@ -200,28 +214,13 @@ namespace emp {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
 
-      // Test if we should NEGATE!
-      if (pos->lexeme == "-") {
-        if constexpr (verbose) std::cout << "Found: UNARY NEGATION" << std::endl;
+      if (emp::Has(unary_ops, pos->lexeme)) {
+        if constexpr (verbose) std::cout << "Found UNARY OP: " << pos->lexeme << std::endl;
+        auto op = unary_ops[pos->lexeme];
         ++pos;
         ValueType val = ParseValue(dm, pos);
-        if (val.type == ValueType::VALUE) { return -val.value; }
-        else { return (value_fun_t) [fun=val.fun](emp::DataMap & dm){ return -fun(dm); }; }
-      }   
-
-      // Test if we should NOT!
-      if (pos->lexeme == "!") {
-        if constexpr (verbose) std::cout << "Found: UNARY NOT" << std::endl;
-        ++pos;
-        ValueType val = ParseValue(dm, pos);
-        if (val.type == ValueType::VALUE) { return !val.value; }
-        else { return (value_fun_t) [fun=val.fun](emp::DataMap & dm){ return !fun(dm); }; }
-      }   
-
-      // A unary PLUS does nothing...
-      if (pos->lexeme == "+") {
-        if constexpr (verbose) std::cout << "Found: UNARY PLUS" << std::endl;
-        ++pos; return ParseValue(dm, pos);
+        if (val.type == ValueType::VALUE) { return op(val.value); }
+        else { return (value_fun_t) [fun=val.fun,op](emp::DataMap & dm){ return op(fun(dm)); }; }
       }
 
       // If we have parentheses, process the contents
@@ -235,7 +234,7 @@ namespace emp {
       }
 
       // If this is a value, set it and return.
-      if (emp::is_digit(pos->lexeme[0])) {
+      if (lexer.IsNumber(*pos)) {
         double result = emp::from_string<double>(pos->lexeme);
         ++pos;
         return result;
@@ -265,6 +264,7 @@ namespace emp {
           std::cout << "...Scanning for operator... [" << pos->lexeme << "]" << std::endl;
         }
 
+        // If we have an operator, act on it!
         if (Has(binary_ops, pos->lexeme)) {
           const BinaryOperator & op = binary_ops[pos->lexeme];
           if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
