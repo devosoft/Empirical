@@ -111,6 +111,10 @@ namespace emp {
       ValueType & operator=(const ValueType &) = default;
       ValueType & operator=(double in_val) { type = VALUE; value = in_val; return *this; }
       ValueType & operator=(value_fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
+
+      value_fun_t AsFun() {
+        if (type==FUNCTION) return fun; else return [v=value](emp::DataMap &){ return v; };
+      }
     };
 
     struct BinaryOperator {
@@ -168,6 +172,7 @@ namespace emp {
 
       // Setup the default functions.
       functions["ABS"].Set1( [](double x){ return std::abs(x); } );
+      functions["EXP"].Set1( [](double x){ return emp::Pow(emp::E, x); } );
       functions["LOG"].Set1( [](double x){ return std::log(x); } );
       functions["LOG2"].Set1( [](double x){ return std::log2(x); } );
       functions["LOG10"].Set1( [](double x){ return std::log10(x); } );
@@ -197,6 +202,7 @@ namespace emp {
 
       // Default 2-input functions
       functions["HYPOT"].Set2( [](double x, double y){ return std::hypot(x,y); } );
+      functions["EXP"].Set2( [](double x, double y){ return emp::Pow(x,y); } );
       functions["LOG"].Set2( [](double x, double y){ return emp::Log(x,y); } );
       functions["MIN"].Set2( [](double x, double y){ return (x<y) ? x : y; } );
       functions["MAX"].Set2( [](double x, double y){ return (x>y) ? x : y; } );
@@ -205,7 +211,8 @@ namespace emp {
       // Default 3-input functions.
       functions["IF"].Set3( [](double x, double y, double z){ return (x!=0.0) ? y : z; } );
       functions["CLAMP"].Set3( [](double x, double y, double z){ return (x<y) ? y : (x>z) ? z : x; } );
-      functions["SCALE"].Set3( [](double x, double y, double z){ return (x-y) / (z-y); } );
+      functions["TO_SCALE"].Set3( [](double x, double y, double z){ return (z-y)*x+y; } );
+      functions["FROM_SCALE"].Set3( [](double x, double y, double z){ return (x-y) / (z-y); } );
     }
 
     /// Helpers for parsing.
@@ -214,6 +221,7 @@ namespace emp {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
 
+      // Deal with any unary operators...
       if (emp::Has(unary_ops, pos->lexeme)) {
         if constexpr (verbose) std::cout << "Found UNARY OP: " << pos->lexeme << std::endl;
         auto op = unary_ops[pos->lexeme];
@@ -240,10 +248,57 @@ namespace emp {
         return result;
       }
 
-      // Otherwise it should be in the datamap!
-      emp_assert(dm.HasName(pos->lexeme), pos->lexeme);
-      size_t id = dm.GetID(pos->lexeme);
+      // Otherwise it should be and identifier!
+      const std::string & name = pos->lexeme;
       ++pos;
+
+      // If it is followed by a parenthesis, it should be a function.
+      const bool is_fun = (pos.IsValid() && pos->lexeme == "(");
+
+      if (is_fun) {
+        emp_assert(emp::Has(functions, name), name); // Must be a function name!
+        ++pos;
+        emp::vector<ValueType> args;
+        while(pos->lexeme != ")") {
+          args.push_back(ParseMath(dm, pos));
+          if (pos->lexeme == ",") ++pos;
+        }
+        ++pos;
+        
+        // Now build the function based on its argument count.
+        value_fun_t out_fun;
+        switch (args.size()) {
+        case 0:
+          if (!functions[name].fun0) emp_error("Function '", name, "' requires arguments.");
+          out_fun = [fun=functions[name].fun0](emp::DataMap & dm) { return fun(); };
+          break;
+        case 1:
+          if (!functions[name].fun1) emp_error("Function '", name, "' cannot have 1 arguments.");
+          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](emp::DataMap & dm) {
+            return fun(arg0(dm));
+          };
+          break;
+        case 2:
+          if (!functions[name].fun2) emp_error("Function '", name, "' cannot have 2 arguments.");
+          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](emp::DataMap & dm) {
+            return fun(arg0(dm), arg1(dm));
+          };
+          break;
+        case 3:
+          if (!functions[name].fun3) emp_error("Function '", name, "' cannot have 3 arguments.");
+          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](emp::DataMap & dm) {
+            return fun(arg0(dm), arg1(dm), arg2(dm));
+          };
+          break;
+        default:
+          emp_error("Too many arguments for function '", name, "'.");
+        }
+        return out_fun;
+      }
+
+      // This must be a DataMap entry name.
+      emp_assert(dm.HasName(name), name);
+      size_t id = dm.GetID(name);
       return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
 
@@ -252,17 +307,12 @@ namespace emp {
 
       if constexpr (verbose) {
         if (pos.IsValid()) {
-          std::cout << "ParseMath at position " << pos.GetIndex()
-                    << " : " << pos->lexeme << std::endl;
-        } else {
-          std::cout << "PROCESSED!" << std::endl;
-        }
+          std::cout << "ParseMath at " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
+        } else std::cout << "PROCESSED!" << std::endl;
       }
 
-      while (pos.IsValid() && pos->lexeme != ")") {
-        if constexpr (verbose) {
-          std::cout << "...Scanning for operator... [" << pos->lexeme << "]" << std::endl;
-        }
+      while (pos.IsValid() && pos->lexeme != ")" && pos->lexeme != ",") {
+        if constexpr (verbose) { std::cout << "...Scanning for op... [" << pos->lexeme << "]" << std::endl;   }
 
         // If we have an operator, act on it!
         if (Has(binary_ops, pos->lexeme)) {
@@ -290,7 +340,7 @@ namespace emp {
           }
         }
 
-        else emp_error("No operator [", pos->lexeme, "] found!");
+        else emp_error("Operator [", pos->lexeme, "] NOT found!");
       }
 
       // @CAO Make sure there's not a illegal lexeme here.
