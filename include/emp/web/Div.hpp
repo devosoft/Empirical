@@ -312,6 +312,10 @@ namespace web {
     // Get a properly cast version of info.
     internal::DivInfo * Info() { return (internal::DivInfo *) info; }
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
+
+    // A constructor using a DivInfo pointer allows us to pass down derived
+    // class pointers when we need to extend the functionality of a component
+    // see the prefab/README.md for more about this design pattern
     Div(internal::DivInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
