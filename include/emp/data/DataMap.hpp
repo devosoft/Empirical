@@ -80,6 +80,8 @@
  *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
  *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can
  *    do it, the improvement in cache performance could be dramatic.
+ * 
+ *  - Rename DataLayout and MemoryImage to DataMapLayout and DataMapMemory
  */
 
 #ifndef EMP_DATA_MAP_H
@@ -302,7 +304,7 @@ namespace emp {
     }
 
     /// Get the DataLayout so that it can be used elsewhere.
-    const emp::DataLayout & GetLayout() { return *layout_ptr; }
+    const emp::DataLayout & GetLayout() const { return *layout_ptr; }
 
     /// Test if this layout is locked (i.e., it cannot be changed.)
     bool IsLocked() const { return layout_ptr && layout_ptr->IsLocked(); }
