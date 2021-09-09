@@ -123,10 +123,10 @@ namespace internal {
      * the second button
      * @param info_ref shared pointer containing presistent state
      */
-    template<typename L1_TYPE, typename L2_TYPE>
+    template<typename LABEL1_TYPE, typename LABEL2_TYPE>
     ToggleButtonGroup(
-      L1_TYPE && activate_indicator,
-      L2_TYPE && deactivate_indicator,
+      LABEL1_TYPE && activate_indicator,
+      LABEL2_TYPE && deactivate_indicator,
       const std::string & activate_style,
       const std::string & deactivate_style,
       web::internal::DivInfo * info_ref
