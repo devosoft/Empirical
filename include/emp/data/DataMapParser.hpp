@@ -11,6 +11,7 @@
 #ifndef EMP_DATA_MAP_PARSER_HPP
 #define EMP_DATA_MAP_PARSER_HPP
 
+#include <cmath>
 #include <string>
 
 #include "../base/error.hpp"
@@ -111,9 +112,25 @@ namespace emp {
       void Set(size_t in_prec, fun_t in_fun) { prec = in_prec; fun = in_fun; }
     };
 
+    struct Function {
+      using fun0_t = std::function<double()>;
+      using fun1_t = std::function<double(double)>;
+      using fun2_t = std::function<double(double,double)>;
+      using fun3_t = std::function<double(double,double,double)>;
+
+      size_t num_args = 0;
+      fun0_t fun0; fun1_t fun1; fun2_t fun2; fun3_t fun3;
+
+      void Set0(fun0_t in_fun) { num_args = 0; fun0 = in_fun; }
+      void Set1(fun1_t in_fun) { num_args = 1; fun1 = in_fun; }
+      void Set2(fun2_t in_fun) { num_args = 2; fun2 = in_fun; }
+      void Set3(fun3_t in_fun) { num_args = 3; fun3 = in_fun; }
+    };
+
     // --------- MEMBER VARIABLES -----------
     DataMapLexer lexer;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
+    std::unordered_map<std::string, Function> functions;
 
   public:
     DataMapParser() {
@@ -134,6 +151,47 @@ namespace emp {
       binary_ops["%"] .Set(   prec, [](double x, double y){ return emp::Mod(x, y); } );
       binary_ops["**"].Set( ++prec, [](double x, double y){ return emp::Pow(x, y); } );
       binary_ops["%%"].Set(   prec, [](double x, double y){ return emp::Log(x, y); } );
+
+      // Setup the default functions.
+      functions["ABS"].Set1( [](double x){ return std::abs(x); } );
+      functions["LOG"].Set1( [](double x){ return std::log(x); } );
+      functions["LOG2"].Set1( [](double x){ return std::log2(x); } );
+      functions["LOG10"].Set1( [](double x){ return std::log10(x); } );
+
+      functions["SQRT"].Set1( [](double x){ return std::sqrt(x); } );
+      functions["CBRT"].Set1( [](double x){ return std::cbrt(x); } );
+
+      functions["SIN"].Set1( [](double x){ return std::sin(x); } );
+      functions["COS"].Set1( [](double x){ return std::cos(x); } );
+      functions["TAN"].Set1( [](double x){ return std::tan(x); } );
+      functions["ASIN"].Set1( [](double x){ return std::asin(x); } );
+      functions["ACOS"].Set1( [](double x){ return std::acos(x); } );
+      functions["ATAN"].Set1( [](double x){ return std::atan(x); } );
+      functions["SINH"].Set1( [](double x){ return std::sinh(x); } );
+      functions["COSH"].Set1( [](double x){ return std::cosh(x); } );
+      functions["TANH"].Set1( [](double x){ return std::tanh(x); } );
+      functions["ASINH"].Set1( [](double x){ return std::asinh(x); } );
+      functions["ACOSH"].Set1( [](double x){ return std::acosh(x); } );
+      functions["ATANH"].Set1( [](double x){ return std::atanh(x); } );
+
+      functions["CEIL"].Set1( [](double x){ return std::ceil(x); } );
+      functions["FLOOR"].Set1( [](double x){ return std::floor(x); } );
+      functions["ROUND"].Set1( [](double x){ return std::round(x); } );
+
+      functions["ISINF"].Set1( [](double x){ return std::isinf(x); } );
+      functions["ISNAN"].Set1( [](double x){ return std::isnan(x); } );
+
+      // Default 2-input functions
+      functions["HYPOT"].Set2( [](double x, double y){ return std::hypot(x,y); } );
+      functions["LOG"].Set2( [](double x, double y){ return emp::Log(x,y); } );
+      functions["MIN"].Set2( [](double x, double y){ return (x<y) ? x : y; } );
+      functions["MAX"].Set2( [](double x, double y){ return (x>y) ? x : y; } );
+      functions["POW"].Set2( [](double x, double y){ return emp::Pow(x,y); } );
+
+      // Default 3-input functions.
+      functions["IF"].Set3( [](double x, double y, double z){ return (x!=0.0) ? y : z; } );
+      functions["CLAMP"].Set3( [](double x, double y, double z){ return (x<y) ? y : (x>z) ? z : x; } );
+      functions["SCALE"].Set3( [](double x, double y, double z){ return (x-y) / (z-y); } );
     }
 
     /// Helpers for parsing.
@@ -257,7 +315,15 @@ namespace emp {
       }
 
       // Otherwise return the function produced.
-      return val.fun;
+      #ifdef NDEBUG
+        return val.fun;
+      #else
+        // If we are in debug mode, save the original datamap and double-check compatability.
+        return [fun=val.fun,&orig_layout=dm.GetLayout()](emp::DataMap & dm){
+          emp_assert(dm.HasLayout(orig_layout));
+          return fun(dm);
+      };
+      #endif
     }
 
   };
