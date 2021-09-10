@@ -48,6 +48,8 @@
  *    std::string to_escaped_string(char value)
  *    std::string to_escaped_string(const std::string & value)
  *    std::string to_web_safe_string(const std::string & value)
+ *    template<bool encode_space=false> std::string url_encode(const std::string &value)
+ *    template<bool decode_plus=false> std::string url_decode(const std::string& str)
  *    std::string to_literal(...)
  *    char from_literal_char(const std::string & value)
  *    std::string from_literal_string(const std::string & value)
@@ -168,20 +170,20 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
+#include <algorithm>
 #include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <iostream>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <numeric>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
-#include <algorithm>
-#include <iterator>
-#include <limits>
-#include <regex>
-#include <memory>
-#include <numeric>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -563,6 +565,58 @@ namespace emp {
 
     return web_safe;
   }
+
+
+  /// Returns url encoding of value.
+  /// See https://en.wikipedia.org/wiki/Percent-encoding
+  // adapted from https://stackoverflow.com/a/17708801
+  template<bool encode_space=false>
+  std::string url_encode(const std::string &value) {
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
+
+    for (const auto c : value) {
+
+      // If encoding space, replace with +
+      if ( encode_space && c == ' ' ) escaped << '+';
+      // Keep alphanumeric and other accepted characters intact
+      else if (
+        std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~'
+      ) escaped << c;
+      // Any other characters are percent-encoded
+      else {
+        escaped << std::uppercase;
+        escaped << '%' << std::setw(2) << (static_cast<int>(c) & 0x000000FF);
+        escaped << std::nouppercase;
+      }
+
+    }
+
+    return escaped.str();
+  }
+
+  /// Returns url decoding of string.
+  /// See https://en.wikipedia.org/wiki/Percent-encoding
+  // adapted from https://stackoverflow.com/a/29962178
+  template<bool decode_plus=false>
+  std::string url_decode(const std::string& str){
+    std::string res;
+
+    for (size_t i{}; i < str.size(); ++i) {
+      if (str[i] == '%') {
+        int hex_code;
+        std::sscanf(str.substr(i + 1, 2).c_str(), "%x", &hex_code);
+        res += static_cast<char>(hex_code);
+        i += 2;
+      } else {
+        res += ( decode_plus && str[i] == '+' ) ? ' ' : str[i];
+      }
+    }
+
+    return res;
+  }
+
 
   /// Take a value and convert it to a C++-style literal.
   template <typename T>
