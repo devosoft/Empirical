@@ -142,7 +142,7 @@ TEST_CASE("Test DataMap", "[data]")
 
   fun = parser.BuildMathFunction(dmA, "CBRT(val1)");
   CHECK( fun(dmA) == Approx(1.1447142426) );
-  CHECK( fun(dmB) == 0.5 );
+  CHECK( fun(dmB) == Approx(0.5) );
 
   fun = parser.BuildMathFunction(dmA, "SQRT(val2)");
   CHECK( fun(dmA) == Approx(1.4142135624) );
