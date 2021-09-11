@@ -99,12 +99,14 @@ namespace emp {
     };
 
     struct ValueType {
-      enum type_t { VALUE, FUNCTION };
+      enum type_t { ERROR=0, VALUE, FUNCTION };
 
       type_t type;
       double value;
       value_fun_t fun;
 
+      ValueType() : type(ERROR) {}
+      ValueType(const ValueType &) = default;
       ValueType(double in_val) : type(VALUE), value(in_val) { }
       ValueType(value_fun_t in_fun) : type(FUNCTION), fun(in_fun) { }
 
@@ -145,16 +147,25 @@ namespace emp {
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
     size_t error_count = 0;
-    std::function<void(const std::string &)> error_fun =
-      [](const std::string & msg){ std::cerr << "ERROR: " << msg << std::endl; };
+
+    using error_fun_t = std::function<void(const std::string &)>;
+    error_fun_t error_fun =
+     [](const std::string & msg){ std::cerr << "ERROR: " << msg << std::endl; };
 
     template<typename... Ts>
-    void AddError(Ts &&... args) {
+    ValueType AddError(Ts &&... args) {
       error_fun( emp::to_string(args...); );
       ++error_count;
+      return ValueType();
     }
 
   public:
+    bool HasErrors() const { return error_count; }
+    size_t NumErrors() const { return error_count; }
+
+    error_fun_t GetErrorFun() const { return error_fun; }
+    void SetErrorFun(error_fun_t in_fun) { error_fun = in_fun; }
+
     DataMapParser() {
       // Setup the unary operators for the parser.
       unary_ops["+"] = [](double x) { return x; };
@@ -245,7 +256,7 @@ namespace emp {
         if constexpr (verbose) std::cout << "Found: OPEN PAREN" << std::endl;
         ++pos;
         ValueType val = ParseMath(dm, pos);
-        if (pos->lexeme != ")") AddError("Expected ')', but found '", pos->lexeme, "'.");
+        if (pos->lexeme != ")") return AddError("Expected ')', but found '", pos->lexeme, "'.");
         ++pos;
         return val;
       }
@@ -265,7 +276,7 @@ namespace emp {
       const bool is_fun = (pos.IsValid() && pos->lexeme == "(");
 
       if (is_fun) {
-        if (!emp::Has(functions, name)) AddError("Call to unknown function '", name,"'.");
+        if (!emp::Has(functions, name)) return AddError("Call to unknown function '", name,"'.");
         ++pos;
         emp::vector<ValueType> args;
         while(pos->lexeme != ")") {
@@ -278,35 +289,35 @@ namespace emp {
         value_fun_t out_fun;
         switch (args.size()) {
         case 0:
-          if (!functions[name].fun0) emp_error("Function '", name, "' requires arguments.");
+          if (!functions[name].fun0) AddError("Function '", name, "' requires arguments.");
           out_fun = [fun=functions[name].fun0](emp::DataMap & dm) { return fun(); };
           break;
         case 1:
-          if (!functions[name].fun1) emp_error("Function '", name, "' cannot have 1 arguments.");
+          if (!functions[name].fun1) AddError("Function '", name, "' cannot have 1 arguments.");
           out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](emp::DataMap & dm) {
             return fun(arg0(dm));
           };
           break;
         case 2:
-          if (!functions[name].fun2) emp_error("Function '", name, "' cannot have 2 arguments.");
+          if (!functions[name].fun2) AddError("Function '", name, "' cannot have 2 arguments.");
           out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](emp::DataMap & dm) {
             return fun(arg0(dm), arg1(dm));
           };
           break;
         case 3:
-          if (!functions[name].fun3) emp_error("Function '", name, "' cannot have 3 arguments.");
+          if (!functions[name].fun3) AddError("Function '", name, "' cannot have 3 arguments.");
           out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](emp::DataMap & dm) {
             return fun(arg0(dm), arg1(dm), arg2(dm));
           };
           break;
         default:
-          emp_error("Too many arguments for function '", name, "'.");
+          AddError("Too many arguments for function '", name, "'.");
         }
         return out_fun;
       }
 
       // This must be a DataMap entry name.
-      emp_assert(dm.HasName(name), name);
+      if (!dm.HasName(name)) AddError("Unknown data map entry '", name, "'.");
       size_t id = dm.GetID(name);
       return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
@@ -349,7 +360,7 @@ namespace emp {
           }
         }
 
-        else emp_error("Operator [", pos->lexeme, "] NOT found!");
+        else AddError("Operator '", pos->lexeme, "' NOT found!");
       }
 
       // @CAO Make sure there's not a illegal lexeme here.
