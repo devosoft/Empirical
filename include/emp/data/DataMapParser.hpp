@@ -9,11 +9,11 @@
  * 
  *  Developer TODO:
  *  - Add error system
- *  - Make functions actually work
  *  - Make ${ ... } actually work
  *  - Setup operator RegEx to be built dynamically
  *  - Allow new operators to be added externally
  *  - Setup LVALUES as a type, and allow assignment
+ *  - Add in a type system (String, double, vectors, etc.)
  */
 
 #ifndef EMP_DATA_MAP_PARSER_HPP
@@ -144,6 +144,15 @@ namespace emp {
     std::unordered_map<std::string, std::function<double(double)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
+    size_t error_count = 0;
+    std::function<void(const std::string &)> error_fun =
+      [](const std::string & msg){ std::cerr << "ERROR: " << msg << std::endl; };
+
+    template<typename... Ts>
+    void AddError(Ts &&... args) {
+      error_fun( emp::to_string(args...); );
+      ++error_count;
+    }
 
   public:
     DataMapParser() {
@@ -236,7 +245,7 @@ namespace emp {
         if constexpr (verbose) std::cout << "Found: OPEN PAREN" << std::endl;
         ++pos;
         ValueType val = ParseMath(dm, pos);
-        emp_assert(pos->lexeme == ")");
+        if (pos->lexeme != ")") AddError("Expected ')', but found '", pos->lexeme, "'.");
         ++pos;
         return val;
       }
@@ -256,7 +265,7 @@ namespace emp {
       const bool is_fun = (pos.IsValid() && pos->lexeme == "(");
 
       if (is_fun) {
-        emp_assert(emp::Has(functions, name), name); // Must be a function name!
+        if (!emp::Has(functions, name)) AddError("Call to unknown function '", name,"'.");
         ++pos;
         emp::vector<ValueType> args;
         while(pos->lexeme != ")") {
