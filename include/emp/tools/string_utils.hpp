@@ -171,9 +171,11 @@
 #define EMP_STRING_UTILS_H
 
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <functional>
 #include <initializer_list>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <limits>
@@ -616,7 +618,6 @@ namespace emp {
 
     return res;
   }
-
 
   /// Take a value and convert it to a C++-style literal.
   template <typename T>
