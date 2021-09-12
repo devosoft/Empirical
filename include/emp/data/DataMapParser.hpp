@@ -8,7 +8,6 @@
  *  @note Status: ALPHA
  * 
  *  Developer TODO:
- *  - Add error system
  *  - Make ${ ... } actually work
  *  - Setup operator RegEx to be built dynamically
  *  - Allow new operators to be added externally
@@ -160,17 +159,29 @@ namespace emp {
     }
 
   public:
+    DataMapParser(bool use_defaults=true) {
+      if (use_defaults) {
+        AddDefaultOperators();
+        AddDefaultFunctions();
+      }
+    }
+
     bool HasErrors() const { return error_count; }
     size_t NumErrors() const { return error_count; }
 
     error_fun_t GetErrorFun() const { return error_fun; }
     void SetErrorFun(error_fun_t in_fun) { error_fun = in_fun; }
 
-    DataMapParser() {
-      // Setup the unary operators for the parser.
-      unary_ops["+"] = [](double x) { return x; };
-      unary_ops["-"] = [](double x) { return -x; };
-      unary_ops["!"] = [](double x) { return (double) (x==0.0); };
+    // Add a unary operator
+    void AddOp(const std::string & op, std::function<double(double)> fun) {
+      unary_ops[op] = fun;
+    }
+
+    void AddDefaultOperators() {
+            // Setup the unary operators for the parser.
+      AddOp("+", [](double x) { return x; });
+      AddOp("-", [](double x) { return -x; };
+      AddOp("!", [](double x) { return (double) (x==0.0); };
 
       // Setup the default binary operators for the parser.
       size_t prec = 0;  // Precedence level of each operator...
@@ -189,7 +200,9 @@ namespace emp {
       binary_ops["%"] .Set(   prec, [](double x, double y){ return emp::Mod(x, y); } );
       binary_ops["**"].Set( ++prec, [](double x, double y){ return emp::Pow(x, y); } );
       binary_ops["%%"].Set(   prec, [](double x, double y){ return emp::Log(x, y); } );
+    }
 
+    void AddDefaultFunctions() {
       // Setup the default functions.
       functions["ABS"].Set1( [](double x){ return std::abs(x); } );
       functions["EXP"].Set1( [](double x){ return emp::Pow(emp::E, x); } );
