@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
+ *  @date 2016-2021.
  *
  *  @file  RegEx.hpp
  *  @brief Basic regular expression handler.
@@ -344,7 +344,7 @@ namespace emp {
             case '-':
             case '\\':
             case ']':
-            case '[':
+            case '[': // technically doesn't need to be escaped, but allowed.
             case '^':
               break;
             default:
@@ -454,7 +454,7 @@ namespace emp {
 
     /// Process the input regex into a tree representaion.
     Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
-      emp_assert(pos >= 0 && pos < regex.size(), pos, regex.size());
+      emp_assert(pos < regex.size(), pos, regex.size());
 
       // If caller does not provide current block, create one (and return it.)
       if (cur_block==nullptr) cur_block = NewPtr<re_block>();
