@@ -73,13 +73,15 @@ namespace emp {
 
   class TokenStream {
   private:
+    std::string name = "";
     emp::vector<Token> tokens;
 
   public:
-    TokenStream() = default;
+    TokenStream(const std::string & in_name) : name(in_name) { }
     TokenStream(const TokenStream &) = default;
     TokenStream(TokenStream &&) = default;
-    TokenStream(const emp::vector<Token> & in_tokens) : tokens(in_tokens) { }
+    TokenStream(const emp::vector<Token> & in_tokens, const std::string & in_name)
+    : name(in_name), tokens(in_tokens) { }
 
     TokenStream & operator=(const TokenStream &) = default;
     TokenStream & operator=(TokenStream &&) = default;
@@ -114,10 +116,12 @@ namespace emp {
       Iterator operator--(int) { Iterator old(*this); --pos; return old; }
 
       bool IsValid() const { return pos < ts->size(); }
+      bool AtEnd() const { return pos == ts->size(); }
     };
 
     size_t size() const { return tokens.size(); }
     const Token & Get(size_t pos) const { return tokens[pos]; }
+    const std::string & GetName() const { return name; }
     Iterator begin() const { return Iterator(*this, 0); }
     Iterator end() const { return Iterator(*this, tokens.size()); }
 
@@ -268,7 +272,7 @@ namespace emp {
     }
 
     /// Turn an input stream of text into a vector of tokens.
-    TokenStream Tokenize(std::istream & is) const {
+    TokenStream Tokenize(std::istream & is, const std::string & name) const {
       emp::vector<Token> out_tokens;
       size_t cur_line = 1;
       emp::Token token = Process(is);
@@ -278,24 +282,24 @@ namespace emp {
         if (GetSaveToken(token)) out_tokens.push_back(token);
         token = Process(is);
       }
-      return out_tokens;
+      return TokenStream{out_tokens, name};
     }
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(const std::string & str) const {
+    TokenStream Tokenize(const std::string & str, const std::string & name) const {
       std::stringstream ss;
       ss << str;
-      return Tokenize(ss);
+      return Tokenize(ss, name);
     }
 
     /// Turn a vector of strings into a vector of tokens.
-    TokenStream Tokenize(const emp::vector<std::string> & str_v) const {
+    TokenStream Tokenize(const emp::vector<std::string> & str_v, const std::string & name) const {
       std::stringstream ss;
       for (auto & str : str_v) {
         ss << str;
       }
       
-      return Tokenize(ss);
+      return Tokenize(ss, name);
     }
 
     /// Get the lexeme associated with the last token identified.
