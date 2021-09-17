@@ -124,6 +124,9 @@ namespace emp {
     const std::string & GetName() const { return name; }
     Iterator begin() const { return Iterator(*this, 0); }
     Iterator end() const { return Iterator(*this, tokens.size()); }
+    const Token & back() const { return tokens.back(); }
+
+    void push_back(const Token & in) { tokens.push_back(in); }
 
     void Print(std::ostream & os=std::cout) const {
       for (auto x : tokens) {
@@ -262,12 +265,20 @@ namespace emp {
       return { best_stop, lexeme };
     }
 
-    /// Shortcut to process a string rather than a stream.
+    /// Shortcut to process a string rather than a stream, chopping off one token each time.
     Token Process(std::string & in_str) const {
       std::stringstream ss;
       ss << in_str;
       auto out_val = Process(ss);
       in_str = ss.str();
+      return out_val;
+    }
+
+    /// Shortcut to just get a single token.
+    Token ToToken(const std::string & in_str) const {
+      std::stringstream ss;
+      ss << in_str;
+      auto out_val = Process(ss);
       return out_val;
     }
 
