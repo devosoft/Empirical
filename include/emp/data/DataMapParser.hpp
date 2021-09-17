@@ -142,7 +142,7 @@ namespace emp {
 
     template<typename... Ts>
     ValueType AddError(Ts &&... args) {
-      error_fun( emp::to_string(args...); );
+      error_fun( emp::to_string(args...) );
       ++error_count;
       return ValueType();
     }
@@ -376,7 +376,7 @@ namespace emp {
     /// returns the result of the above equation.
 
     value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
-      emp::TokenStream tokens = lexer.Tokenize(expression);
+      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression :") + expression);
       if constexpr (verbose) tokens.Print();
       pos_t pos = tokens.begin();
       ValueType val = ParseMath(dm, pos);
