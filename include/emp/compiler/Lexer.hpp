@@ -275,7 +275,7 @@ namespace emp {
     }
 
     /// Shortcut to just get a single token.
-    Token ToToken(const std::string & in_str) const {
+    Token ToToken(std::string_view in_str) const {
       std::stringstream ss;
       ss << in_str;
       auto out_val = Process(ss);
@@ -297,7 +297,7 @@ namespace emp {
     }
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(const std::string & str, const std::string & name) const {
+    TokenStream Tokenize(std::string_view str, const std::string & name) const {
       std::stringstream ss;
       ss << str;
       return Tokenize(ss, name);
