@@ -42,7 +42,6 @@ namespace emp {
       int token_number;       ///< Token id for literal numbers
       int token_string;       ///< Token id for literal strings
       int token_char;         ///< Token id for literal characters
-      int token_external;     ///< Token id for strings to be evaluated externally.
       int token_symbol;       ///< Token id for other symbols
 
     public:
@@ -69,21 +68,16 @@ namespace emp {
         // its ascii value.
         token_char = AddToken("Literal Character", "'([^'\n\\\\]|\\\\.)+'");
 
-        // An external value should be evaluated in a provided function.  If no such function
-        // exists, using it will be an error.
-        // example:  ${EXTERNAL_VAR}
-        token_external = AddToken("External Evaluation", "[$]"s + regex_nested('{', '}', 4));
-
         // Symbols should have least priority.  They include any solitary character not listed
         // above, or pre-specified multi-character groups.
         token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
       }
 
-      bool IsID(const emp::Token token) const noexcept { return token.token_id == token_identifier; }
-      bool IsNumber(const emp::Token token) const noexcept { return token.token_id == token_number; }
-      bool IsString(const emp::Token token) const noexcept { return token.token_id == token_string; }
-      bool IsChar(const emp::Token token) const noexcept { return token.token_id == token_char; }
-      bool IsSymbol(const emp::Token token) const noexcept { return token.token_id == token_symbol; }
+      bool IsID(const emp::Token & token) const noexcept { return token.token_id == token_identifier; }
+      bool IsNumber(const emp::Token & token) const noexcept { return token.token_id == token_number; }
+      bool IsString(const emp::Token & token) const noexcept { return token.token_id == token_string; }
+      bool IsChar(const emp::Token & token) const noexcept { return token.token_id == token_char; }
+      bool IsSymbol(const emp::Token & token) const noexcept { return token.token_id == token_symbol; }
     };
 
     struct ValueType {
@@ -134,8 +128,8 @@ namespace emp {
     std::unordered_map<std::string, std::function<double(double)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
-    size_t error_count = 0;
 
+    size_t error_count = 0;
     using error_fun_t = std::function<void(const std::string &)>;
     error_fun_t error_fun =
      [](const std::string & msg){ std::cerr << "ERROR: " << msg << std::endl; };
@@ -292,7 +286,7 @@ namespace emp {
         switch (args.size()) {
         case 0:
           if (!functions[name].fun0) AddError("Function '", name, "' requires arguments.");
-          out_fun = [fun=functions[name].fun0](emp::DataMap & dm) { return fun(); };
+          out_fun = [fun=functions[name].fun0](emp::DataMap & /*dm*/) { return fun(); };
           break;
         case 1:
           if (!functions[name].fun1) AddError("Function '", name, "' cannot have 1 arguments.");
