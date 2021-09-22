@@ -161,7 +161,7 @@ namespace internal {
         false, false
       );
       activate_label << activate_radio;
-      activate_label << std::forward<L1_TYPE>(activate_indicator);
+      activate_label << std::forward<LABEL1_TYPE>(activate_indicator);
 
       deactivate_label.AddAttr(
         "class", "active",
@@ -179,7 +179,7 @@ namespace internal {
         false, true
       );
       deactivate_label << deactivate_radio;
-      deactivate_label << std::forward<L2_TYPE>(deactivate_indicator);
+      deactivate_label << std::forward<LABEL2_TYPE>(deactivate_indicator);
     }
 
     public:

@@ -19,6 +19,7 @@
 
 #include <functional>
 #include <utility>
+#include <unordered_map>
 
 #include "emp/base/optional.hpp"
 #include "emp/base/vector.hpp"
@@ -65,10 +66,7 @@ namespace internal {
       int GetRate() const { return rate; }
     };
 
-    // ControlPanelInfo holds contains two specific instances of a
-    // RefreshChecker for milliseconds and frames to keep independent rates
-    // for both.
-    class : public RefreshChecker {
+    class MillisecondRefreshChecker: public RefreshChecker {
       public:
       int elapsed_milliseconds = 0;
       bool operator()(const web::Animate & anim) override {
@@ -80,16 +78,25 @@ namespace internal {
           }
           return false;
       }
-    } millisecond_refresher;
-    class : public RefreshChecker {
+    };
+
+    class FrameRefreshChecker: public RefreshChecker {
       public:
       bool operator()(const web::Animate & anim) override {
         return anim.GetFrameCount() % rate;
       }
-    } frame_refresher;
+    };
+
+    // ControlPanelInfo holds contains two specific instances of a
+    // RefreshChecker for milliseconds and frames to keep independent rates
+    // for both.
+    std::unordered_map<std::string, RefreshChecker * > refresh_checkers{
+      { "MILLISECONDS", new MillisecondRefreshChecker{} },
+      { "FRAMES", new FrameRefreshChecker{} }
+    };
 
     // The current redraw checker function
-    RefreshChecker & should_redraw;
+    RefreshChecker * should_redraw;
 
     // A list of widget that should be redrawn when do_redraw return true
     emp::vector<web::Widget> refresh_list;
@@ -104,14 +111,22 @@ namespace internal {
      */
     ControlPanelInfo(const std::string & in_id="")
     : DivInfo(in_id),
-    should_redraw(millisecond_refresher),
+    should_redraw(refresh_checkers.at("MILLISECONDS")),
     step_callback([](){ ; })  { ; }
+
+    /**
+     * Desctructor for the shared pointer managing the ControlPanel's state.
+     * Cleans up any pointers to new RefreshCheckers.
+     */
+    ~ControlPanelInfo() {
+      for (auto & p : anim_map) delete p.second;
+    }
 
     /**
      * Get a constant reference to the redraw checker function
      * @return a redraw checker
      */
-    const RefreshChecker & GetRefreshChecker() const {
+    const RefreshChecker * GetRefreshChecker() const {
       return should_redraw;
     }
 
@@ -119,8 +134,18 @@ namespace internal {
      * Get a reference to the redraw checker function
      * @return a redraw checker
      */
-    RefreshChecker & GetRefreshChecker() {
+    RefreshChecker * GetRefreshChecker() {
       return should_redraw;
+    }
+
+    /**
+     * Adds a new refresh checker to the list of those available.
+     * @param name a name for the checker
+     * @param checker an instance of a functor inheriting from emp::prefab::internal::RefreshChecker
+     */
+    template<class SPECIALIZED_REF_CHECK>
+    void AddRefreshChecker(const std::string & name, SPECIALIZED_REF_CHECK && checker) {
+      refresh_checkers[name] = new SPECIALIZED_REF_CHECK{std::move(checker)};
     }
 
     /**
@@ -141,17 +166,10 @@ namespace internal {
     }
 
     /**
-     * Set the redraw checker function to milliseconds instance
+     * Set the redraw checker function to the one specified.
      */
-    void SetRefreshCheckerMilliseconds() {
-      should_redraw = millisecond_refresher;
-    }
-
-    /**
-     * Set the redraw checker function to frames instance
-     */
-    void SetRefreshCheckerFrames() {
-      should_redraw = frame_refresher;
+    void SetRefreshChecker(const std::string & checker_name) {
+      should_redraw = refresh_checkers.at(checker_name);
     }
 
     /**
@@ -242,7 +260,7 @@ namespace internal {
       AddAnimation(GetID(),
         [&step_simulation=Info()->GetStepCallback(),
           &refresh_list=Info()->GetRefreshList(),
-          &should_redraw=Info()->GetRefreshChecker()]
+          &should_redraw=*(Info()->GetRefreshChecker())]
         (const web::Animate & anim) mutable {
           // Run the simulation function every frame
           step_simulation();
@@ -299,17 +317,24 @@ namespace internal {
     }
 
     /**
+     * Adds a new refresh checker to the list of those available.
+     * @param name a name for the checker
+     * @param checker an instance of a functor inheriting from
+     * emp::prefab::ControlPanel::RefreshChecker
+     */
+    template<class SPECIALIZED_REF_CHECK>
+    void AddRefreshMode(const std::string & name, SPECIALIZED_REF_CHECK && checker) {
+      Info()->AddRefreshChecker(name, std::forward<SPECIALIZED_REF_CHECK>(checker));
+    }
+
+    /**
      * Set the refresh rate units for this control panel.
      * @param unit either "MILLISECONDS" or "FRAMES"
      * @note rates are independent for "MILLISECONDS" and "FRAMES" so changing
      * units may also change the rate.
      */
     ControlPanel & SetRefreshUnit(const std::string & units) {
-      if (units == "MILLISECONDS") {
-        Info()->SetRefreshCheckerMilliseconds();
-      } else if (units == "FRAMES") {
-        Info()->SetRefreshCheckerFrames();
-      }
+      Info()->SetRefreshChecker(units);
       return *this;
     }
 
@@ -319,7 +344,7 @@ namespace internal {
      * @note rates are independent for "MILLISECONDS" and "FRAMES".
      */
     void SetRefreshRate(const int & rate) {
-      Info()->GetRefreshChecker().SetRate(rate);
+      Info()->GetRefreshChecker()->SetRate(rate);
     }
 
     /**
@@ -338,7 +363,7 @@ namespace internal {
      * @return the current refresh rate
      */
     int GetRate() const {
-      return Info()->GetRefreshChecker().GetRate();
+      return Info()->GetRefreshChecker()->GetRate();
     }
 
     /**
