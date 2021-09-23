@@ -39,10 +39,10 @@ guidelines below are for consistency.
 > -   Constants should be ALL_UPPERCASE, with words separated by
 >     underscores
 > -   Template parameters should be ALL_UPPERCASE.
-> -   Typedefs should match the casing of the types they are aliasing.
->     For example, a typedef on a template parameter might be all
->     uppercase, while a typedef on a user-defined type should be
->     CamelCase.
+> -   Typedefs or using statements should be all lowercase with an _t at
+>     the end of the alaised type name.
+>     For example, a typedef on a template parameter CONTAINER_T might be
+>     container_t.
 
 ## Guidelines based on Emscripten Limitations
 
