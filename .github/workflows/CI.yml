@@ -9,7 +9,7 @@ on:
     - cron: '0 0 * * 0'
 jobs:
   tidy:
-    name: Enforce Tidiness
+    name: Enforce Tidyness
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
