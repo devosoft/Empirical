@@ -108,8 +108,8 @@ namespace emp {
     void Resize(size_t new_size) {
       nodes.resize(new_size, new_size);
       for (auto & node : nodes) {
-	      node.Resize(new_size);
-	      node.Clear();
+        node.Resize(new_size);
+        node.Clear();
       }
     }
 
@@ -215,7 +215,7 @@ namespace emp {
       const size_t new_size = start_size + in_graph.GetSize();
       nodes.resize(new_size, new_size);
       for (auto & node : nodes) {
-	      node.Resize(new_size);
+        node.Resize(new_size);
       }
 
       for (size_t i = 0; i < in_graph.GetSize(); i++) {
@@ -232,7 +232,7 @@ namespace emp {
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to=from+1; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
-	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+          emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
           os << from << " " << to << std::endl;
         }
       }
@@ -315,7 +315,7 @@ namespace emp {
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to=from+1; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
-	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+          emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
           os << from << " " << to << " " << weights[from][to] << std::endl;
         }
       }

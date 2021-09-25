@@ -37,12 +37,13 @@
  *  Example of using an introspective tuple:
  *
  *    `struct JSONObject {
- *    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
- *				   int, name,
- * 				   int, parent,
- *                 double, y,
- *                 int, depth
- * 	  	   )
+ *      EMP_BUILD_INTROSPECTIVE_TUPLE(
+ *         double, x,
+ *         int, name,
+ *         int, parent,
+ *         double, y,
+ *         int, depth
+ *      )
  *    };`
  *
  *  This struct can now be used as a C++ stand-in for Javscript objects for use with
@@ -85,7 +86,7 @@
   TYPE & NAME(const typename std::decay<TYPE>::type & _in) {       \
     std::get<POS>(TUPLE_NAME) = _in;                               \
     return std::get<POS>(TUPLE_NAME);                              \
-  }								   \
+  }                                                                \
 
 
 // We have to figure out how many arguments we have.

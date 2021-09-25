@@ -1032,9 +1032,9 @@ public:
 
     char * color = (char *) MAIN_THREAD_EM_ASM_INT({
         var text = d3.hcl($1, 150, $0*175).toString();
-	    var buffer = Module._malloc(text.length+1);
-	    Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-	    return buffer;
+      var buffer = Module._malloc(text.length+1);
+      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
+      return buffer;
     }, r, theta);
 
     std::string result = std::string(color);

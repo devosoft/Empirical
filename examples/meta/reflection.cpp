@@ -152,7 +152,7 @@ int main()
 
   std::function<int(int,int,int)> add3(Add3);
   std::cout << "emp::SubsetCall(add3, 4,5,6,7.5,8.5) = "
-	    << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << std::endl;
+      << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << std::endl;
 
   has_XY<A>::type_X test_val = (has_XY<A>::type_X) 2.5;
   std::cout << "has_XY<A>::type_X = " << test_val << std::endl;

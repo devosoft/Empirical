@@ -19,9 +19,9 @@
 #include "../../../include/emp/datastructs/vector_utils.hpp"
 
 int GetValue(const std::string & query,
-	     emp::vector<std::string> & args,
-	     uint32_t & cur_arg,
-	     int max_val=-1)
+       emp::vector<std::string> & args,
+       uint32_t & cur_arg,
+       int max_val=-1)
 {
   if (cur_arg < args.size()) {  // We already have value from the command line!
     return std::stoi( args[cur_arg++] );
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
               << "  4 - Grid" << std::endl
               << "  5 - Lossy Grid" << std::endl
               << "  6 - Linked Cliques" << std::endl
-	            << "  7 - Hamiltonion Cycle (with solution)" << std::endl
+              << "  7 - Hamiltonion Cycle (with solution)" << std::endl
               << "  8 - Random DAG" << std::endl
               << "  9 - Multiple Random Components" << std::endl
               << " 10 - Random Weighted" << std::endl;

@@ -41,8 +41,8 @@ int main()
   std::cout << "\nTruncateCall Tests:\n";
   std::function<int(int,int,int)> fun(Sum3);
   std:: cout << "emp::TruncateCall(fun, 1,2,3,4,5) = "
-	     << emp::TruncateCall(fun, 1,2,3,4,5)
-	     << std::endl;
+       << emp::TruncateCall(fun, 1,2,3,4,5)
+       << std::endl;
 
   std::cout << "\nAdaptFunction Tests:\n";
   auto fun2 = emp::AdaptFunction<int,int,int,int>::Expand<double, char>(fun);
@@ -51,17 +51,17 @@ int main()
   // Test type tests...
   std::cout << "\nTest type examples:\n";
   std::cout << "std::is_integral<int> value = "
-	    << emp::test_type_value<std::is_integral, int>()
-	    << std::endl;
+      << emp::test_type_value<std::is_integral, int>()
+      << std::endl;
   std::cout << "std::is_integral<double> value = "
-	    << emp::test_type_value<std::is_integral, double>()
-	    << std::endl;
+      << emp::test_type_value<std::is_integral, double>()
+      << std::endl;
 
   std::cout << "std::is_integral<int> exists = "
-	    << emp::test_type_exist<std::is_integral, int>()
-	    << std::endl;
+      << emp::test_type_exist<std::is_integral, int>()
+      << std::endl;
   std::cout << "std::is_integral<double> exists = "
-	    << emp::test_type_exist<std::is_integral, double>()
-	    << std::endl;
+      << emp::test_type_exist<std::is_integral, double>()
+      << std::endl;
 
 }

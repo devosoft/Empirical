@@ -11,5 +11,5 @@ TEST_CASE("Test Functions", "[tools]")
 {
     REQUIRE(emp::UniqueVal() == 0);
     REQUIRE(emp::UniqueVal() == 1);
-	REQUIRE(emp::UniqueName("string") == "string2");
+  REQUIRE(emp::UniqueName("string") == "string2");
 }

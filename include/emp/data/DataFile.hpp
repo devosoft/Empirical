@@ -103,8 +103,8 @@ namespace emp {
       emp_assert(step > 0);
       emp_assert(first < last);
       timing_fun = [first,step,last](size_t update) {
-	      if (update < first || update > last) return false;
-	      return ((update - first) % step) == 0;
+        if (update < first || update > last) return false;
+        return ((update - first) % step) == 0;
       };
     }
 

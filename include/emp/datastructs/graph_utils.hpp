@@ -38,9 +38,9 @@ namespace emp {
     // Put the mapped edges into the new graph.
     for (size_t from = 0; from < N; from++) {
       for (size_t to = 0; to < N; to++) {
-	if (in_graph.HasEdge(from, to)) {
-	  out_graph.AddEdge( v_map[from], v_map[to] );
-	}
+        if (in_graph.HasEdge(from, to)) {
+          out_graph.AddEdge( v_map[from], v_map[to] );
+        }
       }
     }
 

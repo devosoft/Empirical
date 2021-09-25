@@ -202,20 +202,20 @@ TEST_CASE("Small vector, constructors", "[tools]") {
 TEST_CASE("Small vector, methods2", "[tools]") {
   // Adapted from vector.cc
   emp::SmallVector<std::string, 3> vec = {"a", "b", "c"};
-	std::string sum;
-	for(auto it=vec.begin(); it!=vec.end(); it++){
-		sum += *it;
-	}
-	REQUIRE(sum == "abc");
+  std::string sum;
+  for(auto it=vec.begin(); it!=vec.end(); it++){
+    sum += *it;
+  }
+  REQUIRE(sum == "abc");
 
   // resize
-	emp::SmallVector<bool, 0> bvec;
-	bvec.resize(1);
-	REQUIRE(bvec.size() == 1);
-	bvec[0] = true;
-	REQUIRE(bvec[0] == true);
-	bvec.resize(5,false);
-	REQUIRE(bvec[1] == false);
+  emp::SmallVector<bool, 0> bvec;
+  bvec.resize(1);
+  REQUIRE(bvec.size() == 1);
+  bvec[0] = true;
+  REQUIRE(bvec[0] == true);
+  bvec.resize(5,false);
+  REQUIRE(bvec[1] == false);
   bvec.resize(4);
   REQUIRE(bvec.size() == 4);
   bvec.resize(3, true);
@@ -226,10 +226,10 @@ TEST_CASE("Small vector, methods2", "[tools]") {
   REQUIRE(bvec.size() == 1000);
 
   // pop_back and pop_back_val
-	emp::SmallVector<bool, 4> bvec2 = { true, false, true, false };
-	REQUIRE(bvec2.size() == 4);
-	bvec2.pop_back();
-	REQUIRE(bvec2.size() == 3);
+  emp::SmallVector<bool, 4> bvec2 = { true, false, true, false };
+  REQUIRE(bvec2.size() == 4);
+  bvec2.pop_back();
+  REQUIRE(bvec2.size() == 3);
   REQUIRE(bvec2.pop_back_val() == true);
 
   // Assign with iterators

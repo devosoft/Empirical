@@ -135,7 +135,7 @@ namespace emp {
     /// Load an entire input stream into a file.
     File & Load(std::istream & input) {
       while (!input.eof()) {
-	      LoadLine(input);
+        LoadLine(input);
       }
       return *this;
     }
@@ -154,7 +154,7 @@ namespace emp {
     /// Write this file to a provided output stream.
     File & Write(std::ostream & output) {
       for (std::string & cur_line : lines) {
-	      output << cur_line << '\n';
+        output << cur_line << '\n';
       }
       return *this;
     }

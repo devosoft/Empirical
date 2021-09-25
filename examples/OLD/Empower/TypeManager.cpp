@@ -12,9 +12,9 @@
 
 void PrintType(const emp::Type & type) {
   std::cout << "type '" << type.GetName()
-	    << "' had id " << type.GetID()
-	    << " and size " << type.GetSize()
-	    << std::endl;
+      << "' had id " << type.GetID()
+      << " and size " << type.GetSize()
+      << std::endl;
 }
 
 int main()

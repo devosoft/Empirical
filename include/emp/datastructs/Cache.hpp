@@ -17,11 +17,11 @@
 namespace emp {
 
   template <class KEY,                                        // Cache::key_type
-	    class T,                                                // Cache::mapped_type
-	    class HASH = std::hash<KEY>,                            // Cache::hasher
-	    class PRED = std::equal_to<KEY>,                        // Cache::key_equal
-	    class ALLOC = std::allocator< std::pair<const KEY,T> >  // Cache::allocator_type
-	   >
+      class T,                                                // Cache::mapped_type
+      class HASH = std::hash<KEY>,                            // Cache::hasher
+      class PRED = std::equal_to<KEY>,                        // Cache::key_equal
+      class ALLOC = std::allocator< std::pair<const KEY,T> >  // Cache::allocator_type
+     >
   class Cache {
   private:
     std::unordered_map<KEY, T, HASH, PRED, ALLOC> cache_map;

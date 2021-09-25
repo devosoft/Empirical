@@ -6,6 +6,6 @@
 
 TEST_CASE("Test Functions", "[tools]")
 {
-	REQUIRE(emp::TimeFun([] () { return 2*2; }) < 2.0);
+  REQUIRE(emp::TimeFun([] () { return 2*2; }) < 2.0);
 
 }

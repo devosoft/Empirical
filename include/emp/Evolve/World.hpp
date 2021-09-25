@@ -1172,7 +1172,7 @@ namespace emp {
       int size_y = (int) pop_sizes[1];
 
       if(id1 == id2) { //self, not neighbors
-	      return false;
+        return false;
       }
 
       int diff = id1 - id2;
@@ -1180,7 +1180,7 @@ namespace emp {
       int col_diff = abs(diff%size_x);
 
       if((row_diff <= 1 || row_diff == (size_y-1)) &&
-        (col_diff <= 1 || col_diff == (size_x-1)))	return true;
+        (col_diff <= 1 || col_diff == (size_x-1)))  return true;
       else return false;
     };
 
@@ -1630,7 +1630,7 @@ namespace emp {
     emp::vector<size_t> valid_IDs(0);
     for(size_t i = 0; i < pop.size(); i++) {
       if ((bool) (pop[i].Raw()) && IsNeighbor(id, i)) {
-	      valid_IDs.push_back(i);
+        valid_IDs.push_back(i);
       }
     }
     return valid_IDs;

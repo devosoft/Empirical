@@ -37,8 +37,8 @@ int main()
   }
 
   std::cout << "Average of " << test_count << " = "
-	    << (((double) total) / (double) test_count)
-	    << std::endl;
+      << (((double) total) / (double) test_count)
+      << std::endl;
 
 
   //emp::NegativeBinomial nbi10(0.5, 2);
@@ -47,7 +47,7 @@ int main()
   std::cout << "\n-- Negative Binomial--\n";
 
   std::cout << "size = " << nbi10.GetSize() << std::endl
-	    << "total_prob = " << nbi10.GetTotalProb() << std::endl;
+      << "total_prob = " << nbi10.GetTotalProb() << std::endl;
 
   // for (size_t i = 0; i < 10; i++) {
   for (size_t i = 9; i < 40; i++) {

@@ -98,9 +98,9 @@ namespace evo {
       double total = 0.0;
       constexpr size_t mask = emp::MaskLow<size_t>(K+1);
       for (size_t i = 0; i < N; i++) {
-	      const size_t cur_val = (genome2 >> (int)i).GetUInt(0) & mask;
-	      const double cur_fit = GetFitness(i, cur_val);
-	      total += cur_fit;
+        const size_t cur_val = (genome2 >> (int)i).GetUInt(0) & mask;
+        const double cur_fit = GetFitness(i, cur_val);
+        total += cur_fit;
       }
       return total;
     }

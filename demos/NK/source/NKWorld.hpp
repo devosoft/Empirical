@@ -91,7 +91,7 @@ struct NKWorld : public emp::World<BitOrg> {
     //   if (n+K < N) {
     //     lexi_funs[n] = [this,n](const BitOrg & org){
     //       const size_t cur_val = (org >> n).GetUInt(0) & emp::MaskLow<size_t>(K+1);
-	  //       return landscape.GetFitness(n, cur_val);
+    //       return landscape.GetFitness(n, cur_val);
     //     };
     //   } else {
     //     lexi_funs[n] = [this,n](const BitOrg & org){

@@ -62,13 +62,13 @@ TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
   // Combine hash should always return the original values if only one combined.
   REQUIRE( emp::CombineHash(1) == 1 );
   REQUIRE( emp::CombineHash(2) == std::hash<int>()(2) );
-	REQUIRE( emp::CombineHash(3) == std::hash<int>()(3) );
-	REQUIRE( emp::CombineHash(4) == std::hash<int>()(4) );
-	REQUIRE( emp::CombineHash(2,3) == 0x9e377a3e );
-	REQUIRE( emp::CombineHash(3,2) == 0x9e377a78);
-	REQUIRE( emp::CombineHash(1,2) == 0x9e3779fa);
-	REQUIRE( emp::CombineHash(3,4) == 0x9e377a7e);
-	REQUIRE( emp::CombineHash(2,3,4) == 0x13c6ef4fc );
+  REQUIRE( emp::CombineHash(3) == std::hash<int>()(3) );
+  REQUIRE( emp::CombineHash(4) == std::hash<int>()(4) );
+  REQUIRE( emp::CombineHash(2,3) == 0x9e377a3e );
+  REQUIRE( emp::CombineHash(3,2) == 0x9e377a78);
+  REQUIRE( emp::CombineHash(1,2) == 0x9e3779fa);
+  REQUIRE( emp::CombineHash(3,4) == 0x9e377a7e);
+  REQUIRE( emp::CombineHash(2,3,4) == 0x13c6ef4fc );
 
 }
 

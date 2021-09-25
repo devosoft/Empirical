@@ -49,7 +49,7 @@
 
 /// Same as above, but a return type and default value are specified.
 
-#define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)	                              \
+#define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)                                \
 namespace internal {                                                                        \
   template <class T, class... ARGS>    /* T::METHOD exists! */                              \
   auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS &&... args) \

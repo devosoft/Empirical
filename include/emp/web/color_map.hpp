@@ -69,36 +69,36 @@ namespace emp {
     emp_assert( s >= 0.0 && s <= 1.0);
     emp_assert( v >= 0.0 && v <= 1.0);
 
-  	double c = s * v;
-  	double x = c * (1 - std::abs(std::fmod(h / 60.0, 2) - 1));
-  	double m = v - c;
-  	double rs, gs, bs;
+    double c = s * v;
+    double x = c * (1 - std::abs(std::fmod(h / 60.0, 2) - 1));
+    double m = v - c;
+    double rs, gs, bs;
 
-  	if(h >= 0 && h < 60) {
-  		rs = c;
-  		gs = x;
-  		bs = 0;
-  	} else if(h >= 60 && h < 120) {
-  		rs = x;
-  		gs = c;
-  		bs = 0;
-  	} else if(h >= 120 && h < 180) {
-  		rs = 0;
-  		gs = c;
-  		bs = x;
-  	} else if(h >= 180 && h < 240) {
-  		rs = 0;
-  		gs = x;
-  		bs = c;
-  	} else if(h >= 240 && h < 300) {
-  		rs = x;
-  		gs = 0;
-  		bs = c;
-  	} else {
-  		rs = c;
-  		gs = 0;
-  		bs = x;
-  	}
+    if(h >= 0 && h < 60) {
+      rs = c;
+      gs = x;
+      bs = 0;
+    } else if(h >= 60 && h < 120) {
+      rs = x;
+      gs = c;
+      bs = 0;
+    } else if(h >= 120 && h < 180) {
+      rs = 0;
+      gs = c;
+      bs = x;
+    } else if(h >= 180 && h < 240) {
+      rs = 0;
+      gs = x;
+      bs = c;
+    } else if(h >= 240 && h < 300) {
+      rs = x;
+      gs = 0;
+      bs = c;
+    } else {
+      rs = c;
+      gs = 0;
+      bs = x;
+    }
 
     int r = (int) ((rs + m) * 255);
     int g = (int) ((gs + m) * 255);

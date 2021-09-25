@@ -34,8 +34,8 @@ int main(int argc, char * argv[])
   // Check if we're just supposed to print the help info.
   if (files[0] == "--help") {
     std::cerr << "Format: " << argv[0] << " [args] {filename} [filenames...]\n"
-	      << "Available args:\n"
-	      << " -v : verbose output\n";
+        << "Available args:\n"
+        << " -v : verbose output\n";
     exit(0);
   }
 
@@ -62,7 +62,7 @@ int main(int argc, char * argv[])
   for (auto & [filename, info] : file_map) {
     if (verbose) {
       std::cerr << "Scanning '" << filename << "' found at: "
-		<< info.path << std::endl;
+        << info.path << std::endl;
     }
 
     emp::File file(info.path);
@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
       if (file.Contains(emp::to_string("\"", filename)) ||
           file.Contains(emp::to_string("/", filename)) ) {
         info.depends.insert(filename);
-	include_count++;
+        include_count++;
       }
     }
     if (verbose) {

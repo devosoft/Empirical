@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
   if (args.size() > 3) {
     std::cerr << "Only a single input filename and output filename are allowed as arguments."
-	      << std::endl;
+        << std::endl;
     exit(1);
   }
 

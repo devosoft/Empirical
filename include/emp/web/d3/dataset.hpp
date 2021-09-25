@@ -223,14 +223,14 @@ namespace D3 {
     }
 
     void Parse(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),	\
-				  accessor.c_str())
-	}
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),  \
+          accessor.c_str())
+      }
 
     void ParseRows(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),	\
-				  accessor.c_str())
-	}
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),  \
+          accessor.c_str())
+      }
 
     /// Put the last row of the array into arr
     template <std::size_t N, typename T>

@@ -30,11 +30,11 @@ namespace D3{
 
   struct JSONTreeNode {
     EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-				   int, name,
-				   int, parent,
-                   double, y,
-                   int, depth
-				   )
+      int, name,
+      int, parent,
+      double, y,
+      int, depth
+    )
   };
 
   /// A TreeLayout can be used to visualize hierarchical data as a tree (a series of edges
@@ -158,16 +158,16 @@ namespace D3{
                     return "translate(" + d.y + "," + d.x + ")"; });
 
         node.attr("transform", function(d) {
-        		  return "translate(" + d.y + "," + d.x + ")"; });
+              return "translate(" + d.y + "," + d.x + ")"; });
 
         var link = js.objects[$3].selectAll("path.link")
-      	  .data(links, function(d) { return d.name; });
+          .data(links, function(d) { return d.name; });
 
         var linkExit = link.exit();
         // Enter the links.
         var linkEnter = link.enter().insert("path", "g")
-      	    .attr("class", "link")
-      	    .attr("d", function(d) {return "M" + d.y + "," + d.x
+            .attr("class", "link")
+            .attr("d", function(d) {return "M" + d.y + "," + d.x
          + "C" + (d.y + d.parent.y) / 2 + "," + d.x
          + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
          + " " + d.parent.y + "," + d.parent.x;})

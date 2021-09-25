@@ -199,7 +199,7 @@ namespace emp {
       // If word is a valid command or alias for a command,
       // return the deflagged, dealiased command...
       // otherwise, it's a positional command.
-	    // In this context, positional commands are options that take
+      // In this context, positional commands are options that take
       // option-arguments
       auto parse_alias = [deflagged, args, alias_map, specs](const size_t i) {
         const std::string deflag = deflagged[i];
@@ -314,7 +314,7 @@ namespace emp {
           });
           i = j;
 
-		    }
+        }
 
       }
 

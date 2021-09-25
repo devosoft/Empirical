@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 
   if (args.size() != 4) {
     std::cout << "Format: " << args[0] << " [num orgs] [num criteria] [num fitness tiers]"
-	      << std::endl;
+        << std::endl;
     exit(1);
   }
 

@@ -40,7 +40,7 @@ namespace web {
     Font(const Font &) = default;
     Font(Font &&) = default;
     Font(const std::string & _family="Helvetica", int _size=15,
-	       const std::string & _color="black", bool _bold=false, bool _italic=false)
+         const std::string & _color="black", bool _bold=false, bool _italic=false)
       : family(_family), size(_size), color(_color)
       , is_bold(_bold), is_italic(_italic), is_smallcaps(false)
       , is_underlined(false), is_overlined(false), is_linethrough(false), is_wavy_line(false)  { ; }

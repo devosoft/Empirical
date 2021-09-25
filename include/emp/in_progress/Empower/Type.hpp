@@ -71,7 +71,7 @@ namespace emp {
 
     /// Destructor for type T at a specified MemoryImage position
     void Destruct(size_t mem_pos, MemoryImage & mem_image) const {
-	    mem_image.GetPtr<T>(mem_pos)->~T();
+      mem_image.GetPtr<T>(mem_pos)->~T();
     }
 
     /// Set the variable of the provided type at this memory position to the provided string.

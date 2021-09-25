@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 
   if (args.size() < 2 || args.size() > 4) {
     std::cerr << "Format: " << args[0] << " [letters] {input file} {output file}."
-	      << std::endl;
+        << std::endl;
     exit(1);
   }
 

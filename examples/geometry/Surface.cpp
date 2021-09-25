@@ -43,8 +43,9 @@ int main()
 
   for (auto & body : bodies) {
     body.id = surface.AddBody(&body,
-			                        { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
-		                  	      random.GetDouble(10.0, 100.0));
+      { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
+      random.GetDouble(10.0, 100.0)
+    );
   }
 
   std::cout << "---- surface results ----" << std::endl;
@@ -88,8 +89,9 @@ int main()
 
   for (auto & body : bodies3) {
     body.id = surface.AddBody(&body,
-			                        { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
-		                  	      random.GetDouble(10.0, 100.0));
+      { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
+      random.GetDouble(10.0, 100.0)
+    );
     std::cout << body.id << " ";
   }
   std::cout << ")\n";

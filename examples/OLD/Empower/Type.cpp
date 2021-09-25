@@ -11,14 +11,14 @@
 
 void PrintType(emp::Type & type) {
   std::cout << "type '" << type.GetName()
-	    << "' had id " << type.GetID()
-	    << " and size " << type.GetSize()
-	    << std::endl;
+      << "' had id " << type.GetID()
+      << " and size " << type.GetSize()
+      << std::endl;
   std::cout << "   IsType<int> = " << type.IsType<int>()
-	    << "   IsType<double> = " << type.IsType<double>()
-	    << "   IsType<string> = " << type.IsType<std::string>()
-	    << "   IsType<bool> = " << type.IsType<bool>()
-	    << std::endl;
+      << "   IsType<double> = " << type.IsType<double>()
+      << "   IsType<string> = " << type.IsType<std::string>()
+      << "   IsType<bool> = " << type.IsType<bool>()
+      << std::endl;
 }
 
 int main()

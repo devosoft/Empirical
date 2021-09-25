@@ -52,8 +52,8 @@ int main()
   // EMP_PACKS_PUSH_ALL(XXX, (1,2), (3,4,5,6), (7,8,9));
 
   std::cout << EMP_STRINGIFY(
-			     EMP_REORDER_ARGS_IMPL( (int test), ((int, a), (bool, b), (std::string, c)) )
-	       ) << std::endl;
+     EMP_REORDER_ARGS_IMPL( (int test), ((int, a), (bool, b), (std::string, c)) )
+    ) << std::endl;
 
 
   // Explore EMP_IF!

@@ -70,8 +70,8 @@ namespace emp {
       // Move the former last value to the now-empty spot.
       const size_t last_pos = vals.size() - 1;
       if (pos != last_pos) {
-      	vals[pos] = vals[last_pos];
-      	id_map[vals[pos]] = pos;
+        vals[pos] = vals[last_pos];
+        id_map[vals[pos]] = pos;
       }
       vals.resize(last_pos);
       return true;

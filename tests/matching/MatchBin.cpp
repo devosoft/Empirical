@@ -592,7 +592,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
   emp::BitSet<32> bs6;
   bs6.SetUInt(0,6);//0000 0110
   const size_t fedora = bitBin.Put("fedora", bs6);
-  REQUIRE	(bitBin.GetVal(fedora) == "fedora");
+  REQUIRE  (bitBin.GetVal(fedora) == "fedora");
 
   REQUIRE(bitBin.Size() == 2);
 
