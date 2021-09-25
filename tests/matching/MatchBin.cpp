@@ -1,17 +1,18 @@
 #define CATCH_CONFIG_MAIN
 
+#include <sstream>
+#include <string>
+
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/data/DataNode.hpp"
 #include "emp/matching/MatchBin.hpp"
 #include "emp/math/Random.hpp"
-
-#include <sstream>
-#include <string>
 
 TEST_CASE("Test MatchBin", "[matchbin]")
 {

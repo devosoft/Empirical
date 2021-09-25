@@ -11,6 +11,18 @@
 #define EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
 
 #include <algorithm>
+#include <deque>
+#include <functional>
+#include <ratio>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+
+#include "../../../third-party/cereal/include/cereal/cereal.hpp"
+#include "../../../third-party/cereal/include/cereal/types/string.hpp"
+#include "../../../third-party/cereal/include/cereal/types/unordered_map.hpp"
+#include "../../../third-party/cereal/include/cereal/types/unordered_set.hpp"
+
 #include "../base/array.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
@@ -19,21 +31,13 @@
 #include "../control/SignalControl.hpp"
 #include "../control/Signal.hpp"
 #include "../datastructs/map_utils.hpp"
-#include <deque>
-#include "EventLib.hpp"
-#include <functional>
-#include "InstLib.hpp"
 #include "../matching/MatchBin.hpp"
 #include "../math/Random.hpp"
-#include <ratio>
-#include "../../../third-party/cereal/include/cereal/cereal.hpp"
-#include "../../../third-party/cereal/include/cereal/types/string.hpp"
-#include "../../../third-party/cereal/include/cereal/types/unordered_map.hpp"
-#include "../../../third-party/cereal/include/cereal/types/unordered_set.hpp"
 #include "../tools/string_utils.hpp"
-#include <tuple>
-#include <unordered_map>
-#include <utility>
+
+#include "EventLib.hpp"
+#include "InstLib.hpp"
+
 
 // Developer Notes:
 //  * Program struct's PrintProgram prints program in a maximally readable format. However, this format

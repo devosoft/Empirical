@@ -18,14 +18,15 @@
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS // This file is just going to confuse doxygen
 
-#include "emp/base/assert_warning.hpp"
 #include <type_traits>
+
+#include "../base/assert_warning.hpp"
+#include "../tools/string_utils.hpp"
 
 /// If __EMSCRIPTEN__ is defined, initialize everything.  Otherwise create useful stubs.
 #ifdef __EMSCRIPTEN__
 
 #include <emscripten.h>
-#include "../tools/string_utils.hpp"
 
 #ifdef  __EMSCRIPTEN_PTHREADS__
 #include <pthread.h>

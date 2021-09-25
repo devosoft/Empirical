@@ -5,8 +5,9 @@
 //
 //  Some examples code for using emp::SettingCombos
 
-#include "emp/config/SettingCombos.hpp"
 #include <iostream>
+
+#include "emp/config/SettingCombos.hpp"
 
 #define PRINT(X) std::cout << #X " = " << X << std::endl
 

@@ -5,9 +5,10 @@
 //
 //  Some examples code for using emp::Distribution are derived classes.
 
+#include <iostream>
+
 #include "emp/math/Distribution.hpp"
 #include "emp/math/Random.hpp"
-#include <iostream>
 
 int main()
 {

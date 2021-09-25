@@ -1,8 +1,10 @@
 // ------- DEPRECATED -------
 #include "base/Ptr.h"
+
 #include <fstream>
-#include "hardware/EventDrivenGP.h"
 #include <iostream>
+
+#include "hardware/EventDrivenGP.h"
 #include "tools/BitSet.h"
 #include "tools/Random.h"
 

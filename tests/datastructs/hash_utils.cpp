@@ -4,13 +4,15 @@
 
 
 #include <array>
-#include "emp/base/vector.hpp"
-#include "emp/datastructs/hash_utils.hpp"
-#include "emp/datastructs/vector_utils.hpp"
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "emp/base/vector.hpp"
+#include "emp/datastructs/hash_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
+
 
 // emp::Random grand;
 TEST_CASE("Test hash_utils", "[datastructs]")

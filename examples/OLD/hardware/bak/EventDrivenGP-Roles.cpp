@@ -11,14 +11,15 @@
 //              fitness for each unique role-id set within the group. To be optimal, demes should coordinate
 //              to ensure that each CPU in the deme has a unique role-id.
 
+#include <iostream>
+#include <unordered_set>
+#include <utility>
+
 #include "base/Ptr.h"
 #include "Evo/World.h"
 #include "hardware/EventDrivenGP.h"
-#include <iostream>
 #include "tools/BitSet.h"
 #include "tools/Random.h"
-#include <unordered_set>
-#include <utility>
 
 using event_t = typename emp::EventDrivenGP::event_t;
 using event_lib_t = typename emp::EventDrivenGP::event_lib_t;

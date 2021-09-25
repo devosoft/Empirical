@@ -1,6 +1,8 @@
-#include "emp/config/ArgManager.hpp"
 #include <fstream>
 #include <iostream>
+
+#include "emp/config/ArgManager.hpp"
+
 #include "../SimplePDWorld.hpp"
 
 EMP_BUILD_CONFIG( PDWorldConfig,

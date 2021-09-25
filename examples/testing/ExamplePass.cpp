@@ -18,6 +18,8 @@
  */
 
 
+#include <string>
+
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
 
@@ -26,7 +28,6 @@
 // You may also include any other files that you need for your specific tests.
 
 #include "emp/tools/string_utils.hpp"
-#include <string>
 
 // You may create an extra functins or macros that you may need.
 

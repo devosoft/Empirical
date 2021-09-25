@@ -1,6 +1,7 @@
 #include <array>
-#include "emp/tools/attrs.hpp"
 #include <iostream>
+
+#include "emp/tools/attrs.hpp"
 
 using namespace emp::tools;
 

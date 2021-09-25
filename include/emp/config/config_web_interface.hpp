@@ -10,14 +10,16 @@
 #ifndef EMP_CONFIG_CONFIG_WEB_INTERFACE_HPP_INCLUDE
 #define EMP_CONFIG_CONFIG_WEB_INTERFACE_HPP_INCLUDE
 
-#include "config.hpp"
-#include "../datastructs/set_utils.hpp"
 #include <map>
 #include <set>
+
+#include "../datastructs/set_utils.hpp"
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"
 #include "../web/Element.hpp"
 #include "../web/Input.hpp"
+
+#include "config.hpp"
 
 namespace emp {
 
