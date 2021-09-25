@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+./ci/test_alphabetize_includes.sh && echo "✔ include alphabetization ok" || exit 1
+./ci/test_alphabetize_imports.sh && echo "✔ import alphabetization ok" || exit 1
+./ci/test_partition_includes.sh && echo "✔ include partitioning ok" || exit 1
+./ci/test_boilerplate.sh && echo "✔ boilerplate ok" || exit 1
+./ci/test_merge_conflict_markers.sh && echo "✔ conflict markers ok" || exit 1
+./ci/test_end_of_file_newlines.sh && echo "✔ EOF newlines ok" || exit 1
+./ci/test_tabs.sh && echo "✔ indentation ok" || exit 1
+./ci/test_trailing_whitespace.sh && echo "✔ trailing whitespace ok" || exit 1
