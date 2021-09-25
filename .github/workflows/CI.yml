@@ -8,6 +8,14 @@ on:
   schedule:
     - cron: '0 0 * * 0'
 jobs:
+  tidy:
+    name: Enforce Tidiness
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: ./ci/test_tidy.sh
   test:
     name: Tests
     runs-on: ubuntu-18.04
@@ -100,6 +108,7 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.ref == 'refs/heads/master'
     needs:
+      - tidy
       - test
       - test-web
       - test-coverage
