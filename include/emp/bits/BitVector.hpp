@@ -215,7 +215,7 @@ namespace emp {
     bool OK() const;
 
 
-    // >>>>>>>>>>  Accessors  <<<<<<<<<< //
+    // =========  Accessors  ========= //
 
     /// How many bits do we currently have?
     [[nodiscard]] size_t GetSize() const { return num_bits; }
@@ -283,7 +283,7 @@ namespace emp {
     BitVector & Resize(size_t new_bits);
 
 
-    // >>>>>>>>>>  Randomization functions  <<<<<<<<<< //
+    // =========  Randomization functions  ========= //
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitVector &  Randomize(Random & random);
@@ -322,7 +322,7 @@ namespace emp {
     BitVector & ClearRandomCount(Random & random, const size_t target_bits);
 
 
-    // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
+    // =========  Comparison Operators  ========= //
 
     [[nodiscard]] bool operator==(const BitVector & in) const;
     [[nodiscard]] bool operator!=(const BitVector & in) const { return !(*this == in); }
@@ -332,7 +332,7 @@ namespace emp {
     [[nodiscard]] bool operator>=(const BitVector & in) const { return !(*this < in); }
 
 
-    // >>>>>>>>>>  Conversion Operators  <<<<<<<<<< //
+    // =========  Conversion Operators  ========= //
 
     /// Automatically convert BitVector to other vector types.
     template <typename T> operator emp::vector<T>();
@@ -341,7 +341,7 @@ namespace emp {
     explicit operator bool() const { return Any(); }
 
 
-    // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
+    // =========  Access Groups of bits  ========= //
 
     /// Retrive the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
@@ -442,7 +442,7 @@ namespace emp {
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
-    // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
+    // =========  Other Analyses  ========= //
 
     /// A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash(size_t start_field=0) const;
@@ -516,7 +516,7 @@ namespace emp {
     [[nodiscard]] bool HasOverlap(const BitVector & in) const;
 
 
-    // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
+    // =========  Print/String Functions  ========= //
 
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
@@ -564,7 +564,7 @@ namespace emp {
     }
 
 
-    // >>>>>>>>>>  Boolean Logic and Shifting Operations  <<<<<<<<<< //
+    // =========  Boolean Logic and Shifting Operations  ========= //
 
     /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
     BitVector & NOT_SELF();
@@ -692,7 +692,7 @@ namespace emp {
     /// Compound operator for shift right...
     BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    // >>>>>>>>>>  Standard Library Compatability  <<<<<<<<<< //
+    // =========  Standard Library Compatability  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] size_t size() const { return num_bits; }

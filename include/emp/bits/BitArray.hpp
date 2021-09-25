@@ -288,7 +288,7 @@ namespace emp {
     /// Unset  a specified number of random bits (does not check if already zero.)
     BitArray & ClearRandomCount(Random & random, const size_t num_bits);
 
-    // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
+    // =========  Comparison Operators  ========== //
 
     template <size_t T2, bool L2>
     [[nodiscard]] bool operator==(const BitArray<T2,L2> & in) const;
@@ -312,7 +312,7 @@ namespace emp {
     explicit operator bool() const { return Any(); }
 
 
-    // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
+    // =========  Access Groups of bits  ========= //
 
     /// Retrive the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
@@ -410,7 +410,7 @@ namespace emp {
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
-    // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
+    // =========  Other Analyses  ========= //
 
     /// A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash() const noexcept;
@@ -459,7 +459,7 @@ namespace emp {
     [[nodiscard]] size_t LongestSegmentOnes() const;
 
 
-    // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
+    // =========  Print/String Functions  ========= //
 
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
