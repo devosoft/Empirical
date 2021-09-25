@@ -13,8 +13,8 @@
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/datastructs/Graph.hpp"
 #include "../../../include/emp/datastructs/graph_utils.hpp"
-#include "../../../include/emp/tools/string_utils.hpp"
 #include "../../../include/emp/tools/SolveState.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
 
 bool verbose;   // Should we print extra information about solving progress?
 bool debug;     // Should we print extra information to help diagnose problems?

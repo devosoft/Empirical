@@ -11,16 +11,16 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <deque>
 #include <algorithm>
+#include <climits>
+#include <deque>
+#include <fstream>
 #include <limits>
 #include <numeric>
-#include <climits>
-#include <unordered_set>
 #include <ratio>
+#include <sstream>
+#include <string>
+#include <unordered_set>
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
@@ -55,8 +55,8 @@
 #include "emp/functional/flex_function.hpp"
 #include "emp/functional/memo_function.hpp"
 #include "emp/io/NullStream.hpp"
-#include "emp/matching/matchbin_utils.hpp"
 #include "emp/matching/MatchBin.hpp"
+#include "emp/matching/matchbin_utils.hpp"
 #include "emp/math/info_theory.hpp"
 #include "emp/math/math.hpp"
 #include "emp/math/Random.hpp"

@@ -11,9 +11,9 @@
 #define EMP_PREFAB_MODAL_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
-#include "../web/Element.hpp"
-#include "../web/Div.hpp"
 #include "../web/Button.hpp"
+#include "../web/Div.hpp"
+#include "../web/Element.hpp"
 #include "../web/Widget.hpp"
 
 namespace emp {

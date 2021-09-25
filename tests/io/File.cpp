@@ -4,8 +4,8 @@
 
 #include "emp/io/File.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test File", "[io]")
 {

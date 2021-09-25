@@ -3,8 +3,8 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "emp/base/vector.hpp"
-#include "emp/math/Random.hpp"
 #include "emp/datastructs/vector_utils.hpp"
+#include "emp/math/Random.hpp"
 #include "emp/web/Animate.hpp"
 #include "emp/web/canvas_utils.hpp"
 #include "emp/web/emfunctions.hpp"

@@ -6,11 +6,11 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/prefab/ValueBox.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-#include "emp/prefab/ValueBox.hpp"
 
 // Test that the ValueBox class is constructed correctly
 struct Test_Value_Box_HTMLLayout : public emp::web::BaseTest {

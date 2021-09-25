@@ -10,8 +10,8 @@
 #ifndef EMP_EVOLVE_WORLD_SELECT_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_SELECT_HPP_INCLUDE
 
-#include <map>
 #include <functional>
+#include <map>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"

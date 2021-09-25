@@ -17,9 +17,9 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "../meta/type_traits.hpp"
 #include "../functional/FunctionSet.hpp"
 #include "../io/NullStream.hpp"
+#include "../meta/type_traits.hpp"
 #include "../tools/string_utils.hpp"
 
 #include "DataNode.hpp"

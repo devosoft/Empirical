@@ -15,8 +15,8 @@
 #define EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE
 
 
-#include <functional>
 #include "../base/assert.hpp"
+#include <functional>
 
 namespace emp {
 

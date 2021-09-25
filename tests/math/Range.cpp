@@ -4,8 +4,8 @@
 
 #include "emp/math/Range.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test Range", "[math]")
 {

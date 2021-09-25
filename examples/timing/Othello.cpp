@@ -11,8 +11,8 @@
 #include <memory>        // For std::shared_ptr
 #include <vector>
 
-#include "emp/games/Othello.hpp"
 #include "emp/games/Othello8.hpp"
+#include "emp/games/Othello.hpp"
 #include "emp/math/Random.hpp"
 
 int main()

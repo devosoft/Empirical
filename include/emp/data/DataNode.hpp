@@ -24,15 +24,15 @@
 #ifndef EMP_DATA_DATANODE_HPP_INCLUDE
 #define EMP_DATA_DATANODE_HPP_INCLUDE
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 
-#include "../base/vector.hpp"
 #include "../base/assert.hpp"
-#include "../meta/ValPack.hpp"
+#include "../base/vector.hpp"
 #include "../datastructs/IndexMap.hpp"
 #include "../functional/FunctionSet.hpp"
 #include "../math/math.hpp"
+#include "../meta/ValPack.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {

@@ -15,12 +15,12 @@
 #ifndef EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
 #define EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
 
-#include <numeric>
-#include <set>
 #include <algorithm>
 #include <functional>
 #include <limits>
 #include <map>
+#include <numeric>
+#include <set>
 
 #include "../base/vector.hpp"
 #include "../tools/string_utils.hpp"

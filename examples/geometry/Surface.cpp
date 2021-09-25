@@ -5,12 +5,12 @@
 //
 //  Some examples code for using emp::Random
 
-#include <iostream>
 #include "emp/geometry/Point2D.hpp"
 #include "emp/geometry/Surface.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
 #include "emp/tools/string_utils.hpp"
+#include <iostream>
 
 struct TestBody {
   size_t id = 0;

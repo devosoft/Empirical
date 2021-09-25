@@ -19,11 +19,11 @@
 
 #include <iostream>
 
+#include "emp/Evolve/StateGrid.hpp"
+#include "emp/Evolve/World.hpp"
 #include "emp/hardware/AvidaGP.hpp"
 #include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
-#include "emp/Evolve/StateGrid.hpp"
-#include "emp/Evolve/World.hpp"
 
 class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
 protected:

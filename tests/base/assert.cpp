@@ -10,8 +10,8 @@
 
 #include "emp/base/assert.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test assert", "[base]")
 {

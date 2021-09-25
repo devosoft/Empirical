@@ -4,8 +4,8 @@
 
 #include "emp/hardware/AvidaGP.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test Avida GP", "[Hardware]")
 {

@@ -9,8 +9,8 @@
 #include <string>
 
 #include "emp/compiler/DFA.hpp"
-#include "emp/compiler/NFA.hpp"
 #include "emp/compiler/lexer_utils.hpp"
+#include "emp/compiler/NFA.hpp"
 #include "emp/compiler/RegEx.hpp"
 
 void Test(const emp::DFA & dfa, const std::string & str) {

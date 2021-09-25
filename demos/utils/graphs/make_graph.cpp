@@ -13,10 +13,10 @@
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/datastructs/Graph.hpp"
 #include "../../../include/emp/datastructs/graph_utils.hpp"
+#include "../../../include/emp/datastructs/vector_utils.hpp"
 #include "../../../include/emp/math/Random.hpp"
 #include "../../../include/emp/math/random_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
-#include "../../../include/emp/datastructs/vector_utils.hpp"
 
 int GetValue(const std::string & query,
        emp::vector<std::string> & args,

@@ -85,16 +85,16 @@
 #ifndef EMP_DATA_DATAMAP_HPP_INCLUDE
 #define EMP_DATA_DATAMAP_HPP_INCLUDE
 
-#include <string>
 #include <cstring>        // For std::memcpy
+#include <string>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../meta/TypeID.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "MemoryImage.hpp"
 #include "DataLayout.hpp"
+#include "MemoryImage.hpp"
 
 namespace emp {
 

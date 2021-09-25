@@ -14,9 +14,9 @@
 #define EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
 
 
-#include <functional>
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
+#include <functional>
 #include "../meta/type_traits.hpp"
 
 namespace emp {

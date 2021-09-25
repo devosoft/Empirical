@@ -25,8 +25,8 @@
 #include "../datastructs/vector_utils.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "type_traits.hpp"
 #include "TypePack.hpp"
+#include "type_traits.hpp"
 
 namespace emp {
 

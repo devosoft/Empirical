@@ -33,8 +33,8 @@
 #include "Input.hpp"
 #include "Selector.hpp"
 #include "Table.hpp"
-#include "Text.hpp"
 #include "TextArea.hpp"
+#include "Text.hpp"
 
 #include "canvas_utils.hpp"
 #include "color_map.hpp"

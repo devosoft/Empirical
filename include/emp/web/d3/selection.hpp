@@ -11,14 +11,14 @@
 #define EMP_WEB_D3_SELECTION_HPP_INCLUDE
 
 #include "d3_init.hpp"
-#include "utils.hpp"
 #include "dataset.hpp"
+#include "utils.hpp"
 
+#include <array>
 #include <iostream>
+#include <map>
 #include <string>
 #include <typeinfo>
-#include <map>
-#include <array>
 
 #include "../../base/assert.hpp"
 #include "../js_utils.hpp"

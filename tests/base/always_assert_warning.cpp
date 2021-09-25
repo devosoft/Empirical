@@ -9,8 +9,8 @@
 
 #include "emp/base/always_assert_warning.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test always_assert_warning", "[base]")
 {

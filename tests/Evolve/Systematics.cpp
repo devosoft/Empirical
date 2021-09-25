@@ -6,15 +6,15 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
+#include "emp/base/vector.hpp"
 #include "emp/Evolve/SystematicsAnalysis.hpp"
 #include "emp/Evolve/Systematics.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/base/vector.hpp"
-#include "emp/hardware/AvidaGP.hpp"
 #include "emp/Evolve/World_output.hpp"
+#include "emp/hardware/AvidaGP.hpp"
 
 
 TEST_CASE("Test Systematics", "[Evolve]")

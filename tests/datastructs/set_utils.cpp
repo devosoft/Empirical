@@ -4,8 +4,8 @@
 
 #include "emp/datastructs/set_utils.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 
 

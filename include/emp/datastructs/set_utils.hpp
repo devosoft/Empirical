@@ -12,9 +12,9 @@
 #define EMP_DATASTRUCTS_SET_UTILS_HPP_INCLUDE
 
 
+#include <algorithm>
 #include <set>
 #include <unordered_set>
-#include <algorithm>
 
 #include "../base/vector.hpp"
 

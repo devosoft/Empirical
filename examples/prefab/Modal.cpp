@@ -4,9 +4,9 @@
 
 #include <iostream>
 
-#include "emp/web/web.hpp"
-#include "emp/web/Button.hpp"
 #include "emp/prefab/Modal.hpp"
+#include "emp/web/Button.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 

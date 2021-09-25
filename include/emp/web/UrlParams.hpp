@@ -14,8 +14,8 @@
 #include <map>
 #include <string>
 
-#include "JSWrap.hpp"
 #include "js_utils.hpp"
+#include "JSWrap.hpp"
 
 namespace emp {
 namespace web {

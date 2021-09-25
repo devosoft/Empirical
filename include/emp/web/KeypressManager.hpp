@@ -44,8 +44,8 @@
 #define EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
 
 #include <functional>
-#include <map>
 #include <locale>
+#include <map>
 
 #include "../base/errors.hpp"
 

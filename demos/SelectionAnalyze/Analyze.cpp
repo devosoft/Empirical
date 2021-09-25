@@ -4,8 +4,8 @@
 //
 //  Analyze probabilities for selection using various selection techniques.
 
-#include "emp/config/command_line.hpp"
 #include "emp/config/ArgManager.hpp"
+#include "emp/config/command_line.hpp"
 #include "emp/math/Random.hpp"
 
 #include "SelectionData.hpp"

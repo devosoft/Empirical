@@ -4,8 +4,8 @@
 
 #include "emp/functional/FunctionSet.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 // should migrate these inside the test case, probably
 

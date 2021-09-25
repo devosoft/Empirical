@@ -12,13 +12,13 @@
 
 #include <set>
 
+#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "../base/array.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "../data/Trait.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
-#include "../datastructs/vector_utils.hpp"
 
 namespace emp {
 

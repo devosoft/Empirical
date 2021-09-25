@@ -4,8 +4,8 @@
 
 #include "emp/base/vector.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test vector", "[base]")
 {

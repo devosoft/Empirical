@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 
+#include "../../base/vector.h"
 #include "../../hardware/AvidaGP.h"
 #include "../../hardware/InstLib.h"
-#include "../../base/vector.h"
 #include "../../tools/string_utils.h"
 
 

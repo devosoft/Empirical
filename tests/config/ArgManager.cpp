@@ -9,12 +9,12 @@
 #include <map>
 #include <optional>
 
+#include "assets/config_setup.hpp"
 #include "emp/base/assert.hpp"
 #include "emp/base/optional.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/config/config.hpp"
-#include "assets/config_setup.hpp"
 
 TEST_CASE("Test ArgManager", "[config]")
 {

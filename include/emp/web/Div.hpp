@@ -30,9 +30,9 @@
 #define EMP_WEB_DIV_HPP_INCLUDE
 
 #include "Animate.hpp"
+#include "init.hpp"
 #include "Text.hpp"
 #include "Widget.hpp"
-#include "init.hpp"
 
 namespace emp {
 namespace web {

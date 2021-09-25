@@ -4,8 +4,8 @@
 //
 //  Some examples code for using emp::TimeQueue
 
-#include <iostream>
 #include "emp/datastructs/TimeQueue.hpp"
+#include <iostream>
 
 int main()
 {

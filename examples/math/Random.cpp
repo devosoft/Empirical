@@ -5,10 +5,10 @@
 //
 //  Some examples code for using emp::Random
 
-#include <iostream>
-#include <vector>
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
+#include <iostream>
+#include <vector>
 
 int main()
 {

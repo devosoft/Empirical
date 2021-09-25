@@ -10,9 +10,9 @@
 #include "emp/base/optional.hpp"
 #include "emp/base/vector.hpp"
 
-#include <utility>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <utility>
 
 TEST_CASE("Test optional bad access", "[base]") {
 

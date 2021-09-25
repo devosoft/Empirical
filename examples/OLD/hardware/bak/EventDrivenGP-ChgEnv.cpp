@@ -11,13 +11,13 @@
 
 #include <iostream>
 
-#include "base/vector.h"
 #include "base/Ptr.h"
+#include "base/vector.h"
+#include "Evo/World.h"
 #include "hardware/EventDrivenGP.h"
+#include "tools/BitSet.h"
 #include "tools/Random.h"
 #include "tools/random_utils.h"
-#include "tools/BitSet.h"
-#include "Evo/World.h"
 
 using event_t = typename emp::EventDrivenGP::event_t;
 using event_lib_t = typename emp::EventDrivenGP::event_lib_t;

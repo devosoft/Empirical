@@ -10,30 +10,30 @@
 #ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
 #define EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
 
-#include <functional>
-#include <tuple>
-#include <unordered_map>
-#include <deque>
-#include <utility>
 #include <algorithm>
+#include "../base/array.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
+#include "../bits/BitVector.hpp"
+#include "../control/SignalControl.hpp"
+#include "../control/Signal.hpp"
+#include "../datastructs/map_utils.hpp"
+#include <deque>
+#include "EventLib.hpp"
+#include <functional>
+#include "InstLib.hpp"
+#include "../matching/MatchBin.hpp"
+#include "../math/Random.hpp"
 #include <ratio>
 #include "../../../third-party/cereal/include/cereal/cereal.hpp"
 #include "../../../third-party/cereal/include/cereal/types/string.hpp"
 #include "../../../third-party/cereal/include/cereal/types/unordered_map.hpp"
 #include "../../../third-party/cereal/include/cereal/types/unordered_set.hpp"
-#include "../bits/BitSet.hpp"
-#include "../bits/BitVector.hpp"
-#include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
-#include "../math/Random.hpp"
-#include "../matching/MatchBin.hpp"
-#include "../base/vector.hpp"
-#include "../base/Ptr.hpp"
-#include "../base/array.hpp"
-#include "../control/SignalControl.hpp"
-#include "../control/Signal.hpp"
-#include "InstLib.hpp"
-#include "EventLib.hpp"
+#include <tuple>
+#include <unordered_map>
+#include <utility>
 
 // Developer Notes:
 //  * Program struct's PrintProgram prints program in a maximally readable format. However, this format

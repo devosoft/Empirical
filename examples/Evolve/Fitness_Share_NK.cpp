@@ -7,9 +7,9 @@
 
 #include <iostream>
 
+#include "emp/bits/BitSet.hpp"
 #include "emp/Evolve/NK-const.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/bits/BitSet.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
 

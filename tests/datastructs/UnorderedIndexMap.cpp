@@ -4,8 +4,8 @@
 
 #include "emp/datastructs/UnorderedIndexMap.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test UnorderedIndexMap", "[datastructs]")
 {

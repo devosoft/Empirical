@@ -4,8 +4,8 @@
 
 #include "emp/io/NullStream.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 
 

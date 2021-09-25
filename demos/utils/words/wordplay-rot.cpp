@@ -13,9 +13,9 @@
 
 #include "../../../include/emp/base/assert.hpp"
 #include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/math/math.hpp"
-#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
 void Rot(std::string & str, int rot) {

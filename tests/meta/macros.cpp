@@ -11,8 +11,8 @@
 #include "emp/meta/macros.hpp"
 
 #include <array>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 // "Macros testing macros...Oh dear..."

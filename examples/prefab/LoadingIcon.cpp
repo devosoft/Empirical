@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include "emp/web/web.hpp"
 #include "emp/prefab/LoadingIcon.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 

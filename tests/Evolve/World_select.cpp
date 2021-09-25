@@ -5,8 +5,8 @@
 #include "emp/Evolve/World.hpp"
 #include "emp/Evolve/World_select.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test World select", "[Evolve]")
 {

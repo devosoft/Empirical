@@ -11,19 +11,19 @@
 #ifndef EMP_MATH_STATS_HPP_INCLUDE
 #define EMP_MATH_STATS_HPP_INCLUDE
 
+#include <cmath>
+#include <functional>
+#include <set>
 #include <type_traits>
 #include <unordered_map>
-#include <cmath>
-#include <vector>
-#include <set>
 #include <unordered_set>
-#include <functional>
+#include <vector>
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
-#include "../meta/type_traits.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "math.hpp"
+#include "../meta/type_traits.hpp"
 
 namespace emp {
 

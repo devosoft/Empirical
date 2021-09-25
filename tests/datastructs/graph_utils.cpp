@@ -4,8 +4,8 @@
 
 #include "emp/datastructs/graph_utils.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test graph_utils", "[datastructs]")
 {

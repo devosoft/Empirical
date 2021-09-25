@@ -12,33 +12,33 @@
 #define EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
 
 
-#include <iostream>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
 #include <algorithm>
-#include <stdexcept>
+#include <array>
+#include <functional>
+#include <iostream>
 #include <limits>
+#include <queue>
 #include <ratio>
+#include <stdexcept>
 #include <string>
 #include <tuple>
-#include <array>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
-#include <queue>
 
 #include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
-#include "../base/assert.hpp"
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
-#include "../datastructs/IndexMap.hpp"
 #include "../datastructs/hash_utils.hpp"
+#include "../datastructs/IndexMap.hpp"
 #include "../datastructs/tuple_utils.hpp"
-#include "../math/math.hpp"
 #include "../math/Distribution.hpp"
-#include "../tools/string_utils.hpp"
+#include "../math/math.hpp"
 #include "../polyfill/span.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

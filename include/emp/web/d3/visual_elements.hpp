@@ -11,9 +11,9 @@
 #ifndef EMP_WEB_D3_VISUAL_ELEMENTS_HPP_INCLUDE
 #define EMP_WEB_D3_VISUAL_ELEMENTS_HPP_INCLUDE
 
-#include "selection.hpp"
 #include "../../base/vector.hpp"
 #include "../JSWrap.hpp"
+#include "selection.hpp"
 
 namespace D3 {
 

@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/games/Othello.hpp"
 #include "emp/base/vector.hpp"
+#include "emp/games/Othello.hpp"
 #include "emp/math/Random.hpp"
 
 TEST_CASE("Test Othello", "[games]") {

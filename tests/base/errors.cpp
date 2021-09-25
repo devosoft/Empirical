@@ -8,8 +8,8 @@
 
 #include "emp/base/errors.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test errors", "[base]")
 {

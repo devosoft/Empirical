@@ -11,8 +11,8 @@
 #ifndef EMP_IO_MEMORYISTREAM_HPP_INCLUDE
 #define EMP_IO_MEMORYISTREAM_HPP_INCLUDE
 
-#include <streambuf>
 #include <istream>
+#include <streambuf>
 
 namespace emp {
 

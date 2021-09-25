@@ -8,8 +8,8 @@
 #include <string>
 
 #include "emp/base/vector.hpp"
-#include "emp/tools/TypeTracker.hpp"
 #include "emp/debug/debug.hpp"
+#include "emp/tools/TypeTracker.hpp"
 
 // Build some sample functions that we want called by type.
 void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }

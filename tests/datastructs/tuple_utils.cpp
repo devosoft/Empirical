@@ -2,11 +2,11 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/tuple_utils.hpp"
 #include "emp/base/vector.hpp"
+#include "emp/datastructs/tuple_utils.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 
 TEST_CASE("Test tuple_utils", "[datastructs]")

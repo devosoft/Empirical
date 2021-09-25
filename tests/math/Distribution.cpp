@@ -5,8 +5,8 @@
 #include "emp/math/Distribution.hpp"
 #include "emp/math/Random.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 /// Ensures that
 /// 1) A == B

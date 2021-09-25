@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include "emp/web/web.hpp"
 #include "emp/prefab/CodeBlock.hpp"
+#include "emp/web/web.hpp"
 
 emp::web::Document doc("emp_base");
 

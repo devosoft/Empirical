@@ -12,14 +12,14 @@
 #define EMP_MATH_MATH_HPP_INCLUDE
 
 
-#include <initializer_list>
 #include <algorithm>
 #include <cmath>
+#include <initializer_list>
 
 #include "../base/assert.hpp"
+#include "constants.hpp"
 #include "../meta/reflection.hpp"
 #include "Random.hpp"
-#include "constants.hpp"
 
 namespace emp {
 

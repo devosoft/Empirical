@@ -12,13 +12,13 @@
 
 #include "d3_init.hpp"
 #include "dataset.hpp"
-#include "selection.hpp"
-#include "svg_shapes.hpp"
 #include "../../datastructs/tuple_struct.hpp"
 #include "../JSWrap.hpp"
+#include "selection.hpp"
+#include "svg_shapes.hpp"
 
-#include <functional>
 #include <array>
+#include <functional>
 
 namespace D3{
 

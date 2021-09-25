@@ -5,8 +5,8 @@
 #include "emp/datastructs/map_utils.hpp"
 #include "emp/datastructs/vector_utils.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 

@@ -12,8 +12,8 @@
 #include <cereal/types/vector.hpp>
 
 #include "emp/data/DataNode.hpp"
-#include "emp/matching/matchbin_utils.hpp"
 #include "emp/matching/MatchBin.hpp"
+#include "emp/matching/matchbin_utils.hpp"
 #include "emp/math/Random.hpp"
 
 #include <sstream>

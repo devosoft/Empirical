@@ -5,9 +5,9 @@
 //
 //  Some examples code for using emp::Random
 
+#include "emp/math/Random14.h"
 #include <iostream>
 #include <vector>
-#include "emp/math/Random14.h"
 
 constexpr double TestConstRandom(int seed) {
   emp14::Random random(seed);

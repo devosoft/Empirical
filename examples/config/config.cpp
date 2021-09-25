@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "emp/config/config.hpp"
 #include "config_setup.hpp"
+#include "emp/config/config.hpp"
 
 int main()
 {

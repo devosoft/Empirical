@@ -14,10 +14,10 @@
 #include <string>
 #include <typeinfo>
 
-#include "../base/assert.hpp"
-#include "../base/vector.hpp"
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/map.hpp"
+#include "../base/vector.hpp"
 
 #include "init.hpp"
 

@@ -4,8 +4,8 @@
 
 #include "emp/math/sequence_utils.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 

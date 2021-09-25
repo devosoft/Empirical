@@ -16,9 +16,9 @@
 
 #include "emp/base/vector.hpp"
 #include "emp/bits/BitVector.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 #include "emp/io/File.hpp"
 #include "emp/math/random_utils.hpp"
-#include "emp/datastructs/vector_utils.hpp"
 
 class SelectionData {
 private:

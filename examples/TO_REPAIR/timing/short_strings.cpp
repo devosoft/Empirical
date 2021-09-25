@@ -13,8 +13,8 @@
 
 #include <algorithm>     // For std::sort
 #include <ctime>         // For std::clock
-#include <iostream>      // For std::cout, etc.
 #include <functional>    // For std::function
+#include <iostream>      // For std::cout, etc.
 #include <string>
 #include <unordered_map>
 #include <vector>

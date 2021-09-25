@@ -10,25 +10,25 @@
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <deque>
 #include <algorithm>
+#include <climits>
+#include <deque>
+#include <fstream>
 #include <limits>
 #include <numeric>
-#include <climits>
-#include <unordered_set>
 #include <ratio>
+#include <sstream>
+#include <string>
+#include <unordered_set>
 
-#include "emp/data/DataNode.hpp"
-#include "emp/bits/BitSet.hpp"
-#include "emp/functional/FunctionSet.hpp"
-#include "emp/compiler/RegEx.hpp"
-#include "emp/math/Random.hpp"
-#include "emp/tools/TypeTracker.hpp"
-#include "emp/tools/attrs.hpp"
 #include "emp/base/map.hpp"
+#include "emp/bits/BitSet.hpp"
+#include "emp/compiler/RegEx.hpp"
+#include "emp/data/DataNode.hpp"
+#include "emp/functional/FunctionSet.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/tools/attrs.hpp"
+#include "emp/tools/TypeTracker.hpp"
 
 
 template <size_t... VALS> struct TestBVConstruct;

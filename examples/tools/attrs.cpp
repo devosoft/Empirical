@@ -1,5 +1,5 @@
-#include "emp/tools/attrs.hpp"
 #include <array>
+#include "emp/tools/attrs.hpp"
 #include <iostream>
 
 using namespace emp::tools;

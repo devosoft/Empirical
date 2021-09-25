@@ -14,7 +14,7 @@
 
 
 #include "../matching/matchbin_metrics.hpp"
-#include "../matching/matchbin_selectors.hpp"
 #include "../matching/matchbin_regulators.hpp"
+#include "../matching/matchbin_selectors.hpp"
 
 #endif // #ifndef EMP_MATCHING_MATCHBIN_UTILS_HPP_INCLUDE

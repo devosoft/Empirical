@@ -6,8 +6,8 @@
 #include <string>
 
 #include "emp/base/array.hpp"
-#include "emp/base/vector.hpp"
 #include "emp/base/Ptr.hpp"
+#include "emp/base/vector.hpp"
 #include "emp/datastructs/tuple_utils.hpp"
 #include "emp/meta/meta.hpp"
 

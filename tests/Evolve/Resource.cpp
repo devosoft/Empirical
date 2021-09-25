@@ -1,15 +1,15 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include <iostream>
 #include "emp/base/array.hpp"
-#include "emp/Evolve/NK-const.hpp"
-#include "emp/Evolve/World.hpp"
-#include "emp/Evolve/Resource.hpp"
-#include "emp/Evolve/NK.hpp"
 #include "emp/bits/BitSet.hpp"
+#include "emp/Evolve/NK-const.hpp"
+#include "emp/Evolve/NK.hpp"
+#include "emp/Evolve/Resource.hpp"
+#include "emp/Evolve/World.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
+#include <iostream>
 
 constexpr size_t K = 3;
 constexpr size_t N = 40;

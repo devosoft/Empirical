@@ -15,8 +15,8 @@
 
 // You may also include any other files that you need for your specific tests.
 
-#include <string>
 #include "emp/tools/string_utils.hpp"
+#include <string>
 
 // You may create an extra functions or macros that you may need.
 

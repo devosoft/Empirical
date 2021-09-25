@@ -3,11 +3,11 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "emp/base/assert.hpp"
-#include "emp/tools/string_utils.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
-#include "emp/web/Document.hpp"
-#include "emp/web/web.hpp"
 #include "emp/prefab/ReadoutPanel.hpp"
+#include "emp/tools/string_utils.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 int num_anim_steps;
 int live_variable;

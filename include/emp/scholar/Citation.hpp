@@ -14,11 +14,11 @@
 #include <set>
 #include <string>
 
+#include "Author.hpp"
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
-#include "Author.hpp"
 
 namespace emp {
 

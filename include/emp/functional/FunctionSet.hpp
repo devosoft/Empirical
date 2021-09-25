@@ -11,8 +11,8 @@
 #ifndef EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
 #define EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
 
-#include <functional>
 #include "../base/vector.hpp"
+#include <functional>
 
 namespace emp {
 

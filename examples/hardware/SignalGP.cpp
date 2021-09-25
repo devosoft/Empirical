@@ -11,8 +11,8 @@
 
 #include "emp/base/Ptr.hpp"
 #include "emp/hardware/EventDrivenGP.hpp"
-#include "emp/hardware/InstLib.hpp"
 #include "emp/hardware/EventLib.hpp"
+#include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
 
 // A few constants

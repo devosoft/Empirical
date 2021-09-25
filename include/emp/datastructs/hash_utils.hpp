@@ -11,11 +11,11 @@
 #ifndef EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
 #define EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
 
-#include <numeric>
-#include <type_traits>
 #include <cstddef>
 #include <cstring>
+#include <numeric>
 #include <stdint.h>
+#include <type_traits>
 
 #include "../base/Ptr.hpp"
 #include "../polyfill/span.hpp"

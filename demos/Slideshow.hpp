@@ -12,8 +12,8 @@
 
 #include "emp/base/vector.hpp"
 #include "emp/web/emfunctions.hpp"
-#include "emp/web/web.hpp"
 #include "emp/web/KeypressManager.hpp"
+#include "emp/web/web.hpp"
 
 namespace emp {
 

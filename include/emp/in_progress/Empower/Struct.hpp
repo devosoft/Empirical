@@ -15,8 +15,8 @@
 #include "../base/vector.hpp"
 
 #include "StructType.h"
-#include "VarInfo.h"
 #include "Var.h"
+#include "VarInfo.h"
 
 namespace emp {
 

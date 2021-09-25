@@ -4,8 +4,8 @@
 
 #include "emp/io/serialize.hpp"
 
-#include <sstream>
 #include <map>
+#include <sstream>
 
 TEST_CASE("Test serialize", "[io]")
 {

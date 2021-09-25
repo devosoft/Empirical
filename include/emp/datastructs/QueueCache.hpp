@@ -11,12 +11,12 @@
 #ifndef EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
 #define EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
 
-#include <list>
-#include <unordered_map>
-#include <utility>
-#include <stdexcept>
 #include <functional>
 #include <limits>
+#include <list>
+#include <stdexcept>
+#include <unordered_map>
+#include <utility>
 
 #include "../base/assert.hpp"
 

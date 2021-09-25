@@ -3,16 +3,16 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <functional>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
-#include "emp/web/Document.hpp"
-#include "emp/web/web.hpp"
-#include "emp/web/Div.hpp"
 #include "emp/web/Button.hpp"
+#include "emp/web/Div.hpp"
+#include "emp/web/Document.hpp"
 #include "emp/web/js_utils.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 #include "emp/prefab/Collapse.hpp"
 

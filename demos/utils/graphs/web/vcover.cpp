@@ -6,8 +6,8 @@
 #include "emp/config/command_line.hpp"
 #include "emp/datastructs/Graph.hpp"
 #include "emp/datastructs/graph_utils.hpp"
-#include "emp/tools/string_utils.hpp"
 #include "emp/tools/SolveState.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #include <emscripten.h>
 

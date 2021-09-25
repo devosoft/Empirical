@@ -5,8 +5,8 @@
 #include "emp/io/ContiguousStream.hpp"
 #include "emp/math/Random.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 
 TEST_CASE("Test ContiguousStreamBuf", "[io]")

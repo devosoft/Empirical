@@ -6,21 +6,21 @@
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <deque>
 #include <algorithm>
+#include <climits>
+#include <deque>
+#include <fstream>
 #include <limits>
 #include <numeric>
-#include <climits>
-#include <unordered_set>
 #include <ratio>
+#include <sstream>
+#include <string>
+#include <unordered_set>
 
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/vector.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/vector.hpp>
 
 TEST_CASE("Test Random", "[math]")
 {

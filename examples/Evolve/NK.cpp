@@ -7,10 +7,10 @@
 
 #include <iostream>
 
+#include "emp/bits/BitVector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/Evolve/NK.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
 EMP_BUILD_CONFIG( NKConfig,

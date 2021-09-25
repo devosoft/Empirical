@@ -5,9 +5,9 @@
 //
 //  Some examples code for using emp::memo_function
 
-#include <iostream>
 #include "emp/functional/memo_function.hpp"
 #include "emp/math/Random.hpp"
+#include <iostream>
 
 double F(int N) {
   double PI = 3.14159;

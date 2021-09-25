@@ -11,8 +11,8 @@
 #define EMP_WEB_FONT_HPP_INCLUDE
 
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "color_map.hpp"
 #include "Style.hpp"

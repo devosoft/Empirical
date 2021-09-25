@@ -11,8 +11,8 @@
 #define EMP_GAMES_MANCALA_HPP_INCLUDE
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <unordered_map>
 
 #include "../base/array.hpp"

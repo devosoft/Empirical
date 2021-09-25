@@ -11,8 +11,8 @@
 
 #include "emp/base/array.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test array", "[base]")
 {

@@ -7,9 +7,9 @@
 
 #include "emp/base/Ptr.hpp"
 
-#include <sstream>
-#include <iostream>
 #include <functional>
+#include <iostream>
+#include <sstream>
 
 TEST_CASE("Test Ptr", "[base]")
 {

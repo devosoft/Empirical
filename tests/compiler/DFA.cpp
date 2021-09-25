@@ -4,8 +4,8 @@
 
 #include "emp/compiler/DFA.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test DFA", "[compiler]")
 {

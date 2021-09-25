@@ -6,11 +6,11 @@
 #include <valarray>
 
 #include "../../config/ArgManager.h"
+#include "../../evo/World.h"
 #include "../../games/Mancala.h"
 #include "../../hardware/AvidaGP.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
-#include "../../evo/World.h"
 
 #include "../../../eco-ea-mancala/source/TestcaseSet.h"
 

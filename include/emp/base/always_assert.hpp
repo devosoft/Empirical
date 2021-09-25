@@ -31,8 +31,8 @@
 
 #include <cstdlib>
 
-#include "_assert_trigger.hpp"
 #include "_assert_macros.hpp"
+#include "_assert_trigger.hpp"
 
 #if defined( __EMSCRIPTEN__ )
 

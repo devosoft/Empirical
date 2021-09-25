@@ -21,9 +21,9 @@
 #include <string>
 #include <vector>
 
+#include "../base/optional.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../base/optional.hpp"
 #include "command_line.hpp"
 #include "config.hpp"
 

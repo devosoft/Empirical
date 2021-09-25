@@ -18,10 +18,10 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "vector_utils.hpp"
-#include "../math/random_utils.hpp"
-#include "../math/Random.hpp"
 #include "Graph.hpp"
+#include "../math/Random.hpp"
+#include "../math/random_utils.hpp"
+#include "vector_utils.hpp"
 
 namespace emp {
 

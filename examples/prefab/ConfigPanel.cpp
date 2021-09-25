@@ -4,11 +4,11 @@
 
 #include <iostream>
 
-#include "emp/config/command_line.hpp"
 #include "emp/config/ArgManager.hpp"
+#include "emp/config/command_line.hpp"
 #include "emp/prefab/ConfigPanel.hpp"
-#include "emp/web/web.hpp"
 #include "emp/web/UrlParams.hpp"
+#include "emp/web/web.hpp"
 
 #include "assets/SampleConfig.hpp"
 

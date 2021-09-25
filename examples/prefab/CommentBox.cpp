@@ -4,9 +4,9 @@
 
 #include <iostream>
 
-#include "emp/web/web.hpp"
-#include "emp/web/Div.hpp"
 #include "emp/prefab/CommentBox.hpp"
+#include "emp/web/Div.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 

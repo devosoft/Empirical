@@ -12,8 +12,8 @@
 #define EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "_is_streamable.hpp"
 

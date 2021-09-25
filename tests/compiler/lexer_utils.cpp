@@ -2,13 +2,13 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include "emp/compiler/DFA.hpp"
 #include "emp/compiler/lexer_utils.hpp"
 #include "emp/compiler/NFA.hpp"
 #include "emp/compiler/RegEx.hpp"
-#include "emp/compiler/DFA.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test lexer_utils", "[compiler]")
 {

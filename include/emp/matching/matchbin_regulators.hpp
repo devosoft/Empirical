@@ -12,25 +12,25 @@
 #define EMP_MATCHING_MATCHBIN_REGULATORS_HPP_INCLUDE
 
 
-#include <iostream>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
 #include <algorithm>
-#include <stdexcept>
+#include <array>
+#include <functional>
+#include <iostream>
 #include <limits>
 #include <ratio>
+#include <stdexcept>
 #include <string>
 #include <tuple>
-#include <array>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
-#include "../base/assert.hpp"
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
-#include "../datastructs/IndexMap.hpp"
 #include "../datastructs/hash_utils.hpp"
+#include "../datastructs/IndexMap.hpp"
 #include "../math/Distribution.hpp"
 #include "../math/math.hpp"
 #include "../tools/string_utils.hpp"

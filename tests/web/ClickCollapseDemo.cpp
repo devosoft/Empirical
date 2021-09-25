@@ -27,15 +27,15 @@
  */
 
 #include <functional>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
-#include "emp/web/web.hpp"
 #include "emp/web/js_utils.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 #include "emp/prefab/Collapse.hpp"
 

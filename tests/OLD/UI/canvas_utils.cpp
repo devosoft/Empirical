@@ -1,6 +1,6 @@
 #include "../../tools/Random.h"
-#include "../../UI/UI.h"
 #include "../../UI/canvas_utils.h"
+#include "../../UI/UI.h"
 
 namespace UI = emp::UI;
 

@@ -6,8 +6,8 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/Document.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
 
 #include "emp/prefab/CodeBlock.hpp"

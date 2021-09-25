@@ -16,10 +16,10 @@
 #define EMP_BITS_BITARRAY_HPP_INCLUDE
 
 
-#include <iostream>
-#include <initializer_list>
-#include <cstring>
 #include <bitset>
+#include <cstring>
+#include <initializer_list>
+#include <iostream>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -30,8 +30,8 @@
 #include "../meta/type_traits.hpp"
 #include "../polyfill/span.hpp"
 
-#include "bitset_utils.hpp"
 #include "_bitset_helpers.hpp"
+#include "bitset_utils.hpp"
 
 namespace emp {
 

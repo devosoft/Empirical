@@ -2,12 +2,12 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/stats.hpp"
 #include "emp/datastructs/vector_utils.hpp"
+#include "emp/math/stats.hpp"
 
-#include <sstream>
-#include <iostream>
 #include <deque>
+#include <iostream>
+#include <sstream>
 
 
 TEST_CASE("Test stats", "[math]") {

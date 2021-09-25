@@ -1,7 +1,7 @@
 #include <vector>
 #define CATCH_CONFIG_MAIN
-#include "third-party/Catch/single_include/catch2/catch.hpp"
 #include <stdlib.h>
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/geometry/Circle2D.hpp"
 

@@ -5,10 +5,10 @@
 #include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
-#include <sstream>
-#include <map>
 #include <limits>
+#include <map>
 #include <ratio>
+#include <sstream>
 
 #include "emp/base/vector.hpp"
 

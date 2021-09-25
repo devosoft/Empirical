@@ -4,8 +4,8 @@
 
 #include "emp/debug/alert.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test Alert", "[debug]")
 {

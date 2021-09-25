@@ -2,9 +2,9 @@
 // Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
+#include <cmath>
 #include <emscripten.h>
 #include <iostream>
-#include <cmath>
 
 #include "EmKinetic.h"
 

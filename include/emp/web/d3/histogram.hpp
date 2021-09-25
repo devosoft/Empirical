@@ -10,9 +10,9 @@
 #ifndef EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE
 #define EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE
 
+#include "../../base/vector.hpp"
 #include "d3_init.hpp"
 #include "dataset.hpp"
-#include "../../base/vector.hpp"
 #include "../../datastructs/tuple_struct.hpp"
 #include "../js_utils.hpp"
 

@@ -3,14 +3,14 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
-#include <sstream>
-#include <iostream>
-#include <unordered_set>
 #include <array>
-#include <unordered_map>
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/hash_utils.hpp"
 #include "emp/datastructs/vector_utils.hpp"
+#include <iostream>
+#include <sstream>
+#include <unordered_map>
+#include <unordered_set>
 
 // emp::Random grand;
 TEST_CASE("Test hash_utils", "[datastructs]")

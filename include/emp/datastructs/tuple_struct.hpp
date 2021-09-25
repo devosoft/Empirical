@@ -70,8 +70,8 @@
 #define EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
 
 #include <tuple>
-#include <typeinfo>
 #include <typeindex>
+#include <typeinfo>
 
 #include "../meta/macros.hpp"
 #include "../meta/meta.hpp"

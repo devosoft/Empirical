@@ -4,8 +4,8 @@
 //
 //  Calculate probabilities for selection using Lexicase Selection
 
-#include "emp/config/command_line.hpp"
 #include "emp/config/ArgManager.hpp"
+#include "emp/config/command_line.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
 

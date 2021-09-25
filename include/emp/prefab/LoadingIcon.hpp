@@ -12,8 +12,8 @@
 
 #include "../base/errors.hpp"
 #include "../tools/string_utils.hpp"
-#include "../web/Element.hpp"
 #include "../web/Div.hpp"
+#include "../web/Element.hpp"
 #include "../web/Widget.hpp"
 
 namespace emp {

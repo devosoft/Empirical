@@ -10,27 +10,27 @@
 #ifndef EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
 #define EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
 
-#include <functional>
 #include <algorithm>
 #include <deque>
+#include <functional>
 
-#include "../../config/config.hpp"
+#include "../Animate.hpp"
+#include "axis.hpp"
 #include "../../bits/BitSet.hpp"
+#include "../../config/config.hpp"
+#include "../../functional/FunctionSet.hpp"
+#include "histogram.hpp"
+#include "../init.hpp"
+#include "../JSWrap.hpp"
+#include "layout.hpp"
+#include "../../math/constants.hpp"
 #include "../../math/Random.hpp"
 #include "../../math/stats.hpp"
-#include "../../tools/string_utils.hpp"
-#include "../../functional/FunctionSet.hpp"
-#include "../../math/constants.hpp"
-#include "../init.hpp"
-#include "../Animate.hpp"
-#include "../JSWrap.hpp"
-#include "selection.hpp"
 #include "scales.hpp"
-#include "axis.hpp"
+#include "selection.hpp"
 #include "svg_shapes.hpp"
-#include "layout.hpp"
+#include "../../tools/string_utils.hpp"
 #include "visual_elements.hpp"
-#include "histogram.hpp"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 

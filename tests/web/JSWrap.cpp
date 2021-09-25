@@ -6,9 +6,9 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/init.hpp"
 #include "emp/web/JSWrap.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 
 // --- These structs are used to test JSWrap ---
 struct JSDataObject {

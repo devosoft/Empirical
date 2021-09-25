@@ -5,8 +5,8 @@
 
 #include "emp/Evolve/NK.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test NK Landscapes", "[Evolve]")
 {

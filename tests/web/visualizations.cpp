@@ -2,12 +2,12 @@
 // Javascript files in karma will cause horrible problems.
 
 
-#include "emp/web/d3/visualizations.hpp"
 #include "emp/datastructs/tuple_struct.hpp"
+#include "emp/web/d3/visualizations.hpp"
 #include "emp/web/Document.hpp"
 
-#include <iostream>
 #include <functional>
+#include <iostream>
 
 struct LineageTreeDataNode{
         EMP_BUILD_INTROSPECTIVE_TUPLE(

@@ -30,8 +30,8 @@
 #include "../base/vector.hpp"
 
 #include "Div.hpp"
-#include "Widget.hpp"
 #include "WidgetExtras.hpp"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {
@@ -737,10 +737,10 @@ namespace web {
 }
 
 #include "_TableCell.hpp"
-#include "_TableRow.hpp"
+#include "_TableColGroup.hpp"
 #include "_TableCol.hpp"
 #include "_TableRowGroup.hpp"
-#include "_TableColGroup.hpp"
+#include "_TableRow.hpp"
 
 namespace emp {
 namespace web {

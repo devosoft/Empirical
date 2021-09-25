@@ -17,10 +17,10 @@
 
 #include <iostream>
 
+#include "emp/Evolve/World.hpp"
 #include "emp/hardware/AvidaGP.hpp"
 #include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
-#include "emp/Evolve/World.hpp"
 
 void Print(const emp::AvidaGP & cpu) {
   cpu.PrintGenome();

@@ -1,10 +1,10 @@
 // ------- DEPRECATED -------
-#include <iostream>
+#include "base/Ptr.h"
 #include <fstream>
 #include "hardware/EventDrivenGP.h"
-#include "base/Ptr.h"
-#include "tools/Random.h"
+#include <iostream>
 #include "tools/BitSet.h"
+#include "tools/Random.h"
 
 int main() {
   std::cout << "Testing EventDrivenGP." << std::endl;

@@ -13,10 +13,10 @@
 #include <map>
 #include <string>
 
-#include "../../meta/macros.hpp"
 #include "../init.hpp"
 #include "../js_utils.hpp"
 #include "../JSWrap.hpp"
+#include "../../meta/macros.hpp"
 
 // Helper macros
 

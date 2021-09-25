@@ -23,13 +23,13 @@
 #ifndef EMP_GEOMETRY_BODY2D_HPP_INCLUDE
 #define EMP_GEOMETRY_BODY2D_HPP_INCLUDE
 
+#include "Angle2D.hpp"
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "Circle2D.hpp"
 #include "../debug/alert.hpp"
 #include "../debug/mem_track.hpp"
-#include "Angle2D.hpp"
-#include "Circle2D.hpp"
 
 namespace emp {
 

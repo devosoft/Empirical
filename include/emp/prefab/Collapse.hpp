@@ -12,8 +12,8 @@
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"
-#include "../web/Widget.hpp"
 #include "../web/_FacetedWidget.hpp"
+#include "../web/Widget.hpp"
 
 namespace emp {
 namespace prefab {

@@ -6,11 +6,11 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
-#include "emp/web/Document.hpp"
-#include "emp/web/Div.hpp"
-#include "emp/web/web.hpp"
 #include "emp/prefab/Card.hpp"
+#include "emp/web/Div.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 
 // Test that the Card class properly gets attached and laid out via emp::web::Document.

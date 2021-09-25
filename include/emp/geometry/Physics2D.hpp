@@ -11,8 +11,8 @@
 #ifndef EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE
 #define EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE
 
-#include <unordered_set>
 #include <functional>
+#include <unordered_set>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

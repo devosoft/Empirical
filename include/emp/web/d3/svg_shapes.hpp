@@ -11,10 +11,10 @@
 #define EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
 
 #include "d3_init.hpp"
-#include "selection.hpp"
-#include "scales.hpp"
 #include "dataset.hpp"
 #include "../js_utils.hpp"
+#include "scales.hpp"
+#include "selection.hpp"
 
 namespace D3 {
 

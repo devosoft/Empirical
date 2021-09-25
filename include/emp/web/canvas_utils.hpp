@@ -16,12 +16,12 @@
 #include "Canvas.hpp"
 
 #include "../base/vector.hpp"
+#include "../bits/BitMatrix.hpp"
+#include "color_map.hpp"
 #include "../Evolve/StateGrid.hpp"
 #include "../geometry/Circle2D.hpp"
 #include "../geometry/Surface2D.hpp"
 #include "../geometry/Surface.hpp"
-#include "../bits/BitMatrix.hpp"
-#include "color_map.hpp"
 
 namespace emp {
 namespace web {

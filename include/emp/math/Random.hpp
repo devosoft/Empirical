@@ -11,10 +11,10 @@
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
 #define EMP_MATH_RANDOM_HPP_INCLUDE
 
-#include <ctime>
 #include <climits>
 #include <cmath>
 #include <cstring>
+#include <ctime>
 #include <iterator>
 
 #include "../base/assert.hpp"

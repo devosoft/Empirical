@@ -4,10 +4,10 @@
 
 #include <iostream>
 
+#include "evo/World.h"
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "evo/World.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {

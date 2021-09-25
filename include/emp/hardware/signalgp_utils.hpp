@@ -12,10 +12,10 @@
 #ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 #define EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 
-#include <unordered_set>
-#include <string>
-#include <functional>
 #include <algorithm>
+#include <functional>
+#include <string>
+#include <unordered_set>
 
 #include "../base/errors.hpp"
 #include "../bits/BitSet.hpp"

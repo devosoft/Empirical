@@ -9,8 +9,8 @@
 #include "emp/meta/macro_math.hpp"
 #include "emp/meta/macros.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 // "Macros testing macros...Oh dear..."

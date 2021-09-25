@@ -9,14 +9,14 @@
 #include <string>
 #include <vector>
 
+#include "../../geometry/Circle2D.h"
+#include "../../geometry/Point2D.h"
 #include "../../tools/assert.h"
 #include "../../tools/callbacks.h"
 #include "../../tools/const.h"
-#include "../../geometry/Circle2D.h"
-#include "../../geometry/Point2D.h"
 
-#include "../../web/emfunctions.h"
 #include "../../web/Color.h"
+#include "../../web/emfunctions.h"
 #include "../../web/Font.h"
 #include "../../web/RawImage.h"
 

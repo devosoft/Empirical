@@ -16,9 +16,9 @@
 
 
 #include "Animate.hpp"
+#include "Div.hpp"
 #include "Text.hpp"
 #include "Widget.hpp"
-#include "Div.hpp"
 
 #include "init.hpp"
 

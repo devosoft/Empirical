@@ -2,8 +2,8 @@
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/config/SettingConfig.hpp"
 #include "../../../include/emp/data/DataLog.hpp"
-#include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/datastructs/vector_utils.hpp"
+#include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/math/stats.hpp"
 
 int main(int argc, char* argv[])

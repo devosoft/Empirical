@@ -4,8 +4,8 @@
 
 #include "emp/datastructs/vector_utils.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test vector_utils", "[datastructs]")
 {

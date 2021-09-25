@@ -2,18 +2,18 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/math.hpp"
 #include "emp/data/DataNode.hpp"
+#include "emp/math/math.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <deque>
 #include <algorithm>
+#include <climits>
+#include <deque>
+#include <iostream>
 #include <limits>
 #include <numeric>
-#include <climits>
-#include <unordered_set>
 #include <ratio>
+#include <sstream>
+#include <unordered_set>
 
 TEST_CASE("Test Math", "[math]")
 {

@@ -4,8 +4,8 @@
 
 #include "emp/compiler/RegEx.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test RegEx", "[compiler]")
 {

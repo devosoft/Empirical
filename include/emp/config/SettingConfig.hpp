@@ -11,10 +11,10 @@
 #ifndef EMP_CONFIG_SETTINGCONFIG_HPP_INCLUDE
 #define EMP_CONFIG_SETTINGCONFIG_HPP_INCLUDE
 
-#include <unordered_map>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

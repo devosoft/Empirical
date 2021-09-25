@@ -11,15 +11,15 @@
 #ifndef EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
 #define EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
 
-#include <unordered_map>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../datastructs/vector_utils.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "../math/math.hpp"
 #include "../tools/string_utils.hpp"
 

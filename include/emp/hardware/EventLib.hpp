@@ -13,10 +13,10 @@
 #define EMP_HARDWARE_EVENTLIB_HPP_INCLUDE
 
 #include <functional>
-#include <unordered_set>
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
+#include <unordered_set>
 
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"

@@ -15,8 +15,8 @@
 #include <emscripten.h>
 #endif
 
-#include "../tools/string_utils.hpp"
 #include "../base/errors.hpp"
+#include "../tools/string_utils.hpp"
 
 #include <map>
 #include <string>

@@ -4,8 +4,8 @@
 
 #include "emp/compiler/NFA.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("Test NFA", "[compiler]")
 {

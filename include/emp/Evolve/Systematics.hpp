@@ -22,23 +22,23 @@
 #define EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
 
 
+#include <limits>
+#include <map>
 #include <ostream>
 #include <set>
 #include <unordered_set>
-#include <map>
-#include <limits>
 
 #include "../base/Ptr.hpp"
 #include "../control/Signal.hpp"
+#include "../data/DataFile.hpp"
 #include "../data/DataManager.hpp"
 #include "../data/DataNode.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../datastructs/set_utils.hpp"
 #include "../math/info_theory.hpp"
 #include "../math/stats.hpp"
-#include "../tools/string_utils.hpp"
-#include "../data/DataFile.hpp"
 #include "SystematicsAnalysis.hpp"
+#include "../tools/string_utils.hpp"
 #include "World_structure.hpp"
 
 namespace emp {

@@ -48,8 +48,8 @@
 
 
 #include <limits>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

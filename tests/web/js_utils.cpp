@@ -2,17 +2,17 @@
 //  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include <string>
 #include <array>
+#include <string>
 
-#include "emp/testing/unit_tests.hpp"
 #include "emp/base/assert.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/config/command_line.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/testing/unit_tests.hpp"
 #include "emp/web/init.hpp"
 #include "emp/web/js_utils.hpp"
 #include "emp/web/JSWrap.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 
 #include <cassert>
 

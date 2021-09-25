@@ -18,9 +18,9 @@
 #include <map>
 #include <string>
 
-#include "../meta/TypePack.hpp"
-#include "../functional/FunctionSet.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../functional/FunctionSet.hpp"
+#include "../meta/TypePack.hpp"
 
 #include "Action.hpp"
 

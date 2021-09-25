@@ -11,8 +11,8 @@
 #define EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
-#include "../web/Div.hpp"
 #include "../web/Animate.hpp"
+#include "../web/Div.hpp"
 
 #include "Card.hpp"
 #include "ValueBox.hpp"

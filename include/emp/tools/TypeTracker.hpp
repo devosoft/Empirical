@@ -25,11 +25,11 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../meta/meta.hpp"
 #include "../base/Ptr.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../functional/GenericFunction.hpp"
 #include "../math/math.hpp"
+#include "../meta/meta.hpp"
 
 namespace emp {
 
