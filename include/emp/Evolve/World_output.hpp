@@ -14,8 +14,9 @@
 
 #include "../base/vector.hpp"
 #include "../data/DataFile.hpp"     // Helper to determine when specific events should occur.
-#include "SystematicsAnalysis.hpp"
 #include "../tools/string_utils.hpp"
+
+#include "SystematicsAnalysis.hpp"
 
 namespace emp {
 

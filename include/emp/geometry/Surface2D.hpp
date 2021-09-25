@@ -27,10 +27,11 @@
 #ifndef EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE
 #define EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE
 
-#include "../base/Ptr.hpp"
-#include "Body2D.hpp"
-
 #include <functional>
+
+#include "../base/Ptr.hpp"
+
+#include "Body2D.hpp"
 
 namespace emp {
 

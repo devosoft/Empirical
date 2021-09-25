@@ -15,6 +15,7 @@
 #define EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
 
 #include "../base/vector.hpp"
+
 #include "math.hpp"
 
 namespace emp {

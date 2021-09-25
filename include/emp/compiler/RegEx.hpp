@@ -44,9 +44,10 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
+#include "../tools/string_utils.hpp"
+
 #include "lexer_utils.hpp"
 #include "NFA.hpp"
-#include "../tools/string_utils.hpp"
 
 namespace emp {
 

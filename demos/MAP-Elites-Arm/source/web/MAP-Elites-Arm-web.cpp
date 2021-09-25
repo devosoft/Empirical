@@ -7,9 +7,10 @@
  *  @brief Controller for WEB version of MAP-Elites app.
  */
 
-#include "../ArmWorld.hpp"
 #include "emp/math/math.hpp"
 #include "emp/web/web.hpp"
+
+#include "../ArmWorld.hpp"
 
 namespace UI = emp::web;
 

@@ -11,12 +11,12 @@
 #ifndef EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
 #define EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
 
+#include <algorithm>
 
 #include "../base/vector.hpp"
 #include "../Evolve/World.hpp"
-#include "stats.hpp"
 
-#include <algorithm>
+#include "stats.hpp"
 
 namespace emp {
 

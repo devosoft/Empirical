@@ -10,14 +10,15 @@
 #ifndef EMP_EVOLVE_OEE_HPP_INCLUDE
 #define EMP_EVOLVE_OEE_HPP_INCLUDE
 
+#include <deque>
+
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/BloomFilter.hpp"
 #include "../datastructs/set_utils.hpp"
 #include "../datastructs/vector_utils.hpp"
-#include "Systematics.hpp"
 
-#include <deque>
+#include "Systematics.hpp"
 
 namespace emp {
 

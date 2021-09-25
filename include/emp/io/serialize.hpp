@@ -56,6 +56,7 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+
 #include "serialize_macros.hpp"
 
 namespace emp {

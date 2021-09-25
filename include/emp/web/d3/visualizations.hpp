@@ -14,22 +14,24 @@
 #include <deque>
 #include <functional>
 
-#include "../Animate.hpp"
-#include "axis.hpp"
 #include "../../bits/BitSet.hpp"
 #include "../../config/config.hpp"
 #include "../../functional/FunctionSet.hpp"
-#include "histogram.hpp"
-#include "../init.hpp"
-#include "../JSWrap.hpp"
-#include "layout.hpp"
 #include "../../math/constants.hpp"
 #include "../../math/Random.hpp"
 #include "../../math/stats.hpp"
+#include "../../tools/string_utils.hpp"
+
+#include "../Animate.hpp"
+#include "../init.hpp"
+#include "../JSWrap.hpp"
+
+#include "axis.hpp"
+#include "histogram.hpp"
+#include "layout.hpp"
 #include "scales.hpp"
 #include "selection.hpp"
 #include "svg_shapes.hpp"
-#include "../../tools/string_utils.hpp"
 #include "visual_elements.hpp"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations

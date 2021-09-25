@@ -4,8 +4,9 @@
 
 #define CATCH_CONFIG_MAIN
 
-#include "emp/tools/string_utils.hpp"
 #include "../third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/tools/string_utils.hpp"
 
 TEST_CASE("Test string_utils", "[tools]")
 {

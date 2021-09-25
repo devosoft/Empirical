@@ -11,8 +11,9 @@
 #ifndef EMP_MATH_DISTANCES_HPP_INCLUDE
 #define EMP_MATH_DISTANCES_HPP_INCLUDE
 
-#include "math.hpp"
 #include "../meta/type_traits.hpp"
+
+#include "math.hpp"
 
 namespace emp {
 

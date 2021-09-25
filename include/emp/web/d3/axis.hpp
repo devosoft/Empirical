@@ -10,11 +10,13 @@
 #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
 #define EMP_WEB_D3_AXIS_HPP_INCLUDE
 
-#include "d3_init.hpp"
+#include "../../tools/string_utils.hpp"
+
 #include "../js_utils.hpp"
+
+#include "d3_init.hpp"
 #include "scales.hpp"
 #include "selection.hpp"
-#include "../../tools/string_utils.hpp"
 
 namespace D3 {
 

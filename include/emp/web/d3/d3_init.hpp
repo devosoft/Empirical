@@ -13,8 +13,10 @@
 #include <iostream>
 
 #include "../../base/errors.hpp"
+
 #include "../init.hpp"
 #include "../JSWrap.hpp"
+
 #include "utils.hpp"
 
 // #ifdef __EMSCRIPTEN__

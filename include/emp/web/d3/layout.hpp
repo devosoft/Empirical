@@ -10,15 +10,16 @@
 #ifndef EMP_WEB_D3_LAYOUT_HPP_INCLUDE
 #define EMP_WEB_D3_LAYOUT_HPP_INCLUDE
 
-#include "d3_init.hpp"
-#include "dataset.hpp"
-#include "../../datastructs/tuple_struct.hpp"
-#include "../JSWrap.hpp"
-#include "selection.hpp"
-#include "svg_shapes.hpp"
-
 #include <array>
 #include <functional>
+
+#include "../../datastructs/tuple_struct.hpp"
+#include "../JSWrap.hpp"
+
+#include "d3_init.hpp"
+#include "dataset.hpp"
+#include "selection.hpp"
+#include "svg_shapes.hpp"
 
 namespace D3{
 

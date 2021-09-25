@@ -14,8 +14,9 @@
 #include <functional>
 #include <tuple>
 
-#include "hash_utils.hpp"
 #include "../meta/ValPack.hpp"
+
+#include "hash_utils.hpp"
 
 namespace emp {
 

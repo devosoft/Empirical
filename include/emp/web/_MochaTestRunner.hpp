@@ -21,9 +21,10 @@
 
 #include "../base/vector.hpp"
 #include "../control/Signal.hpp"
+#include "../testing/unit_tests.hpp"
+
 #include "Document.hpp"
 #include "JSWrap.hpp"
-#include "../testing/unit_tests.hpp"
 
 namespace emp {
 namespace web {

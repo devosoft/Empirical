@@ -22,8 +22,9 @@
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/vector_utils.hpp"
-#include "math.hpp"
 #include "../meta/type_traits.hpp"
+
+#include "math.hpp"
 
 namespace emp {
 

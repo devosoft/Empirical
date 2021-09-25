@@ -17,6 +17,7 @@
 #include <cmath>
 
 #include "../math/constants.hpp"
+
 #include "Point2D.hpp"
 
 namespace emp {

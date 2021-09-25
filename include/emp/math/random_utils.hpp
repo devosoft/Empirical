@@ -15,6 +15,7 @@
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
+
 #include "Random.hpp"
 
 namespace emp {

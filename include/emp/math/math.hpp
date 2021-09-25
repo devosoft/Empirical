@@ -17,8 +17,9 @@
 #include <initializer_list>
 
 #include "../base/assert.hpp"
-#include "constants.hpp"
 #include "../meta/reflection.hpp"
+
+#include "constants.hpp"
 #include "Random.hpp"
 
 namespace emp {

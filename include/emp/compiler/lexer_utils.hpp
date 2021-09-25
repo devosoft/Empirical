@@ -17,6 +17,7 @@
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
+
 #include "DFA.hpp"
 #include "NFA.hpp"
 

@@ -37,8 +37,9 @@
 #include "../datastructs/set_utils.hpp"
 #include "../math/info_theory.hpp"
 #include "../math/stats.hpp"
-#include "SystematicsAnalysis.hpp"
 #include "../tools/string_utils.hpp"
+
+#include "SystematicsAnalysis.hpp"
 #include "World_structure.hpp"
 
 namespace emp {

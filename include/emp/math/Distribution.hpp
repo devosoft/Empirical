@@ -28,6 +28,7 @@
 #define EMP_MATH_DISTRIBUTION_HPP_INCLUDE
 
 #include "../datastructs/UnorderedIndexMap.hpp"
+
 #include "Random.hpp"
 
 namespace emp {

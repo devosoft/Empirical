@@ -10,9 +10,10 @@
 #ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
 #define EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
 
+#include "../js_utils.hpp"
+
 #include "d3_init.hpp"
 #include "dataset.hpp"
-#include "../js_utils.hpp"
 #include "scales.hpp"
 #include "selection.hpp"
 

@@ -17,6 +17,7 @@
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
+
 #include "lexer_utils.hpp"
 #include "RegEx.hpp"
 

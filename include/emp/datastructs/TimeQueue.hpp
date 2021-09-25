@@ -53,6 +53,7 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
+
 #include "vector_utils.hpp"
 
 namespace emp {

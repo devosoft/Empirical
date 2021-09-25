@@ -13,8 +13,9 @@
 #include <functional>
 
 #include "../debug/alert.hpp"
-#include "JSWrap.hpp"
 #include "../tools/string_utils.hpp"
+
+#include "JSWrap.hpp"
 
 namespace emp {
 

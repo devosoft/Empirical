@@ -11,6 +11,7 @@
 #define EMP_SCHOLAR_BIBLIOGRAPHY_HPP_INCLUDE
 
 #include "../base/vector.hpp"
+
 #include "Citation.hpp"
 
 namespace emp {

@@ -23,8 +23,8 @@
 #ifndef EMP_MATH_INFO_THEORY_HPP_INCLUDE
 #define EMP_MATH_INFO_THEORY_HPP_INCLUDE
 
-
 #include "../base/vector.hpp"
+
 #include "math.hpp"
 
 namespace emp {
