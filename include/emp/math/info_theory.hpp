@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  info_theory.hpp
+ *  @file info_theory.hpp
  *  @brief Tools to calculate Information Theory metrics.
  *  @note Status: ALPHA
  *
@@ -20,9 +20,9 @@
  *    compression, etc.)
  */
 
+#ifndef EMP_MATH_INFO_THEORY_HPP_INCLUDE
+#define EMP_MATH_INFO_THEORY_HPP_INCLUDE
 
-#ifndef EMP_INFO_THEORY_H
-#define EMP_INFO_THEORY_H
 
 #include "../base/vector.hpp"
 #include "math.hpp"
@@ -68,4 +68,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_INFO_THEORY_HPP_INCLUDE

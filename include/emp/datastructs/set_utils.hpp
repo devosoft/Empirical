@@ -8,9 +8,9 @@
  *  @note Status: ALPHA
  */
 
+#ifndef EMP_DATASTRUCTS_SET_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_SET_UTILS_HPP_INCLUDE
 
-#ifndef EMP_SET_UTILS_H
-#define EMP_SET_UTILS_H
 
 #include <set>
 #include <unordered_set>
@@ -223,4 +223,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_SET_UTILS_HPP_INCLUDE

@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  graph_utils.hpp
+ *  @file graph_utils.hpp
  *  @brief This file provides a number of tools for manipulating graphs.
  *  @note Status: BETA
  */
 
-#ifndef EMP_GRAPH_UTILS_H
-#define EMP_GRAPH_UTILS_H
+#ifndef EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE
 
 #include <fstream>
 #include <iostream>
@@ -345,4 +345,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE

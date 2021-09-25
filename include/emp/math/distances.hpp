@@ -8,8 +8,8 @@
  *  @note Status: BETA
  */
 
-#ifndef EMP_DISTANCES_H
-#define EMP_DISTANCES_H
+#ifndef EMP_MATH_DISTANCES_HPP_INCLUDE
+#define EMP_MATH_DISTANCES_HPP_INCLUDE
 
 #include "math.hpp"
 #include "../meta/type_traits.hpp"
@@ -54,4 +54,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_DISTANCES_HPP_INCLUDE

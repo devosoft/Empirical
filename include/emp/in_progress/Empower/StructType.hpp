@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  StructType.hpp
+ *  @file StructType.hpp
  *  @brief StructType maps variables to a MemoryImage; Struct is an instance of StructType
  *
  *  @todo Immediately before setting a StructType to active, we can optimize variable ordering.
  */
 
-#ifndef EMP_EMPOWER_STRUCT_TYPE_H
-#define EMP_EMPOWER_STRUCT_TYPE_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_STRUCTTYPE_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_STRUCTTYPE_HPP_INCLUDE
 
 #include <unordered_map>
 
@@ -104,4 +104,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_STRUCTTYPE_HPP_INCLUDE

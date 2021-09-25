@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Othello8.hpp
+ *  @file Othello8.hpp
  *  @brief A simple Othello game state handler limited to an 8x8 board.
  *
  *  @todo Add Hash for boards to be able to cachce moves.
  *  @todo Setup OPTIONAL caching of expensive board measures.
  */
 
-#ifndef EMP_GAME_OTHELLO8_H
-#define EMP_GAME_OTHELLO8_H
+#ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE
+#define EMP_GAMES_OTHELLO8_HPP_INCLUDE
 
 #include <fstream>
 #include <iostream>
@@ -409,4 +409,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE

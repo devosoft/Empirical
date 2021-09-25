@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  dataset.hpp
+ *  @file dataset.hpp
  *  @brief Tools to maintain data in D3.
  */
 
-#ifndef EMP_D3_LOAD_DATA_H
-#define EMP_D3_LOAD_DATA_H
+#ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE
+#define EMP_WEB_D3_DATASET_HPP_INCLUDE
 
 #include <functional>
 
@@ -248,4 +248,4 @@ namespace D3 {
 };
 
 
-#endif
+#endif // #ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE

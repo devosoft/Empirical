@@ -1,13 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  ce_string defines a limited string object for use within a constexpr class or function.
-//  Status: DESIGN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file ce_string.hpp
+ *  @brief ce_string defines a limited string object for use within a constexpr class or function.
+ *
+ *  Status: DESIGN.
+ */
 
-#ifndef EMP_CE_STRING_H
-#define EMP_CE_STRING_H
+#ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE
+#define EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE
 
 #include <string>
 #include <type_traits>
@@ -61,4 +64,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  CanvasAction.hpp
+ *  @file CanvasAction.hpp
  *  @brief Define a base class for all actions that can be done to widgets, plus simple actions.
  *
  *  CanvasAction objects modify the appearance of a canvas and can be tracked to reconstruct the
@@ -17,9 +17,9 @@
  *  See also CanvasShape.h for more actions.
  */
 
+#ifndef EMP_WEB_CANVASACTION_HPP_INCLUDE
+#define EMP_WEB_CANVASACTION_HPP_INCLUDE
 
-#ifndef EMP_WEB_CANVAS_ACTION_H
-#define EMP_WEB_CANVAS_ACTION_H
 
 #include <string>
 
@@ -154,4 +154,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_CANVASACTION_HPP_INCLUDE

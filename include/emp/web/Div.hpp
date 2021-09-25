@@ -3,8 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Div.hpp
- *  @note Formerly called Slate.h
+ *  @file Div.hpp
  *  @brief Div Widgets maintain an ordered collection of other widgets in an HTML div.
  *
  *  When printed to the web page, these internal widgets are presented in order.
@@ -24,11 +23,11 @@
  *    my_doc << my_div;
  *
  *  @todo Should we move all widget_dict info into Document?
+ *  @note Formerly called Slate.h
  */
 
-#ifndef EMP_WEB_DIV_H
-#define EMP_WEB_DIV_H
-
+#ifndef EMP_WEB_DIV_HPP_INCLUDE
+#define EMP_WEB_DIV_HPP_INCLUDE
 
 #include "Animate.hpp"
 #include "Text.hpp"
@@ -378,4 +377,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_DIV_HPP_INCLUDE

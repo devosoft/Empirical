@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  DataFile.hpp
+ *  @file DataFile.hpp
  *  @brief DataFile objects use DataNode objects to dynamically fill out file contents.
  */
 
-#ifndef EMP_DATA_FILE_H
-#define EMP_DATA_FILE_H
+#ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
+#define EMP_DATA_DATAFILE_HPP_INCLUDE
 
 #include <fstream>
 #include <functional>
@@ -694,4 +694,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE

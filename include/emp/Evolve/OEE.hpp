@@ -1,5 +1,14 @@
-#ifndef EMP_OEE_STATS_H
-#define EMP_OEE_STATS_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file OEE.hpp
+ *  @brief TODO.
+ */
+
+#ifndef EMP_EVOLVE_OEE_HPP_INCLUDE
+#define EMP_EVOLVE_OEE_HPP_INCLUDE
 
 #include "../base/vector.hpp"
 #include "../base/Ptr.hpp"
@@ -232,4 +241,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_OEE_HPP_INCLUDE

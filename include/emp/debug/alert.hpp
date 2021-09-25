@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  alert.hpp
+ *  @file alert.hpp
  *  @brief Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_ALERT_H
-#define EMP_ALERT_H
+#ifndef EMP_DEBUG_ALERT_HPP_INCLUDE
+#define EMP_DEBUG_ALERT_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
 
@@ -64,4 +64,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_DEBUG_ALERT_HPP_INCLUDE

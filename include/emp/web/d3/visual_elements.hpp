@@ -1,10 +1,19 @@
-#ifndef VISUALIZATION_ELEMENTS_H
-#define VISUALIZATION_ELEMENTS_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file visual_elements.hpp
+ *  @brief TODO.
+ *
+ */
+
+#ifndef EMP_WEB_D3_VISUAL_ELEMENTS_HPP_INCLUDE
+#define EMP_WEB_D3_VISUAL_ELEMENTS_HPP_INCLUDE
 
 #include "selection.hpp"
 #include "../../base/vector.hpp"
 #include "../JSWrap.hpp"
-
 
 namespace D3 {
 
@@ -68,4 +77,4 @@ public:
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_VISUAL_ELEMENTS_HPP_INCLUDE

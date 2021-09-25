@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  reflection.hpp
+ *  @file reflection.hpp
  *  @brief Macros and template utilities to help determine details about unknown classes.
  */
 
-#ifndef EMP_REFLECTION_H
-#define EMP_REFLECTION_H
+#ifndef EMP_META_REFLECTION_HPP_INCLUDE
+#define EMP_META_REFLECTION_HPP_INCLUDE
 
 #include "meta.hpp"
 #include "TypePack.hpp"
@@ -194,5 +194,7 @@ namespace emp {
   template <typename T, template <typename...> class FILTER>
   using type_if = typename internal::EMP_eval_type< T, FILTER<T>::value >::type;
   #endif // DOXYGEN_SHOULD_SKIP_THIS
+
 }
-#endif
+
+#endif // #ifndef EMP_META_REFLECTION_HPP_INCLUDE

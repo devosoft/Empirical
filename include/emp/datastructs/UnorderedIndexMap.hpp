@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2021.
  *
- *  @file  UnorderedIndexMap.hpp
+ *  @file UnorderedIndexMap.hpp
  *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
  *
@@ -11,8 +11,8 @@
  *  @todo Should operator[] index by element count or by weight?
  */
 
-#ifndef EMP_UNORDERED_INDEX_MAP_H
-#define EMP_UNORDERED_INDEX_MAP_H
+#ifndef EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE
 
 #include "../base/vector.hpp"
 
@@ -223,4 +223,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE

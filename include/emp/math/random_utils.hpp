@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  random_utils.hpp
+ *  @file random_utils.hpp
  *  @brief Helper functions for emp::Random for common random tasks.
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_RANDOM_UTILS_H
-#define EMP_RANDOM_UTILS_H
+#ifndef EMP_MATH_RANDOM_UTILS_HPP_INCLUDE
+#define EMP_MATH_RANDOM_UTILS_HPP_INCLUDE
 
 #include <functional>
 
@@ -129,4 +129,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_RANDOM_UTILS_HPP_INCLUDE

@@ -1,14 +1,11 @@
-#ifndef EMP_LOADING_MODAL_HPP
-#define EMP_LOADING_MODAL_HPP
-
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020 - 2021
+ *  @date 2020-2021
  *
- *  @file  LoadingModal.hpp
+ *  @file LoadingModal.hpp
  *  @brief Wrapper for loading moadal
- 
+ *
  * To add a loading modal to your web page, you must
  * link the LoadingModal.js script directly after the
  * body tag in the HTML doc. To close the script, call
@@ -18,6 +15,10 @@
  * See https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo
  * for more details.
  */
+
+#ifndef EMP_PREFAB_LOADINGMODAL_HPP_INCLUDE
+#define EMP_PREFAB_LOADINGMODAL_HPP_INCLUDE
+
 #include "../tools/string_utils.hpp"
 #include "../web/Element.hpp"
 #include "../web/Div.hpp"
@@ -38,4 +39,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_LOADINGMODAL_HPP_INCLUDE

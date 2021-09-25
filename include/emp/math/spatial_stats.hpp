@@ -8,9 +8,9 @@
  *  @note Status: BETA
  */
 
+#ifndef EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
+#define EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
 
-#ifndef EMP_SPATIAL_STATS_H
-#define EMP_SPATIAL_STATS_H
 
 #include "../base/vector.hpp"
 #include "../Evolve/World.hpp"
@@ -118,4 +118,4 @@ namespace emp {
     }
 }
 
-#endif
+#endif // #ifndef EMP_MATH_SPATIAL_STATS_HPP_INCLUDE

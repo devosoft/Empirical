@@ -1,69 +1,72 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file tuple_struct.hpp
+ *  @brief These macros will build a tuple and accessors to that tuple's members inside of a
+ * class definintion.
+ *
+ *  Status: ALPHA
+ *
+ *  "But WHY???" you ask. Let me explain: Keeping a tuple allows us to easily track the
+ *  members in the stuct or class, and makes possible powerful types of reflection
+ *  including identifying all members and performing an action on each (such as
+ *  serialization).  Since tuples instantiate members directly, these benefits should
+ *  come at no cost to performance.
+ *
+ *  To instantiate these tuple members, inside the class definition use:
+ *
+ *    `EMP_BUILD_TUPLE( int, MyInt,
+ *                     char, MyChar,
+ *                     int, MyInt2,
+ *                     std::string, MyString );`
+ *
+ *  This will create a std::tuple<int, char, int, std::string> and create accessors.
+ *  For example the accessors created for MyInt2 would look like:
+ *
+ *    `const int & MyInt2() const;
+ *    int & MyInt2();
+ *    int & MyInt2(int);`
+ *
+ *  The default tuple will be called "emp__tuple_body".  If you want to use a different
+ *  name for it (for example if you want more than one tuple in the class), you need to
+ *  call EMP_BUILD_NAMED_TUPLE, which is identical to EMP_BUILD_TUPLE, but takes the
+ *  name to be used for the tuple as its first argument.
+ *
+ *  Example of using an introspective tuple:
+ *
+ *    `struct JSONObject {
+ *    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+ *				   int, name,
+ * 				   int, parent,
+ *                 double, y,
+ *                 int, depth
+ * 	  	   )
+ *    };`
+ *
+ *  This struct can now be used as a C++ stand-in for Javscript objects for use with
+ *  JSWrap.
+ *
+ *  Introspective tuple structs have a static member n_fields that indicates how
+ *  many variables they have.
+ *
+ *  Development notes:
+ *  * Add static member function to help with reflection?
+ *  * Make play nicely with serialization techniques.
+ *  * It would be really awesome to make tuple structs (or at least the introspective ones)
+ *    be indexable and iterable. (right now the main obstacle is type inference)
+ *
+ *  Changes in last revision:
+ *  * Changed name of macro that builds tuple that keeps track of variable names to
+ *    EMP_BUILD_INTROSPECTIVE_TUPLE
+ *  * Introspective tuples now also keep track of variable types and maintain an
+ *    array of pointers to each element, which is very useful for doing operations on
+ * all members of a tuple.
+ */
 
-///  These macros will build a tuple and accessors to that tuple's members inside of a
-///  class definintion.
-///  Status: ALPHA
-///
-///  "But WHY???" you ask. Let me explain: Keeping a tuple allows us to easily track the
-///  members in the stuct or class, and makes possible powerful types of reflection
-///  including identifying all members and performing an action on each (such as
-///  serialization).  Since tuples instantiate members directly, these benefits should
-///  come at no cost to performance.
-///
-///  To instantiate these tuple members, inside the class definition use:
-///
-///    `EMP_BUILD_TUPLE( int, MyInt,
-///                     char, MyChar,
-///                     int, MyInt2,
-///                     std::string, MyString );`
-///
-///  This will create a std::tuple<int, char, int, std::string> and create accessors.
-///  For example the accessors created for MyInt2 would look like:
-///
-///    `const int & MyInt2() const;
-///    int & MyInt2();
-///    int & MyInt2(int);`
-///
-///  The default tuple will be called "emp__tuple_body".  If you want to use a different
-///  name for it (for example if you want more than one tuple in the class), you need to
-///  call EMP_BUILD_NAMED_TUPLE, which is identical to EMP_BUILD_TUPLE, but takes the
-///  name to be used for the tuple as its first argument.
-///
-///  Example of using an introspective tuple:
-///
-///    `struct JSONObject {
-///    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-///				   int, name,
-/// 				   int, parent,
-///                 double, y,
-///                 int, depth
-/// 	  	   )
-///    };`
-///
-///  This struct can now be used as a C++ stand-in for Javscript objects for use with
-///  JSWrap.
-///
-///  Introspective tuple structs have a static member n_fields that indicates how
-///  many variables they have.
-//
-//  Development notes:
-//  * Add static member function to help with reflection?
-//  * Make play nicely with serialization techniques.
-//  * It would be really awesome to make tuple structs (or at least the introspective ones)
-//    be indexable and iterable. (right now the main obstacle is type inference)
-//
-//  Changes in last revision:
-//  * Changed name of macro that builds tuple that keeps track of variable names to
-//    EMP_BUILD_INTROSPECTIVE_TUPLE
-//  * Introspective tuples now also keep track of variable types and maintain an
-//    array of pointers to each element, which is very useful for doing operations on
-//    all memebrs of a tuple.
-
-#ifndef EMP_TUPLE_STRUCT_H
-#define EMP_TUPLE_STRUCT_H
+#ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
+#define EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
 
 #include <tuple>
 #include <typeinfo>
@@ -222,4 +225,5 @@ namespace emp {
 #define EMP_BUILD_INTROSPECTIVE_TUPLE(...) EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(emp__tuple_body, __VA_ARGS__)
 
 #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
-#endif
+
+#endif // #ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE

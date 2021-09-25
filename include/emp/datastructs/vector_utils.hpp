@@ -12,8 +12,8 @@
  *  @todo speed up Append to count all additions at once, resize, and fill them in.
  */
 
-#ifndef EMP_VECTOR_UTILS_H
-#define EMP_VECTOR_UTILS_H
+#ifndef EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
 
 #include <numeric>
 #include <set>
@@ -391,4 +391,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE

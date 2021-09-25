@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  visualizations.hpp
+ *  @file visualizations.hpp
  *  @brief Tools to build D3 visualizations.
  */
 
-#ifndef EMP_VISUALIZATION_UTILS_H
-#define EMP_VISUALIZATION_UTILS_H
+#ifndef EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
+#define EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
 
 #include <functional>
 #include <algorithm>
@@ -1151,4 +1151,5 @@ public:
 
 }
 }
-#endif
+
+#endif // #ifndef EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE

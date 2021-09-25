@@ -1,5 +1,14 @@
-#ifndef EMP_D3_HISTOGRAM_H
-#define EMP_D3_HISTOGRAM_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file histogram.hpp
+ *  @brief TODO.
+ */
+
+#ifndef EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE
+#define EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE
 
 #include "d3_init.hpp"
 #include "dataset.hpp"
@@ -110,4 +119,4 @@ namespace D3 {
     };
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE

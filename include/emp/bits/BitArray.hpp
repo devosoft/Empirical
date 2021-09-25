@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  BitArray.hpp
+ *  @file BitArray.hpp
  *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
  *  @note Status: RELEASE
  *
@@ -12,9 +12,9 @@
  *        option is to do this well ONCE with a macro that properly fills in the details.
  */
 
+#ifndef EMP_BITS_BITARRAY_HPP_INCLUDE
+#define EMP_BITS_BITARRAY_HPP_INCLUDE
 
-#ifndef EMP_BIT_ARRAY_HPP
-#define EMP_BIT_ARRAY_HPP
 
 #include <iostream>
 #include <initializer_list>
@@ -2090,4 +2090,4 @@ namespace std
     };
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITARRAY_HPP_INCLUDE

@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019-2021.
  *
- *  @file  hash_utils.hpp
+ *  @file hash_utils.hpp
  *  @brief This file provides tools for hashing values and containers.
  *  @note Status: BETA
  */
 
-#ifndef EMP_HASH_UTILS_H
-#define EMP_HASH_UTILS_H
+#ifndef EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
 
 #include <numeric>
 #include <type_traits>
@@ -247,4 +247,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE

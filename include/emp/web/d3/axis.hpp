@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  axis.hpp
+ *  @file axis.hpp
  *  @brief Handle drawing of axes on D3 graphts.
  */
 
-#ifndef EMP_D3_AXIS_H
-#define EMP_D3_AXIS_H
+#ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
+#define EMP_WEB_D3_AXIS_HPP_INCLUDE
 
 #include "../js_utils.hpp"
 #include "../../tools/string_utils.hpp"
@@ -266,4 +266,4 @@ namespace D3 {
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE

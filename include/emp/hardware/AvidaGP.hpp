@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2021.
  *
- *  @file  AvidaGP.hpp
+ *  @file AvidaGP.hpp
  *  @brief This is a simple, efficient CPU for and applied version of Avida.
  *
  *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
@@ -15,9 +15,9 @@
  *    commands...
  */
 
+#ifndef EMP_HARDWARE_AVIDAGP_HPP_INCLUDE
+#define EMP_HARDWARE_AVIDAGP_HPP_INCLUDE
 
-#ifndef EMP_AVIDA_GP_H
-#define EMP_AVIDA_GP_H
 
 #include <fstream>
 #include <iostream>
@@ -591,4 +591,4 @@ namespace std {
   }
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_AVIDAGP_HPP_INCLUDE

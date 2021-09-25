@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021
  *
- *  @file  BitMatrix.hpp
+ *  @file BitMatrix.hpp
  *  @brief A COL x ROW matrix of bits and provides easy indexing and manipulation
  *  @note Status: BETA
  */
 
-#ifndef EMP_BIT_MATRIX_H
-#define EMP_BIT_MATRIX_H
+#ifndef EMP_BITS_BITMATRIX_HPP_INCLUDE
+#define EMP_BITS_BITMATRIX_HPP_INCLUDE
 
 #include <iostream>
 #include <typeinfo>
@@ -185,4 +185,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITMATRIX_HPP_INCLUDE

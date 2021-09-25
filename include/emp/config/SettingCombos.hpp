@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  SettingCombos.hpp
+ *  @file SettingCombos.hpp
  *  @brief A tool for exploring all parameter combinations
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_SETTING_COMBOS_H
-#define EMP_SETTING_COMBOS_H
+#ifndef EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
+#define EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
 
 #include <unordered_map>
 #include <sstream>
@@ -398,4 +398,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE

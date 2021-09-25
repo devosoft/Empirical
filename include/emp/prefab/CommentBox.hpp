@@ -1,15 +1,22 @@
-#ifndef EMP_COMMENT_BOX_HPP
-#define EMP_COMMENT_BOX_HPP
-
-#include "../tools/string_utils.hpp"
-#include "../web/Div.hpp"
-
-/*
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file CommentBox.hpp
+ *  @brief Create a light grey "comment bubble."
+ *
  * TODO: When prefab tools for adding mobile only and desktop only
  * content are created, remove AddMobileContent(), desktop_content
  * and mobile_content divs, and ConfigPanel as a friend class.
  * AddConent() should stream into all_content div.
  */
+
+#ifndef EMP_PREFAB_COMMENTBOX_HPP_INCLUDE
+#define EMP_PREFAB_COMMENTBOX_HPP_INCLUDE
+
+#include "../tools/string_utils.hpp"
+#include "../web/Div.hpp"
 
 namespace emp {
 namespace prefab {
@@ -75,4 +82,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_COMMENTBOX_HPP_INCLUDE

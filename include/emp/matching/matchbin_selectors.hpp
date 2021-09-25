@@ -8,9 +8,9 @@
  *
  */
 
+#ifndef EMP_MATCHING_MATCHBIN_SELECTORS_HPP_INCLUDE
+#define EMP_MATCHING_MATCHBIN_SELECTORS_HPP_INCLUDE
 
-#ifndef EMP_MATCH_BIN_SELECTORS_H
-#define EMP_MATCH_BIN_SELECTORS_H
 
 #include <iostream>
 #include <unordered_set>
@@ -658,4 +658,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATCHING_MATCHBIN_SELECTORS_HPP_INCLUDE

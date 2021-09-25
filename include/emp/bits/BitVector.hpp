@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  BitVector.hpp
+ *  @file BitVector.hpp
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
@@ -25,9 +25,9 @@
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
 
+#ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE
+#define EMP_BITS_BITVECTOR_HPP_INCLUDE
 
-#ifndef EMP_BIT_VECTOR_H
-#define EMP_BIT_VECTOR_H
 
 #include <iostream>
 #include <initializer_list>
@@ -2278,4 +2278,4 @@ namespace std {
   };
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE

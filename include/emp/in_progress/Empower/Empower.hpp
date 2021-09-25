@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Empower.hpp
+ *  @file Empower.hpp
  *  @brief A scripting language built inside of C++
  *
  *  Empower is a scripting language built inside of Empirical to simplify and the use of fast
@@ -29,8 +29,8 @@
  *  @todo Allow nested namespaces to be branched at any level (so outer levels share vars)
  */
 
-#ifndef EMP_EMPOWER_H
-#define EMP_EMPOWER_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE
 
 #include <functional>
 #include <map>
@@ -306,4 +306,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE

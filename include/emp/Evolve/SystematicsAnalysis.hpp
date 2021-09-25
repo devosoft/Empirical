@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- * This file contains extra analysis tools to use with systematics managers that
- * have non-null DATA_TYPES.
-**/
+ *  @file SystematicsAnalysis.hpp
+ *  @brief TODO.
+ */
 
-#ifndef EMP_EVO_SYSTEMATICS_ANALYSIS_H
-#define EMP_EVO_SYSTEMATICS_ANALYSIS_H
+#ifndef EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE
+#define EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE
 
 #include "../base/Ptr.hpp"
 
@@ -167,4 +167,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE

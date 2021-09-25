@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2021.
  *
- *  @file  Random.hpp
+ *  @file Random.hpp
  *  @brief A versatile and non-patterned pseudo-random-number generator.
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_RANDOM_H
-#define EMP_RANDOM_H
+#ifndef EMP_MATH_RANDOM_HPP_INCLUDE
+#define EMP_MATH_RANDOM_HPP_INCLUDE
 
 #include <ctime>
 #include <climits>
@@ -477,4 +477,4 @@ namespace emp {
 
 } // END emp namespace
 
-#endif
+#endif // #ifndef EMP_MATH_RANDOM_HPP_INCLUDE

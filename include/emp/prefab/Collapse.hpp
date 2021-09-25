@@ -1,5 +1,14 @@
-#ifndef EMP_COLLAPSE_HPP
-#define EMP_COLLAPSE_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file Collapse.hpp
+ *  @brief Sets up a collapsable DOM element.
+ */
+
+#ifndef EMP_PREFAB_COLLAPSE_HPP_INCLUDE
+#define EMP_PREFAB_COLLAPSE_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"
@@ -218,4 +227,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_COLLAPSE_HPP_INCLUDE

@@ -1,5 +1,14 @@
-#ifndef EMP_CODE_BLOCK_HPP
-#define EMP_CODE_BLOCK_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file CodeBlock.hpp
+ *  @brief Wraps a HighlightJS code block.
+ */
+
+#ifndef EMP_PREFAB_CODEBLOCK_HPP_INCLUDE
+#define EMP_PREFAB_CODEBLOCK_HPP_INCLUDE
 
 #include "../base/errors.hpp"
 #include "../tools/string_utils.hpp"
@@ -56,4 +65,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_CODEBLOCK_HPP_INCLUDE

@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file _assert_trigger.hpp
+ *  @file _native_assert_trigger.hpp
  *  @brief Native asssert trigger implementation.
  *  @note For internal use.
  */
 
-#ifndef EMP_NATIVE_ASSERT_TRIGGER_HPP
-#define EMP_NATIVE_ASSERT_TRIGGER_HPP
+#ifndef EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
+#define EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
 
 #include <iostream>
 #include <string>
@@ -53,4 +53,4 @@ namespace emp {
 } // namespace emp
 
 
-#endif // #ifndef EMP_NATIVE_ASSERT_TRIGGER_HPP
+#endif // #ifndef EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE

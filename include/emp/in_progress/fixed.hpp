@@ -1,20 +1,20 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015
+ *
+ *  @file fixed.hpp
+ *  @brief A comprehensive (ideally) fixed-point number representation.
+ *
+ *  Type-name: emp::fixed
+ *
+ *  Representation: sign (1 bit), int value (21 bits), frac value (10 bits)
+ *  Max value:  2097151.999
+ *  Min value: -2097152.999 (@CAO or .000?)
+ */
 
-#ifndef EMP_FIXED_H
-#define EMP_FIXED_H
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  A comprehensive (ideally) fixed-point number representation.
-//
-//  Type-name: emp::fixed
-//
-//  Representation: sign (1 bit), int value (21 bits), frac value (10 bits)
-//  Max value:  2097151.999
-//  Min value: -2097152.999 (@CAO or .000?)
-//
+#ifndef EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
+#define EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
 
 #include <iostream>
 
@@ -114,4 +114,4 @@ template <int FRAC_BITS> std::istream & operator>>(std::istream & is,
   return is;
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_FIXED_HPP_INCLUDE

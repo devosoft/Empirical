@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  Genome.hpp
+ *  @file Genome.hpp
  *  @brief This is a simple, container for a series of instructions.
  *
  */
 
-#ifndef EMP_GENOME_H
-#define EMP_GENOME_H
+#ifndef EMP_HARDWARE_GENOME_HPP_INCLUDE
+#define EMP_HARDWARE_GENOME_HPP_INCLUDE
 
 #include "../base/Ptr.hpp"
 
@@ -88,4 +88,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_GENOME_HPP_INCLUDE

@@ -3,14 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file  timing.hpp
+ *  @file timing.hpp
  *  @brief A collection of tools to help measure timing of code.
  *  @note Status: BETA
  */
 
-
-#ifndef EMP_TIMING_H
-#define EMP_TIMING_H
+#ifndef EMP_TOOLS_TIMING_HPP_INCLUDE
+#define EMP_TOOLS_TIMING_HPP_INCLUDE
 
 #include <ctime>
 #include <functional>
@@ -54,4 +53,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_TIMING_HPP_INCLUDE

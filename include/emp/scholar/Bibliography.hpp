@@ -1,12 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A collection of references.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file Bibliography.hpp
+ *  @brief A collection of references.
+ */
 
-#ifndef EMP_BIBLIOGRAPHY_H
-#define EMP_BIBLIOGRAPHY_H
+#ifndef EMP_SCHOLAR_BIBLIOGRAPHY_HPP_INCLUDE
+#define EMP_SCHOLAR_BIBLIOGRAPHY_HPP_INCLUDE
 
 #include "../base/vector.hpp"
 #include "Citation.hpp"
@@ -28,4 +30,4 @@ namespace emp {
 
 };
 
-#endif
+#endif // #ifndef EMP_SCHOLAR_BIBLIOGRAPHY_HPP_INCLUDE

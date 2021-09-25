@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  TimeQueue.hpp
+ *  @file TimeQueue.hpp
  *  @brief A priority queue for timings, always marching forward.
  *  @note Status: ALPHA
  *
@@ -43,9 +43,9 @@
  *  triggered immediately, you should try to avoid putting it in the TimeQueue.
  */
 
+#ifndef EMP_DATASTRUCTS_TIMEQUEUE_HPP_INCLUDE
+#define EMP_DATASTRUCTS_TIMEQUEUE_HPP_INCLUDE
 
-#ifndef EMP_TIME_QUEUE_H
-#define EMP_TIME_QUEUE_H
 
 #include <limits>
 #include <string>
@@ -197,4 +197,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_TIMEQUEUE_HPP_INCLUDE

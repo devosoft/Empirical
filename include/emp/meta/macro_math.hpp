@@ -44,8 +44,8 @@
  *   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
  */
 
-#ifndef EMP_MACRO_MATH_H
-#define EMP_MACRO_MATH_H
+#ifndef EMP_META_MACRO_MATH_HPP_INCLUDE
+#define EMP_META_MACRO_MATH_HPP_INCLUDE
 
 /// @cond MACROS
 
@@ -2702,4 +2702,4 @@
 
 /// @endcond
 
-#endif
+#endif // #ifndef EMP_META_MACRO_MATH_HPP_INCLUDE

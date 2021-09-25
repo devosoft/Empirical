@@ -8,9 +8,9 @@
  *
  */
 
+#ifndef EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
+#define EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
 
-#ifndef EMP_MATCH_BIN_METRICS_H
-#define EMP_MATCH_BIN_METRICS_H
 
 #include <iostream>
 #include <unordered_map>
@@ -1226,4 +1226,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE

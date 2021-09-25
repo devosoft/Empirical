@@ -3,16 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  AnyFunction.hpp
+ *  @file AnyFunction.hpp
  *  @brief Based on std::function, but with a generic base class.
  *  @note Status: ALPHA
  *
  *  (Built from GenericFunction.h)
  */
 
+#ifndef EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
+#define EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
 
-#ifndef EMP_ANY_FUNCTION_H
-#define EMP_ANY_FUNCTION_H
 
 #include <functional>
 #include "../base/assert.hpp"
@@ -200,4 +200,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE

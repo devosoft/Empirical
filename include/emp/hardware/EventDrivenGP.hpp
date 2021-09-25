@@ -1,5 +1,14 @@
-#ifndef EMP_EVENT_DRIVEN_GP_H
-#define EMP_EVENT_DRIVEN_GP_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file EventDrivenGP.hpp
+ *  @brief TODO.
+ */
+
+#ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
+#define EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
 
 #include <functional>
 #include <tuple>
@@ -2128,4 +2137,4 @@ namespace emp {
   using EventDrivenGP = EventDrivenGP_AW<8>;
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE

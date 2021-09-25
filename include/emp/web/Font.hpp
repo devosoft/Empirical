@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Font.hpp
+ *  @file Font.hpp
  *  @brief Maintains basic information about a font to be used in HTML.
  */
 
+#ifndef EMP_WEB_FONT_HPP_INCLUDE
+#define EMP_WEB_FONT_HPP_INCLUDE
 
-#ifndef EMP_FONT_H
-#define EMP_FONT_H
 
 #include <string>
 #include <sstream>
@@ -185,4 +185,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_FONT_HPP_INCLUDE

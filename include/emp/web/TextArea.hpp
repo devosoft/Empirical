@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  TextArea.hpp
+ *  @file TextArea.hpp
  *  @brief Specs for the TextArea widget.
  *
  *
  * @todo Callback does a lot of string-copies at the moment; should be streamlined.
  */
 
-#ifndef EMP_WEB_TEXT_AREA_H
-#define EMP_WEB_TEXT_AREA_H
+#ifndef EMP_WEB_TEXTAREA_HPP_INCLUDE
+#define EMP_WEB_TEXTAREA_HPP_INCLUDE
 
 #include "Widget.hpp"
 
@@ -170,4 +170,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_TEXTAREA_HPP_INCLUDE

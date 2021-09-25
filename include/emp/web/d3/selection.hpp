@@ -1,9 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file selection.hpp
+ *  @brief TODO.
+ */
 
-#ifndef __SELECTION_H__
-#define __SELECTION_H__
+#ifndef EMP_WEB_D3_SELECTION_HPP_INCLUDE
+#define EMP_WEB_D3_SELECTION_HPP_INCLUDE
 
 #include "d3_init.hpp"
 #include "utils.hpp"
@@ -1697,4 +1702,5 @@ namespace D3 {
   }
 
 }
-#endif
+
+#endif // #ifndef EMP_WEB_D3_SELECTION_HPP_INCLUDE

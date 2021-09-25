@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  World.hpp
+ *  @file World.hpp
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
  *
  *  A definition of the emp::World template, linking in specialized file handling, iterators,
@@ -23,8 +23,8 @@
  *        phenotype.
  */
 
-#ifndef EMP_EVO_WORLD_H
-#define EMP_EVO_WORLD_H
+#ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_HPP_INCLUDE
 
 #include <functional>
 #include <map>
@@ -1737,4 +1737,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

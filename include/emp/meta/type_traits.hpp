@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  type_traits.hpp
+ *  @file type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
  */
 
+#ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE
+#define EMP_META_TYPE_TRAITS_HPP_INCLUDE
 
-#ifndef EMP_TYPE_TRAITS_H
-#define EMP_TYPE_TRAITS_H
 
 #include <functional>
 #include <tuple>
@@ -625,4 +625,4 @@ namespace emp {
 
 }  // namespace emp
 
-#endif
+#endif // #ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE

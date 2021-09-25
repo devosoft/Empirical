@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  Systematics.hpp
+ *  @file Systematics.hpp
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
  *
@@ -18,9 +18,9 @@
  *       lifetimes gracefully.
  */
 
+#ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
+#define EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
 
-#ifndef EMP_EVO_SYSTEMATICS_H
-#define EMP_EVO_SYSTEMATICS_H
 
 #include <ostream>
 #include <set>
@@ -1835,4 +1835,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE

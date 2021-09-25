@@ -1,12 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Information about a citation for a single paper / book / etc.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2019
+ *
+ *  @file Citation.hpp
+ *  @brief Information about a citation for a single paper / book / etc.
+ */
 
-#ifndef EMP_CITATION_H
-#define EMP_CITATION_H
+#ifndef EMP_SCHOLAR_CITATION_HPP_INCLUDE
+#define EMP_SCHOLAR_CITATION_HPP_INCLUDE
 
 #include <ostream>
 #include <set>
@@ -174,4 +176,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_SCHOLAR_CITATION_HPP_INCLUDE

@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file  _bitset_helpers.hpp
+ *  @file _bitset_helpers.hpp
  *  @brief An internal Empirical class with tools to build collections of bits.
  */
 
+#ifndef EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
+#define EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
 
-#ifndef EMP_BIT_SET_HELPERS_H
-#define EMP_BIT_SET_HELPERS_H
 
 namespace emp {
 
@@ -57,4 +57,4 @@ namespace emp {
   }; // --- End of BitProxy
 }
 
-#endif
+#endif // #ifndef EMP_BITS__BITSET_HELPERS_HPP_INCLUDE

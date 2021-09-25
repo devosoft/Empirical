@@ -11,10 +11,8 @@
  *  Edit/Levenschtein) and alignment.
  */
 
-
-
-#ifndef EMP_SEQUENCE_UTILS_H
-#define EMP_SEQUENCE_UTILS_H
+#ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
+#define EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
 
 #include "../base/vector.hpp"
 #include "math.hpp"
@@ -183,4 +181,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE

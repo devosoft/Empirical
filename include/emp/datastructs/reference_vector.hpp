@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  reference_vector.hpp
+ *  @file reference_vector.hpp
  *  @brief A version of vector that holds only references to objects.  Be careful!
  *  @note Status: ALPHA
- **/
+ */
 
-#ifndef EMP_REFERENCE_VECTOR_H
-#define EMP_REFERENCE_VECTOR_H
+#ifndef EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
+#define EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
@@ -99,4 +99,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE

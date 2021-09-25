@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  signalgp_utils.hpp
+ *  @file signalgp_utils.hpp
  *  @brief Helper functions for working with SignalGP virtual hardware/programs.
  *  @todo Mutator class
  *  @todo tests
  */
 
-#ifndef EMP_SIGNALGP_UTILS_H
-#define EMP_SIGNALGP_UTILS_H
+#ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
+#define EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 
 #include <unordered_set>
 #include <string>
@@ -751,4 +751,4 @@ namespace emp {
   class SignalGPMutatorFacade : public SignalGPMutator<Hardware::affinity_width, typename Hardware::trait_t, typename Hardware::matchbin_t> { } ;
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE

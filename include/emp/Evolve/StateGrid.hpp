@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018.
  *
- *  @file  StateGrid.hpp
+ *  @file StateGrid.hpp
  *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
  *
  *  State grids are a matrix of values, representing states of a 2D environment that an organism
@@ -16,9 +16,9 @@
  *    possible ownership)
  */
 
+#ifndef EMP_EVOLVE_STATEGRID_HPP_INCLUDE
+#define EMP_EVOLVE_STATEGRID_HPP_INCLUDE
 
-#ifndef EMP_EVO_STATE_GRID_H
-#define EMP_EVO_STATE_GRID_H
 
 #include <map>
 #include <string>
@@ -389,4 +389,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_STATEGRID_HPP_INCLUDE

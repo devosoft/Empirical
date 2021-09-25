@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Type.hpp
+ *  @file Type.hpp
  *  @brief A collection of information about how to manage variables of a specified type.
  */
 
-#ifndef EMP_EMPOWER_TYPE_H
-#define EMP_EMPOWER_TYPE_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
 
 #include <functional>
 #include <string>
@@ -102,4 +102,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE

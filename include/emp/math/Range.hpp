@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019
  *
- *  @file  Range.hpp
+ *  @file Range.hpp
  *  @brief A simple way to track value ranges
  *  @note Status: BETA
  */
 
-#ifndef EMP_RANGE_H
-#define EMP_RANGE_H
+#ifndef EMP_MATH_RANGE_HPP_INCLUDE
+#define EMP_MATH_RANGE_HPP_INCLUDE
 
 #include <limits>
 
@@ -78,4 +78,4 @@ namespace emp {
   inline Range<double> DRange(double _l, double _u) { return Range<double>(_l,_u); }
 }
 
-#endif
+#endif // #ifndef EMP_MATH_RANGE_HPP_INCLUDE

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Resource.hpp
+ *  @file Resource.hpp
  *  @brief Implement resource-based selection.
  *
  *
@@ -12,9 +12,9 @@
  *        but lacks a lot of features for Artificial Life systems.
  */
 
+#ifndef EMP_EVOLVE_RESOURCE_HPP_INCLUDE
+#define EMP_EVOLVE_RESOURCE_HPP_INCLUDE
 
-#ifndef EMP_EVO_RESOURCE_H
-#define EMP_EVO_RESOURCE_H
 
 #include "World.hpp"
 
@@ -168,4 +168,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_RESOURCE_HPP_INCLUDE

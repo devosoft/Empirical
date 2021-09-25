@@ -8,9 +8,8 @@
  *  @note Status: BETA
  */
 
-
-#ifndef EMP_STATS_H
-#define EMP_STATS_H
+#ifndef EMP_MATH_STATS_HPP_INCLUDE
+#define EMP_MATH_STATS_HPP_INCLUDE
 
 #include <type_traits>
 #include <unordered_map>
@@ -219,7 +218,7 @@ namespace emp {
 
 }
 
-#endif
-
 //Base class outputs most recent
 //Write derived class
+
+#endif // #ifndef EMP_MATH_STATS_HPP_INCLUDE

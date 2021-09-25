@@ -1,6 +1,14 @@
-#ifndef EMP_CONFIG_WEB_INTERFACE_H
-#define EMP_CONFIG_WEB_INTERFACE_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file config_web_interface.hpp
+ *  @brief TODO.
+ */
 
+#ifndef EMP_CONFIG_CONFIG_WEB_INTERFACE_HPP_INCLUDE
+#define EMP_CONFIG_CONFIG_WEB_INTERFACE_HPP_INCLUDE
 
 #include <map>
 #include <set>
@@ -143,4 +151,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONFIG_CONFIG_WEB_INTERFACE_HPP_INCLUDE

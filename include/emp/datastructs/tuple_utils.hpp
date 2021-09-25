@@ -8,8 +8,8 @@
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_TUPLE_UTILS_H
-#define EMP_TUPLE_UTILS_H
+#ifndef EMP_DATASTRUCTS_TUPLE_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_TUPLE_UTILS_HPP_INCLUDE
 
 #include <functional>
 #include <tuple>
@@ -98,4 +98,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_TUPLE_UTILS_HPP_INCLUDE

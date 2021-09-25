@@ -24,8 +24,8 @@
  *  @todo Get working with threads
  */
 
-#ifndef EMP_PTR_H
-#define EMP_PTR_H
+#ifndef EMP_BASE_PTR_HPP_INCLUDE
+#define EMP_BASE_PTR_HPP_INCLUDE
 
 #include <cstring>
 #include <unordered_map>
@@ -1062,4 +1062,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // EMP_PTR_H
+#endif // #ifndef EMP_BASE_PTR_HPP_INCLUDE

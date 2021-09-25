@@ -1,14 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A tool to control a series of runs and keep them updated.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file BatchConfig.hpp
+ *  @brief A tool to control a series of runs and keep them updated.
+ *
+ *  Development notes: currently doesn't compile because of last line.
+ */
 
-// Development notes: currently doesn't compile because of last line
-
-#ifndef EMP_BATCH_CONFIG_H
-#define EMP_BATCH_CONFIG_H
+#ifndef EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
+#define EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
 
 #include <functional>
 
@@ -60,4 +62,4 @@ namespace emp {
   template <typename RUN_T> using BatchConfig = BatchConfig<RUN_T, typename RUN_T::config_t>;
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE

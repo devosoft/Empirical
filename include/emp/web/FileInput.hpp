@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  FileInput.hpp
+ *  @file FileInput.hpp
  *  @brief Specs for the FileInput widget (click on to upload a file)
  *
  *  @todo Setup FileInput to work outside of web mode as well.
  */
 
-#ifndef EMP_WEB_FILE_INPUT_H
-#define EMP_WEB_FILE_INPUT_H
+#ifndef EMP_WEB_FILEINPUT_HPP_INCLUDE
+#define EMP_WEB_FILEINPUT_HPP_INCLUDE
 
 #include <functional>
 #include <string>
@@ -144,4 +144,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_FILEINPUT_HPP_INCLUDE

@@ -8,9 +8,9 @@
  *
  */
 
+#ifndef EMP_MATCHING_MATCHBIN_REGULATORS_HPP_INCLUDE
+#define EMP_MATCHING_MATCHBIN_REGULATORS_HPP_INCLUDE
 
-#ifndef EMP_MATCH_BIN_REGULATORS_H
-#define EMP_MATCH_BIN_REGULATORS_H
 
 #include <iostream>
 #include <unordered_map>
@@ -391,4 +391,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATCHING_MATCHBIN_REGULATORS_HPP_INCLUDE

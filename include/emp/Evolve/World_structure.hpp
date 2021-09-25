@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  World_structure.hpp
+ *  @file World_structure.hpp
  *  @brief Functions for popular world structure methods.
  */
 
-#ifndef EMP_EVO_WORLD_STRUCTURE_H
-#define EMP_EVO_WORLD_STRUCTURE_H
+#ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 
 #include <set>
 
@@ -556,4 +556,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE

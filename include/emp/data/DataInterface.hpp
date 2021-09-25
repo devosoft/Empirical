@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  DataInterface.hpp
+ *  @file DataInterface.hpp
  *  @brief DataInterface is a *generic* interface to a DataNode.
  */
 
+#ifndef EMP_DATA_DATAINTERFACE_HPP_INCLUDE
+#define EMP_DATA_DATAINTERFACE_HPP_INCLUDE
 
-#ifndef EMP_DATA_INTERFACE_H
-#define EMP_DATA_INTERFACE_H
 
 #include "DataNode.hpp"
 
@@ -136,4 +136,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAINTERFACE_HPP_INCLUDE

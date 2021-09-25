@@ -18,8 +18,8 @@
  *  @todo Functions should be able to have fixed type values mixed in.
  */
 
-#ifndef EMP_TYPE_TRACKER_H
-#define EMP_TYPE_TRACKER_H
+#ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
+#define EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
 
 #include <unordered_map>
 
@@ -260,4 +260,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE

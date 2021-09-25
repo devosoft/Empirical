@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  Graph.hpp
+ *  @file Graph.hpp
  *  @brief A simple, fast class for managing verticies (nodes) and edges.
  *  @note Status: BETA
  */
 
-#ifndef EMP_GRAPH_H
-#define EMP_GRAPH_H
+#ifndef EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE
+#define EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE
 
 #include <iostream>
 
@@ -338,4 +338,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE

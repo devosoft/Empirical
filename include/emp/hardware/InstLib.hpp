@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2021.
  *
- *  @file  InstLib.hpp
+ *  @file InstLib.hpp
  *  @brief This file maintains information about instructions availabel in virtual hardware.
  */
 
-#ifndef EMP_INST_LIB_H
-#define EMP_INST_LIB_H
+#ifndef EMP_HARDWARE_INSTLIB_HPP_INCLUDE
+#define EMP_HARDWARE_INSTLIB_HPP_INCLUDE
 
 #include <map>
 #include <string>
@@ -213,4 +213,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_INSTLIB_HPP_INCLUDE

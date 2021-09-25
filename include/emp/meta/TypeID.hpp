@@ -1,18 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  TypeID provides an easy way to convert types to strings.
-//
-//
-//  Developer notes:
-//  * Fill out defaults for remaining standard library classes (as possible)
-//  * If a class has a static TypeID_GetName() defined, use that for the name.
-//  * If a type is a template, give access to parameter types.
-//  * If a type is a function, give access to parameter types.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2021
+ *
+ *  @file TypeID.hpp
+ *  @brief TypeID provides an easy way to convert types to strings.
+ *
+ *  Developer notes:
+ *  * Fill out defaults for remaining standard library classes (as possible)
+ *  * If a class has a static TypeID_GetName() defined, use that for the name.
+ *  * If a type is a template, give access to parameter types.
+ *  * If a type is a function, give access to parameter types.
+ */
 
-#ifndef EMP_TYPE_ID_H
-#define EMP_TYPE_ID_H
+#ifndef EMP_META_TYPEID_HPP_INCLUDE
+#define EMP_META_TYPEID_HPP_INCLUDE
 
 #include <cmath>
 #include <sstream>
@@ -25,7 +27,6 @@
 
 #include "type_traits.hpp"
 #include "TypePack.hpp"
-
 
 namespace emp {
 
@@ -479,4 +480,4 @@ namespace std {
   }
 }
 
-#endif
+#endif // #ifndef EMP_META_TYPEID_HPP_INCLUDE

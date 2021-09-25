@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  color_map.hpp
+ *  @file color_map.hpp
  *  @brief Tools to dynamically build (and cache) color maps.
  */
 
-#ifndef EMP_COLOR_MAP_H
-#define EMP_COLOR_MAP_H
+#ifndef EMP_WEB_COLOR_MAP_HPP_INCLUDE
+#define EMP_WEB_COLOR_MAP_HPP_INCLUDE
 
 #include <cmath>
 #include <iomanip>
@@ -159,4 +159,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_COLOR_MAP_HPP_INCLUDE

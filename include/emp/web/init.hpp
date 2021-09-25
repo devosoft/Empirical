@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018.
  *
- *  @file  init.hpp
+ *  @file init.hpp
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  * 
  * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It 
@@ -13,8 +13,8 @@
  * for avoiding confusion in linters and IDEs. 
  */
 
-#ifndef EMP_INIT_H
-#define EMP_INIT_H
+#ifndef EMP_WEB_INIT_HPP_INCLUDE
+#define EMP_WEB_INIT_HPP_INCLUDE
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS // This file is just going to confuse doxygen
 
@@ -240,4 +240,4 @@ std::function<std::string()> emp::Live(T && val) {;}
 
 #endif
 
-#endif
+#endif // #ifndef EMP_WEB_INIT_HPP_INCLUDE

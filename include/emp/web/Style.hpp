@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Style.hpp
+ *  @file Style.hpp
  *  @brief A CSS class for tracking font style, etc.
  */
 
+#ifndef EMP_WEB_STYLE_HPP_INCLUDE
+#define EMP_WEB_STYLE_HPP_INCLUDE
 
-#ifndef EMP_WEB_STYLE_H
-#define EMP_WEB_STYLE_H
 
 
 #ifdef __EMSCRIPTEN__
@@ -210,4 +210,4 @@ namespace web {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_STYLE_HPP_INCLUDE

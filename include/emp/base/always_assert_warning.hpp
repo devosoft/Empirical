@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file always_assert.hpp
+ *  @file always_assert_warning.hpp
  *  @brief A more dynamic replacement for standard library asserts.
  *  @note Status: RELEASE
  *
@@ -24,8 +24,8 @@
  *  assertion error whether compiled in debug mode or not.
  */
 
-#ifndef EMP_ALWAYS_ASSERT_WARNING_HPP
-#define EMP_ALWAYS_ASSERT_WARNING_HPP
+#ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
+#define EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
 
 #include <cstdlib>
 
@@ -68,4 +68,4 @@
   #define emp_always_assert_warning(...)
 #endif
 
-#endif // #ifdef EMP_ALWAYS_ASSERT_WARNING_HPP
+#endif // #ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE

@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef EMP_ALWAYS_ASSERT_HPP
-#define EMP_ALWAYS_ASSERT_HPP
+#ifndef EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE
+#define EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE
 
 #include <cstdlib>
 
@@ -78,4 +78,4 @@
 /// both debug and release mode.
 #define emp_always_assert(...) emp_always_assert_impl(__VA_ARGS__)
 
-#endif // #ifdef EMP_ALWAYS_ASSERT_HPP
+#endif // #ifndef EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE

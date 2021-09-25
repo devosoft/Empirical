@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  QueueCache.hpp
+ *  @file QueueCache.hpp
  *  @brief A simple implementation of a Least-Recently Used Cache.
  *		It orders elements by access time and removes the stalest ones in case maximum capacity is reached.
  */
 
-#ifndef EMP_QUEUECACHE_H
-#define EMP_QUEUECACHE_H
+#ifndef EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
+#define EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
 
 #include <list>
 #include <unordered_map>
@@ -196,5 +196,7 @@
 				return Get(index);
 			}
 	};
+
 }
-#endif
+
+#endif // #ifndef EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE

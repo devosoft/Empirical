@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Document.hpp
+ *  @file Document.hpp
  *  @brief Manage an entire document.
  *
  *  The Document class is built off of Div, but initializes the EMP web framework, if
@@ -19,8 +19,8 @@
  *  doc.Canvas("my_canvas")
  */
 
-#ifndef EMP_WEB_DOCUMENT_H
-#define EMP_WEB_DOCUMENT_H
+#ifndef EMP_WEB_DOCUMENT_HPP_INCLUDE
+#define EMP_WEB_DOCUMENT_HPP_INCLUDE
 
 #include "events.hpp"
 
@@ -130,4 +130,4 @@ namespace web {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_DOCUMENT_HPP_INCLUDE

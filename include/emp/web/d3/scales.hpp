@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  scales.hpp
+ *  @file scales.hpp
  *  @brief Tools for scaling graph axes in D3.
  */
 
-#ifndef EMP_D3_SCALES_H
-#define EMP_D3_SCALES_H
+#ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
+#define EMP_WEB_D3_SCALES_HPP_INCLUDE
 
 #include "d3_init.hpp"
 #include "utils.hpp"
@@ -277,4 +277,4 @@ namespace D3 {
   };
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE

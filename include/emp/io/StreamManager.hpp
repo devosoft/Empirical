@@ -3,16 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020-2021.
  *
- *  @file  StreamManager.hpp
+ *  @file StreamManager.hpp
  *  @brief The StreamManager object links names to files or other streams.
  *  @note  Status: BETA
  *
  *  @todo  Ideally should also work with emp::File
  */
 
+#ifndef EMP_IO_STREAMMANAGER_HPP_INCLUDE
+#define EMP_IO_STREAMMANAGER_HPP_INCLUDE
 
-#ifndef EMP_STREAM_MANAGER_H
-#define EMP_STREAM_MANAGER_H
 
 #include <fstream>
 #include <iostream>
@@ -329,4 +329,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IO_STREAMMANAGER_HPP_INCLUDE

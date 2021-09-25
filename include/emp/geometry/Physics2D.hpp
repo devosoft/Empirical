@@ -1,13 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Physics2D - handles movement and collissions in a simple 2D world.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Physics2D.hpp
+ *  @brief Physics2D - handles movement and collissions in a simple 2D world.
+ *
+ */
 
-
-#ifndef EMP_PHYSICS_2D_H
-#define EMP_PHYSICS_2D_H
+#ifndef EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE
+#define EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE
 
 #include <unordered_set>
 #include <functional>
@@ -190,4 +192,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE

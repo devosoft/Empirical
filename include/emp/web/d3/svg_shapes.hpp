@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  svg_shapes.hpp
+ *  @file svg_shapes.hpp
  *  @brief Tools to build common SVG shapes.
  */
 
-#ifndef EMP_D3_SVG_SHAPES_H
-#define EMP_D3_SVG_SHAPES_H
+#ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
+#define EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
 
 #include "d3_init.hpp"
 #include "selection.hpp"
@@ -570,4 +570,4 @@ namespace D3 {
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE

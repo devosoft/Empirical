@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Listeners.hpp
+ *  @file Listeners.hpp
  *  @brief A class for tracking font event listeners for Widgets
  */
 
+#ifndef EMP_WEB_LISTENERS_HPP_INCLUDE
+#define EMP_WEB_LISTENERS_HPP_INCLUDE
 
-#ifndef EMP_WEB_LISTENERS_H
-#define EMP_WEB_LISTENERS_H
 
 
 #ifdef __EMSCRIPTEN__
@@ -128,4 +128,4 @@ namespace web {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_LISTENERS_HPP_INCLUDE

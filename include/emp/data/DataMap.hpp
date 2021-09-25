@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2021.
  *
- *  @file  DataMap.hpp
+ *  @file DataMap.hpp
  *  @brief A DataMap links names to arbitrary object types.
  *  @note Status: ALPHA
  *
@@ -82,8 +82,8 @@
  *    do it, the improvement in cache performance could be dramatic.
  */
 
-#ifndef EMP_DATA_MAP_H
-#define EMP_DATA_MAP_H
+#ifndef EMP_DATA_DATAMAP_HPP_INCLUDE
+#define EMP_DATA_DATAMAP_HPP_INCLUDE
 
 #include <string>
 #include <cstring>        // For std::memcpy
@@ -316,4 +316,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAMAP_HPP_INCLUDE

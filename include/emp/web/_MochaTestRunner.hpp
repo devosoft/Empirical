@@ -1,17 +1,16 @@
-
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  _MochaTestRunner.hpp
+ *  @file _MochaTestRunner.hpp
  *  @brief Utility class for managing software testing for Emscripten web code using the Karma + Mocha
  *         javascript testing framework.
  *
  */
 
-#ifndef WEB_TESTING_MOCHA_TEST_RUNNER_H
-#define WEB_TESTING_MOCHA_TEST_RUNNER_H
+#ifndef EMP_WEB__MOCHATESTRUNNER_HPP_INCLUDE
+#define EMP_WEB__MOCHATESTRUNNER_HPP_INCLUDE
 
 #include <functional>
 #include <type_traits>
@@ -379,4 +378,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB__MOCHATESTRUNNER_HPP_INCLUDE

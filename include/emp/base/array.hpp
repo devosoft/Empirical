@@ -15,9 +15,9 @@
  *  @todo Add tests for get.
  */
 
+#ifndef EMP_BASE_ARRAY_HPP_INCLUDE
+#define EMP_BASE_ARRAY_HPP_INCLUDE
 
-#ifndef EMP_ARRAY_H
-#define EMP_ARRAY_H
 
 #include <initializer_list>
 #include <array>
@@ -220,4 +220,4 @@ namespace std {
 
 }
 
-#endif // Include guards
+#endif // #ifndef EMP_BASE_ARRAY_HPP_INCLUDE

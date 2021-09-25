@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  DataNode.hpp
+ *  @file DataNode.hpp
  *  @brief DataNode objects track a specific type of data over the course of a run.
  *
  *  Collection: New data can be pushed or pulled.
@@ -21,8 +21,8 @@
  *         reflects the number of resets.
  */
 
-#ifndef EMP_DATA_NODE_H
-#define EMP_DATA_NODE_H
+#ifndef EMP_DATA_DATANODE_HPP_INCLUDE
+#define EMP_DATA_DATANODE_HPP_INCLUDE
 
 #include <limits>
 #include <algorithm>
@@ -765,4 +765,4 @@ namespace emp {
   using DataArchive = DataNode<T, data::Info, data::Archive, data::FullRange, MODS...>;
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATANODE_HPP_INCLUDE

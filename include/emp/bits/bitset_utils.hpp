@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file  bitset_utils.hpp
+ *  @file bitset_utils.hpp
  *  @brief A set of simple functions to manipulate bitsets.
  *  @note Status: BETA
  */
 
-#ifndef EMP_BITSET_UTILS_H
-#define EMP_BITSET_UTILS_H
+#ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
+#define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
 namespace emp {
 
@@ -141,4 +141,4 @@ namespace emp {
   */
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE

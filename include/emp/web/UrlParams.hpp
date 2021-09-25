@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  UrlParams.hpp
+ *  @file UrlParams.hpp
  *  @brief Get an unordered_map containing url query key/value parameters.
  *
  */
 
-#ifndef EMP_WEB_UrlParams_H
-#define EMP_WEB_UrlParams_H
+#ifndef EMP_WEB_URLPARAMS_HPP_INCLUDE
+#define EMP_WEB_URLPARAMS_HPP_INCLUDE
 
 #include <map>
 #include <string>
@@ -80,4 +80,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_URLPARAMS_HPP_INCLUDE

@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  layout.hpp
+ *  @file layout.hpp
  *  @brief Tools for laying out nodes in D3.
  */
 
-#ifndef EMP_D3_LAYOUT_H
-#define EMP_D3_LAYOUT_H
+#ifndef EMP_WEB_D3_LAYOUT_HPP_INCLUDE
+#define EMP_WEB_D3_LAYOUT_HPP_INCLUDE
 
 #include "d3_init.hpp"
 #include "dataset.hpp"
@@ -201,4 +201,4 @@ namespace D3{
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_D3_LAYOUT_HPP_INCLUDE

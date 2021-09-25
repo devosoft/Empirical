@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
  *
- *  @file  config.hpp
+ *  @file config.hpp
  *  @brief Maintains a set of configuration options.
  *
  *  This file defines a master configuration option Config, whose values can be loaded
@@ -35,8 +35,8 @@
  *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly created configuration object.
  */
 
-#ifndef EMP_CONFIG_H
-#define EMP_CONFIG_H
+#ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE
+#define EMP_CONFIG_CONFIG_HPP_INCLUDE
 
 #include <fstream>
 #include <functional>
@@ -807,4 +807,4 @@ namespace emp {
     EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)        \
   };
 
-#endif
+#endif // #ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE

@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  FunctionSet.hpp
+ *  @file FunctionSet.hpp
  *  @brief Setup a collection of functions, all with the same signature, that can be run as a group.
  *  @note Status: BETA
  */
 
-#ifndef EMP_FUNCTION_SET_H
-#define EMP_FUNCTION_SET_H
+#ifndef EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
+#define EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
 
 #include <functional>
 #include "../base/vector.hpp"
@@ -121,4 +121,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE

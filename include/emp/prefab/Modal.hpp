@@ -1,5 +1,14 @@
-#ifndef EMP_MODAL_HPP
-#define EMP_MODAL_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Modal.hpp
+ *  @brief Wraps a Bootstrap modal.
+ */
+
+#ifndef EMP_PREFAB_MODAL_HPP_INCLUDE
+#define EMP_PREFAB_MODAL_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
 #include "../web/Element.hpp"
@@ -110,4 +119,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_MODAL_HPP_INCLUDE

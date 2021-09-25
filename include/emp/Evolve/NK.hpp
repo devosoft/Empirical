@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  NK.hpp
+ *  @file NK.hpp
  *  @brief This file provides code to build NK-based algorithms.
  *
  *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
@@ -15,8 +15,8 @@
  *    Based on K value, we should be able to do this automatically, so we could merge the two.
  */
 
-#ifndef EMP_EVO_NK_H
-#define EMP_EVO_NK_H
+#ifndef EMP_EVOLVE_NK_HPP_INCLUDE
+#define EMP_EVOLVE_NK_HPP_INCLUDE
 
 #include <array>
 
@@ -218,4 +218,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_NK_HPP_INCLUDE
