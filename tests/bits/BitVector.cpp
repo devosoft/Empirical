@@ -150,7 +150,7 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
 
   emp::Random random;
   emp::BitVector bv1k(1000, random, 0.75);
-  
+
   // Make sure all sizes are correct.
   REQUIRE( bv0.GetSize() == 0 );
   REQUIRE( bv1.GetSize() == 1 );
@@ -238,7 +238,7 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
 }
 
 TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
-  // Make sure range-based accessors still work when there are no bits. 
+  // Make sure range-based accessors still work when there are no bits.
   emp::BitVector bv0(0);
   bv0.SetRange(0,0);
   bv0.SetAll();
@@ -248,7 +248,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv0.Toggle(0,0);
   REQUIRE( bv0.GetSize() == 0 );
 
-  // Now try range-based accessors on a single bit. 
+  // Now try range-based accessors on a single bit.
   emp::BitVector bv1(1, false);  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
   bv1.Set(0);                    REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
   bv1.Clear(0);                  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
@@ -492,7 +492,7 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
 TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
-  
+
   emp::BitVector bv(num_bits);
   REQUIRE(bv.GetSize() == num_bits);
   REQUIRE(bv.GetNumBytes() == num_bytes);

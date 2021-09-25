@@ -234,7 +234,7 @@ namespace emp {
       for (auto & str : str_v) {
         ss << str;
       }
-      
+
       return Tokenize(ss);
     }
 

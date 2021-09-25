@@ -83,7 +83,7 @@ namespace emp {
       original_seed = weyl_state;
 
       weyl_state *= 2;  // Make sure starting state is even.
-      
+
       Get(); // Prime the new sequence by skipping the first number.
     }
 
@@ -244,12 +244,12 @@ namespace emp {
         }
         return;
       }
-  
+
       const uint8_t start_byte = dest[start_byte_id];    // Save first byte to restore bits.
 
       // Randomize the full bits we need to use.
       RandFillP<PROB>(dest + start_byte_id, end_byte_id - start_byte_id);
-  
+
       // If we are not starting at the beginning of a byte, restore missing bits.
       if (start_bit_id) {
         const uint8_t mask = (uint8_t) ((1 << start_bit_id) - 1); // Signify how byte is divided.

@@ -386,7 +386,7 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	CHECK(world.GetHeight() == 4);
 	CHECK(world.GetDepth() == 3);
 	CHECK(world.GetSize() == 5*4*3);
-	
+
 	int org1 = 5;
 
 	world.InjectAt(org1, 0);
@@ -408,7 +408,7 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	legal_neighbors = {58, 54, 53, 39, 38, 34, 33};
 	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
-	
+
 	// Test is_neighbor
 	CHECK(world.IsNeighbor(5, 6));
 	CHECK(world.IsNeighbor(0, 20));
@@ -428,11 +428,11 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	legal_neighbors = {1,5,6,20,21,25,26};
 	CHECK(emp::Has<size_t>(legal_neighbors, pos.GetIndex() ));
 	CHECK(pos.GetPopID() == 1);
-	CHECK(world.GetNumOrgs() == 1);	
+	CHECK(world.GetNumOrgs() == 1);
 	world.Update();
-	CHECK(world.GetNumOrgs() == 1);	
+	CHECK(world.GetNumOrgs() == 1);
 	world.Update();
-	CHECK(world.GetNumOrgs() == 0);	
+	CHECK(world.GetNumOrgs() == 0);
 
 }
 

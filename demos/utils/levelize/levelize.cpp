@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
   std::cerr << num_files << " files found.  Processing!" << std::endl;
 
   bool verbose = false;
-  
+
   // Simplify to just the filenames (remove paths)
   std::map<std::string, FileInfo> file_map;
   emp::vector<std::string> filenames;
@@ -93,7 +93,7 @@ int main(int argc, char * argv[])
     if (verbose) {
       std::cerr << "Processing!" << std::endl;
     }
-    
+
     // Loop through each file to see if we can determine its level.
     for (auto & [filename, info] : file_map) {
       if (info.level != FileInfo::NO_LEVEL) continue;  // Already has a level!
@@ -164,5 +164,5 @@ int main(int argc, char * argv[])
   if (verbose) {
     std::cerr << "Number of files with unknown levels: " << unknown_count << std::endl;
   }
-  
+
 }

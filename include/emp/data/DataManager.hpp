@@ -105,7 +105,7 @@ namespace emp {
      * ```
      * DataManager<int, data::Current, data::Range> my_data_manager;
      * my_data_manager.Add("my_node_name");
-     * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  
+     * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);
      * ```*/
     template <typename... Ts>
     void AddData(const std::string & name, Ts... extra) {

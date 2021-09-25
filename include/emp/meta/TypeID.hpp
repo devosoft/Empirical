@@ -322,12 +322,12 @@ namespace emp {
     template <typename T> bool IsType() const { return *this == GetTypeID<T>(); }
 
     template <typename T, typename... Ts>
-    bool IsTypeIn() const { 
+    bool IsTypeIn() const {
       if (IsType<T>()) return true;
       if constexpr (sizeof...(Ts) > 0) return IsTypeIn<Ts...>();
       else return false;
     }
- 
+
     TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
     TypeID GetElementTypeID() const { return info_ptr->GetElementID(); }
     TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
@@ -408,7 +408,7 @@ namespace emp {
         if constexpr (std::rank<T>::value > 2) info.name += "[" + emp::to_string(std::extent<T,2>::value) + "]";
         if constexpr (std::rank<T>::value > 3) info.name += "[" + emp::to_string(std::extent<T,3>::value) + "]";
         if constexpr (std::rank<T>::value > 4) info.name += "[" + emp::to_string(std::extent<T,4>::value) + "]";
-        if constexpr (std::rank<T>::value > 5) info.name += "[...]";        
+        if constexpr (std::rank<T>::value > 5) info.name += "[...]";
       }
       else if constexpr (emp::is_pointer<T>()) {
         info.name = type_id.GetRemovePointerTypeID().GetName() + '*';

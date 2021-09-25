@@ -256,23 +256,23 @@ namespace emp {
     size_t GetUpdate() const { return update; }
 
     /// How many cells wide is the world? (assumes grids are active.)
-    size_t GetWidth() const { 
+    size_t GetWidth() const {
       emp_assert(HasAttribute("PopStruct"));
-      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid"); 
-      return pop_sizes[0]; 
+      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid");
+      return pop_sizes[0];
     }
 
     /// How many cells tall is the world? (assumes grids are active.)
-    size_t GetHeight() const { 
+    size_t GetHeight() const {
       emp_assert(HasAttribute("PopStruct"));
-      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid"); 
-      return pop_sizes[1]; 
+      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid");
+      return pop_sizes[1];
     }
 
     /// How many cells deep is the world? (assumes 3d grids are active.)
-    size_t GetDepth() const { 
-      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "3DGrid"); 
-      return pop_sizes[2]; 
+    size_t GetDepth() const {
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "3DGrid");
+      return pop_sizes[2];
     }
 
     /// Get the full population to analyze externally.
@@ -993,7 +993,7 @@ namespace emp {
     if (pos.IsActive()) {
       --num_orgs;                                    // Track one fewer organisms in the population
       if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
-    } 
+    }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
       s->RemoveOrgAfterRepro(pos, update);          // Notify systematics about organism removal
@@ -1179,7 +1179,7 @@ namespace emp {
       int row_diff = abs(diff / size_x);
       int col_diff = abs(diff%size_x);
 
-      if((row_diff <= 1 || row_diff == (size_y-1)) && 
+      if((row_diff <= 1 || row_diff == (size_y-1)) &&
         (col_diff <= 1 || col_diff == (size_x-1)))	return true;
       else return false;
     };
@@ -1265,7 +1265,7 @@ namespace emp {
         } else if (z_pos == size_z - 1) {
           for (int i = 18; i < 27; i++) {
             options.Set(i, false);
-          }          
+          }
         }
        if (y_pos == 0) {
           options.Set(0, false);
@@ -1288,7 +1288,7 @@ namespace emp {
           options.Set(25, false);
           options.Set(26, false);
         }
-       if (x_pos == 0) {         
+       if (x_pos == 0) {
           options.Set(0, false);
           options.Set(3, false);
           options.Set(6, false);
@@ -1316,7 +1316,7 @@ namespace emp {
           rand_pos = options.PopOne();
         }
       }
-      
+
       int rand_z = z_pos + rand_pos / 9 - 1;
       int rand_y = y_pos + (rand_pos - (9 * (rand_pos / 9))) / 3 - 1;
       int rand_x = x_pos + (rand_pos - (9 * (rand_pos / 9))) % 3 - 1;
@@ -1351,7 +1351,7 @@ namespace emp {
 
       int x_diff = abs(x_pos_1 - x_pos_2);
       int y_diff = abs(y_pos_1 - y_pos_2);
-      int z_diff = abs(z_pos_1 - z_pos_2);    
+      int z_diff = abs(z_pos_1 - z_pos_2);
 
       return (x_diff <= 1) && (y_diff <= 1) && (z_diff <= 1);
 
@@ -1624,8 +1624,8 @@ namespace emp {
 
   /// Return IDs of all occupied neighbors of specified position.
   template<typename ORG>
-  emp::vector<size_t> World<ORG>::GetValidNeighborOrgIDs(size_t id) { 
-    //Note: this function is similar to FindCellIDs, but because ORG don't know their index, 
+  emp::vector<size_t> World<ORG>::GetValidNeighborOrgIDs(size_t id) {
+    //Note: this function is similar to FindCellIDs, but because ORG don't know their index,
     //FindCellIDs can't be used.
     emp::vector<size_t> valid_IDs(0);
     for(size_t i = 0; i < pop.size(); i++) {

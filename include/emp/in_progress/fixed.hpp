@@ -56,7 +56,7 @@ namespace emp {
       value = (((long) value) << FRAC_BITS) / rhs.value;
       return *this;
     }
-    
+
     fixed & operator++() { value += (1 << FRAC_BITS); }
     fixed operator++(int) { int old_val = value; operator++(); return fixed(old_val); }
     fixed & operator--() { value -= (1 << FRAC_BITS); }
@@ -81,7 +81,7 @@ namespace emp {
       const int new_value = (((long) lhs.value) << FRAC_BITS) / rhs.value;
       return fixed(new_value, true);
     }
-    
+
     friend bool operator==(const fixed & lhs, const fixed & rhs)
     { return lhs.value == rhs.value; }
     friend bool operator!=(const fixed & lhs, const fixed & rhs)
@@ -94,20 +94,20 @@ namespace emp {
     { return lhs.value >  rhs.value; }
     friend bool operator>=(const fixed & lhs, const fixed & rhs)
     { return lhs.value >= rhs.value; }
-  
+
   };
 
-  
+
 };
-  
+
 // Overload istream and ostream to work with fixed.
 template <int FRAC_BITS> std::ostream & operator<<(std::ostream & os,
-                                                   const emp::fixed<FRAC_BITS> & input) { 
+                                                   const emp::fixed<FRAC_BITS> & input) {
   return os << input.AsDouble();
 }
 
 template <int FRAC_BITS> std::istream & operator>>(std::istream & is,
-                                                   emp::fixed<FRAC_BITS> & input) { 
+                                                   emp::fixed<FRAC_BITS> & input) {
   double tmp_val;
   is >> tmp_val;
   input = tmp_val;

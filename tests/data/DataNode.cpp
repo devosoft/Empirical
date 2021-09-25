@@ -286,7 +286,7 @@ TEST_CASE("Test histogram", "[data]") {
     REQUIRE(data.GetHistMax() == 21);
 
     REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
-    
+
     REQUIRE(data.GetOverflow() == 1);
     REQUIRE(data.GetUnderflow() == 2);
     REQUIRE(data.GetHistCount(9) == 1);

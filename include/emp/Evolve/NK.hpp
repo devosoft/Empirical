@@ -141,7 +141,7 @@ namespace emp {
       return total;
     }
 
-    /// Get the fitness of a site in a bitstring 
+    /// Get the fitness of a site in a bitstring
     // (pass by value so can be modified.)
     double GetSiteFitness(size_t n, BitVector genome) const {
       emp_assert(genome.GetSize() == N, genome.GetSize(), N);

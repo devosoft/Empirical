@@ -67,4 +67,3 @@ TEST_CASE("Another Test Lexer", "[compiler]")
   REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
   REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
 }
-

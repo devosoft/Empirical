@@ -5,12 +5,12 @@
  *
  *  @file init.hpp
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
- * 
- * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It 
+ *
+ * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It
  * handles making sure that behind the scenes stuff is all set up properly. It also defines some
  * useful stubs and dummy functions so that your code will still be possible to comple with a normal
  * C++ compiler (although the web part won't do anything, of course). These stubs are also helpful
- * for avoiding confusion in linters and IDEs. 
+ * for avoiding confusion in linters and IDEs.
  */
 
 #ifndef EMP_WEB_INIT_HPP_INCLUDE
@@ -198,7 +198,7 @@ namespace emp {
 #include <fstream>
 
 namespace emp {
-  
+
   std::ofstream debug_file("debug_file");
   bool init = false;      // Make sure we only initialize once!
 

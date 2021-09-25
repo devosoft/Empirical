@@ -34,7 +34,7 @@ TEST_CASE("Test Bloom Filter", "[datastructs]")
 
 	emp::CompressibleBloomFilter cbf(parameters);
 	cbf.insert("Hi!");
-	
+
 	emp::BloomFilter b2 = b | cbf;
 	CHECK(b2.contains("Hi!"));
 	CHECK(b2.contains(3));

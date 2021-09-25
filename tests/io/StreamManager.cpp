@@ -7,7 +7,7 @@
 TEST_CASE("Test StreamManager", "[io]")
 {
   emp::StreamManager sm;
-   
+
   std::stringstream & test_stream = sm.AddStringStream("test_stream");
   test_stream << "abc" << 123 << 'd' << 'e' << 'f';
   REQUIRE( test_stream.str() == "abc123def" );

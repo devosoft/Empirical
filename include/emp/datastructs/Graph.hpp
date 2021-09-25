@@ -103,7 +103,7 @@ namespace emp {
     Node GetNode(int i) {return nodes[i];}
     /// @returns a vector of all nodes in the graph
     emp::vector<Node> GetNodes(){return nodes;}
-    
+
     /// Change the number of vertices in this graph.
     void Resize(size_t new_size) {
       nodes.resize(new_size, new_size);
@@ -129,7 +129,7 @@ namespace emp {
     /// Get the in-degree (number of incoming edges)
     /// of the node @param id
     /// This should only be used for directed graphs (for
-    /// undirected graphs, GetDegree() is equivalent and faster) 
+    /// undirected graphs, GetDegree() is equivalent and faster)
     size_t GetInDegree(size_t id) const {
       size_t count = 0;
       for (auto & node : nodes) {

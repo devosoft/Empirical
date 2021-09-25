@@ -384,7 +384,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
   auto id6 = sys.AddOrg(29, id5, 39);
   std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   auto id7 = sys.AddOrg(30, id1, 6);
-  
+
 
   std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
@@ -831,7 +831,7 @@ TEST_CASE("Test GetCanopy", "[evo]")
   can_set = sys.GetCanopyExtantRoots(2);
 
   // Both 3 and 4 were not alive at time point 2, so the canopy roots
-  // will be 1 and 2. 
+  // will be 1 and 2.
   CHECK(can_set.size() == 2);
   CHECK(Has(can_set, id1));
   CHECK(Has(can_set, id2));
@@ -842,7 +842,7 @@ TEST_CASE("Test GetCanopy", "[evo]")
 
   // Only 4 is alive, but it wasn't alive at time point 2. 2 is the
   // only canopy root because even though 1 is alive, because 4's
-  // lineage diverged from 1 when 2 was born. 
+  // lineage diverged from 1 when 2 was born.
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id2));
 
@@ -852,12 +852,12 @@ TEST_CASE("Test GetCanopy", "[evo]")
   sys.RemoveOrg(id5, 11);
 
   can_set = sys.GetCanopyExtantRoots(7);
-  // Should only be 4 
+  // Should only be 4
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id4));
 
   can_set = sys.GetCanopyExtantRoots(9);
-  // Should only be 5 
+  // Should only be 5
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id5));
 
@@ -873,12 +873,12 @@ TEST_CASE("Test GetCanopy", "[evo]")
   sys.RemoveOrg(id9, 20);
 
   can_set = sys.GetCanopyExtantRoots(22);
-  // Should only be 10 
+  // Should only be 10
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id10));
 
   can_set = sys.GetCanopyExtantRoots(14);
-  // Should only be 9, even though others were alive 
+  // Should only be 9, even though others were alive
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id9));
 
@@ -1053,7 +1053,7 @@ TEST_CASE("Tree balance", "[evo]") {
   CHECK(tree33.SackinIndex() == 6);
 
   // From CollessLike metric paper
-  emp::Systematics<int, int> treecl([](const int & i){return i;}, true, true, false, false);  
+  emp::Systematics<int, int> treecl([](const int & i){return i;}, true, true, false, false);
   auto treeclorg1 = treecl.AddOrg(1, nullptr);
   auto treeclorg2 = treecl.AddOrg(2, treeclorg1);
   auto treeclorg3 = treecl.AddOrg(3, treeclorg1);

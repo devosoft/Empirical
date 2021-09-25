@@ -4,7 +4,7 @@
  *  @date 2021.
  *
  *  @file _error_trigger.hpp
- *  @brief Error trigger implementation selector 
+ *  @brief Error trigger implementation selector
  *  @note For internal use.
  */
 

@@ -88,7 +88,7 @@ TEST_CASE("Test Mancala", "[games]")
   REQUIRE( game.IsMoveValid(0) == true );
   REQUIRE( game.IsMoveValid(2) == true );
   REQUIRE( game.IsMoveValid(5) == false );
-  
+
   auto options = game.GetMoveOptions();
   REQUIRE( options.size() == 5 );
   REQUIRE( options[4] == 4 );

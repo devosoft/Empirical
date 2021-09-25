@@ -15,7 +15,7 @@
 #include <string>
 
 namespace emp {
-  
+
   template <typename... Ts>
   void trigger_emp_error(const std::string& filename, const size_t line, Ts &&... args) {
     std::cerr << "Fatal Error (In " << filename << " line " << line

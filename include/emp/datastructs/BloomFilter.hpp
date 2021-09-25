@@ -171,7 +171,7 @@ public:
 
 };
 
-/// This class implements a Bloom filter, which is a 
+/// This class implements a Bloom filter, which is a
 /// memory-efficient data structure for identifying
 /// values that have been seen before (with a tunable
 /// probability of a false positive - thinking that
@@ -411,7 +411,7 @@ public:
       return table_size_;
    }
 
-   /// @returns the number of elements that have been added 
+   /// @returns the number of elements that have been added
    /// to the Bloom filter
    inline unsigned long long int element_count() const
    {

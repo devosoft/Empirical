@@ -1016,4 +1016,3 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
   REQUIRE(hw1.GetMatchBin().Size() == 2);
 
 }
-

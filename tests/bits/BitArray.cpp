@@ -177,7 +177,7 @@ TEST_CASE("3: Test Simple BitArray Accessors", "[bits]"){
 
   emp::Random random;
   emp::BitArray<1000> bs1k(random, 0.75);
-  
+
   // Make sure all sizes are correct.
   REQUIRE( bs1.GetSize() == 1 );
   REQUIRE( bs8.GetSize() == 8 );
@@ -260,7 +260,7 @@ TEST_CASE("3: Test Simple BitArray Accessors", "[bits]"){
 }
 
 TEST_CASE("4: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
-  // Now try range-based accessors on a single bit. 
+  // Now try range-based accessors on a single bit.
   emp::BitArray<1> bs1(false);  REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
   bs1.Set(0);                 REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
   bs1.Clear(0);               REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
@@ -505,7 +505,7 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
 TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
-  
+
   emp::BitArray<num_bits> bs;
   REQUIRE(bs.GetSize() == num_bits);
   REQUIRE(bs.GetNumBytes() == num_bytes);
@@ -1329,7 +1329,7 @@ struct MultiTester {
     emp::BitArray<width> bs(rand);
     const emp::BitArray<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
-    
+
     // Rotations should not change the number of ones.
     for (int i = -width - STEP - 1; i <= width + STEP + 1; i += STEP) {
       for (size_t rep = 0; rep < width; ++ rep) {

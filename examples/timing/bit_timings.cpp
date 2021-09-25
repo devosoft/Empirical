@@ -28,7 +28,7 @@ template <typename T>
 double TimeFunction(T && fun) {
   std::clock_t start_time = std::clock();
   fun();
-  std::clock_t total_time = std::clock() - start_time; 
+  std::clock_t total_time = std::clock() - start_time;
   return total_time / (double) CLOCKS_PER_SEC;
 }
 
@@ -139,7 +139,7 @@ struct SpeedTester {
 
       std::cout << std::left
                 << "  size: " << std::setw(7) << size
-                << "  count: " << std::setw(7) << obj_count              
+                << "  count: " << std::setw(7) << obj_count
                 << "  BitSet: " << std::setw(8) << bs_timings[name][size]
                 << "  BitVector: " << std::setw(8) << bv_timings[name][size]
                 << "  Ratio: " << std::setw(8) << (bs_timings[name][size] / bv_timings[name][size])
@@ -176,5 +176,5 @@ int main()
   SpeedTester speed_tester;
 
   speed_tester.RunTests();
-  speed_tester.PrintResults();  
+  speed_tester.PrintResults();
 }

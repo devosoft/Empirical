@@ -265,7 +265,7 @@ namespace emp {
     /// Set all bits randomly, with a fixed number of them being ones.
     BitArray & ChooseRandom(Random & random, const size_t target_ones,
                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
-    
+
     /// Flip random bits with a given probability.
     BitArray & FlipRandom(Random & random, const double p,
                         const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
@@ -346,7 +346,7 @@ namespace emp {
 
     /// Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
-    
+
     /// Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
@@ -384,7 +384,7 @@ namespace emp {
 
     /// Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
-    
+
     /// Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
@@ -601,7 +601,7 @@ namespace emp {
     /// Wraps if it underflows.
     /// Returns this object.
     BitArray & SUB_SELF(const BitArray & array2);
-    
+
     /// Operator bitwise NOT...
     [[nodiscard]] BitArray operator~() const { return NOT(); }
 
@@ -996,7 +996,7 @@ namespace emp {
 
     /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & 
+  BitArray<NUM_BITS,ZERO_LEFT> &
   BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
@@ -1004,7 +1004,7 @@ namespace emp {
 
   /// Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & 
+  BitArray<NUM_BITS,ZERO_LEFT> &
   BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
@@ -1489,7 +1489,7 @@ namespace emp {
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in the BitArray.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  size_t BitArray<NUM_BITS,ZERO_LEFT>::CountOnes() const { 
+  size_t BitArray<NUM_BITS,ZERO_LEFT>::CountOnes() const {
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.

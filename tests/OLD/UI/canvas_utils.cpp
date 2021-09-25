@@ -18,7 +18,7 @@ int main() {
   // Draw a random bitmap onto a canvas.
 
   auto & canvas = doc.AddCanvas(w, h, "can");
-  
+
   emp::BitMatrix<10,10> matrix;
   for (int x = 0; x < 10; x++) {
     for (int y = 0; y < 10; y++) {
@@ -32,7 +32,7 @@ int main() {
   // Draw a surface with circles on it!
   using dBRAIN = int;
   using dBODY = emp::CircleBody2D<dBRAIN>;
-    
+
   // Build the surface with bodies on it.
   emp::Surface2D<dBODY, dBRAIN> surface(w, h);
   for (int i = 0; i < 1000; i++) {
@@ -55,7 +55,7 @@ int main() {
   // Draw a grid on the canvas!
   const int num_rows = 50;
   const int num_cols = 20;
-  emp::vector< emp::vector<int> > grid(num_rows); //  = {{0,100,200},{100,200,0},{200,0,100}};  
+  emp::vector< emp::vector<int> > grid(num_rows); //  = {{0,100,200},{100,200,0},{200,0,100}};
   for (int row = 0; row < num_rows; row++) {
     grid[row].resize(num_cols);
     for (int col = 0; col < num_cols; col++) {

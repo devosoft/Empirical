@@ -284,7 +284,7 @@ namespace emp {
 
     return out_vv;
   }
-  
+
   /// Returns a vector containing the numbers from @param N1 to @param N2
   // from https://stackoverflow.com/questions/13152252/is-there-a-compact-equivalent-to-python-range-in-c-stl
   template <typename T>
@@ -295,7 +295,7 @@ namespace emp {
   }
 
   /// Return a new vector containing the same elements as @param v
-  /// with any duplicate elements removed. 
+  /// with any duplicate elements removed.
   /// Not guaranteed to preserve order
   template <typename T>
   emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {

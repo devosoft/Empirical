@@ -237,7 +237,7 @@ struct TestPassArrayToCpp : public emp::web::BaseTest {
     assert(emp::to_string(test_arr_2[0]) == emp::to_string(5.2));
     assert(test_arr_2[1] == 1.5);
     assert(emp::to_string(test_arr_2[2]) == emp::to_string(3.1));
-    #endif 
+    #endif
 
     // Test doubles
     EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});

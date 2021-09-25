@@ -107,7 +107,7 @@ namespace emp {
 
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
-    
+
     bool IsInst(const std::string name) const {
       return Has(name_map, name);
     }

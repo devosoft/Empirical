@@ -13,4 +13,3 @@ int main() {
 
   doc.Update();
 }
-

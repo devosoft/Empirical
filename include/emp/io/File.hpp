@@ -204,14 +204,14 @@ namespace emp {
 
     /// Keep only strings that contain a specific substring.
     File & KeepIfContains(const std::string & pattern) {
-      return KeepIf( 
+      return KeepIf(
         [&pattern](const std::string & line){ return line.find(pattern) != std::string::npos; }
       );
     }
 
     /// Remove all strings that contain a specific substring.
     File & RemoveIfContains(const std::string & pattern) {
-      return KeepIf( 
+      return KeepIf(
         [&pattern](const std::string & line){ return line.find(pattern) == std::string::npos; }
       );
     }

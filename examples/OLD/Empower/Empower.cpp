@@ -26,4 +26,3 @@ int main()
   std::cout << "var3 = " << var3.Restore<std::string>() << std::endl;
   std::cout << "var4 = " << var4.Restore<int>() << std::endl;
 }
-

@@ -32,4 +32,3 @@ int main() {
 
   UI::document.Update();
 }
-

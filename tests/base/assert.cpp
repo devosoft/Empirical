@@ -47,7 +47,7 @@ TEST_CASE("Test assert", "[base]")
   REQUIRE(emp::assert_last_fail);
   emp::assert_clear();
   REQUIRE_FALSE(emp::assert_last_fail);
-  
+
   // Run through similar tests to ensure no holdovers from cleared assert.
   emp_assert(true);
   REQUIRE(emp::assert_last_fail == 0);
@@ -59,7 +59,7 @@ TEST_CASE("Test assert", "[base]")
   const int expected_line_num_2 = __LINE__ + 1; // Line must precede the assert for line num to pass
   emp_assert(2 > 3); // False! Trigger the assert
   REQUIRE(emp::assert_last_fail);
-  
+
 
   const std::string filename_2 = emp::assert_fail_info.filename;
   REQUIRE_THAT(filename_2, Catch::Matchers::EndsWith("assert.cpp"));

@@ -137,10 +137,10 @@ namespace emp {
           else if constexpr (ACCESS == Access::OUTPUT) ptr = NewPtr<std::ofstream>(name);
           else if constexpr (ACCESS == Access::IO)     ptr = NewPtr<std::fstream>(name);
         }
- 
+
         // Build string streams.
         else if constexpr (TYPE == Type::STRING)       ptr = NewPtr<std::stringstream>();
- 
+
         // Otherwise use std::cin or std::cout
         else {
           owned = false;  // Use a pre-existing stream.
@@ -157,7 +157,7 @@ namespace emp {
     // A default class for when we do not have a live stream.
     struct StreamInfo_None : public StreamInfo {
       StreamInfo_None() : StreamInfo("", false) { }
-      
+
       Type GetType() const override { return Type::NONE; }
       Access GetAccess() const override { return Access::NONE; }
       std::istream & GetInputStream() override { emp_error("No input stream!"); return GetDefaultStream(); }
@@ -195,7 +195,7 @@ namespace emp {
     }
 
     bool Has(const std::string & name) const { return emp::Has(streams, name); }
- 
+
     // Check to see if certain types of streams are being managed.
     bool HasInputFileStream(const std::string & name) const { return GetInfo(name).IsInputFile(); }
     bool HasOutputFileStream(const std::string & name) const { return GetInfo(name).IsOutputFile(); }
@@ -266,7 +266,7 @@ namespace emp {
       };
       return GetDefaultStream();
     }
-    
+
     /// Build a default output stream.
     std::ostream & AddOutputStream(const std::string & name) {
       emp_assert(!Has(name));

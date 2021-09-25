@@ -177,7 +177,7 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
 
   emp::Random random;
   emp::BitSet<1000> bs1k(random, 0.75);
-  
+
   // Make sure all sizes are correct.
   REQUIRE( bs1.GetSize() == 1 );
   REQUIRE( bs8.GetSize() == 8 );
@@ -262,7 +262,7 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
 }
 
 TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
-  // Now try range-based accessors on a single bit. 
+  // Now try range-based accessors on a single bit.
   emp::BitSet<1> bs1(false);  REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
   bs1.Set(0);                 REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
   bs1.Clear(0);               REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
@@ -500,13 +500,13 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   for (size_t i = 400; i < 550; i++)  { REQUIRE(one_counts[i] > 680);  REQUIRE(one_counts[i] < 810); }
   for (size_t i = 550; i < 700; i++)  { REQUIRE(one_counts[i] >  60);  REQUIRE(one_counts[i] < 150); }
   for (size_t i = 700; i < 850; i++)  { REQUIRE(one_counts[i] > 950);  REQUIRE(one_counts[i] < 999); }
-  for (size_t i = 850; i < 1000; i++) { REQUIRE(one_counts[i] == 0); }  
+  for (size_t i = 850; i < 1000; i++) { REQUIRE(one_counts[i] == 0); }
 }
 
 TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
-  
+
   emp::BitSet<num_bits> bs;
   REQUIRE(bs.GetSize() == num_bits);
   REQUIRE(bs.GetNumBytes() == num_bytes);

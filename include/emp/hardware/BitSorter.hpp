@@ -20,7 +20,7 @@ namespace emp {
 
   class BitSorter {
   public:
-    using bits_t = uint32_t;          ///< Type used to represent pairs if posisions as bit masks. 
+    using bits_t = uint32_t;          ///< Type used to represent pairs if posisions as bit masks.
   protected:
 
     emp::vector<bits_t> compare_set;  ///< Comparators, in order (pairs of 1's in bitstring)

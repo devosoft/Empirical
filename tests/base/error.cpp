@@ -17,28 +17,28 @@ TEST_CASE("Test error", "[base]")
 {
   // Error should not be thrown by default
   REQUIRE_FALSE(emp::error_thrown);
-  // Throw an error and try to detect it! 
+  // Throw an error and try to detect it!
   const std::string passed_error_string = "This is an error!";
   // Don't separate the next two lines or else the line number test will fail!
   const size_t expected_error_line = __LINE__ + 1;
   emp_error(passed_error_string);
   REQUIRE(emp::error_thrown);
 
-  // Did we capture the correct filename and line number? 
+  // Did we capture the correct filename and line number?
   const std::string caught_filename = emp::error_info.filename;
   REQUIRE_THAT(caught_filename, Catch::Matchers::EndsWith("error.cpp"));
   REQUIRE(emp::error_info.line_num == expected_error_line);
-  
+
   // Test the output message
   REQUIRE(emp::error_info.output == passed_error_string);
 
-  
+
   // Can we clear the error?
   REQUIRE(emp::error_thrown);
   emp::error_clear();
   REQUIRE_FALSE(emp::error_thrown);
 
-  
+
   // 1. Do things get updated (we'll run it all again)
   // 2. Can we pass more than a string to emp_error?
   const int expected_error_line_2 = __LINE__ + 1;
@@ -48,7 +48,7 @@ TEST_CASE("Test error", "[base]")
   const std::string caught_filename_2 = emp::error_info.filename;
   REQUIRE_THAT(caught_filename_2, Catch::Matchers::EndsWith("error.cpp"));
   REQUIRE(emp::error_info.line_num == expected_error_line_2);
-  
+
   // Test the output message
   REQUIRE(emp::error_info.output == "test24.5");
 }

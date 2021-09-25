@@ -104,7 +104,7 @@ namespace emp {
   template <typename> struct is_emp_vector : std::false_type { };
   template <typename T, typename... Ts>
   struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
-  
+
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
