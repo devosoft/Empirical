@@ -193,4 +193,3 @@ TEST_CASE("Test hash_utils", "[datastructs]")
     REQUIRE(hasher2({0, 1, 2}) == 11084449573900);
   }
 }
-

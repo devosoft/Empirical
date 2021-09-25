@@ -57,4 +57,3 @@ TEST_CASE("Test Point2D", "[geometry]")
   REQUIRE(points[2].GetRot180().Magnitude() == 13);
   REQUIRE(points[2].GetRot270().Magnitude() == 13);
 }
-
