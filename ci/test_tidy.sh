@@ -12,3 +12,5 @@ set -e
 ./ci/test_tabs.sh && echo "✔ no tabs, indentation ok" || exit 1
 ./ci/test_2space_indentation.sh && echo "✔ 2-space indents, indentation ok" || exit 1
 ./ci/test_trailing_whitespace.sh && echo "✔ trailing whitespace ok" || exit 1
+./ci/test_filename_whitespace.sh && echo "✔ filename whitespace ok" || exit 1
+./ci/test_modern_suffixes.sh && echo "✔ modern suffixes ok" || exit 1
