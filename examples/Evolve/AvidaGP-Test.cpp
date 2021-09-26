@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP-Test.cc
+ *  @file AvidaGP-Test.cpp
  *  @brief A simple test of AvidaGP with World for copies and mutations.
  *
  *  A few basic steps to examine AvidaGP organisms in a world.

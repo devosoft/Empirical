@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP-Evo.cc
+ *  @file AvidaGP-Evo.cpp
  *  @brief A test of AvidaGP with World; organisms must find squares of values.
  */
 

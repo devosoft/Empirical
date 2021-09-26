@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file Ptr.cc
+ *  @file Ptr.cpp
  *  @brief An example file for using emp::Ptr.
  */
 

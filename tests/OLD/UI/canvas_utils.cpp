@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file canvas_utils.cpp
+ */
+
 #include "../../tools/Random.h"
 #include "../../UI/canvas_utils.h"
 #include "../../UI/UI.h"

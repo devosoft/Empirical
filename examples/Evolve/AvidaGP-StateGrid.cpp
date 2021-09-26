@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP-StateGrid.cc
+ *  @file AvidaGP-StateGrid.cpp
  *  @brief A example of using AvidaGP evolving with a StateGrid.
  *
  *  Example file of AvidaGP-based organisms (called SGOrg here) moving through a state grid,

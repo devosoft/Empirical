@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file ExampleFail.cc
+ *  @file ExampleFail.cpp
  *  @brief An example file to show what FAILING unit tests look like, with commentary.
  */
 
