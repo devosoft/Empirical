@@ -165,12 +165,13 @@ kill *pid*
 
 As part of our continuous integration, we test for several tidyness violations, including
 * unalphabetized C++ includes,
-* unpartitioned C++ includes (i.e., no empty line between `#include <`'s and `#include "`'s.,
+* unpartitioned C++ includes (i.e., no empty line between `#include <`'s and `#include "`'s),
 * unalphabetized Python imports,
 * missing end-of-file newlines,
 * missing or malformed boilerplate (headerguards and file docstrings),
 * trailing whitespace,
 * improper indentation (using tabs or non-two-space),
+* old-style source file suffixes,
 * whitespace in filenames, and
 * Git merge conflict markers.
 
