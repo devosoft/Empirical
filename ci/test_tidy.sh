@@ -2,6 +2,10 @@
 
 set -e
 
+echo "Running tidyness enforcement tests..."
+echo "See https://empirical.readthedocs.io/en/latest/dev/guide-to-testing.html#tidyness-enforcement for info on tidyness enforcement."
+echo "(Including how to automatically generate tidyness fixes if tidyness enforcement detects tidyness issues.)"
+
 ./ci/test_alphabetize_includes.sh && echo "✔ include alphabetization ok" || exit 1
 ./ci/test_alphabetize_imports.sh && echo "✔ import alphabetization ok" || exit 1
 ./ci/test_partition_includes.sh && echo "✔ include partitioning ok" || exit 1
