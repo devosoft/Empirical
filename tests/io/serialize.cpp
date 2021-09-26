@@ -6,7 +6,6 @@
  *  @file serialize.cpp
  */
 
-
 #include <map>
 #include <sstream>
 

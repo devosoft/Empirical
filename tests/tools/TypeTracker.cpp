@@ -6,7 +6,6 @@
  *  @file TypeTracker.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

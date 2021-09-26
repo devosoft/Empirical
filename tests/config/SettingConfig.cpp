@@ -6,7 +6,6 @@
  *  @file SettingConfig.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/config/SettingConfig.hpp"

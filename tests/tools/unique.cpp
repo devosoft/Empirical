@@ -6,7 +6,6 @@
  *  @file unique.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

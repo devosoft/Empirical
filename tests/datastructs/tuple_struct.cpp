@@ -6,7 +6,6 @@
  *  @file tuple_struct.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/datastructs/tuple_struct.hpp"

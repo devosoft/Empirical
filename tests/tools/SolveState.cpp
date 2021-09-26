@@ -6,7 +6,6 @@
  *  @file SolveState.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

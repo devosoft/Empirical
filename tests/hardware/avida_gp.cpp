@@ -6,7 +6,6 @@
  *  @file avida_gp.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

@@ -6,7 +6,6 @@
  *  @file flex_function.cpp
  */
 
-
 #include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"

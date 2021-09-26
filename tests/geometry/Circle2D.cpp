@@ -6,7 +6,6 @@
  *  @file Circle2D.cpp
  */
 
-
 #include <stdlib.h>
 #include <vector>
 

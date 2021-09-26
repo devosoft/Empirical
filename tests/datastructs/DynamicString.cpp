@@ -6,7 +6,6 @@
  *  @file DynamicString.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

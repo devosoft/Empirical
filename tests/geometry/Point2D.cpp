@@ -6,7 +6,6 @@
  *  @file Point2D.cpp
  */
 
-
 #include <vector>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"

@@ -6,7 +6,6 @@
  *  @file event_driven_gp.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 #include <unordered_set>

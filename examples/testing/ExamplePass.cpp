@@ -17,7 +17,6 @@
  *  Try running the executable with --verbose to see the full information provided.
  */
 
-
 #include <string>
 
 // The only required include for unit tests is the one below.

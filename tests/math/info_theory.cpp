@@ -6,7 +6,6 @@
  *  @file info_theory.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

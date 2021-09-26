@@ -6,7 +6,6 @@
  *  @file RegEx.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

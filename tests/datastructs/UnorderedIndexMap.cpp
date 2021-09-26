@@ -6,7 +6,6 @@
  *  @file UnorderedIndexMap.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

@@ -6,7 +6,6 @@
  *  @file hash_utils.cpp
  */
 
-
 #include <array>
 #include <iostream>
 #include <sstream>

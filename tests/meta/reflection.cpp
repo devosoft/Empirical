@@ -6,7 +6,6 @@
  *  @file reflection.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

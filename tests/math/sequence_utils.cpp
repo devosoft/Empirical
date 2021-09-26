@@ -6,7 +6,6 @@
  *  @file sequence_utils.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 #include <string>

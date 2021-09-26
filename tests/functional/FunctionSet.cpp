@@ -6,7 +6,6 @@
  *  @file FunctionSet.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

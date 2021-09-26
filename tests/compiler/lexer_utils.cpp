@@ -6,7 +6,6 @@
  *  @file lexer_utils.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

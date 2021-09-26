@@ -6,7 +6,6 @@
  *  @file ContiguousStream.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

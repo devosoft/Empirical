@@ -6,7 +6,6 @@
  *  @file DataLog.cpp
  */
 
-
 #ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
 #endif

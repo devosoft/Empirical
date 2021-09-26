@@ -6,7 +6,6 @@
  *  @file set_utils.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

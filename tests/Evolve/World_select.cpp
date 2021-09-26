@@ -6,7 +6,6 @@
  *  @file World_select.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

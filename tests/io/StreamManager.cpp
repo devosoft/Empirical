@@ -6,7 +6,6 @@
  *  @file StreamManager.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/io/StreamManager.hpp"

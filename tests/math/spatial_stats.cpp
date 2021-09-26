@@ -6,7 +6,6 @@
  *  @file spatial_stats.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/math/spatial_stats.hpp"

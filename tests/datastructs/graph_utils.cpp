@@ -6,7 +6,6 @@
  *  @file graph_utils.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

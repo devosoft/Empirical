@@ -6,7 +6,6 @@
  *  @file Distribution.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

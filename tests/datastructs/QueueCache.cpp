@@ -6,7 +6,6 @@
  *  @file QueueCache.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

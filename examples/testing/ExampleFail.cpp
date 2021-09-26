@@ -7,7 +7,6 @@
  *  @brief An example file to show what FAILING unit tests look like, with commentary.
  */
 
-
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
 

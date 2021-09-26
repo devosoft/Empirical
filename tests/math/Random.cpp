@@ -6,7 +6,6 @@
  *  @file Random.cpp
  */
 
-
 #include <algorithm>
 #include <climits>
 #include <deque>

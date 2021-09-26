@@ -6,7 +6,6 @@
  *  @file MatchBin.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

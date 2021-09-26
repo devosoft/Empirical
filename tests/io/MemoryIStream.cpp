@@ -6,7 +6,6 @@
  *  @file MemoryIStream.cpp
  */
 
-
 #include <cstring>
 #include <limits>
 #include <ratio>

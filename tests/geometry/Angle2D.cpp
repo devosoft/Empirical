@@ -6,7 +6,6 @@
  *  @file Angle2D.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/geometry/Angle2D.hpp"

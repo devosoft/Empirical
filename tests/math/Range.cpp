@@ -6,7 +6,6 @@
  *  @file Range.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

@@ -6,7 +6,6 @@
  *  @file reference_vector.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/datastructs/reference_vector.hpp"

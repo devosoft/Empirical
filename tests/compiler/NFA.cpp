@@ -6,7 +6,6 @@
  *  @file NFA.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

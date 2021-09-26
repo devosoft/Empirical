@@ -6,7 +6,6 @@
  *  @file NK-const.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/Evolve/NK-const.hpp"

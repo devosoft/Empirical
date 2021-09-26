@@ -6,7 +6,6 @@
  *  @file stats.cpp
  */
 
-
 #include <deque>
 #include <iostream>
 #include <sstream>

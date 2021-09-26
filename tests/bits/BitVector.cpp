@@ -6,7 +6,6 @@
  *  @file BitVector.cpp
  */
 
-
 #include <limits>
 #include <map>
 #include <ratio>

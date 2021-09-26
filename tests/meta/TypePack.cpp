@@ -6,7 +6,6 @@
  *  @file TypePack.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

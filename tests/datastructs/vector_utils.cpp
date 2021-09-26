@@ -6,7 +6,6 @@
  *  @file vector_utils.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

@@ -6,7 +6,6 @@
  *  @file NullStream.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

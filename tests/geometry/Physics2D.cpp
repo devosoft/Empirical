@@ -6,7 +6,6 @@
  *  @file Physics2D.cpp
  */
 
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/geometry/Physics2D.hpp"

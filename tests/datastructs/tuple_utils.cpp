@@ -6,7 +6,6 @@
  *  @file tuple_utils.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

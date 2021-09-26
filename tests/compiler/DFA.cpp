@@ -6,7 +6,6 @@
  *  @file DFA.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

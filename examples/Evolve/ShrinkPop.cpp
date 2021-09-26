@@ -7,7 +7,6 @@
  *  @brief This file explores the grid options for emp::World.hpp
  */
 
-
 #include <iostream>
 
 #include "emp/Evolve/World.hpp"

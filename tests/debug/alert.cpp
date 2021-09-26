@@ -6,7 +6,6 @@
  *  @file alert.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

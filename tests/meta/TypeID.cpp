@@ -6,7 +6,6 @@
  *  @file TypeID.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

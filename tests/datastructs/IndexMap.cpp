@@ -6,7 +6,6 @@
  *  @file IndexMap.cpp
  */
 
-
 #include <iostream>
 #include <sstream>
 

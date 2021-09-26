@@ -6,7 +6,6 @@
  *  @file meta.cpp
  */
 
-
 #include <sstream>
 #include <string>
 

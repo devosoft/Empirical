@@ -110,7 +110,6 @@ struct Test_Collapse_One_Click : emp::web::BaseTest {
    */
 
 
-
   Test_Collapse_One_Click()
   : BaseTest({"emp_test_container"})
   {
