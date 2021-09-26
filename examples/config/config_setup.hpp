@@ -26,6 +26,10 @@
  * optimizations in the code.)  As with VALUEs, aliases may be included.
  */
 
+#pragma once
+
+#include "emp/config/config.hpp"
+
 EMP_BUILD_CONFIG( MyConfig,
   GROUP(DEFAULT_GROUP, "General Settings"),
   VALUE(DEBUG_MODE, bool, false, "Should we output debug information?"),

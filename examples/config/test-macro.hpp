@@ -29,6 +29,10 @@
  *   maintain backward compatibility if names change in newer software versions.
  */
 
+#pragma once
+
+#include "emp/config/config.hpp"
+
 EMP_BUILD_CONFIG(MyConfig,
   GROUP(DEFAULT_GROUP, "General Settings"),
     VALUE(DEBUG_MODE, bool, 0, "Should we output debug information?"),
