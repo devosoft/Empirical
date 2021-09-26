@@ -6,13 +6,11 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
+#include "emp/prefab/ToggleSwitch.hpp"
 #include "emp/web/Div.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-
-#include "emp/prefab/ToggleSwitch.hpp"
-
 
 struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
 

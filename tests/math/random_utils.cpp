@@ -4,12 +4,12 @@
 
 #define CATCH_CONFIG_MAIN
 
+#include <sstream>
+#include <string>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/math/random_utils.hpp"
-
-#include <sstream>
-#include <string>
 
 TEST_CASE("Test random_utils", "[math]")
 {

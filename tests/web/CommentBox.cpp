@@ -6,13 +6,11 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
+#include "emp/prefab/CommentBox.hpp"
 #include "emp/web/Div.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-
-#include "emp/prefab/CommentBox.hpp"
-
 
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Comment_Box_HTMLLayout : public emp::web::BaseTest {

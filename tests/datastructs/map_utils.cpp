@@ -1,14 +1,13 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/datastructs/map_utils.hpp"
-#include "emp/datastructs/vector_utils.hpp"
-
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/datastructs/map_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 
 TEST_CASE("Test map_utils", "[datastructs]")
 {

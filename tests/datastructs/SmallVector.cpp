@@ -8,12 +8,12 @@
 
 #define CATCH_CONFIG_MAIN
 
+#include <list>
+#include <stdarg.h>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/datastructs/SmallVector.hpp"
-
-#include <list>
-#include <stdarg.h>
 
 TEST_CASE("Small vector, iterators", "[tools]") {
   emp::SmallVector<int, 4> v;

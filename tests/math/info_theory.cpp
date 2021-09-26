@@ -1,12 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/math/info_theory.hpp"
-
 #include <sstream>
 #include <string>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/math/info_theory.hpp"
 
 TEST_CASE("Test info_theory", "[math]")
 {

@@ -1,15 +1,18 @@
 #define CATCH_CONFIG_MAIN
 
+#include <iostream>
+#include <sstream>
+#include <unordered_set>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
-
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
 
 #include "emp/base/Ptr.hpp"
 #include "emp/hardware/EventDrivenGP.hpp"
@@ -17,10 +20,6 @@
 #include "emp/hardware/InstLib.hpp"
 #include "emp/hardware/signalgp_utils.hpp"
 #include "emp/math/Random.hpp"
-
-#include <iostream>
-#include <sstream>
-#include <unordered_set>
 
 TEST_CASE("Test Event Driven GP", "[Hardware]")
 {

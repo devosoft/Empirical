@@ -1,13 +1,12 @@
 #define CATCH_CONFIG_MAIN
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/tuple_utils.hpp"
-
-#include <iostream>
-#include <sstream>
-
 
 TEST_CASE("Test tuple_utils", "[datastructs]")
 {

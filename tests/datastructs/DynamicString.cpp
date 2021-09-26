@@ -1,12 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/datastructs/DynamicString.hpp"
-
 #include <iostream>
 #include <sstream>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/datastructs/DynamicString.hpp"
 
 TEST_CASE("Test DynamicString", "[datastructs]")
 {

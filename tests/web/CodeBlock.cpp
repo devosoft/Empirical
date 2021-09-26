@@ -6,11 +6,10 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
+#include "emp/prefab/CodeBlock.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-
-#include "emp/prefab/CodeBlock.hpp"
 
 
 // Test that the Element class properly gets attached and laid out via emp::web::Document.

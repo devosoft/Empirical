@@ -2,12 +2,12 @@
 // Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
-#include <emscripten.h>
 #include <iostream>
-
 #include <list>
 #include <string>
 #include <vector>
+
+#include <emscripten.h>
 
 #include "../../geometry/Circle2D.h"
 #include "../../geometry/Point2D.h"

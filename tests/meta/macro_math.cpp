@@ -4,14 +4,14 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
+#include <iostream>
+#include <sstream>
+#include <string>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/meta/macro_math.hpp"
 #include "emp/meta/macros.hpp"
-
-#include <iostream>
-#include <sstream>
-#include <string>
 
 // "Macros testing macros...Oh dear..."
 #undef EMP_TEST_MACRO

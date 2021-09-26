@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <array>
+#include <cassert>
 #include <string>
 
 #include "emp/base/assert.hpp"
@@ -13,8 +14,6 @@
 #include "emp/web/js_utils.hpp"
 #include "emp/web/JSWrap.hpp"
 #include "emp/web/_MochaTestRunner.hpp"
-
-#include <cassert>
 
 // This file tests source/web/js_utils.h (using Mocha + Karma framework)
 // - pass_array_to_javascript

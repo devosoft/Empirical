@@ -4,15 +4,15 @@
 
 #define CATCH_CONFIG_MAIN
 
+#include <iostream>
+#include <sstream>
+#include <utility>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/assert.hpp"
 #include "emp/base/optional.hpp"
 #include "emp/base/vector.hpp"
-
-#include <iostream>
-#include <sstream>
-#include <utility>
 
 TEST_CASE("Test optional bad access", "[base]") {
 

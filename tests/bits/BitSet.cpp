@@ -3,13 +3,6 @@
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/vector.hpp>
-
 #include <algorithm>
 #include <climits>
 #include <deque>
@@ -20,6 +13,13 @@
 #include <sstream>
 #include <string>
 #include <unordered_set>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/vector.hpp>
 
 #include "emp/base/map.hpp"
 #include "emp/bits/BitSet.hpp"

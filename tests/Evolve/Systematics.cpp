@@ -3,11 +3,10 @@
   #define TDEBUG
 #endif
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-
 #include <iostream>
 #include <sstream>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/vector.hpp"
 #include "emp/Evolve/SystematicsAnalysis.hpp"

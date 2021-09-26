@@ -3,8 +3,9 @@
 // under the MIT Software license; see doc/LICENSE
 
 #include <cmath>
-#include <emscripten.h>
 #include <iostream>
+
+#include <emscripten.h>
 
 #include "kinetic/Kinetic.h"
 

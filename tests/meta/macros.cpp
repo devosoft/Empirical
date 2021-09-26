@@ -1,19 +1,18 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
-
-#define EMP_DECORATE(X) [X]
-#define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
-
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/meta/macros.hpp"
 
 #include <array>
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#define EMP_DECORATE(X) [X]
+#define EMP_DECORATE_PAIR(X,Y) [X-Y]
+#include "emp/meta/macros.hpp"
 
 // "Macros testing macros...Oh dear..."
 #undef EMP_TEST_MACRO

@@ -11,7 +11,6 @@
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
 
-
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Element_HTMLLayout : public emp::web::BaseTest {
 

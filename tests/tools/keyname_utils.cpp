@@ -1,13 +1,12 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/tools/keyname_utils.hpp"
-
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/tools/keyname_utils.hpp"
 
 TEST_CASE("Test keyname_utils", "[tools]")
 {

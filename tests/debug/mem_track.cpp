@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
 #define EMP_TRACK_MEM
 
+#include <sstream>
+#include <string>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/debug/mem_track.hpp"
-
-#include <sstream>
-#include <string>
 
 struct TestClass1 {
   TestClass1() {

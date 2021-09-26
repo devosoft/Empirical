@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/functional/FunctionSet.hpp"
-
-#include <iostream>
-#include <sstream>
 
 // should migrate these inside the test case, probably
 

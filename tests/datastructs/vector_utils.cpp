@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/datastructs/vector_utils.hpp"
-
-#include <iostream>
-#include <sstream>
 
 TEST_CASE("Test vector_utils", "[datastructs]")
 {

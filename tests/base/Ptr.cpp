@@ -3,13 +3,13 @@
 
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/base/Ptr.hpp"
-
 #include <functional>
 #include <iostream>
 #include <sstream>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/base/Ptr.hpp"
 
 TEST_CASE("Test Ptr", "[base]")
 {

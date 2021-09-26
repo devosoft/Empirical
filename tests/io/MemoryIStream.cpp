@@ -1,10 +1,10 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
 #include <cstring>
 #include <limits>
 #include <ratio>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/io/ContiguousStream.hpp"
 #include "emp/io/MemoryIStream.hpp"

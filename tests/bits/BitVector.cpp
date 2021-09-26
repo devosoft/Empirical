@@ -1,16 +1,15 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/bits/BitVector.hpp"
-#include "emp/math/Random.hpp"
-
 #include <limits>
 #include <map>
 #include <ratio>
 #include <sstream>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
 #include "emp/base/vector.hpp"
+#include "emp/bits/BitVector.hpp"
+#include "emp/math/Random.hpp"
 
 TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   // Create a size 50 bit vector, default to all zeros.

@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/math/Distribution.hpp"
 #include "emp/math/Random.hpp"
-
-#include <iostream>
-#include <sstream>
 
 /// Ensures that
 /// 1) A == B

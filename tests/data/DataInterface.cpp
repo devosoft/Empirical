@@ -4,13 +4,6 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/data/DataFile.hpp"
-#include "emp/data/DataInterface.hpp"
-#include "emp/data/DataManager.hpp"
-#include "emp/data/DataNode.hpp"
-
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -18,6 +11,12 @@
 #include <iterator>
 #include <string>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/data/DataFile.hpp"
+#include "emp/data/DataInterface.hpp"
+#include "emp/data/DataManager.hpp"
+#include "emp/data/DataNode.hpp"
 
 TEST_CASE("Test DataInterface", "[data]") {
   auto * di = emp::MakeDataInterface<double, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log>();

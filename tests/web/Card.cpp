@@ -12,7 +12,6 @@
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
 
-
 // Test that the Card class properly gets attached and laid out via emp::web::Document.
 struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
 

@@ -1,10 +1,5 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/data/DataNode.hpp"
-#include "emp/math/math.hpp"
-
 #include <algorithm>
 #include <climits>
 #include <deque>
@@ -14,6 +9,11 @@
 #include <ratio>
 #include <sstream>
 #include <unordered_set>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/data/DataNode.hpp"
+#include "emp/math/math.hpp"
 
 TEST_CASE("Test Math", "[math]")
 {

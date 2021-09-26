@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
+#include <sstream>
+#include <string>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/datastructs/Cache.hpp"
-
-#include <sstream>
-#include <string>
 
 TEST_CASE("Test Cache", "[datastructs]")
 {

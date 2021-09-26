@@ -1,10 +1,10 @@
 #define CATCH_CONFIG_MAIN
 
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/bits/BitMatrix.hpp"
-
-#include <sstream>
 
 /**
  * Constructor and basic getters

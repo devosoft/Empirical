@@ -2,18 +2,16 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/array.hpp"
-#include "emp/Evolve/Resource.hpp"
-#include "emp/Evolve/World.hpp"
-
-
-#include "emp/bits/BitSet.hpp"
-#include "emp/datastructs/vector_utils.hpp"
-#include "emp/math/Random.hpp"
-#include "emp/tools/string_utils.hpp"
-
 #include <iostream>
 #include <sstream>
+
+#include "emp/base/array.hpp"
+#include "emp/bits/BitSet.hpp"
+#include "emp/datastructs/vector_utils.hpp"
+#include "emp/Evolve/Resource.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/tools/string_utils.hpp"
 
 constexpr size_t K = 3;
 constexpr size_t N = 40;

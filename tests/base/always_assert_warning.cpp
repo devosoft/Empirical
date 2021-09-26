@@ -5,12 +5,12 @@
 #define CATCH_CONFIG_MAIN
 #define TDEBUG 1
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/always_assert_warning.hpp"
-
-#include <iostream>
-#include <sstream>
 
 TEST_CASE("Test always_assert_warning", "[base]")
 {

@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
 
+#include <sstream>
+#include <string>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/QueueCache.hpp"
-
-#include <sstream>
-#include <string>
 
 SCENARIO("Queue Caches store elements", "[datastructs]") {
   GIVEN("a queue cache of a certain capacity") {

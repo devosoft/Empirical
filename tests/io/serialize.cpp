@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
+#include <map>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/io/serialize.hpp"
-
-#include <map>
-#include <sstream>
 
 TEST_CASE("Test serialize", "[io]")
 {

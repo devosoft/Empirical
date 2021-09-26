@@ -6,12 +6,10 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
+#include "emp/prefab/FontAwesomeIcon.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-
-#include "emp/prefab/FontAwesomeIcon.hpp"
-
 
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_FontAwesome_Icon_HTMLLayout : public emp::web::BaseTest {

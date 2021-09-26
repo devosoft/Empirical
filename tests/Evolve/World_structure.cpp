@@ -1,13 +1,13 @@
 #define CATCH_CONFIG_MAIN
 #define EMP_TDEBUG
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/Evolve/World.hpp"
 #include "emp/Evolve/World_structure.hpp"
-
-#include <iostream>
-#include <sstream>
 
 TEST_CASE("Test World structure", "[Evolve]")
 {

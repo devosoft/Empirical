@@ -1,13 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/io/NullStream.hpp"
-
 #include <iostream>
 #include <sstream>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include "emp/io/NullStream.hpp"
 
 TEST_CASE("Test NullStream", "[io]")
 {

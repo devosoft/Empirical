@@ -7,12 +7,12 @@
   #define TDEBUG
 #endif
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/array.hpp"
-
-#include <iostream>
-#include <sstream>
 
 TEST_CASE("Test array", "[base]")
 {

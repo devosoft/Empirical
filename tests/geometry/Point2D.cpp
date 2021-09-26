@@ -1,5 +1,7 @@
-#include <vector>
 #define CATCH_CONFIG_MAIN
+
+#include <vector>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/geometry/Point2D.hpp"

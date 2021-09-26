@@ -6,13 +6,11 @@
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
+#include "emp/prefab/Modal.hpp"
 #include "emp/web/Button.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-
-#include "emp/prefab/Modal.hpp"
-
 
 struct Test_Modal : emp::web::BaseTest {
 

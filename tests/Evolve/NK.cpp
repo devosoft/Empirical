@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
 #define EMP_TDEBUG
 
+#include <iostream>
+#include <sstream>
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/Evolve/NK.hpp"
-
-#include <iostream>
-#include <sstream>
 
 TEST_CASE("Test NK Landscapes", "[Evolve]")
 {

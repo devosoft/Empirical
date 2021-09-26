@@ -1,13 +1,12 @@
 // This file is a monstrosity, because including multiple emscripten-generated
 // Javascript files in karma will cause horrible problems.
 
+#include <functional>
+#include <iostream>
 
 #include "emp/datastructs/tuple_struct.hpp"
 #include "emp/web/d3/visualizations.hpp"
 #include "emp/web/Document.hpp"
-
-#include <functional>
-#include <iostream>
 
 struct LineageTreeDataNode{
         EMP_BUILD_INTROSPECTIVE_TUPLE(

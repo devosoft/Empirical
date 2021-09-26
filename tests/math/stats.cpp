@@ -1,14 +1,13 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/datastructs/vector_utils.hpp"
-#include "emp/math/stats.hpp"
-
 #include <deque>
 #include <iostream>
 #include <sstream>
 
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/datastructs/vector_utils.hpp"
+#include "emp/math/stats.hpp"
 
 TEST_CASE("Test stats", "[math]") {
   emp::vector<int> vec1({1,2,1,1,2,3});

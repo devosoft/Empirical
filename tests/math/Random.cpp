@@ -1,11 +1,5 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-
-#include "emp/math/Random.hpp"
-#include "emp/math/random_utils.hpp"
-
 #include <algorithm>
 #include <climits>
 #include <deque>
@@ -21,6 +15,11 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/math/Random.hpp"
+#include "emp/math/random_utils.hpp"
 
 TEST_CASE("Test Random", "[math]")
 {

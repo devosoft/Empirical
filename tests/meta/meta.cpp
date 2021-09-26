@@ -1,16 +1,15 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
 #include <sstream>
 #include <string>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/array.hpp"
 #include "emp/base/Ptr.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/tuple_utils.hpp"
 #include "emp/meta/meta.hpp"
-
 
 struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
 struct HasA2 { static char A; };

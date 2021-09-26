@@ -2,11 +2,11 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#define CATCH_CONFIG_MAIN
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
 #include <iostream>
 #include <string>
+
+#define CATCH_CONFIG_MAIN
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/assert.hpp"
 #include "emp/base/vector.hpp"
