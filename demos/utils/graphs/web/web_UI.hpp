@@ -1,3 +1,12 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file web_UI.hpp
+ *
+ */
+
 #ifndef TUBE_WEB_H
 #define TUBE_WEB_H
 

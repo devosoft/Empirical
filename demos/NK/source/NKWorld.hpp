@@ -1,3 +1,12 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file NKWorld.hpp
+ *
+ */
+
 #include "emp/bits/BitVector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/Evolve/NK.hpp"

@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file SimplePDWorld.hpp
+ */
+
 #include "emp/base/vector.hpp"
 #include "emp/math/Random.hpp"
 

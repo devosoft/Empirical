@@ -1,5 +1,12 @@
-// Adapted from Emily's memic_model project
-// https://github.com/emilydolson/memic_model
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file SampleConfig.hpp
+ *  @note Adapted from Emily's memic_model project
+ *  https://github.com/emilydolson/memic_model
+ */
 
 #pragma once
 
