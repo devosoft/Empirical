@@ -3,13 +3,13 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #undef NDEBUG
-#define TDEBUG 1
 
 #include <iostream>
 #include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#define TDEBUG 1
 #include "emp/base/error.hpp"
 
 TEST_CASE("Test error", "[base]")

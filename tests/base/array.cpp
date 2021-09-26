@@ -2,15 +2,14 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#ifndef NDEBUG
-  #define TDEBUG
-#endif
-
 #include <iostream>
 #include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#ifndef NDEBUG
+  #define TDEBUG
+#endif
 #include "emp/base/array.hpp"
 
 TEST_CASE("Test array", "[base]")

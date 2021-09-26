@@ -1,12 +1,11 @@
-#ifndef NDEBUG
-  #define TDEBUG
-#endif
-
 #include <iostream>
 #include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#ifndef NDEBUG
+  #define TDEBUG
+#endif
 #include "emp/base/vector.hpp"
 #include "emp/Evolve/SystematicsAnalysis.hpp"
 #include "emp/Evolve/Systematics.hpp"
