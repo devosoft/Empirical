@@ -1,12 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
-
-/*
- * This file provides a simple example of clicking a web
- * element at multiple points within a test. In this case,
- * the web page consists of a numerical "live" variable, x,
- * (http://mmore500.com/waves/tutorials/lesson04.html#live-variables)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file ClickCounterDemo.cpp
+ *  @brief This file provides a simple example of clicking a web
+ * element at multiple points within a test.
+ *
+ * In this case, the web page consists of a numerical "live" variable,
+ * x, (http://mmore500.com/waves/tutorials/lesson04.html#live-variables)
  * and an emp::web::Button. When the button is clicked, the
  * value of x will increment by 1 and the page will be redrawn.
  *
@@ -29,6 +31,7 @@
  * in a setTimeout(). However, all other click must be within
  * a setTimeout().
  */
+
 #include <functional>
 #include <unordered_map>
 

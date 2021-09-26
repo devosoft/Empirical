@@ -1,10 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Build graphs of various types in the standard format.
-//  NOTE: All questions can be answered by providing command-line arguements.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file make_graph.cpp
+ *  @brief Build graphs of various types in the standard format.
+ *
+ *  NOTE: All questions can be answered by providing command-line arguments.
+ */
 
 #include <iostream>
 

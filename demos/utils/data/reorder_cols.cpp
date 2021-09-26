@@ -1,16 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This utility loads in a space-separated file and reorders the columns.
-//
-//  Identify a file and a set of columns (starting with column 1).  Load the
-//  file and output the columns listed in the order given.
-//
-//    reorder_cols info.dat 5 2 7 3
-//
-//  ...will sent (to standard out) a file consisting of columns 5, 2, 7, and 3,
-//  ignoring all of the others.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file reorder_cols.cpp
+ *  @brief This utility loads in a space-separated file and reorders the columns.
+ *
+ *  Identify a file and a set of columns (starting with column 1).  Load the
+ *  file and output the columns listed in the order given.
+ *
+ *    reorder_cols info.dat 5 2 7 3
+ *
+ *  ...will sent (to standard out) a file consisting of columns 5, 2, 7, and 3,
+ *  ignoring all of the others.
+ */
 
 #include <iostream>
 #include <string>

@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using hash_utils.h
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file hash_utils.cpp
+ *  @brief Some examples code for using hash_utils.hpp
+ */
 
 #include <iostream>
 #include <unordered_map>

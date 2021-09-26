@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Find all words in a dictionary with a combination of letters IN ORDER, annotated by length.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file has-letters.cpp
+ *  @brief Find all words in a dictionary with a combination of letters IN ORDER, annotated by length.
+ */
 
 #include <fstream>
 #include <iostream>

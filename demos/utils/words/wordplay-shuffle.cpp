@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-// Find words that are a shuffle of another workd.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file wordplay-shuffle.cpp
+ *  @brief Find words that are a shuffle of another word.
+ */
 
 #include <iostream>
 #include <set>

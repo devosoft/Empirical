@@ -1,6 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file Graph.cpp
+ */
 
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/vector_utils.hpp"

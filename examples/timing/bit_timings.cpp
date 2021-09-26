@@ -1,8 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Some code testing the speed of operations on BitSet and BitVector.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020-2021
+ *
+ *  @file bit_timings.cpp
+ *  @brief Some code testing the speed of operations on BitSet and BitVector.
+ */
 
 #include <algorithm>     // For std::max
 #include <ctime>         // For std::clock

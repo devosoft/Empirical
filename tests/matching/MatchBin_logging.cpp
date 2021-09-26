@@ -1,9 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2020.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Tests for files in the tools/ folder.
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2020
+ *
+ *  @file MatchBin_logging.cpp
+ */
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]

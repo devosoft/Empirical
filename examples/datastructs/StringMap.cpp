@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::StringMap and emp::StringID
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018-2021
+ *
+ *  @file StringMap.cpp
+ *  @brief Some examples code for using emp::StringMap and emp::StringID
+ */
 
 #include <iostream>
 

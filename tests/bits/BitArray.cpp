@@ -1,3 +1,10 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file BitArray.cpp
+ */
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]

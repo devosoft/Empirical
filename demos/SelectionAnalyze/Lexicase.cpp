@@ -1,8 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Calculate probabilities for selection using Lexicase Selection
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file Lexicase.cpp
+ *  @brief Calculate probabilities for selection using Lexicase Selection.
+ */
 
 #include "emp/config/ArgManager.hpp"
 #include "emp/config/command_line.hpp"

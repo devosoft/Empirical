@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Annotate all of the words in an input list with their length.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file annotate-length.cpp
+ *  @brief Annotate all of the words in an input list with their length.
+ */
 
 #include <iostream>
 #include <set>
