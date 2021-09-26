@@ -8,5 +8,6 @@ set -e
 ./ci/test_boilerplate.sh && echo "✔ boilerplate ok" || exit 1
 ./ci/test_merge_conflict_markers.sh && echo "✔ conflict markers ok" || exit 1
 ./ci/test_end_of_file_newlines.sh && echo "✔ EOF newlines ok" || exit 1
-./ci/test_tabs.sh && echo "✔ indentation ok" || exit 1
+./ci/test_tabs.sh && echo "✔ no tabs, indentation ok" || exit 1
+./ci/test_2space_indentation.sh && echo "✔ 2-space indents, indentation ok" || exit 1
 ./ci/test_trailing_whitespace.sh && echo "✔ trailing whitespace ok" || exit 1
