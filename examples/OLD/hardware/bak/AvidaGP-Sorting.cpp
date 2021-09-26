@@ -1,18 +1,11 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
+ *  @date 2017
  *
  *  @file AvidaGP-Sorting.cpp
+ *  @brief This is an example file, evolving AvidaGP organisms to sort numbers.
  */
-
-
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This is an example file, evolving AvidaGP organisms to sort numbers.
 
 #include <iostream>
 #include <unordered_map>
