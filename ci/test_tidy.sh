@@ -6,6 +6,7 @@ set -e
 ./ci/test_alphabetize_imports.sh && echo "✔ import alphabetization ok" || exit 1
 ./ci/test_partition_includes.sh && echo "✔ include partitioning ok" || exit 1
 ./ci/test_boilerplate.sh && echo "✔ boilerplate ok" || exit 1
+./ci/test_license_notices.sh && echo "✔ license notices ok" || exit 1
 ./ci/test_merge_conflict_markers.sh && echo "✔ conflict markers ok" || exit 1
 ./ci/test_end_of_file_newlines.sh && echo "✔ EOF newlines ok" || exit 1
 ./ci/test_tabs.sh && echo "✔ no tabs, indentation ok" || exit 1
