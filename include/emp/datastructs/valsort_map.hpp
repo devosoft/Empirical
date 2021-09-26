@@ -84,6 +84,4 @@ namespace emp {
   };
 }
 
-#endif
-
 #endif // #ifndef EMP_DATASTRUCTS_VALSORT_MAP_HPP_INCLUDE
