@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/meta/type_traits.hpp"

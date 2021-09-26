@@ -37,7 +37,7 @@ test-native-%: %.cpp
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
 
 test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	g++ $(CFLAGS_all) color_map.cpp -o color_map.out
+	g++ $(CFLAGS_all) -DCATCH_CONFIG_MAIN color_map.cpp -o color_map.out
 	./color_map.out
 
 test-GetUrlParams: GetUrlParams.cpp

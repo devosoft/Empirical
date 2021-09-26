@@ -2,7 +2,6 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#define CATCH_CONFIG_MAIN
 #ifndef NDEBUG
   #define TDEBUG
 #endif

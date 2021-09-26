@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #define EMP_TDEBUG
 
 #include <iostream>

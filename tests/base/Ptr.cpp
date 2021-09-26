@@ -1,7 +1,6 @@
 //#ifndef EMP_TRACK_MEM
 //#define EMP_TRACK_MEM
 
-#define CATCH_CONFIG_MAIN
 
 #include <functional>
 #include <iostream>

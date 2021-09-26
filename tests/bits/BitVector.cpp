@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 
 #include <limits>
 #include <map>

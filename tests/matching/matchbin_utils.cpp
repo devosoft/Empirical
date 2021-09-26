@@ -2,7 +2,6 @@
 //  Copyright (C) Michigan State University, 2020-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#define CATCH_CONFIG_MAIN
 
 #include <sstream>
 #include <string>

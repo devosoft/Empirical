@@ -3,7 +3,6 @@
  * stack overflow error (using mingw on windows 10)
  */
 
-#define CATCH_CONFIG_MAIN
 
 #include <iostream>
 #include <sstream>
