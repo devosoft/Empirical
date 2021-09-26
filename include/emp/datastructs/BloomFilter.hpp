@@ -783,5 +783,6 @@ private:
 
   Note 2:
   For performance reasons where possible when allocating memory it should
+*/
 
 #endif // #ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
