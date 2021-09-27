@@ -143,9 +143,9 @@ namespace internal {
      * @param name a name for the checker
      * @param checker an instance of a functor inheriting from emp::prefab::internal::RefreshChecker
      */
-    template<class SPECIALIZED_REF_CHECK>
-    void AddRefreshChecker(const std::string & name, SPECIALIZED_REF_CHECK && checker) {
-      refresh_checkers[name] = new SPECIALIZED_REF_CHECK{std::move(checker)};
+    template<class SPECIALIZED_REFRESH_CHECKER>
+    void AddRefreshChecker(const std::string & name, SPECIALIZED_REFRESH_CHECKER && checker) {
+      refresh_checkers[name] = new SPECIALIZED_REFRESH_CHECKER{std::move(checker)};
     }
 
     /**
@@ -322,9 +322,9 @@ namespace internal {
      * @param checker an instance of a functor inheriting from
      * emp::prefab::ControlPanel::RefreshChecker
      */
-    template<class SPECIALIZED_REF_CHECK>
-    void AddRefreshMode(const std::string & name, SPECIALIZED_REF_CHECK && checker) {
-      Info()->AddRefreshChecker(name, std::forward<SPECIALIZED_REF_CHECK>(checker));
+    template<class SPECIALIZED_REFRESH_CHECKER>
+    void AddRefreshMode(const std::string & name, SPECIALIZED_REFRESH_CHECKER && checker) {
+      Info()->AddRefreshChecker(name, std::forward<SPECIALIZED_REFRESH_CHECKER>(checker));
     }
 
     /**
