@@ -91,7 +91,7 @@ namespace emp {
 
   /// AnyFunction manages the function pointers to be dynamically handled.
   class AnyFunction {
-  public:
+  private:
     emp::Ptr<BaseFunction> fun = nullptr;
 
   private:
@@ -109,27 +109,25 @@ namespace emp {
     AnyFunction() { ; }
     
     AnyFunction(const AnyFunction& other){ // copy constructor
-      if(other.fun == nullptr) fun = nullptr;
-      else fun = other.fun->Clone();
+      fun = other.CloneFunc();
     }
 
     AnyFunction(AnyFunction&& other) noexcept{ // move constructor
-      fun = other.fun;
+      //fun = other.fun;
+      fun = other.CloneFunc();
       other.fun = nullptr;
     }
 
     AnyFunction& operator=(const AnyFunction& other){ // copy assignment
-      if(fun) fun.Delete();
-      if(other.fun == nullptr) fun = nullptr;
-      else fun = other.fun->Clone();
-      fun = other.fun->Clone();
+      Clear();
+      fun = other.CloneFunc();
       return *this;
     }
 
     AnyFunction& operator=(AnyFunction&& other) noexcept{ // move assignment
-      if(fun) fun.Delete();
-      fun = other.fun;
-      other.fun = nullptr;
+      Clear();
+      fun = other.CloneFunc();
+      other.Clear();
       return *this;
     }
 
@@ -143,6 +141,10 @@ namespace emp {
 
     void Clear() { if (fun) fun.Delete(); fun = nullptr; }
     size_t NumArgs() const { return fun ? fun->NumArgs() : 0; }
+    emp::Ptr<BaseFunction> CloneFunc() const{
+      if(fun == nullptr) return nullptr;
+      return fun->Clone();
+    }
 
     operator bool() { return (bool) fun; }
 
