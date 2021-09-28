@@ -50,6 +50,8 @@ namespace emp {
 
     /// Determine if this BaseFunction can be converted into a derived emp::Function
     template <typename T> bool ConvertOK();
+    
+    virtual emp::Ptr<BaseFunction> Clone() = 0;
   };
 
 
@@ -80,14 +82,19 @@ namespace emp {
 
     /// Get the std::function to be called.
     const fun_t & GetFunction() const { return fun; }
+
+    emp::Ptr<BaseFunction> Clone() override{
+      return emp::NewPtr<DerivedFunction<RETURN(PARAMS...)>>(fun);
+    } 
   };
 
 
   /// AnyFunction manages the function pointers to be dynamically handled.
   class AnyFunction {
-  private:
+  public:
     emp::Ptr<BaseFunction> fun = nullptr;
 
+  private:
     /// Helper to build a proper derived function.
     template <typename T>
     auto MakePtr( T in_fun ) {
@@ -100,6 +107,31 @@ namespace emp {
   public:
     // By default, build an empty function.
     AnyFunction() { ; }
+    
+    AnyFunction(const AnyFunction& other){ // copy constructor
+      if(other.fun == nullptr) fun = nullptr;
+      else fun = other.fun->Clone();
+    }
+
+    AnyFunction(AnyFunction&& other) noexcept{ // move constructor
+      fun = other.fun;
+      other.fun = nullptr;
+    }
+
+    AnyFunction& operator=(const AnyFunction& other){ // copy assignment
+      if(fun) fun.Delete();
+      if(other.fun == nullptr) fun = nullptr;
+      else fun = other.fun->Clone();
+      fun = other.fun->Clone();
+      return *this;
+    }
+
+    AnyFunction& operator=(AnyFunction&& other) noexcept{ // move assignment
+      if(fun) fun.Delete();
+      fun = other.fun;
+      other.fun = nullptr;
+      return *this;
+    }
 
     /// If an argument is provided, set the function.
     template <typename T>
