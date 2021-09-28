@@ -245,6 +245,10 @@ public:
     return std::distance( std::begin( data ), found );
   }
 
+  bool operator==(const MatchDepository& other) const {
+    return data == other.data;
+  }
+
 };
 
 } // namespace emp
