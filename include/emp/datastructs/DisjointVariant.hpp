@@ -24,7 +24,7 @@ namespace emp {
 template<typename ...Ts>
 class DisjointVariant {
 
-  // Holds state for each member.
+  // Holds state for each element.
   std::tuple<Ts...> disjoint_data;
 
   /// Tracks which type is active.
@@ -38,14 +38,27 @@ class DisjointVariant {
   : disjoint_data(std::forward<Args>(args)...)
   {}
 
-  /// Switch which data member is active.
+  /// Switch which data element is active.
   template<typename T>
   void Activate() {
-      using wrapped_active_type_t = std::type_identity<T>;
-      active_typeid.template emplace<wrapped_active_type_t>();
+    using wrapped_active_type_t = std::type_identity<T>;
+    active_typeid.template emplace<wrapped_active_type_t>();
   }
 
-  /// Wraps std::visit to execute visitor on active data member.
+  /// Assign to data element.
+  template<typename T>
+  void AssignToElement(T&& val) {
+    std::get<T>(disjoint_data) = std::forward<T>(val);
+  }
+
+  /// Assign data element and set that element as active.
+  template<typename T>
+  void AssignAndActivate(T&& val) {
+    AssignToElement<T>( std::forward<T>(val) );
+    Activate<T>();
+  }
+
+  /// Wraps std::visit to execute visitor on active data element.
   template<class Visitor>
   decltype(auto) Visit(Visitor&& visitor) {
     return std::visit(
