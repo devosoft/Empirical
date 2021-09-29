@@ -312,6 +312,7 @@ namespace web {
     // Get a properly cast version of info.
     internal::DivInfo * Info() { return (internal::DivInfo *) info; }
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
+    Div(internal::DivInfo * in_info) : WidgetFacet(in_info) { ; }
 
     // A constructor using a DivInfo pointer allows us to pass down derived
     // class pointers when we need to extend the functionality of a component
@@ -380,6 +381,8 @@ namespace web {
     }
 
     // A quick way to retrieve Animate widgets by name.
+    // TODO: may want to change this to use .at() rather than [] since this default
+    // constructs an Animate object if one doesn't exist!
     web::Animate & Animate (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
   };
 
