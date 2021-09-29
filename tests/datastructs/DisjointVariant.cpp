@@ -5,6 +5,7 @@
 #include "emp/datastructs/DisjointVariant.hpp"
 
 #include <iostream>
+#include <tuple>
 #include <type_traits>
 
 TEST_CASE("Test DisjointVariant", "[datastructs]") {
@@ -22,5 +23,12 @@ TEST_CASE("Test DisjointVariant", "[datastructs]") {
 
   disjoint_variant.Activate<int>();
   disjoint_variant.Visit( [](auto&& v){ REQUIRE( v == 42 ); } );
+
+  // ensure that disjoint variant is zero overhead,
+  // that there's only one copy of a big type in there
+  static_assert(
+    sizeof(emp::DisjointVariant<std::array<int, 99>>)
+    < 2*sizeof(std::tuple<std::array<int, 99>>)
+  );
 
 }
