@@ -12,6 +12,7 @@
 #define EMP_TOGGLE_BUTTON_GROUP_HPP
 
 #include <functional>
+#include <string>
 #include <utility>
 
 #include "emp/tools/string_utils.hpp"
