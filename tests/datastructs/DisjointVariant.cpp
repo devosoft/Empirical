@@ -28,7 +28,18 @@ TEST_CASE("Test DisjointVariant", "[datastructs]") {
   // that there's only one copy of a big type in there
   static_assert(
     sizeof(emp::DisjointVariant<std::array<int, 99>>)
-    < 2*sizeof(std::tuple<std::array<int, 99>>)
+    < 2 * sizeof(std::array<int, 99>)
+  );
+  // that overhead scales 1:1 with data
+  static_assert(
+    sizeof(emp::DisjointVariant<int, char, double>)
+      - sizeof(emp::DisjointVariant<char, double>)
+    == sizeof(std::tuple<int, char, double>)
+      - sizeof(std::tuple<char, double>)
+  );
+  // that overhead is <= uint64_t
+  static_assert(
+    sizeof(emp::DisjointVariant<char>) <= sizeof(uint64_t) + 1
   );
 
 }
