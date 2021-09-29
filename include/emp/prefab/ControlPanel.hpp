@@ -86,6 +86,29 @@ class FrameRefreshChecker {
 
 };
 
+/**
+ * A RefreshChecker is a functor that accepts an Animate reference
+ * and returns a boolean indicating whether components should be redrawn
+ * based on an internal "rate" for redrawing.
+ */
+class DynamicRefreshChecker {
+
+  std::function<bool(const web::Animate &)> checker;
+
+  public:
+
+  explicit DynamicRefreshChecker(
+    const std::function<bool(const web::Animate &)> checker_
+      =[](const web::Animate &){ return true; }
+  ) : checker(checker_)
+  {}
+
+  bool ShouldRefresh(const web::Animate & anim) {
+    return checker(anim);
+  }
+
+};
+
 namespace internal {
 
   /**
@@ -102,7 +125,8 @@ namespace internal {
     // for both.
     emp::DisjointVariant<
       emp::prefab::MillisecondRefreshChecker,
-      emp::prefab::FrameRefreshChecker
+      emp::prefab::FrameRefreshChecker,
+      emp::prefab::DynamicRefreshChecker
     > checkers;
 
     // A list of widget that should be redrawn when do_redraw return true
@@ -205,7 +229,7 @@ namespace internal {
      * more information on this design pattern.
      *
      * @param checker refresh checker to use
-     * (i.e., emp::MillisecondRefreshChecker or emp::FrameRefreshChecker)
+     * (i.e., emp::MillisecondRefreshChecker, emp::FrameRefreshChecker, or emp::DynamicRefreshChecker)
      * @param in_info info object associated with this component
      */
     template< typename RefreshChecker >
