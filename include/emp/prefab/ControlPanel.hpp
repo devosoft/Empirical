@@ -18,6 +18,7 @@
 #define EMP_CONTROL_PANEL_HPP
 
 #include <functional>
+#include <string>
 #include <utility>
 #include <unordered_map>
 
