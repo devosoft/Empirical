@@ -125,10 +125,16 @@ namespace emp {
 
     // --------- MEMBER VARIABLES -----------
     DataMapLexer lexer;
+
+    // Operators and functions that should be used when parsing.
     std::unordered_map<std::string, std::function<double(double)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
 
+    // The set of data map entries accessed when the last function was parsed.
+    std::set<std::string> dm_names;
+
+    // Track the number of errors and the function to call when errors occur.
     size_t error_count = 0;
     using error_fun_t = std::function<void(const std::string &)>;
     error_fun_t error_fun =
@@ -155,7 +161,10 @@ namespace emp {
     error_fun_t GetErrorFun() const { return error_fun; }
     void SetErrorFun(error_fun_t in_fun) { error_fun = in_fun; }
 
-    // Add a unary operator
+    /// Get the set of names that the most recently generated function accesses in DataMap.
+    const std::set<std::string> & GetNamesUsed() const { return dm_names; }
+
+    /// Add a unary operator
     void AddOp(const std::string & op, std::function<double(double)> fun) {
       unary_ops[op] = fun;
     }
@@ -315,6 +324,7 @@ namespace emp {
       // This must be a DataMap entry name.
       if (!dm.HasName(name)) AddError("Unknown data map entry '", name, "'.");
       size_t id = dm.GetID(name);
+      dm_names.insert(name);    // Store this name in the list of those used.
       return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
 
@@ -370,8 +380,9 @@ namespace emp {
     /// returns the result of the above equation.
 
     value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
-      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression :") + expression);
+      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
       if constexpr (verbose) tokens.Print();
+      dm_names.clear();    // Reset the names used from data map.
       pos_t pos = tokens.begin();
       ValueType val = ParseMath(dm, pos);
 
