@@ -22,18 +22,15 @@
 #include <utility>
 #include <unordered_map>
 
-#include "emp/base/optional.hpp"
-#include "emp/base/vector.hpp"
-
-#include "emp/prefab/ButtonGroup.hpp"
-#include "emp/prefab/FontAwesomeIcon.hpp"
-#include "emp/prefab/ToggleButtonGroup.hpp"
-
-#include "emp/tools/string_utils.hpp"
-
-#include "emp/web/Animate.hpp"
-#include "emp/web/Element.hpp"
-#include "emp/web/Div.hpp"
+#include "../base/optional.hpp"
+#include "../base/vector.hpp"
+#include "../prefab/ButtonGroup.hpp"
+#include "../prefab/FontAwesomeIcon.hpp"
+#include "../prefab/ToggleButtonGroup.hpp"
+#include "../tools/string_utils.hpp"
+#include "../web/Animate.hpp"
+#include "../web/Element.hpp"
+#include "../web/Div.hpp"
 
 namespace emp::prefab {
 
