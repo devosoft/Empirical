@@ -79,6 +79,13 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
+  const std::set<std::string> & names_used = parser.GetNamesUsed();
+  CHECK( names_used.size() == 3 );
+  CHECK( emp::Has(names_used, "val1") );
+  CHECK( emp::Has(names_used, "val2") );
+  CHECK( emp::Has(names_used, "val3") );
+  CHECK( !emp::Has(names_used, "val4") );
+
   fun = parser.BuildMathFunction(dmA, "1.5*val3");
   CHECK( fun(dmA) == 4.5 );
   CHECK( fun(dmB) == 6.0 );
