@@ -24,10 +24,10 @@ struct Test_Control_Panel : emp::web::BaseTest {
   Test_Control_Panel()
   : BaseTest({"emp_test_container"}) {
 
-    emp::prefab::ControlPanel cp{ emp::prefab::FrameRefreshChecker(5), "ctrl"};
+    emp::prefab::ControlPanel cp{5, "FRAMES", "ctrl"};
     emp::web::Div sim_area{"sim_area"};
     cp.AddToRefreshList(sim_area);
-    cp.SetRefreshChecker( emp::prefab::MillisecondRefreshChecker(500) );
+    cp.SetRefreshRate(500, "MILLISECONDS");
 
     emp::prefab::ButtonGroup husk{"husk"};
     husk << emp::web::Button{[](){;}, "A", "a_button"};
@@ -37,6 +37,7 @@ struct Test_Control_Panel : emp::web::BaseTest {
     emp::prefab::ToggleButtonGroup toggle{
       "Auto", "Manual",
       "primary", "secondary",
+      true, false,
       "mode_toggle"
     };
     cp << toggle;
@@ -49,7 +50,7 @@ struct Test_Control_Panel : emp::web::BaseTest {
     });
     emp::prefab::ButtonGroup real{"real"};
     real << emp::web::Button([](){;}, "D", "d_button");
-    real.TakeChildren(std::forward<emp::prefab::ButtonGroup>(husk));
+    real.TakeChildren(std::forward<ButtonGroup>(husk));
     cp << real;
     cp << husk;
 
@@ -152,3 +153,4 @@ int main() {
   test_runner.AddTest<Test_Control_Panel>("Test emp::prefab::ControlPanel HTML Layout");
   test_runner.Run();
 }
+
