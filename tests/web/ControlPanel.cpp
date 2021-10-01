@@ -37,7 +37,6 @@ struct Test_Control_Panel : emp::web::BaseTest {
     emp::prefab::ToggleButtonGroup toggle{
       "Auto", "Manual",
       "primary", "secondary",
-      true, false,
       "mode_toggle"
     };
     cp << toggle;
@@ -50,7 +49,7 @@ struct Test_Control_Panel : emp::web::BaseTest {
     });
     emp::prefab::ButtonGroup real{"real"};
     real << emp::web::Button([](){;}, "D", "d_button");
-    real.TakeChildren(std::forward<ButtonGroup>(husk));
+    real.TakeChildren(std::forward<emp::prefab::ButtonGroup>(husk));
     cp << real;
     cp << husk;
 
@@ -153,4 +152,3 @@ int main() {
   test_runner.AddTest<Test_Control_Panel>("Test emp::prefab::ControlPanel HTML Layout");
   test_runner.Run();
 }
-
