@@ -72,6 +72,20 @@ class DisjointVariant {
     );
   }
 
+
+  /// Wraps std::apply to execute function on each data element.
+  template<class UnaryFunction>
+  void ApplyToAll(UnaryFunction&& f) {
+    // adapted from https://stackoverflow.com/a/54053084
+    std::apply(
+      [&f](auto&&... args){
+        (( f(args) ), ...);
+      },
+      disjoint_data
+    );
+  }
+
+
 };
 
 } // namespace emp

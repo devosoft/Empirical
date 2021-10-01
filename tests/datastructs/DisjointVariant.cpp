@@ -5,12 +5,17 @@
 #include "emp/datastructs/DisjointVariant.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <tuple>
 #include <type_traits>
 
 TEST_CASE("Test DisjointVariant", "[datastructs]") {
 
   emp::DisjointVariant<int, double> disjoint_variant{10, 8.2};
+
+  std::stringstream ss;
+  disjoint_variant.ApplyToAll( [&ss](auto&& v){ ss << v << ' '; } );
+  REQUIRE( ss.str() == "10 8.2 " );
 
   disjoint_variant.Visit( [](auto&& v){ REQUIRE( v == 10 ); } );
 
