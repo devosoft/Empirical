@@ -63,6 +63,10 @@ class MillisecondRefreshChecker {
       return false;
   }
 
+  std::string Describe() const {
+    return emp::to_string("Every ", refresh_rate, " Milliseconds");
+  }
+
 };
 
 /**
@@ -84,6 +88,10 @@ class FrameRefreshChecker {
     return anim.GetFrameCount() % refresh_rate;
   }
 
+  std::string Describe() const {
+    return emp::to_string("Every ", refresh_rate, " Updates");
+  }
+
 };
 
 /**
@@ -94,18 +102,23 @@ class FrameRefreshChecker {
 class DynamicRefreshChecker {
 
   std::function<bool(const web::Animate &)> checker;
+  std::string description;
 
   public:
 
   explicit DynamicRefreshChecker(
     const std::function<bool(const web::Animate &)> checker_
-      =[](const web::Animate &){ return true; }
+      =[](const web::Animate &){ return true; },
+    const std::string& description_="Custom Refresh"
   ) : checker(checker_)
+  , description(description_)
   {}
 
   bool ShouldRefresh(const web::Animate & anim) {
     return checker(anim);
   }
+
+  std::string Describe() const { return description; }
 
 };
 
