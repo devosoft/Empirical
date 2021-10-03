@@ -53,7 +53,7 @@ namespace emp {
 
         // Meaningful tokens have next priority.
 
-        // An indentifier must begin with a letter, underscore, or dot, and followed by
+        // An identifier must begin with a letter, underscore, or dot, and followed by
         // more of the same OR numbers or brackets.
         token_identifier = AddToken("Identifier", "[a-zA-Z_.][a-zA-Z0-9_.[\\]]*");
 
@@ -163,6 +163,19 @@ namespace emp {
 
     /// Get the set of names that the most recently generated function accesses in DataMap.
     const std::set<std::string> & GetNamesUsed() const { return dm_names; }
+
+    /// Get the set of names used in the provided equation.
+    const std::set<std::string> & GetNamesUsed(const std::string & expression) {
+      dm_names.clear();
+      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
+      for (emp::Token token : tokens) {
+        if (lexer.IsID(token) && !emp::Has(functions, token.lexeme)) {
+          dm_names.insert(token.lexeme);
+        }
+      }
+      return dm_names;
+    }
+
 
     /// Add a unary operator
     void AddOp(const std::string & op, std::function<double(double)> fun) {
