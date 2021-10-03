@@ -61,13 +61,19 @@ namespace emp {
 
   /// Convert a map to a vector.
   template <typename T, typename INDEX_T=size_t>
-  emp::vector<T> ToVector(const std::map<INDEX_T, T> & in_map, T default_val=T()) {
+  emp::vector<T> ToVector(
+    const std::map<INDEX_T, T> & in_map,
+    T default_val=T(),
+    INDEX_T index_cap=32768
+  ) {
     INDEX_T max_index = in_map.back().second;
     if (max_index < 0) max_index = 0; // In case all entries are negative...
+    if (max_index >= index_cap) max_index=index_cap-1;
     emp::vector<T> out_vec;
     out_vec.resize(max_index+1, default_val);
     for (auto [index, val] : in_map) {
-      if (index < 0) continue; // Skip entries that can't go into a vector...
+      if (index < 0) continue;       // Skip entries that can't go into a vector...
+      if (index >= index_cap) break; // Stop when we've hit the upper limit on vector size.
       out_vec[index] = val;
     }
     return out_vec;
@@ -75,10 +81,14 @@ namespace emp {
 
   /// Convert an unordered map to a vector.
   template <typename T, typename INDEX_T=size_t>
-  emp::vector<T> ToVector(const std::unordered_map<INDEX_T, T> & in_map, T default_val=T()) {
+  emp::vector<T> ToVector(
+    const std::unordered_map<INDEX_T, T> & in_map,
+    T default_val=T(),
+    INDEX_T index_cap=32768
+  ) {
     emp::vector<T> out_vec;
     for (auto [index, val] : in_map) {
-      if (index < 0) continue; // Skip entries that can't go into a vector...
+      if (index < 0 || index >= index_cap) continue; // Skip entries that can't go into a vector...
       if (((size_t) index) >= out_vec.size()) out_vec.resize(index+1, default_val);
       out_vec[index] = val;
     }
