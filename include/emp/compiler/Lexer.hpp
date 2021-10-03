@@ -98,7 +98,7 @@ namespace emp {
 
       const TokenStream & GetTokenStream() const { return *ts; }
       size_t GetIndex() const { return pos; }
-      emp::Ptr<const Token> ToPtr() const { return &(ts->Get(pos)); }
+      emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
 
       Token operator*() const { return ts->tokens[pos]; }
       const Token * operator->() const { return &(ts->tokens[pos]); }
@@ -121,6 +121,7 @@ namespace emp {
 
     size_t size() const { return tokens.size(); }
     const Token & Get(size_t pos) const { return tokens[pos]; }
+    emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
     const std::string & GetName() const { return name; }
     Iterator begin() const { return Iterator(*this, 0); }
     Iterator end() const { return Iterator(*this, tokens.size()); }
