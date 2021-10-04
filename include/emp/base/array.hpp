@@ -21,6 +21,7 @@
 
 #include <initializer_list>
 #include <array>
+#include <vector>
 
 #include "assert.hpp"
 
