@@ -422,8 +422,8 @@ namespace emp {
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos) = 0;
-    virtual void AddOrg(ORG && org, WorldPosition pos, WorldPosition pos) = 0;
-    virtual void AddOrg(ORG & org, WorldPosition pos, WorldPosition pos) = 0;
+    virtual void AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) = 0;
+    virtual void AddOrg(ORG & org, WorldPosition pos, WorldPosition parent) = 0;
     virtual bool RemoveOrg(WorldPosition pos) = 0;
     virtual void RemoveOrgAfterRepro(WorldPosition pos) = 0;
     virtual void PrintStatus(std::ostream & os) const = 0;
