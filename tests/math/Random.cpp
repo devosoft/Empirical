@@ -30,6 +30,24 @@ TEST_CASE("Test Random", "[math]")
 	rnd.ResetSeed(5);
 	REQUIRE(rnd.GetSeed() == 5);
 
+  // Grab 100 random values.
+  std::array<double, 100> value_series;
+  for (double & x : value_series) x = rnd.GetDouble();
+
+  // Reset the seed -- we should now get the same 100 values.
+  rnd.ResetSeed(5);
+  std::array<double, 100> value_series2;
+  for (double & x : value_series2) x = rnd.GetDouble();
+
+  REQUIRE( value_series == value_series2 );
+
+  // If we build a new random number generator with the same seed it should ALSO give the same values.
+  emp::Random rnd2(5);
+  std::array<double, 100> value_series3;
+  for (double & x : value_series3) x = rnd2.GetDouble();
+
+  REQUIRE( value_series == value_series3 );
+
 	// Get Double
 	double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
 	REQUIRE(r_d >= 0.0);

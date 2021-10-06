@@ -219,7 +219,8 @@ namespace emp {
         return "[N/A]";
       }
 
-      bool FromDouble(double value, const emp::Ptr<void> ptr) const override {
+      bool FromDouble([[maybe_unused]] double value,
+                      [[maybe_unused]] const emp::Ptr<void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in FromDouble() trait, use it!
