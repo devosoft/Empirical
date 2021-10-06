@@ -430,6 +430,7 @@ namespace emp {
     virtual double CalcDiversity() const = 0;
     virtual void Update() = 0;
     virtual void SetNextParent(WorldPosition pos) = 0;
+    virtual void SwapPositions(WorldPosition p1, WorldPosition p2) = 0;
   };
 
   // Forward-declare CollessStruct for use in calculating Colless metric
@@ -1094,6 +1095,26 @@ namespace emp {
     /// WARNING: Current, this function assumes one parent taxon per-taxon.
     /// @param file_path the file to store the snapshot data in
     void Snapshot(const std::string & file_path) const;
+
+    void SwapPositions(WorldPosition p1, WorldPosition p2) {
+      emp::vector<Ptr<taxon_t> > * v1;
+      emp::vector<Ptr<taxon_t> > * v2;
+
+      if (p1.GetPopID() == 0) {
+        v1 = &taxon_locations;
+      } else {
+        v1 = &next_taxon_locations;
+      }
+
+      if (p2.GetPopID() == 0) {
+        v2 = &taxon_locations;
+      } else {
+        v2 = &next_taxon_locations;
+      }
+
+      std::swap((*v1)[p1.GetIndex()], (*v2)[p2.GetIndex()]);
+
+    }
 
   };
 
