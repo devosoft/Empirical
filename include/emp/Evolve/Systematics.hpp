@@ -422,6 +422,8 @@ namespace emp {
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos) = 0;
+    virtual void AddOrg(ORG && org, WorldPosition pos, WorldPosition pos) = 0;
+    virtual void AddOrg(ORG & org, WorldPosition pos, WorldPosition pos) = 0;
     virtual bool RemoveOrg(WorldPosition pos) = 0;
     virtual void RemoveOrgAfterRepro(WorldPosition pos) = 0;
     virtual void PrintStatus(std::ostream & os) const = 0;
@@ -530,7 +532,7 @@ namespace emp {
     emp::vector<Ptr<taxon_t> > taxon_locations; ///< Positions in this vector indicate taxon positions in world
     emp::vector<Ptr<taxon_t> > next_taxon_locations; ///< Positions in next generation, for synchronous populations
 
-    Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when any organism is pruned from tree
+    Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when a new taxon is created
     Signal<void(Ptr<taxon_t>)> on_extinct_sig; ///< Trigger when a taxon goes extinct
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
 
@@ -600,10 +602,12 @@ namespace emp {
     /// @param pos the position of the organism being added
     /// @param parent a pointer to the org's parent
     void AddOrg(ORG && org, WorldPosition pos);
+    void AddOrg(ORG && org, WorldPosition pos, WorldPosition parent);
     Ptr<taxon_t> AddOrg(ORG && org, WorldPosition pos, Ptr<taxon_t> parent);
     Ptr<taxon_t> AddOrg(ORG && org, Ptr<taxon_t> parent=nullptr);
 
     void AddOrg(ORG & org, WorldPosition pos);
+    void AddOrg(ORG & org, WorldPosition pos, WorldPosition parent);
     Ptr<taxon_t> AddOrg(ORG & org, WorldPosition pos, Ptr<taxon_t> parent);
     Ptr<taxon_t> AddOrg(ORG & org, Ptr<taxon_t> parent=nullptr);
     ///@}
@@ -1213,6 +1217,32 @@ namespace emp {
     // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
     AddOrg(org, pos, next_parent);
     next_parent = nullptr;
+  }
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos, WorldPosition parent) {
+    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+    if (pos.GetPopID() == 0) {
+      AddOrg(org, pos, taxon_locations[pos.GetIndex()]);
+    } else {
+      AddOrg(org, pos, next_taxon_locations[pos.GetIndex()]);
+    }
+  }
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) {
+    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+    if (pos.GetPopID() == 0) {
+      AddOrg(org, pos, taxon_locations[pos.GetIndex()]);
+    } else {
+      AddOrg(org, pos, next_taxon_locations[pos.GetIndex()]);
+    }
   }
 
 
