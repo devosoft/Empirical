@@ -528,10 +528,9 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    int removal_pos = -1;   ///< Position of taxon to next be removed
+    emp::WorldPosition removal_pos = {-1, -1};   ///< Position of taxon to next be removed
 
-    emp::vector<Ptr<taxon_t> > taxon_locations; ///< Positions in this vector indicate taxon positions in world
-    emp::vector<Ptr<taxon_t> > next_taxon_locations; ///< Positions in next generation, for synchronous populations
+    emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
     Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when a new taxon is created
     Signal<void(Ptr<taxon_t>)> on_extinct_sig; ///< Trigger when a taxon goes extinct
@@ -649,7 +648,7 @@ namespace emp {
       if (!pos.IsValid()) {
         next_parent = nullptr;
       } else {
-        next_parent = taxon_locations[pos.GetIndex()];
+        next_parent = taxon_locations[pos.GetPopID()][pos.GetIndex()];
       }
     }
 
@@ -715,26 +714,16 @@ namespace emp {
 
     /// @returns true if there is a taxon at specified location
     bool IsTaxonAt(WorldPosition id) {
-      if (id.GetPopID() == 0) {
-        emp_assert(id.GetIndex() < taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
-        return taxon_locations[id.GetIndex()] != nullptr;
-      } else {
-        emp_assert(id.GetIndex() < next_taxon_locations.size(), "Invalid taxon location", id, next_taxon_locations.size());
-        return next_taxon_locations[id.GetIndex()] != nullptr; 
-      }
+      emp_assert(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
+      emp_assert(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
+      return taxon_locations[id.GetPopID()][id.GetIndex()] != nullptr;      
     }
 
     /// @returns pointer to taxon at specified location
     Ptr<taxon_t> GetTaxonAt(WorldPosition id) {
-      if (id.GetPopID() == 0) { 
-        emp_assert(id.GetIndex() < taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
-        emp_assert(taxon_locations[id.GetIndex()], "No taxon at specified location");
-        return taxon_locations[id.GetIndex()];
-      } else {
-        emp_assert(id.GetIndex() < next_taxon_locations.size(), "Invalid taxon location", id, next_taxon_locations.size());
-        emp_assert(next_taxon_locations[id.GetIndex()], "No taxon at specified location");
-        return next_taxon_locations[id.GetIndex()];
-      }
+      emp_assert(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
+      emp_assert(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
+      return taxon_locations[id.GetPopID()][id.GetIndex()];      
     }
 
     // ===== Functions for adding actions to systematics manager signals ====
@@ -1097,23 +1086,9 @@ namespace emp {
     void Snapshot(const std::string & file_path) const;
 
     void SwapPositions(WorldPosition p1, WorldPosition p2) {
-      emp::vector<Ptr<taxon_t> > * v1;
-      emp::vector<Ptr<taxon_t> > * v2;
-
-      if (p1.GetPopID() == 0) {
-        v1 = &taxon_locations;
-      } else {
-        v1 = &next_taxon_locations;
-      }
-
-      if (p2.GetPopID() == 0) {
-        v2 = &taxon_locations;
-      } else {
-        v2 = &next_taxon_locations;
-      }
-
-      std::swap((*v1)[p1.GetIndex()], (*v2)[p2.GetIndex()]);
-
+      emp::vector<Ptr<taxon_t> > & v1 = taxon_locations[p1.GetPopID()];
+      emp::vector<Ptr<taxon_t> > & v2 = taxon_locations[p2.GetPopID()]
+      std::swap(v1[p1.GetIndex()], v2[p2.GetIndex()]);
     }
 
   };
@@ -1133,13 +1108,15 @@ namespace emp {
       // Clear pending removal
       if (to_be_removed != nullptr) {
         RemoveOrg(to_be_removed);
-        taxon_locations[removal_pos] = nullptr;
+        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
         to_be_removed = nullptr;
-        removal_pos = -1;
+        removal_pos = {-1, -1};
       }
 
-      std::swap(taxon_locations, next_taxon_locations);
-      next_taxon_locations.resize(0);
+      // Assumes that synchronous worlds have two populations, with 0
+      // being currently alive and 1 being the one being created
+      std::swap(taxon_locations[0], taxon_locations[1]);
+      taxon_locations[1].resize(0);
     }
     ++curr_update;
   }
@@ -1246,11 +1223,7 @@ namespace emp {
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos, WorldPosition parent) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    if (parent.GetPopID() == 0) {
-      AddOrg(org, pos, taxon_locations[parent.GetIndex()]);
-    } else {
-      AddOrg(org, pos, next_taxon_locations[parent.GetIndex()]);
-    }
+    AddOrg(org, pos, taxon_locations[parent.GetPopID()][parent.GetIndex()]);
   }
 
   // Add information about a new organism, including its stored info and parent's taxon;
@@ -1259,11 +1232,7 @@ namespace emp {
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    if (parent.GetPopID() == 0) {
-      AddOrg(org, pos, taxon_locations[parent.GetIndex()]);
-    } else {
-      AddOrg(org, pos, next_taxon_locations[parent.GetIndex()]);
-    }
+    AddOrg(org, pos, taxon_locations[parent.GetPopID()][parent.GetIndex()]);
   }
 
 
@@ -1321,18 +1290,13 @@ namespace emp {
     }
     // std::cout << "about to store poisition" << std::endl;
     if (store_position) {
-      if (pos.GetPopID()) {
-        if (pos.GetIndex() >= next_taxon_locations.size()) {
-          next_taxon_locations.resize(pos.GetIndex()+1);
-        }
-        next_taxon_locations[pos.GetIndex()] = cur_taxon;
-
-      } else {
-        if (pos.GetIndex() >= taxon_locations.size()) {
-          taxon_locations.resize(pos.GetIndex()+1);
-        }
-        taxon_locations[pos.GetIndex()] = cur_taxon;
+      if (pos.GetPopID() >= taxon_locations.size()) {
+        taxon_locations.resize(pos.GetPopID()+1);
       }
+      if (pos.GetIndex() >= taxon_locations[pos.GetPopID()].size()) {
+        taxon_locations[pos.GetPopID()].resize(pos.GetIndex()+1);
+      }
+      taxon_locations[pos.GetPopID()][pos.GetIndex()] = cur_taxon;
     }
 
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
@@ -1351,22 +1315,24 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(WorldPosition pos) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
 
-    if (pos.GetIndex() >= taxon_locations.size() || !taxon_locations[pos.GetIndex()]) {
+    if (pos.GetPopID() >= taxon_locations.size() ||
+        pos.GetIndex() >= taxon_locations[pos.GetPopID()].size() || 
+        !taxon_locations[pos.GetPopID()][pos.GetIndex()]) {
       // There's not actually a taxon here
       return;
     }
 
-    RemoveOrgAfterRepro(taxon_locations[pos.GetIndex()]);
-    removal_pos = pos.GetIndex();
+    RemoveOrgAfterRepro(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
+    removal_pos = pos;
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
     if (to_be_removed != nullptr) {
       RemoveOrg(to_be_removed);
-      taxon_locations[removal_pos] = nullptr;
+      taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
       to_be_removed = nullptr;
-      removal_pos = -1;
+      removal_pos = {-1,-1};
     }
     to_be_removed = taxon;
   }
@@ -1376,22 +1342,16 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(WorldPosition pos) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    emp_assert(pos.GetPopID() < taxon_locations.size(), "Invalid population requested for removal", pos.GetPopID(), taxon_locations.size());
+    emp_assert(pos.GetIndex() < taxon_locations[pos.GetPopID()].size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations[pos.GetPopID()].size());
 
-    if (pos.GetPopID() == 0) {
-      emp_assert(pos.GetIndex() < taxon_locations.size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations.size());
-      bool active = false;
-      if (taxon_locations[pos.GetIndex()]) {
-        //TODO: Figure out how this can ever not be true
-        active = RemoveOrg(taxon_locations[pos.GetIndex()]);
-      }
-      taxon_locations[pos.GetIndex()] = nullptr;
-      return active;
-    } else {
-      emp_assert(pos.GetIndex() < next_taxon_locations.size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations.size());
-      bool active = RemoveOrg(next_taxon_locations[pos.GetIndex()]);
-      next_taxon_locations[pos.GetIndex()] = nullptr;
-      return active;
+    bool active = false;
+    if (taxon_locations[pos.GetPopID()][pos.GetIndex()]) {
+      //TODO: Figure out how this can ever not be true
+      active = RemoveOrg(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
     }
+    taxon_locations[pos.GetPopID()][pos.GetIndex()] = nullptr;
+    return active;
   }
 
   // Remove an instance of a taxon; track when it's gone.
