@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019-2020.
+ *  @date 2019-2021.
  *
  *  @file matchbin_selectors.hpp
  *  @brief Selector structs that can be plugged into MatchBin.
@@ -607,7 +607,8 @@ namespace emp {
       const auto partition = std::partition(
         std::begin(scores),
         std::end(scores),
-        [&scores, lock_in, stochastic](const auto& pair){
+        // [&scores, lock_in, stochastic](const auto& pair){
+        [lock_in, stochastic](const auto& pair){
           return pair.second < lock_in + stochastic;
         }
       );
@@ -617,7 +618,8 @@ namespace emp {
         std::begin(scores),
         partition,
         std::back_inserter(probabilities),
-        [&scores, lock_in, stochastic](const auto& pair){
+        // [&scores, lock_in, stochastic](const auto& pair){
+        [lock_in, stochastic](const auto& pair){
           // goal:
           // RAW SCORE:    0.0 ... lock_in ... lock_in + stochastic ... 1.0
           // INTERMEDIATE: 0.0 ... 0.0 ... -> ... 1.0 ...           ... 1.0

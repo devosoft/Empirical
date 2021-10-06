@@ -87,7 +87,7 @@ void test_setall_clear(){
 }
 
 /**
- * CountOnes, FindBit
+ * CountOnes, FindOne
  */
 void test_count_find(){
 	emp::BitMatrix<2,3> bm;
@@ -95,10 +95,10 @@ void test_count_find(){
 	REQUIRE((bm.CountOnes() == 3));
 	bm.SetRow(2);
 	REQUIRE((bm.CountOnes() == 4));
-	REQUIRE((bm.FindBit() == 0));
+	REQUIRE((bm.FindOne() == 0));
 	bm.Unset(0);
 	bm.Unset(2);
-	REQUIRE((bm.FindBit() == 4));
+	REQUIRE((bm.FindOne() == 4));
 }
 
 /**
@@ -113,7 +113,7 @@ void test_shifts_one(){
 	bm = bm.DownShift();
 	REQUIRE(bm.Get(16));
 	REQUIRE(!bm.Get(12));
-	REQUIRE((bm.FindBit() == 6));
+	REQUIRE((bm.FindOne() == 6));
 
 	emp::BitMatrix<3,3> bm1;
 	bm1.SetCol(2);
@@ -335,7 +335,7 @@ TEST_CASE("Another test BitMatrix", "[bits]")
   REQUIRE(bm45.Get(1,1) == 0);
   REQUIRE(bm45.Get(1,2) == 1);
   REQUIRE(bm45.CountOnes() == 1);
-  REQUIRE(bm45.FindBit() == bm45.ToID(1,2));
+  REQUIRE(bm45.FindOne() == bm45.ToID(1,2));
 
   bm45.SetAll();
   REQUIRE(bm45.All() == true);

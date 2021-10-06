@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2021.
  *
  *  @file  ValPack.hpp
  *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
@@ -253,7 +253,7 @@ namespace emp {
 
     static std::string ToString() { return ""; }
 
-    static void PrintVals(std::ostream & os=std::cout) { ; }
+    static void PrintVals(std::ostream & /* os */=std::cout) { ; }
   };
 
   namespace pack {

@@ -53,7 +53,7 @@ TEST_CASE("Test Avida GP", "[Hardware]")
 	// RandomizeInst PushRandom
 	emp::Random rnd(1200);
 	gp.PushRandom(rnd);
-	REQUIRE(gp.GetGenome().sequence.size() == 3);
+	REQUIRE(gp.GetGenome().size() == 3);
 	gp.RandomizeInst(0, rnd);
 	if(gp.GetInst(0).id != 2)
 	{

@@ -1,0 +1,70 @@
+=== Timings for 'clear' ===
+  size: 1        count: 20000    BitSet: 0.003249  BitVector: 0.060379  Ratio: 0.0538101
+  size: 8        count: 20000    BitSet: 0.002845  BitVector: 0.060451  Ratio: 0.0470629
+  size: 31       count: 20000    BitSet: 0.002731  BitVector: 0.062313  Ratio: 0.0438271
+  size: 32       count: 20000    BitSet: 0.002934  BitVector: 0.061767  Ratio: 0.0475011
+  size: 50       count: 20000    BitSet: 0.002721  BitVector: 0.067965  Ratio: 0.0400353
+  size: 63       count: 20000    BitSet: 0.003375  BitVector: 0.069989  Ratio: 0.0482219
+  size: 64       count: 20000    BitSet: 0.002796  BitVector: 0.06322   Ratio: 0.0442265
+  size: 100      count: 20000    BitSet: 0.006019  BitVector: 0.068559  Ratio: 0.087793
+  size: 1000     count: 5120     BitSet: 0.011796  BitVector: 0.02376   Ratio: 0.496465
+  size: 10000    count: 512      BitSet: 0.012209  BitVector: 0.01681   Ratio: 0.726294
+  size: 100000   count: 51       BitSet: 0.014463  BitVector: 0.016146  Ratio: 0.895764
+  size: 1000000  count: 5        BitSet: 0.014226  BitVector: 0.013363  Ratio: 1.06458
+
+
+=== Timings for 'set_all' ===
+  size: 1        count: 20000    BitSet: 0.00303   BitVector: 0.100021  Ratio: 0.0302936
+  size: 8        count: 20000    BitSet: 0.002295  BitVector: 0.091984  Ratio: 0.02495
+  size: 31       count: 20000    BitSet: 0.00217   BitVector: 0.085641  Ratio: 0.0253383
+  size: 32       count: 20000    BitSet: 0.002419  BitVector: 0.083636  Ratio: 0.028923
+  size: 50       count: 20000    BitSet: 0.002115  BitVector: 0.083411  Ratio: 0.0253564
+  size: 63       count: 20000    BitSet: 0.002294  BitVector: 0.087604  Ratio: 0.026186
+  size: 64       count: 20000    BitSet: 0.002691  BitVector: 0.080239  Ratio: 0.0335373
+  size: 100      count: 20000    BitSet: 0.006917  BitVector: 0.089793  Ratio: 0.0770327
+  size: 1000     count: 5120     BitSet: 0.033724  BitVector: 0.030493  Ratio: 1.10596
+  size: 10000    count: 512      BitSet: 0.01938   BitVector: 0.020851  Ratio: 0.929452
+  size: 100000   count: 51       BitSet: 0.017735  BitVector: 0.017994  Ratio: 0.985606
+  size: 1000000  count: 5        BitSet: 0.014452  BitVector: 0.012858  Ratio: 1.12397
+
+=== Timings for 'randomize' ===
+  size: 1        count: 20000    BitSet: 0.103631  BitVector: 0.140396  Ratio: 0.738134
+  size: 8        count: 20000    BitSet: 0.04084   BitVector: 0.13689   Ratio: 0.298342
+  size: 31       count: 20000    BitSet: 0.095266  BitVector: 0.10784   Ratio: 0.883401
+  size: 32       count: 20000    BitSet: 0.04115   BitVector: 0.109808  Ratio: 0.374745
+  size: 50       count: 20000    BitSet: 0.109984  BitVector: 0.164857  Ratio: 0.667148
+  size: 63       count: 20000    BitSet: 0.088319  BitVector: 0.126686  Ratio: 0.697149
+  size: 64       count: 20000    BitSet: 0.08151   BitVector: 0.076133  Ratio: 1.07063
+  size: 100      count: 20000    BitSet: 0.156624  BitVector: 0.182218  Ratio: 0.859542
+  size: 1000     count: 5120     BitSet: 0.332355  BitVector: 0.326727  Ratio: 1.01723
+  size: 10000    count: 512      BitSet: 0.32555   BitVector: 0.321152  Ratio: 1.01369
+  size: 100000   count: 51       BitSet: 0.323101  BitVector: 0.32021   Ratio: 1.00903
+  size: 1000000  count: 5        BitSet: 0.315316  BitVector: 0.317433  Ratio: 0.993331
+
+=== Timings for 'randomize75' ===
+  size: 1        count: 20000    BitSet: 0.095342  BitVector: 0.085534  Ratio: 1.11467
+  size: 8        count: 20000    BitSet: 0.064832  BitVector: 0.14294   Ratio: 0.453561
+  size: 31       count: 20000    BitSet: 0.516913  BitVector: 0.633922  Ratio: 0.815421
+  size: 32       count: 20000    BitSet: 0.067439  BitVector: 0.099907  Ratio: 0.675018
+  size: 50       count: 20000    BitSet: 0.319654  BitVector: 0.309046  Ratio: 1.03432
+  size: 63       count: 20000    BitSet: 0.682278  BitVector: 0.678855  Ratio: 1.00504
+  size: 64       count: 20000    BitSet: 0.119706  BitVector: 0.122847  Ratio: 0.974432
+  size: 100      count: 20000    BitSet: 0.45523   BitVector: 0.509892  Ratio: 0.892797
+  size: 1000     count: 5120     BitSet: 0.490299  BitVector: 0.486445  Ratio: 1.00792
+  size: 10000    count: 512      BitSet: 0.496028  BitVector: 0.480745  Ratio: 1.03179
+  size: 100000   count: 51       BitSet: 0.508294  BitVector: 0.468891  Ratio: 1.08403
+  size: 1000000  count: 5        BitSet: 0.465654  BitVector: 0.460608  Ratio: 1.01096
+
+=== Timings for 'randomize82' ===
+  size: 1        count: 20000    BitSet: 0.097639  BitVector: 0.053949  Ratio: 1.80984
+  size: 8        count: 20000    BitSet: 0.299518  BitVector: 0.318175  Ratio: 0.941362
+  size: 31       count: 20000    BitSet: 1.19827   BitVector: 1.25781   Ratio: 0.952669
+  size: 32       count: 20000    BitSet: 1.42109   BitVector: 1.31851   Ratio: 1.0778
+  size: 50       count: 20000    BitSet: 2.33136   BitVector: 2.09982   Ratio: 1.11027
+  size: 63       count: 20000    BitSet: 2.64438   BitVector: 2.55956   Ratio: 1.03314
+  size: 64       count: 20000    BitSet: 3.05496   BitVector: 2.70889   Ratio: 1.12775
+  size: 100      count: 20000    BitSet: 4.10899   BitVector: 4.43622   Ratio: 0.926236
+  size: 1000     count: 5120     BitSet: 10.5527   BitVector: 10.5609   Ratio: 0.999216
+  size: 10000    count: 512      BitSet: 10.1709   BitVector: 10.3389   Ratio: 0.983754
+  size: 100000   count: 51       BitSet: 9.96224   BitVector: 10.2105   Ratio: 0.975685
+  size: 1000000  count: 5        BitSet: 10.5416   BitVector: 10.2855   Ratio: 1.0249

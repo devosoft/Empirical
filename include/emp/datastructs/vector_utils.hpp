@@ -1,14 +1,15 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2020.
+ *  @date 2017-2021.
  *
  *  @file vector_utils.hpp
  *  @brief A set of simple functions to manipulate emp::vector
  *  @note Status: BETA
  *
  *
- *  @note consider adding a work-around to avoid vector<bool> ?
+ *  @todo consider adding a work-around to avoid vector<bool> ?
+ *  @todo speed up Append to count all additions at once, resize, and fill them in.
  */
 
 #ifndef EMP_VECTOR_UTILS_H
@@ -19,8 +20,10 @@
 #include <algorithm>
 #include <functional>
 #include <limits>
+#include <map>
 
 #include "../base/vector.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 
@@ -51,9 +54,55 @@ namespace emp {
   /// Concatonate two or more vectors together, creating a new vector.
   template <typename T, typename... Vs>
   emp::vector<T> Concat(const emp::vector<T> & v1, const Vs &... vs) {
-    emp::vector<T> out_v = v1;
+    emp::vector<T> out_v(v1);
     Append(out_v, vs...);
     return out_v;
+  }
+
+  /// Convert a map to a vector.
+  template <typename T, typename INDEX_T=size_t>
+  emp::vector<T> ToVector(const std::map<INDEX_T, T> & in_map, T default_val=T()) {
+    INDEX_T max_index = in_map.back().second;
+    if (max_index < 0) max_index = 0; // In case all entries are negative...
+    emp::vector<T> out_vec;
+    out_vec.resize(max_index+1, default_val);
+    for (auto [index, val] : in_map) {
+      if (index < 0) continue; // Skip entries that can't go into a vector...
+      out_vec[index] = val;
+    }
+    return out_vec;
+  }
+
+  /// Convert an unordered map to a vector.
+  template <typename T, typename INDEX_T=size_t>
+  emp::vector<T> ToVector(const std::unordered_map<INDEX_T, T> & in_map, T default_val=T()) {
+    emp::vector<T> out_vec;
+    for (auto [index, val] : in_map) {
+      if (index < 0) continue; // Skip entries that can't go into a vector...
+      if (((size_t) index) >= out_vec.size()) out_vec.resize(index+1, default_val);
+      out_vec[index] = val;
+    }
+    return out_vec;
+  }
+
+  /// Convert a vector into a map.
+  template <typename T>
+  std::map<size_t, T> ToMap(const emp::vector<T> & in_vec) {
+    std::map<size_t, T> out_map;
+    for (size_t i=0; i < in_vec.size(); i++) {
+      out_map[i] = in_vec[i];
+    }
+    return out_map;
+  }
+
+  /// Convert a vector into a map.
+  template <typename INDEX_T=size_t, typename T>
+  std::unordered_map<INDEX_T, T> ToUMap(const emp::vector<T> & in_vec) {
+    std::unordered_map<INDEX_T, T> out_map;
+    for (size_t i=0; i < in_vec.size(); i++) {
+      out_map[(INDEX_T) i] = in_vec[i];
+    }
+    return out_map;
   }
 
   /// Return the first position of a value in a vector (or -1 if none exists)
@@ -91,7 +140,7 @@ namespace emp {
   void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
     for (size_t id = 0; id < v.size(); id++) {
       if (id) os << spacer; // Put a space before second element and beyond.
-      os << v[id];
+      os << emp::to_string(v[id]);
     }
   }
 
@@ -145,6 +194,13 @@ namespace emp {
   template <typename T>
   T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
+  /// Find the intersection between this vector and another container.
+  template <typename T, typename C2>
+  emp::vector<T> FindIntersect(const emp::vector<T> & in1, const C2 & in2) {
+    emp::vector<T> out;
+    for (const auto & x : in1) if (emp::Has(in2, x)) out.push_back(x);
+    return out;
+  }
 
   /// Sum all of the contents of a vector.
   template <typename T>

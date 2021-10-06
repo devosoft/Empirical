@@ -1,9 +1,10 @@
 # Base Tools
 
 A handful of tools are available in the include/emp/base/ folder in
-Empirical. These mimic basic functionality available in C++ or the
+Empirical. These mimic basic functionality available in C++ or its
 standard library, but provide extra protection against common memory use
-errors and additional information to the developer.
+errors and additional information to the developer.  These protections
+can be turned off by comiling with -DNDEBUG.
 
 ## base/assert.h
 

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2021.
  *
  *  @file string_utils.hpp
  *  @brief Simple functions to manipulate strings.
@@ -12,27 +12,27 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
+#include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <functional>
 #include <initializer_list>
+#include <iomanip>
 #include <iostream>
+#include <iterator>
+#include <memory>
+#include <numeric>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
-#include <algorithm>
-#include <iterator>
-#include <limits>
-#include <regex>
-#include <memory>
-#include <numeric>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
-#include "../meta/StringType.hpp"
 #include "../meta/type_traits.hpp"
 
 namespace emp {
@@ -128,6 +128,57 @@ namespace emp {
     web_safe = std::regex_replace(web_safe, double_quote, "&quot");
 
     return web_safe;
+  }
+
+
+  /// Returns url encoding of value.
+  /// See https://en.wikipedia.org/wiki/Percent-encoding
+  // adapted from https://stackoverflow.com/a/17708801
+  template<bool encode_space=false>
+  std::string url_encode(const std::string &value) {
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
+
+    for (const auto c : value) {
+
+      // If encoding space, replace with +
+      if ( encode_space && c == ' ' ) escaped << '+';
+      // Keep alphanumeric and other accepted characters intact
+      else if (
+        std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~'
+      ) escaped << c;
+      // Any other characters are percent-encoded
+      else {
+        escaped << std::uppercase;
+        escaped << '%' << std::setw(2) << (static_cast<int>(c) & 0x000000FF);
+        escaped << std::nouppercase;
+      }
+
+    }
+
+    return escaped.str();
+  }
+
+  /// Returns url decoding of string.
+  /// See https://en.wikipedia.org/wiki/Percent-encoding
+  // adapted from https://stackoverflow.com/a/29962178
+  template<bool decode_plus=false>
+  std::string url_decode(const std::string& str){
+    std::string res;
+
+    for (size_t i{}; i < str.size(); ++i) {
+      if (str[i] == '%') {
+        int hex_code;
+        std::sscanf(str.substr(i + 1, 2).c_str(), "%x", &hex_code);
+        res += static_cast<char>(hex_code);
+        i += 2;
+      } else {
+        res += ( decode_plus && str[i] == '+' ) ? ' ' : str[i];
+      }
+    }
+
+    return res;
   }
 
   /// Take a value and convert it to a C++-style literal.
@@ -494,7 +545,7 @@ namespace emp {
 
 
   /// If no functions are provided to is_valid(), always return false as base case.
-  inline bool is_valid(char test_char) { return false; }
+  inline bool is_valid(char /* test_char */ ) { return false; }
 
   /// Determine if a character passes any of the test functions provided.
   template <typename... FUNS>
@@ -530,8 +581,10 @@ namespace emp {
   /// Get a segment from the beginning of a string as another string, leaving original untouched.
   static inline std::string string_get_range(const std::string & in_string, std::size_t start_pos,
                                              std::size_t end_pos) {
-    if (end_pos == std::string::npos) end_pos = in_string.size() - start_pos;
-    return in_string.substr(start_pos, end_pos);
+    emp_assert(start_pos <= in_string.size());
+    if (end_pos == std::string::npos) end_pos = in_string.size();
+    emp_assert(end_pos <= in_string.size());
+    return in_string.substr(start_pos, end_pos - start_pos);
   }
 
   /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
@@ -555,6 +608,7 @@ namespace emp {
   /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
   /// modify it. If the delimeter is not found, return the entire input string.
   inline std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
+    emp_assert(start_pos <= in_string.size());
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
@@ -568,6 +622,15 @@ namespace emp {
   inline std::string string_get_word(const std::string & in_string, size_t start_pos=0) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_get(in_string, " \n\r\t", start_pos);
+  }
+
+  /// Test if a string has a given prefix.
+  inline bool has_prefix(const std::string & in_string, const std::string & prefix) {
+    if (prefix.size() > in_string.size()) return false;
+    for (size_t i = 0; i < prefix.size(); ++i) {
+      if (in_string[i] != prefix[i]) return false;
+    }
+    return true;
   }
 
   /// Remove a prefix of a string, up to the first newline, and return it.
@@ -589,6 +652,12 @@ namespace emp {
   inline void right_justify(std::string & in_string) {
     // @CAO *very* inefficient at the moment.
     while (is_whitespace(in_string.back())) in_string.pop_back();
+  }
+
+  /// Remove all whitespace at both the beginning and the end of a string.
+  inline void justify(std::string & in_string) {
+    left_justify(in_string);
+    right_justify(in_string);
   }
 
   /// Remove instances of characters from file.
@@ -802,7 +871,8 @@ namespace emp {
 
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
-  template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+  template <typename T, typename... Ts>
+  inline std::string ToString(const emp::vector<T, Ts...> & container);
 
   /// Join a container of strings with a delimiter.
   /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
@@ -873,8 +943,8 @@ namespace emp {
   }
 
   /// Setup emp::ToString to work on vectors.
-  template <typename... Ts>
-  inline std::string ToString(const emp::vector<Ts...> & container) {
+  template <typename T, typename... Ts>
+  inline std::string ToString(const emp::vector<T, Ts...> & container) {
     std::stringstream ss;
     ss << "[ ";
     for (const auto & el : container) {
@@ -1027,6 +1097,87 @@ namespace emp {
   static inline std::string to_quoted_list(const string_vec_t & in_strings,
                                            const std::string quote="'") {
     return to_english_list(quote_strings(in_strings, quote));
+  }
+
+  // Some ANSI helper functions.
+  inline constexpr char ANSI_ESC() { return (char) 27; }
+  inline std::string ANSI_Reset() { return "\033[0m"; }
+  inline std::string ANSI_Bold() { return "\033[1m"; }
+  inline std::string ANSI_Faint() { return "\033[2m"; }
+  inline std::string ANSI_Italic() { return "\033[3m"; }
+  inline std::string ANSI_Underline() { return "\033[4m"; }
+  inline std::string ANSI_SlowBlink() { return "\033[5m"; }
+  inline std::string ANSI_Blink() { return "\033[6m"; }
+  inline std::string ANSI_Reverse() { return "\033[7m"; }
+  inline std::string ANSI_Strike() { return "\033[9m"; }
+
+  inline std::string ANSI_NoBold() { return "\033[22m"; }
+  inline std::string ANSI_NoItalic() { return "\033[23m"; }
+  inline std::string ANSI_NoUnderline() { return "\033[24m"; }
+  inline std::string ANSI_NoBlink() { return "\033[25m"; }
+  inline std::string ANSI_NoReverse() { return "\033[27m"; }
+
+  inline std::string ANSI_Black() { return "\033[30m"; }
+  inline std::string ANSI_Red() { return "\033[31m"; }
+  inline std::string ANSI_Green() { return "\033[32m"; }
+  inline std::string ANSI_Yellow() { return "\033[33m"; }
+  inline std::string ANSI_Blue() { return "\033[34m"; }
+  inline std::string ANSI_Magenta() { return "\033[35m"; }
+  inline std::string ANSI_Cyan() { return "\033[36m"; }
+  inline std::string ANSI_White() { return "\033[37m"; }
+  inline std::string ANSI_DefaultColor() { return "\033[39m"; }
+
+  inline std::string ANSI_BlackBG() { return "\033[40m"; }
+  inline std::string ANSI_RedBG() { return "\033[41m"; }
+  inline std::string ANSI_GreenBG() { return "\033[42m"; }
+  inline std::string ANSI_YellowBG() { return "\033[43m"; }
+  inline std::string ANSI_BlueBG() { return "\033[44m"; }
+  inline std::string ANSI_MagentaBG() { return "\033[45m"; }
+  inline std::string ANSI_CyanBG() { return "\033[46m"; }
+  inline std::string ANSI_WhiteBG() { return "\033[47m"; }
+  inline std::string ANSI_DefaultBGColor() { return "\033[49m"; }
+
+  inline std::string ANSI_BrightBlack() { return "\033[30m"; }
+  inline std::string ANSI_BrightRed() { return "\033[31m"; }
+  inline std::string ANSI_BrightGreen() { return "\033[32m"; }
+  inline std::string ANSI_BrightYellow() { return "\033[33m"; }
+  inline std::string ANSI_BrightBlue() { return "\033[34m"; }
+  inline std::string ANSI_BrightMagenta() { return "\033[35m"; }
+  inline std::string ANSI_BrightCyan() { return "\033[36m"; }
+  inline std::string ANSI_BrightWhite() { return "\033[37m"; }
+
+  inline std::string ANSI_BrightBlackBG() { return "\033[40m"; }
+  inline std::string ANSI_BrightRedBG() { return "\033[41m"; }
+  inline std::string ANSI_BrightGreenBG() { return "\033[42m"; }
+  inline std::string ANSI_BrightYellowBG() { return "\033[43m"; }
+  inline std::string ANSI_BrightBlueBG() { return "\033[44m"; }
+  inline std::string ANSI_BrightMagentaBG() { return "\033[45m"; }
+  inline std::string ANSI_BrightCyanBG() { return "\033[46m"; }
+  inline std::string ANSI_BrightWhiteBG() { return "\033[47m"; }
+
+  /// Make a string appear bold when printed to the command line.
+  inline std::string to_ansi_bold(const std::string & _in) {
+    return ANSI_Bold() + _in + ANSI_NoBold();
+  }
+
+  /// Make a string appear italics when printed to the command line.
+  inline std::string to_ansi_italic(const std::string & _in) {
+    return ANSI_Italic() + _in + ANSI_NoItalic();
+  }
+
+  /// Make a string appear underline when printed to the command line.
+  inline std::string to_ansi_underline(const std::string & _in) {
+    return ANSI_Underline() + _in + ANSI_NoUnderline();
+  }
+
+  /// Make a string appear blink when printed to the command line.
+  inline std::string to_ansi_blink(const std::string & _in) {
+    return ANSI_Blink() + _in + ANSI_NoBlink();
+  }
+
+  /// Make a string appear reverse when printed to the command line.
+  inline std::string to_ansi_reverse(const std::string & _in) {
+    return ANSI_Reverse() + _in + ANSI_NoReverse();
   }
 
 

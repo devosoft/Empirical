@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2019.
+ *  @date 2018-2021.
  *
  *  @file  ConceptWrapper.hpp
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
@@ -100,7 +100,7 @@
 #include <string>
 #include <utility>
 
-#include "../base/macros.hpp"
+#include "macros.hpp"
 #include "meta.hpp"
 #include "TypePack.hpp"
 

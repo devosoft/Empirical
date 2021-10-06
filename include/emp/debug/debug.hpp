@@ -20,10 +20,16 @@
 
 namespace emp {
 
-  /// BlockRelease() will halt compilation if NDEBUG is on.  It is useful to include alongside
-  /// debug print code that you want to remember to remove when you are done debugging.
+  /// BlockRelease() will halt compilation if NDEBUG is on and EMP_NO_BLOCK is off.
+  /// It is useful to include alongside debug code that you want to remember to remove when you
+  /// are done debugging; it is automatically included with the emp_debug() function below.
+  /// If you want to intentionally compile in release mode, make sure to define EMP_NO_BLOCK.
 #ifdef NDEBUG
-  #define BlockRelease(BLOCK) static_assert(!BLOCK, "Release blocked due to debug material.")
+  #ifdef EMP_NO_BLOCK
+    #define BlockRelease(BLOCK)
+  #else
+    #define BlockRelease(BLOCK) static_assert(!BLOCK, "Release blocked due to debug material.")
+  #endif
 #else
   #define BlockRelease(BLOCK)
 #endif
@@ -34,6 +40,15 @@ namespace emp {
 #else
 #define EMP_DEBUG(...) __VA_ARGS__
 #endif
+
+  template<typename... Ts>
+  void emp_debug_print(Ts &&... args) {
+    (std::cerr <<  ... << std::forward<Ts>(args));
+    std::cerr << std::endl;
+  }
+
+  /// emp_debug() will print its contents as a message in debug mode and BLOCK release mode until it's removed.
+  #define emp_debug(...) BlockRelease(true); emp::emp_debug_print(__VA_ARGS__);
 
   /// Depricated() prints its contents exactly once to notify a user of a depricated function.
   static void Depricated(const std::string & name, const std::string & desc="") {

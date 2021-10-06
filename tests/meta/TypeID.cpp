@@ -41,6 +41,8 @@ TEST_CASE("Test TypeID", "[meta]")
   REQUIRE(emp::GetTypeID<void>().GetName() == "void");
   REQUIRE(emp::GetTypeID<int>().GetName() == "int32_t");
   REQUIRE(emp::GetTypeID<std::string>().GetName() == "std::string");
+  REQUIRE(emp::GetTypeID<int[5][8][10][12][100]>().GetName() == "int32_t[5][8][10][12][100]");
+  REQUIRE(emp::GetTypeID<emp::remove_pointer_t< bool * const >>().GetName() == "const bool");
 
   // Check on qualities.
   REQUIRE(emp::GetTypeID<int>().IsConst() == false);
