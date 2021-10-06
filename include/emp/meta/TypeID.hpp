@@ -2,8 +2,51 @@
 //  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  TypeID provides an easy way to convert types to strings.
+//  TypeID provides an easy way to compare types, analyze them, and convert to strings.
+//  All TypeID objects are consistent within a type, and are ordinal and hashable.
 //
+//  To get the unique type information for type T use:
+//    TypeID t = emp::GetTypeID<T>();
+//
+//  MEMBER FUNCTIONS:
+//    std::string GetName() - Return a human readable (ideally) version of type's name.
+//    void SetName(in_name) - Set the name that should be used henceforth for this type.
+//    size_t GetSize()      - Return number of bytes used by this type.
+//
+//    -- TESTS --
+//    bool IsAbstract()     - Is this type a pure-virtual class?
+//    bool IsArithmetic()   - Is this type numeric?
+//    bool IsArray()        - Does this type represent a sequence of objects in memory?
+//    bool IsClass()        - Is this type a non-union class?
+//    bool IsConst()        - Is this contents of this type prevented from changing?
+//    bool IsEmpty()        - Does type type have no contents?
+//    bool IsObject()       - Is this type ANY object type?
+//    bool IsPointer()      - Is this type a pointer?
+//    bool IsReference()    - Is this type a reference?
+//    bool IsTrivial()      - Is this type trivial?
+//    bool IsVoid()         - Is this the type "void"?
+//    bool IsVolatile()     - Is this type volatile qualified?
+//    bool IsTypePack()     - Is this type an emp::TypePack?
+//
+//    bool IsType<T>()      - Is this type the specified type T?
+//    bool IsTypeIn<T1,T2,...>() - Is this type one of the listed types?
+//
+//    -- TYPE CONVERSIONS --
+//    TypeID GetDecayTypeID()            - Remove all qualifications (const, reference, etc.)
+//    TypeID GetElementTypeID()          - Return type that makes up this type (i.e. for arrays)
+//    TypeID GetRemoveConstTypeID()      - Remove const-ness of this type, if any.
+//    TypeID GetRemoveCVTypeID()         - Remove constness and volatility of this type.
+//    TypeID GetRemoveExtentTypeID()     - Flatten one level of a multi-dimensional array.
+//    TypeID GetRemoveAllExtentsTypeID() - Flatten multi-dimensional arrays.
+//    TypeID GetRemovePointerTypeID()    - If this is a pointer, change to type pointed to.
+//    TypeID GetRemoveReferenceTypeID()  - If this is a reference, change to type referred to.
+//    TypeID GetRemoveVolatileTypeID()   - Remove volatility of this type, if any
+//
+//    -- VALUE CONVERSIONS --
+//    double ToDouble(pointer)           - Convert pointed-to object (of this type) to a double.
+//    std::string ToString(pointer)      - Convert pointed-to object (of this type) to a std::string.
+//    bool FromDouble(value, pointer)    - Use double value to set pointed-to object (of this type)
+//    bool FromString(string, pointer)   - Use string value to set pointed-to object (of this type)
 //
 //  Developer notes:
 //  * Fill out defaults for remaining standard library classes (as possible)
