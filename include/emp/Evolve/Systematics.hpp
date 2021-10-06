@@ -72,7 +72,7 @@ namespace emp {
           fitness.Add(fit);
         }
 
-        const double GetFitness() const {
+        double GetFitness() const {
           return fitness.GetMean();
         }
     };
@@ -98,7 +98,7 @@ namespace emp {
       }
 
       /// @returns this taxon's fitness
-      const double GetFitness() const {
+      double GetFitness() const {
         return fitness.GetMean();
       }
 
@@ -1246,10 +1246,10 @@ namespace emp {
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos, WorldPosition parent) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    if (pos.GetPopID() == 0) {
-      AddOrg(org, pos, taxon_locations[pos.GetIndex()]);
+    if (parent.GetPopID() == 0) {
+      AddOrg(org, pos, taxon_locations[parent.GetIndex()]);
     } else {
-      AddOrg(org, pos, next_taxon_locations[pos.GetIndex()]);
+      AddOrg(org, pos, next_taxon_locations[parent.GetIndex()]);
     }
   }
 
@@ -1259,10 +1259,10 @@ namespace emp {
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    if (pos.GetPopID() == 0) {
-      AddOrg(org, pos, taxon_locations[pos.GetIndex()]);
+    if (parent.GetPopID() == 0) {
+      AddOrg(org, pos, taxon_locations[parent.GetIndex()]);
     } else {
-      AddOrg(org, pos, next_taxon_locations[pos.GetIndex()]);
+      AddOrg(org, pos, next_taxon_locations[parent.GetIndex()]);
     }
   }
 
@@ -1320,7 +1320,7 @@ namespace emp {
       on_new_sig.Trigger(cur_taxon, org);
     }
     // std::cout << "about to store poisition" << std::endl;
-    if (store_position && pos.GetIndex() >= 0) {
+    if (store_position) {
       if (pos.GetPopID()) {
         if (pos.GetIndex() >= next_taxon_locations.size()) {
           next_taxon_locations.resize(pos.GetIndex()+1);
