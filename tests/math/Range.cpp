@@ -10,7 +10,7 @@
 TEST_CASE("Test Range", "[math]")
 {
   // Basic constructor
-  emp::Range<int> rng;
+  [[maybe_unused]] emp::Range<int> rng;
 
 	// GetLower GetUpper
 	emp::Range<int> r(0,10);

@@ -53,7 +53,7 @@ TEST_CASE("Test Random", "[math]")
 
 	// Values are consistent when random seeded with 5
 	double rndNormal = rnd.GetRandNormal(5.0, 0.1);
-	REQUIRE( abs(rndNormal - 5.0) < 0.5 );
+	REQUIRE( std::abs(rndNormal - 5.0) < 0.5 );
 
 	REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
 
@@ -66,7 +66,7 @@ TEST_CASE("Test Random", "[math]")
 	REQUIRE(b2_result < 50);
 
 	emp::RandomStdAdaptor randomStd(rnd);
-	REQUIRE(randomStd(4) == 3);
+	REQUIRE(randomStd(4) == 1);
 
   REQUIRE(rnd.GetRandGeometric(1) == 1);
   REQUIRE(rnd.GetRandGeometric(0) == std::numeric_limits<uint32_t>::infinity());
