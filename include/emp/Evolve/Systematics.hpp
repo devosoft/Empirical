@@ -675,7 +675,7 @@ namespace emp {
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     /// @returns set of ancestor taxa (extinct, but have active descendants)
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
-    /// @returns set of outside taxa (exrinct, with no active descendants)
+    /// @returns set of outside taxa (extinct, with no active descendants)
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetOutside() const { return outside_taxa; }
 
     /// How many taxa are still active in the population?
@@ -786,21 +786,12 @@ namespace emp {
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") {
-      return AddDeleteriousStepDataNodeImpl(1, name);
-    }
+      constexpr if (!DATA_STRUCT::has_fitness_t::value) {
+        emp_assert(false && 
+          "Error: Trying to track deleterious steps in Systematics manager that doesn't track fitness" &&
+          "Please use a DATA_STRUCT type that supports fitness tracking.");
+      }
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    /// Decoy to warn if you to try to use this with a data_struct
-    /// type that doesn't keep track of the correct information
-    data_ptr_t AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
-      emp_assert(false, "Calculating deleterious steps requires suitable DATA_STRUCT");
-      return AddDataNode(name);
-    }
-
-    /// Actual implementation of adding deleterious step node
-    template <typename T=int>
-    data_ptr_t
-    AddDeleteriousStepDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_fitness_t::value, T>::type decoy, const std::string & name = "deleterious_steps") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
@@ -812,25 +803,18 @@ namespace emp {
 
       return node;
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// Add data node that phenotypic volatility (changes in phenotype) along
     /// lineages in this systematics manager when requested to pull.
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddVolatilityDataNode(const std::string & name = "volatility") {
-      return AddVolatilityDataNodeImpl(1, name);
-    }
+      constexpr if (!DATA_STRUCT::has_phen_t::value) {
+        emp_assert(false && 
+          "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track fitness" &&
+          "Please use a DATA_STRUCT type that supports phenotype tracking.");
+      }
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    data_ptr_t AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
-      emp_assert(false, "Calculating taxon volatility requires suitable DATA_STRUCT");
-      return AddDataNode(name);
-    }
-
-    template <typename T=int>
-    data_ptr_t
-    AddVolatilityDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "volatility") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
@@ -842,25 +826,18 @@ namespace emp {
 
       return node;
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// Add data node that records counts of unique taxa along
     /// lineages in this systematics manager when requested to pull.
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
-      return AddUniqueTaxaDataNodeImpl(1, name);
-    }
+      constexpr if (!DATA_STRUCT::has_phen_t::value) {
+        emp_assert(false && 
+          "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track fitness" &&
+          "Please use a DATA_STRUCT type that supports phenotype tracking.");
+      }
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    data_ptr_t AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
-      emp_assert(false, "Calculating unique taxa requires suitable DATA_STRUCT");
-      return AddDataNode(name);
-    }
-
-    template <typename T=int>
-    data_ptr_t
-    AddUniqueTaxaDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "unique_taxa") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
@@ -870,27 +847,20 @@ namespace emp {
         return result;
       });
 
-      return node;
+      return node;      
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// Add data node that records counts of mutations of the specified type along
     /// lineages in this systematics manager when requested to pull.
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
-      return AddMutationCountDataNodeImpl(1, name, mutation);
-    }
+      constexpr if (!DATA_STRUCT::has_phen_t::value) {
+        emp_assert(false && 
+          "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track mutations" &&
+          "Please use a DATA_STRUCT type that supports mutation tracking.");
+      }
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    data_ptr_t AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
-      emp_assert(false, "Calculating mutation count requires suitable DATA_STRUCT");
-      return AddDataNode(name);
-    }
-
-    template <typename T=int>
-    data_ptr_t
-    AddMutationCountDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_mutations_t::value, T>::type decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       auto node = AddDataNode(name);
       node->AddPullSet([this,mutation](){
         emp::vector<double> result;
@@ -902,7 +872,7 @@ namespace emp {
 
       return node;
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
+
 
     // ===== Functions for calculating phylogeny toplogy metrics ====
 
