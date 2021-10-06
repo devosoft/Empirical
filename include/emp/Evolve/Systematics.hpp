@@ -528,7 +528,7 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    emp::WorldPosition removal_pos = {-1, -1};   ///< Position of taxon to next be removed
+    emp::WorldPosition removal_pos = {0, 0};   ///< Position of taxon to next be removed
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
@@ -786,21 +786,21 @@ namespace emp {
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") {
-      constexpr if (!DATA_STRUCT::has_fitness_t::value) {
+      auto node = AddDataNode(name);
+
+      if constexpr (!DATA_STRUCT::has_fitness_t::value) {
         emp_assert(false && 
           "Error: Trying to track deleterious steps in Systematics manager that doesn't track fitness" &&
           "Please use a DATA_STRUCT type that supports fitness tracking.");
+      } else {
+        node->AddPullSet([this](){
+          emp::vector<double> result;
+          for (auto tax : active_taxa) {
+            result.push_back(CountDeleteriousSteps(tax));
+          }
+          return result;
+        });
       }
-
-      auto node = AddDataNode(name);
-      node->AddPullSet([this](){
-        emp::vector<double> result;
-        for (auto tax : active_taxa) {
-          result.push_back(CountDeleteriousSteps(tax));
-        }
-        return result;
-      });
-
       return node;
     }
 
@@ -809,21 +809,21 @@ namespace emp {
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddVolatilityDataNode(const std::string & name = "volatility") {
-      constexpr if (!DATA_STRUCT::has_phen_t::value) {
+      auto node = AddDataNode(name);
+
+      if constexpr (!DATA_STRUCT::has_phen_t::value) {
         emp_assert(false && 
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track fitness" &&
           "Please use a DATA_STRUCT type that supports phenotype tracking.");
+      } else {
+        node->AddPullSet([this](){
+          emp::vector<double> result;
+          for (auto tax : active_taxa) {
+            result.push_back(CountPhenotypeChanges(tax));
+          }
+          return result;
+        });
       }
-
-      auto node = AddDataNode(name);
-      node->AddPullSet([this](){
-        emp::vector<double> result;
-        for (auto tax : active_taxa) {
-          result.push_back(CountPhenotypeChanges(tax));
-        }
-        return result;
-      });
-
       return node;
     }
 
@@ -832,20 +832,22 @@ namespace emp {
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
-      constexpr if (!DATA_STRUCT::has_phen_t::value) {
+      auto node = AddDataNode(name);
+
+      if constexpr (!DATA_STRUCT::has_phen_t::value) {
         emp_assert(false && 
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track fitness" &&
           "Please use a DATA_STRUCT type that supports phenotype tracking.");
-      }
+      } else {
 
-      auto node = AddDataNode(name);
-      node->AddPullSet([this](){
-        emp::vector<double> result;
-        for (auto tax : active_taxa) {
-          result.push_back(CountUniquePhenotypes(tax));
-        }
-        return result;
-      });
+        node->AddPullSet([this](){
+          emp::vector<double> result;
+          for (auto tax : active_taxa) {
+            result.push_back(CountUniquePhenotypes(tax));
+          }
+          return result;
+        });
+      }
 
       return node;      
     }
@@ -855,21 +857,21 @@ namespace emp {
     /// Used by AddLineageMutationFile in World_output.hpp
     virtual data_ptr_t
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
-      constexpr if (!DATA_STRUCT::has_phen_t::value) {
+      auto node = AddDataNode(name);
+
+      if constexpr (!DATA_STRUCT::has_phen_t::value) {
         emp_assert(false && 
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track mutations" &&
           "Please use a DATA_STRUCT type that supports mutation tracking.");
+      } else {     
+        node->AddPullSet([this,mutation](){
+          emp::vector<double> result;
+          for (auto tax : active_taxa) {
+            result.push_back(CountMuts(tax, mutation));
+          }
+          return result;
+        });
       }
-
-      auto node = AddDataNode(name);
-      node->AddPullSet([this,mutation](){
-        emp::vector<double> result;
-        for (auto tax : active_taxa) {
-          result.push_back(CountMuts(tax, mutation));
-        }
-        return result;
-      });
-
       return node;
     }
 
@@ -1057,7 +1059,7 @@ namespace emp {
 
     void SwapPositions(WorldPosition p1, WorldPosition p2) {
       emp::vector<Ptr<taxon_t> > & v1 = taxon_locations[p1.GetPopID()];
-      emp::vector<Ptr<taxon_t> > & v2 = taxon_locations[p2.GetPopID()]
+      emp::vector<Ptr<taxon_t> > & v2 = taxon_locations[p2.GetPopID()];
       std::swap(v1[p1.GetIndex()], v2[p2.GetIndex()]);
     }
 
@@ -1080,7 +1082,7 @@ namespace emp {
         RemoveOrg(to_be_removed);
         taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
         to_be_removed = nullptr;
-        removal_pos = {-1, -1};
+        removal_pos = {0, 0};
       }
 
       // Assumes that synchronous worlds have two populations, with 0
@@ -1302,7 +1304,7 @@ namespace emp {
       RemoveOrg(to_be_removed);
       taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
       to_be_removed = nullptr;
-      removal_pos = {-1,-1};
+      removal_pos = {0, 0};
     }
     to_be_removed = taxon;
   }
