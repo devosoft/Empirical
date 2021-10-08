@@ -94,10 +94,12 @@ namespace emp{
     
 
       VirtualCPU(const genome_t & in_genome)
-          : genome(in_genome), genome_working(in_genome), regs(), inputs(), outputs(),
-          inst_ptr(0), flow_head(0), read_head(0), write_head(0), errors(0){
+          : regs(), inputs(), outputs(), 
+          inst_ptr(0), flow_head(0), read_head(0), write_head(0), errors(0),
+          genome(in_genome), genome_working(in_genome){
         ResetHardware();
       }
+      
       /// Create a default VirtualCPU (no genome sequence, default instruction set)
       VirtualCPU() : VirtualCPU(genome_t(inst_lib_t::DefaultInstLib())) { ; }
       /// Copy constructor
