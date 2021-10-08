@@ -51,7 +51,7 @@ namespace emp {
     bool IsActive() const { return pop_id == 0; }
     bool IsValid() const { return index != invalid_id; }
 
-    WorldPosition & SetActive(bool _active=true) { pop_id = 0; return *this; }
+    WorldPosition & SetActive(bool /*_active*/=true) { pop_id = 0; return *this; }
     WorldPosition & SetPopID(size_t _id) { emp_assert(_id <= invalid_id); pop_id = (uint32_t) _id; return *this; }
     WorldPosition & SetIndex(size_t _id) { emp_assert(_id <= invalid_id); index = (uint32_t) _id; return *this; }
     WorldPosition & MarkInvalid() { index = invalid_id; pop_id = invalid_id; return *this; }

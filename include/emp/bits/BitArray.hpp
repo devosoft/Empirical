@@ -1026,7 +1026,7 @@ namespace emp {
     const size_t from_bit
   ) {
     // Only check for same-ness if the two types are the same.
-    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_array != this);
+    if constexpr (FROM_BITS == NUM_BITS) { emp_assert(&from_array != this); }
 
     emp_assert(from_bit < FROM_BITS);
 
@@ -1089,7 +1089,7 @@ namespace emp {
 
   template <size_t NUM_BITS, bool ZERO_LEFT>
   bool BitArray<NUM_BITS,ZERO_LEFT>::Get(size_t index) const {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     return (bits[field_id] & (((field_t)1U) << pos_id)) != 0;
@@ -1121,7 +1121,7 @@ namespace emp {
   /// Flip a single bit
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t index) {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;

@@ -11,7 +11,7 @@
  *    const std::string & empty_string()               - Reference to an empty string for null returns
  * 
  *    -- CLASSIFICATION --
- *    size_t count(const std::string & str, char c)    - Count the occurances of c in str.
+ *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
  *    bool is_literal_char(const std::string & value)
  *    bool is_literal_string(const std::string & value)
  *    bool is_whitespace(char test_char)

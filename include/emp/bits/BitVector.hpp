@@ -1246,7 +1246,7 @@ namespace emp {
     }
 
     // Otherwise bits is null; num_bits should be zero.
-    else emp_assert(num_bits == 0);
+    else { emp_assert(num_bits == 0); }
 
     return true;
   }
