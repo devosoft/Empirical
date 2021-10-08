@@ -25,6 +25,47 @@ namespace emp {
     return in_map.find(key) != in_map.end();
   }
 
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool AnyOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
+
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool AllOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::all_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::all_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
+
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool NoneOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::none_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::none_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
 
   template <class MAP_T>
   inline auto Keys( const MAP_T & in_map) -> emp::vector<typename std::remove_const<decltype(in_map.begin()->first)>::type> {
