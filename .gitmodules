@@ -16,5 +16,5 @@
 	shallow = true
 [submodule "third-party/robin-hood-hashing"]
 	path = third-party/robin-hood-hashing
-	url = https://github.com/martinus/robin-hood-hashing
+	url = https://github.com/martinus/robin-hood-hashing.git
 	shallow = true
