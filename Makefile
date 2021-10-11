@@ -53,7 +53,9 @@ install-coverage-dependencies:
 	cd third-party && make install-coverage-dependencies
 
 clean:
-	cd docs && make clean
+	cd doc && make clean
+	cd demos && make clean
+	cd examples && make clean
 	cd tests && make clean
 
 clean-dep:
