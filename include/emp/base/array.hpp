@@ -18,9 +18,9 @@
 #ifndef EMP_BASE_ARRAY_HPP_INCLUDE
 #define EMP_BASE_ARRAY_HPP_INCLUDE
 
-
 #include <array>
 #include <initializer_list>
+#include <vector>
 
 #include "assert.hpp"
 
