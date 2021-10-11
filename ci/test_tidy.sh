@@ -18,4 +18,4 @@ echo "(Including how to automatically generate tidyness fixes if tidyness enforc
 ./ci/test_trailing_whitespace.sh && echo "✔ trailing whitespace ok" || exit 1
 ./ci/test_filename_whitespace.sh && echo "✔ filename whitespace ok" || exit 1
 ./ci/test_modern_suffixes.sh && echo "✔ modern suffixes ok" || exit 1
-./ci/test_clean.sh && echo "✔ no compilation artifacts" || exit 1
+./ci/test_make_clean.sh && echo "✔ no compilation artifacts" || exit 1
