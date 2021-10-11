@@ -30,6 +30,7 @@ jobs:
           - test-native-fulldebug
           - test-native-opt
           - test-examples
+          - test-demos
           # - test-cookiecutter
     env:
       CXX: ${{ matrix.cxx }}
