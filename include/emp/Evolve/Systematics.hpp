@@ -859,7 +859,7 @@ namespace emp {
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       auto node = AddDataNode(name);
 
-      if constexpr (!DATA_STRUCT::has_phen_t::value) {
+      if constexpr (!DATA_STRUCT::has_mutations_t::value) {
         emp_assert(false && 
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track mutations" &&
           "Please use a DATA_STRUCT type that supports mutation tracking.");

@@ -87,19 +87,19 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	CHECK(sys1.GetStorePosition() == false);
 
 	#ifndef NDEBUG
-	sys1.AddDeleteriousStepDataNodeImpl(true);
+	sys1.AddDeleteriousStepDataNode();
 	CHECK(emp::assert_last_fail);
 	emp::assert_clear();
 
-	sys1.AddVolatilityDataNodeImpl(true);
+	sys1.AddVolatilityDataNode();
 	CHECK(emp::assert_last_fail);
 	emp::assert_clear();
 
-	sys1.AddUniqueTaxaDataNodeImpl(true);
+	sys1.AddUniqueTaxaDataNode();
 	CHECK(emp::assert_last_fail);
 	emp::assert_clear();
 
-	sys1.AddMutationCountDataNodeImpl(true);
+	sys1.AddMutationCountDataNode();
 	CHECK(emp::assert_last_fail);
 	emp::assert_clear();
 	#endif
@@ -574,6 +574,10 @@ TEST_CASE("Test Data Struct", "[evo]")
 
   emp::Ptr<emp::Systematics<int, int, emp::datastruct::mut_landscape_info<int> >> sys;
   sys.New([](const int & i){return i;}, true, true, true, false);
+  sys->AddMutationCountDataNode();
+  sys->AddVolatilityDataNode();
+  sys->AddUniqueTaxaDataNode();
+
   auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
@@ -624,10 +628,22 @@ TEST_CASE("Test Data Struct", "[evo]")
 
   CHECK(FindDominant(*sys) == id4);
 
+  sys->GetDataNode("mutation_count")->PullData();
+  CHECK(sys->GetDataNode("mutation_count")->GetMean() == Approx(2.8));
+
+  sys->GetDataNode("volatility")->PullData();
+  CHECK(sys->GetDataNode("volatility")->GetMean() == Approx(0.6));
+
+  sys->GetDataNode("unique_taxa")->PullData();
+  CHECK(sys->GetDataNode("unique_taxa")->GetMean() == Approx(1.4));
+
+
   sys.Delete();
 
   emp::Ptr<emp::Systematics<int, int, emp::datastruct::fitness >> sys2;
   sys2.New([](const int & i){return i;}, true, true, true, false);
+  sys2->AddDeleteriousStepDataNode();
+
   auto new_tax = sys2->AddOrg(1, nullptr);
   new_tax->GetData().RecordFitness(2);
   CHECK(new_tax->GetData().GetFitness() == 2);
@@ -638,6 +654,13 @@ TEST_CASE("Test Data Struct", "[evo]")
   fit_data.RecordFitness(5);
   new_tax->SetData(fit_data);
   CHECK(new_tax->GetData().GetFitness() == 5);
+
+  auto tax2 = sys2->AddOrg(2, new_tax);
+  tax2->GetData().RecordFitness(1);
+  
+  sys->GetDataNode("deleterious_steps")->PullData();
+  CHECK(sys->GetDataNode("deleterious_steps")->GetMean() == Approx(.5));
+
 
   sys2.Delete();
 
