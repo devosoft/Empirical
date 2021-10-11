@@ -38,14 +38,14 @@ namespace prefab {
         if (label != "") {
           label_element << label;
         }
-        checkbox.SetAttr("class", "custom-control-input");
-        this->SetAttr("class", "custom-control custom-switch");
+        checkbox.SetAttr("class", "custom-control-input form-check-input");
+        this->SetAttr("class", "custom-control custom-switch form-check form-switch");
         this->SetCSS(
           "clear", "none",
           "display", "inline"
         );
         label_element.SetAttr(
-          "class", "custom-control-label",
+          "class", "custom-control-label form-check-label",
           "for", checkbox.GetID()
         );
       }

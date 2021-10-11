@@ -35,6 +35,11 @@
 #include "Widget.hpp"
 #include "init.hpp"
 
+namespace emp::prefab {
+  class ButtonGroup;
+  class ControlPanel;
+}
+
 namespace emp {
 namespace web {
 
@@ -52,6 +57,8 @@ namespace web {
     class TableInfo;
     class DivInfo : public internal::WidgetInfo {
       friend Element; friend Div; friend TableInfo;
+      friend prefab::ButtonGroup;
+      friend prefab::ControlPanel;
     protected:
       double scroll_top;                              ///< Where should div scroll to? (0.0 to 1.0)
       emp::vector<Widget> m_children;                 ///< Widgets contained in this one.
@@ -305,6 +312,10 @@ namespace web {
     // Get a properly cast version of info.
     internal::DivInfo * Info() { return (internal::DivInfo *) info; }
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
+
+    // A constructor using a DivInfo pointer allows us to pass down derived
+    // class pointers when we need to extend the functionality of a component
+    // see the prefab/README.md for more about this design pattern
     Div(internal::DivInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:

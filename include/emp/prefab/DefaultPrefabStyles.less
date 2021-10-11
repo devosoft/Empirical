@@ -23,7 +23,8 @@
 @BootstrapDeviceLarge:      992px;
 @BootstrapDeviceExtraLarge: 1200px;
 
-/* Glyphicon Toggle */
+// ---------------- Glyphicon Toggle ----------------
+
 .collapse_toggle[aria-expanded=true] .fa-angle-double-down {
   display: none;
 }
@@ -49,7 +50,7 @@
   float: right;
 }
 
-/* Card */
+// ------------------ Card ------------------
 .card{
   margin-bottom: 10px;
 }
@@ -69,7 +70,7 @@
   text-align: left;
 }
 
-/* Comment Box */
+// ---------------- Comment Box ----------------
 .commentbox_triangle {
   width: 0;
   height: 0;
@@ -90,7 +91,7 @@
   display: none;
 }
 
-/* Loading modal  */
+// ---------------- Loading Modal -----------------
 .bd-example-modal-lg .modal-dialog {
   display: table;
   position: relative;
@@ -103,7 +104,8 @@
   border: none;
 }
 
-/* Config Panel */
+// ---------------- Config Panel ----------------
+
 .config_main {
   display: flex;
   flex-flow: column wrap;
@@ -125,7 +127,7 @@
   justify-content: flex-end;
 }
 
-/* Mobile adjustments */
+// ---------------- Mobile Adjustments ----------------
 
 // TODO: it would be much better to avoid media break points,
 // but need to solve the auto-flow dense/min-width issue (see .value_view).
@@ -138,7 +140,7 @@
   }
 }
 
-/* Value Box, Control and Display */
+// ----------- Value Box, Control and Display -----------
 .value_box {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -188,8 +190,7 @@
   }
 }
 
-// A value description should span from the first column
-// to the last (entire row)
+// A value description should span from the first column to the last (whole row)
 .value_description {
   grid-column: 1 / -1;
 }
@@ -197,4 +198,42 @@
 // Use the class "exclude" to hide config groups or individuals settings
 .excluded {
   display: none;
+}
+
+// -------------- ToolBar --------------
+
+.btn-toolbar.space_groups > :not(:last-child) {
+  margin-right: .5rem;
+}
+
+// -------------- ToggleButtonGroup --------------
+
+// Overrides nested toggle button group styles when using "hide_active" to turn
+// cassette style buttons into play/pause style and "grayout" to add additional
+// visual cues
+
+div:not(.btn-group) > div.btn-group.btn-group-toggle.hide_inactive > .btn {
+  border-radius: .25rem;
+}
+
+.btn-group > .hide_inactive.btn-group-toggle:first-child > .btn {
+  border-top-left-radius: .25rem;
+  border-bottom-left-radius: .25rem;
+}
+
+.btn-group > .hide_inactive.btn-group-toggle:last-child > .btn {
+  border-top-right-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+}
+
+.btn-group > .hide_inactive.btn-group-toggle > .btn {
+  margin-left: unset;
+}
+
+.btn-group-toggle.hide_inactive > label.active {
+  display: none;
+}
+
+.btn-group-toggle.grayout > label:not(.active):not(:hover) {
+  filter: grayscale(1);
 }
