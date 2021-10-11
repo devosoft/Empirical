@@ -26,7 +26,7 @@ debug:
 web-test:
 	# $(MAKE) web -C EasyChair/
 	$(MAKE) web -C MAP-Elites-Arm/
-	$(MAKE) web -C NK/
+	# $(MAKE) web -C NK/
 	# $(MAKE) web -C SelectionAnalyze/
 	$(MAKE) web -C SpatialCoop2017/
 	$(MAKE) web -C Sudoku/
