@@ -166,7 +166,7 @@ RUN \
   && \
   npm install -g n \
   && \
-  n 12.18.2 \
+  n 14.17 \
   && \
   export python="/usr/bin/python3" \
   && \
