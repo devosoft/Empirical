@@ -8,8 +8,8 @@
 #include <iostream>
 #include "emp/math/constants.hpp"
 
-#define TEST_PRINT(T) std::cout << "MaxValue<" << #T << ">() = " << (uint64_t) emp::MaxValue<T>() << '\n';
-#define TEST_PRINT2(T) std::cout << "MaxValue<" << #T << ">() = " << emp::MaxValue<T>() << '\n';
+#define TEST_PRINT(T) std::cout << "MaxValue<" << #T << ">() = " << (uint64_t) emp::MaxValue<T>() << std::endl;
+#define TEST_PRINT2(T) std::cout << "MaxValue<" << #T << ">() = " << emp::MaxValue<T>() << std::endl;
 
 int main()
 {

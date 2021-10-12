@@ -76,14 +76,14 @@ namespace emp {
        }
 
        // Collect all fitness info.
-    //    std::cout << extra_funs.size() << '\n';
+    //    std::cout << extra_funs.size() << std::endl;
 
        for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
-        //    std::cout << org_id << '\n';
+        //    std::cout << org_id << std::endl;
          if (!world.IsOccupied(org_id)) {
              continue;
          }
-        //  std::cout << "still going" << '\n';
+        //  std::cout << "still going" << std::endl;
          if (use_base) {
             base_fitness[org_id] = world.CalcFitnessID(org_id);
          } else {
@@ -91,7 +91,7 @@ namespace emp {
          }
 
          for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-            //  std::cout << "Test " << ex_id << '\n';
+            //  std::cout << "Test " << ex_id << std::endl;
 
            pools[ex_id].Inc(pools[ex_id].GetInflow()/world.GetNumOrgs());
            double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
@@ -105,32 +105,32 @@ namespace emp {
             }
         //    if (org_id==0) {std::cout << " Multiplied out: " << cur_fit;}
            cur_fit = std::min(cur_fit, max_bonus);
-        //    if (org_id==0) {std::cout << " Final: " << cur_fit << '\n';}
+        //    if (org_id==0) {std::cout << " Final: " << cur_fit << std::endl;}
            extra_fitnesses[ex_id][org_id] = emp::Pow2(cur_fit);
         //    std::cout << "Fit before:  = " << base_fitness[org_id] << "   Res: " << pools[ex_id].GetAmount();
            base_fitness[org_id] *= emp::Pow2(cur_fit);
            pools[ex_id].Dec(std::abs(cur_fit));
         //    std::cout << "   Bonus " << ex_id << " = " << extra_funs[ex_id](world[org_id]) << " "<< emp::Pow(2.0,cur_fit) << " " << emp::to_string(world[org_id])
         // //              << "   fitnes = " << base_fitness[org_id]
-        //              << '\n';
+        //              << std::endl;
 
          }
        }
 
-    //    std::cout << "Resource allocations" << '\n';
-    //    std::cout << emp::to_string(base_fitness) << '\n';
-    //    std::cout << emp::to_string(world[0]) << '\n';
+    //    std::cout << "Resource allocations" << std::endl;
+    //    std::cout << emp::to_string(base_fitness) << std::endl;
+    //    std::cout << emp::to_string(world[0]) << std::endl;
     //    std::cout << world.CalcFitnessID(0);
 
     //    for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
     //        std::cout << extra_fitnesses[ex_id][0] << " ";
     //    }
-    //    std::cout << '\n';
+    //    std::cout << std::endl;
 
        emp::vector<size_t> entries;
        for (size_t T = 0; T < tourny_count; T++) {
          entries.resize(0);
-        //  std::cout << T << '\n';
+        //  std::cout << T << std::endl;
          for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
 
          double best_fit = base_fitness[entries[0]];

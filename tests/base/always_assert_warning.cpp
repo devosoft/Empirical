@@ -67,7 +67,7 @@ TEST_CASE("Another test always_assert_warning", "[tools]")
   EMP_TEST_VALUE(emp::assert_fail_info.line_num, "31");
   EMP_TEST_VALUE(emp::assert_fail_info.error, "false");
 */
-  // if (emp::assert_fail_info.filename != "assert.cc") std::cerr << "Failed case 6!" << '\n';
-  // if (emp::assert_fail_info.line_num != __LINE__ - 3) std::cerr << "Failed case 7!" << '\n';
-  // if (emp::assert_fail_info.error != "false") std::cerr << "Failed case 8!" << '\n';
+  // if (emp::assert_fail_info.filename != "assert.cc") std::cerr << "Failed case 6!" << std::endl;
+  // if (emp::assert_fail_info.line_num != __LINE__ - 3) std::cerr << "Failed case 7!" << std::endl;
+  // if (emp::assert_fail_info.error != "false") std::cerr << "Failed case 8!" << std::endl;
 }

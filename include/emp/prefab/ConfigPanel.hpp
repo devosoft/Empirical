@@ -199,7 +199,7 @@ namespace prefab {
         const std::string name_input_number = name + "_input_number";
         const std::string name_input_mobile_slider = name + "_input_mobile_slider";
         web::Input slider( [](std::string x) {
-          std::cout << "empty slider function" << '\n';},
+          std::cout << "empty slider function" << std::endl;},
           "range",
           "",
           name_input_slider
@@ -207,7 +207,7 @@ namespace prefab {
         setting_element << slider;
 
         web::Input number([](std::string val) {
-          std::cout << "empty number function" << '\n';
+          std::cout << "empty number function" << std::endl;
           },
           "number",
           "",
@@ -215,7 +215,7 @@ namespace prefab {
         );
         setting_element << number;
         web::Input mobile_slider([](std::string val) {
-          std::cout << "empty mobile slider function" << '\n';
+          std::cout << "empty mobile slider function" << std::endl;
           },
           "range",
           "",

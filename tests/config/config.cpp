@@ -25,14 +25,14 @@ TEST_CASE("Test config", "[config]"){
     MyConfig config;
     config.Read("assets/test.cfg");
 
-    std::cout << "Random seed = " << config.RANDOM_SEED() << '\n';
+    std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
 
     REQUIRE(config.RANDOM_SEED() == 333);
     REQUIRE(config.TEST_STRING() == "default");
 
     config.RANDOM_SEED(123);
 
-    std::cout << "Random seed = " << config.RANDOM_SEED() << '\n';
+    std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
 
     REQUIRE(config.RANDOM_SEED() == 123);
 

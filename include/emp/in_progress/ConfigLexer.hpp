@@ -236,7 +236,7 @@ namespace emp {
           case '?':
             return Token(prev_char);
           default:
-            // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << '\n';
+            // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << std::endl;
             return Token(Token::UNKNOWN, std::string(1, prev_char));
         }
       }

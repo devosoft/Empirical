@@ -33,8 +33,8 @@ namespace emp {
   template <typename T, typename... EXTRA>
   void assert_print(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
     if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
-      ss << name << ": [" << val << "]" << '\n';
-    } else ss << name << ": (non-streamable type)" << '\n';
+      ss << name << ": [" << val << "]" << std::endl;
+    } else ss << name << ": (non-streamable type)" << std::endl;
     assert_print(ss, std::forward<EXTRA>(extra)...);
   }
 

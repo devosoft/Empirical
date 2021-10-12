@@ -228,23 +228,23 @@ namespace emp {
 
     /// Print a symmetric graph to the provided output stream (defaulting to standard out)
     void PrintSym(std::ostream & os=std::cout) {
-      os << GetSize() << " " << (GetEdgeCount()/2) << '\n';
+      os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to=from+1; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
 	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
-          os << from << " " << to << '\n';
+          os << from << " " << to << std::endl;
         }
       }
     }
 
     /// Print a directed graph to the provided output stream (defaulting to standard out)
     void PrintDirected(std::ostream & os=std::cout) {
-      os << GetSize() << " " << GetEdgeCount() << '\n';
+      os << GetSize() << " " << GetEdgeCount() << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to = 0; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
-          os << from << " " << to << '\n';
+          os << from << " " << to << std::endl;
         }
       }
     }
@@ -311,23 +311,23 @@ namespace emp {
 
     /// Print a symmetric graph to the provided output stream (defaulting to standard out)
     void PrintSym(std::ostream & os=std::cout) {
-      os << GetSize() << " " << (GetEdgeCount()/2) << '\n';
+      os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to=from+1; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
 	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
-          os << from << " " << to << " " << weights[from][to] << '\n';
+          os << from << " " << to << " " << weights[from][to] << std::endl;
         }
       }
     }
 
     /// Print a directed graph to the provided output stream (defaulting to standard out)
     void PrintDirected(std::ostream & os=std::cout) {
-      os << GetSize() << " " << GetEdgeCount() << '\n';
+      os << GetSize() << " " << GetEdgeCount() << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to = 0; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
-          os << from << " " << to << " " << weights[from][to] << '\n';
+          os << from << " " << to << " " << weights[from][to] << std::endl;
         }
       }
     }

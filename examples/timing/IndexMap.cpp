@@ -45,7 +45,7 @@ int main()
   std::clock_t tot_time1 = std::clock() - start_time1;
   std::cout << "Ordered total = " << total_ids
             << ";  time = " << 1000.0 * ((double) tot_time1) / (double) CLOCKS_PER_SEC
-            << " ms." << '\n';
+            << " ms." << std::endl;
 
 
 
@@ -63,7 +63,7 @@ int main()
   std::clock_t tot_time2 = std::clock() - start_time2;
   std::cout << "Unordered total = " << total_ids2
             << ";  time = " << 1000.0 * ((double) tot_time2) / (double) CLOCKS_PER_SEC
-            << " ms." << '\n';
+            << " ms." << std::endl;
 
 
 }

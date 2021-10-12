@@ -205,15 +205,15 @@ int main() {
   hw16_2.PushInst("Output", 0, 0);
   hw16_2.PushInst("MsgFriend", 0, 0, 0, hardware_t::affinity_t());
 
-  std::cout << "==== Hardware 1's Program ====" << '\n';
+  std::cout << "==== Hardware 1's Program ====" << std::endl;
   hw16_1.PrintProgramFull();
-  std::cout << "==== Hardware 2's Program ====" << '\n';
+  std::cout << "==== Hardware 2's Program ====" << std::endl;
   hw16_2.PrintProgramFull();
 
   // ------------------------------------------------
   // --- Evaluating SignalGP programs on hardware ---
-  std::cout << "----------------------------" << '\n';
-  std::cout << "--- Evaluating programs! ---" << '\n';
+  std::cout << "----------------------------" << std::endl;
+  std::cout << "--- Evaluating programs! ---" << std::endl;
   // Reset the hardware.
   hw16_1.ResetHardware();
   hw16_2.ResetHardware();
@@ -221,19 +221,19 @@ int main() {
   //            nothing will happen!
   hw16_1.SpawnCore(0);
   for (size_t t = 0; t < 32; ++t) {
-    std::cout << "\n== Time: " << t << " ==" << '\n';
-    std::cout << "-- Hardware 1 --" << '\n';
+    std::cout << "\n== Time: " << t << " ==" << std::endl;
+    std::cout << "-- Hardware 1 --" << std::endl;
     hw16_1.PrintState();
-    std::cout << "-- Hardware 2 --" << '\n';
+    std::cout << "-- Hardware 2 --" << std::endl;
     hw16_2.PrintState();
 
     hw16_1.SingleProcess();
     hw16_2.SingleProcess();
   }
-  std::cout << "\n== Time: FINAL ==" << '\n';
-  std::cout << "-- Hardware 1 --" << '\n';
+  std::cout << "\n== Time: FINAL ==" << std::endl;
+  std::cout << "-- Hardware 1 --" << std::endl;
   hw16_1.PrintState();
-  std::cout << "-- Hardware 2 --" << '\n';
+  std::cout << "-- Hardware 2 --" << std::endl;
   hw16_2.PrintState();
 
 
@@ -268,7 +268,7 @@ int main() {
       prog.PushFunction(new_fun);
     }
 
-    std::cout << "==== Generated program: ====" << '\n';
+    std::cout << "==== Generated program: ====" << std::endl;
     hw16_1.Reset();         // Reset hardware, traits, and program.
     hw16_2.ResetHardware(); // HW1/HW2 can still communicate. We'll reset hw2 between program evaluations.
     hw16_1.SetProgram(prog);

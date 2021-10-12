@@ -61,7 +61,7 @@ void FindInitBound() {
   best_nodes = ~node_mask;
   best_count = best_nodes.CountOnes();
 
-  if (verbose) std::cout << "Init size: " << best_count << '\n';
+  if (verbose) std::cout << "Init size: " << best_count << std::endl;
 }
 
 // std::vector<emp::BitVector> in_vector;   // Which values have been included at each level?
@@ -69,7 +69,7 @@ void FindInitBound() {
 
 void Solve(const emp::SolveState & in_state, int depth=0)
 {
-  if (debug) std::cout << "Solve(" << depth << ")" << '\n';
+  if (debug) std::cout << "Solve(" << depth << ")" << std::endl;
 
   // Simple Bounds tests
   const int cur_count = in_state.CountIn();
@@ -80,7 +80,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
     if (TestSolution(in_state) == false) return;  // Ignore illegal answers.
     best_count = cur_count;                       // This must be the best answer so far!
     best_nodes = in_state.GetInVector();
-    if (verbose) std::cout << "New best: " << best_count << '\n';
+    if (verbose) std::cout << "New best: " << best_count << std::endl;
     return;
   }
 

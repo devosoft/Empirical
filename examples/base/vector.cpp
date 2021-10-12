@@ -15,7 +15,7 @@ int main()
   v.insert(v.begin() + 3, -1);
 
   for (auto x : v) std::cout << x << ' ';
-  std::cout << '\n';
+  std::cout << std::endl;
 
   // Examine vector<bool> specialization.
   emp::vector<bool> vb(1000,false);
@@ -27,32 +27,32 @@ int main()
   for (size_t i = 0; i < vb.size(); i++) {
     if (vb2[i]) count++;
   }
-  std::cout << "Count = " << count << '\n';
+  std::cout << "Count = " << count << std::endl;
 
 
   // Try running vector through sort.
   std::sort(v.begin(), v.end());
   for (auto x : v) { std::cout << x << ' '; }
-  std::cout << '\n';
+  std::cout << std::endl;
 
 
   // Removeing 3rd value
   v.erase(v.begin() + 3);
-  std::cout << "After removing value #3: " << '\n';
+  std::cout << "After removing value #3: " << std::endl;
   for (auto x : v) { std::cout << x << ' '; }
-  std::cout << '\n';
+  std::cout << std::endl;
 
   // Try inserting value in place of old 30
   emp::vector<int> ins_vals = {25, 28, 32, 35};
   v.insert(v.begin() + 3, ins_vals.begin(), ins_vals.end());
-  std::cout << "After inserting four values in place of 30: " << '\n';
+  std::cout << "After inserting four values in place of 30: " << std::endl;
   for (auto x : v) { std::cout << x << ' '; }
-  std::cout << '\n';
+  std::cout << std::endl;
 
   // Try looking through these BACKWARDS for ptinting.
   std::cout << "\nPrinting in reverse!\n";
   for (emp::vector<int>::reverse_iterator it = v.rbegin(); it < v.rend(); it++) {
     std::cout << *it << " ";
   }
-  std::cout << '\n';
+  std::cout << std::endl;
 }

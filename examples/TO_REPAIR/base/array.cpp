@@ -10,9 +10,9 @@
 template <size_t N>
 void ArrayPrint(const std::array<int,N> & ar) {
   for (int x : ar) std::cout << x << " ";
-  std::cout << '\n';
+  std::cout << std::endl;
 
-  std::cout << ar << '\n';
+  std::cout << ar << std::endl;
 }
 
 int main()
@@ -23,7 +23,7 @@ int main()
     test_array[i] = (int) (i * i);
   }
 
-  std::cout << "First array: " << '\n';
+  std::cout << "First array: " << std::endl;
   ArrayPrint<A_SIZE>(test_array);
 
   int sum = 0;
@@ -31,11 +31,11 @@ int main()
     sum += test_array[i];
   }
 
-  std::cout << "Sum of 0 through " << A_SIZE << " = " << sum << '\n';
+  std::cout << "Sum of 0 through " << A_SIZE << " = " << sum << std::endl;
 
   emp::array<std::string, 5> array_lit = {{ "this", "is", "an", "array", "literal" }};
   for (const std::string & word : array_lit) {
     std::cout << word << " ";
   }
-  std::cout << '\n';
+  std::cout << std::endl;
 }

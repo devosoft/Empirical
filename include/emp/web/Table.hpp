@@ -62,8 +62,8 @@ namespace web {
       /// Debug function to determine if this datum is structually consistent.
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
-        if (verbose) ss << prefix << "Scanning: emp::TableDataInfo" << '\n';
-        if (masked) { ss << "Warning: Masked cell may have contents!" << '\n'; ok = false; }
+        if (verbose) ss << prefix << "Scanning: emp::TableDataInfo" << std::endl;
+        if (masked) { ss << "Warning: Masked cell may have contents!" << std::endl; ok = false; }
         return ok;
       }
     };  // END: TableDataInfo
@@ -90,7 +90,7 @@ namespace web {
       /// Debug function to determine if this row is structually consistent.
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
-        if (verbose) { ss << prefix << "Scanning: emp::TableRowInfo" << '\n'; }
+        if (verbose) { ss << prefix << "Scanning: emp::TableRowInfo" << std::endl; }
         for (auto & cell : data) ok = ok && cell.OK(ss, verbose, prefix+"  ");
         return ok;
       }
@@ -394,44 +394,44 @@ namespace web {
         // Basic info
         if (verbose) {
           ss << prefix << "Scanning: emp::TableInfo (rows=" << row_count
-             << ", cols=" << col_count << ")." << '\n';
+             << ", cols=" << col_count << ")." << std::endl;
         }
 
         // Make sure rows and columns are being sized correctly.
         if (row_count != rows.size()) {
           ss << prefix << "Error: row_count = " << row_count
-             << ", but rows has " << rows.size() << " elements." << '\n';
+             << ", but rows has " << rows.size() << " elements." << std::endl;
           ok = false;
         }
 
         if (cols.size() && col_count != cols.size()) {
           ss << prefix << "Error: col_count = " << col_count
-             << ", but cols has " << cols.size() << " elements." << '\n';
+             << ", but cols has " << cols.size() << " elements." << std::endl;
           ok = false;
         }
 
         if (row_count < 1) {
           ss << prefix << "Error: Cannot have " << row_count
-             << " rows in table." << '\n';
+             << " rows in table." << std::endl;
           ok = false;
         }
 
         if (col_count < 1) {
           ss << prefix << "Error: Cannot have " << col_count
-             << " cols in table." << '\n';
+             << " cols in table." << std::endl;
           ok = false;
         }
 
         // And perform the same test for row/column groups.
         if (col_groups.size() && col_count != col_groups.size()) {
           ss << prefix << "Error: col_count = " << col_count
-             << ", but col_groups has " << col_groups.size() << " elements." << '\n';
+             << ", but col_groups has " << col_groups.size() << " elements." << std::endl;
           ok = false;
         }
 
         if (row_groups.size() && row_count != row_groups.size()) {
           ss << prefix << "Error: row_count = " << row_count
-             << ", but row_groups has " << row_groups.size() << " elements." << '\n';
+             << ", but row_groups has " << row_groups.size() << " elements." << std::endl;
           ok = false;
         }
 
@@ -440,19 +440,19 @@ namespace web {
           ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
           if (col_count != rows[r].data.size()) {
             ss << prefix << "  Error: col_count = " << col_count
-               << ", but row has " << rows[r].data.size() << " elements." << '\n';
+               << ", but row has " << rows[r].data.size() << " elements." << std::endl;
             ok = false;
           }
           for (size_t c = 0; c < col_count; c++) {
             auto & cell = rows[r].data[c];
             if (c + cell.colspan > col_count) {
               ss << prefix << "  Error: Cell at row " << r << ", col " << c
-                 << " extends past right side of table." << '\n';
+                 << " extends past right side of table." << std::endl;
               ok = false;
             }
             if (r + cell.rowspan > row_count) {
               ss << prefix << "  Error: Cell at row " << r << ", col " << c
-                 << " extends past bottom of table." << '\n';
+                 << " extends past bottom of table." << std::endl;
               ok = false;
             }
           }
@@ -617,17 +617,17 @@ namespace web {
       // Basic info
       if (verbose) {
         ss << prefix << "Scanning: emp::Table (rows=" << Info()->row_count
-           << ", cols=" << Info()->col_count << ")." << '\n';
+           << ", cols=" << Info()->col_count << ")." << std::endl;
       }
 
       // Make sure current row and col are valid.
       if (cur_row >= Info()->row_count) {
-        ss << prefix << "Error: cur_row = " << cur_row << "." << '\n';
+        ss << prefix << "Error: cur_row = " << cur_row << "." << std::endl;
         ok = false;
       }
 
       if (cur_col >= Info()->col_count) {
-        ss << prefix << "Error: cur_col = " << cur_col << "." << '\n';
+        ss << prefix << "Error: cur_col = " << cur_col << "." << std::endl;
         ok = false;
       }
 

@@ -45,7 +45,7 @@ void TimeFun(const std::string & name, std::function<int()> fun) {
   std::cout << name
             << " result = " << result
             << "   time = " << ((double) base_tot_time) / (double) CLOCKS_PER_SEC
-            << " seconds." << '\n';
+            << " seconds." << std::endl;
 }
 
 template <typename CTYPE, typename ITYPE>
@@ -85,7 +85,7 @@ int main()
     string_map_pp[ToStringID(i)] = i;
   }
 
-  std::cout << "Starting tests!" << '\n';
+  std::cout << "Starting tests!" << std::endl;
 
   TimeFun("Direct Variables      ", []() {
     int val1 = 42, val2 = 100, val3 = 1000;

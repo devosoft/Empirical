@@ -21,8 +21,8 @@ int main()
   type_map.Get<int>() = "This is an int.";
   type_map.Get<std::string>() = "This is an std::string.";
 
-  std::cout << "Bool message: " << type_map.Get<bool>() << '\n';
-  std::cout << "Double message: " << type_map.Get<double>() << '\n';
-  std::cout << "Int message: " << type_map.Get<int>() << '\n';
-  std::cout << "String message: " << type_map.Get<std::string>() << '\n';
+  std::cout << "Bool message: " << type_map.Get<bool>() << std::endl;
+  std::cout << "Double message: " << type_map.Get<double>() << std::endl;
+  std::cout << "Int message: " << type_map.Get<int>() << std::endl;
+  std::cout << "String message: " << type_map.Get<std::string>() << std::endl;
 }

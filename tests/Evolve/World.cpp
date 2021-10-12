@@ -128,7 +128,7 @@ TEST_CASE("Test World", "[Evolve]")
 	// think it may be caused because world is trying to delete the ptr to
 	// the systematic but the ptr has already been deleted by the Ptr destructor?
 	//world2.AddSystematics(w2_sys1, "sys1");
-	//std::cout << world2.GetSystematics() << '\n';
+	//std::cout << world2.GetSystematics() << std::endl;
 	//REQUIRE(world2.GetSystematics("sys1") == w2_sys1);
 
 	emp::World<double> world3("World3");
@@ -375,11 +375,11 @@ TEST_CASE("Test fitness sharing", "[evo]")
   grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
   RouletteSelect(grid_world, 500);
 
-  std::cout << '\n';
+  std::cout << std::endl;
   grid_world.PrintGrid();
   //std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
-  //   std::cout << '\n';
+  //   std::cout << std::endl;
 
 }
 
@@ -399,19 +399,19 @@ TEST_CASE("Test 3D population structure", "[Evolve]")
 	// Test lower bounds
 	emp::WorldPosition neigh = world.GetRandomNeighborPos(0);
 	emp::vector<size_t> legal_neighbors = {1,5,6,20,21,25,26};
-	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << '\n';
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
 
 	// Test middle of grid
 	neigh = world.GetRandomNeighborPos(26);
 	legal_neighbors = {0,1,2, 5,6,7,10,11,12,20, 21, 22, 25, 27, 30, 31, 32, 40, 41, 42, 45, 46, 47, 50, 51, 52};
-	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << '\n';
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
 
 	// Test upper bounds
 	neigh = world.GetRandomNeighborPos(59);
 	legal_neighbors = {58, 54, 53, 39, 38, 34, 33};
-	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << '\n';
+	// std::cout << neigh.GetIndex() << " " << emp::to_string(legal_neighbors) << std::endl;
 	CHECK(emp::Has<size_t>(legal_neighbors, neigh.GetIndex()));
 	
 	// Test is_neighbor
@@ -472,5 +472,5 @@ TEST_CASE("Test GetValidNeighborOrgIDs on Grid", "[Evolve]")
   REQUIRE(grid_world.GetValidNeighborOrgIDs(12) == valid_neighbors);
   REQUIRE(grid_world.IsNeighbor(0, 49));
 
-  std::cout << '\n';
+  std::cout << std::endl;
 }

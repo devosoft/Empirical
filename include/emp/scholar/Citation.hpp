@@ -137,7 +137,7 @@ namespace emp {
     // By default, print a standard citation style.
     void PrintERROR(std::ostream & out=std::cout) { out << "ERROR with printing citation."; }
     void PrintUNKNOWN(std::ostream & out=std::cout) { (void) out; } // Dynamically guess type?
-    void PrintARTICLE(std::ostream & out=std::cout) { PrintAuthors(out); out << '\n'; }
+    void PrintARTICLE(std::ostream & out=std::cout) { PrintAuthors(out); out << std::endl; }
     void PrintBOOK(std::ostream & out=std::cout) { (void) out; }
     void PrintBOOKLET(std::ostream & out=std::cout) { (void) out; }
     void PrintCONFERENCE(std::ostream & out=std::cout) { (void) out; }

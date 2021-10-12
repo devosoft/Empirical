@@ -30,6 +30,6 @@ int main()
   home["Country"] = "Anywhere!";
 
   // Try Restore()
-  std::cout << "House Number: " << home["House Number"].Restore<size_t>() << '\n';
-  std::cout << "Street:       " << home["Street"].Restore<std::string>() << '\n';
+  std::cout << "House Number: " << home["House Number"].Restore<size_t>() << std::endl;
+  std::cout << "Street:       " << home["Street"].Restore<std::string>() << std::endl;
 }

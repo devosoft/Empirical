@@ -24,12 +24,12 @@ int main()
   constexpr org_t MAX_ORG = 8192;
   constexpr org_t MAX_ORG_DIFF = MAX_ORG - MIN_ORG;
 
-std::cout << "START!" << '\n';
+std::cout << "START!" << std::endl;
 
   emp::Random random(1);
   emp::World<org_t> map_world(random);
 
-std::cout << "World build." << '\n';
+std::cout << "World build." << std::endl;
 
   // Fitness = value; trait 1 = num bits; trait 2 = value mod 31
   std::function<double(org_t &)> fit_fun =    [](org_t & val){ return (double) val; };
@@ -40,11 +40,11 @@ std::cout << "World build." << '\n';
   map_world.AddPhenotype("Num Bits", trait1_fun, 0, 14);
   map_world.AddPhenotype("Mod 31", trait2_fun, 0, 31);
 
-std::cout << "Phenotype functions in place." << '\n';
+std::cout << "Phenotype functions in place." << std::endl;
 
   emp::SetMapElites(map_world, {14,31});
 
-std::cout << "Setup MAP-Elites" << '\n';
+std::cout << "Setup MAP-Elites" << std::endl;
 
   // Setup the print function to output the appropriate number of characters.
   std::function<void(org_t&,std::ostream &)> print_fun = [](org_t & val, std::ostream & os) {
@@ -55,7 +55,7 @@ std::cout << "Setup MAP-Elites" << '\n';
   map_world.SetPrintFun(print_fun);
 
 
-std::cout << "Setup print functions." << '\n';
+std::cout << "Setup print functions." << std::endl;
 
   // Start off world with random organism.
   map_world.Inject(random.GetUInt64(MAX_ORG_DIFF/4));
@@ -71,7 +71,7 @@ std::cout << "Setup print functions." << '\n';
       }
     }
     if (g % 50 == 0) {
-      std::cout << "UD: " << g << '\n';
+      std::cout << "UD: " << g << std::endl;
       map_world.PrintGrid(std::cout, "----");
     }
   }
@@ -79,5 +79,5 @@ std::cout << "Setup print functions." << '\n';
 
   // std::cout << "Final Org Counts:\n";
   // map_world.PrintOrgCounts();
-  std::cout << '\n';
+  std::cout << std::endl;
 }

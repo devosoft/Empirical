@@ -14,7 +14,7 @@
 
 int main()
 {
-  std::cout << "Test." << '\n';
+  std::cout << "Test." << std::endl;
 
   emp::BitSorter test_sorter;
 
@@ -24,11 +24,11 @@ int main()
   }
 
   size_t vals = 11110;
-  std::cout << "Pre-sort Vals  = " << test_sorter.ToString(vals) << '\n';
+  std::cout << "Pre-sort Vals  = " << test_sorter.ToString(vals) << std::endl;
   vals = test_sorter.Sort(vals);
-  std::cout << "Post-sort Vals = " << test_sorter.ToString(vals) << '\n';
-  std::cout << "Size = " << test_sorter.GetSize() << '\n';
-  std::cout << "Depth = " << test_sorter.CalcDepth() << '\n';
+  std::cout << "Post-sort Vals = " << test_sorter.ToString(vals) << std::endl;
+  std::cout << "Size = " << test_sorter.GetSize() << std::endl;
+  std::cout << "Depth = " << test_sorter.CalcDepth() << std::endl;
 
-  std::cout << "Sort count = " << test_sorter.CountSortable() << "/" << (1 << 16) << '\n';
+  std::cout << "Sort count = " << test_sorter.CountSortable() << "/" << (1 << 16) << std::endl;
 }

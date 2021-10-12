@@ -25,7 +25,7 @@ int main() {
         emp::vector<std::string> command = emp::slice(line, ' ');
 
         if (!lib->IsInst(command[0])) {
-            std::cout << "Unknown instruction" << '\n';
+            std::cout << "Unknown instruction" << std::endl;
             std::cout << ">> ";
             continue;
         }
@@ -35,7 +35,7 @@ int main() {
         size_t inst = lib->GetID(command[0]);
 
         if (lib->GetNumArgs(inst) != args.size()) {
-            std::cout << "Wrong number of args" << '\n';
+            std::cout << "Wrong number of args" << std::endl;
             std::cout << ">> ";
             continue;
         }
@@ -56,7 +56,7 @@ int main() {
             break;
         default:
             std::cout << "Not implemented error. This inst has more than 3 args." <<
-                         " Fix the swtich statement in the interpreter" << '\n';
+                         " Fix the swtich statement in the interpreter" << std::endl;
         }
 
         cpu.Process(1);

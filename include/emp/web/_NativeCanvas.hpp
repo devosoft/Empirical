@@ -208,7 +208,7 @@ namespace web {
     }
 
     template <typename... Ts>
-    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, 
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points,
       const emp::web::Color fc=emp::web::Color("black"),
       const emp::web::Color lc=emp::web::Color("black"), const double lw=1.0) {
           for (auto p2 : points) {
@@ -306,7 +306,7 @@ namespace web {
                     return this->Draw(circle, emp::web::Color(fc), emp::web::Color(lc));
     }
     Canvas & Draw(const emp::Circle & circle,
-                  const emp::web::Color fc=emp::web::Color("white"), 
+                  const emp::web::Color fc=emp::web::Color("white"),
                   const emp::web::Color lc=emp::web::Color("black")) {
                     this->Circle(width/2, height/2, 5, fc, lc);
       return *this;

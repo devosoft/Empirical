@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
   size_t fit_id = 0;
   auto fit_id_info = am.UseArg("fit_id");
   if (fit_id_info->size() == 0) {
-    std::cout << "Error: Fit ID flag has no arguments!" << '\n';
+    std::cout << "Error: Fit ID flag has no arguments!" << std::endl;
     exit(1);
   }
   if (fit_id_info) fit_id = emp::from_string<size_t>((*fit_id_info)[0]);
@@ -52,24 +52,24 @@ int main(int argc, char* argv[])
   std::vector<std::string> filenames = *am.UseArg("_positional");
 
   if (filenames.size() < 1) {
-    std::cerr << "Format: " << command << " [input file] {output file} {flags}." << '\n';
+    std::cerr << "Format: " << command << " [input file] {output file} {flags}." << std::endl;
     exit(1);
   }
 
   SelectionData data(filenames[0], use_row_headings, use_col_headings);
   if (verbose) data.SetVerbose();
   if (do_elite) {
-    std::cout << "Using ELITE selection.  Fitness function id = " << fit_id << "." << '\n';
+    std::cout << "Using ELITE selection.  Fitness function id = " << fit_id << "." << std::endl;
     data.SetFitnessID(fit_id);
   }
 
   if (data.GetNumCriteria() == 0) {
-    std::cout << "Warning: No criteria data found." << '\n';
+    std::cout << "Warning: No criteria data found." << std::endl;
   }
 
   std::ofstream out_file;
   if (filenames.size() > 1) {
-    std::cout << "Opening output file: " << filenames[1] << '\n';
+    std::cout << "Opening output file: " << filenames[1] << std::endl;
     out_file.open(filenames[1]);
   }
   std::ostream & out_stream = (filenames.size() > 1) ? out_file : std::cout;
@@ -78,13 +78,13 @@ int main(int argc, char* argv[])
     data.AnalyzeLexicase();
     data.CalcLexicaseProbs();
 
-    // std::cout << "By organism (" << data.GetNumOrgs() << "):" << '\n';
+    // std::cout << "By organism (" << data.GetNumOrgs() << "):" << std::endl;
     // data.PrintOrgs();
-    // std::cout << '\n';
-    // std::cout << "By criterion (" << data.GetNumCriteria() << "):" << '\n';
+    // std::cout << std::endl;
+    // std::cout << "By criterion (" << data.GetNumCriteria() << "):" << std::endl;
     // data.PrintCriteria();
 
-    // std::cout << '\n';
+    // std::cout << std::endl;
     // data.PrintNewCriteria();
 
     data.PrintSelectProbs(out_stream, sort_output);
@@ -103,8 +103,8 @@ int main(int argc, char* argv[])
       out_stream << result[i];
       total += result[i];
     }
-    out_stream << '\n';
-    std::cout << "Total prob = " << total << '\n';
+    out_stream << std::endl;
+    std::cout << "Total prob = " << total << std::endl;
   }
   // emp::vector< double > fit_data = data.GetFitData(0);
   // emp::IndexMap fit_map(num_orgs);
@@ -114,6 +114,6 @@ int main(int argc, char* argv[])
   // for (size_t i = 0; i < num_orgs; i++) {
   //   std::cout << fit_map.GetProb(i) << " ";
   // }
-  // std::cout << '\n';
+  // std::cout << std::endl;
 }
 

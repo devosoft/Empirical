@@ -37,7 +37,7 @@ int main()
   std::clock_t base_tot_time = std::clock() - base_start_time;
   std::cout << "base sum = " << total_base
             << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
-            << " ms." << '\n';
+            << " ms." << std::endl;
 
 
   std::clock_t std_start_time = std::clock();
@@ -55,7 +55,7 @@ int main()
   std::clock_t std_tot_time = std::clock() - std_start_time;
   std::cout << "std sum = " << total_std
             << ";  time = " << 1000.0 * ((double) std_tot_time) / (double) CLOCKS_PER_SEC
-            << " ms." << '\n';
+            << " ms." << std::endl;
 
 
   std::clock_t emp_start_time = std::clock();
@@ -74,5 +74,5 @@ int main()
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
   std::cout << "emp sum = " << total_emp
             << ";  time = " << 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC
-            << " ms." << '\n';
+            << " ms." << std::endl;
 }

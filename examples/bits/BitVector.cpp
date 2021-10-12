@@ -46,25 +46,25 @@ int main()
 
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
-  std::cout << "Time = " << time << '\n';
+  std::cout << "Time = " << time << std::endl;
 
   std::unordered_set<emp::BitVector> bv_set;
   bv_set.insert(set1);
   bv_set.insert(set2);
 
   emp::BitVector bv(10);
-  std::cout << bv.Hash() << "  (initial, 10 bits)" << '\n';
+  std::cout << bv.Hash() << "  (initial, 10 bits)" << std::endl;
   bv[3] = true;
-  std::cout << bv.Hash() << "  (bit 3 set to true)" << '\n';
+  std::cout << bv.Hash() << "  (bit 3 set to true)" << std::endl;
   bv.Resize(9);
-  std::cout << bv.Hash() << "  (resized to 9.)" << '\n';
-  std::cout << bv.Hash() << "  (same as previous)" << '\n';
+  std::cout << bv.Hash() << "  (resized to 9.)" << std::endl;
+  std::cout << bv.Hash() << "  (same as previous)" << std::endl;
   emp::BitVector bv2(12);
-  std::cout << bv2.Hash() << "  (new bv with 12 bits)" << '\n';
+  std::cout << bv2.Hash() << "  (new bv with 12 bits)" << std::endl;
   bv2[3] = true;
   bv2[11] = true;
-  std::cout << bv2.Hash() << "  (bits 3 and 11 set true)" << '\n';
+  std::cout << bv2.Hash() << "  (bits 3 and 11 set true)" << std::endl;
   bv2.Resize(9);
-  std::cout << bv2.Hash() << "  (resized new bv to 9)" << '\n';
+  std::cout << bv2.Hash() << "  (resized new bv to 9)" << std::endl;
 
 }

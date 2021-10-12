@@ -54,16 +54,16 @@ namespace emp {
     // If we are verbose OR the test failed, print information about it.
     if (verbose == UnitTestOutput::Mode::VERBOSE || !pass) {
       std::cout << filename << ", line " << line_num << ": "
-                << test_input << " == " << result << '\n';
+                << test_input << " == " << result << std::endl;
     }
     if (!pass) {
       if (is_require) {
-        std::cout << "-> \033[1;31mREQUIREMENT FAILED!\033[0m" << '\n';
+        std::cout << "-> \033[1;31mREQUIREMENT FAILED!\033[0m" << std::endl;
       } else {
         std::cout << "-> \033[1;31mMATCH FAILED!  Expected: ["
-                  << exp_result << "]\033[0m" << '\n';
+                  << exp_result << "]\033[0m" << std::endl;
         std::cout << "                    Output: ["
-                  << result << "]" << '\n';
+                  << result << "]" << std::endl;
       }
       GetUnitTestOutput().errors++;
       if (GetUnitTestOutput().abort) {
@@ -71,7 +71,7 @@ namespace emp {
         abort();
       }
     } else if (verbose == UnitTestOutput::Mode::VERBOSE) {
-      std::cout << "-> \033[1;32mPASSED!" << "\033[0m" << '\n';
+      std::cout << "-> \033[1;32mPASSED!" << "\033[0m" << std::endl;
     }
   }
 }
@@ -151,10 +151,10 @@ namespace emp {
     if (num_errors) {
       std::cout << "\033[1;31mRESULT: " << num_errors << "/" << num_tests
                 << " tests failed!"
-                << "\033[0m" << '\n';
+                << "\033[0m" << std::endl;
     } else {
       std::cout << "\033[1;32mRESULT: " << num_tests << "/" << num_tests << " tests PASSED!"
-                << "\033[0m" << '\n';
+                << "\033[0m" << std::endl;
     }
     return num_errors;
   }

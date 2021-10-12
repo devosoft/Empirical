@@ -47,7 +47,7 @@ int main()
 		                  	      random.GetDouble(10.0, 100.0));
   }
 
-  std::cout << "---- surface results ----" << '\n';
+  std::cout << "---- surface results ----" << std::endl;
   surface.AddOverlapFun(
     [&surface](TestBody & body1, TestBody & body2) {
       std::cout << "Overlap " << body1.id << " and " << body2.id
@@ -58,7 +58,7 @@ int main()
   );
   surface.FindOverlaps();
 
-//   std::cout << "\n---- brute force ----" << '\n';
+//   std::cout << "\n---- brute force ----" << std::endl;
 //   for (size_t id1 = 1; id1 < bodies.size(); id1++) {
 //     auto & body1 = bodies[id1];
 //     for (size_t id2 = 0; id2 < id1; id2++) {
@@ -70,7 +70,7 @@ int main()
 //     }
 //   }
 
-  std::cout << '\n' << "Moving bodies...\n";
+  std::cout << std::endl << "Moving bodies...\n";
   for (auto & body : bodies) {
     surface.SetCenter(body.id, { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) });
   }

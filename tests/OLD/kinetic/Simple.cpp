@@ -35,7 +35,7 @@
 // }
 
 int main() {
-  std::cout << "Testing!!" << '\n';
+  std::cout << "Testing!!" << std::endl;
 
   int result = EM_ASM_INT({
       alert("My test: " + $0);

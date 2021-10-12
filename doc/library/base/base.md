@@ -97,6 +97,6 @@ Example:
 
 emp::Ptr<int> int_ptr;
 int_ptr.New(123456); // Store the value 123456 in int_ptr.
-std::cout << "*int_ptr = " << *int_ptr << '\n';
+std::cout << "*int_ptr = " << *int_ptr << std::endl;
 int_ptr.Delete();
 ```

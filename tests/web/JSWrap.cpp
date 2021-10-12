@@ -81,7 +81,7 @@ struct TestJSWrap : emp::web::BaseTest {
     wrapped_func_ids["TestName7"] = emp::JSWrap(TestFun7, "TestName7", false);
     wrapped_func_ids["TestName8"] = emp::JSWrap(TestFun8, "TestName8", false);
     wrapped_func_ids["TestName9"] = emp::JSWrap([x]() { return x; }, "TestName9", false);
-    wrapped_func_ids["TestName10"] = emp::JSWrap([](const std::string & msg){ std::cout << msg << '\n'; return "yes"; }, "TestName10", false);
+    wrapped_func_ids["TestName10"] = emp::JSWrap([](const std::string & msg){ std::cout << msg << std::endl; return "yes"; }, "TestName10", false);
     wrapped_func_ids["TestName11"] = emp::JSWrap([](int i){return i*i;}, "TestName11", false);
     wrapped_func_ids["TestName12"] = emp::JSWrap(TestFun12, "TestName12", false);
     wrapped_func_ids["TestName13"] = emp::JSWrap(TestFun13, "TestName13", false);
@@ -253,13 +253,13 @@ struct TestJSWrap : emp::web::BaseTest {
   }
 
   static void TestFun2(double a, double b) {
-    std::cout <<  a - b  << '\n';
+    std::cout <<  a - b  << std::endl;
   }
 
   static void TestFun3(std::string str1, int copies) {
     std::string out_str;
     for (int i = 0; i < copies; i++) out_str += str1;
-    std::cout << out_str << '\n';
+    std::cout << out_str << std::endl;
   }
 
   static double TestFun4(double a, double b) {
@@ -269,9 +269,9 @@ struct TestJSWrap : emp::web::BaseTest {
   static double TestFun5() { return 10000.1; }
 
   static bool TestFun6(char in_char) {
-    std::cout << "in_char = " << in_char << '\n';
-    std::cout << "(in_char >= 'a')" << (in_char >= 'a') << '\n';
-    std::cout << "(in_char <= 'z')" << (in_char <= 'z') << '\n';
+    std::cout << "in_char = " << in_char << std::endl;
+    std::cout << "(in_char >= 'a')" << (in_char >= 'a') << std::endl;
+    std::cout << "(in_char <= 'z')" << (in_char <= 'z') << std::endl;
     return in_char >= 'a' && in_char <= 'z';
   }
 

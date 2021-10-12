@@ -651,7 +651,7 @@ public:
   //   //
   //   //   js.objects[$0].selectAll(".line-seg").attr("d", function(d){console.log("in d", d, $1, js.objects[$1]); return js.objects[$1](d);});
   //   // }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
-  //   std::cout << "Done redrawing" << '\n';
+  //   std::cout << "Done redrawing" << std::endl;
   // }
   template <typename T>
   void Redraw(D3::SelectionOrTransition<T> & s) {
@@ -743,7 +743,7 @@ public:
     if (data.size() > 0) {
       DrawData(true);
     } else if (data.size() == 0) {
-    //   std::cout << "About to draw callback" << '\n';
+    //   std::cout << "About to draw callback" << std::endl;
       CallDrawCallback();
     }
   }
@@ -858,17 +858,17 @@ public:
   }
 
   void DrawTree() {
-    // std::cout << "Vis data id: " << data->GetID() << '\n';
+    // std::cout << "Vis data id: " << data->GetID() << std::endl;
     emp::array<D3::Selection, 4> nodes_links = tree.GenerateNodesAndLinks(*GetSVG());
-    // std::cout << "Links generated" << '\n';
+    // std::cout << "Links generated" << std::endl;
     nodes_links[0].Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     nodes_links[1].Remove();
     nodes_links[3].Remove();
-    // std::cout << "Circles appended" << '\n';
+    // std::cout << "Circles appended" << std::endl;
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
-    // std::cout << "Circles styled" << '\n';
+    // std::cout << "Circles styled" << std::endl;
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
-    // std::cout << "links styled" << '\n';
+    // std::cout << "links styled" << std::endl;
     CallDrawCallback();
   }
 
@@ -1141,7 +1141,7 @@ public:
                             .On("mouseover", GetID()+"legend_mouseover")
                             .On("mouseout", GetID()+"legend_mouseout");
 
-    GetSVG()->SelectAll(".node").On("click", [this](NODE d){std::cout << emp::to_string(GetLocHistory(d.name())) << '\n';});
+    GetSVG()->SelectAll(".node").On("click", [this](NODE d){std::cout << emp::to_string(GetLocHistory(d.name())) << std::endl;});
 
   }
 

@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   auto unused_args = config.GetUnusedArgs();
 
   if (unused_args.size() != 1) {
-    std::cout << "Must include a single filename for data." << '\n';
+    std::cout << "Must include a single filename for data." << std::endl;
     exit(1);
   }
 
@@ -26,11 +26,11 @@ int main(int argc, char* argv[])
   file.RemoveEmpty();       // Remove all now-empty lines from file.
 
   if (file.GetNumLines() == 0) {
-    std::cout << "No data found. Exiting." << '\n';
+    std::cout << "No data found. Exiting." << std::endl;
     exit(2);
   }
 
-  std::cout << "Found data for " << file.GetNumLines() << " histograms." << '\n';
+  std::cout << "Found data for " << file.GetNumLines() << " histograms." << std::endl;
 
   auto data = file.ToData<double>();
 
@@ -66,15 +66,15 @@ int main(int argc, char* argv[])
   while (file.GetNumLines()) {
     emp::DataLog<double> row = file.ExtractRowAs<double>();
 
-    std::cout << "MIN_VAL: " << min_val << '\n';
+    std::cout << "MIN_VAL: " << min_val << std::endl;
     row.AsciiHistogram();
-    std::cout << "MAX_VAL: " << max_val << '\n';
+    std::cout << "MAX_VAL: " << max_val << std::endl;
   }
 
-  std::cout << "OVERALL COUNT: " << num_vals << '\n';
-  std::cout << "OVERALL MIN:   " << min_val << '\n';
-  std::cout << "OVERALL MAX:   " << max_val << '\n';
-  std::cout << "OVERALL MEAN:  " << (total_val/(double) num_vals) << '\n';
+  std::cout << "OVERALL COUNT: " << num_vals << std::endl;
+  std::cout << "OVERALL MIN:   " << min_val << std::endl;
+  std::cout << "OVERALL MAX:   " << max_val << std::endl;
+  std::cout << "OVERALL MEAN:  " << (total_val/(double) num_vals) << std::endl;
 
   emp::AsciiBarGraph(bin_counts);
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
   if (scale < 1.0) scale = 1.0;
   for (size_t count : bin_counts) {
     for (size_t i = 0; i < (count/scale); i++) std::cout << "*";
-    std::cout << '\n';
+    std::cout << std::endl;
   }
 }
 

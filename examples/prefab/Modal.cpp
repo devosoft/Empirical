@@ -31,6 +31,6 @@ int main(){
   modal_btn.SetAttr("class", "btn btn-info");
   modal.AddButton(modal_btn);
 
-  std::cout << "end of main... !" << '\n';
+  std::cout << "end of main... !" << std::endl;
 
 }

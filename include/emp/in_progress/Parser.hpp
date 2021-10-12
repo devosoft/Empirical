@@ -196,18 +196,18 @@ namespace emp {
 
     /// Print the current status of this parser (for debugging)
     void Print(std::ostream & os=std::cout) const {
-      os << symbols.size() << " parser symbols available." << '\n';
+      os << symbols.size() << " parser symbols available." << std::endl;
       for (const auto & s : symbols) {
         os << "symbol '" << s.name << "' (id " << s.id << ") has "
            << s.rule_ids.size() << " patterns.";
         if (s.nullable) os << " [NULLABLE]";
-        os << '\n';
+        os << std::endl;
         for (size_t rid : s.rule_ids) {
           const emp::vector<size_t> & p = rules[rid].pattern;
           os << " ";
           if (p.size() == 0) os << " [empty]";
           for (size_t x : p) os << " " << GetName(x) << "(" << x << ")";
-          os << '\n';
+          os << std::endl;
         }
       }
     }

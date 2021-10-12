@@ -23,11 +23,11 @@ size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream &
 
   // Request a move from the human.
   char move;
-  os << "Move?" << '\n';
+  os << "Move?" << std::endl;
   is >> move;
 
   while (move < 'A' || move > 'F' || game.GetCurSide()[(size_t)(move-'A')] == 0) {
-    os << "Invalid move! (choose a value 'A' to 'F')" <<  '\n';
+    os << "Invalid move! (choose a value 'A' to 'F')" <<  std::endl;
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     is >> move;
@@ -68,14 +68,14 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
     size_t best_move = play_fun(game);
 
     if (verbose) {
-      std::cout << "round = " << round++ << "   errors = " << errors << '\n';
+      std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
       game.Print();
       char move_sym = (char) ('A' + best_move);
       std::cout << "Move = " << move_sym;
       if (game.GetCurSide()[best_move] == 0) {
         std::cout << " (illegal!)";
       }
-      std::cout << '\n' << '\n';
+      std::cout << std::endl << std::endl;
     }
 
     // If the chosen move is illegal, shift through other options.
@@ -92,7 +92,7 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
   if (verbose) {
     std::cout << "Final scores -- A: " << game.ScoreA()
               << "   B: " << game.ScoreB()
-              << '\n';
+              << std::endl;
   }
 
   return ((double) game.ScoreA()) - ((double) game.ScoreB()) - ((double) errors * 10.0);
@@ -122,7 +122,7 @@ int main()
 
   std::string line;
   while (std::getline(file, line)) {
-      std::cout << line << '\n';
+      std::cout << line << std::endl;
       emp::remove_punctuation(line);
       emp::right_justify(line);
       emp::left_justify(line);
@@ -133,7 +133,7 @@ int main()
       }
 
       if (!lib->IsInst(command[0])) {
-          std::cout << "Unknown instruction " << command[0] << '\n';
+          std::cout << "Unknown instruction " << command[0] << std::endl;
           std::cout << ">> ";
           continue;
       }
@@ -156,7 +156,7 @@ int main()
           break;
       default:
           std::cout << "Not implemented error. This inst has more than 3 args." <<
-                       " Fix the swtich statement in the interpreter" << '\n';
+                       " Fix the swtich statement in the interpreter" << std::endl;
       }
 
   }

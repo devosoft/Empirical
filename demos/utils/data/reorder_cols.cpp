@@ -45,7 +45,7 @@ int main(int argc, char * argv[]) {
       if (col_pos) std::cout << ' ';
       std::cout << cols[ col_ids[col_pos]-1 ][line_id];
     }
-    std::cout << '\n';
+    std::cout << std::endl;
   }
 }
 

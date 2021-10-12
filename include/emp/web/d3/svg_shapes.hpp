@@ -329,7 +329,7 @@ namespace D3 {
         } else if (type == "horizontal") {
             MAIN_THREAD_EMP_ASM({js.objects[$0] = d3.linkHorizontal();}, this->id);
         } else {
-            std::cout << "WARNING: Invalid link type" << '\n';
+            std::cout << "WARNING: Invalid link type" << std::endl;
             MAIN_THREAD_EMP_ASM({js.objects[$0] = d3.linkVertical();}, this->id);
         }
     }

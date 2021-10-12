@@ -45,7 +45,7 @@ int main(int argc, char * argv[])
 
   f_data << "epoch,num_coop,num_defect\n";
   for (size_t e = 0; e < E; e += step) {
-    std::cout << "Epoch = " << e << '\n';
+    std::cout << "Epoch = " << e << std::endl;
     world.Run(step);
     const size_t num_coop = world.CountCoop();
     const size_t num_defect = N - num_coop;

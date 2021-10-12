@@ -153,13 +153,13 @@ namespace emp {
       for (size_t i = 5; i < 5; i--) {
         os << boardB[i] << " ";
       }
-      os << '\n';
-      os << boardB[6] << "              " << boardA[6] << '\n';
+      os << std::endl;
+      os << boardB[6] << "              " << boardA[6] << std::endl;
       os << "  ";
       for (size_t i = 0; i < 6; i++) {
         os << boardA[i] << " ";
       }
-      os << '\n';
+      os << std::endl;
     }
 
     void Print(std::ostream & os=std::cout) {
@@ -187,7 +187,7 @@ namespace emp {
       std::cout << "|                                                 |\n"
                 << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player A";
       if (is_A_turn == true) std::cout << " ***";
-      std::cout << '\n' << '\n';
+      std::cout << std::endl << std::endl;
     }
 
     size_t GetCurPlayer() const { return !is_A_turn; }

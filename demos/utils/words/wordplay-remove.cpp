@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
   if (args.size() != 3) {
-    std::cout << "Expected: " << args[0] << " [dict file] [removals]" << '\n';
+    std::cout << "Expected: " << args[0] << " [dict file] [removals]" << std::endl;
     exit(0);
   }
 
@@ -34,12 +34,12 @@ int main(int argc, char* argv[])
   for (const std::string & word : words) {
     std::string word2 = word;
     emp::remove_chars(word2, chars);
-    if (count < 10) std::cout << "Converted '" << word << "' to '" << word2 << "'." << '\n';
+    if (count < 10) std::cout << "Converted '" << word << "' to '" << word2 << "'." << std::endl;
     if (word2.size() > 1 && (word2.size() < word.size()) && emp::Has(words, word2)) {
     // if (word2.size() > 1 && emp::Has(words, word2)) {
-      std::cout << word << " -> " << word2 << '\n';
+      std::cout << word << " -> " << word2 << std::endl;
     }
     count++;
   }
-  std::cout << count << " words tested." << '\n';
+  std::cout << count << " words tested." << std::endl;
 }

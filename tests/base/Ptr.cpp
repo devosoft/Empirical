@@ -146,7 +146,7 @@ TEST_CASE("Another Test Ptr", "[base]")
   REQUIRE(*ptr8 == 6);
   ptr7.Delete();
 
-  // std::cout << ptr_set[0]->DebugGetCount() << '\n';
+  // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
 //   // @CAO Make sure we don't delete below 0
 //   // @CAO Make sure we don't delete below 1 if we own it

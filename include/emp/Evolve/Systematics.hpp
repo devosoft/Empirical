@@ -842,8 +842,8 @@ namespace emp {
         return 0;
       }
 
-      // std::cout << "Initializing divisor to " << divisor << " Offspring: " << tax->GetTotalOffspring() << '\n';
-      // std::cout << "MRCA ID: " << mrca->GetID() << " Tax ID: " << tax->GetID() << " time: " << time << " Orig: " << tax->GetOriginationTime() << '\n';
+      // std::cout << "Initializing divisor to " << divisor << " Offspring: " << tax->GetTotalOffspring() << std::endl;
+      // std::cout << "MRCA ID: " << mrca->GetID() << " Tax ID: " << tax->GetID() << " time: " << time << " Orig: " << tax->GetOriginationTime() << std::endl;
 
       Ptr<taxon_t> test_taxon = tax->GetParent();
 
@@ -857,22 +857,22 @@ namespace emp {
         //           "Invalid time - are you passing time to rg?", time);
 
         depth += time - test_taxon->GetOriginationTime();
-        // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << '\n';
+        // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
         time = test_taxon->GetOriginationTime();
         if (test_taxon == mrca || !test_taxon) {
           // Stop when everything has converged or when we hit the root.
-          // std::cout << (int)(test_taxon == mrca) << " depth: " << depth << " divisor: " << divisor << '\n';
+          // std::cout << (int)(test_taxon == mrca) << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           return total;
         } else if (test_taxon->GetNumOrgs() > 0) {
           // If this taxon is still alive we need to update the divisor
-          // std::cout << "Alive point" << " depth: " << depth << " divisor: " << divisor << '\n';
+          // std::cout << "Alive point" << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           depth = 0;
           divisor = test_taxon->GetTotalOffspring() + 1;
         } else if (test_taxon->GetNumOff() > 1) {
           // This is a branch point. We need to add the things on the other branch to the divisor..
-          // std::cout << "Branch point" << " depth: " << depth << " divisor: " << divisor << '\n';
+          // std::cout << "Branch point" << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           depth = 0;
           divisor = test_taxon->GetTotalOffspring();
@@ -956,12 +956,12 @@ namespace emp {
         curr_pointers[tax] = emp::vector<emp::vector<int>>({{0}});
       }
 
-      // std::cout << "Starting curr_pointers size: " << curr_pointers.size() << '\n';
+      // std::cout << "Starting curr_pointers size: " << curr_pointers.size() << std::endl;
 
       while (curr_pointers.size() > 0) {
         for (auto & tax : curr_pointers) {
           bool alive = tax.first->GetNumOrgs() > 0;
-          // std::cout << tax.first << " has " << to_string(tax.second) << "and is waiting for " << tax.first->GetNumOff() + int(alive) << '\n';
+          // std::cout << tax.first << " has " << to_string(tax.second) << "and is waiting for " << tax.first->GetNumOff() + int(alive) << std::endl;
           if ( tax.second.size() < tax.first->GetNumOff() + int(alive)) {
             if (Has(next_pointers, tax.first)) {
               // In case an earlier iteration added this node to next_pointers
@@ -984,14 +984,14 @@ namespace emp {
               for (size_t j = i+1; j < tax.second.size(); j++) {
                 for (int disti : tax.second[i]) {
                   for (int distj : tax.second[j]) {
-                    // std::cout << "Adding " << disti << " and " << distj << '\n';
+                    // std::cout << "Adding " << disti << " and " << distj << std::endl;
                     dists.push_back(disti+distj);
                   }
                 }
               }
             }
           }
-          // std::cout << "dists " << to_string(dists) << '\n';
+          // std::cout << "dists " << to_string(dists) << std::endl;
           // Increment distances and stick them in new vector
           emp::vector<int> new_dist_vec;
           for (auto & vec : tax.second) {
@@ -1000,7 +1000,7 @@ namespace emp {
             }
           }
 
-          // std::cout << "new_dist_vec " << to_string(new_dist_vec) << '\n';
+          // std::cout << "new_dist_vec " << to_string(new_dist_vec) << std::endl;
 
           next_pointers.erase(tax.first);
 
@@ -1024,7 +1024,7 @@ namespace emp {
         }
         curr_pointers = next_pointers;
         next_pointers.clear();
-        // std::cout << curr_pointers.size() << '\n';
+        // std::cout << curr_pointers.size() << std::endl;
       }
 
       if (dists.size() != (active_taxa.size()*(active_taxa.size()-1))/2) {
@@ -1033,7 +1033,7 @@ namespace emp {
         return dists;
       }
 
-      // std::cout << "Total: " << total << "Dists: " << dists.size() << '\n';
+      // std::cout << "Total: " << total << "Dists: " << dists.size() << std::endl;
 
       return dists;
 
@@ -1049,14 +1049,14 @@ namespace emp {
       // function
 
       std::set< Ptr<taxon_t>> result;
-      // std::cout << "starting " << time_point << '\n';
+      // std::cout << "starting " << time_point << std::endl;
       for (Ptr<taxon_t> tax : active_taxa) {
-          // std::cout << tax->GetInfo() << '\n';
+          // std::cout << tax->GetInfo() << std::endl;
         while (tax) {
-          // std::cout << tax->GetInfo() << " " << tax->GetOriginationTime() << " " << tax->GetDestructionTime() << '\n';
+          // std::cout << tax->GetInfo() << " " << tax->GetOriginationTime() << " " << tax->GetDestructionTime() << std::endl;
           if (tax->GetOriginationTime() <= time_point && tax->GetDestructionTime() > time_point ) {
             result.insert(tax);
-          // std::cout << "inserting " << tax->GetInfo() << '\n';
+          // std::cout << "inserting " << tax->GetInfo() << std::endl;
             break;
           }
           tax = tax->GetParent();
@@ -1263,23 +1263,23 @@ namespace emp {
       }
 
       for (Ptr<taxon_t> off : curr->GetOffspring()) {
-        // std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << '\n';
+        // std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
 
         CollessStruct new_result = RecursiveCollessStep(off);
         result.ns.push_back(Sum(new_result.ns) + log(off->GetOffspring().size() + exp(1)));
         result.total += new_result.total;
       }
 
-      // std::cout << "Evaluating: " << curr->GetID() << '\n';
+      // std::cout << "Evaluating: " << curr->GetID() << std::endl;
 
       double med = Median(result.ns);
       double sum_diffs = 0;
-      // std::cout << "Median: " << med << '\n';
+      // std::cout << "Median: " << med << std::endl;
       for (double n : result.ns) {
-        // std::cout << n << '\n';
+        // std::cout << n << std::endl;
         sum_diffs += std::abs(n-med);
       }
-      // std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << '\n';
+      // std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << std::endl;
       result.total += sum_diffs/result.ns.size();
       return result;
     }
@@ -1332,7 +1332,7 @@ namespace emp {
           }
         }
       }
-      // std::cout << "About to remove " << to_remove.size() << " orgs" << '\n';
+      // std::cout << "About to remove " << to_remove.size() << " orgs" << std::endl;
       for (std::pair<Ptr<taxon_t>, std::set<Ptr<taxon_t>>> el : to_remove) {
         emp_assert(el.first->GetDestructionTime() < ud, el.first->GetDestructionTime(), ud);
         if (el.first->GetNumOff() == el.second.size()) {
@@ -1463,7 +1463,7 @@ namespace emp {
       taxon.Delete();
       return;
     }
-    // std::cout << "About to set destruction time " << time << '\n';
+    // std::cout << "About to set destruction time " << time << std::endl;
     // Only need to track destruction time if we're archiving taxa
     taxon->SetDestructionTime(time);
 
@@ -1585,7 +1585,7 @@ namespace emp {
 
       cur_taxon->SetOriginationTime(update);
     }
-    // std::cout << "about to store poisition" << '\n';
+    // std::cout << "about to store poisition" << std::endl;
     if (store_position && pos.GetIndex() >= 0) {
       if (pos.GetPopID()) {
         if (pos.GetIndex() >= next_taxon_locations.size()) {
@@ -1635,7 +1635,7 @@ namespace emp {
       removal_pos = -1;
     }
     to_be_removed = taxon;
-    // std::cout << "Setting remove time to " << time << '\n';
+    // std::cout << "Setting remove time to " << time << std::endl;
     removal_time = time;
   }
 
@@ -1696,27 +1696,27 @@ namespace emp {
        << " archive=" << archive
        << " next_id=" << next_id
        << " synchronous=" << track_synchronous
-       << '\n';
+       << std::endl;
     os << "Active count:   " << active_taxa.size();
     for (const auto & x : active_taxa) {
       os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
          << (x->GetParent() ? emp::to_string(x->GetParent()->GetID()) : "null") << "]";
     }
-    os << '\n';
+    os << std::endl;
 
     os << "Ancestor count: " << ancestor_taxa.size();
     for (const auto & x : ancestor_taxa) {
       os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
          << (x->GetParent() ? emp::to_string(x->GetParent()->GetID()) : "null") << "]";
     }
-    os << '\n';
+    os << std::endl;
 
     os << "Outside count:  " << outside_taxa.size();
     for (const auto & x : outside_taxa) {
       os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
          << (x->GetParent() ? emp::to_string(x->GetParent()->GetID()) : "null") << "]";
     }
-    os << '\n';
+    os << std::endl;
   }
 
   // Print whole lineage.
@@ -1724,7 +1724,7 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
     os << "Lineage:\n";
     while (taxon) {
-      os << taxon->GetInfo() << '\n';
+      os << taxon->GetInfo() << std::endl;
       taxon = taxon->GetParent();
     }
   }

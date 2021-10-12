@@ -48,7 +48,7 @@ int main()
   }
 
   std::cout << " time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
-            << " seconds." << '\n';
+            << " seconds." << std::endl;
 
 
   //
@@ -73,7 +73,7 @@ int main()
 	    << " expecting ~" << expected << " hits.\n"
 	    << "  num hits = " << success_count
             << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
-            << " seconds." << '\n';
+            << " seconds." << std::endl;
 
 
   //
@@ -96,7 +96,7 @@ int main()
 	    << " expecting ~" << expected << " hits.\n"
 	    << "  num hits = " << success_count
             << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
-            << " seconds." << '\n';
+            << " seconds." << std::endl;
 
 
 }

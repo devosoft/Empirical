@@ -31,7 +31,7 @@ int main()
   for (int x : vals) set_vals.insert(x);
   for (int x : vals_remove) set_vals.erase(x);
 
-  std::cout << "ra size = " << ra_vals.size() << '\n';
-  std::cout << "set size = " << set_vals.size() << '\n';
+  std::cout << "ra size = " << ra_vals.size() << std::endl;
+  std::cout << "set size = " << set_vals.size() << std::endl;
 
 }

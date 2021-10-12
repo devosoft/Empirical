@@ -86,7 +86,7 @@ namespace emp {
 
     void PrintNames(std::ostream & os=std::cout) {
       os << signal_map.size() << " signals found:\n";
-      for (auto & x : signal_map) os << "  " << x.first << '\n';
+      for (auto & x : signal_map) os << "  " << x.first << std::endl;
     }
   };
 

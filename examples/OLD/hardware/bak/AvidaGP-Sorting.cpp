@@ -122,7 +122,7 @@ int main()
     }
 
     world.Update();
-    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << '\n';
+    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
     // Mutate all but the first organism.
     world.MutatePop(1);

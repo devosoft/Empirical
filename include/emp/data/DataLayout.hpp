@@ -114,7 +114,7 @@ namespace emp {
       //           << "' of type " << emp::GetTypeID<T>()
       //           << " to DataMap with " << id_map.size() << " elements"
       //           << " totalling " << image_size << " bytes."
-      //           << '\n';
+      //           << std::endl;
 
       // Analyze the size of the new object and where it will go.
       constexpr const size_t obj_size = sizeof(T);

@@ -19,11 +19,11 @@ int main()
   auto var4 = empower.NewVar<int>("test4", 4);
 
   int & x = var.Restore<int>();
-  std::cout << "x = " << x << '\n';
+  std::cout << "x = " << x << std::endl;
   x = 12345;
-  std::cout << "var  = " << var.Restore<int>() << '\n';
-  std::cout << "var2 = " << var2.Restore<int>() << '\n';
-  std::cout << "var3 = " << var3.Restore<std::string>() << '\n';
-  std::cout << "var4 = " << var4.Restore<int>() << '\n';
+  std::cout << "var  = " << var.Restore<int>() << std::endl;
+  std::cout << "var2 = " << var2.Restore<int>() << std::endl;
+  std::cout << "var3 = " << var3.Restore<std::string>() << std::endl;
+  std::cout << "var4 = " << var4.Restore<int>() << std::endl;
 }
 

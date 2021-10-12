@@ -153,7 +153,7 @@ TEST_CASE("Another Test random", "[math]")
       const double min_threshold = expected_mean-error_thresh;
       const double max_threshold = expected_mean+error_thresh;
       const double mean_value = total / static_cast<double>(num_tests);
-      // std::cout << mean_value * 1000 << '\n';
+      // std::cout << mean_value * 1000 << std::endl;
 
       n_fails["GetUInt"].first += !(mean_value > min_threshold);
       n_fails["GetUInt"].second += !(mean_value < max_threshold);
@@ -286,7 +286,7 @@ TEST_CASE("Another Test random", "[math]")
   }
 
   for (const auto & [k, v] : n_fails) {
-    // std::cout << k << ": " << v.first << ", " << v.second << '\n';
+    // std::cout << k << ": " << v.first << ", " << v.second << std::endl;
     REQUIRE(v.first + v.second == 0);
   }
 }

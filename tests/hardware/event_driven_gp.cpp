@@ -540,13 +540,13 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[har
   // Enumerate all 2-bit tags
   emp::vector<emp::BitSet<2>> tags2;
   uset.clear();
-  std::cout << "All two-bit tags: " << '\n';
+  std::cout << "All two-bit tags: " << std::endl;
   for (size_t i = 0; i < emp::Pow2(2); ++i) {
     tags2.emplace_back(emp::GenRandSignalGPTag<2>(random, tags2));
     uset.emplace(tags2.back().GetUInt(0));
     std::cout << "  ";
     tags2.back().Print();
-    std::cout << " : " << tags2.back().GetUInt(0) << '\n';
+    std::cout << " : " << tags2.back().GetUInt(0) << std::endl;
   }
   REQUIRE(tags2.size() == emp::Pow2(2));
   REQUIRE(uset.size() == emp::Pow2(2));
@@ -555,13 +555,13 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[har
   // Enumerate all 4-bit tags
   emp::vector<emp::BitSet<4>> tags4;
   uset.clear();
-  std::cout << "All four-bit tags: " << '\n';
+  std::cout << "All four-bit tags: " << std::endl;
   for (size_t i = 0; i < emp::Pow2(4); ++i) {
     tags4.emplace_back(emp::GenRandSignalGPTag<4>(random, tags4));
     uset.emplace(tags4.back().GetUInt(0));
     std::cout << "  ";
     tags4.back().Print();
-    std::cout << " : " << tags4.back().GetUInt(0) << '\n';
+    std::cout << " : " << tags4.back().GetUInt(0) << std::endl;
   }
   REQUIRE(tags4.size() == emp::Pow2(4));
   REQUIRE(uset.size() == emp::Pow2(4));

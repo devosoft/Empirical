@@ -42,9 +42,9 @@ int main()
   grid_world.SetFitFun(fit_fun);
   RouletteSelect(grid_world, 500);
 
-  std::cout << '\n';
+  std::cout << std::endl;
   grid_world.PrintGrid();
   std::cout << "Final Org Counts:\n";
 //   grid_world.PrintOrgCounts(print_fun);
-//   std::cout << '\n';
+//   std::cout << std::endl;
 }

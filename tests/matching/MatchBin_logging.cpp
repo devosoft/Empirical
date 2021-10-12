@@ -156,7 +156,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
     bin.Match(2);
     bin.MatchRaw(2);
 
-    std::cout << "Printing logging test:" << '\n';
+    std::cout << "Printing logging test:" << std::endl;
     // emplace an ostream without flushing
     bin.log.EmplaceDataFile(std::cout);
 

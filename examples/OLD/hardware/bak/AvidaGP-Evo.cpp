@@ -13,7 +13,7 @@ void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
     std::cout << "[" << cpu.GetReg(i) << "] ";
   }
-  std::cout << " IP=" << cpu.GetIP() << '\n';
+  std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
 constexpr size_t POP_SIZE = 1000;
@@ -77,19 +77,19 @@ int main()
     world.LexicaseSelect(fit_set, POP_SIZE-1);
     // world.EcoSelect(fit_fun, fit_set, 100, 5, POP_SIZE-1);
     world.Update();
-    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << '\n';
+    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
     // Mutate all but the first organism.
     world.MutatePop(1);
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
   world[0].PrintGenome();
-  std::cout << '\n';
+  std::cout << std::endl;
   for (int i = 0; i < 16; i++) {
     std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   }
-  std::cout << '\n';
+  std::cout << std::endl;
 
   return 0;
 }

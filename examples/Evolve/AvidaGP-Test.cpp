@@ -27,7 +27,7 @@ void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
     std::cout << "[" << cpu.GetReg(i) << "] ";
   }
-  std::cout << " IP=" << cpu.GetIP() << '\n';
+  std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
 constexpr size_t POP_SIZE = 1000;
@@ -55,22 +55,22 @@ int main()
   // Copy genome into cell 1
   world.Inject( world.GetGenomeAt(0) );
 
-  std::cout << '\n' << "GENOME 0" << '\n';
+  std::cout << std::endl << "GENOME 0" << std::endl;
   Print(world[0]);
 
-  std::cout << '\n' << "GENOME 1" << '\n';
+  std::cout << std::endl << "GENOME 1" << std::endl;
   Print(world[1]);
 
   // Mutate cell 1 and see what happens.
   world.DoMutations(1);
 
-  std::cout << '\n' << "GENOME 1 (post mutations)" << '\n';
+  std::cout << std::endl << "GENOME 1 (post mutations)" << std::endl;
   Print(world[1]);
 
   // Copy mutated genome 1 into cell 2
   world.Inject( world.GetGenomeAt(1) );
 
-  std::cout << '\n' << "GENOME 2 (copy of mutant)" << '\n';
+  std::cout << std::endl << "GENOME 2 (copy of mutant)" << std::endl;
   Print(world[2]);
 
   // Let's do some selection; setup a neutral fitness function.
@@ -81,15 +81,15 @@ int main()
   EliteSelect(world, 1, 3);
   TournamentSelect(world, 3, 1);
 
-  std::cout << '\n' << "GENOME 0 (after selection!)" << '\n';
+  std::cout << std::endl << "GENOME 0 (after selection!)" << std::endl;
   Print(world[0]);
 
   world.Update();
   double fit0 = world.CalcFitnessID(0);
-  std::cout << "Fitness 0 = " << fit0 << '\n';
+  std::cout << "Fitness 0 = " << fit0 << std::endl;
   world.DoMutations(1);
 
-  std::cout << '\n' << "GENOME 0 (and DoMutations, but not on this!)" << '\n';
+  std::cout << std::endl << "GENOME 0 (and DoMutations, but not on this!)" << std::endl;
   Print(world[0]);
 
 }

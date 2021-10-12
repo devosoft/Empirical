@@ -347,7 +347,7 @@ namespace emp {
             if (res) {
               std::cerr << "UNKNOWN | _unknown:";
               for(const auto & v : *res) std::cerr << " " << v;
-              std::cerr << '\n';
+              std::cerr << std::endl;
               std::exit(EXIT_FAILURE);
             }
           }
@@ -367,7 +367,7 @@ namespace emp {
           [config](emp::optional<pack_t> res){
             if (res && config) {
               const std::string cfg_file = res->front();
-              std::cout << "Generating new config file: " << cfg_file << '\n';
+              std::cout << "Generating new config file: " << cfg_file << std::endl;
               config->Write(cfg_file);
             }
           }
@@ -381,7 +381,7 @@ namespace emp {
         //   [config](emp::optional<pack_t> res){
         //     if (res && config) {
         //       const std::string macro_file = res->front();
-        //       std::cout << "Generating new macros file: " << macro_file << '\n';
+        //       std::cout << "Generating new macros file: " << macro_file << std::endl;
         //       config->WriteMacros(macro_file, true);
         //     }
         //   }
@@ -577,14 +577,14 @@ namespace emp {
 
       if (const auto res = UseArg("gen"); res && config) {
         const std::string cfg_file = res->front();
-        os << "Generating new config file: " << cfg_file << '\n';
+        os << "Generating new config file: " << cfg_file << std::endl;
         config->Write(cfg_file);
         proceed = false;
       }
 
       if (const auto res = UseArg("make-const"); res && config)  {
         const std::string macro_file = res->front();
-        os << "Generating new macros file: " << macro_file << '\n';
+        os << "Generating new macros file: " << macro_file << std::endl;
         config->WriteMacros(macro_file, true);
         proceed = false;
       }
@@ -613,7 +613,7 @@ namespace emp {
         for (const auto & v : pack) {
           os << " " << v;
         }
-        os << '\n';
+        os << std::endl;
       }
 
     }
@@ -622,7 +622,7 @@ namespace emp {
     /// make pretty.
     void PrintHelp(std::ostream & os=std::cerr) const {
 
-      os << "Usage:" << '\n';
+      os << "Usage:" << std::endl;
       // print arguments in alphabetical order
       for (
         const auto & [name, spec]
@@ -641,10 +641,10 @@ namespace emp {
             << spec.most_quota << " ]";
         }
 
-        os << '\n'
+        os << std::endl
           << "   | "
           << spec.description
-          << '\n';
+          << std::endl;
 
       }
 
@@ -747,7 +747,7 @@ namespace emp {
           os << arg_names[i]
              << std::string(max_name_size + 1 - arg_names[i].size(), ' ')
              << arg_descs[i]
-             << '\n';
+             << std::endl;
         }
       }
 
@@ -756,7 +756,7 @@ namespace emp {
         if (size() > 1) {
           os << "Unknown args:";
           for (size_t i = 1; i < size(); i++) os << " " << (*this)[i];
-          os << '\n';
+          os << std::endl;
           PrintHelp(os);
           return true;
         }
@@ -788,12 +788,12 @@ namespace emp {
 
         if (print_help)    { PrintHelp(os); return false; }
         if (create_config) {
-          os << "Generating new config file: " << cfg_file << '\n';
+          os << "Generating new config file: " << cfg_file << std::endl;
           config.Write(cfg_file);
           return false;
         }
         if (const_macros)  {
-          os << "Generating new macros file: " << macro_file << '\n';
+          os << "Generating new macros file: " << macro_file << std::endl;
           config.WriteMacros(macro_file, true);
           return false;
         }

@@ -21,11 +21,11 @@ constexpr double TestConstRandom(emp14::Random random) {
 int main()
 {
   constexpr double x = TestConstRandom(1);
-  std::cout << "x=" << x << '\n';
+  std::cout << "x=" << x << std::endl;
   constexpr double y = TestConstRandom(2);
-  std::cout << "y=" << y << '\n';
+  std::cout << "y=" << y << std::endl;
 
   constexpr emp14::Random random(3);
   constexpr double z = TestConstRandom(random);
-  std::cout << "z=" << z << '\n';
+  std::cout << "z=" << z << std::endl;
 }

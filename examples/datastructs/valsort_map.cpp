@@ -21,14 +21,14 @@ int main()
     test_map.Set(i, random.GetDouble(-100.0, 100.0));
   }
 
-  std::cout << "INSERT ORDER:" << '\n';
+  std::cout << "INSERT ORDER:" << std::endl;
   for (auto it = test_map.cbegin(); it != test_map.cend(); it++) {
-    std::cout << it->first << " : " << it->second << '\n';
+    std::cout << it->first << " : " << it->second << std::endl;
   }
 
-  std::cout << "\nSORTED ORDER:" << '\n';
+  std::cout << "\nSORTED ORDER:" << std::endl;
   for (auto it = test_map.cvbegin(); it != test_map.cvend(); it++) {
-    std::cout << it->first << " : " << it->second << '\n';
+    std::cout << it->first << " : " << it->second << std::endl;
   }
 
   emp::valsort_map<std::string, int> score_map;
@@ -49,11 +49,11 @@ int main()
 
   std::cout << "\n\nBY NAME:\n";
   for (auto it = score_map.cbegin(); it != score_map.cend(); it++) {
-    std::cout << it->first << " : " << it->second << '\n';
+    std::cout << it->first << " : " << it->second << std::endl;
   }
 
   std::cout << "\nBY HIGH SCORE\n";
   for (auto it = score_map.crvbegin(); it != score_map.crvend(); it++) {
-    std::cout << it->first << " : " << it->second << '\n';
+    std::cout << it->first << " : " << it->second << std::endl;
   }
 }

@@ -86,7 +86,7 @@ namespace emp {
   void LoadArg(T & arg_var) {
     if constexpr ( is_introspective_tuple<T>() ) {
       using JSON_TYPE = T;
-      //std::cout << "Loading ARGNID: " << ARG_ID << '\n';
+      //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
       MAIN_THREAD_EMP_ASM({
         emp_i.object_queue = [];
         emp_i.curr_obj = emp_i.cb_args[$0];
@@ -191,7 +191,7 @@ namespace emp {
   template <int ARG_ID, typename JSON_TYPE> static
   typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
   LoadArg(JSON_TYPE & arg_var, std::string var) {
-    //std::cout << "Loading " << var << " ARGNID: " << ARG_ID << '\n';
+    //std::cout << "Loading " << var << " ARGNID: " << ARG_ID << std::endl;
     //LoadArg<ARG_ID>(std::get<ARG_ID>(arg_var.emp__tuple_body));
     MAIN_THREAD_EMP_ASM({
       emp_i.object_queue.push(emp_i.curr_obj);
@@ -204,7 +204,7 @@ namespace emp {
   template <typename JSON_TYPE, int ARG_ID, int FIELD>
   struct LoadTuple {
     static void LoadJSDataArg(JSON_TYPE & arg_var) {
-    //std::cout << "LoadingJS " << arg_var.var_names[FIELD-1] << " FIeLd: " << FIELD-1 << '\n';
+    //std::cout << "LoadingJS " << arg_var.var_names[FIELD-1] << " FIeLd: " << FIELD-1 << std::endl;
       LoadArg<ARG_ID>(std::get<FIELD-1>(arg_var.emp__tuple_body), arg_var.var_names[FIELD-1]);
       LoadTuple<JSON_TYPE, ARG_ID, FIELD-1> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, FIELD-1>();
       load_tuple.LoadJSDataArg(arg_var);

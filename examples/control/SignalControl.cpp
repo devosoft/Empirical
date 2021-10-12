@@ -9,9 +9,9 @@
 #include "emp/control/SignalControl.hpp"
 
 // Build a set of potential actions.
-void PrintInt(int i) { std::cout << "[" << i << "]" << '\n'; }
-void PrintVoid() { std::cout << "***" << '\n'; }
-void MultInt(int i, int j) { std::cout << "[" << i*j << "]" << '\n'; }
+void PrintInt(int i) { std::cout << "[" << i << "]" << std::endl; }
+void PrintVoid() { std::cout << "***" << std::endl; }
+void MultInt(int i, int j) { std::cout << "[" << i*j << "]" << std::endl; }
 void Sum4(int w, int x, int y, int z, int & result) { result=w+x+y+z; PrintInt(result); }
 
 int main()
@@ -66,11 +66,11 @@ int main()
   sum4_sig.AddAction(Sum4);
   int result=0;
   sum4_sig.Trigger(1,2,3,4,result);
-  std::cout << "result variable is now set to " << result << '\n';
+  std::cout << "result variable is now set to " << result << std::endl;
 
   std::cout << "Phase 7: Add mult 2 to prev signal... using only two args!  Call with 2,3,4,5\n";
-  std::function<void(int,int)> mult_pair = [](int x, int y){std::cout << x << "*" << y << "=" << x*y << '\n';};
+  std::function<void(int,int)> mult_pair = [](int x, int y){std::cout << x << "*" << y << "=" << x*y << std::endl;};
   sum4_sig.AddAction(mult_pair);
   sum4_sig.Trigger(2,3,4,5,result);
-  std::cout << "result variable is now set to " << result << '\n';
+  std::cout << "result variable is now set to " << result << std::endl;
 }

@@ -18,14 +18,14 @@ double F(int N) {
 int main()
 {
   std::cout << "Testing.  "
-            << '\n';
+            << std::endl;
 
   emp::Cache<int, double> test_cache;
 
   for (int i = 0; i < 400; i++) {
     // std::cout << i%100 << ":" << F(i%100+10000000) << " ";
     std::cout << i%100 << ":" << test_cache.Get(i%100+10000000, F) << " ";
-    if (i%8 == 7) std::cout << '\n';
+    if (i%8 == 7) std::cout << std::endl;
   }
 
 }

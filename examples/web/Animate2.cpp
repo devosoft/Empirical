@@ -23,7 +23,7 @@ double poly_rot = 0.0;
 void CanvasAnim(double time) {
   auto mycanvas = doc.Canvas("can");
 
-  std::cerr << time << '\n';
+  std::cerr << time << std::endl;
 
   // Update the circle position.
   cx+=3;

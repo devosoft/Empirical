@@ -31,48 +31,48 @@ int main() {
     world.Inject(i+100,2);
   }
 
-  std::cout << "Start Size = " << world.GetSize() << '\n' << '\n';
+  std::cout << "Start Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  std::cout << '\n';
+  std::cout << std::endl;
 
   EliteSelect(world, 10, 10);
 
-  std::cout << "\nElite Select(10,10)\n" << '\n';
+  std::cout << "\nElite Select(10,10)\n" << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  std::cout << '\n';
+  std::cout << std::endl;
 
   TournamentSelect(world, 5, 100);
   world.Update();
-  std::cout << "\nPost-Tourney Size = " << world.GetSize() << '\n' << '\n';
+  std::cout << "\nPost-Tourney Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  std::cout << '\n';
+  std::cout << std::endl;
 
   EliteSelect(world, 10, 10);
   world.Update();
-  std::cout << "\nPost-Elite Size = " << world.GetSize() << '\n' << '\n';
+  std::cout << "\nPost-Elite Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  std::cout << '\n' << '\n';
+  std::cout << std::endl << std::endl;
 
 
   emp::World<TestOrg1> ea_world;
   ea_world.SetPopStruct_Mixed(true);
   for (int i = 0; i < 100; i++) ea_world.Inject(i+200);
 
-  std::cout << "\nStart Size = " << ea_world.GetSize() << '\n';
+  std::cout << "\nStart Size = " << ea_world.GetSize() << std::endl;
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
-  std::cout << '\n';
+  std::cout << std::endl;
 
   TournamentSelect(ea_world, 5, 100);
   ea_world.Update();
-  std::cout << "\nPost-Tourney Size = " << ea_world.GetSize() << '\n';
+  std::cout << "\nPost-Tourney Size = " << ea_world.GetSize() << std::endl;
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
-  std::cout << '\n';
+  std::cout << std::endl;
 
   EliteSelect(ea_world, 10, 10);
   ea_world.Update();
-  std::cout << "Post-Elite Size = " << ea_world.GetSize() << '\n';
+  std::cout << "Post-Elite Size = " << ea_world.GetSize() << std::endl;
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
-  std::cout << '\n' << '\n';
+  std::cout << std::endl << std::endl;
 
   // Test grid Populations
   emp::Random random;
@@ -85,8 +85,8 @@ int main() {
     size_t id = random.GetUInt(grid_world.GetSize());
     if (grid_world.IsOccupied(id)) grid_world.DoBirth(grid_world[id], id);
   }
-  std::cout << '\n';
+  std::cout << std::endl;
   grid_world.PrintGrid();
-  std::cout << "Num orgs=" << grid_world.GetNumOrgs() << '\n';
-  std::cout << '\n';
+  std::cout << "Num orgs=" << grid_world.GetNumOrgs() << std::endl;
+  std::cout << std::endl;
 }

@@ -20,5 +20,5 @@ int main()
 
   double in = 100.0;
   auto results = test_set.EvalValues(in);
-  for (auto x : results) std::cout << x << '\n';
+  for (auto x : results) std::cout << x << std::endl;
 }

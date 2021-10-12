@@ -25,7 +25,7 @@ int main()
   test_imap[7] = 3.5;
   test_imap[8] = 4.0;
   test_imap[9] = 4.5;
-  std::cout << "Ping!" << '\n';
+  std::cout << "Ping!" << std::endl;
 
   emp::Random random;
   emp::vector<int> count((size_t)10,(int)0);
@@ -34,16 +34,16 @@ int main()
     count[id]++;
   }
   for (size_t id = 0; id < 10; id++) {
-    std::cout << id << " : " << count[id] << '\n';
+    std::cout << id << " : " << count[id] << std::endl;
   }
 
-  std::cout << "Start weight = " << test_imap.GetWeight() << '\n';
+  std::cout << "Start weight = " << test_imap.GetWeight() << std::endl;
 
   std::cout << "\n... adjusting set weights ...\n";
   for (size_t i = 0; i < 100000000; i++) {
     test_imap[random.GetUInt(SET_SIZE)] = random.GetDouble(0.0,5000.0);
   }
 
-  std::cout << "End weight = " << test_imap.GetWeight() << '\n';
+  std::cout << "End weight = " << test_imap.GetWeight() << std::endl;
 
 }

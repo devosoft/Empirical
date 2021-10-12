@@ -149,7 +149,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
   sys.RemoveOrg(id2);
 
   double mpd = sys.GetMeanPairwiseDistance();
-  std::cout << "MPD: " << mpd <<'\n';
+  std::cout << "MPD: " << mpd <<std::endl;
   REQUIRE(mpd == Approx(2.8));
 
   std::cout << "\nAddOrg 31 (id8; parent id7)\n";
@@ -234,10 +234,10 @@ TEST_CASE("Test Systematics", "[Evolve]")
   REQUIRE(sys.GetPhylogeneticDiversity() == 17);
   REQUIRE(sys.GetAveDepth() == Approx(4.272727));
 
-  std::cout << "id1 = " << id1 << '\n';
-  std::cout << "id2 = " << id2 << '\n';
-  std::cout << "id3 = " << id3 << '\n';
-  std::cout << "id4 = " << id4 << '\n';
+  std::cout << "id1 = " << id1 << std::endl;
+  std::cout << "id2 = " << id2 << std::endl;
+  std::cout << "id3 = " << id3 << std::endl;
+  std::cout << "id4 = " << id4 << std::endl;
 
   std::stringstream result;
 
@@ -437,8 +437,8 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
   auto id19 = sys.AddOrg(42, id17, 37);
   REQUIRE(id17->GetTotalOffspring() > 0);
 
-  std::cout << "id3 = " << id3 << '\n';
-  std::cout << "id4 = " << id4 << '\n';
+  std::cout << "id3 = " << id3 << std::endl;
+  std::cout << "id4 = " << id4 << std::endl;
 
   std::stringstream result;
 
@@ -779,7 +779,7 @@ TEST_CASE("Run world", "[evo]") {
     world.ResetHardware();
     world.Process(200);
     double fit0 = world.CalcFitnessID(0);
-    std::cout << (ud+1) << " : " << 0 << " : " << fit0 << '\n';
+    std::cout << (ud+1) << " : " << 0 << " : " << fit0 << std::endl;
 
     // Keep the best individual.
     EliteSelect(world, 1, 1);
@@ -797,13 +797,13 @@ TEST_CASE("Run world", "[evo]") {
 
   }
 
-  // std::cout << '\n';
+  // std::cout << std::endl;
   // world[0].PrintGenome();
-  // std::cout << '\n';
+  // std::cout << std::endl;
   // for (int i = 0; i < 16; i++) {
   //   std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   // }
-  // std::cout << '\n';
+  // std::cout << std::endl;
 }
 
 

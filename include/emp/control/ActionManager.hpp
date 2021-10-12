@@ -82,7 +82,7 @@ namespace emp {
     /// Print out the name of all actions maintained by this manager.
     void PrintNames(std::ostream & os=std::cout) {
       os << action_map.size() << " actions found:\n";
-      for (auto & x : action_map) os << "  " << x.first << '\n';
+      for (auto & x : action_map) os << "  " << x.first << std::endl;
     }
   };
 

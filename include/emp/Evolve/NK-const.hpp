@@ -78,7 +78,7 @@ namespace evo {
     /// [state]
     double GetFitness(size_t n, size_t state) const {
       emp_assert(state < state_count(), state, state_count());
-      // std::cout << n << " : " << state << " : " << landscape[n][state] << '\n';
+      // std::cout << n << " : " << state << " : " << landscape[n][state] << std::endl;
       return landscape[n][state];
     }
 

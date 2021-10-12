@@ -116,7 +116,7 @@ namespace D3 {
 
     void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
-      std::cout << filename.c_str() << '\n';
+      std::cout << filename.c_str() << std::endl;
       MAIN_THREAD_EM_ASM ({
         var filename = UTF8ToString($1);
         d3.json(filename, function(data){

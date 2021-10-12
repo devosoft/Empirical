@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   emp::cl::ArgManager args(argc, argv);
 
   if (args.size() < 3) {
-    std::cout << "Expected: " << args[0] << " [dict file] [shuffle positions ...]" << '\n';
+    std::cout << "Expected: " << args[0] << " [dict file] [shuffle positions ...]" << std::endl;
     exit(1);
   }
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   if (from_size && min_from_size > from_size) {
     std::cout << "Position value " << min_from_size - 1
               << " too high for string of length " << from_size
-              << '\n';
+              << std::endl;
     exit(2);
   }
   if (from_size) {
@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
     }
 
     if (test_count < 10) {
-      std::cout << "Converted '" << word << "' to '" << word2 << "'." << '\n';
+      std::cout << "Converted '" << word << "' to '" << word2 << "'." << std::endl;
     }
     if (emp::Has(words, word2)) {
-      std::cout << word << " -> " << word2 << '\n';
+      std::cout << word << " -> " << word2 << std::endl;
       okay_count++;
     }
     test_count++;
   }
-  std::cout << test_count << " words tested of legal length." << '\n';
-  std::cout << okay_count << " words tested of potential match." << '\n';
+  std::cout << test_count << " words tested of legal length." << std::endl;
+  std::cout << okay_count << " words tested of potential match." << std::endl;
 }

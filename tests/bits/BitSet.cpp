@@ -444,13 +444,13 @@ struct ImportExportTester {
     dest.Randomize(rand);
 
     for(size_t from_bit = 0; from_bit < source.GetSize(); ++from_bit) {
-      // std::cout << "---------" << '\n';
-      // std::cout << source << '\n';
+      // std::cout << "---------" << std::endl;
+      // std::cout << source << std::endl;
       dest.template Import(source, from_bit);
-      // std::cout << "=========" << '\n';
-      // std::cout << from_bit << '\n';
-      // std::cout << source << '\n';
-      // std::cout << dest << '\n';
+      // std::cout << "=========" << std::endl;
+      // std::cout << from_bit << std::endl;
+      // std::cout << source << std::endl;
+      // std::cout << dest << std::endl;
       for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
         REQUIRE(source.Get(i+from_bit) == dest.Get(i));
       }

@@ -19,11 +19,11 @@ int main()
   while (mancala.IsDone() == false) {
     size_t player = mancala.GetCurPlayer();
     char symbol = 'A' + (char) player;
-    std::cout << symbol << " move? " << '\n';
+    std::cout << symbol << " move? " << std::endl;
     std::cin >> move;
 
     if (move < 1 || move > 6) {
-      std::cout << "Invalid move!! (choose a value 1 to 6)" <<  '\n';
+      std::cout << "Invalid move!! (choose a value 1 to 6)" <<  std::endl;
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
@@ -31,7 +31,7 @@ int main()
     move += player * 7;
 
     if (mancala[move] == 0) {
-      std::cout << "Error: Cannot move from empty pit!" << '\n';
+      std::cout << "Error: Cannot move from empty pit!" << std::endl;
       continue;
     }
 
@@ -43,7 +43,7 @@ int main()
   const size_t scoreA = mancala.ScoreA();
   const size_t scoreB = mancala.ScoreB();
 
-  if (scoreA == scoreB) { std::cout << "TIE GAME!!" << '\n'; }
-  else if (scoreA > scoreB) { std::cout << "A Wins!!" << '\n'; }
-  else { std::cout << "B Wins!!" << '\n'; }
+  if (scoreA == scoreB) { std::cout << "TIE GAME!!" << std::endl; }
+  else if (scoreA > scoreB) { std::cout << "A Wins!!" << std::endl; }
+  else { std::cout << "B Wins!!" << std::endl; }
 }

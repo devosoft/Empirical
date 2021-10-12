@@ -75,7 +75,7 @@ namespace emp {
       if (HasObject(obj_name) == true) {
         std::stringstream ss;
         ss << "Building new object of type '" << type_keyword << "' named '"
-           << obj_name << "' when one already exists. Replacing." << '\n';
+           << obj_name << "' when one already exists. Replacing." << std::endl;
         NotifyError(ss.str());
         delete name_map[obj_name];
       }
@@ -87,7 +87,7 @@ namespace emp {
       if (HasObject(obj_name) == false) {
         std::stringstream ss;
         ss << "Trying to use object of type '" << type_keyword << "' named '"
-           << obj_name << "', but does not exist. Ignoring." << '\n';
+           << obj_name << "', but does not exist. Ignoring." << std::endl;
         NotifyError(ss.str());
         return;
       }
@@ -98,7 +98,7 @@ namespace emp {
       if (cur_obj == nullptr) {
         std::stringstream ss;
         ss << "Must build new '" << type_keyword << "' object before using command '"
-           << command_keyword << "'.  Ignoring." << '\n';
+           << command_keyword << "'.  Ignoring." << std::endl;
         NotifyError(ss.str());
         return false;
       }

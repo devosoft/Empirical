@@ -12,12 +12,12 @@
 
 int Sum3(int x, int y, int z) { return x+y+z; }
 
-void PrintTwice(int x) { std::cout << x << x << '\n'; }
-void PrintProduct(int x, int y) { std::cout << (x * y) << '\n'; }
+void PrintTwice(int x) { std::cout << x << x << std::endl; }
+void PrintProduct(int x, int y) { std::cout << (x * y) << std::endl; }
 
 int main()
 {
-  std::cout << "Ping!" << '\n';
+  std::cout << "Ping!" << std::endl;
 
   std::unordered_map<std::tuple<int,int,int>, double, emp::TupleHash<int,int,int>> test_map;
 
@@ -31,12 +31,12 @@ int main()
   int z = 22;
   auto test_tup = std::make_tuple(x,y,z);
   std::cout << "Sum3(" << x << "," << y << "," << z << ") = "
-	    << emp::ApplyTuple(Sum3, test_tup) << '\n';
+	    << emp::ApplyTuple(Sum3, test_tup) << std::endl;
   std::cout << "Prod3(" << x << "," << y << "," << z << ") = "
-	    << emp::ApplyTuple([](int x, int y, int z){ return x*y*z; }, test_tup) << '\n';
+	    << emp::ApplyTuple([](int x, int y, int z){ return x*y*z; }, test_tup) << std::endl;
 
   std::cout << "CombineHash(" << x << "," << y << "," << z << ") = "
-      << emp::ApplyTuple(emp::CombineHash<int,int,int>, test_tup) << '\n';
+      << emp::ApplyTuple(emp::CombineHash<int,int,int>, test_tup) << std::endl;
 
   std::cout << "\nPrintTwice with TupleIterate:\n";
   emp::TupleIterate(tup, PrintTwice);

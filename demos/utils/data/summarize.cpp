@@ -15,12 +15,12 @@
 #include "../../../include/emp/tools/string_utils.hpp"
 
 void ProcessFile(const std::string & filename, std::ostream & os=std::cout) {
-  os << "Processing file: " << filename << '\n';
+  os << "Processing file: " << filename << std::endl;
   std::ifstream is(filename);
 
   // Make sure the file opened correctly.
   if (is.fail()) {
-    std::cerr << "Unable to open config file '" << filename << "'. Ignoring." << '\n';
+    std::cerr << "Unable to open config file '" << filename << "'. Ignoring." << std::endl;
     return;
   }
 
@@ -73,10 +73,10 @@ void ProcessFile(const std::string & filename, std::ostream & os=std::cout) {
   }
 
   // Output the results.
-  os << "Min: " << col_min << '\n';
-  os << "Max: " << col_max << '\n';
-  os << "Ave: " << col_ave << '\n';
-  os << "Tot: " << col_total << '\n';
+  os << "Min: " << col_min << std::endl;
+  os << "Max: " << col_max << std::endl;
+  os << "Ave: " << col_ave << std::endl;
+  os << "Tot: " << col_total << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   const bool verbose = emp::cl::use_arg(args, "-v");
 
   if (args.size() < 2) {
-    std::cerr << "Must provide at least one filename!" << '\n';
+    std::cerr << "Must provide at least one filename!" << std::endl;
     exit(1);
   }
 

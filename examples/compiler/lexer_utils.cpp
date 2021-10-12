@@ -18,7 +18,7 @@ void Test(const emp::DFA & dfa, const std::string & str) {
   std::cout << "String: " << str
             << "  valid=" << (out_state != -1)
             << "  stop=" << dfa.IsStop(out_state)
-            << '\n';
+            << std::endl;
 }
 
 void Test(const emp::NFA & nfa, const std::string & str) {
@@ -27,7 +27,7 @@ void Test(const emp::NFA & nfa, const std::string & str) {
   std::cout << "String: " << str
             << "  valid=" << nfa_state.IsActive()
             << "  stop=" << nfa_state.IsStop()
-            << '\n';
+            << std::endl;
 }
 
 int main()
@@ -41,7 +41,7 @@ int main()
   nfa2c.AddFreeTransition(0,2);
   nfa2c.SetStop(2);
 
-  // std::cout << "NFA size = " << nfa2c.GetSize() << '\n';
+  // std::cout << "NFA size = " << nfa2c.GetSize() << std::endl;
   // Test(nfa2c, "ababaabbab");
   // Test(nfa2c, "cc");
   // Test(nfa2c, "ccc");
@@ -50,11 +50,11 @@ int main()
   // Test(nfa2c, "ccbabab");
   // Test(nfa2c, "ccbababc");
 
-  // std::cout << '\n';
+  // std::cout << std::endl;
   // auto dfa2c = to_DFA(nfa2c);
   // dfa2c.Print();
 
-  // std::cout << "DFA size = " << dfa2c.GetSize() << '\n';
+  // std::cout << "DFA size = " << dfa2c.GetSize() << std::endl;
   // Test(dfa2c, "ababaabbab");
   // Test(dfa2c, "cc");
   // Test(dfa2c, "ccc");
@@ -68,9 +68,9 @@ int main()
   emp::NFA nfa2f = to_NFA(re2f);
   emp::DFA dfa2f = to_DFA(nfa2f);
   re2f.PrintDebug();
-  std::cout << "RegEx NFA size = " << nfa2f.GetSize() << '\n';
+  std::cout << "RegEx NFA size = " << nfa2f.GetSize() << std::endl;
   nfa2f.Print();
-  std::cout << "RegEx DFA size = " << dfa2f.GetSize() << '\n';
+  std::cout << "RegEx DFA size = " << dfa2f.GetSize() << std::endl;
   dfa2f.Print();
 
   Test(dfa2f, "a");
@@ -83,7 +83,7 @@ int main()
   Test(dfa2f, "defed");
   Test(dfa2f, "ff");
 
-  std::cout << "\nAll same case tests..." << '\n';
+  std::cout << "\nAll same case tests..." << std::endl;
   emp::RegEx re_lower("[a-z]+");
   emp::RegEx re_upper("[A-Z]+");
   emp::RegEx re_inc("[a-z]+[A-Z]+");
@@ -100,7 +100,7 @@ int main()
   nfa_lower.Print();
   nfa_all.Print();
   dfa_all.Print();
-  std::cout << "=== nfa_lower ===" << '\n';
+  std::cout << "=== nfa_lower ===" << std::endl;
   Test(nfa_lower, "abc");
   Test(nfa_lower, "DEF");
   Test(nfa_lower, "abcDEF");
@@ -109,7 +109,7 @@ int main()
   Test(nfa_lower, "abcdefghijklmnopqrstuvwxyz");
   Test(nfa_lower, "ABC-DEF");
 
-  std::cout << "=== dfa_all ===" << '\n';
+  std::cout << "=== dfa_all ===" << std::endl;
   Test(dfa_all, "abc");
   Test(dfa_all, "DEF");
   Test(dfa_all, "abcDEF");
@@ -123,9 +123,9 @@ int main()
 
   // Generate examples of DFAs
   std::cout << "DFA Examples:\n"
-            << "dfa_lower example: " << emp::FindExample(dfa_lower) << '\n'
-            << "dfa_upper example: " << emp::FindExample(dfa_upper) << '\n'
-            << "dfa_inc example:   " << emp::FindExample(dfa_inc) << '\n'
-            << "dfa_all example:   " << emp::FindExample(dfa_all) << '\n'
-            << "dfa_inc size 5 example: " << emp::FindExample(dfa_inc, 5) << '\n';
+            << "dfa_lower example: " << emp::FindExample(dfa_lower) << std::endl
+            << "dfa_upper example: " << emp::FindExample(dfa_upper) << std::endl
+            << "dfa_inc example:   " << emp::FindExample(dfa_inc) << std::endl
+            << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl
+            << "dfa_inc size 5 example: " << emp::FindExample(dfa_inc, 5) << std::endl;
 }

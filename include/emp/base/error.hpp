@@ -22,7 +22,7 @@ namespace emp {
     std::cerr << "Fatal Error (In " << filename << " line " << line
               <<  "): ";
     (std::cerr << ... << args);
-    std::cerr << '\n';
+    std::cerr << std::endl;
     abort();
   }
 

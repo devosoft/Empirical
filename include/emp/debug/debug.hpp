@@ -16,7 +16,7 @@
 #include <string>
 #include <type_traits>
 
-#define EMP_DEBUG_PRINT(...) std::cout << "[" << #__VA_ARGS__ << "] = " << __VA_ARGS__ << '\n'
+#define EMP_DEBUG_PRINT(...) std::cout << "[" << #__VA_ARGS__ << "] = " << __VA_ARGS__ << std::endl
 
 namespace emp {
 
@@ -39,8 +39,8 @@ namespace emp {
   static void Depricated(const std::string & name, const std::string & desc="") {
     static std::set<std::string> name_set;
     if (name_set.count(name) == 0) {
-      std::cerr << "Deprication WARNING: " << name << '\n';
-      if (desc != "") std::cerr << desc << '\n';
+      std::cerr << "Deprication WARNING: " << name << std::endl;
+      if (desc != "") std::cerr << desc << std::endl;
       name_set.insert(name);
     }
   }

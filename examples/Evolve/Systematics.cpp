@@ -26,10 +26,10 @@ int main()
   std::cout << "\nRemoveOrg (id4)\n";
   sys.RemoveOrg(id4);
 
-  std::cout << "id1 = " << id1 << '\n';
-  std::cout << "id2 = " << id2 << '\n';
-  std::cout << "id3 = " << id3 << '\n';
-  std::cout << "id4 = " << id4 << '\n';
+  std::cout << "id1 = " << id1 << std::endl;
+  std::cout << "id2 = " << id2 << std::endl;
+  std::cout << "id3 = " << id3 << std::endl;
+  std::cout << "id4 = " << id4 << std::endl;
 
   std::cout << "\nLineage:\n";
   sys.PrintLineage(id4);

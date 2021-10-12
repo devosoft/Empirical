@@ -163,18 +163,18 @@ namespace emp {
       bool ok = true;
 
       if (verbose) {
-        ss << prefix << "Scanning: emp::SlideShow" << '\n';
+        ss << prefix << "Scanning: emp::SlideShow" << std::endl;
       }
 
       if (div_name == "") {
-        ss << "Warning: Must have a div name in SlideShow!" << '\n';
+        ss << "Warning: Must have a div name in SlideShow!" << std::endl;
         ok = false;
       }
 
       // Make sure the current slide position is valid.
       if (cur_pos < 0 || cur_pos >= (int) slides.size()) {
         ss << "Error: Show has " << slides.size() << " slides.  Current slide = "
-           << cur_pos << '\n';
+           << cur_pos << std::endl;
         ok = false;
       }
 

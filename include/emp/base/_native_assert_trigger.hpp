@@ -28,8 +28,8 @@ namespace emp {
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
     if constexpr ( emp::is_streamable<decltype( std::cerr ), T>::value ) {
-      std::cerr << name << ": [" << val << "]" << '\n';
-    } else std::cerr << name << ": (non-streamable type)" << '\n';
+      std::cerr << name << ": [" << val << "]" << std::endl;
+    } else std::cerr << name << ": (non-streamable type)" << std::endl;
 
     assert_print(std::forward<EXTRA>(extra)...);
   }
@@ -37,7 +37,7 @@ namespace emp {
   template <typename... EXTRA>
   bool assert_trigger(std::string filename, size_t line, std::string expr, EXTRA &&... extra) {
     std::cerr << "Assert Error (In " << filename << " line " << line
-              <<  "): " << expr << '\n';
+              <<  "): " << expr << std::endl;
     assert_print(std::forward<EXTRA>(extra)...);
 
     return true; // do process subsequent abort

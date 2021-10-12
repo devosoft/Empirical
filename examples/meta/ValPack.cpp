@@ -11,17 +11,17 @@
 
 #include "emp/meta/ValPack.hpp"
 
-#define EMP_PRINT_VAL(X) std::cout << #X << " = " << X << '\n'
-#define EMP_PRINT_PACK(X) std::cout << #X << " = "; X::PrintVals(); std::cout << '\n'
+#define EMP_PRINT_VAL(X) std::cout << #X << " = " << X << std::endl
+#define EMP_PRINT_PACK(X) std::cout << #X << " = "; X::PrintVals(); std::cout << std::endl
 
 int main()
 {
   // using rise_t = emp::ValPack<1,2,3,4,5,6,7,8,9,10>;
   using rise_t = emp::ValPackRange<1,11>;
-  std::cout << "using rise_t = emp::ValPack<1,2,3,4,5,6,7,8,9,10>" << '\n';
+  std::cout << "using rise_t = emp::ValPack<1,2,3,4,5,6,7,8,9,10>" << std::endl;
   std::cout << "Printing Pack: emp::ValPack<";
   rise_t::PrintVals();
-  std::cout << '>' << '\n';
+  std::cout << '>' << std::endl;
   EMP_PRINT_VAL(rise_t::GetSize());
   EMP_PRINT_VAL(rise_t::Has(0));
   EMP_PRINT_VAL(rise_t::Has(10));
@@ -34,10 +34,10 @@ int main()
   EMP_PRINT_VAL(rise_t::Product());
 
   using fib_t = emp::ValPack<0,1,1,2,3,5,8,13,21,34>;
-  std::cout << "\nusing fib_t  = emp::ValPack<0,1,1,2,3,5,8,13,21,34>" << '\n';
+  std::cout << "\nusing fib_t  = emp::ValPack<0,1,1,2,3,5,8,13,21,34>" << std::endl;
   std::cout << "Printing Pack: emp::ValPack<";
   fib_t::PrintVals();
-  std::cout << '>' << '\n';
+  std::cout << '>' << std::endl;
   EMP_PRINT_VAL(fib_t::GetSize());
   EMP_PRINT_VAL(fib_t::Has(0));
   EMP_PRINT_VAL(fib_t::Has(10));
@@ -51,7 +51,7 @@ int main()
 
   std::cout << "\nTesting sorting and removing.\n";
   using test_t = emp::ValPack<0,1,2,1,3,4,1,4,5,6,1,1,-1,-1>::push_back<0>;
-  std::cout << "Starting pack: ";  test_t::PrintVals(); std::cout << '\n';
+  std::cout << "Starting pack: ";  test_t::PrintVals(); std::cout << std::endl;
   EMP_PRINT_VAL(test_t::Min());
   EMP_PRINT_VAL(test_t::Max());
   EMP_PRINT_PACK(test_t);
@@ -63,7 +63,7 @@ int main()
   EMP_PRINT_PACK(t1::append<t1>);
 
   emp::ValPack<1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25>::PrintVals();
-  std::cout << '\n';
+  std::cout << std::endl;
 
   EMP_PRINT_PACK(emp::pack::reverse<test_t>);
   EMP_PRINT_PACK(emp::pack::uniq<test_t>);
@@ -75,5 +75,5 @@ int main()
   // Try out ValPAck with doubles...
   using t2 = emp::ValPack<'t','e','s','t','i','n','g','!'>;
   EMP_PRINT_PACK(t2);
-  std::cout << "As string: " << t2::ToString() << '\n';
+  std::cout << "As string: " << t2::ToString() << std::endl;
 }

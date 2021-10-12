@@ -32,7 +32,7 @@ struct Test_Code_Block_HTMLLayout : public emp::web::BaseTest {
   Test_Code_Block_HTMLLayout()
   : BaseTest({"emp_test_container"})
   {
-    std::string code_str = "// c++ comment\nint i = 3;\nstd::cout << i << '\n';";
+    std::string code_str = "// c++ comment\nint i = 3;\nstd::cout << i << std::endl;";
     emp::prefab::CodeBlock code(code_str, "c++", "code_block");
 
     Doc("emp_test_container")

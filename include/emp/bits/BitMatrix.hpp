@@ -160,7 +160,7 @@ namespace emp {
         for (size_t x = 0; x < COLS; x++) {
           os << bits[ToID(x,y)];
         }
-        os << '\n';
+        os << std::endl;
       }
     }
 

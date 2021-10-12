@@ -7,7 +7,7 @@
 #include "tools/BitSet.h"
 
 int main() {
-  std::cout << "Testing EventDrivenGP." << '\n';
+  std::cout << "Testing EventDrivenGP." << std::endl;
 
   // Some convenient type aliases:
   using inst_t = typename emp::EventDrivenGP::inst_t;
@@ -36,21 +36,21 @@ int main() {
   std::ifstream prog2_fstream("EventDrivenGP_2.gp");
   cpu1.Load(prog2_fstream);
 
-  std::cout << "=====================================" << '\n';
-  std::cout << "CPU 0's PROGRAM: " << '\n';
-  std::cout << "Abbreviated version:" << '\n';
+  std::cout << "=====================================" << std::endl;
+  std::cout << "CPU 0's PROGRAM: " << std::endl;
+  std::cout << "Abbreviated version:" << std::endl;
   cpu0.PrintProgram();
-  std::cout << "Full version:" << '\n';
+  std::cout << "Full version:" << std::endl;
   cpu0.PrintProgramFull();
-  std::cout << "=====================================" << '\n';
+  std::cout << "=====================================" << std::endl;
 
-  std::cout << "=====================================" << '\n';
-  std::cout << "CPU 1's PROGRAM: " << '\n';
-  std::cout << "Abbreviated version:" << '\n';
+  std::cout << "=====================================" << std::endl;
+  std::cout << "CPU 1's PROGRAM: " << std::endl;
+  std::cout << "Abbreviated version:" << std::endl;
   cpu1.PrintProgram();
-  std::cout << "Full version:" << '\n';
+  std::cout << "Full version:" << std::endl;
   cpu1.PrintProgramFull();
-  std::cout << "=====================================" << '\n';
+  std::cout << "=====================================" << std::endl;
 
   // Configure hardware.
   cpu0.SetMinBindThresh(1.0);

@@ -55,12 +55,12 @@ TEST_CASE("Test DataRange", "[data]") {
 
     data.Add(29,28);
 
-    // std::cout << "=> Added 27, 28, and 29" << '\n';
-    // std::cout << "Current = " << data.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data.GetMean() << '\n';
-    // std::cout << "Min     = " << data.GetMin() << '\n';
-    // std::cout << "Max     = " << data.GetMax() << '\n';
+    // std::cout << "=> Added 27, 28, and 29" << std::endl;
+    // std::cout << "Current = " << data.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data.GetMean() << std::endl;
+    // std::cout << "Min     = " << data.GetMin() << std::endl;
+    // std::cout << "Max     = " << data.GetMax() << std::endl;
 
     REQUIRE(data.GetCurrent() == 28);
     REQUIRE(data.GetTotal() == 84);
@@ -73,12 +73,12 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(data.GetPercentile(100) == 29);
 
     data.Add(32);
-    // std::cout << "\n=> Added 32" << '\n';
-    // std::cout << "Current = " << data.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data.GetMean() << '\n';
-    // std::cout << "Min     = " << data.GetMin() << '\n';
-    // std::cout << "Max     = " << data.GetMax() << '\n';
+    // std::cout << "\n=> Added 32" << std::endl;
+    // std::cout << "Current = " << data.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data.GetMean() << std::endl;
+    // std::cout << "Min     = " << data.GetMin() << std::endl;
+    // std::cout << "Max     = " << data.GetMax() << std::endl;
 
     REQUIRE(data.GetCurrent() == 32);
     REQUIRE(data.GetTotal() == 116);
@@ -92,12 +92,12 @@ TEST_CASE("Test DataRange", "[data]") {
 
 
     data.Reset();
-    // std::cout << "\n=> Reset!" << '\n';
-    // std::cout << "Current = " << data.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data.GetMean() << '\n';
-    // std::cout << "Min     = " << data.GetMin() << '\n';
-    // std::cout << "Max     = " << data.GetMax() << '\n';
+    // std::cout << "\n=> Reset!" << std::endl;
+    // std::cout << "Current = " << data.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data.GetMean() << std::endl;
+    // std::cout << "Min     = " << data.GetMin() << std::endl;
+    // std::cout << "Max     = " << data.GetMax() << std::endl;
 
     REQUIRE(data.GetCurrent() == 32);
     REQUIRE(data.GetTotal() == 0);
@@ -110,12 +110,12 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(std::isnan(data.GetPercentile(100)));
 
     data.Add(100,200,300,400,500);
-    // std::cout << "\nAdded 100,200,300,400,500" << '\n';
-    // std::cout << "Current = " << data.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data.GetMean() << '\n';
-    // std::cout << "Min     = " << data.GetMin() << '\n';
-    // std::cout << "Max     = " << data.GetMax() << '\n';
+    // std::cout << "\nAdded 100,200,300,400,500" << std::endl;
+    // std::cout << "Current = " << data.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data.GetMean() << std::endl;
+    // std::cout << "Min     = " << data.GetMin() << std::endl;
+    // std::cout << "Max     = " << data.GetMax() << std::endl;
 
     REQUIRE(data.GetCurrent() == 500);
     REQUIRE(data.GetTotal() == 1500);
@@ -129,12 +129,12 @@ TEST_CASE("Test DataRange", "[data]") {
 
     data.AddPull([](){return -800;});
     data.PullData();
-    // std::cout << "\nAdded -800 via PullData()" << '\n';
-    // std::cout << "Current = " << data.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data.GetMean() << '\n';
-    // std::cout << "Min     = " << data.GetMin() << '\n';
-    // std::cout << "Max     = " << data.GetMax() << '\n';
+    // std::cout << "\nAdded -800 via PullData()" << std::endl;
+    // std::cout << "Current = " << data.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data.GetMean() << std::endl;
+    // std::cout << "Min     = " << data.GetMin() << std::endl;
+    // std::cout << "Max     = " << data.GetMax() << std::endl;
 
     REQUIRE(data.GetCurrent() == -800);
     REQUIRE(data.GetTotal() == 700);
@@ -148,12 +148,12 @@ TEST_CASE("Test DataRange", "[data]") {
 
     data.AddPullSet([](){return emp::vector<int>({1600,0,0});});
     data.PullData(); // Remember that this also runs the function that returns -800
-    // std::cout << "\nAdded another -800, a 1600 and two 0's via PullData()" << '\n';
-    // std::cout << "Current = " << data.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data.GetMean() << '\n';
-    // std::cout << "Min     = " << data.GetMin() << '\n';
-    // std::cout << "Max     = " << data.GetMax() << '\n';
+    // std::cout << "\nAdded another -800, a 1600 and two 0's via PullData()" << std::endl;
+    // std::cout << "Current = " << data.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data.GetMean() << std::endl;
+    // std::cout << "Min     = " << data.GetMin() << std::endl;
+    // std::cout << "Max     = " << data.GetMax() << std::endl;
 
     REQUIRE(data.GetCurrent() == 0);
     REQUIRE(data.GetTotal() == 1500);
@@ -191,12 +191,12 @@ TEST_CASE("Test DataArchive", "[data]") {
     // data2.PrintDebug();
 
     data2.Add(1,2,3,4,5,6,7,9,8);
-    // std::cout << "\nSetup data2 with values 1 through 9" << '\n';
-    // std::cout << "Current = " << data2.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data2.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data2.GetMean() << '\n';
-    // std::cout << "Min     = " << data2.GetMin() << '\n';
-    // std::cout << "Max     = " << data2.GetMax() << '\n';
+    // std::cout << "\nSetup data2 with values 1 through 9" << std::endl;
+    // std::cout << "Current = " << data2.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data2.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data2.GetMean() << std::endl;
+    // std::cout << "Min     = " << data2.GetMin() << std::endl;
+    // std::cout << "Max     = " << data2.GetMax() << std::endl;
 
     REQUIRE(data2.GetCurrent() == 8);
     REQUIRE(data2.GetTotal() == 45);
@@ -243,18 +243,18 @@ TEST_CASE("Test DataArchive", "[data]") {
 TEST_CASE("Test DataStats", "[data]") {
     emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Stats, emp::data::Log> data3;
 
-    // std::cout << "\nSetup data3 with values 1 through 8 with an extra 8" << '\n';
+    // std::cout << "\nSetup data3 with values 1 through 8 with an extra 8" << std::endl;
 
     data3.Add(1,2,3,4,5,6,7,8,8);
-    // std::cout << "Current = " << data3.GetCurrent() << '\n';
-    // std::cout << "Total   = " << data3.GetTotal() << '\n';
-    // std::cout << "Mean    = " << data3.GetMean() << '\n';
-    // std::cout << "Min     = " << data3.GetMin() << '\n';
-    // std::cout << "Max     = " << data3.GetMax() << '\n';
-    // std::cout << "Variance= " << data3.GetVariance() << '\n';
-    // std::cout << "Std Dev = " << data3.GetStandardDeviation() << '\n';
-    // std::cout << "Skew    = " << data3.GetSkew() << '\n';
-    // std::cout << "Kurtosis= " << data3.GetKurtosis() << '\n';
+    // std::cout << "Current = " << data3.GetCurrent() << std::endl;
+    // std::cout << "Total   = " << data3.GetTotal() << std::endl;
+    // std::cout << "Mean    = " << data3.GetMean() << std::endl;
+    // std::cout << "Min     = " << data3.GetMin() << std::endl;
+    // std::cout << "Max     = " << data3.GetMax() << std::endl;
+    // std::cout << "Variance= " << data3.GetVariance() << std::endl;
+    // std::cout << "Std Dev = " << data3.GetStandardDeviation() << std::endl;
+    // std::cout << "Skew    = " << data3.GetSkew() << std::endl;
+    // std::cout << "Kurtosis= " << data3.GetKurtosis() << std::endl;
 
     REQUIRE(data3.GetCurrent() == 8);
     REQUIRE(data3.GetTotal() == 44);

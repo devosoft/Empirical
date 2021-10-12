@@ -19,7 +19,7 @@ void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
     std::cout << "[" << cpu.GetReg(i) << "] ";
   }
-  std::cout << " IP=" << cpu.GetIP() << '\n';
+  std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
 constexpr size_t POP_SIZE = 500;
@@ -79,7 +79,7 @@ int main()
     if (!hit_end) {
         fitness = 0;
     }
-    // std::cout << *org << " Fitness: " << fitness << '\n';
+    // std::cout << *org << " Fitness: " << fitness << std::endl;
 
     return fitness;
 };
@@ -137,7 +137,7 @@ std::function<double(const emp::AvidaGP&)> bad_hint = [](const emp::AvidaGP & or
     world.ResetHardware();
     world.Process(200);
     double fit0 = world.CalcFitnessID(0);
-    std::cout << (ud+1) << " : " << resources[0].GetAmount() << " "  << resources[1].GetAmount() << " : " << fit0 << '\n';
+    std::cout << (ud+1) << " : " << resources[0].GetAmount() << " "  << resources[1].GetAmount() << " : " << fit0 << std::endl;
 
     // Keep the best individual.
     EliteSelect(world, 1, 1);
@@ -152,14 +152,14 @@ std::function<double(const emp::AvidaGP&)> bad_hint = [](const emp::AvidaGP & or
     world.DoMutations(1);
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
   world[0].PrintGenome();
   world.GetOrg(0).Process(200);
-  std::cout << '\n';
+  std::cout << std::endl;
   for (int i = 0; i < 32; i++) {
     std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   }
-  std::cout << '\n';
+  std::cout << std::endl;
 
   return 0;
 }

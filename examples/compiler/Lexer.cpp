@@ -28,6 +28,6 @@ int main()
   emp::Token token = 1;
   while (token > 0) {
     token = lexer.Process(ss);
-    std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << '\n';
+    std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
   }
 }

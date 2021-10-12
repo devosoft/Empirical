@@ -521,22 +521,22 @@ namespace emp {
     }
 
     /// For debugging: print the internal representation of the regex.
-    void PrintInternal() const { head.Print(std::cout); std::cout << '\n'; }
+    void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
 
     /// For debugging: print any internal notes generated about this regex.
     void PrintNotes() const {
       for (const std::string & n : notes) {
-        std::cout << n << '\n';
+        std::cout << n << std::endl;
       }
     }
 
     /// Print general debuging information about this regex.
     void PrintDebug() const {
       if (notes.size()) {
-        std::cout << "NOTES:" << '\n';
+        std::cout << "NOTES:" << std::endl;
         PrintNotes();
       }
-      std::cout << "RegEx: " << to_escaped_string(regex) << '\n';
+      std::cout << "RegEx: " << to_escaped_string(regex) << std::endl;
       std::cout << "INTERNAL: ";
       PrintInternal();
     }

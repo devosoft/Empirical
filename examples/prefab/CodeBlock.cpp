@@ -15,7 +15,7 @@ int main()
   std::string my_code =
   R"(
       int num = 9;
-      std::cout << num << " is a square number" << '\n';
+      std::cout << num << " is a square number" << std::endl;
   )";
 
   emp::prefab::CodeBlock code_block(my_code, "c++");

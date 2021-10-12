@@ -14,13 +14,13 @@ int main()
   std::function<void(int,int,int&)> sum_fun = [](int x, int y, int& result){ result=x+y; };
 
   emp::Action<void(int,int,int&)> sum_action(sum_fun, "sum");
-  std::cout << "Ping!" << '\n';
+  std::cout << "Ping!" << std::endl;
   int result;
   sum_action.Call(5,6,result);
-  std::cout << "5+6 = " << result << '\n';
+  std::cout << "5+6 = " << result << std::endl;
 
   // Test actions with return values...
   std::function<int(int,int)> mult_fun = [](int x, int y){ return x*y; };
   emp::Action<int(int,int)> mult_action(mult_fun, "mult");
-  std::cout << "5*6 = " << mult_action.Call(5,6) << '\n';
+  std::cout << "5*6 = " << mult_action.Call(5,6) << std::endl;
 }

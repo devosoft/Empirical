@@ -33,7 +33,7 @@ namespace emp {
   /// Send msg to cerr if in C++, or show msg in an alert box if compiled to Javascript
   /// Input can be any number of arguments of any types as long as the can be converted to
   /// strings with emp::to_string().
-  void Alert(const std::string & msg) { std::cerr << msg << '\n'; }
+  void Alert(const std::string & msg) { std::cerr << msg << std::endl; }
 #endif
   /// @cond TEMPLATES
   template <typename... TYPE_SET>

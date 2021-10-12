@@ -29,7 +29,7 @@ int GetValue(const std::string & query,
 
   std::cout << query;
   if (max_val >= 0) std::cout << " [max=" << max_val << "]";
-  std::cout << ":" << '\n';
+  std::cout << ":" << std::endl;
 
   int out_val;
   std::cin >> out_val;
@@ -49,18 +49,18 @@ int main(int argc, char* argv[])
     graph_type = std::stoi( args[cur_arg++] );
   }
   else { // No command-line arg; request input from user.
-    std::cout << "What type of graph?" << '\n'
-              << "  0 - Random" << '\n'
-              << "  1 - Chain" << '\n'
-              << "  2 - Ring" << '\n'
-              << "  3 - Tree" << '\n'
-              << "  4 - Grid" << '\n'
-              << "  5 - Lossy Grid" << '\n'
-              << "  6 - Linked Cliques" << '\n'
-	            << "  7 - Hamiltonion Cycle (with solution)" << '\n'
-              << "  8 - Random DAG" << '\n'
-              << "  9 - Multiple Random Components" << '\n'
-              << " 10 - Random Weighted" << '\n';
+    std::cout << "What type of graph?" << std::endl
+              << "  0 - Random" << std::endl
+              << "  1 - Chain" << std::endl
+              << "  2 - Ring" << std::endl
+              << "  3 - Tree" << std::endl
+              << "  4 - Grid" << std::endl
+              << "  5 - Lossy Grid" << std::endl
+              << "  6 - Linked Cliques" << std::endl
+	            << "  7 - Hamiltonion Cycle (with solution)" << std::endl
+              << "  8 - Random DAG" << std::endl
+              << "  9 - Multiple Random Components" << std::endl
+              << " 10 - Random Weighted" << std::endl;
     std::cin >> graph_type;
   }
 
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   std::string filename;
 
   if (graph_type == 0) {
-    std::cout << "Generating a Random Graph." << '\n';
+    std::cout << "Generating a Random Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
     emp::Graph graph = build_graph_random(nodes, edges, random);
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 1) {
-    std::cout << "Generating a Chain Graph." << '\n';
+    std::cout << "Generating a Chain Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     emp::Graph graph = build_graph_grid(nodes, 1, random);
     filename = emp::to_string("chain-", nodes, '-', nodes-1);
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 2) {
-    std::cout << "Generating a Ring Graph." << '\n';
+    std::cout << "Generating a Ring Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     emp::Graph graph = build_graph_ring(nodes, random);
     filename = emp::to_string("ring-", nodes, '-', nodes);
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 3) {
-    std::cout << "Generating a Tree Graph." << '\n';
+    std::cout << "Generating a Tree Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     emp::Graph graph = build_graph_tree(nodes, random);
     filename = emp::to_string("tree-", nodes, '-', nodes-1);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 4) {
-    std::cout << "Generating a Grid Graph." << '\n';
+    std::cout << "Generating a Grid Graph." << std::endl;
     int rows = GetValue("How many rows?", args, cur_arg, 100);
     int cols = GetValue("How many columns?", args, cur_arg, 100);
     emp::Graph graph = build_graph_grid(rows, cols, random);
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 5) {
-    std::cout << "Generating a Lossy Grid Graph." << '\n';
+    std::cout << "Generating a Lossy Grid Graph." << std::endl;
     int rows = GetValue("How many rows?", args, cur_arg, 100);
     int cols = GetValue("How many columns?", args, cur_arg, 100);
     int max_edges = rows*(cols-1) + cols*(rows-1);
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 6) {
-    std::cout << "Generating a Linked Cliques Graph." << '\n';
+    std::cout << "Generating a Linked Cliques Graph." << std::endl;
     int clique_count = GetValue("How many cliques?", args, cur_arg, 100);
     int clique_size = GetValue("How big is each clique?", args, cur_arg, 100);
     int v_count = clique_count * clique_size;
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 7) {
-    std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << '\n';
+    std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
     size_t nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     size_t edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
 
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
     }
   }
   else if (graph_type == 8) {
-    std::cout << "Generating a Random DAG." << '\n';
+    std::cout << "Generating a Random DAG." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
     emp::Graph graph = build_graph_dag(nodes, edges, random);
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
     graph.PrintDirected();
   }
   else if (graph_type == 9) {
-    std::cout << "Generating a Multiple Random Graph Components." << '\n';
+    std::cout << "Generating a Multiple Random Graph Components." << std::endl;
     size_t components = GetValue("How many components?", args, cur_arg, 100);
     size_t min_nodes = GetValue("Minimum number of vertices per component?", args, cur_arg, 100);
     size_t max_nodes = GetValue("Maximum number of vertices per component?", args, cur_arg, 100);
@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 10) {
-    std::cout << "Generating a Random WEIGHTED Graph." << '\n';
+    std::cout << "Generating a Random WEIGHTED Graph." << std::endl;
     size_t nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     size_t edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
     size_t min_weight = GetValue("Minimum Weight?", args, cur_arg);
@@ -214,10 +214,10 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else {
-    std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << '\n';
+    std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
     return 0;
   }
 
 
-  std::cout << "Printed to file '" << filename << "'." << '\n';
+  std::cout << "Printed to file '" << filename << "'." << std::endl;
 }

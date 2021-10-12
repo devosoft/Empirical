@@ -8,7 +8,7 @@
 #include <iostream>
 #include "emp/datastructs/StringMap.hpp"
 
-#define PRINT_VAL(X) std::cout << #X " = " << X << '\n'
+#define PRINT_VAL(X) std::cout << #X " = " << X << std::endl
 
 int main()
 {

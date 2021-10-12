@@ -179,7 +179,7 @@ namespace emp {
     /// Load in the contents of a StateGrid using the file information provided.
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
-      std::cout << "Loading!" << '\n';
+      std::cout << "Loading!" << std::endl;
 
       // Load this data from a stream or a file.
       File file(std::forward<Ts>(args)...);
@@ -215,7 +215,7 @@ namespace emp {
         for (size_t j = 1; j < width; j++) {
           out[j*2] = info.GetSymbol( states[i*width+j] );
         }
-        os << out << '\n';
+        os << out << std::endl;
       }
       return *this;
     }
@@ -346,7 +346,7 @@ namespace emp {
       UpdateHistory();
       // std::cout << " end = (" << cur_state.x << "," << cur_state.y << ")"
       //           << "  facing = " << cur_state.facing
-      //           << '\n';
+      //           << std::endl;
     }
 
     /// Rotate starting from current facing.
@@ -382,7 +382,7 @@ namespace emp {
           out[j*2] = grid.GetSymbol(j,i);
           if (WasAt(j,i)) out[j*2] = '*';
         }
-        os << out << '\n';
+        os << out << std::endl;
       }
     }
   };

@@ -16,7 +16,7 @@ int can_size = 400;
 void CanvasAnim(double time) {
   auto & mycanvas = doc.Canvas("can");
 
-  std::cerr << time << '\n';
+  std::cerr << time << std::endl;
 
   cx+=3;
   if (cx >= can_size + cr) cx -= can_size;

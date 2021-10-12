@@ -59,29 +59,29 @@ int main()
     total += (double) set5.CountOnes();
   }
 
-  std::cout << "total = " << total << '\n';
+  std::cout << "total = " << total << std::endl;
   double bsm = BitSetMath();
-  std::cout << "BitSetMath() = " << bsm << '\n';
+  std::cout << "BitSetMath() = " << bsm << std::endl;
 
 //   emp::BitVector bv(10);
-//   std::cout << bv.Hash() << "  (initial, 10 bits)" << '\n';
+//   std::cout << bv.Hash() << "  (initial, 10 bits)" << std::endl;
 //   bv[3] = true;
-//   std::cout << bv.Hash() << "  (bit 3 set to true)" << '\n';
+//   std::cout << bv.Hash() << "  (bit 3 set to true)" << std::endl;
 //   bv.Resize(9);
-//   std::cout << bv.Hash() << "  (resized to 9.)" << '\n';
-//   std::cout << bv.Hash() << "  (same as previous)" << '\n';
+//   std::cout << bv.Hash() << "  (resized to 9.)" << std::endl;
+//   std::cout << bv.Hash() << "  (same as previous)" << std::endl;
 //   emp::BitVector bv2(12);
-//   std::cout << bv2.Hash() << "  (new bv with 12 bits)" << '\n';
+//   std::cout << bv2.Hash() << "  (new bv with 12 bits)" << std::endl;
 //   bv2[3] = true;
 //   bv2[11] = true;
-//   std::cout << bv2.Hash() << "  (bits 3 and 11 set true)" << '\n';
+//   std::cout << bv2.Hash() << "  (bits 3 and 11 set true)" << std::endl;
 //   bv2.Resize(9);
-//   std::cout << bv2.Hash() << "  (resized new bv to 9)" << '\n';
+//   std::cout << bv2.Hash() << "  (resized new bv to 9)" << std::endl;
 
   emp::Random random;
-  std::cout << "Printing random 5-bit BitSets..." << '\n';
+  std::cout << "Printing random 5-bit BitSets..." << std::endl;
   for (size_t i = 0; i < 10; i++) {
     emp::BitSet<5> print_set(random);
-    std::cout << print_set << " : " << print_set.GetUInt(0) << '\n';
+    std::cout << print_set << " : " << print_set.GetUInt(0) << std::endl;
   }
 }

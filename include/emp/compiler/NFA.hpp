@@ -209,7 +209,7 @@ namespace emp {
 
     /// Print information about this NFA (for debugging)
     void Print() const {
-      std::cout << states.size() << " States:" << '\n';
+      std::cout << states.size() << " States:" << std::endl;
       for (size_t i = 0; i < states.size(); i++) {
         std::cout << " state " << i << " - ";
         for (const auto & t : states[i].trans) {
@@ -222,7 +222,7 @@ namespace emp {
           for (auto f : states[i].free_to) std::cout << " " << f;
         }
         if (IsStop(i)) std::cout << " STOP(" << (int) GetStop(i) << ")";
-        std::cout << '\n';
+        std::cout << std::endl;
       }
     }
 
@@ -231,10 +231,10 @@ namespace emp {
       for (int i = 0; i < states.size(); i++) {
         std::cout << "Free from ( ";
         for (auto x : states[i].free_from) std::cout << x << " ";
-        std::cout << ") to " << i << '\n';
+        std::cout << ") to " << i << std::endl;
         std::cout << "Free from " << i << " to ( ";
         for (auto x : states[i].free_to) std::cout << x << " ";
-        std::cout << ")" << '\n';
+        std::cout << ")" << std::endl;
       }
     }
   };
@@ -294,7 +294,7 @@ namespace emp {
       for (auto s : state_set) {
         std::cout << " " << s;
       }
-      std::cout << '\n';
+      std::cout << std::endl;
     }
   };
 

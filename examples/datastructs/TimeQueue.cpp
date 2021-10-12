@@ -18,14 +18,14 @@ int main()
   time_queue.Insert(4, 260.0);
 
   // Print the first item; advance time to 120.
-  std::cout << time_queue.Next() << '\n';
+  std::cout << time_queue.Next() << std::endl;
   time_queue.Insert(5, 230.0);
 
   while (time_queue.GetSize()) {
-    std::cout << time_queue.Next() << '\n';
+    std::cout << time_queue.Next() << std::endl;
   }
 
-  std::cout << "End time = " << time_queue.GetTime() << '\n';
+  std::cout << "End time = " << time_queue.GetTime() << std::endl;
 
 
   std::cout << "\nNow with strings:\n";
@@ -39,13 +39,13 @@ int main()
   time_queue2.Insert("Item 4", 102.6);
 
   // Print the first item; advance time to 120.
-  std::cout << time_queue2.Next() << '\n';
+  std::cout << time_queue2.Next() << std::endl;
   time_queue2.Insert("Item 5", 2.3);
 
 
   while (time_queue2.GetSize()) {
-    std::cout << time_queue2.Next() << '\n';
+    std::cout << time_queue2.Next() << std::endl;
   }
 
-  std::cout << "End time = " << time_queue2.GetTime() << '\n';
+  std::cout << "End time = " << time_queue2.GetTime() << std::endl;
 }

@@ -17,12 +17,12 @@ void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
     std::cout << "[" << cpu.GetReg(i) << "] ";
   }
-  std::cout << " IP=" << cpu.GetIP() << '\n';
+  std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
 int main()
 {
-  std::cout << "Test." << '\n';
+  std::cout << "Test." << std::endl;
 
   // const auto & inst_lib = emp::AvidaGP::GetInstLib();
   emp::Random random;
@@ -53,17 +53,17 @@ int main()
   emp::AvidaGP cpu2;
   cpu2.Load("test.org");
 
-  std::cout << "Original CPU size: " << cpu.GetSize() << '\n';
-  std::cout << "Reloaded CPU size: " << cpu2.GetSize() << '\n';
+  std::cout << "Original CPU size: " << cpu.GetSize() << std::endl;
+  std::cout << "Reloaded CPU size: " << cpu2.GetSize() << std::endl;
 
   // Run a ton of organisms.
   for (int t = 0; t < 1000000; t++) {
-    if (t % 10000 == 0) std::cout << t << '\n';
+    if (t % 10000 == 0) std::cout << t << std::endl;
     cpu.Reset();
     for (int i = 0; i < 100; i++) cpu.PushRandom(random);
     cpu.Process(200);
   }
-  std::cout << "NEW AvidaGP" << '\n';
+  std::cout << "NEW AvidaGP" << std::endl;
 
   return 0;
 }

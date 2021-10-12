@@ -45,5 +45,5 @@ int main()
   doc << collapse2.GetTargetDiv();
   doc << collapse1.GetControllerDiv(1);
 
-  std::cout << "end of main... !" << '\n';
+  std::cout << "end of main... !" << std::endl;
 }

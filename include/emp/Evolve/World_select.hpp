@@ -258,7 +258,7 @@ namespace emp {
       //TriggerOnLexicaseSelect(world, used, win_id);
       world.DoBirth( world.GetGenomeAt(win_id), win_id );
     }
-    // std::cout << "Done with lex" << '\n';
+    // std::cout << "Done with lex" << std::endl;
   }
 
   /// ==OPTIMIZED LEXICASE== Is the same as regular lexicase, but determines how many unique genotypes there are
@@ -302,12 +302,12 @@ namespace emp {
     }
 
     if (!max_funs) max_funs = fit_funs.size();
-    // std::cout << "in lexicase" << '\n';
+    // std::cout << "in lexicase" << std::endl;
     // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
     emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
     for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
       fitnesses[fit_id].resize(genotype_counts.size());
-      // std::cout << fit_id << '\n';
+      // std::cout << fit_id << std::endl;
       int id = 0;
       for (auto & gen : genotype_lists) {
         fitnesses[fit_id][id] = fit_funs[fit_id](world.GetOrg(gen[0]));
@@ -315,12 +315,12 @@ namespace emp {
       }
     }
 
-    // std::cout << to_string(fitnesses) << '\n';
-  // std::cout << "fitness calculated" << '\n';
+    // std::cout << to_string(fitnesses) << std::endl;
+  // std::cout << "fitness calculated" << std::endl;
     // Go through a new ordering of fitness functions for each selections.
-  // std::cout << "randdomized" << '\n';
+  // std::cout << "randdomized" << std::endl;
     for (size_t repro = 0; repro < repro_count; ++repro) {
-  // std::cout << "repro: " << repro << '\n';
+  // std::cout << "repro: " << repro << std::endl;
       // Determine the current ordering of the functions.
       emp::vector<size_t> order;
 
@@ -331,33 +331,33 @@ namespace emp {
         for (auto & x : order) x = world.GetRandom().GetUInt(fit_funs.size());
       }
       // @CAO: We could have selected the order more efficiently!
-  // std::cout << "reoreder" << '\n';
+  // std::cout << "reoreder" << std::endl;
       // Step through the functions in the proper order.
       cur_gens = all_gens;  // Start with all of the organisms.
       int depth = -1;
       for (size_t fit_id : order) {
-        // std::cout << "fit_id: " << fit_id << '\n';
+        // std::cout << "fit_id: " << fit_id << std::endl;
         depth++;
 
-        // std::cout << "about to index" << '\n';
-        // std::cout << to_string(fitnesses[fit_id]) << '\n';
-        // std::cout << cur_orgs[0] << '\n';
+        // std::cout << "about to index" << std::endl;
+        // std::cout << to_string(fitnesses[fit_id]) << std::endl;
+        // std::cout << cur_orgs[0] << std::endl;
         double max_fit = fitnesses[fit_id][cur_gens[0]];
         next_gens.push_back(cur_gens[0]);
-        // std::cout << "Starting max: " << max_fit << to_string(cur_gens) << '\n';
+        // std::cout << "Starting max: " << max_fit << to_string(cur_gens) << std::endl;
         for (size_t gen_id : cur_gens) {
 
           const double cur_fit = fitnesses[fit_id][gen_id];
-          // std::cout << "gen_id: " << gen_id << "Fit: " << cur_fit << '\n';
+          // std::cout << "gen_id: " << gen_id << "Fit: " << cur_fit << std::endl;
           if (cur_fit > max_fit) {
             max_fit = cur_fit;             // This is a the NEW maximum fitness for this function
             next_gens.resize(0);           // Clear out orgs with former maximum fitness
             next_gens.push_back(gen_id);   // Add this org as only one with new max fitness
-            // std::cout << "New max: " << max_fit << " " << cur_gens.size() << '\n';
+            // std::cout << "New max: " << max_fit << " " << cur_gens.size() << std::endl;
           }
           else if (cur_fit == max_fit) {
             next_gens.push_back(gen_id);   // Same as cur max fitness -- save this org too.
-            // std::cout << "Adding: " << gen_id << '\n';
+            // std::cout << "Adding: " << gen_id << std::endl;
           }
         }
         // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
@@ -385,14 +385,14 @@ namespace emp {
       }
       emp_assert(repro_id != -1, repro_id, winner, options);
 
-      // std::cout << depth << "about to calc used" <<'\n';
+      // std::cout << depth << "about to calc used" <<std::endl;
       emp::vector<size_t> used = Slice(order, 0, depth+1);
       // If the world has a OnLexicaseSelect method, call it
-      // std::cout << depth << " " << to_string(used) << '\n';
+      // std::cout << depth << " " << to_string(used) << std::endl;
       TriggerOnLexicaseSelect(world, used, repro_id);
       world.DoBirth( world.GetGenomeAt(repro_id), repro_id );
     }
-    // std::cout << "Done with lex" << '\n';
+    // std::cout << "Done with lex" << std::endl;
   }
 
 
@@ -448,7 +448,7 @@ namespace emp {
       // std::cout << "Bonus " << ex_id << " = " << cur_bonus
       //           << "   max_extra_fit = " << max_extra_fit[ex_id]
       //           << "   max_count = " << max_count[ex_id]
-      //           << '\n';
+      //           << std::endl;
 
       for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
         // If this organism is the best at the current resource, git it the bonus!

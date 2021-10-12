@@ -22,7 +22,7 @@ struct A {
   static const int X = 1;
 
   int Test1(int x, int y) { return x + y; }
-  void Print(int x, int y) { std::cout << "A:" << Test1(x,y) << '\n'; }
+  void Print(int x, int y) { std::cout << "A:" << Test1(x,y) << std::endl; }
 
   static std::string GetName() { return "A"; }
 };
@@ -31,7 +31,7 @@ struct B {
   static const int X = 2;
 
   int Test1(int x, int y) { return x + 2*y; }
-  void Print(int x, int y) { std::cout << "B:" << Test1(x,y) << '\n'; }
+  void Print(int x, int y) { std::cout << "B:" << Test1(x,y) << std::endl; }
 
   static std::string GetName() { return "B"; }
 };
@@ -47,7 +47,7 @@ struct C {
   static constexpr int class_id = 3;
   bool use_this;
   int Test1(int x, int y) { return x + 3*y; }
-  void Print(int x, int y) { std::cout << "C:" << Test1(x,y) << '\n'; }
+  void Print(int x, int y) { std::cout << "C:" << Test1(x,y) << std::endl; }
 
   static std::string GetName() { return "C"; }
 };
@@ -107,13 +107,13 @@ int main()
 
   int x = 10;
   int y = 10;
-  std::cout << "Test1(a, " << x << ", " << y << ") = " << Test1(a, x, y) << '\n';
-  std::cout << "Test1(b, " << x << ", " << y << ") = " << Test1(b, x, y) << '\n';
-  std::cout << "Test1(c, " << x << ", " << y << ") = " << Test1(c, x, y) << '\n';
-  std::cout << "Test1(d, " << x << ", " << y << ") = " << Test1(d, x, y) << '\n';
-  std::cout << "Test1(e, " << x << ", " << y << ") = " << Test1(e, x, y) << '\n';
-  std::cout << "Test1(f, " << x << ", " << y << ") = " << Test1(f, x, y) << '\n';
-  std::cout << "Test1(g, " << x << ", " << y << ") = " << Test1(g, x, y) << '\n';
+  std::cout << "Test1(a, " << x << ", " << y << ") = " << Test1(a, x, y) << std::endl;
+  std::cout << "Test1(b, " << x << ", " << y << ") = " << Test1(b, x, y) << std::endl;
+  std::cout << "Test1(c, " << x << ", " << y << ") = " << Test1(c, x, y) << std::endl;
+  std::cout << "Test1(d, " << x << ", " << y << ") = " << Test1(d, x, y) << std::endl;
+  std::cout << "Test1(e, " << x << ", " << y << ") = " << Test1(e, x, y) << std::endl;
+  std::cout << "Test1(f, " << x << ", " << y << ") = " << Test1(f, x, y) << std::endl;
+  std::cout << "Test1(g, " << x << ", " << y << ") = " << Test1(g, x, y) << std::endl;
 
   Print(a,x,y);
   Print(b,x,y);
@@ -123,13 +123,13 @@ int main()
   Print(f,x,y);
   Print(g,x,y);
 
-  std::cout << "Test2(a, " << x << ", " << y << ") = " << Test2(a, x, y) << '\n';
-  std::cout << "Test2(b, " << x << ", " << y << ") = " << Test2(b, x, y) << '\n';
-  std::cout << "Test2(c, " << x << ", " << y << ") = " << Test2(c, x, y) << '\n';
-  std::cout << "Test2(d, " << x << ", " << y << ") = " << Test2(d, x, y) << '\n';
-  std::cout << "Test2(e, " << x << ", " << y << ") = " << Test2(e, x, y) << '\n';
-  std::cout << "Test2(f, " << x << ", " << y << ") = " << Test2(f, x, y) << '\n';
-  std::cout << "Test2(g, " << x << ", " << y << ") = " << Test2(g, x, y) << '\n';
+  std::cout << "Test2(a, " << x << ", " << y << ") = " << Test2(a, x, y) << std::endl;
+  std::cout << "Test2(b, " << x << ", " << y << ") = " << Test2(b, x, y) << std::endl;
+  std::cout << "Test2(c, " << x << ", " << y << ") = " << Test2(c, x, y) << std::endl;
+  std::cout << "Test2(d, " << x << ", " << y << ") = " << Test2(d, x, y) << std::endl;
+  std::cout << "Test2(e, " << x << ", " << y << ") = " << Test2(e, x, y) << std::endl;
+  std::cout << "Test2(f, " << x << ", " << y << ") = " << Test2(f, x, y) << std::endl;
+  std::cout << "Test2(g, " << x << ", " << y << ") = " << Test2(g, x, y) << std::endl;
 
 
   // Continuing test of EMP_CHOOSE_MEMBER_TYPE...
@@ -138,24 +138,24 @@ int main()
   (void) wrap_A;
   (void) wrap_B;
 
-  std::cout << Wrapper<A>::VALUE/2 << '\n';  // 2.5
-  std::cout << Wrapper<B>::VALUE/2 << '\n';  // 2
+  std::cout << Wrapper<A>::VALUE/2 << std::endl;  // 2.5
+  std::cout << Wrapper<B>::VALUE/2 << std::endl;  // 2
 
   // Continuing test of EMP_SETUP_TYPE_SELECTOR...
 
   // CE
-  std::cout << "Selected (C): " << auto_type<int, C, D, E>::GetName() << '\n';
-  std::cout << "Selected (E): " << auto_type<int, D, E>::GetName() << '\n';
-  std::cout << "Selected (C): " << auto_type<C, D, E>::GetName() << '\n';
+  std::cout << "Selected (C): " << auto_type<int, C, D, E>::GetName() << std::endl;
+  std::cout << "Selected (E): " << auto_type<int, D, E>::GetName() << std::endl;
+  std::cout << "Selected (C): " << auto_type<C, D, E>::GetName() << std::endl;
 
-  std::cout << "Add3(1,2,3) = " << Add3(1,2,3) << '\n';
+  std::cout << "Add3(1,2,3) = " << Add3(1,2,3) << std::endl;
 
   std::function<int(int,int,int)> add3(Add3);
   std::cout << "emp::SubsetCall(add3, 4,5,6,7.5,8.5) = "
-	    << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << '\n';
+	    << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << std::endl;
 
   has_XY<A>::type_X test_val = (has_XY<A>::type_X) 2.5;
-  std::cout << "has_XY<A>::type_X = " << test_val << '\n';
+  std::cout << "has_XY<A>::type_X = " << test_val << std::endl;
   has_XY<A>::type_Y test_val2 = (has_XY<A>::type_Y) 2.5;
-  std::cout << "has_XY<A>::type_Y = " << test_val2 << '\n';
+  std::cout << "has_XY<A>::type_Y = " << test_val2 << std::endl;
 }

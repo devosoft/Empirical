@@ -12,15 +12,15 @@
 #include "emp/debug/debug.hpp"
 
 // Build some sample functions that we want called by type.
-void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << '\n'; }
-void fun_int_double(int x, double y) { std::cout << x << "," << y << " : " << y * (double) x << '\n'; }
-void fun_string_double(std::string x, int y) { std::cout << x << " -> " << y << '\n'; }
-void fun_string(std::string x) { std::cout << "The lonely string is '" << x << "'" << '\n'; }
-void fun_int(int x) { std::cout << "The lonely int is '" << x << "'" << '\n'; }
-void fun_double(double x) { std::cout << "The lonely double is '" << x << "'" << '\n'; }
+void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }
+void fun_int_double(int x, double y) { std::cout << x << "," << y << " : " << y * (double) x << std::endl; }
+void fun_string_double(std::string x, int y) { std::cout << x << " -> " << y << std::endl; }
+void fun_string(std::string x) { std::cout << "The lonely string is '" << x << "'" << std::endl; }
+void fun_int(int x) { std::cout << "The lonely int is '" << x << "'" << std::endl; }
+void fun_double(double x) { std::cout << "The lonely double is '" << x << "'" << std::endl; }
 void fun_5ints(int v, int w, int x, int y, int z) {
   std::cout << "Eval " << v << "+" << w << "+" << x << "+" << y << "+" << z
-            << " = " << (v+w+x+y+z) << '\n';
+            << " = " << (v+w+x+y+z) << std::endl;
 }
 
 int main()
@@ -44,9 +44,9 @@ int main()
 
   // Now run the appropriate function for any pair of objects.  Undefined ones should be skipped.
   for (auto & x : objs) {
-    if (tt.IsType<int>(x)) std::cout << "INT" << '\n';
-    if (tt.IsType<double>(x)) std::cout << "DOUBLE" << '\n';
-    if (tt.IsType<std::string>(x)) std::cout << "STRING" << '\n';
+    if (tt.IsType<int>(x)) std::cout << "INT" << std::endl;
+    if (tt.IsType<double>(x)) std::cout << "DOUBLE" << std::endl;
+    if (tt.IsType<std::string>(x)) std::cout << "STRING" << std::endl;
     tt.RunFunction(x);
     for (auto & y : objs) {
       tt.RunFunction(x,y);
@@ -55,7 +55,7 @@ int main()
 
   // Let's convert one back!
   int x = tt.ToType<int>(objs[1]);
-  std::cout << "And the second value was " << x << '\n';
+  std::cout << "And the second value was " << x << std::endl;
 
   // Cleanup objects.
   objs.clear();
@@ -82,7 +82,7 @@ int main()
   EMP_DEBUG_PRINT(tt_t::GetID<int,double>());
   EMP_DEBUG_PRINT(tt_t::GetID<double,double>());
 
-  std::cout << '\n';
+  std::cout << std::endl;
   EMP_DEBUG_PRINT(tt_t::GetComboID<int>());
   EMP_DEBUG_PRINT(tt_t::GetComboID<double>());
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,int>());
@@ -101,7 +101,7 @@ int main()
   emp::TrackedVar tval6( tt.Convert<int>(8) );
   emp::TrackedVar tval7( tt.Convert<int>(9) );
 
-  std::cout << '\n';
+  std::cout << std::endl;
   EMP_DEBUG_PRINT(tt_t::GetID<int,std::string,double>());
   EMP_DEBUG_PRINT(tt_t::GetTrackedID(tval1, tval2, tval3));
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,std::string,double>());

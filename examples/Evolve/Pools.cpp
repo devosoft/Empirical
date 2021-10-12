@@ -41,12 +41,12 @@ int main()
       size_t id = random.GetUInt(pool_world.GetSize());
       if (pool_world.IsOccupied(id)) pool_world.DoBirth(pool_world[id], id);
     }
-    if (g % 1000 == 0) std::cout << "Generation: " << g << '\n';
+    if (g % 1000 == 0) std::cout << "Generation: " << g << std::endl;
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
   pool_world.PrintGrid();
   std::cout << "Final Org Counts:\n";
   pool_world.PrintOrgCounts();
-  std::cout << '\n';
+  std::cout << std::endl;
 }

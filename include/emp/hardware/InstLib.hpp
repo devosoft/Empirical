@@ -192,7 +192,7 @@ namespace emp {
         std::string arg_name = emp::string_pop_word(info);
         // @CAO: Should check to make sure arg name is real.
         if (emp::Has(arg_map, arg_name) == false) {
-          std::cerr << "Unknown argument '" << arg_name << "'.  Ignoring." << '\n';
+          std::cerr << "Unknown argument '" << arg_name << "'.  Ignoring." << std::endl;
         }
         genome.back().args[i] = arg_map[arg_name];
       }
@@ -200,9 +200,9 @@ namespace emp {
 
     /// Print out summary of instruction library.
     void PrintManifest(std::ostream & os=std::cout) const {
-      os << "id" << "," << "name" << '\n';
+      os << "id" << "," << "name" << std::endl;
       for (size_t i = 0; i < inst_lib.size(); ++i) {
-        os << i << "," << inst_lib[i].name << '\n';
+        os << i << "," << inst_lib[i].name << std::endl;
       }
     }
 

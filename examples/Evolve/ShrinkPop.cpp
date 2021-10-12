@@ -35,7 +35,7 @@ int main()
   for (size_t i = 0; i < POP_SIZE; i++) grid_world.InjectAt((int)i,i);
 
   // What does the grid look like after inject?
-  std::cout << "BEFORE SerialTransfer(0.01):" << '\n';
+  std::cout << "BEFORE SerialTransfer(0.01):" << std::endl;
   grid_world.PrintGrid();
 
 
@@ -45,15 +45,15 @@ int main()
 //       size_t id = random.GetUInt(grid_world.GetSize());
 //       if (grid_world.IsOccupied(id)) grid_world.DoBirth(grid_world[id], id);
 //     }
-//     if (g % 1000 == 0) std::cout << "Generation: " << g << '\n';
+//     if (g % 1000 == 0) std::cout << "Generation: " << g << std::endl;
 //   }
 
-  std::cout << '\n';
-  std::cout << "AFTER SerialTransfer(0.01):" << '\n';
+  std::cout << std::endl;
+  std::cout << "AFTER SerialTransfer(0.01):" << std::endl;
   grid_world.PrintGrid();
   std::cout << "Final Grid Org Counts:\n";
   grid_world.PrintOrgCounts();
-  std::cout << '\n';
+  std::cout << std::endl;
 
 
 
@@ -66,13 +66,13 @@ int main()
   for (size_t i = 0; i < POP_SIZE; i++) grid_world.InjectAt((int)i%10,i);
 
   // What does the grid look like after inject?
-  std::cout << "Mass action, BEFORE Bottlneck(20):" << '\n';
+  std::cout << "Mass action, BEFORE Bottlneck(20):" << std::endl;
   grid_world.PrintOrgCounts();
 
   grid_world.DoBottleneck(20);
 
-  std::cout << '\n';
-  std::cout << "Mass action, AFTER Bottleneck" << '\n';
+  std::cout << std::endl;
+  std::cout << "Mass action, AFTER Bottleneck" << std::endl;
   grid_world.PrintOrgCounts();
-  std::cout << '\n';
+  std::cout << std::endl;
 }

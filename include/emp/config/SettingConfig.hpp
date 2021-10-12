@@ -489,7 +489,7 @@ namespace emp {
       }
 
       if constexpr (sizeof...(examples) > 0) {
-        std::cout << "\nExample: " << emp::to_string(examples...) << '\n';
+        std::cout << "\nExample: " << emp::to_string(examples...) << std::endl;
       }
 
       std::cout.flush();

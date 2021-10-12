@@ -23,7 +23,7 @@ emp::Surface<Rock, Paper, Scissors> surface(can_size, can_size);
 void CanvasAnim(double time) {
   auto mycanvas = doc.Canvas("can");
 
-  std::cerr << time << '\n';
+  std::cerr << time << std::endl;
 
   // Update the line.
   mycanvas.Draw(surface);

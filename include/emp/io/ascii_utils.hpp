@@ -40,7 +40,7 @@ namespace emp {
       os << "  (" << datum << ")\n";
     }
     if (show_scale) {
-      os << "SCALE: = -> " << (1.0 / scale) << '\n';
+      os << "SCALE: = -> " << (1.0 / scale) << std::endl;
     }
   }
 

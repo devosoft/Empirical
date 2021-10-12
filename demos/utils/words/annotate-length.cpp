@@ -19,7 +19,7 @@ void Process(std::istream & is, std::ostream & os) {
   std::string cur_str;
   while (is) {
     is >> cur_str;
-    os << cur_str.size() << " " << cur_str << '\n';
+    os << cur_str.size() << " " << cur_str << std::endl;
   }
 }
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
   if (args.size() > 3) {
     std::cerr << "Only a single input filename and output filename are allowed as arguments."
-	      << '\n';
+	      << std::endl;
     exit(1);
   }
 

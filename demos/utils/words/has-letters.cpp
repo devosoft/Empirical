@@ -28,7 +28,7 @@ void Process(const std::string & letters, std::istream & is, std::ostream & os) 
   while (is) {
     is >> cur_str;
     if (StringOK(letters, cur_str)) {
-      os << cur_str.size() << " " << cur_str << '\n';
+      os << cur_str.size() << " " << cur_str << std::endl;
     }
   }
 }
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 
   if (args.size() < 2 || args.size() > 4) {
     std::cerr << "Format: " << args[0] << " [letters] {input file} {output file}."
-	      << '\n';
+	      << std::endl;
     exit(1);
   }
 

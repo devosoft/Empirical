@@ -45,6 +45,7 @@ int test_fun() {
   return val += 3;
 }
 
+<<<<<<< HEAD
 TEST_CASE("Test DataFile", "[data]") {
      int test_int = 5;
 

@@ -37,12 +37,12 @@ struct TestDerived : public TestBase {
 int main()
 {
   std::string test_str = "Test String!";
-  std::cout << test_str << '\n';
+  std::cout << test_str << std::endl;
 
   // Passing an existing pointer into test_ptr; should not be tracked.
   emp::Ptr<std::string> test_ptr(&test_str);
-  std::cout << "From Ptr: " << *test_ptr << '\n';
-  std::cout << "  with size = " << test_ptr->size() << '\n';
+  std::cout << "From Ptr: " << *test_ptr << std::endl;
+  std::cout << "  with size = " << test_ptr->size() << std::endl;
 
   {
     emp::Ptr<std::string> test_ptr2(&test_str);
@@ -51,9 +51,9 @@ int main()
   // Creating new int Ptr, which should be tracked.
   emp::Ptr<int> int_ptr;
   int_ptr.New(123456);
-  std::cout << "*int_ptr = " << *int_ptr << '\n';
+  std::cout << "*int_ptr = " << *int_ptr << std::endl;
   int_ptr.Delete();
-  std::cout << "Deleted int_ptr." << '\n';
+  std::cout << "Deleted int_ptr." << std::endl;
 
 
   // Examples with base and derived classes.
@@ -71,7 +71,7 @@ int main()
   for (size_t i = 0; i < 20; i++) {
     std::cout << " " << int_ptr[i];
   }
-  std::cout << '\n';
+  std::cout << std::endl;
   int_ptr.DeleteArray();
 
 
@@ -99,7 +99,7 @@ int main()
   for (size_t i = 0; i < v_ptr.size(); i++) {
     std::cout << *v_ptr[i];
   }
-  std::cout << '\n';
+  std::cout << std::endl;
 
   // Juggle the pointers with another vector.
   emp::vector<emp::Ptr<char>> v_ptr2;
@@ -111,5 +111,5 @@ int main()
   }
 
   // Signal that we are done.
-  std::cout << "End of main()." << '\n';
+  std::cout << "End of main()." << std::endl;
 }

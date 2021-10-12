@@ -14,7 +14,7 @@
 
 int main()
 {
-  std::cout << "Test." << '\n';
+  std::cout << "Test." << std::endl;
 
   emp::LinearCode<> test_code;
   test_code.push_back(emp::Instruction<3>(3, {1,2,3}));
@@ -22,5 +22,5 @@ int main()
   test_code.AddInst(2, {1});
   test_code.AddInst(3, {1,2,3});
 
-  std::cout << "Test code size = " << test_code.size() << '\n';
+  std::cout << "Test code size = " << test_code.size() << std::endl;
 }

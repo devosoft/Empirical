@@ -22,5 +22,5 @@ int main()
   doc << off_switch;
   off_switch.AddLabel("Switch Defult Off");
 
-  std::cout << "end of main... !" << '\n';
+  std::cout << "end of main... !" << std::endl;
 }

@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
   std::string in1, in2;
   for (int i = 0; i < N; i++) {
     std::cin >> in1 >> in2;
-    std::cout << emp::calc_edit_distance(in1, in2) << '\n';
+    std::cout << emp::calc_edit_distance(in1, in2) << std::endl;
   }
 
   return 0;

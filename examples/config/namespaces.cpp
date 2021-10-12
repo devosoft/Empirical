@@ -30,19 +30,19 @@ int main()
   config.Read("namespaces.cfg");
   //config.Write("namespaces.cfg");
   //config.WriteMacros("test-macro.h");
-  std::cout << "We are in namespaces!" << '\n';
+  std::cout << "We are in namespaces!" << std::endl;
 
   std::cout << "Config values:";
-  std::cout << "  config.DEBUG_MODE() = " << config.DEBUG_MODE() << '\n';
-  std::cout << "  config.RANDOM_SEED() = " << config.RANDOM_SEED() << '\n';
-  std::cout << "  config.TEST_BOOL() = " << config.TEST_BOOL() << '\n';
-  std::cout << "  config.TEST_STRING() = " << config.TEST_STRING() << '\n';
-  std::cout << "  config.TEST_CONST() = " << config.TEST_CONST() << '\n';
-  std::cout << "  config.TEST_STRING_SPACE() = " << config.TEST_STRING_SPACE() << '\n';
-  std::cout << "  config.TEST_DUP() = " << config.TEST_DUP() << '\n';
+  std::cout << "  config.DEBUG_MODE() = " << config.DEBUG_MODE() << std::endl;
+  std::cout << "  config.RANDOM_SEED() = " << config.RANDOM_SEED() << std::endl;
+  std::cout << "  config.TEST_BOOL() = " << config.TEST_BOOL() << std::endl;
+  std::cout << "  config.TEST_STRING() = " << config.TEST_STRING() << std::endl;
+  std::cout << "  config.TEST_CONST() = " << config.TEST_CONST() << std::endl;
+  std::cout << "  config.TEST_STRING_SPACE() = " << config.TEST_STRING_SPACE() << std::endl;
+  std::cout << "  config.TEST_DUP() = " << config.TEST_DUP() << std::endl;
 
   std::cout << "\nConfig2 values:";
-  std::cout << "  config2.TEST_INT1() = " << config2.TEST_INT1() << '\n';
-  std::cout << "  config2.TEST_INT2() = " << config2.TEST_INT2() << '\n';
-  std::cout << "  config2.TEST_DUP() = " << config2.TEST_DUP() << '\n';
+  std::cout << "  config2.TEST_INT1() = " << config2.TEST_INT1() << std::endl;
+  std::cout << "  config2.TEST_INT2() = " << config2.TEST_INT2() << std::endl;
+  std::cout << "  config2.TEST_DUP() = " << config2.TEST_DUP() << std::endl;
 }

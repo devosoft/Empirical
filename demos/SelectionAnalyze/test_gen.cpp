@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 
   if (args.size() != 4) {
     std::cout << "Format: " << args[0] << " [num orgs] [num criteria] [num fitness tiers]"
-	      << '\n';
+	      << std::endl;
     exit(1);
   }
 
@@ -29,13 +29,13 @@ int main(int argc, char* argv[])
     if (fit_id > 0) std::cout << ", ";
     std::cout << "Criterion " << fit_id;
   }
-  std::cout << '\n';
+  std::cout << std::endl;
 
   for (size_t org_id = 0; org_id < num_orgs; org_id++) {
     for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
       if (fit_id > 0) std::cout << ", ";
       std::cout << random.GetUInt(num_tiers);
     }
-    std::cout << '\n';
+    std::cout << std::endl;
   }
 }

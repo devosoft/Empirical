@@ -8,7 +8,7 @@
 #include <iostream>
 #include "emp/config/SettingCombos.hpp"
 
-#define PRINT(X) std::cout << #X " = " << X << '\n'
+#define PRINT(X) std::cout << #X " = " << X << std::endl
 
 int main()
 {
@@ -20,7 +20,7 @@ int main()
   config_set.AddSetting<double>("double", "A double value!", 'd') = { 1.1, 2.2 };
 
   do {
-    std::cout << config_set.CurString() << '\n';
+    std::cout << config_set.CurString() << std::endl;
   } while (config_set.Next());
 
   std::cout << "------------ Process Args ------------\n";
@@ -29,11 +29,11 @@ int main()
     config_set.ProcessOptions( { "testing", "--int1", "5,6,7", "unused", "-d", "3.3,4.4,5.5"} );
 
   do {
-    std::cout << config_set.CurString() << '\n';
+    std::cout << config_set.CurString() << std::endl;
   } while (config_set.Next());
 
   std::cout << "Remaining Args:\n";
 
-  for (auto x : out_args) std::cout << "  " << x << '\n';
+  for (auto x : out_args) std::cout << "  " << x << std::endl;
 
 }

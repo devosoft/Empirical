@@ -16,11 +16,11 @@ int main()
   emp::AnyFunction fun2;
   emp::AnyFunction fun3;
   fun3.Set<void(double)>( [](double val) {
-      std::cout << "2*Val = " << (2*val) << '\n';
+      std::cout << "2*Val = " << (2*val) << std::endl;
     });
 
-  std::cout << fun.Call<int>(2,3) << '\n';
-  std::cout << fun.Call<int, int,int>(10,12) << '\n';
+  std::cout << fun.Call<int>(2,3) << std::endl;
+  std::cout << fun.Call<int, int,int>(10,12) << std::endl;
   fun3.Call<void, double>(3.14);
   fun3.Call<void>(20.20);
   fun3.Call(11.11);

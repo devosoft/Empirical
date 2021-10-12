@@ -170,7 +170,7 @@ namespace D3 {
 
       DERIVED Merge(DERIVED & other) {
           int new_id = NextD3ID();
-        //   std::cout << "New id should be: " << new_id << '\n';
+        //   std::cout << "New id should be: " << new_id << std::endl;
           MAIN_THREAD_EMP_ASM({
               js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
             //   console.log("Merged: ", js.objects[$2], $2);
@@ -958,7 +958,7 @@ namespace D3 {
     };
 
     // Selection& operator= (const Selection & other) {
-    //     std::cout << "Calling assingment: " << this->id << " " << other.id << '\n';
+    //     std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
     //     this->id = other.id;
     //     return (*this);
     // }
@@ -1059,7 +1059,7 @@ namespace D3 {
     // template<typename C>
     // emp::sfinae_decoy<Selection, decltype(C::value_type::n_fields)>
     // Data(C values){
-    //     std::cout << "using the right one" << '\n';
+    //     std::cout << "using the right one" << std::endl;
     //   int update_id = NextD3ID();
     //   emp::pass_array_to_javascript(values);
     //
@@ -1081,7 +1081,7 @@ namespace D3 {
       int update_id = NextD3ID();
 
 
-        //   std::cout << "In bind data: " << values[0].x0() << '\n';
+        //   std::cout << "In bind data: " << values[0].x0() << std::endl;
       emp::pass_array_to_javascript(values);
 
   	  MAIN_THREAD_EMP_ASM({

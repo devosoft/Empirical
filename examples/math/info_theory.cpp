@@ -11,12 +11,12 @@
 
 int main()
 {
-  std::cout << "Testing!" << '\n';
+  std::cout << "Testing!" << std::endl;
 
   emp::vector<double> vals = {0.25, 0.25, 0.5};
-  std::cout << emp::Entropy(vals) << '\n';
+  std::cout << emp::Entropy(vals) << std::endl;
 
   emp::vector<int> vals2 = {20, 40, 20};
-  std::cout << emp::Entropy(vals2) << '\n';
+  std::cout << emp::Entropy(vals2) << std::endl;
 }
 
