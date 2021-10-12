@@ -6,6 +6,9 @@
  *  @file SimplePDWorld.hpp
  */
 
+#ifndef DEMOS_SPATIALCOOP2017_SOURCE_SIMPLEPDWORLD_HPP_INCLUDE
+#define DEMOS_SPATIALCOOP2017_SOURCE_SIMPLEPDWORLD_HPP_INCLUDE
+
 #include "emp/base/vector.hpp"
 #include "emp/math/Random.hpp"
 
@@ -237,3 +240,5 @@ void SimplePDWorld::PrintNeighborInfo(std::ostream & os) {
   }
   os.flush();
 }
+
+#endif // #ifndef DEMOS_SPATIALCOOP2017_SOURCE_SIMPLEPDWORLD_HPP_INCLUDE

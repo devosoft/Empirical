@@ -26,7 +26,8 @@
  * optimizations in the code.)  As with VALUEs, aliases may be included.
  */
 
-#pragma once
+#ifndef TESTS_CONFIG_ASSETS_CONFIG_SETUP_HPP_INCLUDE
+#define TESTS_CONFIG_ASSETS_CONFIG_SETUP_HPP_INCLUDE
 
 #include "emp/config/config.hpp"
 
@@ -44,3 +45,5 @@ EMP_BUILD_CONFIG( MyConfig,
   //VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate.", MUT_RATE),
   VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate."),
 )
+
+#endif // #ifndef TESTS_CONFIG_ASSETS_CONFIG_SETUP_HPP_INCLUDE

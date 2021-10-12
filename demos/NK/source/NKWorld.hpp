@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE
+#define DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE
+
 #include "emp/bits/BitVector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/Evolve/NK.hpp"
@@ -123,4 +126,7 @@ struct NKWorld : public emp::World<BitOrg> {
       std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
     }
   }
+
 };
+
+#endif // #ifndef DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE

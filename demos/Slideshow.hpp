@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef EMP_SLIDESHOW_H
-#define EMP_SLIDESHOW_H
+#ifndef DEMOS_SLIDESHOW_HPP_INCLUDE
+#define DEMOS_SLIDESHOW_HPP_INCLUDE
 
 #include <string>
 
@@ -190,4 +190,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef DEMOS_SLIDESHOW_HPP_INCLUDE

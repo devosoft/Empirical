@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TUBE_WEB_H
-#define TUBE_WEB_H
+#ifndef DEMOS_UTILS_GRAPHS_WEB_WEB_UI_HPP_INCLUDE
+#define DEMOS_UTILS_GRAPHS_WEB_WEB_UI_HPP_INCLUDE
 
 #include <emscripten.h>
 
@@ -36,4 +36,4 @@ public:
 
 };
 
-#endif
+#endif // #ifndef DEMOS_UTILS_GRAPHS_WEB_WEB_UI_HPP_INCLUDE

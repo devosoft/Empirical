@@ -29,7 +29,8 @@
  *   maintain backward compatibility if names change in newer software versions.
  */
 
-#pragma once
+#ifndef EXAMPLES_CONFIG_TEST_MACRO_HPP_INCLUDE
+#define EXAMPLES_CONFIG_TEST_MACRO_HPP_INCLUDE
 
 #include "emp/config/config.hpp"
 
@@ -47,3 +48,5 @@ For example, are multi-line descriptions okay?"),
     VALUE(MUTATION_RATE, float, 0.025000, "This is my mutation rate."),
 
 )
+
+#endif // #ifndef EXAMPLES_CONFIG_TEST_MACRO_HPP_INCLUDE

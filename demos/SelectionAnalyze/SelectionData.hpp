@@ -7,9 +7,9 @@
  *  @brief This class maintains all of the fitness data for a population of organisms.
  */
 
+#ifndef DEMOS_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE
+#define DEMOS_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE
 
-#ifndef SELECTION_DATA_H
-#define SELECTION_DATA_H
 
 #include <iostream>
 #include <map>
@@ -595,4 +595,4 @@ public:
   }
 };
 
-#endif
+#endif // #ifndef DEMOS_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE

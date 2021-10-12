@@ -7,7 +7,8 @@
  *
  */
 
-#pragma once
+#ifndef TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE
+#define TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE
 
 #include "emp/config/config.hpp"
 
@@ -30,3 +31,5 @@ EMP_BUILD_CONFIG( Config,
   VALUE(RADIATION_DOSE_SIZE, double, 2, "Dose size (Gy) (for use in web interface - use a radiation prescription file for command-line)"),
   VALUE(UNKNOWN, std::string, "A unsupported type", "Type overridden later to simulate new config type"),
 );
+
+#endif // #ifndef TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE

@@ -8,7 +8,8 @@
  *  https://github.com/emilydolson/memic_model
  */
 
-#pragma once
+#ifndef EXAMPLES_PREFAB_ASSETS_SAMPLECONFIG_HPP_INCLUDE
+#define EXAMPLES_PREFAB_ASSETS_SAMPLECONFIG_HPP_INCLUDE
 
 #include "emp/config/config.hpp"
 
@@ -49,3 +50,5 @@ EMP_BUILD_CONFIG( Config,
   VALUE(OER_ALPHA_MAX, double, 1.75, "OER alpha max constant"),
   VALUE(OER_BETA_MAX, double, 3.25, "OER alpha (? this is what the paper says but I feel like it's supposed to be beta) max constant"),
 );
+
+#endif // #ifndef EXAMPLES_PREFAB_ASSETS_SAMPLECONFIG_HPP_INCLUDE

@@ -7,8 +7,8 @@
  *  @brief Defines the specialized world for the MAP-Elites app.
  */
 
-#ifndef ARM_WORLD_H
-#define ARM_WORLD_H
+#ifndef DEMOS_MAP_ELITES_ARM_SOURCE_ARMWORLD_HPP_INCLUDE
+#define DEMOS_MAP_ELITES_ARM_SOURCE_ARMWORLD_HPP_INCLUDE
 
 #include "emp/base/vector.hpp"
 #include "emp/Evolve/World.hpp"
@@ -167,4 +167,4 @@ public:
 
 };
 
-#endif
+#endif // #ifndef DEMOS_MAP_ELITES_ARM_SOURCE_ARMWORLD_HPP_INCLUDE
