@@ -8,7 +8,12 @@
 //  To get the unique type information for type T use:
 //    TypeID t = emp::GetTypeID<T>();
 //
+//  To make TypeID work more effectively with your custom class, implement the static member 
+//  function EMPGetTypeName() which returns a string with its full name (including namespace).
+//    static std::string EMPGetTypeName() { return "myns::MyClass"; }
+//
 //  MEMBER FUNCTIONS:
+//
 //    std::string GetName() - Return a human readable (ideally) version of type's name.
 //    void SetName(in_name) - Set the name that should be used henceforth for this type.
 //    size_t GetSize()      - Return number of bytes used by this type.
@@ -50,7 +55,6 @@
 //
 //  Developer notes:
 //  * Fill out defaults for remaining standard library classes (as possible)
-//  * If a class has a static TypeID_GetName() defined, use that for the name.
 //  * If a type is a template, give access to parameter types.
 //  * If a type is a function, give access to parameter types.
 
@@ -427,6 +431,11 @@ namespace emp {
     return internal::TypePackIDs_impl<T>::GetIDs();
   }
 
+  // Determine if a type has a static EMPGetTypeName() member function.
+  template <typename T, typename=void> struct HasEMPGetTypeName : std::false_type { };
+  template<typename T>
+  struct HasEMPGetTypeName<emp::decoy_t<T, decltype(T::EMPGetTypeName())>> : std::true_type{};
+
   /// Build the information for a single TypeID.
   template <typename T>
   static emp::Ptr<TypeID::Info> BuildInfo() {
@@ -435,7 +444,12 @@ namespace emp {
       TypeID type_id(&info);
 
       info.init = true;
-      info.name = typeid(T).name();
+
+      if constexpr (HasEMPGetTypeName<T>()) {
+        info.name = T::EMPGetTypeName();
+      } else {
+        info.name = typeid(T).name();
+      }
 
       // Now, fix the name if we can be more precise about it.
       if constexpr (std::is_const<T>()) {
