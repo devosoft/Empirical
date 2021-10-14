@@ -32,6 +32,9 @@ namespace emp {
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
+  /// A struct declaration with no definition to show a type name in a compile time error.
+  template <typename...> struct ShowType;
+
   /// A false type that does NOT resolve in unexecuted if-constexpr branches.
   /// By Brian Bi; from: https://stackoverflow.com/questions/69501472/best-way-to-trigger-a-compile-time-error-if-no-if-constexprs-succeed
   template <class T> struct dependent_false : std::false_type {};
