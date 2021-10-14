@@ -3,18 +3,19 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  Action.hpp
+ *  @file ActionManager.hpp
  *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
  *  @note Status: Beta
  */
 
-#ifndef EMP_CONTROL_ACTION_MANAGER
-#define EMP_CONTROL_ACTION_MANAGER
+#ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
+#define EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
 
 #include <string>
 #include <unordered_map>
 
 #include "../tools/string_utils.hpp"
+
 #include "Action.hpp"
 
 namespace emp {
@@ -88,4 +89,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE

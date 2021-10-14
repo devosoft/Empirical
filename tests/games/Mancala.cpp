@@ -1,4 +1,11 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Mancala.cpp
+ */
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/games/Mancala.hpp"
@@ -88,7 +95,7 @@ TEST_CASE("Test Mancala", "[games]")
   REQUIRE( game.IsMoveValid(0) == true );
   REQUIRE( game.IsMoveValid(2) == true );
   REQUIRE( game.IsMoveValid(5) == false );
-  
+
   auto options = game.GetMoveOptions();
   REQUIRE( options.size() == 5 );
   REQUIRE( options[4] == 4 );

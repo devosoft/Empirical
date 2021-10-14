@@ -1,16 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2021.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ValueBox.cpp
+ */
 
 #include <functional>
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/prefab/ValueBox.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-#include "emp/prefab/ValueBox.hpp"
 
 // Test that the ValueBox class is constructed correctly
 struct Test_Value_Box_HTMLLayout : public emp::web::BaseTest {

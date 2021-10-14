@@ -9,8 +9,8 @@
  *  Include meta/type_traits.hpp to use is_streamable.
  */
 
-#ifndef EMP_IS_STREAMABLE_HPP
-#define EMP_IS_STREAMABLE_HPP
+#ifndef EMP_BASE__IS_STREAMABLE_HPP_INCLUDE
+#define EMP_BASE__IS_STREAMABLE_HPP_INCLUDE
 
 namespace emp {
 
@@ -35,4 +35,4 @@ public:
 
 } // namespace emp
 
-#endif // #ifndef EMP_IS_STREAMABLE_HPP
+#endif // #ifndef EMP_BASE__IS_STREAMABLE_HPP_INCLUDE

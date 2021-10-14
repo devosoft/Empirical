@@ -1,19 +1,22 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-// This file contains macros used to build Empirical's C++ wrapper for D3
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file utils.hpp
+ *  @brief This file contains macros used to build Empirical's C++ wrapper for D3.
+ */
 
-#ifndef __UTILS_H__
-#define __UTILS_H__
+#ifndef EMP_WEB_D3_UTILS_HPP_INCLUDE
+#define EMP_WEB_D3_UTILS_HPP_INCLUDE
 
 #include <map>
 #include <string>
 
-#include "../../meta/macros.hpp"
 #include "../init.hpp"
 #include "../js_utils.hpp"
 #include "../JSWrap.hpp"
+#include "../../meta/macros.hpp"
 
 // Helper macros
 
@@ -147,4 +150,4 @@ void StoreNewObject(int id){
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_D3_UTILS_HPP_INCLUDE

@@ -3,12 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  MAP-Elites-Arm-web.cpp
+ *  @file MAP-Elites-Arm-web.cpp
  *  @brief Controller for WEB version of MAP-Elites app.
  */
 
 #include "emp/math/math.hpp"
 #include "emp/web/web.hpp"
+
 #include "../ArmWorld.hpp"
 
 namespace UI = emp::web;

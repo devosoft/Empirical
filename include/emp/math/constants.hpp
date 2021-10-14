@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  constants.hpp
+ *  @file constants.hpp
  *  @brief Commonly used constant values.
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_CONST_H
-#define EMP_CONST_H
+#ifndef EMP_MATH_CONSTANTS_HPP_INCLUDE
+#define EMP_MATH_CONSTANTS_HPP_INCLUDE
 
 #include <cstdint>
 
@@ -336,4 +336,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_CONSTANTS_HPP_INCLUDE

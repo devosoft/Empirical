@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file Template.cc
+ *  @file Template.cpp
  *  @brief A starting point for writing unit tests.
  */
 

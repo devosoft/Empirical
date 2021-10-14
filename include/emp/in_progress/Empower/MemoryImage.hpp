@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  MemoryImage.hpp
+ *  @file MemoryImage.hpp
  *  @brief A collection of arbitrary objects stored in a chunk of memory.
  */
 
-#ifndef EMP_MEMORY_IMAGE_H
-#define EMP_MEMORY_IMAGE_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_MEMORYIMAGE_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_MEMORYIMAGE_HPP_INCLUDE
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -48,4 +48,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_MEMORYIMAGE_HPP_INCLUDE

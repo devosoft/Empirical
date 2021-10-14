@@ -1,7 +1,24 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file BitSet.cpp
+ */
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
-#define CATCH_CONFIG_MAIN
+
+#include <algorithm>
+#include <climits>
+#include <deque>
+#include <fstream>
+#include <limits>
+#include <numeric>
+#include <ratio>
+#include <sstream>
+#include <string>
+#include <unordered_set>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -10,25 +27,14 @@
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <deque>
-#include <algorithm>
-#include <limits>
-#include <numeric>
-#include <climits>
-#include <unordered_set>
-#include <ratio>
-
-#include "emp/data/DataNode.hpp"
-#include "emp/bits/BitSet.hpp"
-#include "emp/functional/FunctionSet.hpp"
-#include "emp/compiler/RegEx.hpp"
-#include "emp/math/Random.hpp"
-#include "emp/tools/TypeTracker.hpp"
-#include "emp/tools/attrs.hpp"
 #include "emp/base/map.hpp"
+#include "emp/bits/BitSet.hpp"
+#include "emp/compiler/RegEx.hpp"
+#include "emp/data/DataNode.hpp"
+#include "emp/functional/FunctionSet.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/tools/attrs.hpp"
+#include "emp/tools/TypeTracker.hpp"
 
 
 template <size_t... VALS> struct TestBVConstruct;
@@ -177,7 +183,7 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
 
   emp::Random random;
   emp::BitSet<1000> bs1k(random, 0.75);
-  
+
   // Make sure all sizes are correct.
   REQUIRE( bs1.GetSize() == 1 );
   REQUIRE( bs8.GetSize() == 8 );
@@ -262,7 +268,7 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
 }
 
 TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
-  // Now try range-based accessors on a single bit. 
+  // Now try range-based accessors on a single bit.
   emp::BitSet<1> bs1(false);  REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
   bs1.Set(0);                 REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
   bs1.Clear(0);               REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
@@ -500,13 +506,13 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   for (size_t i = 400; i < 550; i++)  { REQUIRE(one_counts[i] > 680);  REQUIRE(one_counts[i] < 810); }
   for (size_t i = 550; i < 700; i++)  { REQUIRE(one_counts[i] >  60);  REQUIRE(one_counts[i] < 150); }
   for (size_t i = 700; i < 850; i++)  { REQUIRE(one_counts[i] > 950);  REQUIRE(one_counts[i] < 999); }
-  for (size_t i = 850; i < 1000; i++) { REQUIRE(one_counts[i] == 0); }  
+  for (size_t i = 850; i < 1000; i++) { REQUIRE(one_counts[i] == 0); }
 }
 
 TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
-  
+
   emp::BitSet<num_bits> bs;
   REQUIRE(bs.GetSize() == num_bits);
   REQUIRE(bs.GetNumBytes() == num_bytes);
@@ -881,23 +887,23 @@ void test_size(){
  * Flip and Toggle
  */
 void test_flip(){
-  emp::BitSet<2> bs2;	// bs2 = 00
-  bs2.flip(0);				// bs2 = 01
+  emp::BitSet<2> bs2;  // bs2 = 00
+  bs2.flip(0);        // bs2 = 01
   REQUIRE(bs2[0]);
 
-  emp::BitSet<8> bs8;	// bs8 = 00000000
-  bs8.flip(0,4);			// bs8 = 00001111
+  emp::BitSet<8> bs8;  // bs8 = 00000000
+  bs8.flip(0,4);      // bs8 = 00001111
   REQUIRE(bs8[0]);
   REQUIRE(bs8[1]);
   REQUIRE(bs8[2]);
   REQUIRE(bs8[3]);
   REQUIRE(!bs8[4]);
 
-  bs8[0].Toggle();		// bs8 = 00001110
+  bs8[0].Toggle();    // bs8 = 00001110
   REQUIRE(!bs8[0]);
 
-  emp::BitSet<4> bs4;	// bs4 = 0000
-  bs4.flip();					// bs4 = 1111
+  emp::BitSet<4> bs4;  // bs4 = 0000
+  bs4.flip();          // bs4 = 1111
   REQUIRE(bs4.all());
 }
 
@@ -905,10 +911,10 @@ void test_flip(){
  * FindOne and PopOne
  */
 void test_find(){
-  emp::BitSet<10> bs10;	// bs10 = 00 00000000
-  bs10.flip(3);					// bs10 = 00 00001000
+  emp::BitSet<10> bs10;  // bs10 = 00 00000000
+  bs10.flip(3);          // bs10 = 00 00001000
   REQUIRE(bs10.FindOne() == 3);
-  bs10.PopOne();				// bs10 = 00 00000000
+  bs10.PopOne();        // bs10 = 00 00000000
   REQUIRE(bs10.PopOne() == -1);
   bs10.flip(3);
   bs10.flip(1);
@@ -920,7 +926,7 @@ void test_find(){
  * GetByte and SetByte
  */
 void test_byte(){
-  emp::BitSet<10>	bs10;
+  emp::BitSet<10>  bs10;
   bs10.SetByte(0, 10);
   REQUIRE(bs10.GetByte(0) == 10);
 
@@ -1006,11 +1012,11 @@ void test_get_ones(){
  */
 void test_bit(){
   emp::BitSet<8> bs8;
-  bs8.Set(0, 1); 			// bs8 = 00000001
+  bs8.Set(0, 1);       // bs8 = 00000001
   REQUIRE(bs8.Get(0));
 
-  bs8.Set(7, 1);			// bs8 = 10000001
-  bs8.Set(0, 0);			// bs8 = 10000000
+  bs8.Set(7, 1);      // bs8 = 10000001
+  bs8.Set(0, 0);      // bs8 = 10000000
   REQUIRE(!bs8.Get(0));
   REQUIRE(bs8.Get(7));
 }
@@ -1023,11 +1029,11 @@ void test_bitwise_xor(){
   bs4.Set(0, 1);
   emp::BitSet<4> bs4_1;
   bs4_1.SetByte(0,3);
-  bs4 ^= bs4_1; 								// bs4 = 0001 ^ 0011 = 0010
-  REQUIRE(bs4.GetByte(0) == 2); 	// 0010 = 2
-  bs4_1.PopOne(); 							// bs4_1 = 0010
-  bs4 ^= bs4_1; 								// bs4 = 0010 ^ 0010 = 0000
-  REQUIRE(bs4.GetByte(0) == 0);	// 0000 = 0
+  bs4 ^= bs4_1;                 // bs4 = 0001 ^ 0011 = 0010
+  REQUIRE(bs4.GetByte(0) == 2);   // 0010 = 2
+  bs4_1.PopOne();               // bs4_1 = 0010
+  bs4 ^= bs4_1;                 // bs4 = 0010 ^ 0010 = 0000
+  REQUIRE(bs4.GetByte(0) == 0);  // 0000 = 0
 }
 
 /**
@@ -1036,11 +1042,11 @@ void test_bitwise_xor(){
 void test_bitwise_or(){
   emp::BitSet<10> bs10;
   emp::BitSet<10> bs10_1;
-  bs10.Set(1,1); 								// bs10 = 00 0000 0010
+  bs10.Set(1,1);                 // bs10 = 00 0000 0010
   bs10_1.Set(3,1);
   bs10_1.SetByte(1,3);
-  REQUIRE(bs10_1.count() == 3);	// bs10_1 = 11 00001000
-  bs10_1 |= bs10;								// bs10_1 = 11 00001000 | 00 00000010 = 11 00001010
+  REQUIRE(bs10_1.count() == 3);  // bs10_1 = 11 00001000
+  bs10_1 |= bs10;                // bs10_1 = 11 00001000 | 00 00000010 = 11 00001010
   REQUIRE(bs10_1.GetByte(0) == 10);
   REQUIRE(bs10_1.GetByte(1) == 3);
 }
@@ -1051,9 +1057,9 @@ void test_bitwise_or(){
 void test_bitwise_and(){
   emp::BitSet<8> bs8;
   emp::BitSet<8> bs8_1;
-  bs8.SetByte(0,13);		// bs8 = 00001101
-  bs8_1.SetByte(0,10);	// bs8_1 = 00001010
-  bs8_1 &= bs8;					// bs8_1 = 00001010 & 00001101 = 00001000
+  bs8.SetByte(0,13);    // bs8 = 00001101
+  bs8_1.SetByte(0,10);  // bs8_1 = 00001010
+  bs8_1 &= bs8;          // bs8_1 = 00001010 & 00001101 = 00001000
   REQUIRE(bs8_1.GetByte(0) == 8);
 }
 

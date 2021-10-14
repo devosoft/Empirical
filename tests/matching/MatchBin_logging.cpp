@@ -1,26 +1,26 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2020.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Tests for files in the tools/ folder.
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2020
+ *
+ *  @file MatchBin_logging.cpp
+ */
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
-#define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <deque>
 #include <algorithm>
+#include <climits>
+#include <deque>
+#include <fstream>
 #include <limits>
 #include <numeric>
-#include <climits>
-#include <unordered_set>
 #include <ratio>
+#include <sstream>
+#include <string>
+#include <unordered_set>
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
@@ -55,8 +55,8 @@
 #include "emp/functional/flex_function.hpp"
 #include "emp/functional/memo_function.hpp"
 #include "emp/io/NullStream.hpp"
-#include "emp/matching/matchbin_utils.hpp"
 #include "emp/matching/MatchBin.hpp"
+#include "emp/matching/matchbin_utils.hpp"
 #include "emp/math/info_theory.hpp"
 #include "emp/math/math.hpp"
 #include "emp/math/Random.hpp"

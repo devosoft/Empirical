@@ -3,18 +3,19 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  svg_shapes.hpp
+ *  @file svg_shapes.hpp
  *  @brief Tools to build common SVG shapes.
  */
 
-#ifndef EMP_D3_SVG_SHAPES_H
-#define EMP_D3_SVG_SHAPES_H
+#ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
+#define EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
+
+#include "../js_utils.hpp"
 
 #include "d3_init.hpp"
-#include "selection.hpp"
-#include "scales.hpp"
 #include "dataset.hpp"
-#include "../js_utils.hpp"
+#include "scales.hpp"
+#include "selection.hpp"
 
 namespace D3 {
 
@@ -40,10 +41,10 @@ namespace D3 {
       emp::pass_array_to_javascript(data);
 
       char * buffer = (char *)EM_ASM_INT({
-	    var result = js.objects[$0](emp_i.__incoming_array);
-	    var buffer = Module._malloc(result.length+1);
-	    Module.stringToUTF8(result, buffer, lengthBytesUTF8(result)+1);
-	    return buffer;
+        var result = js.objects[$0](emp_i.__incoming_array);
+        var buffer = Module._malloc(result.length+1);
+        Module.stringToUTF8(result, buffer, lengthBytesUTF8(result)+1);
+        return buffer;
       }, this->id);
 
       std::string result = std::string(buffer);
@@ -66,19 +67,19 @@ namespace D3 {
       s = s.Append("path");
 
       MAIN_THREAD_EM_ASM({
-	    var sel = js.objects[$0].attr("d", js.objects[$1](js.objects[$2]));
-    }, s.GetID(), this->id, data.GetID());
+        var sel = js.objects[$0].attr("d", js.objects[$1](js.objects[$2]));
+      }, s.GetID(), this->id, data.GetID());
       return s;
     }
 
    /// If you pass a triple-nested array, it will be treated as an array of paths
     template <typename T, std::size_t SIZE, std::size_t SIZE2>
     Selection DrawShape(emp::array<emp::array<emp::array<T, 2>, SIZE>,\
-			 SIZE2> & data) {
+                        SIZE2> & data) {
       Selection group = Select("svg").Append("g");
       for (auto arr: data) {
-	    Selection path = group.Append("path");
-	    path.SetAttr("d", Generate(arr).c_str());
+        Selection path = group.Append("path");
+        path.SetAttr("d", Generate(arr).c_str());
       }
       return group;
     }
@@ -90,8 +91,8 @@ namespace D3 {
   public:
     SymbolGenerator() {
       MAIN_THREAD_EM_ASM({
-  	    var new_line = d3.symbol();
-  	    js.objects[$0] = new_line;
+        var new_line = d3.symbol();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -125,8 +126,8 @@ namespace D3 {
     //If size is a constant, it's in pixels, so an int is reasonable
     void SetSize(int size) {
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].size($1);
-	  }, this->id, size);
+        js.objects[$0].size($1);
+      }, this->id, size);
     }
 
     /// @cond TEMPLATES
@@ -163,8 +164,8 @@ namespace D3 {
     /// parameter is used.
     void SetTension(float tension){
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].tension($1);
-	  }, this->id, tension);
+        js.objects[$0].tension($1);
+      }, this->id, tension);
     }
 
     /// Set a function indicating where the line is defined (i.e. valid)
@@ -187,8 +188,8 @@ namespace D3 {
   public:
     LineGenerator() {
       MAIN_THREAD_EM_ASM({
-	    var new_line = d3.line();
-	    js.objects[$0] = new_line;
+        var new_line = d3.line();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -200,12 +201,12 @@ namespace D3 {
     template <typename X_SCALE_TYPE>
     void AddXScale(X_SCALE_TYPE & scale){
       MAIN_THREAD_EM_ASM({
-	    var scale = js.objects[$1];
-	    var curr_x = js.objects[$0].x();
+        var scale = js.objects[$1];
+        var curr_x = js.objects[$0].x();
 
-	    //Apply scale to whatever the current x axis function is
-	    js.objects[$0].x(function(d, i){return scale(curr_x(d, i));});
-	  }, this->id, scale.GetID());
+        //Apply scale to whatever the current x axis function is
+        js.objects[$0].x(function(d, i){return scale(curr_x(d, i));});
+      }, this->id, scale.GetID());
     }
 
     /// Often, when you're drawing cartesion lines, you want to use a scale to transform numbers
@@ -216,12 +217,12 @@ namespace D3 {
     template <typename Y_SCALE_TYPE>
     void AddYScale(Y_SCALE_TYPE & scale){
       MAIN_THREAD_EM_ASM({
-	    var scale = js.objects[$1];
-	    var curr_y = js.objects[$0].y();
+        var scale = js.objects[$1];
+        var curr_y = js.objects[$0].y();
 
-	    //Apply scale on top of whatever the current y axis function is
-	    js.objects[$0].y(function(d, i){return scale(curr_y(d, i));});
-	  }, this->id, scale.GetID());
+        //Apply scale on top of whatever the current y axis function is
+        js.objects[$0].y(function(d, i){return scale(curr_y(d, i));});
+      }, this->id, scale.GetID());
     }
 
     /// If the data that you are generating lines from is anything more complicated than a sequence
@@ -385,8 +386,8 @@ namespace D3 {
   public:
     AreaGenerator() {
       MAIN_THREAD_EM_ASM({
-	    var new_line = d3.area();
-	    js.objects[$0] = new_line;
+        var new_line = d3.area();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -439,8 +440,8 @@ namespace D3 {
   public:
     RadialLineGenerator(){
       MAIN_THREAD_EM_ASM({
-  	    var new_line = d3.radialLine();
-  	    js.objects[$0] = new_line;
+        var new_line = d3.radialLine();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -465,8 +466,8 @@ namespace D3 {
   public:
     RadialAreaGenerator() {
       MAIN_THREAD_EM_ASM({
-     	var new_line = d3.radialArea();
-  	    js.objects[$0] = new_line;
+        var new_line = d3.radialArea();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -507,8 +508,8 @@ namespace D3 {
   public:
     ChordGenerator()  {
       MAIN_THREAD_EM_ASM({
-    	var new_line = d3.ribbon();
-  	    js.objects[$0] = new_line;
+        var new_line = d3.ribbon();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -535,8 +536,8 @@ namespace D3 {
   public:
     ArcGenerator()  {
       MAIN_THREAD_EM_ASM({
-  	    var new_line = d3.arc();
-  	    js.objects[$0] = new_line;
+        var new_line = d3.arc();
+        js.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -570,4 +571,4 @@ namespace D3 {
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE

@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018.
  *
- *  @file  _TableCol.hpp
+ *  @file _TableCol.hpp
  *  @brief The TableCol widget, which behaves like the Table widget, but focuses on a single column.
  *
  *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
  */
 
-#ifndef EMP_WEB_TABLE_COL_H
-#define EMP_WEB_TABLE_COL_H
+#ifndef EMP_WEB__TABLECOL_HPP_INCLUDE
+#define EMP_WEB__TABLECOL_HPP_INCLUDE
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -64,4 +64,4 @@ namespace web {
 
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-#endif
+#endif // #ifndef EMP_WEB__TABLECOL_HPP_INCLUDE

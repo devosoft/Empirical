@@ -1,15 +1,21 @@
-/*** @note This file is included in Empirical (https://github.com/devosoft/Empirical) for convenience.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file BloomFilter.hpp
+ *  @brief A Bloom filter implementation
+ *
+ *  @note This file is included in Empirical (https://github.com/devosoft/Empirical) for convenience.
  * The Bloom filter class was written by Arash Partow (http://www.partow.net/programming/hashfunctions/index.html)
  * and distributed under the MIT License.
- * 
  * @copyright Arash Partow, 2000 (modified slightly by Emily Dolson)
- * @brief A Bloom filter implementation
- * @file  BloomFilter.hpp
-*/ 
+ */
 
-/*
- *********************************************************************
- *                                                                   *
+#ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
+#define EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
+
+/*********************************************************************
  *                           Open Bloom Filter                       *
  *                                                                   *
  * Author: Arash Partow - 2000                                       *
@@ -23,10 +29,6 @@
  *                                                                   *
  *********************************************************************
 */
-
-
-#ifndef INCLUDE_BLOOM_FILTER_HPP
-#define INCLUDE_BLOOM_FILTER_HPP
 
 #include <algorithm>
 #include <cmath>
@@ -169,7 +171,7 @@ public:
 
 };
 
-/// This class implements a Bloom filter, which is a 
+/// This class implements a Bloom filter, which is a
 /// memory-efficient data structure for identifying
 /// values that have been seen before (with a tunable
 /// probability of a false positive - thinking that
@@ -409,7 +411,7 @@ public:
       return table_size_;
    }
 
-   /// @returns the number of elements that have been added 
+   /// @returns the number of elements that have been added
    /// to the Bloom filter
    inline unsigned long long int element_count() const
    {
@@ -772,9 +774,6 @@ private:
 
 }
 
-#endif
-
-
 /*
   Note 1:
   If it can be guaranteed that bits_per_char will be of the form 2^n then
@@ -784,5 +783,6 @@ private:
 
   Note 2:
   For performance reasons where possible when allocating memory it should
-  be aligned (aligned_alloc) according to the architecture being used.
 */
+
+#endif // #ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE

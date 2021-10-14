@@ -3,23 +3,24 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file  math.hpp
+ *  @file math.hpp
  *  @brief Useful mathematical functions (that are constexpr when possible.)
  *  @note Status: BETA (though new functions are added frequently)
  */
 
+#ifndef EMP_MATH_MATH_HPP_INCLUDE
+#define EMP_MATH_MATH_HPP_INCLUDE
 
-#ifndef EMP_MATH_H
-#define EMP_MATH_H
 
-#include <initializer_list>
 #include <algorithm>
 #include <cmath>
+#include <initializer_list>
 
 #include "../base/assert.hpp"
 #include "../meta/reflection.hpp"
-#include "Random.hpp"
+
 #include "constants.hpp"
+#include "Random.hpp"
 
 namespace emp {
 
@@ -382,4 +383,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_MATH_HPP_INCLUDE

@@ -1,4 +1,10 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file StreamManager.cpp
+ */
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -7,7 +13,7 @@
 TEST_CASE("Test StreamManager", "[io]")
 {
   emp::StreamManager sm;
-   
+
   std::stringstream & test_stream = sm.AddStringStream("test_stream");
   test_stream << "abc" << 123 << 'd' << 'e' << 'f';
   REQUIRE( test_stream.str() == "abc123def" );

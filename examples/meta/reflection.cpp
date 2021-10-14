@@ -1,9 +1,11 @@
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//
-//
-//  Some examples of code using reflection techniques.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file reflection.cpp
+ *  @brief Some examples of code using reflection techniques.
+ */
 
 #include <iostream>
 
@@ -152,7 +154,7 @@ int main()
 
   std::function<int(int,int,int)> add3(Add3);
   std::cout << "emp::SubsetCall(add3, 4,5,6,7.5,8.5) = "
-	    << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << std::endl;
+      << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << std::endl;
 
   has_XY<A>::type_X test_val = (has_XY<A>::type_X) 2.5;
   std::cout << "has_XY<A>::type_X = " << test_val << std::endl;

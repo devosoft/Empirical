@@ -1,16 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file RunTournament.cpp
+ */
 
 #include <iostream>
 
 #include <experimental/filesystem>
 
+#include "../../evo/World.h"
 #include "../../games/Mancala.h"
 #include "../../hardware/AvidaGP.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
-#include "../../evo/World.h"
 
 constexpr size_t POP_SIZE = 200;
 constexpr size_t GENOME_SIZE = 100;

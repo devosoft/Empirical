@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  BitVector.hpp
+ *  @file BitVector.hpp
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
@@ -25,14 +25,14 @@
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
 
+#ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE
+#define EMP_BITS_BITVECTOR_HPP_INCLUDE
 
-#ifndef EMP_BIT_VECTOR_H
-#define EMP_BIT_VECTOR_H
 
-#include <iostream>
-#include <initializer_list>
-#include <cstring>
 #include <bitset>
+#include <cstring>
+#include <initializer_list>
+#include <iostream>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -42,8 +42,8 @@
 #include "../math/Random.hpp"
 #include "../polyfill/span.hpp"
 
-#include "bitset_utils.hpp"
 #include "_bitset_helpers.hpp"
+#include "bitset_utils.hpp"
 
 namespace emp {
 
@@ -55,7 +55,7 @@ namespace emp {
 
   class BitVector {
   private:
-    // Use size_t for field_t since size_t is normally the native size for a processor (and, 
+    // Use size_t for field_t since size_t is normally the native size for a processor (and,
     // correctly, 32 bits for Emscripten), this should work in almost all cases.
     using field_t = size_t;
 
@@ -215,7 +215,7 @@ namespace emp {
     bool OK() const;
 
 
-    // >>>>>>>>>>  Accessors  <<<<<<<<<< //
+    // =========  Accessors  ========= //
 
     /// How many bits do we currently have?
     [[nodiscard]] size_t GetSize() const { return num_bits; }
@@ -283,7 +283,7 @@ namespace emp {
     BitVector & Resize(size_t new_bits);
 
 
-    // >>>>>>>>>>  Randomization functions  <<<<<<<<<< //
+    // =========  Randomization functions  ========= //
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitVector &  Randomize(Random & random);
@@ -299,7 +299,7 @@ namespace emp {
     /// Set all bits randomly, with a given number of ones.
     BitVector & ChooseRandom(Random & random, const int target_ones,
                              const size_t start_pos=0, size_t stop_pos=MAX_BITS);
-    
+
     /// Flip random bits with a given probability.
     BitVector & FlipRandom(Random & random, const double p,
                            const size_t start_pos=0, size_t stop_pos=MAX_BITS);
@@ -322,7 +322,7 @@ namespace emp {
     BitVector & ClearRandomCount(Random & random, const size_t target_bits);
 
 
-    // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
+    // =========  Comparison Operators  ========= //
 
     [[nodiscard]] bool operator==(const BitVector & in) const;
     [[nodiscard]] bool operator!=(const BitVector & in) const { return !(*this == in); }
@@ -332,7 +332,7 @@ namespace emp {
     [[nodiscard]] bool operator>=(const BitVector & in) const { return !(*this < in); }
 
 
-    // >>>>>>>>>>  Conversion Operators  <<<<<<<<<< //
+    // =========  Conversion Operators  ========= //
 
     /// Automatically convert BitVector to other vector types.
     template <typename T> operator emp::vector<T>();
@@ -341,7 +341,7 @@ namespace emp {
     explicit operator bool() const { return Any(); }
 
 
-    // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
+    // =========  Access Groups of bits  ========= //
 
     /// Retrive the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
@@ -377,7 +377,7 @@ namespace emp {
 
     // Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
-    
+
     // Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
@@ -416,7 +416,7 @@ namespace emp {
 
     // Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
-    
+
     // Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
@@ -442,7 +442,7 @@ namespace emp {
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
-    // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
+    // =========  Other Analyses  ========= //
 
     /// A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash(size_t start_field=0) const;
@@ -516,7 +516,7 @@ namespace emp {
     [[nodiscard]] bool HasOverlap(const BitVector & in) const;
 
 
-    // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
+    // =========  Print/String Functions  ========= //
 
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
@@ -564,7 +564,7 @@ namespace emp {
     }
 
 
-    // >>>>>>>>>>  Boolean Logic and Shifting Operations  <<<<<<<<<< //
+    // =========  Boolean Logic and Shifting Operations  ========= //
 
     /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
     BitVector & NOT_SELF();
@@ -692,7 +692,7 @@ namespace emp {
     /// Compound operator for shift right...
     BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    // >>>>>>>>>>  Standard Library Compatability  <<<<<<<<<< //
+    // =========  Standard Library Compatability  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] size_t size() const { return num_bits; }
@@ -1254,7 +1254,7 @@ namespace emp {
 
 
   // --------------------  Implementations of common accessors -------------------
-  
+
   /// Retrive the bit value from the specified index.
   bool BitVector::Get(size_t index) const {
     emp_assert(index < num_bits, index, num_bits);
@@ -1283,7 +1283,7 @@ namespace emp {
     ClearExcessBits();
     return *this;
   }
-  
+
   /// Set all bits to 0.
   BitVector & BitVector::Clear() {
     const size_t NUM_FIELDS = NumFields();
@@ -1653,7 +1653,7 @@ namespace emp {
   /// A simple hash function for bit vectors.
   std::size_t BitVector::Hash(size_t start_field) const {
     static_assert(std::is_same_v<field_t, size_t>, "Hash() requires fields to be size_t");
-    
+
     // If there are no fields left, hash on size one.
     if (start_field == NumFields()) return num_bits;
 
@@ -1668,7 +1668,7 @@ namespace emp {
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in the BitVector.
-  size_t BitVector::CountOnes() const { 
+  size_t BitVector::CountOnes() const {
     if (num_bits == 0) return 0;
     const field_t NUM_FIELDS = NumFields();
     size_t bit_count = 0;
@@ -2278,4 +2278,4 @@ namespace std {
   };
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE

@@ -8,8 +8,8 @@
  *  @note For internal use.
  */
 
-#ifndef EMP_ASSERT_TRIGGER_HPP
-#define EMP_ASSERT_TRIGGER_HPP
+#ifndef EMP_BASE__ASSERT_TRIGGER_HPP_INCLUDE
+#define EMP_BASE__ASSERT_TRIGGER_HPP_INCLUDE
 
 /// TDEBUG hould trigger its EMP equivalent.
 #ifdef TDEBUG
@@ -24,4 +24,4 @@
   #include "_native_assert_trigger.hpp"
 #endif
 
-#endif // #ifndef EMP_ASSERT_TRIGGER_HPP
+#endif // #ifndef EMP_BASE__ASSERT_TRIGGER_HPP_INCLUDE

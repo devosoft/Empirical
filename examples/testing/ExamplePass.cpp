@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file ExamplePass.cc
+ *  @file ExamplePass.cpp
  *  @brief An example file to show what PASSING unit tests look like, with commentary.
  *
  *  Unit tests can be built easily, with a good bit of flexibility, as described below.
@@ -17,6 +17,7 @@
  *  Try running the executable with --verbose to see the full information provided.
  */
 
+#include <string>
 
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
@@ -25,7 +26,6 @@
 
 // You may also include any other files that you need for your specific tests.
 
-#include <string>
 #include "emp/tools/string_utils.hpp"
 
 // You may create an extra functins or macros that you may need.

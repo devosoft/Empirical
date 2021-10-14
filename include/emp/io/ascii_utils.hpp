@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  ascii_utils.hpp
+ *  @file ascii_utils.hpp
  *  @brief Tools for working with ascii output.
  *  @note  Status: ALPHA
  *
  */
 
-#ifndef EMP_ASCII_UTILS_H
-#define EMP_ASCII_UTILS_H
+#ifndef EMP_IO_ASCII_UTILS_HPP_INCLUDE
+#define EMP_IO_ASCII_UTILS_HPP_INCLUDE
 
 #include <iostream>
 #include <ostream>
@@ -70,4 +70,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IO_ASCII_UTILS_HPP_INCLUDE

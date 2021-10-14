@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  TypePack.hpp
+ *  @file TypePack.hpp
  *  @brief A set of types that can be manipulated at compile time (good for metaprogramming)
  *
  *  TypePacks are static structues that provide a large set of mechanisms to access and adjust
@@ -66,8 +66,8 @@
  *    - GetIDPack could return an ValPack of ALL ID's for a type that appears more than once.
  */
 
-#ifndef EMP_TYPE_PACK_H
-#define EMP_TYPE_PACK_H
+#ifndef EMP_META_TYPEPACK_HPP_INCLUDE
+#define EMP_META_TYPEPACK_HPP_INCLUDE
 
 #include "meta.hpp"
 
@@ -395,4 +395,4 @@ namespace emp {
 /// Macro for building a TypePack from a set of types.
 #define EMP_BUILD_TYPE_PACK(...) emp::TypePack<__VA_ARGS__>
 
-#endif
+#endif // #ifndef EMP_META_TYPEPACK_HPP_INCLUDE

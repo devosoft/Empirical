@@ -1,15 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Some example code for using TypeTracker
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file TypeTracker.cpp
+ *  @brief Some example code for using TypeTracker
+ */
 
 #include <iostream>
 #include <string>
 
 #include "emp/base/vector.hpp"
-#include "emp/tools/TypeTracker.hpp"
 #include "emp/debug/debug.hpp"
+#include "emp/tools/TypeTracker.hpp"
 
 // Build some sample functions that we want called by type.
 void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }

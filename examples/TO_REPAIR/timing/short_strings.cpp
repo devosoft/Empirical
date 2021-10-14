@@ -1,20 +1,22 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Code comparing various methods of accessing entries in an unsorted_map.
-//
-//
-//  We are comparing the timings for accessing an unsorted map using:
-//  * Numerical IDs
-//  * Short strings
-//  * Longer strings
-//  * Floating point IDs
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file short_strings.cpp
+ *  @brief Code comparing various methods of accessing entries in an unsorted_map.
+ *
+ *  We are comparing the timings for accessing an unsorted map using:
+ *  * Numerical IDs
+ *  * Short strings
+ *  * Longer strings
+ *  * Floating point IDs
+ */
 
 #include <algorithm>     // For std::sort
 #include <ctime>         // For std::clock
-#include <iostream>      // For std::cout, etc.
 #include <functional>    // For std::function
+#include <iostream>      // For std::cout, etc.
 #include <string>
 #include <unordered_map>
 #include <vector>

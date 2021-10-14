@@ -1,8 +1,11 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015
+ *
+ *  @file config.cpp
+ */
 
-#define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <iostream>
@@ -14,6 +17,7 @@
 #include "emp/config/ArgManager.hpp"
 #include "emp/config/command_line.hpp"
 #include "emp/config/config.hpp"
+
 #include "assets/config_setup.hpp"
 
 TEST_CASE("Test config", "[config]"){

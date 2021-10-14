@@ -8,8 +8,8 @@
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_VALUE_UTILS_H
-#define EMP_VALUE_UTILS_H
+#ifndef EMP_TOOLS_VALUE_UTILS_HPP_INCLUDE
+#define EMP_TOOLS_VALUE_UTILS_HPP_INCLUDE
 
 #include <string>
 
@@ -33,4 +33,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_VALUE_UTILS_HPP_INCLUDE

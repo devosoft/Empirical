@@ -1,16 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
-
-#define CATCH_CONFIG_MAIN
-
-#include <ratio>
-#include <string>
-#include <unordered_set>
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file hash_namify.cpp
+ */
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/hash_namify.h"
+#include "emp/tools/hash_namify.hpp"
 
 TEST_CASE("Test hash_namify", "[tools]") {
 

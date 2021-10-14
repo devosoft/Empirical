@@ -3,22 +3,22 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  World_structure.hpp
+ *  @file World_structure.hpp
  *  @brief Functions for popular world structure methods.
  */
 
-#ifndef EMP_EVO_WORLD_STRUCTURE_H
-#define EMP_EVO_WORLD_STRUCTURE_H
+#ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 
 #include <set>
 
+#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "../base/array.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "../data/Trait.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
-#include "../datastructs/vector_utils.hpp"
 
 namespace emp {
 
@@ -556,4 +556,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE

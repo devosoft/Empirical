@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
  *
- *  @file  Lexer.hpp
+ *  @file Lexer.hpp
  *  @brief A general-purpose, fast lexer.
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_LEXER_H
-#define EMP_LEXER_H
+#ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
+#define EMP_COMPILER_LEXER_HPP_INCLUDE
 
 #include <map>
 #include <string>
@@ -17,6 +17,7 @@
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
+
 #include "lexer_utils.hpp"
 #include "RegEx.hpp"
 
@@ -234,7 +235,7 @@ namespace emp {
       for (auto & str : str_v) {
         ss << str;
       }
-      
+
       return Tokenize(ss);
     }
 
@@ -271,4 +272,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE

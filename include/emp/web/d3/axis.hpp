@@ -3,18 +3,20 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  axis.hpp
+ *  @file axis.hpp
  *  @brief Handle drawing of axes on D3 graphts.
  */
 
-#ifndef EMP_D3_AXIS_H
-#define EMP_D3_AXIS_H
+#ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
+#define EMP_WEB_D3_AXIS_HPP_INCLUDE
+
+#include "../../tools/string_utils.hpp"
 
 #include "../js_utils.hpp"
-#include "../../tools/string_utils.hpp"
+
 #include "d3_init.hpp"
-#include "selection.hpp"
 #include "scales.hpp"
+#include "selection.hpp"
 
 namespace D3 {
 
@@ -85,7 +87,7 @@ namespace D3 {
 
       MAIN_THREAD_EM_ASM({
         var axis_range = js.objects[$0].scale().range();
-	    js.objects[$3] = js.objects[$1].append("g");
+        js.objects[$3] = js.objects[$1].append("g");
 
         js.objects[$3].append("g").attr("id", UTF8ToString($2))
                                   .call(js.objects[$0]);
@@ -138,8 +140,8 @@ namespace D3 {
     template <typename T>
     Axis& ApplyAxis(const SelectionOrTransition<T> & selection) {
       MAIN_THREAD_EM_ASM({
-	    js.objects[$1].call(js.objects[$0]);
-	  }, this->id, selection.GetID());
+        js.objects[$1].call(js.objects[$0]);
+      }, this->id, selection.GetID());
       return *this;
     }
 
@@ -150,8 +152,8 @@ namespace D3 {
       this->scale = scale;
 
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].scale(js.objects[$1]);
-	  }, this->id, scale.GetID());
+        js.objects[$0].scale(js.objects[$1]);
+      }, this->id, scale.GetID());
       return *this;
     }
 
@@ -183,44 +185,44 @@ namespace D3 {
       emp::pass_array_to_javascript(values);
 
       MAIN_THREAD_EM_ASM({
-  	    js.objects[$0].tickValues(emp_i.__incoming_array);
-	  }, this->id);
+          js.objects[$0].tickValues(emp_i.__incoming_array);
+      }, this->id);
       return *this;
     }
 
     Axis& SetTickSize(float size) {
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].tickSize($1);
+        js.objects[$0].tickSize($1);
       }, this->id, size);
       return *this;
     }
 
     Axis& SetTickSizeInner(float size) {
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].tickSizeInner($1);
-	  }, this->id, size);
+        js.objects[$0].tickSizeInner($1);
+      }, this->id, size);
       return *this;
     }
 
     Axis& SetTickSizeOuter(float size) {
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].tickSizeOuter($1);
-  	  }, this->id, size);
+        js.objects[$0].tickSizeOuter($1);
+      }, this->id, size);
       return *this;
     }
 
     Axis& SetTickPadding(int padding) {
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].tickPadding($1);
-	  }, this->id, padding);
+        js.objects[$0].tickPadding($1);
+      }, this->id, padding);
       return *this;
     }
 
     /// Set the number of ticks along the axis
     Axis& SetTicks(int count){
       MAIN_THREAD_EM_ASM({
-	    js.objects[$0].ticks($1);
-	  }, this->id, count);
+        js.objects[$0].ticks($1);
+      }, this->id, count);
       return *this;
     }
 
@@ -266,4 +268,4 @@ namespace D3 {
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE

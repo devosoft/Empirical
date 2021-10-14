@@ -1,21 +1,21 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The SignalControl class manages all of the signals and actions, linking them together
-//  upon request (by name, base class, or derived class).
-//
-//
-//  Developer notes:
-//  * Right now SignalControl can only link to signals that it creates.  Ideally, external signals
-//    should also be able to be added to it.  The question is, how should this be done?
-//    - They could be copied.  But should we copy existing actions?  How do we provide keys?
-//    - They could use a smart pointer style, so only deleted with final version (slow down?)
-//    - They could reference the originally and automatically clean up if its deleted (confusing?)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file SignalControl.hpp
+ *  @brief The SignalControl class manages all of the signals and actions, linking them together
+ *  upon request (by name, base class, or derived class).
+ *
+ *  Developer notes:
+ *  * Right now SignalControl can only link to signals that it creates.  Ideally, external signals
+ *    should also be able to be added to it.  The question is, how should this be done?
+ *    - They could be copied.  But should we copy existing actions?  How do we provide keys?
+ *    - They could use a smart pointer style, so only deleted with final version (slow down?)
+ */
 
-#ifndef EMP_SIGNAL_CONTROL
-#define EMP_SIGNAL_CONTROL
+#ifndef EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
+#define EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
 
 #include <string>
 #include <unordered_map>
@@ -95,4 +95,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE

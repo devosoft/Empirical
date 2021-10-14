@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  config_utils.hpp
+ *  @file config_utils.hpp
  *  @brief Helper functions for working with emp::Config objects.
  *
  */
 
-#ifndef EMP_CONFIG_UTILS_H
-#define EMP_CONFIG_UTILS_H
+#ifndef EMP_CONFIG_CONFIG_UTILS_HPP_INCLUDE
+#define EMP_CONFIG_CONFIG_UTILS_HPP_INCLUDE
 
 #include "config.hpp"
 
@@ -22,4 +22,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONFIG_CONFIG_UTILS_HPP_INCLUDE

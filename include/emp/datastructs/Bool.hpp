@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  Bool.hpp
+ *  @file Bool.hpp
  *  @brief A bool representation that doesn't trip up std::vector
  *  @note Status: ALPHA
  *
  */
 
+#ifndef EMP_DATASTRUCTS_BOOL_HPP_INCLUDE
+#define EMP_DATASTRUCTS_BOOL_HPP_INCLUDE
 
-#ifndef EMP_BOOL_H
-#define EMP_BOOL_H
 
 #include <iostream>
 
@@ -65,4 +65,4 @@ namespace std {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_BOOL_HPP_INCLUDE

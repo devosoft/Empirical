@@ -3,18 +3,18 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  SettingConfig.hpp
+ *  @file SettingConfig.hpp
  *  @brief A tool for collecting settings, including from files and the command line.
  *  @note Status: DEPRECATED!
  */
 
-#ifndef EMP_SETTING_CONFIG_H
-#define EMP_SETTING_CONFIG_H
+#ifndef EMP_CONFIG_SETTINGCONFIG_HPP_INCLUDE
+#define EMP_CONFIG_SETTINGCONFIG_HPP_INCLUDE
 
-#include <unordered_map>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
@@ -498,4 +498,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONFIG_SETTINGCONFIG_HPP_INCLUDE

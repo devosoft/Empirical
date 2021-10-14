@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some example code for using TypePack
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2019
+ *
+ *  @file TypePack.cpp
+ *  @brief Some examples of code using reflection techniques.
+ */
 
 #include <iostream>
 #include <string>
@@ -50,7 +52,7 @@ int main()
   using test4_t = test2_t::shrink<2>;
   std::cout << "After shrink<2>, size of type = " << test4_t::GetSize() << std::endl;
   std::cout << "After merge of t1 and t2, size = "
-	    << test_t::merge<test2_t>::GetSize() << std::endl;
+      << test_t::merge<test2_t>::GetSize() << std::endl;
 
   // IF applied correctly, v will be a vector of uint64_t.
   test3_t::apply<std::vector> v;
@@ -94,9 +96,9 @@ int main()
 
   using tp_size_3_t = emp::TypePack<int, double, bool>;
   std::cout << "\nTesting combos; tp_size_3_t has " << tp_size_3_t::SIZE << " types: "
-	    << emp::GetTypeID<tp_size_3_t>().GetName() << "\n"
-	    << "Combo size three has " << tp_size_3_t::make_combos<3>::SIZE << " triples:"
-	    << emp::GetTypeID<tp_size_3_t::make_combos<3>>().GetName() << "\n";
+      << emp::GetTypeID<tp_size_3_t>().GetName() << "\n"
+      << "Combo size three has " << tp_size_3_t::make_combos<3>::SIZE << " triples:"
+      << emp::GetTypeID<tp_size_3_t::make_combos<3>>().GetName() << "\n";
 
   using tmp_t = emp::internal::all_combos<3,tp_size_3_t,tp_size_3_t>;
   DEBUG_PRINT(tmp_t::next_combos);

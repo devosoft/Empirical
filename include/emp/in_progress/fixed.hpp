@@ -1,20 +1,20 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015
+ *
+ *  @file fixed.hpp
+ *  @brief A comprehensive (ideally) fixed-point number representation.
+ *
+ *  Type-name: emp::fixed
+ *
+ *  Representation: sign (1 bit), int value (21 bits), frac value (10 bits)
+ *  Max value:  2097151.999
+ *  Min value: -2097152.999 (@CAO or .000?)
+ */
 
-#ifndef EMP_FIXED_H
-#define EMP_FIXED_H
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  A comprehensive (ideally) fixed-point number representation.
-//
-//  Type-name: emp::fixed
-//
-//  Representation: sign (1 bit), int value (21 bits), frac value (10 bits)
-//  Max value:  2097151.999
-//  Min value: -2097152.999 (@CAO or .000?)
-//
+#ifndef EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
+#define EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
 
 #include <iostream>
 
@@ -56,7 +56,7 @@ namespace emp {
       value = (((long) value) << FRAC_BITS) / rhs.value;
       return *this;
     }
-    
+
     fixed & operator++() { value += (1 << FRAC_BITS); }
     fixed operator++(int) { int old_val = value; operator++(); return fixed(old_val); }
     fixed & operator--() { value -= (1 << FRAC_BITS); }
@@ -81,7 +81,7 @@ namespace emp {
       const int new_value = (((long) lhs.value) << FRAC_BITS) / rhs.value;
       return fixed(new_value, true);
     }
-    
+
     friend bool operator==(const fixed & lhs, const fixed & rhs)
     { return lhs.value == rhs.value; }
     friend bool operator!=(const fixed & lhs, const fixed & rhs)
@@ -94,24 +94,24 @@ namespace emp {
     { return lhs.value >  rhs.value; }
     friend bool operator>=(const fixed & lhs, const fixed & rhs)
     { return lhs.value >= rhs.value; }
-  
+
   };
 
-  
+
 };
-  
+
 // Overload istream and ostream to work with fixed.
 template <int FRAC_BITS> std::ostream & operator<<(std::ostream & os,
-                                                   const emp::fixed<FRAC_BITS> & input) { 
+                                                   const emp::fixed<FRAC_BITS> & input) {
   return os << input.AsDouble();
 }
 
 template <int FRAC_BITS> std::istream & operator>>(std::istream & is,
-                                                   emp::fixed<FRAC_BITS> & input) { 
+                                                   emp::fixed<FRAC_BITS> & input) {
   double tmp_val;
   is >> tmp_val;
   input = tmp_val;
   return is;
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_FIXED_HPP_INCLUDE

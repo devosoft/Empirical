@@ -3,20 +3,20 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Struct.hpp
+ *  @file Struct.hpp
  *  @brief Struct is a set of active variables, grouped by name (organized by a specific StructType)
  */
 
-#ifndef EMP_EMPOWER_STRUCT_H
-#define EMP_EMPOWER_STRUCT_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_STRUCT_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_STRUCT_HPP_INCLUDE
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 
 #include "StructType.h"
-#include "VarInfo.h"
 #include "Var.h"
+#include "VarInfo.h"
 
 namespace emp {
 
@@ -54,4 +54,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_STRUCT_HPP_INCLUDE

@@ -1,8 +1,11 @@
-//  This file is part of Project Name
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This file contains an easy-to-manipulate NK world.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file NK-web.cpp
+ *  @brief This file contains an easy-to-manipulate NK world.
+ */
 
 #include "emp/web/web.hpp"
 

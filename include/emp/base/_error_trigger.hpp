@@ -4,12 +4,12 @@
  *  @date 2021.
  *
  *  @file _error_trigger.hpp
- *  @brief Error trigger implementation selector 
+ *  @brief Error trigger implementation selector
  *  @note For internal use.
  */
 
-#ifndef EMP_ERROR_TRIGGER_HPP
-#define EMP_ERROR_TRIGGER_HPP
+#ifndef EMP_BASE__ERROR_TRIGGER_HPP_INCLUDE
+#define EMP_BASE__ERROR_TRIGGER_HPP_INCLUDE
 
 /// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG
@@ -24,4 +24,4 @@
   #include "_native_error_trigger.hpp"
 #endif
 
-#endif // #ifndef EMP_ERROR_TRIGGER_HPP
+#endif // #ifndef EMP_BASE__ERROR_TRIGGER_HPP_INCLUDE

@@ -1,16 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Example code for converting string pattern representations.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file lexer_utils.cpp
+ *  @brief Example code for converting string pattern representations.
+ */
 
 #include <iostream>
 #include <string>
 
 #include "emp/compiler/DFA.hpp"
-#include "emp/compiler/NFA.hpp"
 #include "emp/compiler/lexer_utils.hpp"
+#include "emp/compiler/NFA.hpp"
 #include "emp/compiler/RegEx.hpp"
 
 void Test(const emp::DFA & dfa, const std::string & str) {

@@ -3,34 +3,36 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  visualizations.hpp
+ *  @file visualizations.hpp
  *  @brief Tools to build D3 visualizations.
  */
 
-#ifndef EMP_VISUALIZATION_UTILS_H
-#define EMP_VISUALIZATION_UTILS_H
+#ifndef EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
+#define EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
 
-#include <functional>
 #include <algorithm>
 #include <deque>
+#include <functional>
 
-#include "../../config/config.hpp"
 #include "../../bits/BitSet.hpp"
+#include "../../config/config.hpp"
+#include "../../functional/FunctionSet.hpp"
+#include "../../math/constants.hpp"
 #include "../../math/Random.hpp"
 #include "../../math/stats.hpp"
 #include "../../tools/string_utils.hpp"
-#include "../../functional/FunctionSet.hpp"
-#include "../../math/constants.hpp"
-#include "../init.hpp"
+
 #include "../Animate.hpp"
+#include "../init.hpp"
 #include "../JSWrap.hpp"
-#include "selection.hpp"
-#include "scales.hpp"
+
 #include "axis.hpp"
-#include "svg_shapes.hpp"
-#include "layout.hpp"
-#include "visual_elements.hpp"
 #include "histogram.hpp"
+#include "layout.hpp"
+#include "scales.hpp"
+#include "selection.hpp"
+#include "svg_shapes.hpp"
+#include "visual_elements.hpp"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
@@ -1032,9 +1034,9 @@ public:
 
     char * color = (char *) MAIN_THREAD_EM_ASM_INT({
         var text = d3.hcl($1, 150, $0*175).toString();
-	    var buffer = Module._malloc(text.length+1);
-	    Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-	    return buffer;
+      var buffer = Module._malloc(text.length+1);
+      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
+      return buffer;
     }, r, theta);
 
     std::string result = std::string(color);
@@ -1151,4 +1153,5 @@ public:
 
 }
 }
-#endif
+
+#endif // #ifndef EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE

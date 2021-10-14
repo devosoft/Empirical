@@ -1,18 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Annotate all of the words in an input list with their length.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file annotate-length.cpp
+ *  @brief Annotate all of the words in an input list with their length.
+ */
 
 #include <iostream>
 #include <set>
 
 #include "../../../include/emp/base/assert.hpp"
 #include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/math/math.hpp"
-#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
 void Process(std::istream & is, std::ostream & os) {
@@ -29,7 +31,7 @@ int main(int argc, char* argv[])
 
   if (args.size() > 3) {
     std::cerr << "Only a single input filename and output filename are allowed as arguments."
-	      << std::endl;
+        << std::endl;
     exit(1);
   }
 

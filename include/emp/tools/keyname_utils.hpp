@@ -10,14 +10,14 @@
  *  https://github.com/mmore500/keyname
  */
 
+#ifndef EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE
+#define EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE
 
-#ifndef EMP_KEY_NAME_UTILS_H
-#define EMP_KEY_NAME_UTILS_H
 
 #include <algorithm>
-#include <unordered_map>
 #include <map>
 #include <string>
+#include <unordered_map>
 #ifndef __EMSCRIPTEN__
 #include <filesystem>
 #else
@@ -112,4 +112,4 @@ namespace emp::keyname {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE

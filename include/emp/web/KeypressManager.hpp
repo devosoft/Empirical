@@ -1,12 +1,9 @@
-#ifndef EMP_WEB_KEYPRESS_MANAGER_H
-#define EMP_WEB_KEYPRESS_MANAGER_H
-
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  KeypressManager.hpp
+ *  @file KeypressManager.hpp
  *  @brief KeypressManager is a tracker for keypresses in HTML5 pages.
  *
  *  When a KeypressManager is created, it can be given functions to run in response
@@ -43,9 +40,12 @@
  *        pass it back in to trigger the removal.
  */
 
+#ifndef EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
+#define EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
+
 #include <functional>
-#include <map>
 #include <locale>
+#include <map>
 
 #include "../base/errors.hpp"
 
@@ -183,4 +183,4 @@ namespace web {
 };
 };
 
-#endif
+#endif // #ifndef EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE

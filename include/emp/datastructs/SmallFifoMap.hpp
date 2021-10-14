@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  SmallFifoMap.hpp
+ *  @file SmallFifoMap.hpp
  *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
  *  value when full. Optimized for small N. Requires N < 256.
  *
  */
 
-#ifndef EMP_ASSOCIATIVE_ARRAY_CACHE_HPP
-#define EMP_ASSOCIATIVE_ARRAY_CACHE_HPP
+#ifndef EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
 
 #include <algorithm>
 #include <utility>
@@ -130,4 +130,4 @@ public:
 
 } // namespace emp
 
-#endif // #ifndef EMP_ASSOCIATIVE_ARRAY_CACHE_HPP
+#endif // #ifndef EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE

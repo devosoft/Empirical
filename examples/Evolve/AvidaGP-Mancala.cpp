@@ -1,14 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file AvidaGP-Mancala.cpp
+ */
 
 #include <iostream>
 
+#include "emp/Evolve/World.hpp"
 #include "emp/games/Mancala.hpp"
 #include "emp/hardware/AvidaGP.hpp"
 #include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
-#include "emp/Evolve/World.hpp"
 
 constexpr size_t POP_SIZE = 20;
 constexpr size_t GENOME_SIZE = 100;

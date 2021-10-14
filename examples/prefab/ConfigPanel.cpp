@@ -1,14 +1,18 @@
-//  This file is part of Config Panel App
-//  Copyright (C) Matthew Andres Moreno, 2020.
-//  Released under MIT license; see LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file ConfigPanel.cpp
+ */
 
 #include <iostream>
 
-#include "emp/config/command_line.hpp"
 #include "emp/config/ArgManager.hpp"
+#include "emp/config/command_line.hpp"
 #include "emp/prefab/ConfigPanel.hpp"
-#include "emp/web/web.hpp"
 #include "emp/web/UrlParams.hpp"
+#include "emp/web/web.hpp"
 
 #include "assets/SampleConfig.hpp"
 

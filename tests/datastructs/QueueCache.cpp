@@ -1,12 +1,18 @@
-#define CATCH_CONFIG_MAIN
-
-#include "third-party/Catch/single_include/catch2/catch.hpp"
-
-#include "emp/datastructs/QueueCache.hpp"
-#include "emp/base/vector.hpp"
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file QueueCache.cpp
+ */
 
 #include <sstream>
 #include <string>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
+
+#include "emp/base/vector.hpp"
+#include "emp/datastructs/QueueCache.hpp"
 
 SCENARIO("Queue Caches store elements", "[datastructs]") {
   GIVEN("a queue cache of a certain capacity") {

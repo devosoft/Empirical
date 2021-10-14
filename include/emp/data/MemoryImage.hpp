@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  MemoryImage.hpp
+ *  @file MemoryImage.hpp
  *  @brief A managed set of Bytes to store any kind of data.
  *  @note Status: ALPHA
  *
  */
 
-#ifndef EMP_MEMORY_IMAGE_H
-#define EMP_MEMORY_IMAGE_H
+#ifndef EMP_DATA_MEMORYIMAGE_HPP_INCLUDE
+#define EMP_DATA_MEMORYIMAGE_HPP_INCLUDE
 
 #include <cstring>        // For std::memcpy
 #include <new>            // For placement new
@@ -159,4 +159,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_MEMORYIMAGE_HPP_INCLUDE

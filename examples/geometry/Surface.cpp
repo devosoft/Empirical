@@ -1,11 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::Random
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file Surface.cpp
+ */
 
 #include <iostream>
+
 #include "emp/geometry/Point2D.hpp"
 #include "emp/geometry/Surface.hpp"
 #include "emp/math/Random.hpp"
@@ -43,8 +45,9 @@ int main()
 
   for (auto & body : bodies) {
     body.id = surface.AddBody(&body,
-			                        { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
-		                  	      random.GetDouble(10.0, 100.0));
+      { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
+      random.GetDouble(10.0, 100.0)
+    );
   }
 
   std::cout << "---- surface results ----" << std::endl;
@@ -88,8 +91,9 @@ int main()
 
   for (auto & body : bodies3) {
     body.id = surface.AddBody(&body,
-			                        { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
-		                  	      random.GetDouble(10.0, 100.0));
+      { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
+      random.GetDouble(10.0, 100.0)
+    );
     std::cout << body.id << " ";
   }
   std::cout << ")\n";

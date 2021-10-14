@@ -3,11 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  FacetedWidget.h
+ *  @file _FacetedWidget.hpp
  *  @brief The FacetedWidget class is used to access the protected methods of WidgetFacet such
  *          as SetCSS and SetAttr. An example of its use can be found in include/emp/prefab/Collapse.h
  *
  */
+
+#ifndef EMP_WEB__FACETEDWIDGET_HPP_INCLUDE
+#define EMP_WEB__FACETEDWIDGET_HPP_INCLUDE
 
 #include "../web/Widget.hpp"
 
@@ -29,3 +32,5 @@ namespace web{
 }
 
 #endif
+
+#endif // #ifndef EMP_WEB__FACETEDWIDGET_HPP_INCLUDE

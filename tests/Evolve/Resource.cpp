@@ -1,13 +1,21 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Resource.cpp
+ */
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <iostream>
+
 #include "emp/base/array.hpp"
-#include "emp/Evolve/NK-const.hpp"
-#include "emp/Evolve/World.hpp"
-#include "emp/Evolve/Resource.hpp"
-#include "emp/Evolve/NK.hpp"
 #include "emp/bits/BitSet.hpp"
+#include "emp/Evolve/NK-const.hpp"
+#include "emp/Evolve/NK.hpp"
+#include "emp/Evolve/Resource.hpp"
+#include "emp/Evolve/World.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
 

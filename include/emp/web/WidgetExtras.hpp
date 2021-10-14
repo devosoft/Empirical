@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  WidgetExtras.hpp
+ *  @file WidgetExtras.hpp
  *  @brief A collection of extra details about HTML Widgets (attributes, style, listerns)
  */
 
-#ifndef EMP_WEB_WIDGET_EXTRA_H
-#define EMP_WEB_WIDGET_EXTRA_H
+#ifndef EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE
+#define EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE
 
 #include "Attributes.hpp"
 #include "init.hpp"
@@ -56,4 +56,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE

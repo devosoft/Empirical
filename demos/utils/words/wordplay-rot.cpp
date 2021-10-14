@@ -1,21 +1,23 @@
-// Test the rotation of letters through an alphabet to see if new words are formed.
-
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Build graphs of various types in the standard format.
-//  NOTE: All questions can be answered by providing command-line arguements.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file wordplay-rot.cpp
+ *  @brief Test the rotation of letters through an alphabet to see if new words are formed.
+ *
+ *  Build graphs of various types in the standard format.
+ *  NOTE: All questions can be answered by providing command-line arguments.
+ */
 
 #include <iostream>
 #include <set>
 
 #include "../../../include/emp/base/assert.hpp"
 #include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/math/math.hpp"
-#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
 void Rot(std::string & str, int rot) {

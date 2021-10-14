@@ -1,16 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple Malcala game state handler.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2021
+ *
+ *  @file Mancala.hpp
+ *  @brief A simple Malcala game state handler.
+ */
 
-#ifndef EMP_GAME_MANCALA_HPP
-#define EMP_GAME_MANCALA_HPP
+#ifndef EMP_GAMES_MANCALA_HPP_INCLUDE
+#define EMP_GAMES_MANCALA_HPP_INCLUDE
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <unordered_map>
 
 #include "../base/array.hpp"
@@ -233,4 +235,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_GAMES_MANCALA_HPP_INCLUDE

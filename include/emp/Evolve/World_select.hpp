@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2021.
  *
- *  @file  World_select.hpp
+ *  @file World_select.hpp
  *  @brief Functions for popular selection methods applied to worlds.
  */
 
-#ifndef EMP_EVO_WORLD_SELECT_H
-#define EMP_EVO_WORLD_SELECT_H
+#ifndef EMP_EVOLVE_WORLD_SELECT_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_SELECT_HPP_INCLUDE
 
-#include <map>
 #include <functional>
+#include <map>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -492,4 +492,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_SELECT_HPP_INCLUDE

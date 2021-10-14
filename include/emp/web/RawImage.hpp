@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  RawImage.hpp
+ *  @file RawImage.hpp
  *  @brief Handle the fundamental loading of an image (without Widget tracking)
  */
 
-#ifndef EMP_RAW_IMAGE_H
-#define EMP_RAW_IMAGE_H
+#ifndef EMP_WEB_RAWIMAGE_HPP_INCLUDE
+#define EMP_WEB_RAWIMAGE_HPP_INCLUDE
 
 #include <functional>
 #include <map>
@@ -158,4 +158,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_RAWIMAGE_HPP_INCLUDE

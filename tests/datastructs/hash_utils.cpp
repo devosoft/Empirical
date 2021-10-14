@@ -1,13 +1,19 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file hash_utils.cpp
+ */
+
+#include <array>
+#include <iostream>
+#include <sstream>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-
-#include <sstream>
-#include <iostream>
-#include <unordered_set>
-#include <array>
-#include <unordered_map>
 #include "emp/base/vector.hpp"
 #include "emp/datastructs/hash_utils.hpp"
 #include "emp/datastructs/vector_utils.hpp"
@@ -191,4 +197,3 @@ TEST_CASE("Test hash_utils", "[datastructs]")
     REQUIRE(hasher2({0, 1, 2}) == 11084449573900);
   }
 }
-
