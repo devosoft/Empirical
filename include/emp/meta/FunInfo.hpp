@@ -30,10 +30,10 @@ namespace emp {
   struct FunInfo <RETURN_T(CLASS_T::*)(PARAM1_T, PARAM_Ts...) const>
   {
     using return_t = RETURN_T;
-    using param_t = TypePack<PARAM1_T, PARAM_Ts>;
+    using param_t = TypePack<PARAM1_T, PARAM_Ts...>;
 
     template <size_t ID>
-    using arg_t = param_t::get<ID>;
+    using arg_t = typename param_t::template get<ID>;
 
     static constexpr size_t NumArgs() { return 1 + sizeof...(PARAM_Ts); }
 
