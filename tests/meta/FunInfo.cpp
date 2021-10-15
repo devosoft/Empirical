@@ -9,6 +9,7 @@
 #include "emp/base/vector.hpp"
 #include "emp/base/Ptr.hpp"
 #include "emp/meta/FunInfo.hpp"
+#include "emp/tools/string_utils.hpp"
 
 std::string fun0(std::string base, int dup) {
   std::string out = "";
@@ -177,4 +178,17 @@ TEST_CASE("Test FunInfo", "[meta]")
   CHECK( test_str == "Start++" );
   fun7b();
   CHECK( test_str == "Start+++" );
+
+
+  // Test function wrapping!
+  auto concat = [](std::string in1, std::string in2){ return in1 + in2; };
+  CHECK( concat("abc","def") == "abcdef" );
+
+  auto concat_to_int =
+    emp::WrapReturnType(
+      concat,
+      [](std::string x){ return emp::from_string<int>(x); }
+    );
+
+  CHECK( concat_to_int("123","456") == 123456 );
 }
