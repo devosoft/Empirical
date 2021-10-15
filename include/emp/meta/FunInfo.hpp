@@ -10,6 +10,10 @@
  *  FunInfo will collect information about a provided function and facilitate
  *  manipulations.
  * 
+ * 
+ *  Developer Notes:
+ *  - Need to setup BindAt to choose bind position(s).
+ *    For example:  fun_info::BindAt<2,4>(my_fun, 12, "abc")
  */
 
 #ifndef EMP_FUN_INFO_HPP
@@ -25,7 +29,18 @@ namespace emp {
   template <typename T>
   struct FunInfo : public FunInfo< decltype(&T::operator()) > {};
 
-  // Specialization for functions with AT LEAST ONE parameter...
+  // Specialization for functions; redirect to function-object specialization.
+  template <typename RETURN_T, typename... PARAM_Ts>
+  struct FunInfo <RETURN_T(PARAM_Ts...)>
+  : public FunInfo< std::function<RETURN_T(PARAM_Ts...)> > {};
+
+  // Specialization for functions; redirect to function-object specialization.
+  template <typename RETURN_T, typename... PARAM_Ts>
+  struct FunInfo <RETURN_T(*)(PARAM_Ts...)>
+  : public FunInfo< std::function<RETURN_T(PARAM_Ts...)> > {};
+
+
+  // Specialization for function objects with AT LEAST ONE parameter...
   template <typename CLASS_T, typename RETURN_T, typename PARAM1_T, typename... PARAM_Ts>
   struct FunInfo <RETURN_T(CLASS_T::*)(PARAM1_T, PARAM_Ts...) const>
   {
@@ -39,7 +54,7 @@ namespace emp {
 
     /// Test if this function can be called with a particular set of arguments.
     template <typename ARG1, typename... ARG_Ts>
-    static constexpr bool InvocableWith(ARG1, ARG_Ts...) {
+    static constexpr bool InvocableWith(ARG1 &&, ARG_Ts &&...) {
       return std::is_invocable<CLASS_T, ARG1, ARG_Ts...>();
     }
 
@@ -50,20 +65,29 @@ namespace emp {
     }
 
     template <typename T>
-    static auto BindFirst(CLASS_T fun, T bound) {
-      return [fun, bound](PARAM_Ts... args) {
-        return fun(std::forward<T>(bound), std::forward<PARAM_Ts>(args)...);
-      };
+    static auto BindFirst(CLASS_T fun, T && bound) {
+      // If the function needs a reference for the parameter, send the supplied value through.
+      if constexpr (std::is_reference<PARAM1_T>()) {
+        return [fun, &bound](PARAM_Ts... args) {
+          return fun(std::forward<T>(bound), std::forward<PARAM_Ts>(args)...);
+        };
+      }
+      // Otherwise, a copy is fine.
+      else {
+        return [fun, bound](PARAM_Ts... args) {
+          return fun(std::forward<T>(bound), std::forward<PARAM_Ts>(args)...);
+        };
+      }
     }
 
-    // template <size_t POS, typename T>
-    // static auto BindAt(CLASS_T fun, T bound) {
+    // template <size_t... POS, typename... Ts>
+    // static auto BindAt(CLASS_T fun, Ts &&... bound) {
     //   return [fun, bound](PARAM_Ts... args) { return fun(bound, args...); };
     // }
 
   };
 
-  // Specialization for functions with NO parameters...
+  // Specialization for function objects with NO parameters...
   template <typename CLASS_T, typename RETURN_T>
   struct FunInfo <RETURN_T(CLASS_T::*)() const>
   {
@@ -76,6 +100,14 @@ namespace emp {
     template <typename... ARG_Ts>
     static constexpr bool InvocableWith(ARG_Ts...) { return sizeof...(ARG_Ts) == 0; }
   };
+
+
+  // Stand-alone helper functions.
+  template <typename FUN_T, typename T>
+  auto BindFirst(FUN_T fun, T && bound) {
+    return FunInfo<FUN_T>::BindFirst(fun, std::forward<T>(bound));
+  }
+
 }
 
 #endif
