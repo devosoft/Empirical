@@ -156,4 +156,25 @@ TEST_CASE("Test FunInfo", "[meta]")
 
   CHECK(fun7(mut_string) == 23);
   CHECK(mut_string == "This String Can Change+");
+
+
+  // Test binding the first parameter.
+  auto fun0b = info0_t::BindFirst(fun0, "123");
+  CHECK(fun0b(3) == "123123123");
+  CHECK(fun0b(10) == "123123123123123123123123123123");
+
+  auto fun0c = emp::BindFirst(fun0, "Test");
+  CHECK(fun0c(3) == "TestTestTest");
+  CHECK(fun0c(10) == "TestTestTestTestTestTestTestTestTestTest");
+
+  std::string test_str = "Start";
+  auto fun7b = emp::BindFirst(fun7, test_str);
+
+  CHECK( test_str == "Start" );
+  fun7b();
+  CHECK( test_str == "Start+" );
+  fun7b();
+  CHECK( test_str == "Start++" );
+  fun7b();
+  CHECK( test_str == "Start+++" );
 }
