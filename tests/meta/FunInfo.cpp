@@ -10,7 +10,7 @@
 #include "emp/base/Ptr.hpp"
 #include "emp/meta/FunInfo.hpp"
 
-std::string StringDup(std::string base, int dup) {
+std::string fun0(std::string base, int dup) {
   std::string out = "";
   for (int i = 0; i < dup; i++) { out += base; }
   return out;
@@ -18,20 +18,20 @@ std::string StringDup(std::string base, int dup) {
 
 TEST_CASE("Test FunInfo", "[meta]")
 {
-  auto lambda1 = [](){ return 0; };
-  auto lambda2 = [](int a, int b, int c){ return a + 2*b + 3*c; };
-  auto lambda3 = [](double a, double b){ return a + b*b; };
+  auto fun1 = [](){ return 0; };
+  auto fun2 = [](int a, int b, int c){ return a + 2*b + 3*c; };
+  auto fun3 = [](double a, double b){ return a + b*b; };
 
-  std::function<double(double,double,double)> fun4 = lambda2;
-  std::function<double(double,double)> fun5 = lambda3;
-  std::function<std::string(std::string,int)> fun6 = StringDup;
+  std::function<double(double,double,double)> fun4 = fun2;
+  std::function<double(double,double)> fun5 = fun3;
+  std::function<std::string(std::string,int)> fun6 = fun0;
 
   std::function<size_t(std::string &)> fun7 = [](std::string & in){ in += '+'; return in.size(); };
 
-  using info0_t = emp::FunInfo<decltype(StringDup)>;
-  using info1_t = emp::FunInfo<decltype(lambda1)>;
-  using info2_t = emp::FunInfo<decltype(lambda2)>;
-  using info3_t = emp::FunInfo<decltype(lambda3)>;
+  using info0_t = emp::FunInfo<decltype(fun0)>;
+  using info1_t = emp::FunInfo<decltype(fun1)>;
+  using info2_t = emp::FunInfo<decltype(fun2)>;
+  using info3_t = emp::FunInfo<decltype(fun3)>;
   using info4_t = emp::FunInfo<decltype(fun4)>;
   using info5_t = emp::FunInfo<decltype(fun5)>;
   using info6_t = emp::FunInfo<decltype(fun6)>;
@@ -84,4 +84,76 @@ TEST_CASE("Test FunInfo", "[meta]")
   CHECK(std::is_same<info7_t::arg_t<0>, std::string &>() == true);
   CHECK(std::is_same<info7_t::arg_t<0>, std::string>() == false); // Must be reference!
   CHECK(std::is_same<info7_t::arg_t<0>, const std::string &>() == false); // Not const!
+
+  // Test how functions can be invoked!
+  const std::string const_string = "My Unchanging String";
+  std::string mut_string = "This String Can Change";
+
+  CHECK(info0_t::InvocableWith("abc", 27) == true);
+  CHECK(info0_t::InvocableWith(27, "abc") == false);
+  CHECK(info0_t::InvocableWith("abc") == false);
+  CHECK(info0_t::InvocableWith("abc", 27, 28) == false);
+  CHECK(info0_t::InvocableWith(const_string, 1) == true);
+  CHECK(info0_t::InvocableWith(mut_string, 10000) == true);
+
+  CHECK(info1_t::InvocableWith() == true);
+  CHECK(info1_t::InvocableWith(1) == false);
+  CHECK(info1_t::InvocableWith(mut_string) == false);
+
+  CHECK(info2_t::InvocableWith(2, 3, 4) == true);
+  CHECK(info2_t::InvocableWith(-2, -3, -4) == true);
+  CHECK(info2_t::InvocableWith(2, 3, '4') == true);
+  CHECK(info2_t::InvocableWith(2, 3, "4") == false);
+  CHECK(info2_t::InvocableWith(2, 3) == false);
+  CHECK(info2_t::InvocableWith(2, 3, 4, 5) == false);
+
+  CHECK(info3_t::InvocableWith(2, 3) == true);
+  CHECK(info3_t::InvocableWith(1.2, 3.4) == true);
+
+  CHECK(info4_t::InvocableWith(2, 3, 4) == true);
+  CHECK(info4_t::InvocableWith(1.2, 3.4, 5.6) == true);
+
+  CHECK(info5_t::InvocableWith(2, 3) == true);
+  CHECK(info5_t::InvocableWith(1.2, 3.4) == true);
+  CHECK(info5_t::InvocableWith(1.1111111, 3.3333333) == true);
+
+  CHECK(info6_t::InvocableWith("abc", 27) == true);
+  CHECK(info6_t::InvocableWith(27, "abc") == false);
+  CHECK(info6_t::InvocableWith("abc") == false);
+  CHECK(info6_t::InvocableWith("abc", 27, 28) == false);
+  CHECK(info6_t::InvocableWith(const_string, 1) == true);
+  CHECK(info6_t::InvocableWith(mut_string, 10000) == true);
+
+  CHECK(info7_t::InvocableWith(mut_string) == true);
+  CHECK(info7_t::InvocableWith(const_string) == false);
+  CHECK(info7_t::InvocableWith("abc") == false);
+
+
+  // Now try actually running them!
+  CHECK(fun0("abc", 6) == "abcabcabcabcabcabc");
+  CHECK(fun0(const_string, 2) == const_string + const_string);
+  CHECK(fun0(mut_string, 1000).size() == 22000);
+
+  CHECK(fun1() == 0);
+
+  CHECK(fun2(2, 3, 4) == 20);
+  CHECK(fun2(-2, -3, -4) == -20);
+  CHECK(fun2(2, 3, '4') == 164);
+
+  CHECK(fun3(2, 3) == 11);
+  CHECK(fun3(1.2, 3.4) == Approx(12.76));
+
+  CHECK(fun4(2, 3, 4) == 20);
+  CHECK(fun4(1.2, 3.4, 5.6) == 22.0);
+
+  CHECK(fun5(2, 3) == 11.0);
+  CHECK(fun5(1.2, 3.4) == Approx(12.76));
+  CHECK(fun5(1.1111111, 3.3333333) == Approx(12.2222219889));
+
+  CHECK(fun6("abc", 6) == "abcabcabcabcabcabc");
+  CHECK(fun6(const_string, 2) == const_string + const_string);
+  CHECK(fun6(mut_string, 1000).size() == 22000);
+
+  CHECK(fun7(mut_string) == 23);
+  CHECK(mut_string == "This String Can Change+");
 }
