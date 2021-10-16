@@ -64,14 +64,25 @@ namespace emp {
       return std::is_invocable<CLASS_T, ARG_Ts...>();
     }
 
+    /// Change a function's return type using a converter function.
     template <typename FUN_T, typename CONVERTER_T>
-    static auto WrapReturnType(FUN_T fun, CONVERTER_T convert_fun)
+    static auto ChangeReturnType(FUN_T fun, CONVERTER_T convert_fun)
     {
       return [fun=fun, c=convert_fun](PARAM1_T && arg1, PARAM_Ts &&... args) {
         return c( fun(std::forward<PARAM1_T>(arg1), std::forward<PARAM_Ts>(args)...) );
       };
     }
 
+    /// Change a function's arguments using a converter function.
+    template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
+    static auto ChangeParameterTypes(FUN_T fun, CONVERTER_T convert_fun)
+    {
+      return [fun=fun, c=convert_fun](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
+        return fun(c(arg1), c(args)...);
+      };
+    }
+
+    /// Lock in the first argument of a function.
     template <typename T>
     static auto BindFirst(CLASS_T fun, T && bound) {
       // If the function needs a reference for the parameter, send the supplied value through.
@@ -108,12 +119,21 @@ namespace emp {
     template <typename... ARG_Ts>
     static constexpr bool InvocableWith(ARG_Ts...) { return sizeof...(ARG_Ts) == 0; }
 
+    /// Change a function's return type using a converter function.
     template <typename FUN_T, typename CONVERTER_T>
-    static auto WrapReturnType(FUN_T fun, CONVERTER_T convert_fun)
+    static auto ChangeReturnType(FUN_T fun, CONVERTER_T convert_fun)
     {
       return [fun=fun, c=convert_fun]() {
         return c(fun());
       };
+    }
+
+    /// Change a function's arguments using a converter function.
+    template <typename /*NEW_T*/, typename FUN_T, typename CONVERTER_T>
+    static auto ChangeParameterTypes(FUN_T fun, CONVERTER_T /*convert_fun*/)
+    {
+      // No parameters, so no conversions to make.
+      return fun;
     }
 
   };
@@ -121,10 +141,18 @@ namespace emp {
 
   // === Stand-alone helper functions ===
 
+    /// Change a function's return type using a converter function.
   template <typename FUN_T, typename CONVERTER_T>
-  static auto WrapReturnType(FUN_T fun, CONVERTER_T convert_fun)
+  static auto ChangeReturnType(FUN_T fun, CONVERTER_T convert_fun)
   {
-    return FunInfo<FUN_T>::WrapReturnType(fun, convert_fun);
+    return FunInfo<FUN_T>::ChangeReturnType(fun, convert_fun);
+  }
+
+  /// Change a function's arguments using a converter function.
+  template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
+  static auto ChangeParameterTypes(FUN_T fun, CONVERTER_T convert_fun)
+  {
+    return FunInfo<FUN_T>::template ChangeParameterTypes<NEW_T>(fun, convert_fun);
   }
 
   /// Lock in the first argument of a function.
