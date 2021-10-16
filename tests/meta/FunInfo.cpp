@@ -185,10 +185,19 @@ TEST_CASE("Test FunInfo", "[meta]")
   CHECK( concat("abc","def") == "abcdef" );
 
   auto concat_to_int =
-    emp::WrapReturnType(
+    emp::ChangeReturnType(
       concat,
       [](std::string x){ return emp::from_string<int>(x); }
     );
 
   CHECK( concat_to_int("123","456") == 123456 );
+
+  auto concat_from_int =
+    emp::ChangeParameterTypes<int>(
+      concat,
+      [](int x){ return emp::to_string(x); }
+    );
+
+  CHECK( concat_from_int(123,456) == "123456" );
+
 }
