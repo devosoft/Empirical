@@ -160,7 +160,7 @@ TEST_CASE("Test FunInfo", "[meta]")
 
 
   // Test binding the first parameter.
-  auto fun0b = info0_t::BindFirst(fun0, "123");
+  auto fun0b = emp::BindFirst(fun0, "123");
   CHECK(fun0b(3) == "123123123");
   CHECK(fun0b(10) == "123123123123123123123123123123");
 
@@ -168,8 +168,20 @@ TEST_CASE("Test FunInfo", "[meta]")
   CHECK(fun0c(3) == "TestTestTest");
   CHECK(fun0c(10) == "TestTestTestTestTestTestTestTestTestTest");
 
+  auto fun2a = emp::BindAt<0>(fun2, 10);
+  auto fun2b = emp::BindAt<1>(fun2, 10);
+  auto fun2c = emp::BindAt<2>(fun2, 10);
+
+  CHECK( fun2a(2,3) == 23 );
+  CHECK( fun2b(2,3) == 31 );
+  CHECK( fun2c(2,3) == 38 );
+
+  CHECK( fun2a(5,15) == 65 );
+  CHECK( fun2b(5,15) == 70 );
+  CHECK( fun2c(5,15) == 65 );
+
   std::string test_str = "Start";
-  auto fun7b = emp::BindFirst(fun7, test_str);
+  auto fun7b = emp::BindAt<0>(fun7, test_str);
 
   CHECK( test_str == "Start" );
   fun7b();
@@ -178,6 +190,18 @@ TEST_CASE("Test FunInfo", "[meta]")
   CHECK( test_str == "Start++" );
   fun7b();
   CHECK( test_str == "Start+++" );
+
+
+  std::string test_str2 = "Again";
+  auto fun7c = emp::BindFirst(fun7, test_str2);
+
+  CHECK( test_str2 == "Again" );
+  fun7c();
+  CHECK( test_str2 == "Again+" );
+  fun7c();
+  CHECK( test_str2 == "Again++" );
+  fun7c();
+  CHECK( test_str2 == "Again+++" );
 
 
   // Test function wrapping!
