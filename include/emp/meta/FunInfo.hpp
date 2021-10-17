@@ -42,8 +42,13 @@ namespace emp {
 
   // Specialization for function objects with AT LEAST ONE parameter...
   template <typename CLASS_T, typename RETURN_T, typename PARAM1_T, typename... PARAM_Ts>
-  struct FunInfo <RETURN_T(CLASS_T::*)(PARAM1_T, PARAM_Ts...) const>
-  {
+  struct FunInfo <RETURN_T(CLASS_T::*)(PARAM1_T, PARAM_Ts...) const> {
+  // private:
+  //   template <typename T> struct is_templated_converter : std::false_type{};
+  //   template <typename T>
+  //   struct is_templated_converter<emp::decoy_t<T, decltype(std::declval<T&>().template operator()<int>(0))>> : std::true_type{};
+
+  public:
     using return_t = RETURN_T;
     using param_t = TypePack<PARAM1_T, PARAM_Ts...>;
 
@@ -73,12 +78,22 @@ namespace emp {
       };
     }
 
-    /// Change a function's arguments using a converter function.
+    /// Change a function's arguments using a fixed converter function.
     template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
     static auto ChangeParameterTypes(FUN_T fun, CONVERTER_T convert_fun)
     {
       return [fun=fun, c=convert_fun](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
         return fun(c(arg1), c(args)...);
+      };
+    }
+
+    /// Convert a function's arguments using a dynamic (tempalted) lambda function.
+    template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
+    static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_lambda)
+    {
+      return [fun=fun, c=convert_lambda](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
+        return fun(c.template operator()<PARAM1_T>(arg1),
+                   c.template operator()<PARAM_Ts>(args)...);
       };
     }
 
@@ -132,6 +147,14 @@ namespace emp {
     template <typename /*NEW_T*/, typename FUN_T, typename CONVERTER_T>
     static auto ChangeParameterTypes(FUN_T fun, CONVERTER_T /*convert_fun*/)
     {
+      // No parameters, so no changes to make.
+      return fun;
+    }
+
+    /// Convert a function's arguments using a dynamic (tempalted) lambda function.
+    template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
+    static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_lambda)
+    {
       // No parameters, so no conversions to make.
       return fun;
     }
@@ -148,11 +171,18 @@ namespace emp {
     return FunInfo<FUN_T>::ChangeReturnType(fun, convert_fun);
   }
 
-  /// Change a function's arguments using a converter function.
+  /// Change a function's arguments using a simple converter function.
   template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
   static auto ChangeParameterTypes(FUN_T fun, CONVERTER_T convert_fun)
   {
     return FunInfo<FUN_T>::template ChangeParameterTypes<NEW_T>(fun, convert_fun);
+  }
+
+  /// Convert a function's arguments using a templated lambda.
+  template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
+  static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_fun)
+  {
+    return FunInfo<FUN_T>::template ConvertParameterTypes<NEW_T>(fun, convert_fun);
   }
 
   /// Lock in the first argument of a function.
