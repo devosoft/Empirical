@@ -38,15 +38,15 @@ TEST_CASE("Test FunInfo", "[meta]")
   using info6_t = emp::FunInfo<decltype(fun6)>;
   using info7_t = emp::FunInfo<decltype(fun7)>;
 
-  // Test NumArgs()
-  CHECK(info0_t::NumArgs() == 2);
-  CHECK(info1_t::NumArgs() == 0);
-  CHECK(info2_t::NumArgs() == 3);
-  CHECK(info3_t::NumArgs() == 2);
-  CHECK(info4_t::NumArgs() == 3);
-  CHECK(info5_t::NumArgs() == 2);
-  CHECK(info6_t::NumArgs() == 2);
-  CHECK(info7_t::NumArgs() == 1);
+  // Test num_args
+  CHECK(info0_t::num_args == 2);
+  CHECK(info1_t::num_args == 0);
+  CHECK(info2_t::num_args == 3);
+  CHECK(info3_t::num_args == 2);
+  CHECK(info4_t::num_args == 3);
+  CHECK(info5_t::num_args == 2);
+  CHECK(info6_t::num_args == 2);
+  CHECK(info7_t::num_args == 1);
 
   // Check return types
   CHECK(std::is_same<info0_t::return_t, std::string>() == true);
@@ -232,4 +232,15 @@ TEST_CASE("Test FunInfo", "[meta]")
     );
 
   CHECK( concat_all_int(100+23,456) == 123456 );
+
+  // A slightly more complex conversion.
+  auto fancy_dup = emp::ConvertParameterTypes<std::string>(
+    fun0,
+    [](std::string in_value, auto out_type) {
+      return emp::from_string<decltype(out_type)>(in_value);
+    }
+  );
+
+  CHECK( fancy_dup("double", "2") == "doubledouble" );
+
 }
