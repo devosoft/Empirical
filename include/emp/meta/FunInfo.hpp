@@ -189,10 +189,20 @@ namespace emp {
   }
 
   /// Convert a function's arguments using a templated lambda.
+  /// @note: Will not work until C++20!!
   template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
   static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_fun)
   {
     return FunInfo<FUN_T>::template ConvertParameterTypes<NEW_T>(fun, convert_fun);
+  }
+
+  /// Convert both return type AND parameter type.
+  /// Convert a function's arguments using a templated lambda.
+  template <typename NEW_T, typename FUN_T, typename R_CONVERTER_T, typename P_CONVERTER_T>
+  static auto ChangeTypes(FUN_T fun, R_CONVERTER_T ret_convert_fun, P_CONVERTER_T param_convert_fun)
+  {
+    auto partial = FunInfo<FUN_T>::template ChangeParameterTypes<NEW_T>(fun, param_convert_fun);
+    return FunInfo<decltype(partial)>::ChangeReturnType(partial, ret_convert_fun); 
   }
 
   /// Lock in a specified argument of a function.
