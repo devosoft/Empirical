@@ -224,4 +224,12 @@ TEST_CASE("Test FunInfo", "[meta]")
 
   CHECK( concat_from_int(123,456) == "123456" );
 
+  auto concat_all_int =
+    emp::ChangeTypes<int>(
+      concat,
+      [](std::string x){ return emp::from_string<int>(x); },
+      [](int x){ return emp::to_string(x); }
+    );
+
+  CHECK( concat_all_int(100+23,456) == 123456 );
 }
