@@ -113,8 +113,8 @@ namespace emp {
     }
 
     AnyFunction(AnyFunction&& other) noexcept{ // move constructor
-      //fun = other.fun;
       fun = other.CloneFunc();
+      other.fun.Delete();
       other.fun = nullptr;
     }
 
