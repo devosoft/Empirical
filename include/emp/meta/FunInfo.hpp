@@ -78,7 +78,7 @@ namespace emp {
     template <size_t ID>
     using arg_t = typename params_t::template get<ID>;
 
-    static constexpr size_t NumArgs() { return 1 + sizeof...(PARAM_Ts); }
+    static constexpr size_t num_args = 1 + sizeof...(PARAM_Ts);
 
     /// Test if this function can be called with a particular set of arguments.
     template <typename ARG1, typename... ARG_Ts>
@@ -114,10 +114,21 @@ namespace emp {
     template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
     static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_lambda)
     {
-      return [fun=fun, c=convert_lambda](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
-        return fun(c.template operator()<PARAM1_T>(arg1),
-                   c.template operator()<PARAM_Ts>(args)...);
-      };
+      // If the converter can take two arguments, assume the second is for type.
+      if constexpr ( std::is_invocable<CONVERTER_T, NEW_T, PARAM1_T>()) {
+        return [fun=fun, c=convert_lambda](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
+          return fun(c(arg1, PARAM1_T{}),
+                     c(args, PARAM_Ts{})...);
+        };
+      }
+
+      // Otherwise assume that we are using a templated lambda (or similar object)
+      else {
+        return [fun=fun, c=convert_lambda](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
+          return fun(c.template operator()<PARAM1_T>(arg1),
+                     c.template operator()<PARAM_Ts>(args)...);
+        };
+      }
     }
 
 
@@ -138,7 +149,7 @@ namespace emp {
     using return_t = RETURN_T;
     using params_t = TypePack<>;
 
-    static constexpr size_t NumArgs() { return 0; }
+    static constexpr size_t num_args = 0;
 
     /// Test if this function can be called with a particular set of arguments.
     template <typename... ARG_Ts>
