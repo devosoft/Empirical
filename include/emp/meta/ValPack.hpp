@@ -200,6 +200,9 @@ namespace emp {
     /// Find the overall maximum value in an ValPack.
     constexpr static auto Max() { return pop::Max(V1); }
 
+    /// Determine if the pack is sorted.
+    constexpr static bool IsSorted() { return V1 <= Min() && pop::IsSorted(); }
+
     /// Use each value in an ValPack as an index and return results as a tuple.
     template <typename T>
     constexpr static auto ApplyIndex(T && container) {
@@ -250,6 +253,8 @@ namespace emp {
     constexpr static auto Min(T cap) { return cap; }
     template <typename T>
     constexpr static auto Max(T floor) { return floor; }
+
+    constexpr static bool IsSorted() { return true; }
 
     static std::string ToString() { return ""; }
 
