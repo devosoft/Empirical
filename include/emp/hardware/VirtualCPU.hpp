@@ -92,6 +92,8 @@ namespace emp{
       genome_t genome;
       genome_t genome_working;
       emp::vector<size_t> copied_inst_id_vec;
+
+      bool needs_nops_curated = true;
     
 
       VirtualCPU(const genome_t & in_genome)
@@ -226,6 +228,7 @@ namespace emp{
       }
 
         int FindLabel(const nop_vec_t& label, size_t start_idx){
+          if(label.size() == 0) return -1;
           for(size_t offset = 1; offset < genome_working.size(); ++offset){
             bool label_correct = true;
             for(size_t nop_idx = 0; nop_idx < label.size(); ++nop_idx){
@@ -233,33 +236,32 @@ namespace emp{
               if(idx >= genome_working.size()) idx -= genome_working.size();
               if(label[nop_idx] == 0){
                 if(genome_working[idx].id != GetInstLib()->GetID("NopA")){
-                label_correct = false;
-                break;
+                  label_correct = false;
+                  break;
+                }
+              }
+              else if(label[nop_idx] == 1){
+                if(genome_working[idx].id != GetInstLib()->GetID("NopB")){
+                  label_correct = false;
+                  break;
+                }
+              }
+              else if(label[nop_idx] == 2){
+                if(genome_working[idx].id != GetInstLib()->GetID("NopC")){
+                  label_correct = false;
+                  break;
+                }
               }
             }
-            else if(label[nop_idx] == 1){
-              if(genome_working[idx].id != GetInstLib()->GetID("NopB")){
-                label_correct = false;
-                break;
-              }
-            }
-            else if(label[nop_idx] == 2){
-              if(genome_working[idx].id != GetInstLib()->GetID("NopC")){
-                label_correct = false;
-                break;
-              }
-            }
+            if(label_correct) return offset;
           }
-          if(label_correct) return offset;
+          return -1;
         }
-        return -1;
-      }
 
       int FindComplementLabel(const nop_vec_t& label, size_t start_idx){
         nop_vec_t comp_label = GetComplementLabel(label);
         return FindLabel(comp_label, start_idx);
       }
-
 
       bool CheckIfLastCopied(const nop_vec_t& label){
         if(label.size() > copied_inst_id_vec.size()) return false;
@@ -296,23 +298,37 @@ namespace emp{
         if(active_stack_idx >= NUM_STACKS) active_stack_idx = 0;
       }
 
+      void CurateNops(){ 
+        size_t nop_a_id = GetInstLib()->GetID("NopA");
+        size_t nop_b_id = GetInstLib()->GetID("NopB");
+        size_t nop_c_id = GetInstLib()->GetID("NopC");
+        size_t nop_idx = 0;
+        for(size_t inst_idx = 0; inst_idx < genome_working.GetSize(); ++inst_idx){
+          genome_working[inst_idx].nop_vec.clear();
+          for(size_t idx = 1; idx < genome_working.size(); ++idx){
+            nop_idx = (inst_idx + idx < genome_working.size()) ? 
+                inst_idx + idx : 
+                (inst_idx + idx) - genome_working.size();
+            if(genome_working[nop_idx].id == nop_a_id)
+              genome_working[inst_idx].nop_vec.push_back(0);
+            else if(genome_working[nop_idx].id == nop_b_id)
+              genome_working[inst_idx].nop_vec.push_back(1);
+            else if(genome_working[nop_idx].id == nop_c_id)
+              genome_working[inst_idx].nop_vec.push_back(2);
+            else 
+              break;
+          }
+        }
+        needs_nops_curated = false;
+      }
+
       /// Process the NEXT instruction pointed to be the instruction pointer
       void SingleProcess() {
         emp_assert(genome_working.GetSize() > 0);  // A genome must exist to be processed.
-        if (inst_ptr >= genome_working.GetSize()) ResetIP();
-        genome_working[inst_ptr].nop_vec.clear();
-        for(size_t idx = 1; idx + inst_ptr < genome_working.size(); ++idx){
-          if(genome_working[inst_ptr + idx].id == GetInstLib()->GetID("NopA"))
-            genome_working[inst_ptr].nop_vec.push_back(0);
-          else if(genome_working[inst_ptr + idx].id == GetInstLib()->GetID("NopB"))
-            genome_working[inst_ptr].nop_vec.push_back(1);
-          else if(genome_working[inst_ptr + idx].id == GetInstLib()->GetID("NopC"))
-            genome_working[inst_ptr].nop_vec.push_back(2);
-          else 
-            break;
-        }
+        //if (inst_ptr >= genome_working.GetSize()) ResetIP();
         //std::cout << "(" << genome_working[inst_ptr].id << ")\t";
         //std::cout << GetInstLib()->GetName(genome_working[inst_ptr].id) << " ";
+        if(needs_nops_curated) CurateNops();
         GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
         AdvanceIP();
         //std::cout << "; IP: " << inst_ptr;
