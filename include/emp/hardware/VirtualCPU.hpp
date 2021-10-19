@@ -55,7 +55,7 @@ namespace emp{
         arg_set_t args;
         emp::vector<size_t> nop_vec;
 
-        Instruction(size_t _idx=0, size_t _id=0, emp::vector<size_t> _nop_vec = {})
+        Instruction(size_t _idx=0, size_t _id=27, emp::vector<size_t> _nop_vec = {})
           : idx(_idx), id(_id), args(), nop_vec(_nop_vec) { }
         Instruction(const Instruction &) = default;
         Instruction(Instruction &&) = default;
@@ -342,10 +342,15 @@ namespace emp{
       void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
     
       inst_t GetRandomInst(Random & rand) {
-        return inst_t(rand.GetUInt(GetInstLib()->GetSize()));
+        size_t idx = rand.GetUInt(GetInstLib()->GetSize());
+        size_t id = GetInstLib()->GetID(idx);
+        return inst_t(idx, id);
       }
     
-      void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; genome_working[pos] = inst;}
+      void SetInst(size_t pos, const inst_t & inst) { 
+        genome[pos] = inst; 
+        genome_working[pos] = inst;
+      }
     
       void RandomizeInst(size_t pos, Random & rand) { SetInst(pos, GetRandomInst(rand) ); }
     
