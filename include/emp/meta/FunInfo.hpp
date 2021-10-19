@@ -22,6 +22,7 @@
 #include <functional>
 
 #include "TypePack.hpp"
+#include "ValPack.hpp"
 
 namespace emp {
 
@@ -131,15 +132,31 @@ namespace emp {
       }
     }
 
-
     /// Lock in a specified argument of a function.
-    template <size_t POS, typename T>
+    template <size_t ID, typename T>
     static auto BindAt(CLASS_T fun, T && bound) {
-      using before_pack = typename params_t::template shrink<POS>;
-      using after_pack = typename params_t::template popN<POS+1>;
+      using before_pack = typename params_t::template shrink<ID>;
+      using after_pack = typename params_t::template popN<ID+1>;
       return BindAt_impl(fun, std::forward<T>(bound), before_pack(), after_pack());
     }
 
+    /// Lock in multiple function arguments.
+    template <size_t ID1, size_t... IDs, typename T1, typename... Ts>
+    static auto Bind(CLASS_T fun, T1 && bound1, Ts &&... bound) {
+      static_assert(emp::ValPack<ID1,IDs...>::IsSorted(),
+                    "FunInfo::Bind must be given sorted indicies.");
+      static_assert(sizeof...(IDs) == sizeof...(Ts),
+                    "FunInfo::Bind must have exactly one ID per bound value.");
+
+      // Bind all LATER positions first, if there are any.
+      if constexpr (sizeof...(IDs) > 0) {
+        auto new_fun = Bind<IDs...>(fun, std::forward<Ts>(bound)...);
+        return FunInfo<decltype(new_fun)>::template BindAt<ID1>(new_fun, bound1);
+      }
+
+      // Otherwise just bind THIS position.
+      else return FunInfo<decltype(fun)>::template BindAt<ID1>(fun, bound1);
+    }
   };
 
   // Specialization for function objects with NO parameters...
@@ -228,6 +245,11 @@ namespace emp {
     return FunInfo<FUN_T>::template BindAt<0>(fun, std::forward<BOUND_T>(bound));
   }
 
+  /// Lock in a series of specified arguments  to a function.
+  template <size_t... IDs, typename FUN_T, typename... Ts>
+  auto Bind(FUN_T fun, Ts &&... bound) {
+    return FunInfo<FUN_T>::template Bind<IDs...>(fun, std::forward<Ts>(bound)...);
+  }
 }
 
 #endif
