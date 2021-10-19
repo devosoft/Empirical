@@ -12,8 +12,7 @@
  * 
  * 
  *  Developer Notes:
- *  - Need to setup BindAt to choose bind position(s).
- *    For example:  fun_info::BindAt<2,4>(my_fun, 12, "abc")
+ *  - Will not currently handle return by reference!
  */
 
 #ifndef EMP_FUN_INFO_HPP
@@ -118,8 +117,8 @@ namespace emp {
       // If the converter can take two arguments, assume the second is for type.
       if constexpr ( std::is_invocable<CONVERTER_T, NEW_T, PARAM1_T>()) {
         return [fun=fun, c=convert_lambda](NEW_T arg1, decoy_t<NEW_T, PARAM_Ts>... args) {
-          return fun(c(arg1, PARAM1_T{}),
-                     c(args, PARAM_Ts{})...);
+          return fun(c(arg1, std::decay_t<PARAM1_T>{}),
+                     c(args, std::decay_t<PARAM_Ts>{})...);
         };
       }
 
