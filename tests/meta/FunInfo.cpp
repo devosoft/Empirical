@@ -97,6 +97,15 @@ TEST_CASE("Test FunInfo", "[meta]")
   CHECK(info0_t::InvocableWith(const_string, 1) == true);
   CHECK(info0_t::InvocableWith(mut_string, 10000) == true);
 
+  CHECK(info0_t::InvocableWith<std::string,int>() == true);
+  CHECK(info0_t::InvocableWith<int, std::string>() == false);
+  // CHECK(info0_t::InvocableWith("abc") == false);
+  // CHECK(info0_t::InvocableWith("abc", 27, 28) == false);
+  // CHECK(info0_t::InvocableWith(const_string, 1) == true);
+  // CHECK(info0_t::InvocableWith(mut_string, 10000) == true);
+
+  CHECK(info0_t::InvocableWith<std::string>("only_one", 1) == true);
+
   CHECK(info1_t::InvocableWith() == true);
   CHECK(info1_t::InvocableWith(1) == false);
   CHECK(info1_t::InvocableWith(mut_string) == false);
@@ -242,5 +251,33 @@ TEST_CASE("Test FunInfo", "[meta]")
   );
 
   CHECK( fancy_dup("double", "2") == "doubledouble" );
+  CHECK( fancy_dup("abc", "10") == "abcabcabcabcabcabcabcabcabcabc" );
+
+  auto concat5 = [](std::string a, std::string b, std::string c, std::string d, std::string e) {
+    return emp::to_string(a,b,c,d,e);
+  };
+
+  CHECK( concat5("a","bcd","e","fghij","kl") == "abcdefghijkl");
+
+  auto concat5a = emp::Bind<0,2,3>(concat5, "[", "]", ": ");
+
+  CHECK( concat5a("Test Status", "Success!") == "[Test Status]: Success!");
+
+  auto concat5b = emp::Bind<1,3,4>(concat5, "bcd", "fghij", "kl");
+
+  CHECK( concat5b("a","e") == "abcdefghijkl" );
+
+  auto concat5c = emp::Bind<0,1,2,3,4>(concat5, "01", "23", "45", "67", "89");
+
+  CHECK( concat5c() == "0123456789" );
+
+  // std::string middle = "X";
+  // auto concat5d = emp::Bind<0,1,2,3,4>(concat5, "<<<", "==", middle, "==", ">>>");
+
+  // CHECK( concat5d() == "<<<==X==>>>" );
+
+  // middle = "()";
+
+  // CHECK( concat5d() == "<<<==()==>>>" );
 
 }
