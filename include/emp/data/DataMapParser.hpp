@@ -42,7 +42,6 @@ namespace emp {
       int token_number;       ///< Token id for literal numbers
       int token_string;       ///< Token id for literal strings
       int token_char;         ///< Token id for literal characters
-      int token_external;     ///< Token id for strings to be evaluated externally.
       int token_symbol;       ///< Token id for other symbols
 
     public:
@@ -54,7 +53,7 @@ namespace emp {
 
         // Meaningful tokens have next priority.
 
-        // An indentifier must begin with a letter, underscore, or dot, and followed by
+        // An identifier must begin with a letter, underscore, or dot, and followed by
         // more of the same OR numbers or brackets.
         token_identifier = AddToken("Identifier", "[a-zA-Z_.][a-zA-Z0-9_.[\\]]*");
 
@@ -69,21 +68,16 @@ namespace emp {
         // its ascii value.
         token_char = AddToken("Literal Character", "'([^'\n\\\\]|\\\\.)+'");
 
-        // An external value should be evaluated in a provided function.  If no such function
-        // exists, using it will be an error.
-        // example:  ${EXTERNAL_VAR}
-        token_external = AddToken("External Evaluation", "[$]"s + regex_nested('{', '}', 4));
-
         // Symbols should have least priority.  They include any solitary character not listed
         // above, or pre-specified multi-character groups.
         token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
       }
 
-      bool IsID(const emp::Token token) const noexcept { return token.token_id == token_identifier; }
-      bool IsNumber(const emp::Token token) const noexcept { return token.token_id == token_number; }
-      bool IsString(const emp::Token token) const noexcept { return token.token_id == token_string; }
-      bool IsChar(const emp::Token token) const noexcept { return token.token_id == token_char; }
-      bool IsSymbol(const emp::Token token) const noexcept { return token.token_id == token_symbol; }
+      bool IsID(const emp::Token & token) const noexcept { return token.token_id == token_identifier; }
+      bool IsNumber(const emp::Token & token) const noexcept { return token.token_id == token_number; }
+      bool IsString(const emp::Token & token) const noexcept { return token.token_id == token_string; }
+      bool IsChar(const emp::Token & token) const noexcept { return token.token_id == token_char; }
+      bool IsSymbol(const emp::Token & token) const noexcept { return token.token_id == token_symbol; }
     };
 
     struct ValueType {
@@ -131,11 +125,17 @@ namespace emp {
 
     // --------- MEMBER VARIABLES -----------
     DataMapLexer lexer;
+
+    // Operators and functions that should be used when parsing.
     std::unordered_map<std::string, std::function<double(double)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
-    size_t error_count = 0;
 
+    // The set of data map entries accessed when the last function was parsed.
+    std::set<std::string> dm_names;
+
+    // Track the number of errors and the function to call when errors occur.
+    size_t error_count = 0;
     using error_fun_t = std::function<void(const std::string &)>;
     error_fun_t error_fun =
      [](const std::string & msg){ std::cerr << "ERROR: " << msg << std::endl; };
@@ -161,7 +161,23 @@ namespace emp {
     error_fun_t GetErrorFun() const { return error_fun; }
     void SetErrorFun(error_fun_t in_fun) { error_fun = in_fun; }
 
-    // Add a unary operator
+    /// Get the set of names that the most recently generated function accesses in DataMap.
+    const std::set<std::string> & GetNamesUsed() const { return dm_names; }
+
+    /// Get the set of names used in the provided equation.
+    const std::set<std::string> & GetNamesUsed(const std::string & expression) {
+      dm_names.clear();
+      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
+      for (emp::Token token : tokens) {
+        if (lexer.IsID(token) && !emp::Has(functions, token.lexeme)) {
+          dm_names.insert(token.lexeme);
+        }
+      }
+      return dm_names;
+    }
+
+
+    /// Add a unary operator
     void AddOp(const std::string & op, std::function<double(double)> fun) {
       unary_ops[op] = fun;
     }
@@ -292,7 +308,7 @@ namespace emp {
         switch (args.size()) {
         case 0:
           if (!functions[name].fun0) AddError("Function '", name, "' requires arguments.");
-          out_fun = [fun=functions[name].fun0](emp::DataMap & dm) { return fun(); };
+          out_fun = [fun=functions[name].fun0](emp::DataMap & /*dm*/) { return fun(); };
           break;
         case 1:
           if (!functions[name].fun1) AddError("Function '", name, "' cannot have 1 arguments.");
@@ -321,6 +337,7 @@ namespace emp {
       // This must be a DataMap entry name.
       if (!dm.HasName(name)) AddError("Unknown data map entry '", name, "'.");
       size_t id = dm.GetID(name);
+      dm_names.insert(name);    // Store this name in the list of those used.
       return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
 
@@ -376,8 +393,9 @@ namespace emp {
     /// returns the result of the above equation.
 
     value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
-      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression :") + expression);
+      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
       if constexpr (verbose) tokens.Print();
+      dm_names.clear();    // Reset the names used from data map.
       pos_t pos = tokens.begin();
       ValueType val = ParseMath(dm, pos);
 

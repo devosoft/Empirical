@@ -98,7 +98,7 @@ namespace emp {
 
       const TokenStream & GetTokenStream() const { return *ts; }
       size_t GetIndex() const { return pos; }
-      emp::Ptr<const Token> ToPtr() const { return &(ts->Get(pos)); }
+      emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
 
       Token operator*() const { return ts->tokens[pos]; }
       const Token * operator->() const { return &(ts->tokens[pos]); }
@@ -121,6 +121,7 @@ namespace emp {
 
     size_t size() const { return tokens.size(); }
     const Token & Get(size_t pos) const { return tokens[pos]; }
+    emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
     const std::string & GetName() const { return name; }
     Iterator begin() const { return Iterator(*this, 0); }
     Iterator end() const { return Iterator(*this, tokens.size()); }
@@ -275,7 +276,7 @@ namespace emp {
     }
 
     /// Shortcut to just get a single token.
-    Token ToToken(const std::string & in_str) const {
+    Token ToToken(std::string_view in_str) const {
       std::stringstream ss;
       ss << in_str;
       auto out_val = Process(ss);
@@ -297,7 +298,7 @@ namespace emp {
     }
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(const std::string & str, const std::string & name) const {
+    TokenStream Tokenize(std::string_view str, const std::string & name) const {
       std::stringstream ss;
       ss << str;
       return Tokenize(ss, name);

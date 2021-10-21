@@ -79,9 +79,23 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
+  std::set<std::string> names_used = parser.GetNamesUsed();
+  CHECK( names_used.size() == 3 );
+  CHECK( emp::Has(names_used, "val1") );
+  CHECK( emp::Has(names_used, "val2") );
+  CHECK( emp::Has(names_used, "val3") );
+  CHECK( !emp::Has(names_used, "val4") );
+
   fun = parser.BuildMathFunction(dmA, "1.5*val3");
   CHECK( fun(dmA) == 4.5 );
   CHECK( fun(dmB) == 6.0 );
+
+  names_used = parser.GetNamesUsed();
+  CHECK( names_used.size() == 1 );
+  CHECK( !emp::Has(names_used, "val1") );
+  CHECK( !emp::Has(names_used, "val2") );
+  CHECK( emp::Has(names_used, "val3") );
+  CHECK( !emp::Has(names_used, "val4") );
 
   fun = parser.BuildMathFunction(dmA, "val1/0.5");
   CHECK( fun(dmA) == 3.0 );
@@ -126,6 +140,12 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( fun(dmA) == 0.875 );
   CHECK( fun(dmB) == 35.031494140625 );
 
+  names_used = parser.GetNamesUsed();
+  CHECK( names_used.size() == 4 );
+  CHECK( emp::Has(names_used, "val1") );
+  CHECK( emp::Has(names_used, "val2") );
+  CHECK( emp::Has(names_used, "val3") );
+  CHECK( emp::Has(names_used, "val4") );
 
   // Using functions.
   fun = parser.BuildMathFunction(dmA, "EXP(val1,val3)");
@@ -164,6 +184,16 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( fun(dmA) == Approx(4.7141324511) );
   CHECK( fun(dmB) == Approx(4.8254220245) );
 
+  names_used = parser.GetNamesUsed();
+  CHECK( names_used.size() == 4 );
+  CHECK( emp::Has(names_used, "val1") );
+  CHECK( emp::Has(names_used, "val2") );
+  CHECK( emp::Has(names_used, "val3") );
+  CHECK( emp::Has(names_used, "val4") );
+  CHECK( !emp::Has(names_used, "LOG") );
+  CHECK( !emp::Has(names_used, "LOG2") );
+  CHECK( !emp::Has(names_used, "LOG10") );
+
   fun = parser.BuildMathFunction(dmA, "SIN(val1)");
   CHECK( fun(dmA) == Approx(0.9974949866) );
   CHECK( fun(dmB) == Approx(0.1246747334) );
@@ -183,6 +213,15 @@ TEST_CASE("Test DataMap", "[data]")
   fun = parser.BuildMathFunction(dmA, "CEIL(SIN(val1))");
   CHECK( fun(dmA) == 1.0 );
   CHECK( fun(dmB) == 1.0 );
+
+  names_used = parser.GetNamesUsed();
+  CHECK( names_used.size() == 1 );
+  CHECK( emp::Has(names_used, "val1") );
+  CHECK( !emp::Has(names_used, "val2") );
+  CHECK( !emp::Has(names_used, "val3") );
+  CHECK( !emp::Has(names_used, "val4") );
+  CHECK( !emp::Has(names_used, "CEIL") );
+  CHECK( !emp::Has(names_used, "SIN") );
 
   fun = parser.BuildMathFunction(dmA, "FLOOR(COS(val2))");
   CHECK( fun(dmA) == -1.0 );
