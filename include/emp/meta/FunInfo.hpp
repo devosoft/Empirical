@@ -51,7 +51,7 @@ namespace emp {
     /// Helper function to lock an argument at a designated position in a function.
     template <typename BOUND_T, typename... BEFORE_Ts, typename... AFTER_Ts>
     static auto BindAt_impl(CLASS_T fun, BOUND_T && bound,
-                            TypePack<BEFORE_Ts...> before_tp, TypePack<AFTER_Ts...> after_tp) {
+                            TypePack<BEFORE_Ts...>, TypePack<AFTER_Ts...>) {
       // If the function needs a reference for the parameter, send the supplied value through.
       if constexpr (std::is_reference<PARAM1_T>()) {
         return [fun, &bound](BEFORE_Ts &&... before_args, AFTER_Ts &&... after_args) {
@@ -72,6 +72,7 @@ namespace emp {
 
 
   public:
+    using fun_t = RETURN_T(PARAM1_T, PARAM_Ts...);
     using return_t = RETURN_T;
     using params_t = TypePack<PARAM1_T, PARAM_Ts...>;
 
@@ -142,8 +143,8 @@ namespace emp {
     /// Lock in multiple function arguments.
     template <size_t ID1, size_t... IDs, typename T1, typename... Ts>
     static auto Bind(CLASS_T fun, T1 && bound1, Ts &&... bound) {
-      static_assert(emp::ValPack<ID1,IDs...>::IsSorted(),
-                    "FunInfo::Bind must be given sorted indicies.");
+      static_assert(emp::ValPack<ID1,IDs...>::IsSorted() && emp::ValPack<ID1,IDs...>::IsUnique(),
+                    "FunInfo::Bind must be given unique, sorted indicies.");
       static_assert(sizeof...(IDs) == sizeof...(Ts),
                     "FunInfo::Bind must have exactly one ID per bound value.");
 
@@ -162,6 +163,7 @@ namespace emp {
   template <typename CLASS_T, typename RETURN_T>
   struct FunInfo <RETURN_T(CLASS_T::*)() const>
   {
+    using fun_t = RETURN_T();
     using return_t = RETURN_T;
     using params_t = TypePack<>;
 
@@ -190,7 +192,7 @@ namespace emp {
 
     /// Convert a function's arguments using a dynamic (tempalted) lambda function.
     template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
-    static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_lambda)
+    static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T /*convert_lambda*/)
     {
       // No parameters, so no conversions to make.
       return fun;
