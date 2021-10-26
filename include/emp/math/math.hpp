@@ -367,14 +367,14 @@ namespace emp {
 
   /// Greatest Common Divisor
   template <typename T>
-  T GCD(const T v1, const T v2) constexpr {
+  constexpr T GCD(const T v1, const T v2) {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
     return std::gcd<T, T>(v1, v2);
   }
 
   /// Least common multiple
   template <typename T>
-  T LCM(const T v1, const T v2) constexpr {
+  constexpr T LCM(const T v1, const T v2) {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
     return std::lcm<T, T>(v1, v2);
   }
