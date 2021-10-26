@@ -366,6 +366,7 @@ namespace emp {
   // Number theory functions
 
   /// Greatest Common Divisor
+  [[deprecated("Replaced by std::gcd")]]
   template <typename T>
   constexpr T GCD(const T v1, const T v2) {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
@@ -373,6 +374,7 @@ namespace emp {
   }
 
   /// Least common multiple
+  [[deprecated("Replaced by std::lcm")]]
   template <typename T>
   constexpr T LCM(const T v1, const T v2) {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
