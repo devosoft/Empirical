@@ -16,7 +16,7 @@ certifi==2021.10.8
     # via requests
 chardet==4.0.0
     # via binaryornot
-charset-normalizer==2.0.4
+git+https://github.com/ousret/charset_normalizer@2.0.7#egg=charset_normalizer
     # via
     #   -r requirements.in
     #   requests
