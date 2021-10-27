@@ -384,7 +384,7 @@ namespace emp {
     return std::lcm<T, T>(v1, v2);
   }
 #endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  
+
 }
 
 #endif // #ifndef EMP_MATH_MATH_HPP_INCLUDE
