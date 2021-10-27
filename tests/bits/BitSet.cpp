@@ -181,7 +181,7 @@ TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
   emp::BitSet<64> bs64( "1000110110001101100000011000110000001101100000000000110110001101" );
   emp::BitSet<75> bs75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
-  emp::Random random;
+  emp::Random random(1);
   emp::BitSet<1000> bs1k(random, 0.75);
 
   // Make sure all sizes are correct.
@@ -349,7 +349,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
   bs88.SetRange(64,66); REQUIRE(bs88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
   // A larger BitSet with lots of random tests.
-  emp::Random random;
+  emp::Random random(1);
   emp::BitSet<1000> bs1k(random, 0.65);
   size_t num_ones = bs1k.CountOnes();  REQUIRE(num_ones > 550);
   bs1k.Toggle();                       REQUIRE(bs1k.CountOnes() == 1000 - num_ones);
@@ -391,7 +391,7 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
 
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
-  emp::Random random;
+  emp::Random random(1);
   emp::BitSet<1000> bs;
 
   REQUIRE(bs.None() == true);
@@ -634,7 +634,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(bs.LongestSegmentOnes() == 7);
 
   // Try again with Find, this time with a random sequence of ones.
-  emp::Random random;
+  emp::Random random(1);
   bs.Randomize(random);
   size_t count = 0;
   for (int i = bs.FindOne(); i != -1; i = bs.FindOne(i+1)) count++;
@@ -1098,7 +1098,7 @@ void test_more_comparators(){
  * Random bitset
  */
 void test_random(){
-  emp::Random random;
+  emp::Random random(1);
   emp::BitSet<8> bs8(random);
   bs8.Randomize(random, 1.0);
   REQUIRE(bs8.all());
