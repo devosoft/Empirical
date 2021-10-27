@@ -194,6 +194,8 @@
 #include "../meta/reflection.hpp"
 #include "../meta/type_traits.hpp"
 
+#include "char_utils.hpp"
+
 namespace emp {
 
   /// Return a const reference to an empty string.  This function is useful to implement other
@@ -324,47 +326,6 @@ namespace emp {
 
     // If we made it here without a problem, it must be correct!
     return "Good!";
-  }
-
-  /// Determine if a character is whitespace.
-  inline bool is_whitespace(char test_char) {
-    return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');
-  }
-
-  /// Determine if a character is an uppercase letter.
-  inline bool is_upper_letter(char test_char) {
-    return (test_char >= 'A' && test_char <= 'Z');
-  }
-
-  /// Determine if a character is a lowercase letter.
-  inline bool is_lower_letter(char test_char) {
-    return (test_char >= 'a' && test_char <= 'z');
-  }
-
-  /// Determine if a character is a letter of any kind.
-  inline bool is_letter(char test_char) {
-    return is_upper_letter(test_char) || is_lower_letter(test_char);
-  }
-
-  /// Determine if a character is a digit.
-  inline bool is_digit(char test_char) {
-    return (test_char >= '0' && test_char <= '9');
-  }
-
-  /// Determine if a character is a letter or digit.
-  inline bool is_alphanumeric(char test_char) {
-    return is_letter(test_char) || is_digit(test_char);
-  }
-
-  /// Determine if a character is a letter, digit, or underscore.
-  inline bool is_idchar(char test_char) {
-    return is_alphanumeric(test_char) || test_char == '_';
-  }
-
-  /// Determine if a character is in a set of characters (represented as a string)
-  static inline bool is_one_of(char test_char, const std::string & char_set) {
-    for (char x : char_set) if (test_char == x) return true;
-    return false;
   }
 
   /// Determine if a string is composed only of a set of characters (represented as a string)
