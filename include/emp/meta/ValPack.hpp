@@ -26,11 +26,13 @@ namespace emp {
   // Anonymous implementations of ValPack interface.
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
+    // Helper.  DONE arg starts as true, but set to false when sequence finished.
     template <bool DONE, auto START, auto END, auto STEP, auto... VALS>
     struct vp_range {
       static constexpr auto NEXT = START + STEP;
       using type = typename vp_range<(NEXT >= END), NEXT, END, STEP, VALS..., START>::type;
     };
+    // Specialization for when DONE is true.
     template <auto START, auto END, auto STEP, auto... VALS>
     struct vp_range <true, START, END, STEP, VALS...> {
       using type = ValPack<VALS...>;

@@ -18,7 +18,7 @@
 //    void SetName(in_name) - Set the name that should be used henceforth for this type.
 //    size_t GetSize()      - Return number of bytes used by this type.
 //
-//    -- TESTS --
+//    -- TYPE TESTS --
 //    bool IsAbstract()     - Is this type a pure-virtual class?
 //    bool IsArithmetic()   - Is this type numeric?
 //    bool IsArray()        - Does this type represent a sequence of objects in memory?
@@ -33,7 +33,8 @@
 //    bool IsVolatile()     - Is this type volatile qualified?
 //    bool IsTypePack()     - Is this type an emp::TypePack?
 //
-//    bool IsType<T>()      - Is this type the specified type T?
+//    -- COMPARISON TESTS --
+//    bool IsType<T>()           - Is this type the specified type T?
 //    bool IsTypeIn<T1,T2,...>() - Is this type one of the listed types?
 //
 //    -- TYPE CONVERSIONS --
