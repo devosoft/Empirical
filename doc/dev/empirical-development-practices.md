@@ -38,4 +38,3 @@ A quick note about our python dependencies: in order to prevent build issues due
 Our direct dependencies are listed (and pinned) in corresponding `requirements.in` files.
 To update Empirical's python dependencies, update the `requirements.in` file and `pip-compile requirements.in` to regenerate `requirements.txt`.
 Then, commit both files.
-
