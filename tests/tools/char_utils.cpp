@@ -69,6 +69,8 @@ TEST_CASE("Test CharSet", "[tools]")
   emp::CharSet cs;
   cs.SetRange('e','p');
   cs.ClearRange('h','j');
+  // cs has: e,f,g,k,l,m,n,o,p
+
   size_t matches = cs.CountMatches("qwertyuiopasdfghjklzxcvbnm");
   CHECK(matches == 9);
 
@@ -77,9 +79,13 @@ TEST_CASE("Test CharSet", "[tools]")
 
   CHECK(cs.Has("flop"));
   CHECK(cs.Has("loom"));
-  CHECK(cs.Has("none"));
   CHECK(cs.Has("poke"));
   CHECK(!cs.Has("most"));
   CHECK(!cs.Has("other"));
   CHECK(!cs.Has("words"));
+
+  CHECK(cs.HasAny("none"));
+  CHECK(cs.HasAny("most"));
+  CHECK(!cs.HasAny("twitch"));
+  CHECK(!cs.HasAny("sarcastic"));
 }
