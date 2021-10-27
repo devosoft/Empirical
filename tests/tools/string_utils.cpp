@@ -100,8 +100,6 @@ TEST_CASE("Test string_utils", "[tools]")
 	CHECK(emp::has_alphanumeric("s0m3 l3tt3r5 @nd num83r5"));
 	CHECK(!emp::has_alphanumeric(")(!*#@&#^%&!"));
 
-	CHECK(emp::has_idchar("!@#$%^&*()_"));
-	CHECK(!emp::has_idchar("!@#$%^&*()"));
 	CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","aeiou"));
 	CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","abc123"));
 	CHECK(!emp::has_one_of("abcdefghijklmnopqrstuvwxyz","12345"));
