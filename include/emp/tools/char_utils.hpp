@@ -19,6 +19,8 @@
  *    bool is_alphanumeric(char test_char)
  *    bool is_idchar(char test_char)
  *    bool is_one_of(char test_char, const std::string & char_set)
+ *    bool is_valid(char test_char )
+ *    bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
  *    
  */
 
@@ -28,6 +30,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
 
 namespace emp {
 
@@ -116,6 +119,13 @@ namespace emp {
     iterator_t begin() const { return iterator_t(this,0); }
     iterator_t end() const { return iterator_t(this,MAX_CHAR); }
 
+    /// Count the number of matches that occur in a string.
+    size_t CountMatches(const std::string & str) const {
+      size_t count = 0;
+      for (char c : str) if (Has(c)) count++;
+      return count;
+    }
+
     /// Convert this set of characters into a regex-style character set.
     std::string AsString() const {
       std::string out("[");
@@ -180,6 +190,15 @@ namespace emp {
   static inline bool is_one_of(char test_char, const std::string & char_set) {
     for (char x : char_set) if (test_char == x) return true;
     return false;
+  }
+
+  /// If no functions are provided to is_valid(), always return false as base case.
+  inline bool is_valid(char /* test_char */ ) { return false; }
+
+  /// Determine if a character passes any of the test functions provided.
+  template <typename... FUNS>
+  inline bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
+    return fun1(test_char) || is_valid(test_char, funs...);
   }
 
 }
