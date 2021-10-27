@@ -363,9 +363,6 @@ namespace emp {
   }
 
 
-// @MAM 10-2021: crashed docs build due to apparent doxygen bug
-// excluded from docs build for now
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Number theory functions
 
   /// Greatest Common Divisor
@@ -383,7 +380,6 @@ namespace emp {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
     return std::lcm<T, T>(v1, v2);
   }
-#endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 }
 
