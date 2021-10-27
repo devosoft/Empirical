@@ -217,7 +217,7 @@ RUN \
     && \
   make test-vector -C /opt/Empirical/tests/base \
     && \
-  make clean \
+  make clean -C /opt/Empirical/tests \
     && \
   echo "representative tests passed!"
 
