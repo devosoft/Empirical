@@ -32,7 +32,6 @@
  *    bool has_letter(const std::string & test_str)
  *    bool has_digit(const std::string & test_str)
  *    bool has_alphanumeric(const std::string & test_str)
- *    bool has_idchar(const std::string & test_str)
  *    bool has_one_of(const std::string & test_str, const std::string & char_set)
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
  * 
@@ -333,73 +332,35 @@ namespace emp {
   }
 
   /// Determine if there is whitespace anywhere in a string.
-  inline bool has_whitespace(const std::string & test_str) {
-    for (char c : test_str) if (is_whitespace(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any uppercase letters in a string.
-  inline bool has_upper_letter(const std::string & test_str) {
-    for (char c : test_str) if (is_upper_letter(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any lowercase letters in a string.
-  inline bool has_lower_letter(const std::string & test_str) {
-    for (char c : test_str) if (is_lower_letter(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any letters in a string.
-  inline bool has_letter(const std::string & test_str) {
-    for (char c : test_str) if (is_letter(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any digits in a string.
-  inline bool has_digit(const std::string & test_str) {
-    for (char c : test_str) if (is_digit(c)) return true;
-    return false;
-  }
+  inline bool has_whitespace(const std::string & str) { return WhitespaceCharSet().HasAny(str); }
+  inline bool has_upper_letter(const std::string & str) { return UpperCharSet().HasAny(str); }
+  inline bool has_lower_letter(const std::string & str) { return LowerCharSet().HasAny(str); }
+  inline bool has_letter(const std::string & str) { return LetterCharSet().HasAny(str); }
+  inline bool has_digit(const std::string & str) { return DigitCharSet().HasAny(str); }
+  inline bool has_alphanumeric(const std::string & str) { return AlphanumericCharSet().HasAny(str); }
 
   /// Determine if there are only digits in a string.
-  inline bool is_digits(const std::string & test_str) {
-    // If string is empty, there are no digits.
-    if (test_str.size() == 0) return false;
-
-    // Otherwise return false if any character is not a digit.
-    for (char c : test_str) if (!is_digit(c)) return false;
-    return true;
+  inline bool is_digits(const std::string & str) {    
+    if (str.size() == 0) return false;   // If string is empty, there are NO digits.
+    return DigitCharSet().Has(str);      // Otherwise return false if any character is not a digit.
   }
 
   /// Determine if there are any letters or digits anywhere in a string.
-  inline bool has_alphanumeric(const std::string & test_str) {
-    for (char c : test_str) if (is_alphanumeric(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any letters or digits anywhere in a string.
-  inline bool is_alphanumeric(const std::string & test_str) {
-    for (char c : test_str) if (!is_alphanumeric(c)) return false;
-    return true;
-  }
-
-  /// Determine if there are any letters, digit, or underscores anywhere in a string.
-  inline bool has_idchar(const std::string & test_str) {
-    for (char c : test_str) if (is_idchar(c)) return true;
-    return false;
+  inline bool is_alphanumeric(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO characters.
+    return AlphanumericCharSet().Has(str);      // Otherwise return false if any character is not a digit.
   }
 
   /// Determine if a specified set of characters appears anywhere in a string.
-  static inline bool has_one_of(const std::string & test_str, const std::string & char_set) {
-    for (char c : test_str) if (is_one_of(c, char_set)) return true;
+  static inline bool has_one_of(const std::string & str, const std::string & char_set) {
+    for (char c : str) if (is_one_of(c, char_set)) return true;
     return false;
   }
 
   /// For a string to be valid, each character must pass at least one provided function.
   template <typename... FUNS>
-  static inline bool is_valid(const std::string & test_str, FUNS... funs) {
-    for (char x : test_str) if ( !is_valid(x, funs...) ) return false;
+  static inline bool is_valid(const std::string & str, FUNS... funs) {
+    for (char x : str) if ( !is_valid(x, funs...) ) return false;
     return true;
   }
 
