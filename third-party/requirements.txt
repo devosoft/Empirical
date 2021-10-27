@@ -4,8 +4,10 @@
 #
 #    pip-compile requirements.in
 #
-arrow==1.2.1
-    # via jinja2-time
+arrow==0.17.0
+    # via
+    #   -r requirements.in
+    #   jinja2-time
 attrs==21.2.0
     # via diff
 binaryornot==0.4.4
@@ -14,8 +16,10 @@ certifi==2021.10.8
     # via requests
 chardet==4.0.0
     # via binaryornot
-charset-normalizer==2.0.7
-    # via requests
+charset-normalizer==2.0.4
+    # via
+    #   -r requirements.in
+    #   requests
 click==8.0.3
     # via cookiecutter
 cookiecutter==1.7.3
