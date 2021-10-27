@@ -254,8 +254,10 @@ RUN \
   && \
   echo "installed karma-firefox-launcher"
 
+# @mmore500 10-2021: python3 -m pip fixes UnicodeDecodeError
+# when installing charset-normalizer from github
 RUN \
-  pip install -r /opt/Empirical/third-party/requirements.txt \
+  python3 -m pip install -r /opt/Empirical/third-party/requirements.txt \
     && \
   echo "installed documentation build requirements"
 
