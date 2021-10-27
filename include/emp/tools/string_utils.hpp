@@ -25,8 +25,6 @@
  *    bool is_composed_of(const std::string & test_str, const std::string & char_set)
  *    bool is_digits(const std::string & test_str)
  *    bool is_alphanumeric(const std::string & test_str)
- *    bool is_valid(char test_char )
- *    bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
  *    bool is_valid(const std::string & test_str, FUNS... funs)
  *    bool has_whitespace(const std::string & test_str)
  *    bool has_upper_letter(const std::string & test_str)
@@ -396,16 +394,6 @@ namespace emp {
   static inline bool has_one_of(const std::string & test_str, const std::string & char_set) {
     for (char c : test_str) if (is_one_of(c, char_set)) return true;
     return false;
-  }
-
-
-  /// If no functions are provided to is_valid(), always return false as base case.
-  inline bool is_valid(char /* test_char */ ) { return false; }
-
-  /// Determine if a character passes any of the test functions provided.
-  template <typename... FUNS>
-  inline bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
-    return fun1(test_char) || is_valid(test_char, funs...);
   }
 
   /// For a string to be valid, each character must pass at least one provided function.
