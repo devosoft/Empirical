@@ -211,11 +211,11 @@ RUN \
 RUN \
   /etc/init.d/xvfb start \
    && \
-  cd /opt/Empirical/tests \
+  make test-web-ConfigPanel -C /opt/Empirical/tests/web \
     && \
-  make test-web \
+  make test-native-ConfigPanel -C /opt/Empirical/tests/web \
     && \
-  make test-base \
+  make test-vector -C /opt/Empirical/tests/base \
     && \
   make clean \
     && \
