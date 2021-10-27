@@ -68,7 +68,7 @@ TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   REQUIRE( bv8.CountOnes() == 9 );
 
   // Some random BitVectors
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv9(1000, random);            // 50/50 chance for each bit.
   const size_t bv9_ones = bv9.CountOnes();
   REQUIRE( bv9_ones >= 400 );
