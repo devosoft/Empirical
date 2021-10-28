@@ -68,7 +68,7 @@ TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   REQUIRE( bv8.CountOnes() == 9 );
 
   // Some random BitVectors
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv9(1000, random);            // 50/50 chance for each bit.
   const size_t bv9_ones = bv9.CountOnes();
   REQUIRE( bv9_ones >= 400 );
@@ -153,7 +153,7 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
   emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
   emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv1k(1000, random, 0.75);
 
   // Make sure all sizes are correct.
@@ -334,7 +334,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv88.SetRange(64,66); REQUIRE(bv88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
   // A larger BitVector with lots of random tests.
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv1k(1000, random, 0.65);
   size_t num_ones = bv1k.CountOnes();  REQUIRE(num_ones > 550);
   bv1k.Toggle();                       REQUIRE(bv1k.CountOnes() == 1000 - num_ones);
@@ -375,7 +375,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
 }
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv(1000);
 
   REQUIRE(bv.None() == true);
@@ -618,7 +618,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(bv.LongestSegmentOnes() == 7);
 
   // Try again with Find, this time with a random sequence of ones.
-  emp::Random random;
+  emp::Random random(1);
   bv.Randomize(random);
   size_t count = 0;
   for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
@@ -849,7 +849,7 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
   REQUIRE(bv.CountOnes() == 1000);
   REQUIRE(bv.CountZeros() == 0);
 
-  emp::Random random;
+  emp::Random random(1);
   bv.Randomize(random);
   REQUIRE(bv.CountOnes() == bv.CountOnes_Sparse());
   size_t num_ones = bv.CountOnes();
