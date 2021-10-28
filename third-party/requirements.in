@@ -1,0 +1,11 @@
+gcovr
+diff
+cookiecutter
+
+# @mmore500 10-2021
+# Docker build can't find matching distribution for
+# arrow==1.2.1
+# charset-normalizer==2.0.7
+# pin to latest known version or directly to source repository
+arrow==0.17.0
+git+https://github.com/ousret/charset_normalizer@2.0.7#egg=charset_normalizer

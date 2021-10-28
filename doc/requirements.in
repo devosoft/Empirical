@@ -1,0 +1,10 @@
+sphinx==3.2.1
+exhale==0.2.3
+sphinx-rtd-theme==0.5.0
+coverxygen==1.5.0
+breathe==4.22.1
+myst-parser==0.12.9
+# @mmore500 2021-10
+# docutils 0.18.0 crashes docs build due to exception
+# AttributeError: 'Values' object has no attribute 'section_self_link'
+docutils==0.17.1

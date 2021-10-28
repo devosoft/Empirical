@@ -33,3 +33,8 @@ This practice minimizes arbitrary barriers for new contributors while maintainin
 Finally, we maintain a complete Empirical development environment as a pre-built Docker container hosted on DockerHub.
 In the past, we have found dependency installation issues to be a major hindrance to onboarding new developers, especially students that hadn't already been using their machines for extensive software development work.
 This practice rolls an otherwise extensive laundry list of tricky installs into a single download, again minimizing arbitrary barriers for new contributors.
+
+A quick note about our python dependencies: in order to prevent build issues due to new package versions, our `requirements.txt` files pin *all* dependencies, including indirect dependencies (i.e., dependencies of our dependencies).
+Our direct dependencies are listed (and pinned) in corresponding `requirements.in` files.
+To update Empirical's python dependencies, update the `requirements.in` file and `pip-compile requirements.in` to regenerate `requirements.txt`.
+Then, commit both files.
