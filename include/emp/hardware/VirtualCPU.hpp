@@ -55,8 +55,10 @@ namespace emp{
         arg_set_t args;
         emp::vector<size_t> nop_vec;
 
-        Instruction(size_t _idx=0, size_t _id=27, emp::vector<size_t> _nop_vec = {})
-          : idx(_idx), id(_id), args(), nop_vec(_nop_vec) { }
+        Instruction() : idx(0), id(0), args(), nop_vec(){ emp_error("default constructor"); }
+
+        Instruction(size_t _idx, size_t _id=0, emp::vector<size_t> _nop_vec = {})
+          : idx(_idx), id(_id), args(), nop_vec(_nop_vec) { ; }
         Instruction(const Instruction &) = default;
         Instruction(Instruction &&) = default;
 
@@ -158,6 +160,7 @@ namespace emp{
 
       /// Add a new instruction to the end of the genome, by NAME and args.
       void PushInst(const std::string & name) {
+        std::cout << "Pushing " << name << std::endl;
         PushInst(GetInstLib()->GetIndex(name));
       }
 
@@ -176,7 +179,9 @@ namespace emp{
       }
       
       /// Add one or more default instructions to the end of the genome.
-      void PushDefaultInst(size_t count=1) { PushInst( Instruction(0), count ); }
+      void PushDefaultInst(size_t count=1) { 
+        PushInst( Instruction(0, GetInstLib()->GetID(0)), count ); 
+      }
 
       void ResetIP(){
         inst_ptr = 0;
@@ -365,6 +370,7 @@ namespace emp{
         sstr << "[" << genome_working.size() << "]";
         for(size_t idx = 0; idx < genome_working.size(); idx++){
           unsigned char c = 'a' + genome_working[idx].id;
+          if(genome_working[idx].id > 25) c = 'A' + genome_working[idx].id - 26;
           sstr << c;
         }
         return sstr.str();
@@ -374,6 +380,7 @@ namespace emp{
         sstr << "[" << genome.size() << "]";
         for(size_t idx = 0; idx < genome.size(); idx++){
           unsigned char c = 'a' + genome[idx].id;
+          if(genome[idx].id > 25) c = 'A' + genome[idx].id - 26;
           sstr << c;
         }
         return sstr.str();
