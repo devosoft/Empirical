@@ -14,16 +14,9 @@
  *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
  *    bool is_literal_char(const std::string & value)
  *    bool is_literal_string(const std::string & value)
- *    bool is_whitespace(char test_char)
- *    bool is_upper_letter(char test_char)
- *    bool is_lower_letter(char test_char)
- *    bool is_letter(char test_char)
- *    bool is_digit(char test_char)
- *    bool is_alphanumeric(char test_char)
- *    bool is_idchar(char test_char)
- *    bool is_one_of(char test_char, const std::string & char_set)
  *    bool is_composed_of(const std::string & test_str, const std::string & char_set)
  *    bool is_digits(const std::string & test_str)
+ *    bool is_number(const std::string & test_str)
  *    bool is_alphanumeric(const std::string & test_str)
  *    bool is_valid(const std::string & test_str, FUNS... funs)
  *    bool has_whitespace(const std::string & test_str)
@@ -34,6 +27,10 @@
  *    bool has_alphanumeric(const std::string & test_str)
  *    bool has_one_of(const std::string & test_str, const std::string & char_set)
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
+ *    bool has_char_at(const std::string & str, char c, size_t pos)
+ *    bool has_one_of_at(const std::string & str, const std::string & opts, size_t pos)
+ *    bool has_digit_at(const std::string & str, size_t pos)
+ *    bool has_letter_at(const std::string & str, size_t pos)
  * 
  *    -- SEARCHING --
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
@@ -339,10 +336,40 @@ namespace emp {
   inline bool has_digit(const std::string & str) { return DigitCharSet().HasAny(str); }
   inline bool has_alphanumeric(const std::string & str) { return AlphanumericCharSet().HasAny(str); }
 
+  inline bool has_char_at(const std::string & str, char c, size_t pos) {
+    return (pos < str.size()) && (str[pos] == c);
+  }
+  inline bool has_one_of_at(const std::string & str, const std::string & opts, size_t pos) {
+    return (pos < str.size()) && is_one_of(str[pos], opts);
+  }
+  inline bool has_digit_at(const std::string & str, size_t pos) { return DigitCharSet().HasAt(str, pos); }
+  inline bool has_letter_at(const std::string & str, size_t pos) { return LetterCharSet().HasAt(str, pos); }
+
   /// Determine if there are only digits in a string.
   inline bool is_digits(const std::string & str) {    
     if (str.size() == 0) return false;   // If string is empty, there are NO digits.
     return DigitCharSet().Has(str);      // Otherwise return false if any character is not a digit.
+  }
+
+  /// Determine if this string represents a proper number.
+  inline bool is_number(const std::string & str) {    
+    if (str.size() == 0) return false;             // If string is empty, not a number!
+    size_t pos = 0;
+    if (has_one_of_at(str, "+-", pos)) ++pos;      // skip leading +/-
+    while (has_digit_at(str, pos)) ++pos;          // Any number of digits (zero is okay)
+    if (has_char_at(str, '.', pos)) {              // If there's a DECIMAL PLACE, look for more digits.
+      ++pos;                                       // Skip over the dot.
+      if (!has_digit_at(str, pos++)) return false; // Must have at least one digit after '.'
+      while (has_digit_at(str, pos)) ++pos;        // Any number of digits.
+    }
+    if (has_one_of_at(str, "eE", pos)) {           // If there's an e... SCIENTIFIC NOTATION
+      ++pos;                                       // Skip over the e.
+      if (has_one_of_at(str, "+-", pos)) ++pos;    // skip leading +/-
+      if (!has_digit_at(str, pos++)) return false; // Must have at least one digit after 'e'
+      while (has_digit_at(str, pos)) ++pos;        // Allow for MORE digits.
+    }
+    // If we've made it to the end of the string AND there was at least one digit, success!
+    return (pos == str.size()) && has_digit(str);
   }
 
   /// Determine if there are any letters or digits anywhere in a string.
