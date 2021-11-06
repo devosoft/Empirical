@@ -62,6 +62,9 @@ namespace emp {
       for (CHAR_T c : str) if (Has(c)) return true;
       return false;      
     }
+    bool HasAt(const std::string & str, size_t pos) const {
+      return (pos < str.size()) && Has(str[pos]);
+    }
 
     bool operator[](CHAR_T index) const { return char_set[index]; }
 
