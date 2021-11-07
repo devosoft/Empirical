@@ -33,9 +33,15 @@ namespace emp{
     public:
       struct Instruction;
 
-      static constexpr size_t NUM_REGS = 3;
       static constexpr size_t NUM_STACKS = 2;
       static constexpr size_t INST_ARGS = 0;
+
+      size_t num_regs = 0;
+      size_t num_nops = 0;
+      bool are_nops_counted = false;
+      bool are_regs_expanded = false;
+      emp::unordered_map<size_t, size_t> nop_id_to_idx_map;
+      emp::unordered_map<size_t, size_t> nop_idx_to_id_map;
 
       using derived_t = DERIVED;
       using this_t = VirtualCPU<derived_t>;
@@ -78,7 +84,7 @@ namespace emp{
           { idx = _idx; id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; nop_vec=_nop_vec;}
       };
 
-      emp::array<data_t, NUM_REGS> regs; 
+      emp::vector<data_t> regs;
       std::unordered_map<int, data_t> inputs;  // Map of all available inputs (position -> value)
       std::unordered_map<int, data_t> outputs; // Map of all outputs (position -> value)
       emp::array<stack_t, NUM_STACKS> stacks;
@@ -121,7 +127,7 @@ namespace emp{
       /// Reset just the CPU hardware, but keep the genome and traits.
       virtual void ResetHardware() {
         // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
-        for (size_t i = 0; i < NUM_REGS; i++) {
+        for (size_t i = 0; i < num_regs; i++) {
           regs[i] = (data_t) i;
         }
         inputs.clear();
@@ -144,8 +150,6 @@ namespace emp{
         ResetHardware();     // Reset the full hardware
       }
 
-
-    
       void SetInputs(const emp::vector<data_t> & vals) { inputs = emp::ToUMap<int,data_t>(vals); }
 
       const std::unordered_map<int,data_t> & GetOutputs() const { return outputs; }
@@ -221,9 +225,10 @@ namespace emp{
       }
 
       size_t GetComplementIdx(size_t idx){
-        if(idx >= NUM_REGS - 1) return 0;
+        if(idx >= num_nops - 1) return 0;
         else return idx + 1;
       }
+
       nop_vec_t GetComplementLabel(const nop_vec_t& nop_vec){
         nop_vec_t res_vec;
         for(size_t nop : nop_vec){
@@ -304,22 +309,18 @@ namespace emp{
       }
 
       void CurateNops(){ 
-        size_t nop_a_id = GetInstLib()->GetID("NopA");
-        size_t nop_b_id = GetInstLib()->GetID("NopB");
-        size_t nop_c_id = GetInstLib()->GetID("NopC");
+        if(!are_nops_counted) CountNops();
         size_t nop_idx = 0;
+        size_t nop_id = 0;
         for(size_t inst_idx = 0; inst_idx < genome_working.GetSize(); ++inst_idx){
           genome_working[inst_idx].nop_vec.clear();
           for(size_t idx = 1; idx < genome_working.size(); ++idx){
             nop_idx = (inst_idx + idx < genome_working.size()) ? 
                 inst_idx + idx : 
                 (inst_idx + idx) - genome_working.size();
-            if(genome_working[nop_idx].id == nop_a_id)
-              genome_working[inst_idx].nop_vec.push_back(0);
-            else if(genome_working[nop_idx].id == nop_b_id)
-              genome_working[inst_idx].nop_vec.push_back(1);
-            else if(genome_working[nop_idx].id == nop_c_id)
-              genome_working[inst_idx].nop_vec.push_back(2);
+            nop_id = genome_working[nop_idx].id;
+            if(emp::Has(nop_id_to_idx_map, nop_id))
+              genome_working[inst_idx].nop_vec.push_back(nop_id_to_idx_map[nop_id]);
             else 
               break;
           }
@@ -327,24 +328,122 @@ namespace emp{
         needs_nops_curated = false;
       }
 
+      void CountNops(){
+        num_nops = 0;
+        nop_id_to_idx_map.clear();
+        nop_idx_to_id_map.clear();
+        are_nops_counted = true;
+        if(GetInstLib()->IsInst("NopA")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopA");
+          nop_id_to_idx_map[id] = 0;
+          nop_id_to_idx_map[0] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopB")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopB");
+          nop_id_to_idx_map[id] = 1;
+          nop_id_to_idx_map[1] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopC")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopC");
+          nop_id_to_idx_map[id] = 2;
+          nop_id_to_idx_map[2] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopD")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopD");
+          nop_id_to_idx_map[id] = 3;
+          nop_id_to_idx_map[3] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopE")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopE");
+          nop_id_to_idx_map[id] = 4;
+          nop_id_to_idx_map[4] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopF")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopF");
+          nop_id_to_idx_map[id] = 5;
+          nop_id_to_idx_map[5] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopG")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopG");
+          nop_id_to_idx_map[id] = 6;
+          nop_id_to_idx_map[6] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopH")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopH");
+          nop_id_to_idx_map[id] = 7;
+          nop_id_to_idx_map[7] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopI")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopI");
+          nop_id_to_idx_map[id] = 8;
+          nop_id_to_idx_map[8] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopJ")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopJ");
+          nop_id_to_idx_map[id] = 9;
+          nop_id_to_idx_map[9] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopK")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopK");
+          nop_id_to_idx_map[id] = 10;
+          nop_id_to_idx_map[10] = id;
+        }
+        else return;
+        if(GetInstLib()->IsInst("NopL")){
+          num_nops++;
+          size_t id = GetInstLib()->GetID("NopL");
+          nop_id_to_idx_map[id] = 11;
+          nop_id_to_idx_map[11] = id;
+        }
+        else return;
+      }
+
+      void ExpandRegisters(){
+        if(!are_nops_counted) CountNops();
+        std::cout << "Expanding registers! " << "Nops: " << num_nops << std::endl;
+        are_regs_expanded = true;
+        num_regs = num_nops;
+        regs.resize(num_regs);
+      }    
+
       /// Process the NEXT instruction pointed to be the instruction pointer
-      void SingleProcess() {
+      void SingleProcess(bool verbose = true) {
         emp_assert(genome_working.GetSize() > 0);  // A genome must exist to be processed.
-        //if (inst_ptr >= genome_working.GetSize()) ResetIP();
-        //std::cout << "(" << genome_working[inst_ptr].id << ")\t";
-        //std::cout << GetInstLib()->GetName(genome_working[inst_ptr].id) << " ";
+        if(!are_regs_expanded) ExpandRegisters();
         if(needs_nops_curated) CurateNops();
+        if(verbose){
+          GetInstLib()->GetName(genome_working[inst_ptr].idx);
+          PrintDetails();
+        }
         GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
         AdvanceIP();
-        //std::cout << "; IP: " << inst_ptr;
-        //std::cout << "; RH: " << read_head;
-        //std::cout << "; WH: " << write_head;
-        //std::cout << "; FH: " << flow_head;
-        //std::cout << std::endl;
       }
 
       /// Process the next SERIES of instructions, directed by the instruction pointer.
-      void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
+      void Process(size_t num_inst, bool verbose) { 
+        for (size_t i = 0; i < num_inst; i++) SingleProcess(verbose); 
+      }
     
       inst_t GetRandomInst(Random & rand) {
         size_t idx = rand.GetUInt(GetInstLib()->GetSize());
@@ -375,6 +474,7 @@ namespace emp{
         }
         return sstr.str();
       }
+
       std::string GetOriginalString(){
         std::stringstream sstr;
         sstr << "[" << genome.size() << "]";
@@ -384,6 +484,18 @@ namespace emp{
           sstr << c;
         }
         return sstr.str();
+      }
+      void PrintDetails(){
+        std::cout << "IP: " << inst_ptr;
+        std::cout << " RH: " << read_head;
+        std::cout << " WH: " << write_head;
+        std::cout << " FH: " << flow_head;
+        std::cout << "(nops: " << num_nops << "; regs: " << num_regs << ")" << std::endl;
+        for(size_t reg_idx = 0; reg_idx < regs.size(); ++reg_idx){
+          std::cout << "[" << reg_idx << "] " << regs[reg_idx] << std::endl;
+        }
+        std::cout << std::endl;
+
       }
   }; // End VirtualCPU class
 } // End namespace
