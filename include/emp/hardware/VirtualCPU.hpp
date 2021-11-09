@@ -100,8 +100,10 @@ namespace emp{
       genome_t genome;
       genome_t genome_working;
       emp::vector<size_t> copied_inst_id_vec;
+      emp::vector<size_t> label_idx_vec;
 
       bool needs_nops_curated = true;
+      bool expanded_nop_args = false;
     
 
       VirtualCPU(const genome_t & in_genome)
@@ -237,33 +239,19 @@ namespace emp{
         return res_vec;
       }
 
+        bool CompareSequences(const nop_vec_t& search_vec, const nop_vec_t& compare_vec){
+          if(search_vec.size() > compare_vec.size()) return false;
+          if(search_vec.size() == 0 || compare_vec.size() == 0) return false;
+          for(size_t idx = 0; idx < search_vec.size(); ++idx){
+            if(search_vec[idx] != compare_vec[idx]) return false;
+          }
+          return true;
+        }
+
         int FindLabel(const nop_vec_t& label, size_t start_idx){
           if(label.size() == 0) return -1;
           for(size_t offset = 1; offset < genome_working.size(); ++offset){
-            bool label_correct = true;
-            for(size_t nop_idx = 0; nop_idx < label.size(); ++nop_idx){
-              size_t idx = start_idx + offset + nop_idx;
-              if(idx >= genome_working.size()) idx -= genome_working.size();
-              if(label[nop_idx] == 0){
-                if(genome_working[idx].id != GetInstLib()->GetID("NopA")){
-                  label_correct = false;
-                  break;
-                }
-              }
-              else if(label[nop_idx] == 1){
-                if(genome_working[idx].id != GetInstLib()->GetID("NopB")){
-                  label_correct = false;
-                  break;
-                }
-              }
-              else if(label[nop_idx] == 2){
-                if(genome_working[idx].id != GetInstLib()->GetID("NopC")){
-                  label_correct = false;
-                  break;
-                }
-              }
-            }
-            if(label_correct) return offset;
+            if(CompareSequences(label, genome_working[start_idx + offset].nop_vec)) return offset;
           }
           return -1;
         }
@@ -291,6 +279,72 @@ namespace emp{
         nop_vec_t comp_label = GetComplementLabel(label);
         return CheckIfLastCopied(comp_label);
       }
+      size_t FindMarkedLabel_Reverse(bool start_local){
+        const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
+        size_t start_label_vec_idx =  label_idx_vec.size() - 1;
+        if(start_local){
+          bool start_found = false;
+          for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
+            if(label_idx_vec[label_idx_vec.size() - offset - 1] <= inst_ptr){
+              start_found = true;
+              break;
+            }
+          }
+          if(!start_found) start_label_vec_idx = label_idx_vec.size() - 1;
+          for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
+            const size_t idx = 
+              label_idx_vec[
+                (start_label_vec_idx - offset + label_idx_vec.size()) % label_idx_vec.size()
+              ];
+            if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+          }
+        }
+        return inst_ptr;
+      }
+
+      size_t FindMarkedLabel(bool start_local, bool reverse = false){
+        if(reverse) FindMarkedLabel_Reverse(start_local);
+        const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
+        size_t start_label_vec_idx = 0;
+        if(start_local){
+          bool start_found = false;
+          for(; start_label_vec_idx < label_idx_vec.size(); ++start_label_vec_idx){
+            if(label_idx_vec[start_label_vec_idx] >= inst_ptr){
+              start_found = true;
+              break;
+            }
+          }
+          if(!start_found) start_label_vec_idx = 0;
+          for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
+            const size_t idx = label_idx_vec[(start_label_vec_idx + offset) % label_idx_vec.size()];
+            if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+          }
+        }
+        return inst_ptr;
+      }
+      
+      size_t FindSequence_Reverse(bool start_local){
+        const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
+        size_t start_idx = genome_working.size() - 1;
+        if(start_local && inst_ptr != 0) start_idx = inst_ptr - 1;
+        for(size_t offset = 0; offset < genome_working.size(); ++offset){
+          const size_t idx = (start_idx - offset + genome_working.size()) % genome_working.size();
+          if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+        }
+        return inst_ptr;
+      }
+
+      size_t FindSequence(bool start_local, bool reverse = false){
+        if(reverse) FindSequence_Reverse(start_local);
+        const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
+        size_t start_idx = 0;
+        if(start_local) start_idx = inst_ptr + 1;
+        for(size_t offset = 0; offset < genome_working.size(); ++offset){
+          const size_t idx = (start_idx + offset) % genome_working.size(); 
+          if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+        }
+        return inst_ptr;
+      }
 
       void StackPush(size_t reg_idx){
         stacks[active_stack_idx].push_back(regs[reg_idx]);
@@ -310,10 +364,16 @@ namespace emp{
 
       void CurateNops(){ 
         if(!are_nops_counted) CountNops();
+        label_idx_vec.clear();
         size_t nop_idx = 0;
         size_t nop_id = 0;
+        bool label_inst_present = GetInstLib()->IsInst("Label");
+        size_t label_inst_id = label_inst_present ? GetInstLib()->GetID("Label") : 0;
         for(size_t inst_idx = 0; inst_idx < genome_working.GetSize(); ++inst_idx){
           genome_working[inst_idx].nop_vec.clear();
+          if(label_inst_present && (genome_working[inst_idx].id == label_inst_id)){
+            label_idx_vec.push_back(inst_idx);
+          }
           for(size_t idx = 1; idx < genome_working.size(); ++idx){
             nop_idx = (inst_idx + idx < genome_working.size()) ? 
                 inst_idx + idx : 
@@ -496,6 +556,20 @@ namespace emp{
         }
         std::cout << std::endl;
 
+      }
+  
+      bool Load(std::istream & input) {
+        File file(input);
+        file.RemoveComments("--");  // Remove all comments beginning with -- (including --> and ----)
+        file.RemoveComments("//");  // Remove all comments beginning with -- (including --> and ----)
+        file.RemoveComments("#");  // Remove all comments beginning with -- (including --> and ----)
+        file.CompressWhitespace();  // Trim down remaining whitespace.
+        file.Apply( [this](std::string & info){ PushInst(info); } );
+        return true;
+      }
+      bool Load(const std::string & filename) { 
+        std::ifstream is(filename); 
+        return Load(is); 
       }
   }; // End VirtualCPU class
 } // End namespace
