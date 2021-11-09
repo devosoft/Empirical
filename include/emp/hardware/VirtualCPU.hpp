@@ -225,6 +225,27 @@ namespace emp{
         flow_head = pos;
         flow_head %= genome_working.size();
       }
+      void SetModdedHead(size_t head_idx, size_t pos){
+        size_t modded_idx = head_idx % 4;
+        if(modded_idx == 0) SetIP(pos);
+        else if(modded_idx == 1) SetRH(pos);
+        else if(modded_idx == 2) SetWH(pos);
+        else if(modded_idx == 3) SetFH(pos);
+      }
+      void AdvanceModdedHead(size_t head_idx, size_t pos){
+        size_t modded_idx = head_idx % 4;
+        if(modded_idx == 0) AdvanceIP(pos);
+        else if(modded_idx == 1) AdvanceRH(pos);
+        else if(modded_idx == 2) AdvanceWH(pos);
+        else if(modded_idx == 3) AdvanceFH(pos);
+      }
+      size_t GetModdedHead(size_t head_idx){
+        size_t modded_idx = head_idx % 4;
+        if(modded_idx == 0) return inst_ptr;
+        else if(modded_idx == 1) return read_head;
+        else if(modded_idx == 2) return write_head;
+        else if(modded_idx == 3) return flow_head;
+      }
 
       size_t GetComplementIdx(size_t idx){
         if(idx >= num_nops - 1) return 0;
