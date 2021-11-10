@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2021.
 //  Released under the MIT Software license; see doc/LICENSE
@@ -7,23 +6,6 @@
 #define __EMP_D3_SELECTION_H__
 
 #include "d3_init.hpp"
-=======
-/**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file selection.hpp
- *  @brief TODO.
- */
-
-#ifndef EMP_WEB_D3_SELECTION_HPP_INCLUDE
-#define EMP_WEB_D3_SELECTION_HPP_INCLUDE
-
-#include "d3_init.hpp"
-#include "dataset.hpp"
-#include "utils.hpp"
->>>>>>> master
 
 #include <array>
 #include <iostream>
@@ -59,16 +41,11 @@ namespace internal {
         const int new_id =internal::NextD3ID();
 
         MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
           const id = $0;
           const selector = UTF8ToString($1);
           const new_id = $2;
           var new_selection = emp_d3.objects[id].select(selector);
           emp_d3.objects[new_id] = new_selection;
-=======
-          var new_selection = js.objects[$0].select(UTF8ToString($1));
-          js.objects[$2] = new_selection;
->>>>>>> master
         }, this->id, selector.c_str(), new_id);
 
         return DERIVED(new_id);
@@ -80,17 +57,11 @@ namespace internal {
         const int new_id =internal::NextD3ID();
 
         MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
           const id = $0;
           const selector = UTF8ToString($1);
           const new_id = $2;
           var new_selection = emp_d3.objects[id].selectAll(selector);
           emp_d3.objects[new_id] = new_selection;
-=======
-        //   console.log($0, js.objects[$0]);
-          var new_selection = js.objects[$0].selectAll(UTF8ToString($1));
-          js.objects[$2] = new_selection;
->>>>>>> master
         }, this->id, selector.c_str(), new_id);
 
         return DERIVED(new_id);
@@ -271,14 +242,9 @@ namespace internal {
       typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetAttr(const std::string & name, T value) {
 
-<<<<<<< HEAD
         MAIN_THREAD_EM_ASM({
           emp_d3.objects[$0].attr(UTF8ToString($1), $2)
           }, this->id, name.c_str(), value);
-=======
-        MAIN_THREAD_EM_ASM({js.objects[$0].attr(UTF8ToString($1), $2)},
-          this->id, name.c_str(), value);
->>>>>>> master
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -326,11 +292,7 @@ namespace internal {
         emp::pass_array_to_javascript(value); // This works for all containers that store data contiguously.
 
         MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
           emp_d3.objects[$0].attr(UTF8ToString($1), emp_i.__incoming_array);
-=======
-          js.objects[$0].attr(UTF8ToString($1), emp_i.__incoming_array);
->>>>>>> master
         }, this->id, name.c_str());
 
         return *(static_cast<DERIVED *>(this));
@@ -349,7 +311,6 @@ namespace internal {
       */
 
       //std::string version because std::strings are better
-<<<<<<< HEAD
       DERIVED& SetStyle(const std::string & name, const std::string & value, bool priority=false) {
 
         MAIN_THREAD_EM_ASM({
@@ -365,31 +326,11 @@ namespace internal {
           }
         }, this->id, name.c_str(), value.c_str(), (uint32_t)priority);
 
-=======
-      DERIVED& SetStyle(std::string name, std::string value, bool priority=false){
-        if (priority){
-          MAIN_THREAD_EM_ASM({
-            var func_string = UTF8ToString($2);
-            if (typeof window[func_string] === "function") {
-              func_string = window[func_string];
-            }
-            for (name in {d3:"d3", emp:"emp"}) {
-              if (typeof window[name][func_string] === "function") {
-                func_string = window[name][func_string];
-              }
-            }
-          js.objects[$0].style(UTF8ToString($1), in_string, "important");
-          }, this->id, name.c_str(), value.c_str());
-        } else {
-          D3_CALLBACK_METHOD_2_ARGS(style, name.c_str(), value.c_str())
-        }
->>>>>>> master
         return *(static_cast<DERIVED *>(this));
       }
 
       /// @cond TEMPLATES
 
-<<<<<<< HEAD
       // Const char * version so the generic template doesn't get greedy with
       // string literals
       DERIVED& SetStyle(const std::string & name, const char * value, bool priority=false) {
@@ -407,27 +348,6 @@ namespace internal {
           }
         }, this->id, name.c_str(), value, (uint32_t)priority);
 
-=======
-      //Const char * version so the generic template doesn't get greedy with
-      //string literals
-      DERIVED& SetStyle(std::string name, const char* value, bool priority=false){
-        if (priority){
-          MAIN_THREAD_EM_ASM({
-            var func_string = UTF8ToString($2);
-            if (typeof window[func_string] === "function") {
-                func_string = window[func_string];
-              }
-              for (name in {d3:"d3", emp:"emp"}) {
-                if (typeof window[name][func_string] === "function") {
-                  func_string = window[name][func_string];
-                }
-              };
-            js.objects[$0].style(UTF8ToString($1), in_string, "important");
-          }, this->id, name.c_str(), value);
-        } else {
-          D3_CALLBACK_METHOD_2_ARGS(style, name.c_str(), value)
-        }
->>>>>>> master
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -470,7 +390,6 @@ namespace internal {
       // Generic template version
       template <typename T>
       typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
-<<<<<<< HEAD
       SetStyle(const std::string & name, T value, bool priority=false) {
         if (priority) {
           MAIN_THREAD_EM_ASM({
@@ -480,16 +399,6 @@ namespace internal {
           MAIN_THREAD_EM_ASM({
             emp_d3.objects[$0].style(UTF8ToString($1), $2)
           }, this->id, name.c_str(), value);
-=======
-      SetStyle(std::string name, T value, bool priority=false){
-        if (priority){
-          MAIN_THREAD_EM_ASM({js.objects[$0].style(UTF8ToString($1), $2, "important")},
-              this->id, name.c_str(), value);
-          }
-        else {
-          MAIN_THREAD_EM_ASM({js.objects[$0].style(UTF8ToString($1), $2)},
-              this->id, name.c_str(), value);
->>>>>>> master
         }
         return *(static_cast<DERIVED *>(this));
       }
@@ -589,114 +498,58 @@ namespace internal {
       ***********************************************/
 
       /// Get the value of this object's [name] attribute when it's a string
-<<<<<<< HEAD
       std::string GetAttrString(const std::string & name) const {
         MAIN_THREAD_EM_ASM({
           var text = emp_d3.objects[$0].attr(UTF8ToString($1));
           emp.PassStringToCpp(text);
-=======
-      std::string GetAttrString(std::string name) const {
-        char * buffer = (char *)EM_ASM_INT({
-          var text = js.objects[$0].attr(UTF8ToString($1));
-          var buffer = Module._malloc(text.length+1);
-          Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-          return buffer;
->>>>>>> master
         }, this->id, name.c_str());
         return emp::pass_str_to_cpp();
       }
 
       /// Get the value of this object's [name] attribute when it's an int
-<<<<<<< HEAD
       int GetAttrInt(const std::string & name) const {
         return MAIN_THREAD_EM_ASM_INT({
           return emp_d3.objects[$0].attr(UTF8ToString($1));
-=======
-      int GetAttrInt(std::string name) const {
-        return EM_ASM_INT({
-          return js.objects[$0].attr(UTF8ToString($1));
->>>>>>> master
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] attribute when it's a double
-<<<<<<< HEAD
       double GetAttrDouble(const std::string & name) const {
         return MAIN_THREAD_EM_ASM_DOUBLE({
           return emp_d3.objects[$0].attr(UTF8ToString($1));
-=======
-      double GetAttrDouble(std::string name) const {
-        return EM_ASM_DOUBLE({
-          return js.objects[$0].attr(UTF8ToString($1));
->>>>>>> master
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] style when it's a string
-<<<<<<< HEAD
       std::string GetStyleString(const std::string & name) const {
         MAIN_THREAD_EM_ASM({
           var style = emp_d3.objects[$0].style(UTF8ToString($1));
           emp.PassStringToCpp(style);
-=======
-      std::string GetStyleString(std::string name) const {
-        char * buffer = (char *)EM_ASM_INT({
-          var text = js.objects[$0].style(UTF8ToString($1));
-          var buffer = Module._malloc(text.length+1);
-          Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-          return buffer;
->>>>>>> master
         }, this->id, name.c_str());
         return emp::pass_str_to_cpp();
       }
 
       /// Get the value of this object's [name] style when it's an int
-<<<<<<< HEAD
       int GetStyleInt(const std::string & name) const {
         return MAIN_THREAD_EM_ASM_INT({
           return emp_d3.objects[$0].style(UTF8ToString($1));
-=======
-      int GetStyleInt(std::string name) const {
-        return EM_ASM_INT({
-          return js.objects[$0].style(UTF8ToString($1));
->>>>>>> master
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] style when it's a double
-<<<<<<< HEAD
       double GetStyleDouble(const std::string & name) const {
         return MAIN_THREAD_EM_ASM_DOUBLE({
           return emp_d3.objects[$0].style(UTF8ToString($1));
-=======
-      double GetStyleDouble(std::string name) const {
-        return EM_ASM_DOUBLE({
-          return js.objects[$0].style(UTF8ToString($1));
->>>>>>> master
         }, this->id, name.c_str());
       }
 
       /// Get this object's text
       std::string GetText() const {
-<<<<<<< HEAD
         MAIN_THREAD_EM_ASM({
           var text = emp_d3.objects[$0].text();
           emp.PassStringToCpp(text);
         }, this->id);
         return emp::pass_str_to_cpp();
-=======
-
-        char * buffer = (char *)EM_ASM_INT({
-          var text = js.objects[$0].text();
-          var buffer = Module._malloc(text.length+1);
-          Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-          return buffer;
-        }, this->id);
-
-        std::string result = std::string(buffer);
-        free(buffer);
-        return result;
->>>>>>> master
       }
 
       // GetHtml and GetProperty are implemented differently for transitions and selections
@@ -755,384 +608,7 @@ namespace internal {
   };
 }
 
-<<<<<<< HEAD
 #include "transition.hpp"
-=======
-    /**************************************************************************//**
-    * @name Constructors
-    *
-    * Usually transitions are constructed from selections by calling the selection.MakeTransition()
-    * method. In rare cases you may want to construct a new transition, though.
-    *
-    * @{
-    ***********************************************/
-
-    /// Default constructor - construct empty transition
-    Transition(){;};
-
-    /// Advanced: Construct new transition pointing to the [id]th element in js.objects.
-    Transition(int id) : SelectionOrTransition(id) {;};
-
-    /// Create a transition from the current transition. If a [name] is specified
-    /// the transition will be given that name
-    ///
-    /// Note: In D3.js this method is just called transition(), but in C++ that would cause a
-    /// collision with the constructor
-    //TODO: D3 supports passing a selection, but it's kind of a weird edge case
-    Transition NewTransition(std::string name="") const {
-      int new_id = NextD3ID();
-      MAIN_THREAD_EM_ASM({
-       var transition = js.objects[$0].transition(UTF8ToString($1));
-      js.objects[$2] = transition;
-    }, this->id, name.c_str(), new_id);
-
-      return D3::Transition(new_id);
-    }
-
-    #ifndef DOXYGEN_RUNNING
-
-    /**************************************************************************//**
-    * @name Setters
-    *
-    * There are three main types of values you might want to change about a selection:
-    * attributes (use `SetAttr`), styles (use `SetStyle`), and properties (use `SetProperty`).
-    * The distinction between these types is rooted in how they are represented in web languages
-    * (Javascript, CSS, and HTML) and would ideally be abstracted in this wrapper but can't be.
-    *
-    * Additional traits you can set include text and html.
-    *
-    * Advanced note: In D3.js, the same functions are used to set and get values (depending on
-    * whether an argument is passed). Because C++ needs to have clearly defined
-    * return types we need separate getters for each return type.
-    *
-    * @{
-    ***********************************************/
-
-    Transition& On(std::string type, std::string listener="null", bool capture=false){
-
-      // Check that the listener is valid
-      emp_assert(EM_ASM_INT({
-        var func_string = UTF8ToString($0);
-        if (func_string == "null") {
-          return true;
-        }
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-        return (typeof func_string === "function");
-      }, listener.c_str()) \
-      && "String passed to On is not s Javascript function or null", listener);
-
-      int new_id = NextD3ID();
-
-      MAIN_THREAD_EM_ASM({
-        var func_string = UTF8ToString($2);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-
-        if (typeof func_string === "function") {
-          js.objects[$0].on(UTF8ToString($1),
-        func_string,$3);
-        } else {
-          js.objects[$0].on(UTF8ToString($1), null);
-        }
-
-      }, this->id, type.c_str(), listener.c_str(), capture, new_id);
-
-      return (*this);
-    }
-
-    /// @cond TEMPLATES
-
-    /// Version for C++ functions
-    template <typename T>
-    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
-    On(std::string type, T listener, bool capture=false){
-
-      uint32_t fun_id = emp::JSWrap(listener, "", false);
-      int new_id = NextD3ID();
-
-      MAIN_THREAD_EM_ASM({
-        js.objects[$0].on(UTF8ToString($1),
-          function(d, i){
-           js.objects[$4] = d3.select(this);
-           emp.Callback($2, d, i, $4);}, $3);
-      }, this->id, type.c_str(), fun_id, capture, new_id);
-
-      emp::JSDelete(fun_id);
-      return (*this);
-    }
-
-    /// @endcond
-
-    Transition& SetDuration(double time) {
-        MAIN_THREAD_EM_ASM({
-            js.objects[$0].duration($1);
-        }, this->id, time);
-        return (*this);
-    }
-
-    /// Sets special properties of DOM elements (e.g. "checked" for checkboxes)
-    /// Value can be a number, function, string, or string naming a Javascript function
-    /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
-    /// for more information.
-    // std::string verison
-    Transition& SetProperty(std::string name, std::string value){
-      MAIN_THREAD_EM_ASM({
-        var arg1 = UTF8ToString($1);                                        \
-        var func_string = UTF8ToString($2);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-        js.objects[$0].each("end", function(){
-          d3.select(this).property(arg1, func_string);
-        });
-      }, name.c_str(), value.c_str());
-      return *this;
-    }
-
-    /// @cond TEMPLATES
-
-    // Const char * version so raw strings work
-    Transition& SetProperty(std::string name, const char* value){
-      MAIN_THREAD_EM_ASM({
-        var arg1 = UTF8ToString($1);                                        \
-        var func_string = UTF8ToString($2);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-        js.objects[$0].each("end", function(){
-          d3.select(this).property(arg1, func_string);
-        });
-      }, name.c_str(), value);
-      return *this;
-    }
-
-    //Generic template version
-    template <typename T>
-    typename std::enable_if<std::is_fundamental<T>::value, Transition&>::type
-    SetProperty(std::string name, T value){
-      MAIN_THREAD_EM_ASM({
-          js.objects[$0].each("end", function() {
-            d3.select(this).property(UTF8ToString($1), $2);
-          });
-      }, this->id, name.c_str());
-      return *this;
-    }
-
-    //This version handles values that are C++ functions and wraps them with JSWrap
-    //If a function is being used repeatedly, it may be more efficient to wrap it
-    //once and then pass the name as a string.
-    template <typename T>
-    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
-    SetProperty(std::string name, T value) {
-      uint32_t fun_id = emp::JSWrap(value, "", false);
-      MAIN_THREAD_EM_ASM({
-        js.objects[$0].each("end", function(){
-                d3.select(this).property(UTF8ToString($1),
-                                          function(d, i, j) {
-                                            return emp.Callback($2, d, i, j);
-                                        });
-        });
-      }, this->id, name.c_str(), fun_id);
-      emp::JSDelete(fun_id);
-      return *this;
-    }
-
-    /// @endcond
-
-    /// Sets this selection's inner html to the specified string, or the string returned by running the
-    /// specified function on the element's bound data
-    Transition& SetHtml(std::string value){
-      MAIN_THREAD_EM_ASM({
-        var func_string = UTF8ToString($1);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-        js.objects[$0].each("end", function(){
-          d3.select(this).html(func_string);
-        });
-      }, this->id, value.c_str());
-      return *this;
-    }
-
-    /// @cond TEMPLATES
-
-    template <typename T>
-    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
-    SetHtml(T func){
-      uint32_t fun_id = emp::JSWrap(func, "", false);
-      MAIN_THREAD_EM_ASM({
-        js.objects[$0].each("end", function(){
-                  d3.select(this).html(function(d, i, j) {
-                        return emp.Callback($1, d, i, j);
-                  });
-        });
-      }, this->id, fun_id);
-      emp::JSDelete(fun_id);
-      return *this;
-    }
-
-    /// @endcond
-
-    /// Change whether or not element in this selection have the [classname] class.
-    /// Example: Add the data-point class with selection.SetClassed("data-point", true);
-    // Value can also be a function that takes bound data and returns a bool
-    Transition& SetClassed(std::string classname, bool value) {
-      MAIN_THREAD_EM_ASM({
-        js.objects[$0].each("end", function(){
-            d3.select(this).classed(UTF8ToString($1), $2);
-        });
-      }, this->id, classname.c_str(), value);
-      return *this;
-    }
-
-    ///@cond TEMPLATES
-
-    // Version for C++ function
-    template <typename T>
-    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
-    SetClassed(std::string, std::string classname, T func){
-      uint32_t fun_id = emp::JSWrap(func, "", false);
-      MAIN_THREAD_EM_ASM({
-        js.objects[$0].each("end", function(){
-                  d3.select(this).classed(UTF8ToString($1),
-                                            function(d, i, j) {
-                                              return emp.Callback($2, d, i, j);
-                                          });
-        });
-      }, this->id, classname.c_str(), fun_id);
-      emp::JSDelete(fun_id);
-
-      return *this;
-    }
-
-    // Version that allows strings containing function names but warns on other strings
-    Transition& SetClassed(std::string classname, std::string value){
-      emp_assert(EM_ASM_INT({
-        var func_string = UTF8ToString($0);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-        return (typeof func_string === "function");
-      }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
-
-      MAIN_THREAD_EM_ASM({
-        var arg1 = UTF8ToString($1);                                        \
-        var func_string = UTF8ToString($2);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-        js.objects[$0].each("end", function(){
-          d3.select(this).classed(arg1, func_string);
-        });
-      }, classname.c_str(), value.c_str());
-
-      return *this;
-    }
-
-    ///@endcond
-
-    /** @} */
-
-    /**************************************************************************//**
-    * @name Getters
-    *
-    * There are three main types of values you might want to access about a selection:
-    * attributes (use `GetAttr`), styles (use `GetStyle`), and properties (use `GetProperty`).
-    * The distinction between these types is rooted in how they are represented in web languages
-    * (Javascript, CSS, and HTML) and would ideally be abstracted in this wrapper but can't be.
-    *
-    * Additional traits you can set include text and html.
-    *
-    * Advanced note: In D3.js, the same functions are used to set and get values (depending on
-    * whether an argument is passed). Because C++ needs to have clearly defined
-    * return types (and because different macros are required to return different types from
-    * Javascript), we need separate getters for each return type.
-    *
-    * @{
-    ***********************************************/
-
-    /// Get this object's html
-    std::string GetHtml() const {
-      char * buffer = (char *)EM_ASM_INT({
-        var text = d3.select(js.objects[$0]).html();
-        var buffer = Module._malloc(text.length+1);
-        Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-        return buffer;
-      }, this->id);
-
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
-    }
-
-    /// Get the value of this object's [name] property when its a string
-    std::string GetPropertyString(std::string name) const {
-      char * buffer = (char *)EM_ASM_INT({
-        var text = d3.select(js.objects[$0]).property(UTF8ToString($1));
-        var buffer = Module._malloc(text.length+1);
-        Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-        return buffer;
-      }, this->id, name.c_str());
-
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
-    }
-
-    /// Get the value of this object's [name] property when it's an int
-    int GetPropertyInt(std::string name) const {
-      return EM_ASM_INT({
-        return d3.select(js.objects[$0]).property(UTF8ToString($1));
-      }, this->id, name.c_str());
-    }
-
-    /// Get the value of this object's [name] property when it's a double
-    double GetPropertyDouble(std::string name) const {
-      return EM_ASM_DOUBLE({
-        return d3.select(js.objects[$0]).property(UTF8ToString($1));
-      }, this->id, name.c_str());
-    }
-
-    /// @}
->>>>>>> master
 
 namespace D3 {
 
@@ -1171,20 +647,12 @@ namespace D3 {
     Selection(const std::string & selector, bool all = false) {
       if (all) {
         MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
           emp_d3.objects[$0] = d3.selectAll(UTF8ToString($1));
-=======
-          js.objects[$0] = d3.selectAll(UTF8ToString($1));
->>>>>>> master
         }, this->id, selector.c_str());
       }
       else {
         MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
           emp_d3.objects[$0] = d3.select(UTF8ToString($1));
-=======
-          js.objects[$0] = d3.select(UTF8ToString($1));
->>>>>>> master
         }, this->id, selector.c_str());
       }
     };
@@ -1220,7 +688,6 @@ namespace D3 {
       MAIN_THREAD_EM_ASM({
         //We could make this slightly prettier with macros, but would
         //add an extra comparison
-<<<<<<< HEAD
         const selection_id = $0;
         const in_string = UTF8ToString($1);
         const data_id = $2;
@@ -1237,27 +704,6 @@ namespace D3 {
       },this->id, key.c_str(), values.GetID(), new_id);
 
       return Selection(new_id);
-=======
-        var in_string = UTF8ToString($1);
-        var fn = window["emp"][in_string];
-        if (typeof fn === "function"){
-          var update_sel = js.objects[$0].data(js.objects[$2], fn);
-          } else if (typeof window["d3"][in_string] === "function") {
-          var update_sel = js.objects[$0].data(js.objects[$2],
-               window["d3"][in_string]);
-        } else if (typeof window[in_string] === "function") {
-          var update_sel = js.objects[$0].data(js.objects[$2],
-               window[in_string]);
-        } else {
-          var update_sel = js.objects[$0].data(js.objects[$2]);
-        }
-
-        js.objects[$3] = update_sel;
-      },this->id, key.c_str(), values.GetID(), update_id);
-
-      Selection update = Selection(update_id);
-      return update;
->>>>>>> master
     }
 
     ///@cond TEMPLATES
@@ -1270,7 +716,6 @@ namespace D3 {
       const uint32_t fun_id = emp::JSWrap(key, "", false);
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         const selection_id = $0;
         const func_id = $1;
         const data_id = $2;
@@ -1279,13 +724,6 @@ namespace D3 {
                                                 function(d,i) {
                                                   return emp.Callback(func_id, d, i);
                                                 });
-=======
-        var update_sel = js.objects[$0].data(js.objects[$2],
-                                                function(d,i) {
-                                                  return emp.Callback($1, d, i);
-                                            });
-      js.objects[$3] = update_sel;
->>>>>>> master
 
       }, this->id, fun_id, values.GetID(), new_id);
 
@@ -1293,27 +731,6 @@ namespace D3 {
       return Selection(new_id);
     }
 
-<<<<<<< HEAD
-=======
-    // template<typename C>
-    // emp::sfinae_decoy<Selection, decltype(C::value_type::n_fields)>
-    // Data(C values){
-    //     std::cout << "using the right one" << std::endl;
-    //   int update_id = NextD3ID();
-    //   emp::pass_array_to_javascript(values);
-    //
-    //   MAIN_THREAD_EM_ASM({
-    //     var update_sel = js.objects[$0].data(emp_i.__incoming_array);
-    //     js.objects[$1] = update_sel;
-    //
-    //   }, this->id, update_id);
-    //
-    //   Selection update = Selection(update_id);
-    //   return update;
-    // }
-
-
->>>>>>> master
     // Accepts string referring to Javascript function
     template<typename C, class = typename C::value_type>
     Selection Data(const C & values, const std::string & key="") {
@@ -1326,7 +743,6 @@ namespace D3 {
         const in_string = UTF8ToString($1);
         const new_id = $2;
 
-<<<<<<< HEAD
         var fn = emp_d3.find_function(in_string);
 
         if (typeof fn === "function"){
@@ -1341,28 +757,6 @@ namespace D3 {
       }, this->id, key.c_str(), new_id);
 
       return Selection(new_id);
-=======
-      MAIN_THREAD_EM_ASM({
-        var in_string = UTF8ToString($1);
-        var fn = window["emp"][in_string];
-        if (typeof fn === "function"){
-          var update_sel = js.objects[$0].data(emp_i.__incoming_array, fn);
-        } else if (typeof window["d3"][in_string] === "function") {
-          var update_sel = js.objects[$0].data(emp_i.__incoming_array,
-               window["d3"][in_string]);
-        } else if (typeof window[in_string] === "function") {
-          var update_sel = js.objects[$0].data(emp_i.__incoming_array,
-               window[in_string]);
-        } else {
-          var update_sel = js.objects[$0].data(emp_i.__incoming_array);
-        }
-
-        js.objects[$2] = update_sel;
-      }, this->id, key.c_str(), update_id);
-
-      Selection update = Selection(update_id);
-      return update;
->>>>>>> master
     }
 
     // Accepts C++ function as key
@@ -1374,7 +768,6 @@ namespace D3 {
       const uint32_t fun_id = emp::JSWrap(key, "", false);
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         const selection_id = $0;
         const func_id = $1;
         const new_id = $2;
@@ -1384,14 +777,6 @@ namespace D3 {
                                                 });
         emp_d3.objects[new_id] = update_sel;
         emp_i.__incoming_array = []
-=======
-        var update_sel = js.objects[$0].data(emp_i.__incoming_array,
-                                                function(d,i,k) {
-                                                  return emp.Callback($1, d, i, k);
-                                            });
-        js.objects[$2] = update_sel;
-      }, this->id, fun_id, update_id);
->>>>>>> master
 
       }, this->id, fun_id, new_id);
 
@@ -1441,16 +826,9 @@ namespace D3 {
       const int new_id =internal::NextD3ID();
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         var exit_selection = emp_d3.objects[$0].exit();
         emp_d3.objects[$1] = exit_selection;
       }, this->id, new_id);
-=======
-        var append_selection = js.objects[$0].enter()
-                                 .append(UTF8ToString($1));
-        js.objects[$2] = append_selection;
-      }, this->id, type.c_str(), new_id);
->>>>>>> master
 
       return Selection(new_id);
     }
@@ -1475,7 +853,6 @@ namespace D3 {
 
       if (before.c_str()){
         MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
           var new_sel = emp_d3.objects[$0].insert(UTF8ToString($1), UTF8ToString($2));
           emp_d3.objects[$3] = new_sel;
           }, this->id, name.c_str(), before.c_str(), new_id);
@@ -1483,16 +860,6 @@ namespace D3 {
   	    MAIN_THREAD_EM_ASM({
 	      var new_sel = emp_d3.objects[$0].insert(UTF8ToString($1));
 	      emp_d3.objects[$2] = new_sel;
-=======
-          var new_sel = js.objects[$0].enter().insert(UTF8ToString($1),
-                UTF8ToString($2));
-          js.objects[$3] = new_sel;
-        }, this->id, name.c_str(), before.c_str(), new_id);
-      } else {
-        MAIN_THREAD_EM_ASM({
-          var new_sel = js.objects[$0].enter().insert(UTF8ToString($1));
-          js.objects[$2] = new_sel;
->>>>>>> master
         }, this->id, name.c_str(), new_id);
       }
       return Selection(new_id);
@@ -1508,7 +875,6 @@ namespace D3 {
       const int new_id =internal::NextD3ID();
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         const selection_id = $0;
         const type_str = UTF8ToString($1);
         const new_id = $2;
@@ -1516,11 +882,6 @@ namespace D3 {
                                 .append(type_str);
         emp_d3.objects[new_id] = append_selection;
       }, this->id, type.c_str(), new_id);
-=======
-        var enter_selection = js.objects[$0].enter();
-        js.objects[$1] = enter_selection;
-      }, this->id, new_id);
->>>>>>> master
 
       return Selection(new_id);
     }
@@ -1533,34 +894,17 @@ namespace D3 {
       const int new_id =internal::NextD3ID();
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
 	      var exit_selection = emp_d3.objects[$0].exit().remove();
 	      emp_d3.objects[$1] = exit_selection;
-=======
-        var exit_selection = js.objects[$0].exit().remove();
-        js.objects[$1] = exit_selection;
->>>>>>> master
       }, this->id, new_id);
     }
 
     /// Insert elements of type [name] into current enter selection
     ///
-<<<<<<< HEAD
     /// For more information, see the D3 documention on
     /// [insert](https://github.com/d3/d3-selection#selection_insert)
     Selection EnterInsert(const std::string & name, const std::string & before=NULL) {
       const int new_id =internal::NextD3ID();
-=======
-    /// Returns a selection object pointing at this selection's exit selection.
-    Selection Exit(){
-
-      int new_id = NextD3ID();
-
-      MAIN_THREAD_EM_ASM({
-        var exit_selection = js.objects[$0].exit();
-        js.objects[$1] = exit_selection;
-      }, this->id, new_id);
->>>>>>> master
 
       if (before.c_str()) {
         MAIN_THREAD_EM_ASM({
@@ -1636,7 +980,6 @@ namespace D3 {
     // Generic template version
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, Selection&>::type
-<<<<<<< HEAD
     SetProperty(const std::string & name, T value) {
       MAIN_THREAD_EM_ASM({
         const id = $0;
@@ -1644,11 +987,6 @@ namespace D3 {
         const value = $2;
         emp_d3.objects[id].property(name, value);
       }, this->id, name.c_str(), value);
-=======
-    SetProperty(std::string name, T value){
-      MAIN_THREAD_EM_ASM({js.objects[$0].property(UTF8ToString($1),
-             $2)}, this->id, name.c_str());
->>>>>>> master
       return *this;
     }
 
@@ -1788,7 +1126,6 @@ namespace D3 {
 
     /// Get this object's html
     std::string GetHtml() const {
-<<<<<<< HEAD
       MAIN_THREAD_EM_ASM({
         const resultStr = emp_d3.objects[$0].html();
         emp.PassStringToCpp(resultStr);
@@ -1809,51 +1146,13 @@ namespace D3 {
     int GetPropertyInt(const std::string & name) const {
       return MAIN_THREAD_EM_ASM_INT({
         return emp_d3.objects[$0].property(UTF8ToString($1));
-=======
-      char * buffer = (char *)EM_ASM_INT({
-      var text = js.objects[$0].html();
-      var buffer = Module._malloc(text.length+1);
-      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-      return buffer;
-    }, this->id);
-
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
-    }
-
-    /// Get the value of this object's [name] property when its a string
-    std::string GetPropertyString(std::string name) const {
-      char * buffer = (char *)EM_ASM_INT({
-      var text = js.objects[$0].property(UTF8ToString($1));
-      var buffer = Module._malloc(text.length+1);
-      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-      return buffer;
-    }, this->id, name.c_str());
-
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
-    }
-
-    /// Get the value of this object's [name] property when it's an int
-    int GetPropertyInt(std::string name) const {
-      return EM_ASM_INT({
-        return js.objects[$0].property(UTF8ToString($1));
->>>>>>> master
       }, this->id, name.c_str());
     }
 
     /// Get the value of this object's [name] property when it's a double
-<<<<<<< HEAD
     double GetPropertyDouble(const std::string & name) const {
       return MAIN_THREAD_EM_ASM_DOUBLE({
         return emp_d3.objects[$0].property(UTF8ToString($1));
-=======
-    double GetPropertyDouble(std::string name) const {
-      return EM_ASM_DOUBLE({
-        return js.objects[$0].property(UTF8ToString($1));
->>>>>>> master
       }, this->id, name.c_str());
     }
 
@@ -1861,55 +1160,13 @@ namespace D3 {
 
     #endif
 
-<<<<<<< HEAD
-=======
-    /// Append DOM element(s) of the type specified by [name] to this selection.
-    Selection Append(std::string name){
-      int new_id = NextD3ID();
-
-      MAIN_THREAD_EM_ASM({
-        var new_selection = js.objects[$0].append(UTF8ToString($1));
-        js.objects[$2] = new_selection;
-      }, this->id, name.c_str(), new_id);
-      return Selection(new_id);
-    }
-
-    /// Insert DOM element of type "name" into the current selection before the element selected by
-    /// the element specified by the [before] string
-    ///
-    /// For more information, see the D3 documention on
-    /// [insert](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#insert)
-    Selection Insert(std::string name, std::string before=NULL){
-      int new_id = NextD3ID();
-
-      if (before.c_str()){
-        MAIN_THREAD_EM_ASM({
-          var new_sel = js.objects[$0].insert(UTF8ToString($1),
-                UTF8ToString($2));
-          js.objects[$3] = new_sel;
-        }, this->id, name.c_str(), before.c_str(), new_id);
-      } else {
-        MAIN_THREAD_EM_ASM({
-          var new_sel = js.objects[$0].insert(UTF8ToString($1));
-          js.objects[$2] = new_sel;
-        }, this->id, name.c_str(), new_id);
-      }
-      return Selection(new_id);
-    }
-
->>>>>>> master
     /// Create a transition from the current selection. If a [name] is specified
     /// the transition will be given that name
     Transition MakeTransition(const std::string & name="") {
       const int new_id =internal::NextD3ID();
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         var transition = emp_d3.objects[$0].transition(UTF8ToString($1));
         emp_d3.objects[$2] = transition;
-=======
-        var transition = js.objects[$0].transition(UTF8ToString($1));
-        js.objects[$2] = transition;
->>>>>>> master
       }, this->id, name.c_str(), new_id);
 
       return Transition(new_id);
@@ -1918,13 +1175,8 @@ namespace D3 {
     Transition MakeTransition(Transition & t) {
       const int new_id =internal::NextD3ID();
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         var transition = emp_d3.objects[$0].transition(emp_d3.objects[$1]);
         emp_d3.objects[$2] = transition;
-=======
-        var transition = js.objects[$0].transition(js.objects[$1]);
-        js.objects[$2] = transition;
->>>>>>> master
       }, this->id, t.GetID(), new_id);
 
       return Transition(new_id);
@@ -1933,11 +1185,7 @@ namespace D3 {
     /// Interrupt the transition with the name [name] on the current selection
     Selection & Interrupt(const std::string & name="") {
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         emp_d3.objects[$0].interrupt(UTF8ToString($1));
-=======
-        js.objects[$0].interrupt(UTF8ToString($1));
->>>>>>> master
       }, this->id, name.c_str());
       return *this;
     }
@@ -1966,15 +1214,10 @@ namespace D3 {
     }
 
     /// Change the order of elements in the document to match their order in this selection
-<<<<<<< HEAD
     Selection & Order() {
       MAIN_THREAD_EM_ASM({
         emp_d3.objects[$0].order()
       }, this->id);
-=======
-    Selection& Order(){
-      MAIN_THREAD_EM_ASM({js.objects[$0].order()}, this->id);
->>>>>>> master
       return *this;
     }
 
@@ -2015,7 +1258,6 @@ namespace D3 {
       // const int new_id =internal::NextD3ID();
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         const id = $0;
         const type = UTF8ToString($1);
         const listener_str = UTF8ToString($2);
@@ -2038,30 +1280,6 @@ namespace D3 {
         }
 
       }, this->id, type.c_str(), listener.c_str(), capture);
-=======
-        var func_string = UTF8ToString($2);
-        if (typeof window[func_string] === "function") {
-          func_string = window[func_string];
-        }
-        for (name in {d3:"d3", emp:"emp"}) {
-          if (typeof window[name][func_string] === "function") {
-            func_string = window[name][func_string];
-          }
-        }
-
-      if (typeof func_string === "function") {
-        js.objects[$0].on(
-          UTF8ToString($1),
-          function(d, i){
-            js.objects[$4] = d3.select(this);
-            func_string(d, i, $4);
-          },
-          $3
-        );
-      } else {
-        js.objects[$0].on(UTF8ToString($1), null);
-      }
->>>>>>> master
 
       return *this;
     }
@@ -2076,7 +1294,6 @@ namespace D3 {
       const uint32_t fun_id = emp::JSWrap(listener, "", false);
 
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         const id = $0;
         const type = UTF8ToString($1);
         const func_id = $2;
@@ -2090,14 +1307,6 @@ namespace D3 {
           capture
         );
       }, this->id, type.c_str(), fun_id, capture);
-=======
-        js.objects[$0].on(UTF8ToString($1),
-        function(){
-          js.objects[$4] = d3.select(this);
-          emp.Callback($2, d, i, $4);}, $3);
-        },
-        this->id, type.c_str(), fun_id, capture, new_id);
->>>>>>> master
 
       emp::JSDelete(fun_id);
       return (*this);
@@ -2213,8 +1422,4 @@ namespace D3 {
 
 }
 
-<<<<<<< HEAD
 #endif
-=======
-#endif // #ifndef EMP_WEB_D3_SELECTION_HPP_INCLUDE
->>>>>>> master

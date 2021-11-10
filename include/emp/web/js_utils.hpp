@@ -218,15 +218,10 @@ namespace emp {
   // This version of the function handles nested arrays with recursive calls
   // until a non-array type is found.
   template<std::size_t SIZE1, std::size_t SIZE2, typename T>
-<<<<<<< HEAD
   void pass_array_to_javascript(
     const emp::array<emp::array<T, SIZE1>, SIZE2> & values,
 		emp::vector<int> recursive_el = emp::vector<int>()
   ) {
-=======
-  void pass_array_to_javascript(emp::array<emp::array<T, SIZE1>, SIZE2> values,
-        emp::vector<int> recursive_el = emp::vector<int>()) {
->>>>>>> master
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
@@ -259,15 +254,10 @@ namespace emp {
   // This version of the function handles nested vectors with recursive calls
   // until a non-array type is found.
   template<typename T>
-<<<<<<< HEAD
   void pass_array_to_javascript(
     const emp::vector<emp::vector<T> > & values,
 		emp::vector<int> recursive_el = emp::vector<int>()
   ) {
-=======
-  void pass_array_to_javascript(emp::vector<emp::vector<T> > values,
-        emp::vector<int> recursive_el = emp::vector<int>()) {
->>>>>>> master
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
