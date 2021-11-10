@@ -7,13 +7,8 @@
  *  @brief Tools for scaling graph axes in D3.
 **/
 
-<<<<<<< HEAD
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
-=======
-#ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
-#define EMP_WEB_D3_SCALES_HPP_INCLUDE
->>>>>>> master
 
 #include "d3_init.hpp"
 
@@ -105,15 +100,9 @@ namespace D3 {
 
     Scale & SetRange(const std::string & lower, const std::string & upper) {
       MAIN_THREAD_EM_ASM({
-<<<<<<< HEAD
         emp_d3.objects[$0].range([UTF8ToString($1), UTF8ToString($2)]);
       }, this->id, lower.c_str(), upper.c_str());
       return *this;
-=======
-        js.objects[$1] = js.objects[$0].copy();
-      }, this->id, new_id);
-      return Scale(new_id);
->>>>>>> master
     }
 
     // ApplyScale
@@ -166,7 +155,6 @@ namespace D3 {
 
     }
 
-<<<<<<< HEAD
     // std::string ApplyScale(double input) {
     //   MAIN_THREAD_EM_ASM({
     //     const resultStr = emp_d3.objects[$0]($1);
@@ -174,17 +162,6 @@ namespace D3 {
     //   }, this->id, input);
     //   return emp::pass_str_to_cpp();
     // }
-=======
-    /// Calculate the ouput for [input], based on the scale's scaling function
-    std::string ApplyScaleString(double input) {
-      //TODO: make this work for other types
-      char * buffer = (char *) EM_ASM_INT({
-        result = js.objects[$0]($1);
-        // console.log(result);
-        var buffer = Module._malloc(result.length+1);
-        Module.stringToUTF8(result, buffer, result.length*4+1);
-        return buffer;
->>>>>>> master
 
     //  std::string ApplyScale(int input) {
     //   MAIN_THREAD_EM_ASM({
@@ -272,7 +249,6 @@ namespace D3 {
   public:
     // Invert is only supported if the range is numeric. If the range is not numeric, returns NaN
     template <typename T>
-<<<<<<< HEAD
     double Invert(T y) {
       return MAIN_THREAD_EM_ASM_DOUBLE({
         return emp_d3.objects[$0].invert($1);
@@ -364,11 +340,6 @@ namespace D3 {
         emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, value.c_str());
       return *this;
-=======
-    double InvertExtent(T y) {
-      return EM_ASM_DOUBLE({return js.objects[$0].invertExtent($1);},
-         this->id, y);
->>>>>>> master
     }
   };
 
@@ -437,16 +408,8 @@ namespace D3 {
       MAIN_THREAD_EM_ASM({ emp_d3.objects[$0] = d3.scaleSymlog(); }, this->id);
     }
 
-<<<<<<< HEAD
     SymlogScale & SetConstant(double constant) {
       MAIN_THREAD_EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
-=======
-    IdentityScale& SetTickFormat(int count, std::string format) {
-      //TODO: format is technically optional, but what is the point of this
-      //function without it?
-      MAIN_THREAD_EM_ASM({js.objects[$0].tick($1, UTF8ToString($2));},
-      this->id, count, format.c_str());
->>>>>>> master
       return *this;
     }
   };
@@ -761,7 +724,6 @@ namespace D3 {
     }
   };
 
-<<<<<<< HEAD
   // scaleSequentialSqrt
   class SequentialSqrtScale : public SequentialOrDivergingScale {
   protected:
@@ -783,14 +745,6 @@ namespace D3 {
 
     SequentialSymlogScale & SetConstant(double constant) {
       MAIN_THREAD_EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
-=======
-    LinearScale& Nice(int count = -1) {
-      if (count != -1){
-        MAIN_THREAD_EM_ASM({js.objects[$0].nice($1);}, this->id, count);
-      } else {
-        MAIN_THREAD_EM_ASM({js.objects[$0].nice();}, this->id);
-      }
->>>>>>> master
       return *this;
     }
   };
@@ -1134,8 +1088,4 @@ namespace D3 {
   };
 }
 
-<<<<<<< HEAD
 #endif
-=======
-#endif // #ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
->>>>>>> master
