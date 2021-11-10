@@ -1,35 +1,37 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file defines a templated class to represent a 2D suface capable of maintaining data
-//  about which 2D bodies are currently on that surface and rapidly identifying if they are
-//  overlapping.
-//
-//  BODY_TYPE is the class that represents the body geometry.
-//  BODY_INFO represents the internal infomation about the body, including the controller.
-//
-//  Member functions include:
-//   Surface2D(double _width, double _height);
-//   const Point & GetMaxPosition() const;
-//   emp::vector<BODY_TYPE *> & GetBodySet();
-//   const emp::vector<BODY_TYPE *> & GetConstBodySet() const;
-//   Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
-//   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
-//
-//
-//  Development notes:
-//  * Need a good function to remove a body; now we have to use GetBodySet() and modify it.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Surface2D.hpp
+ *  @brief This file defines a templated class to represent a 2D suface capable of maintaining data
+ *  about which 2D bodies are currently on that surface and rapidly identifying if they are
+ *  overlapping.
+ *
+ *  BODY_TYPE is the class that represents the body geometry.
+ *  BODY_INFO represents the internal infomation about the body, including the controller.
+ *
+ *  Member functions include:
+ *   Surface2D(double _width, double _height);
+ *   const Point & GetMaxPosition() const;
+ *   emp::vector<BODY_TYPE *> & GetBodySet();
+ *   const emp::vector<BODY_TYPE *> & GetConstBodySet() const;
+ *   Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
+ *   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
+ *
+ *
+ *  Development notes:
+ *  * Need a good function to remove a body; now we have to use GetBodySet() and modify it.
+ */
 
-
-#ifndef EMP_SURFACE_2D_H
-#define EMP_SURFACE_2D_H
-
-#include "../base/Ptr.hpp"
-#include "Body2D.hpp"
+#ifndef EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE
+#define EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE
 
 #include <functional>
+
+#include "../base/Ptr.hpp"
+
+#include "Body2D.hpp"
 
 namespace emp {
 
@@ -132,4 +134,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE

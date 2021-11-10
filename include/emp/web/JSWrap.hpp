@@ -1,12 +1,9 @@
-#ifndef EMP_JSWRAP_H
-#define EMP_JSWRAP_H
-
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  JSWrap.hpp
+ *  @file JSWrap.hpp
  *  @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
  *
  *  To wrap a function, call:
@@ -38,6 +35,9 @@
  *        mostly to be able to test programs without Emscripten.
  *
  */
+
+#ifndef EMP_WEB_JSWRAP_HPP_INCLUDE
+#define EMP_WEB_JSWRAP_HPP_INCLUDE
 
 #include <array>
 #include <functional>
@@ -628,4 +628,4 @@ void empCppCallback(const size_t cb_id) {
 
 
 
-#endif
+#endif // #ifndef EMP_WEB_JSWRAP_HPP_INCLUDE

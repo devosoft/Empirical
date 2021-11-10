@@ -1,36 +1,42 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file lexer_utils.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include "emp/compiler/DFA.hpp"
 #include "emp/compiler/lexer_utils.hpp"
 #include "emp/compiler/NFA.hpp"
 #include "emp/compiler/RegEx.hpp"
-#include "emp/compiler/DFA.hpp"
-
-#include <sstream>
-#include <iostream>
 
 TEST_CASE("Test lexer_utils", "[compiler]")
 {
-	emp::DFA dfa(3);
-	dfa.SetTransition(0, 2, 'a');
-	dfa.SetTransition(2, 1, 'b');
-	dfa.SetTransition(1, 0, 'c');
+  emp::DFA dfa(3);
+  dfa.SetTransition(0, 2, 'a');
+  dfa.SetTransition(2, 1, 'b');
+  dfa.SetTransition(1, 0, 'c');
 
-	REQUIRE(emp::to_DFA(dfa).GetSize() == dfa.GetSize());
-	REQUIRE(emp::to_DFA(dfa).Test("abc") == dfa.Test("abc"));
+  REQUIRE(emp::to_DFA(dfa).GetSize() == dfa.GetSize());
+  REQUIRE(emp::to_DFA(dfa).Test("abc") == dfa.Test("abc"));
 
-	emp::NFA nfa = emp::to_NFA(dfa);
-	REQUIRE(nfa.GetSize() == dfa.GetSize());
+  emp::NFA nfa = emp::to_NFA(dfa);
+  REQUIRE(nfa.GetSize() == dfa.GetSize());
     std::set<size_t> nxt = nfa.GetNext('a');
-	REQUIRE(nxt.find(2) != nxt.end());
-	REQUIRE(nxt.find(1) == nxt.end());
+  REQUIRE(nxt.find(2) != nxt.end());
+  REQUIRE(nxt.find(1) == nxt.end());
 
-	dfa.SetStop(0);
-	REQUIRE(dfa.Test(emp::FindExample(dfa)));
+  dfa.SetStop(0);
+  REQUIRE(dfa.Test(emp::FindExample(dfa)));
 
-	emp::DFA dfa2(3);
-	REQUIRE(emp::FindExample(dfa2) == "");
+  emp::DFA dfa2(3);
+  REQUIRE(emp::FindExample(dfa2) == "");
 }
 
 TEST_CASE("Another Test lexer_utils", "[compiler]")

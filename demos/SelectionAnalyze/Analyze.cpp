@@ -1,11 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Analyze probabilities for selection using various selection techniques.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file Analyze.cpp
+ *  @brief Analyze probabilities for selection using various selection techniques.
+ */
 
-#include "emp/config/command_line.hpp"
 #include "emp/config/ArgManager.hpp"
+#include "emp/config/command_line.hpp"
 #include "emp/math/Random.hpp"
 
 #include "SelectionData.hpp"
@@ -77,4 +80,3 @@ int main(int argc, char* argv[])
   }
 
 }
-

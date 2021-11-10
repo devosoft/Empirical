@@ -1,16 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file Widget.cpp
+ */
 
 #include <functional>
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Div.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-
 
 struct Test_WidgetWrapWith : emp::web::BaseTest {
 
@@ -119,11 +123,72 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
 
 };
 
+struct Test_TemplatedAppending : emp::web::BaseTest {
+
+  Test_TemplatedAppending()
+  : BaseTest({"emp_test_container"})
+  {
+    emp::web::Div widgets("widgets");
+    emp::web::Div strings("strings");
+    emp::web::Div invoked("invoked");
+    Doc("emp_test_container") << widgets;
+    Doc("emp_test_container") << strings;
+    Doc("emp_test_container") << invoked;
+
+    emp::vector<emp::web::Div> divVec({emp::web::Div("one"), emp::web::Div("two"), emp::web::Div("three")});
+    widgets << divVec;
+    emp::vector<std::string> stringVec({"hi", "why", "bye"});
+    strings << stringVec;
+    invoked << []() { return "Handles lambdas"; };
+  }
+
+  void Describe() override {
+    EM_ASM({
+      describe("Widget::Append templated handling", function() {
+        describe("#widgets", function() {
+          const widgets = document.getElementById("widgets");
+          // Divs remain distinct
+          it("should have 3 children", function() {
+            chai.assert.equal(widgets.childElementCount, 3);
+          });
+        });
+        describe("#strings", function() {
+          const strings = document.getElementById("strings");
+          // Strings get appended together in the span
+          it("should have 1 child", function() {
+            chai.assert.equal(strings.childElementCount,1);
+          });
+          const child = strings.children[0];
+          describe("child", function() {
+            it("should be a span", function() {
+              chai.assert.equal(child.nodeName, "SPAN");
+            });
+          });
+        });
+        describe("#invoked", function() {
+          const invoked = document.getElementById("invoked");
+          it("should have 1 child", function() {
+            chai.assert.equal(invoked.childElementCount, 1);
+          });
+          const child = invoked.children[0];
+          describe("child", function() {
+            it("should be a span", function() {
+              chai.assert.equal(child.nodeName, "SPAN");
+            });
+          });
+        });
+      });
+    });
+  }
+};
+
 emp::web::MochaTestRunner test_runner;
 int main() {
 
   test_runner.Initialize({"emp_test_container"});
 
   test_runner.AddTest<Test_WidgetWrapWith>("Test Widget::WrapWith");
+  test_runner.AddTest<Test_TemplatedAppending>("Test Widget::Append's handling of various types");
+
   test_runner.Run();
 }

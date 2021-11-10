@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  map_utils.hpp
+ *  @file map_utils.hpp
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */
 
-#ifndef EMP_MAP_UTILS_H
-#define EMP_MAP_UTILS_H
+#ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 
 #include <map>
 #include <unordered_map>
@@ -90,4 +90,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE

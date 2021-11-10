@@ -1,22 +1,26 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015
+ *
+ *  @file test.cpp
+ */
 
-#include <emscripten.h>
 #include <iostream>
-
 #include <list>
 #include <string>
 #include <vector>
 
+#include <emscripten.h>
+
+#include "../../geometry/Circle2D.h"
+#include "../../geometry/Point2D.h"
 #include "../../tools/assert.h"
 #include "../../tools/callbacks.h"
 #include "../../tools/const.h"
-#include "../../geometry/Circle2D.h"
-#include "../../geometry/Point2D.h"
 
-#include "../../web/emfunctions.h"
 #include "../../web/Color.h"
+#include "../../web/emfunctions.h"
 #include "../../web/Font.h"
 #include "../../web/RawImage.h"
 

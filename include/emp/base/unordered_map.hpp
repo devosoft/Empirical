@@ -8,8 +8,8 @@
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_UNORDERED_MAP_H
-#define EMP_UNORDERED_MAP_H
+#ifndef EMP_BASE_UNORDERED_MAP_HPP_INCLUDE
+#define EMP_BASE_UNORDERED_MAP_HPP_INCLUDE
 
 #include <initializer_list>
 #include <unordered_map>
@@ -210,4 +210,4 @@ namespace emp {
 
 
 
-#endif
+#endif // #ifndef EMP_BASE_UNORDERED_MAP_HPP_INCLUDE

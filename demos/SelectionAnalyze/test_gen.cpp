@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file test_gen.cpp
+ */
+
 #include "emp/config/command_line.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
@@ -15,7 +23,7 @@ int main(int argc, char* argv[])
 
   if (args.size() != 4) {
     std::cout << "Format: " << args[0] << " [num orgs] [num criteria] [num fitness tiers]"
-	      << std::endl;
+        << std::endl;
     exit(1);
   }
 

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  Systematics.hpp
+ *  @file Systematics.hpp
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
  *
@@ -18,18 +18,19 @@
  *       lifetimes gracefully.
  */
 
+#ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
+#define EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
 
-#ifndef EMP_EVO_SYSTEMATICS_H
-#define EMP_EVO_SYSTEMATICS_H
 
+#include <limits>
+#include <map>
 #include <ostream>
 #include <set>
 #include <unordered_set>
-#include <map>
-#include <limits>
 
 #include "../base/Ptr.hpp"
 #include "../control/Signal.hpp"
+#include "../data/DataFile.hpp"
 #include "../data/DataManager.hpp"
 #include "../data/DataNode.hpp"
 #include "../datastructs/map_utils.hpp"
@@ -37,7 +38,7 @@
 #include "../math/info_theory.hpp"
 #include "../math/stats.hpp"
 #include "../tools/string_utils.hpp"
-#include "../data/DataFile.hpp"
+
 #include "SystematicsAnalysis.hpp"
 #include "World_structure.hpp"
 
@@ -1835,4 +1836,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE

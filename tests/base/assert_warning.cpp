@@ -1,22 +1,25 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file assert_warning.cpp
+ */
 
-#define CATCH_CONFIG_MAIN
 #undef NDEBUG
 #define TDEBUG 1
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/assert_warning.hpp"
 
-#include <sstream>
-#include <iostream>
-
 TEST_CASE("Test assert_warning", "[base]")
 {
 
-	// Asserts are tricky to test.  Here are a bunch that should PASS.
+  // Asserts are tricky to test.  Here are a bunch that should PASS.
   emp_assert_warning(true);
   REQUIRE(emp::assert_last_fail == 0);
 
@@ -29,20 +32,20 @@ TEST_CASE("Test assert_warning", "[base]")
   emp_assert_warning((14 < 13)?0:1);
   REQUIRE(emp::assert_last_fail == 0);
 
-	// Best way to test different behavior of emp_assert_warning based on compiler flags?
+  // Best way to test different behavior of emp_assert_warning based on compiler flags?
 
-	emp_assert_warning(false);
-	REQUIRE(emp::assert_last_fail);
+  emp_assert_warning(false);
+  REQUIRE(emp::assert_last_fail);
 
-	/* not sure why file is assert.h and line_num is 95, is this expected behavior?
-	std::string filen = emp::assert_fail_info.filename;
-	std::string test_filen = "assert.h";
-	REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen);
-	REQUIRE(emp::assert_fail_info.line_num == 95);
-	*/
+  /* not sure why file is assert.h and line_num is 95, is this expected behavior?
+  std::string filen = emp::assert_fail_info.filename;
+  std::string test_filen = "assert.h";
+  REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen);
+  REQUIRE(emp::assert_fail_info.line_num == 95);
+  */
 
-	REQUIRE(emp::assert_fail_info.error == "false");
-	emp::assert_clear();
+  REQUIRE(emp::assert_fail_info.error == "false");
+  emp::assert_clear();
 }
 
 TEST_CASE("Another test assert_warning", "[tools]")

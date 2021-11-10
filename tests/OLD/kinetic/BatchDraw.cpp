@@ -1,10 +1,14 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015
+ *
+ *  @file BatchDraw.cpp
+ */
 
+#include <cmath>
 #include <emscripten.h>
 #include <iostream>
-#include <cmath>
 
 #include "EmKinetic.h"
 

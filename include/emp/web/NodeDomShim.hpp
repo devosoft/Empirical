@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  NodeDomShim.hpp
+ *  @file NodeDomShim.hpp
  *  @brief Shim for Empirical compatibility with node.js. Mimicks the browser
  *  document object model (DOM).
  */
 
-#ifndef EMP_NODE_DOM_SHIM_HPP
-#define EMP_NODE_DOM_SHIM_HPP
+#ifndef EMP_WEB_NODEDOMSHIM_HPP_INCLUDE
+#define EMP_WEB_NODEDOMSHIM_HPP_INCLUDE
 
 #include <string>
 
@@ -62,4 +62,4 @@ namespace web {
 } // namespace web
 } // namespace emp
 
-#endif // #ifndef EMP_NODE_DOM_SHIM_HPP
+#endif // #ifndef EMP_WEB_NODEDOMSHIM_HPP_INCLUDE

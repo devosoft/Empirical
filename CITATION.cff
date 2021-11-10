@@ -1,0 +1,58 @@
+# YAML 1.2
+# Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
+cff-version: 1.0.3
+message: If you use this software, please cite it using these metadata.
+title: 'Empirical: C++ library for efficient, reliable, and accessible scientific software'
+doi: 10.5281/zenodo.4141943
+authors:
+- given-names: Charles
+  family-names: Ofria
+  affiliation: Michigan State University
+- given-names: Matthew Andres
+  family-names: Moreno
+  affiliation: Michigan State University
+  orcid: 'https://orcid.org/0000-0003-4726-4479'
+- given-names: Emily
+  family-names: Dolson
+  affiliation: Michigan State University
+- given-names: Alex
+  family-names: Lalejini
+- given-names: Santiago
+  family-names: Rodriguez Papa
+- given-names: Jake
+  family-names: Fenton
+- given-names: Katherine
+  family-names: Perry
+- given-names: Steven
+  family-names: Jorgensen
+- given-names: hoffmanriley
+  family-names: ''
+- given-names: grenewode
+  family-names: ''
+- given-names: Oliver
+  family-names: Edwards
+  name-particle: Baldwin
+  affiliation: Amherst College
+- given-names: Jason
+  family-names: Stredwick
+  affiliation: Appdiff Inc. (test.ai)
+- given-names: cgnitash
+  family-names: ''
+- given-names: theycallmeHeem
+  family-names: ''
+- given-names: Anya
+  family-names: Vostinar
+- given-names: Ryan
+  family-names: Moreno
+- given-names: Jory
+  family-names: Schossau
+  affiliation: Michigan State University
+- given-names: Luis
+  family-names: Zaman
+  affiliation: University of Washington
+- given-names: djrain
+  family-names: ''
+version: 0.0.4
+date-released: 2020-10-27
+repository-code: https://github.com/devosoft/Empirical
+license: MIT

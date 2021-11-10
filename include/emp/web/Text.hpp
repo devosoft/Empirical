@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Text.hpp
+ *  @file Text.hpp
  *  @brief Specs for the Text widget.
  *
  *  A representation of text on a web page.  Text Widgets can be included inside of Divs or
@@ -12,8 +12,8 @@
  *  own text widget is to control the text style.
  */
 
-#ifndef EMP_WEB_TEXT_H
-#define EMP_WEB_TEXT_H
+#ifndef EMP_WEB_TEXT_HPP_INCLUDE
+#define EMP_WEB_TEXT_HPP_INCLUDE
 
 #include "../datastructs/DynamicString.hpp"
 
@@ -105,4 +105,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_TEXT_HPP_INCLUDE

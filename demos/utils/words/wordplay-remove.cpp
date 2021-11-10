@@ -1,18 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-// Test the removal of letters through an alphabet to see if new words are formed.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file wordplay-remove.cpp
+ *  @brief Test the removal of letters through an alphabet to see if new words are formed.
+ */
 
 #include <iostream>
 #include <set>
 
 #include "../../../include/emp/base/assert.hpp"
 #include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/math/math.hpp"
-#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
 int main(int argc, char* argv[])

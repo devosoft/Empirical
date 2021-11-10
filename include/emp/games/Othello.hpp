@@ -3,19 +3,19 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Othello.hpp
+ *  @file Othello.hpp
  *  @brief A simple Othello game state handler.
  *
  *  @todo Add Hash for boards to be able to cachce moves.
  *  @todo Setup OPTIONAL caching of expensive board measures.
  */
 
-#ifndef EMP_GAME_OTHELLO_H
-#define EMP_GAME_OTHELLO_H
+#ifndef EMP_GAMES_OTHELLO_HPP_INCLUDE
+#define EMP_GAMES_OTHELLO_HPP_INCLUDE
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <unordered_map>
 
 #include "../base/array.hpp"
@@ -359,4 +359,4 @@ namespace emp {
   using Othello = Othello_Game<8>;
 }
 
-#endif
+#endif // #ifndef EMP_GAMES_OTHELLO_HPP_INCLUDE

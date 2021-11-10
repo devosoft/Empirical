@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  VarMap.hpp
+ *  @file VarMap.hpp
  *  @brief VarMaps track arbitrary data by name (slow) or id (faster).
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_VAR_MAP_H
-#define EMP_VAR_MAP_H
+#ifndef EMP_DATA_VARMAP_HPP_INCLUDE
+#define EMP_DATA_VARMAP_HPP_INCLUDE
 
 #include <string>
 
@@ -157,4 +157,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_VARMAP_HPP_INCLUDE

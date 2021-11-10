@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef EMP_MATCH_DEPOSITORY_HPP
-#define EMP_MATCH_DEPOSITORY_HPP
+#ifndef EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE
+#define EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE
 
 #include <algorithm>
 #include <limits>
@@ -232,4 +232,4 @@ public:
 
 } // namespace emp
 
-#endif // #ifndef EMP_MATCH_DEPOSITORY_HPP
+#endif // #ifndef EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE

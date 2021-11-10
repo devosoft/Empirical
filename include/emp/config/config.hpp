@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
  *
- *  @file  config.hpp
+ *  @file config.hpp
  *  @brief Maintains a set of configuration options.
  *
  *  This file defines a master configuration option Config, whose values can be loaded
@@ -21,6 +21,7 @@
  *  load settings from a file:         config.Read(filename);
  *  save settings to a stream:         config.Write(stream);
  *  save settings to a file:           config.Write(filename);
+ *  generate a query string:           config.WriteUrlQueryString(stream);
  *
  *  write settings macros to a stream: config.WriteMacros(stream);
  *  write settings macros to a file:   config.WriteMacros(filename);
@@ -34,14 +35,14 @@
  *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly created configuration object.
  */
 
-#ifndef EMP_CONFIG_H
-#define EMP_CONFIG_H
+#ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE
+#define EMP_CONFIG_CONFIG_HPP_INCLUDE
 
 #include <fstream>
 #include <functional>
 #include <ostream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <unordered_set>
 
 #include "../base/errors.hpp"
@@ -50,8 +51,8 @@
 #include "../datastructs/map_utils.hpp"
 #include "../meta/macros.hpp"
 #include "../tools/string_utils.hpp"
-#include "ConfigManager.hpp"
 
+#include "ConfigManager.hpp"
 
 namespace emp {
   using namespace std::placeholders;
@@ -126,7 +127,17 @@ namespace emp {
       std::string GetValue() const { return emp::to_string(entry_ref); }
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
       ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
-        std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
+        if constexpr (std::is_same<VAR_TYPE, std::string>::value) {
+          // Using a stringstream on a string with whitespace will only get
+          // first word, so only right trim for extra white space
+          size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
+          entry_ref = (end == std::string::npos) ? "" : in_val.substr(0, end+1);
+        } else {
+          // For other values, use the power of a stringstream to do a quick
+          // conversion
+          std::stringstream ss; ss << in_val; ss >> entry_ref;
+        }
+        return *this;
       }
       bool IsConst() const { return false; }
     };
@@ -236,6 +247,15 @@ namespace emp {
         }
 
         out << std::endl; // Skip a line after each group.
+      }
+
+      void WriteUrlQueryString(std::ostream & out) const {
+        for (auto entry : entry_set) {
+          out << url_encode<false>(entry->GetName());
+          out << "=";
+          out << url_encode<false>(entry->GetValue());
+          out << "&";
+        }
       }
 
       void WriteMacros(std::ostream & out, bool as_const) const {
@@ -468,6 +488,19 @@ namespace emp {
       std::ofstream out(filename);
       Write(out);
       out.close();
+    }
+
+    // Generates url query parameters for the state of Config
+    void WriteUrlQueryString(std::ostream & out) const {
+      std::stringstream ss;
+      ss << "?";
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
+        (*it)->WriteUrlQueryString(ss);
+      }
+      std::string query(ss.str());
+      // Erase the trailing & to prevent parsing as an illegal (empty) argument to query
+      query.erase(query.end()-1);
+      out << query;
     }
 
     // Generate a text representation (typically a file) for the state of Config
@@ -774,4 +807,4 @@ namespace emp {
     EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)        \
   };
 
-#endif
+#endif // #ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE

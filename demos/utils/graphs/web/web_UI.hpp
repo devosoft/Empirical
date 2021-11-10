@@ -1,5 +1,14 @@
-#ifndef TUBE_WEB_H
-#define TUBE_WEB_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file web_UI.hpp
+ *
+ */
+
+#ifndef DEMOS_UTILS_GRAPHS_WEB_WEB_UI_HPP_INCLUDE
+#define DEMOS_UTILS_GRAPHS_WEB_WEB_UI_HPP_INCLUDE
 
 #include <emscripten.h>
 
@@ -27,4 +36,4 @@ public:
 
 };
 
-#endif
+#endif // #ifndef DEMOS_UTILS_GRAPHS_WEB_WEB_UI_HPP_INCLUDE

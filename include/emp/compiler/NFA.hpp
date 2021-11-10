@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  NFA.hpp
+ *  @file NFA.hpp
  *  @brief A Non-deterministic Finite Automata simulator
  *  @note Status: BETA
  *
@@ -17,11 +17,11 @@
  *  @note DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
  *        since in a DFA a second SetTransition with the same start state and symbol will override
  *        first, while in an NFA a second AddTransition will always add a new option.
-*/
+ */
 
+#ifndef EMP_COMPILER_NFA_HPP_INCLUDE
+#define EMP_COMPILER_NFA_HPP_INCLUDE
 
-#ifndef EMP_NFA_H
-#define EMP_NFA_H
 
 #include <map>
 #include <set>
@@ -315,4 +315,4 @@ namespace emp {
   using NFA_State = tNFA_State<128, uint8_t>;
 }
 
-#endif
+#endif // #ifndef EMP_COMPILER_NFA_HPP_INCLUDE

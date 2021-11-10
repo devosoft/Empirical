@@ -8,8 +8,8 @@
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_MAP_PROXY_H
-#define EMP_MAP_PROXY_H
+#ifndef EMP_BASE_MAPPROXY_HPP_INCLUDE
+#define EMP_BASE_MAPPROXY_HPP_INCLUDE
 
 #include "assert.hpp"
 
@@ -171,4 +171,4 @@ std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
   return is;
 }
 
-#endif
+#endif // #ifndef EMP_BASE_MAPPROXY_HPP_INCLUDE

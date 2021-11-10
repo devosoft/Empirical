@@ -3,20 +3,21 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  lexer_utils.hpp
+ *  @file lexer_utils.hpp
  *  @brief A set of utilities to convert between NFAs and DFAs
  *  @note Status: BETA
  */
 
+#ifndef EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE
+#define EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE
 
-#ifndef EMP_LEXER_UTILS_H
-#define EMP_LEXER_UTILS_H
 
 #include <map>
 #include <utility> // std::pair
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
+
 #include "DFA.hpp"
 #include "NFA.hpp"
 
@@ -144,4 +145,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  VarMap.cc
+ *  @file VarMap.cpp
  *  @brief An example file for using VarMap
  */
 

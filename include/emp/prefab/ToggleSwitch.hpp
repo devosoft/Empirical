@@ -1,5 +1,14 @@
-#ifndef EMP_TOGGLE_SWITCH_HPP
-#define EMP_TOGGLE_SWITCH_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ToggleSwitch.hpp
+ *  @brief Wraps Bootstrap's toggle switch.
+ */
+
+#ifndef EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE
+#define EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
 #include "../web/Element.hpp"
@@ -59,4 +68,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE

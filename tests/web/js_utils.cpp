@@ -1,20 +1,23 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2020
+ *
+ *  @file js_utils.cpp
+ */
 
-#include <string>
 #include <array>
+#include <cassert>
+#include <string>
 
-#include "emp/testing/unit_tests.hpp"
 #include "emp/base/assert.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/config/command_line.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/testing/unit_tests.hpp"
 #include "emp/web/init.hpp"
 #include "emp/web/js_utils.hpp"
 #include "emp/web/JSWrap.hpp"
-
-#include <cassert>
+#include "emp/web/_MochaTestRunner.hpp"
 
 // This file tests source/web/js_utils.h (using Mocha + Karma framework)
 // - pass_array_to_javascript
@@ -237,7 +240,7 @@ struct TestPassArrayToCpp : public emp::web::BaseTest {
     assert(emp::to_string(test_arr_2[0]) == emp::to_string(5.2));
     assert(test_arr_2[1] == 1.5);
     assert(emp::to_string(test_arr_2[2]) == emp::to_string(3.1));
-    #endif 
+    #endif
 
     // Test doubles
     EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});

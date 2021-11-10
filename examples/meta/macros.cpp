@@ -1,6 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2021.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2021
+ *
+ *  @file macros.cpp
+ */
 
 #include <iostream>
 
@@ -52,8 +56,8 @@ int main()
   // EMP_PACKS_PUSH_ALL(XXX, (1,2), (3,4,5,6), (7,8,9));
 
   std::cout << EMP_STRINGIFY(
-			     EMP_REORDER_ARGS_IMPL( (int test), ((int, a), (bool, b), (std::string, c)) )
-	       ) << std::endl;
+     EMP_REORDER_ARGS_IMPL( (int test), ((int, a), (bool, b), (std::string, c)) )
+    ) << std::endl;
 
 
   // Explore EMP_IF!

@@ -1,13 +1,18 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file TypeTracker.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/tools/TypeTracker.hpp"
 #include "emp/tools/string_utils.hpp"
-
-#include <sstream>
-#include <iostream>
-
+#include "emp/tools/TypeTracker.hpp"
 
 std::string tt_result;
 

@@ -1,4 +1,14 @@
-#pragma once
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Config.hpp
+ *
+ */
+
+#ifndef TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE
+#define TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE
 
 #include "emp/config/config.hpp"
 
@@ -19,4 +29,7 @@ EMP_BUILD_CONFIG( Config,
   GROUP(TREATMENT, "Treatment settings"),
   VALUE(RADIATION_DOSES, int, 1, "Number of radiation doses to apply (for use in web interface - use a radiation prescription file for command-line)"),
   VALUE(RADIATION_DOSE_SIZE, double, 2, "Dose size (Gy) (for use in web interface - use a radiation prescription file for command-line)"),
+  VALUE(UNKNOWN, std::string, "A unsupported type", "Type overridden later to simulate new config type"),
 );
+
+#endif // #ifndef TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE

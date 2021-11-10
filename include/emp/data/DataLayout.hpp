@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019.
  *
- *  @file  DataLayout.hpp
+ *  @file DataLayout.hpp
  *  @brief A mapping of names to variables stored in a MemoryImage.
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_DATA_LAYOUT_H
-#define EMP_DATA_LAYOUT_H
+#ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
+#define EMP_DATA_DATALAYOUT_HPP_INCLUDE
 
 #include <string>
 #include <unordered_map>
@@ -217,4 +217,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE

@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ElementTable.cpp
+ */
+
 #include "../../UI/UI.h"
 #include "../../web/emfunctions.h"
 
@@ -15,7 +23,7 @@ int main() {
   doc.Table("test_table").CSS("background-color", "#880000");
   doc.Table("test_table").RowsCSS("background-color", "#DDDDFF");
   doc.Table("test_table").CellsCSS("border", "1px solid black");
-  
+
   doc.Table("test_table").GetCell(2,2).CSS("background-color", "#008800");
 
   doc.Table("test_table") << "Test Entry!" << "!!"
@@ -43,4 +51,3 @@ int main() {
 
   doc.Update();
 }
-

@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file levelize.cpp
+ */
+
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -34,15 +42,15 @@ int main(int argc, char * argv[])
   // Check if we're just supposed to print the help info.
   if (files[0] == "--help") {
     std::cerr << "Format: " << argv[0] << " [args] {filename} [filenames...]\n"
-	      << "Available args:\n"
-	      << " -v : verbose output\n";
+        << "Available args:\n"
+        << " -v : verbose output\n";
     exit(0);
   }
 
   std::cerr << num_files << " files found.  Processing!" << std::endl;
 
   bool verbose = false;
-  
+
   // Simplify to just the filenames (remove paths)
   std::map<std::string, FileInfo> file_map;
   emp::vector<std::string> filenames;
@@ -62,7 +70,7 @@ int main(int argc, char * argv[])
   for (auto & [filename, info] : file_map) {
     if (verbose) {
       std::cerr << "Scanning '" << filename << "' found at: "
-		<< info.path << std::endl;
+        << info.path << std::endl;
     }
 
     emp::File file(info.path);
@@ -76,7 +84,7 @@ int main(int argc, char * argv[])
       if (file.Contains(emp::to_string("\"", filename)) ||
           file.Contains(emp::to_string("/", filename)) ) {
         info.depends.insert(filename);
-	include_count++;
+        include_count++;
       }
     }
     if (verbose) {
@@ -93,7 +101,7 @@ int main(int argc, char * argv[])
     if (verbose) {
       std::cerr << "Processing!" << std::endl;
     }
-    
+
     // Loop through each file to see if we can determine its level.
     for (auto & [filename, info] : file_map) {
       if (info.level != FileInfo::NO_LEVEL) continue;  // Already has a level!
@@ -164,5 +172,5 @@ int main(int argc, char * argv[])
   if (verbose) {
     std::cerr << "Number of files with unknown levels: " << unknown_count << std::endl;
   }
-  
+
 }

@@ -1,30 +1,43 @@
-#ifndef EMP_EVENT_DRIVEN_GP_H
-#define EMP_EVENT_DRIVEN_GP_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file EventDrivenGP.hpp
+ *  @brief TODO.
+ */
 
+#ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
+#define EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
+
+#include <algorithm>
+#include <deque>
 #include <functional>
+#include <ratio>
 #include <tuple>
 #include <unordered_map>
-#include <deque>
 #include <utility>
-#include <algorithm>
-#include <ratio>
+
 #include "../../../third-party/cereal/include/cereal/cereal.hpp"
 #include "../../../third-party/cereal/include/cereal/types/string.hpp"
 #include "../../../third-party/cereal/include/cereal/types/unordered_map.hpp"
 #include "../../../third-party/cereal/include/cereal/types/unordered_set.hpp"
+
+#include "../base/array.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
 #include "../bits/BitVector.hpp"
-#include "../datastructs/map_utils.hpp"
-#include "../tools/string_utils.hpp"
-#include "../math/Random.hpp"
-#include "../matching/MatchBin.hpp"
-#include "../base/vector.hpp"
-#include "../base/Ptr.hpp"
-#include "../base/array.hpp"
 #include "../control/SignalControl.hpp"
 #include "../control/Signal.hpp"
-#include "InstLib.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../matching/MatchBin.hpp"
+#include "../math/Random.hpp"
+#include "../tools/string_utils.hpp"
+
 #include "EventLib.hpp"
+#include "InstLib.hpp"
+
 
 // Developer Notes:
 //  * Program struct's PrintProgram prints program in a maximally readable format. However, this format
@@ -2128,4 +2141,4 @@ namespace emp {
   using EventDrivenGP = EventDrivenGP_AW<8>;
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE

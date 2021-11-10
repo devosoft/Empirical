@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Table.hpp
+ *  @file Table.hpp
  *  @brief Specs for the Table widget.
  *
  *  TableInfo is the core information for a table and has two helper classes:
@@ -24,14 +24,14 @@
  *  @todo Add an operator[] to table that returns the appropriate row (and one to row for cell).
  */
 
-#ifndef EMP_WEB_TABLE_H
-#define EMP_WEB_TABLE_H
+#ifndef EMP_WEB_TABLE_HPP_INCLUDE
+#define EMP_WEB_TABLE_HPP_INCLUDE
 
 #include "../base/vector.hpp"
 
 #include "Div.hpp"
-#include "Widget.hpp"
 #include "WidgetExtras.hpp"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {
@@ -737,10 +737,10 @@ namespace web {
 }
 
 #include "_TableCell.hpp"
-#include "_TableRow.hpp"
+#include "_TableColGroup.hpp"
 #include "_TableCol.hpp"
 #include "_TableRowGroup.hpp"
-#include "_TableColGroup.hpp"
+#include "_TableRow.hpp"
 
 namespace emp {
 namespace web {
@@ -793,4 +793,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_TABLE_HPP_INCLUDE

@@ -1,13 +1,20 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file visualizations.cpp
+ */
+
 // This file is a monstrosity, because including multiple emscripten-generated
 // Javascript files in karma will cause horrible problems.
 
+#include <functional>
+#include <iostream>
 
 #include "web/d3/visualizations.hpp"
 #include "datastructs/tuple_struct.hpp"
 #include "web/Document.hpp"
-
-#include <iostream>
-#include <functional>
 
 struct LineageTreeDataNode{
         EMP_BUILD_INTROSPECTIVE_TUPLE(

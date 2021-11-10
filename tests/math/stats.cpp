@@ -1,14 +1,19 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file stats.cpp
+ */
+
+#include <deque>
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/stats.hpp"
 #include "emp/datastructs/vector_utils.hpp"
-
-#include <sstream>
-#include <iostream>
-#include <deque>
-
+#include "emp/math/stats.hpp"
 
 TEST_CASE("Test stats", "[math]") {
   emp::vector<int> vec1({1,2,1,1,2,3});

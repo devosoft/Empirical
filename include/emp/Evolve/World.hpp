@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  World.hpp
+ *  @file World.hpp
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
  *
  *  A definition of the emp::World template, linking in specialized file handling, iterators,
@@ -23,8 +23,8 @@
  *        phenotype.
  */
 
-#ifndef EMP_EVO_WORLD_H
-#define EMP_EVO_WORLD_H
+#ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_HPP_INCLUDE
 
 #include <functional>
 #include <map>
@@ -33,14 +33,14 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
-#include "../control/Signal.hpp"
 #include "../control/SignalControl.hpp"
+#include "../control/Signal.hpp"
 #include "../data/DataFile.hpp"
 #include "../data/DataManager.hpp"
-#include "../data/Trait.hpp"
 #include "../datastructs/map_utils.hpp"
-#include "../math/random_utils.hpp"
+#include "../data/Trait.hpp"
 #include "../math/Random.hpp"
+#include "../math/random_utils.hpp"
 #include "../math/Range.hpp"
 #include "../meta/reflection.hpp"
 #include "../tools/string_utils.hpp"
@@ -256,23 +256,23 @@ namespace emp {
     size_t GetUpdate() const { return update; }
 
     /// How many cells wide is the world? (assumes grids are active.)
-    size_t GetWidth() const { 
+    size_t GetWidth() const {
       emp_assert(HasAttribute("PopStruct"));
-      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid"); 
-      return pop_sizes[0]; 
+      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid");
+      return pop_sizes[0];
     }
 
     /// How many cells tall is the world? (assumes grids are active.)
-    size_t GetHeight() const { 
+    size_t GetHeight() const {
       emp_assert(HasAttribute("PopStruct"));
-      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid"); 
-      return pop_sizes[1]; 
+      emp_assert(GetAttribute("PopStruct") == "Grid" || GetAttribute("PopStruct") == "3DGrid");
+      return pop_sizes[1];
     }
 
     /// How many cells deep is the world? (assumes 3d grids are active.)
-    size_t GetDepth() const { 
-      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "3DGrid"); 
-      return pop_sizes[2]; 
+    size_t GetDepth() const {
+      emp_assert(HasAttribute("PopStruct") && GetAttribute("PopStruct") == "3DGrid");
+      return pop_sizes[2];
     }
 
     /// Get the full population to analyze externally.
@@ -993,7 +993,7 @@ namespace emp {
     if (pos.IsActive()) {
       --num_orgs;                                    // Track one fewer organisms in the population
       if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
-    } 
+    }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
       s->RemoveOrgAfterRepro(pos, update);          // Notify systematics about organism removal
@@ -1114,34 +1114,53 @@ namespace emp {
       return WorldPosition(GetRandomCellID());
     };
 
-    // neighbors are in 8-sized neighborhood.
-    fun_get_neighbor = [this](WorldPosition pos) {
+    // If our world is 1-dimensional, consider only 2 neighbors.
+    if (width == 1 || height == 1) {
+      fun_get_neighbor = [this](WorldPosition pos) {
+        emp_assert(random_ptr);
+        emp_assert(pop_sizes.size() == 2);
 
-      emp_assert(random_ptr);
-      emp_assert(pop_sizes.size() == 2);
+        const size_t world_size = pop_sizes[0] * pop_sizes[1];
+        const size_t id = pos.GetIndex();
+        const int offset = random_ptr->P(0.5) ? -1 : 1;
+        const int neighbor_id = emp::Mod(id + offset, (int) world_size); // Ensure new id is on grid.
 
-      const size_t size_x = pop_sizes[0];
-      const size_t size_y = pop_sizes[1];
-      const size_t id = pos.GetIndex();
+        // The new ID should never be the old one.
+        emp_assert((int) pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id, world_size, offset);
 
-      // Determine x and y for a random neighbor.
-      int offset = random_ptr->GetInt(8);               // Eight possible neighbors.
-      if (offset >= 4) ++offset;                        // Option 4 is self; we want 0-3 or 5-8
-      const int offset_x = offset%3 - 1;                // Set x offset as -1 through +1
-      const int offset_y = offset/3 - 1;                // Set y offset as -1 through +1
-      const int rand_x = (int) (id%size_x) + offset_x;  // Shift x by start position.
-      const int rand_y = (int) (id/size_x) + offset_y;  // Shift y by start position.
-      const int neighbor_x = emp::Mod(rand_x, (int) size_x); // Ensure new x pos is on grid.
-      const int neighbor_y = emp::Mod(rand_y, (int) size_y); // Ensure new y pos is on grid.
+        return pos.SetIndex(neighbor_id);
+      };
+    }
 
-      // Combine into the new neighbor id.
-      const int neighbor_id = neighbor_x + neighbor_y * (int)size_x;
+    // Otherwise neighbors are in size-8 neighborhood.
+    else {
+      fun_get_neighbor = [this](WorldPosition pos) {
+        emp_assert(random_ptr);
+        emp_assert(pop_sizes.size() == 2);
 
-      // The new ID should never be the old one.
-      emp_assert((int)pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id);
+        const size_t size_x = pop_sizes[0];
+        const size_t size_y = pop_sizes[1];
+        const size_t id = pos.GetIndex();
 
-      return pos.SetIndex(neighbor_id);
-    };
+        // Determine x and y for a random neighbor.
+        int offset = random_ptr->GetInt(8);                    // Eight possible neighbors.
+        if (offset >= 4) ++offset;                             // In 2d world, 4 is self; we want 0-3 or 5-8
+        const int offset_x = offset%3 - 1;                     // Set x offset as -1 through +1
+        const int offset_y = offset/3 - 1;                     // Set y offset as -1 through +1
+        const int rand_x = (int) (id%size_x) + offset_x;       // Shift x by start position.
+        const int rand_y = (int) (id/size_x) + offset_y;       // Shift y by start position.
+        const int neighbor_x = emp::Mod(rand_x, (int) size_x); // Ensure new x pos is on grid.
+        const int neighbor_y = emp::Mod(rand_y, (int) size_y); // Ensure new y pos is on grid.
+
+        // Combine into the new neighbor id.
+        const int neighbor_id = neighbor_x + neighbor_y * (int)size_x;
+
+        // The new ID should never be the old one.
+        emp_assert((int)pos.GetIndex() != neighbor_id, pos.GetIndex(), neighbor_id, neighbor_x, neighbor_y, size_x, size_y);
+
+        return pos.SetIndex(neighbor_id);
+      };
+    }
 
     // Neighbors are in 8-sized neighborhood excluding self
     fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
@@ -1153,17 +1172,16 @@ namespace emp {
       int size_y = (int) pop_sizes[1];
 
       if(id1 == id2) { //self, not neighbors
-	      return false;
+        return false;
       }
 
       int diff = id1 - id2;
       int row_diff = abs(diff / size_x);
       int col_diff = abs(diff%size_x);
 
-      if((row_diff <= 1 || row_diff == (size_y-1)) && 
-        (col_diff <= 1 || col_diff == (size_x-1)))	return true;
+      if((row_diff <= 1 || row_diff == (size_y-1)) &&
+        (col_diff <= 1 || col_diff == (size_x-1)))  return true;
       else return false;
-
     };
 
 
@@ -1247,7 +1265,7 @@ namespace emp {
         } else if (z_pos == size_z - 1) {
           for (int i = 18; i < 27; i++) {
             options.Set(i, false);
-          }          
+          }
         }
        if (y_pos == 0) {
           options.Set(0, false);
@@ -1270,7 +1288,7 @@ namespace emp {
           options.Set(25, false);
           options.Set(26, false);
         }
-       if (x_pos == 0) {         
+       if (x_pos == 0) {
           options.Set(0, false);
           options.Set(3, false);
           options.Set(6, false);
@@ -1298,7 +1316,7 @@ namespace emp {
           rand_pos = options.PopOne();
         }
       }
-      
+
       int rand_z = z_pos + rand_pos / 9 - 1;
       int rand_y = y_pos + (rand_pos - (9 * (rand_pos / 9))) / 3 - 1;
       int rand_x = x_pos + (rand_pos - (9 * (rand_pos / 9))) % 3 - 1;
@@ -1333,7 +1351,7 @@ namespace emp {
 
       int x_diff = abs(x_pos_1 - x_pos_2);
       int y_diff = abs(y_pos_1 - y_pos_2);
-      int z_diff = abs(z_pos_1 - z_pos_2);    
+      int z_diff = abs(z_pos_1 - z_pos_2);
 
       return (x_diff <= 1) && (y_diff <= 1) && (z_diff <= 1);
 
@@ -1606,13 +1624,13 @@ namespace emp {
 
   /// Return IDs of all occupied neighbors of specified position.
   template<typename ORG>
-  emp::vector<size_t> World<ORG>::GetValidNeighborOrgIDs(size_t id) { 
-    //Note: this function is similar to FindCellIDs, but because ORG don't know their index, 
+  emp::vector<size_t> World<ORG>::GetValidNeighborOrgIDs(size_t id) {
+    //Note: this function is similar to FindCellIDs, but because ORG don't know their index,
     //FindCellIDs can't be used.
     emp::vector<size_t> valid_IDs(0);
     for(size_t i = 0; i < pop.size(); i++) {
       if ((bool) (pop[i].Raw()) && IsNeighbor(id, i)) {
-	      valid_IDs.push_back(i);
+        valid_IDs.push_back(i);
       }
     }
     return valid_IDs;
@@ -1719,4 +1737,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

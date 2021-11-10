@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  DataLog.hpp
+ *  @file DataLog.hpp
  *  @brief Tools for processing a single set of data.
  *  @note  Status: ALPHA
  *
  */
 
-#ifndef EMP_DATA_LOG_H
-#define EMP_DATA_LOG_H
+#ifndef EMP_DATA_DATALOG_HPP_INCLUDE
+#define EMP_DATA_DATALOG_HPP_INCLUDE
 
 #include <iostream>
 #include <ostream>
@@ -77,4 +77,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATALOG_HPP_INCLUDE

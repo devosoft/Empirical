@@ -3,20 +3,20 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Attributes.hpp
+ *  @file Attributes.hpp
  *  @brief An Attributes class for tracking non-style features about HTML objects
  */
 
-#ifndef EMP_WEB_ATTRIBUTES_H
-#define EMP_WEB_ATTRIBUTES_H
+#ifndef EMP_WEB_ATTRIBUTES_HPP_INCLUDE
+#define EMP_WEB_ATTRIBUTES_HPP_INCLUDE
 
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
-#include "../tools/string_utils.hpp"
 #include "../base/errors.hpp"
+#include "../tools/string_utils.hpp"
 
 #include <map>
 #include <string>
@@ -167,4 +167,4 @@ namespace web {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_ATTRIBUTES_HPP_INCLUDE

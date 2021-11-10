@@ -7,14 +7,16 @@
  *  @brief Handle drawing of axes on D3 graphs.
  */
 
-#ifndef EMP_D3_AXIS_H
-#define EMP_D3_AXIS_H
+#ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
+#define EMP_WEB_D3_AXIS_HPP_INCLUDE
+
+#include "../../tools/string_utils.hpp"
 
 #include "../js_utils.hpp"
-#include "../../tools/string_utils.hpp"
+
 #include "d3_init.hpp"
-#include "selection.hpp"
 #include "scales.hpp"
+#include "selection.hpp"
 
 namespace D3 {
 

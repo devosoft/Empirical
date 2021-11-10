@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2020.
  *
- *  @file  Distribution.hpp
+ *  @file Distribution.hpp
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
  *
@@ -24,10 +24,11 @@
  *
  */
 
-#ifndef EMP_DISTRIBUTION_H
-#define EMP_DISTRIBUTION_H
+#ifndef EMP_MATH_DISTRIBUTION_HPP_INCLUDE
+#define EMP_MATH_DISTRIBUTION_HPP_INCLUDE
 
 #include "../datastructs/UnorderedIndexMap.hpp"
+
 #include "Random.hpp"
 
 namespace emp {
@@ -48,6 +49,7 @@ namespace emp {
     }
 
     size_t PickRandom(Random & random) const {
+      emp_assert(weights.GetSize() > 0, "Distribution can only pick a random entry if it has at least one entry!");
       return weights.Index( random.GetDouble(GetTotalProb()) );
     }
   };
@@ -169,4 +171,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_DISTRIBUTION_HPP_INCLUDE

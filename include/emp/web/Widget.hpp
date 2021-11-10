@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2019.
  *
- *  @file  Widget.hpp
+ *  @file Widget.hpp
  *  @brief Widgets maintain individual components on a web page and link to Elements
  *
  *  Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can
@@ -29,9 +29,9 @@
  *
  */
 
+#ifndef EMP_WEB_WIDGET_HPP_INCLUDE
+#define EMP_WEB_WIDGET_HPP_INCLUDE
 
-#ifndef EMP_WEB_WIDGET_H
-#define EMP_WEB_WIDGET_H
 
 #include <string>
 
@@ -39,6 +39,7 @@
 #include "../base/vector.hpp"
 #include "../control/Signal.hpp"
 #include "../debug/mem_track.hpp"
+#include "../meta/meta.hpp"
 
 #include "events.hpp"
 #include "Font.hpp"
@@ -207,7 +208,7 @@ namespace web {
     /// Debug...
     std::string GetInfoType() const;
   };
-  
+
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
@@ -325,6 +326,17 @@ namespace web {
         else if constexpr ( std::is_invocable<T>() ) {
           std::function<std::string()> fun_val( val );
           return Append(fun_val);
+        }
+
+        // If we are given a vector, we should try and add each element individually.
+        // Allows one to stream ___.Children() to get similar behavior to display: contents
+        // which is unsupported on some browsers
+        else if constexpr ( is_emp_vector<T>::value ) {
+          Widget last(this);
+          for (auto & item : val) {
+            last = Append(item);
+          }
+          return last;
         }
 
         // Anything else we should just try to convert to a string, and used that.
@@ -962,4 +974,4 @@ namespace web {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_WIDGET_HPP_INCLUDE

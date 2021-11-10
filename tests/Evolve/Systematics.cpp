@@ -1,147 +1,152 @@
-#define CATCH_CONFIG_MAIN
-#ifndef NDEBUG
-	#define TDEBUG
-#endif
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Systematics.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-
-#include <sstream>
-#include <iostream>
-
+#ifndef NDEBUG
+  #define TDEBUG
+#endif
+#include "emp/base/vector.hpp"
 #include "emp/Evolve/SystematicsAnalysis.hpp"
 #include "emp/Evolve/Systematics.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/base/vector.hpp"
-#include "emp/hardware/AvidaGP.hpp"
 #include "emp/Evolve/World_output.hpp"
+#include "emp/hardware/AvidaGP.hpp"
 
 
 TEST_CASE("Test Systematics", "[Evolve]")
 {
 
-	// Taxon
-	emp::Taxon<std::string> tx(0, "a");
-	REQUIRE(tx.GetID() == 0);
-	REQUIRE(tx.GetParent() == nullptr);
-	REQUIRE(tx.GetInfo() == "a");
-	REQUIRE(tx.GetNumOrgs() == 0);
-	REQUIRE(tx.GetTotOrgs() == 0);
-	tx.AddOrg();
-	REQUIRE(tx.GetNumOrgs() == 1);
-	tx.RemoveOrg();
-	REQUIRE(tx.GetNumOrgs() == 0);
-	REQUIRE(tx.GetTotOrgs() == 1);
-	REQUIRE(tx.GetTotalOffspring() == 0);
+  // Taxon
+  emp::Taxon<std::string> tx(0, "a");
+  REQUIRE(tx.GetID() == 0);
+  REQUIRE(tx.GetParent() == nullptr);
+  REQUIRE(tx.GetInfo() == "a");
+  REQUIRE(tx.GetNumOrgs() == 0);
+  REQUIRE(tx.GetTotOrgs() == 0);
+  tx.AddOrg();
+  REQUIRE(tx.GetNumOrgs() == 1);
+  tx.RemoveOrg();
+  REQUIRE(tx.GetNumOrgs() == 0);
+  REQUIRE(tx.GetTotOrgs() == 1);
+  REQUIRE(tx.GetTotalOffspring() == 0);
 
-	emp::Ptr< emp::Taxon<std::string, emp::datastruct::no_data> > parentPtr(&tx);
-	emp::Taxon<std::string> tx_1(1, "b", parentPtr);
-	REQUIRE(tx_1.GetParent() == parentPtr);
-	tx_1.AddTotalOffspring();
-	REQUIRE(tx_1.GetTotalOffspring() == 1);
-	REQUIRE(tx.GetTotalOffspring() == 1);
+  emp::Ptr< emp::Taxon<std::string, emp::datastruct::no_data> > parentPtr(&tx);
+  emp::Taxon<std::string> tx_1(1, "b", parentPtr);
+  REQUIRE(tx_1.GetParent() == parentPtr);
+  tx_1.AddTotalOffspring();
+  REQUIRE(tx_1.GetTotalOffspring() == 1);
+  REQUIRE(tx.GetTotalOffspring() == 1);
 
-	// Systematics
-	std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
-	emp::Systematics<double, std::string> sys1(calc_taxon);
-	REQUIRE(sys1.GetTrackSynchronous() == false);
-	REQUIRE(sys1.GetNumAncestors() == 0);
-	REQUIRE(sys1.GetNumActive() == 0);
-	REQUIRE(sys1.GetNumOutside() == 0);
-	REQUIRE(sys1.GetTreeSize() == 0);
-	REQUIRE(sys1.GetNumTaxa() == 0);
+  // Systematics
+  std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
+  emp::Systematics<double, std::string> sys1(calc_taxon);
+  REQUIRE(sys1.GetTrackSynchronous() == false);
+  REQUIRE(sys1.GetNumAncestors() == 0);
+  REQUIRE(sys1.GetNumActive() == 0);
+  REQUIRE(sys1.GetNumOutside() == 0);
+  REQUIRE(sys1.GetTreeSize() == 0);
+  REQUIRE(sys1.GetNumTaxa() == 0);
 
-	sys1.SetTrackSynchronous(true);
-	sys1.AddOrg(15.0, {0,0}, 0);
-	REQUIRE(sys1.GetNumActive() == 1);
-	REQUIRE(sys1.GetTaxonAt(0)->GetInfo() == "small");
-	sys1.AddOrg(56.0, {1,1}, 0);
-	REQUIRE(sys1.GetNumActive() == 2);
-	REQUIRE(sys1.GetNextTaxonAt(1)->GetInfo() == "large");
-	sys1.RemoveOrg({1,1});
-	REQUIRE(sys1.GetNumActive() == 1);
+  sys1.SetTrackSynchronous(true);
+  sys1.AddOrg(15.0, {0,0}, 0);
+  REQUIRE(sys1.GetNumActive() == 1);
+  REQUIRE(sys1.GetTaxonAt(0)->GetInfo() == "small");
+  sys1.AddOrg(56.0, {1,1}, 0);
+  REQUIRE(sys1.GetNumActive() == 2);
+  REQUIRE(sys1.GetNextTaxonAt(1)->GetInfo() == "large");
+  sys1.RemoveOrg({1,1});
+  REQUIRE(sys1.GetNumActive() == 1);
 
-	// Base setters and getters
-	REQUIRE(sys1.GetStoreActive() == true);
-	REQUIRE(sys1.GetStoreAncestors() == true);
-	REQUIRE(sys1.GetStoreOutside() == false);
-	REQUIRE(sys1.GetArchive() == true);
-	REQUIRE(sys1.GetStorePosition() == true);
-	sys1.SetStoreActive(false);
-	REQUIRE(sys1.GetStoreActive() == false);
-	sys1.SetStoreAncestors(false);
-	REQUIRE(sys1.GetStoreAncestors() == false);
-	sys1.SetStoreOutside(true);
-	REQUIRE(sys1.GetStoreOutside() == true);
-	sys1.SetArchive(false);
-	REQUIRE(sys1.GetArchive() == false);
-	sys1.SetStorePosition(false);
-	REQUIRE(sys1.GetStorePosition() == false);
+  // Base setters and getters
+  REQUIRE(sys1.GetStoreActive() == true);
+  REQUIRE(sys1.GetStoreAncestors() == true);
+  REQUIRE(sys1.GetStoreOutside() == false);
+  REQUIRE(sys1.GetArchive() == true);
+  REQUIRE(sys1.GetStorePosition() == true);
+  sys1.SetStoreActive(false);
+  REQUIRE(sys1.GetStoreActive() == false);
+  sys1.SetStoreAncestors(false);
+  REQUIRE(sys1.GetStoreAncestors() == false);
+  sys1.SetStoreOutside(true);
+  REQUIRE(sys1.GetStoreOutside() == true);
+  sys1.SetArchive(false);
+  REQUIRE(sys1.GetArchive() == false);
+  sys1.SetStorePosition(false);
+  REQUIRE(sys1.GetStorePosition() == false);
 
-	#ifndef NDEBUG
-	sys1.AddDeleteriousStepDataNodeImpl(true);
-	REQUIRE(emp::assert_last_fail);
-	emp::assert_clear();
+  #ifndef NDEBUG
+  sys1.AddDeleteriousStepDataNodeImpl(true);
+  REQUIRE(emp::assert_last_fail);
+  emp::assert_clear();
 
-	sys1.AddVolatilityDataNodeImpl(true);
-	REQUIRE(emp::assert_last_fail);
-	emp::assert_clear();
+  sys1.AddVolatilityDataNodeImpl(true);
+  REQUIRE(emp::assert_last_fail);
+  emp::assert_clear();
 
-	sys1.AddUniqueTaxaDataNodeImpl(true);
-	REQUIRE(emp::assert_last_fail);
-	emp::assert_clear();
+  sys1.AddUniqueTaxaDataNodeImpl(true);
+  REQUIRE(emp::assert_last_fail);
+  emp::assert_clear();
 
-	sys1.AddMutationCountDataNodeImpl(true);
-	REQUIRE(emp::assert_last_fail);
-	emp::assert_clear();
-	#endif
+  sys1.AddMutationCountDataNodeImpl(true);
+  REQUIRE(emp::assert_last_fail);
+  emp::assert_clear();
+  #endif
 
-	// Analysis
-	using my_taxon = emp::Taxon<std::string, emp::datastruct::mut_landscape_info<double>>;
-	//emp::Systematics<double, std::string, emp::datastruct::mut_landscape_info> sys2(calc_taxon)
-	my_taxon taxon1(1, "medium");
-	emp::Ptr<my_taxon> ptr1 = &taxon1;
-	REQUIRE(emp::LineageLength(ptr1) == 1);
-	my_taxon taxon2(1, "medium", ptr1);
-	emp::Ptr<my_taxon> ptr2 = &taxon2;
-	REQUIRE(emp::LineageLength(ptr1) == 1);
-	REQUIRE(emp::LineageLength(ptr2) == 2);
-	std::unordered_map<std::string, int> muts;
-	muts["short"] = 12;
-	muts["tall"] = 3;
-	taxon2.GetData().RecordMutation(muts);
-	REQUIRE(taxon2.GetData().mut_counts.size() == 2);
-	REQUIRE(taxon2.GetData().mut_counts["tall"] == 3);
+  // Analysis
+  using my_taxon = emp::Taxon<std::string, emp::datastruct::mut_landscape_info<double>>;
+  //emp::Systematics<double, std::string, emp::datastruct::mut_landscape_info> sys2(calc_taxon)
+  my_taxon taxon1(1, "medium");
+  emp::Ptr<my_taxon> ptr1 = &taxon1;
+  REQUIRE(emp::LineageLength(ptr1) == 1);
+  my_taxon taxon2(1, "medium", ptr1);
+  emp::Ptr<my_taxon> ptr2 = &taxon2;
+  REQUIRE(emp::LineageLength(ptr1) == 1);
+  REQUIRE(emp::LineageLength(ptr2) == 2);
+  std::unordered_map<std::string, int> muts;
+  muts["short"] = 12;
+  muts["tall"] = 3;
+  taxon2.GetData().RecordMutation(muts);
+  REQUIRE(taxon2.GetData().mut_counts.size() == 2);
+  REQUIRE(taxon2.GetData().mut_counts["tall"] == 3);
 
-	emp::vector<std::string> types;
-	types.push_back("tall");
-	types.push_back("short");
-	REQUIRE(emp::CountMuts(ptr2, types) == 15);
-	REQUIRE(emp::CountMutSteps(ptr2, types) == 2);
-	REQUIRE(emp::CountMutSteps(ptr2, "short") == 1);
-	muts["short"] = 4;
-	taxon1.GetData().RecordMutation(muts);
-	REQUIRE(emp::CountMuts(ptr1, "short") == 4);
-	REQUIRE(emp::CountMuts(ptr2, "short") == 16);
-	REQUIRE(emp::CountMutSteps(ptr1, "short") == 1);
-	REQUIRE(emp::CountMutSteps(ptr2, "short") == 2);
+  emp::vector<std::string> types;
+  types.push_back("tall");
+  types.push_back("short");
+  REQUIRE(emp::CountMuts(ptr2, types) == 15);
+  REQUIRE(emp::CountMutSteps(ptr2, types) == 2);
+  REQUIRE(emp::CountMutSteps(ptr2, "short") == 1);
+  muts["short"] = 4;
+  taxon1.GetData().RecordMutation(muts);
+  REQUIRE(emp::CountMuts(ptr1, "short") == 4);
+  REQUIRE(emp::CountMuts(ptr2, "short") == 16);
+  REQUIRE(emp::CountMutSteps(ptr1, "short") == 1);
+  REQUIRE(emp::CountMutSteps(ptr2, "short") == 2);
 
-	 emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
-  	std::cout << "\nAddOrg 25 (id1, no parent)\n";
-  	auto id1 = sys.AddOrg(25, nullptr, 0);
-  	std::cout << "\nAddOrg -10 (id2; parent id1)\n";
-  	auto id2 = sys.AddOrg(-10, id1, 6);
-  	std::cout << "\nAddOrg 26 (id3; parent id1)\n";
-  	auto id3 = sys.AddOrg(26, id1, 10);
-  	std::cout << "\nAddOrg 27 (id4; parent id2)\n";
-  	auto id4 = sys.AddOrg(27, id2, 25);
-  	std::cout << "\nAddOrg 28 (id5; parent id2)\n";
-  	auto id5 = sys.AddOrg(28, id2, 32);
-  	std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  	auto id6 = sys.AddOrg(29, id5, 39);
-  	std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  	auto id7 = sys.AddOrg(30, id1, 6);
+    std::cout << "\nAddOrg 25 (id1, no parent)\n";
+    auto id1 = sys.AddOrg(25, nullptr, 0);
+    std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+    auto id2 = sys.AddOrg(-10, id1, 6);
+    std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+    auto id3 = sys.AddOrg(26, id1, 10);
+    std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+    auto id4 = sys.AddOrg(27, id2, 25);
+    std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+    auto id5 = sys.AddOrg(28, id2, 32);
+    std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+    auto id6 = sys.AddOrg(29, id5, 39);
+    std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+    auto id7 = sys.AddOrg(30, id1, 6);
 
 
   std::cout << "\nRemoveOrg (id2)\n";
@@ -384,7 +389,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
   auto id6 = sys.AddOrg(29, id5, 39);
   std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   auto id7 = sys.AddOrg(30, id1, 6);
-  
+
 
   std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
@@ -831,7 +836,7 @@ TEST_CASE("Test GetCanopy", "[evo]")
   can_set = sys.GetCanopyExtantRoots(2);
 
   // Both 3 and 4 were not alive at time point 2, so the canopy roots
-  // will be 1 and 2. 
+  // will be 1 and 2.
   CHECK(can_set.size() == 2);
   CHECK(Has(can_set, id1));
   CHECK(Has(can_set, id2));
@@ -842,7 +847,7 @@ TEST_CASE("Test GetCanopy", "[evo]")
 
   // Only 4 is alive, but it wasn't alive at time point 2. 2 is the
   // only canopy root because even though 1 is alive, because 4's
-  // lineage diverged from 1 when 2 was born. 
+  // lineage diverged from 1 when 2 was born.
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id2));
 
@@ -852,12 +857,12 @@ TEST_CASE("Test GetCanopy", "[evo]")
   sys.RemoveOrg(id5, 11);
 
   can_set = sys.GetCanopyExtantRoots(7);
-  // Should only be 4 
+  // Should only be 4
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id4));
 
   can_set = sys.GetCanopyExtantRoots(9);
-  // Should only be 5 
+  // Should only be 5
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id5));
 
@@ -873,12 +878,12 @@ TEST_CASE("Test GetCanopy", "[evo]")
   sys.RemoveOrg(id9, 20);
 
   can_set = sys.GetCanopyExtantRoots(22);
-  // Should only be 10 
+  // Should only be 10
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id10));
 
   can_set = sys.GetCanopyExtantRoots(14);
-  // Should only be 9, even though others were alive 
+  // Should only be 9, even though others were alive
   CHECK(can_set.size() == 1);
   CHECK(Has(can_set, id9));
 
@@ -1053,7 +1058,7 @@ TEST_CASE("Tree balance", "[evo]") {
   CHECK(tree33.SackinIndex() == 6);
 
   // From CollessLike metric paper
-  emp::Systematics<int, int> treecl([](const int & i){return i;}, true, true, false, false);  
+  emp::Systematics<int, int> treecl([](const int & i){return i;}, true, true, false, false);
   auto treeclorg1 = treecl.AddOrg(1, nullptr);
   auto treeclorg2 = treecl.AddOrg(2, treeclorg1);
   auto treeclorg3 = treecl.AddOrg(3, treeclorg1);

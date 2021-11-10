@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP-StateGrid.cc
+ *  @file AvidaGP-StateGrid.cpp
  *  @brief A example of using AvidaGP evolving with a StateGrid.
  *
  *  Example file of AvidaGP-based organisms (called SGOrg here) moving through a state grid,
@@ -19,11 +19,11 @@
 
 #include <iostream>
 
+#include "emp/Evolve/StateGrid.hpp"
+#include "emp/Evolve/World.hpp"
 #include "emp/hardware/AvidaGP.hpp"
 #include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
-#include "emp/Evolve/StateGrid.hpp"
-#include "emp/Evolve/World.hpp"
 
 class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
 protected:

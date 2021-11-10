@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  MAP-Elites-Arm.cpp
+ *  @file MAP-Elites-Arm.cpp
  *  @brief Controller for NATIVE (Command Line) version of MAP-Elites app.
  */
 

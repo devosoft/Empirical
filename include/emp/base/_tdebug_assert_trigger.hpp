@@ -4,12 +4,12 @@
  *  @date 2020.
  *
  *  @file _tdebug_assert_trigger.hpp
- *  @brief Non-terminating asssert trigger implementation for unit testing.
+ *  @brief Non-terminating assert trigger implementation for unit testing.
  *  @note For internal use.
  */
 
-#ifndef EMP_TDEBUG_ASSERT_TRIGGER_HPP
-#define EMP_TDEBUG_ASSERT_TRIGGER_HPP
+#ifndef EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE
+#define EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE
 
 #include <string>
 
@@ -28,8 +28,8 @@ namespace emp {
   bool assert_trigger(
     std::string filename, size_t line, std::string expr, EXTRA &&...
   ) {
-    emp::assert_fail_info.filename = __FILE__;
-    emp::assert_fail_info.line_num = __LINE__;
+    emp::assert_fail_info.filename = filename;
+    emp::assert_fail_info.line_num = line;
     emp::assert_fail_info.error = expr;
     emp::assert_last_fail = true;
 
@@ -40,4 +40,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_TDEBUG_ASSERT_TRIGGER_HPP
+#endif // #ifndef EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE

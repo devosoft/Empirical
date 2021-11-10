@@ -1,18 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  TypeID provides an easy way to convert types to strings.
-//
-//
-//  Developer notes:
-//  * Fill out defaults for remaining standard library classes (as possible)
-//  * If a class has a static TypeID_GetName() defined, use that for the name.
-//  * If a type is a template, give access to parameter types.
-//  * If a type is a function, give access to parameter types.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2021
+ *
+ *  @file TypeID.hpp
+ *  @brief TypeID provides an easy way to convert types to strings.
+ *
+ *  Developer notes:
+ *  * Fill out defaults for remaining standard library classes (as possible)
+ *  * If a class has a static TypeID_GetName() defined, use that for the name.
+ *  * If a type is a template, give access to parameter types.
+ *  * If a type is a function, give access to parameter types.
+ */
 
-#ifndef EMP_TYPE_ID_H
-#define EMP_TYPE_ID_H
+#ifndef EMP_META_TYPEID_HPP_INCLUDE
+#define EMP_META_TYPEID_HPP_INCLUDE
 
 #include <cmath>
 #include <sstream>
@@ -23,9 +25,8 @@
 #include "../datastructs/vector_utils.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "type_traits.hpp"
 #include "TypePack.hpp"
-
+#include "type_traits.hpp"
 
 namespace emp {
 
@@ -321,12 +322,12 @@ namespace emp {
     template <typename T> bool IsType() const { return *this == GetTypeID<T>(); }
 
     template <typename T, typename... Ts>
-    bool IsTypeIn() const { 
+    bool IsTypeIn() const {
       if (IsType<T>()) return true;
       if constexpr (sizeof...(Ts) > 0) return IsTypeIn<Ts...>();
       else return false;
     }
- 
+
     TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
     TypeID GetElementTypeID() const { return info_ptr->GetElementID(); }
     TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
@@ -407,7 +408,7 @@ namespace emp {
         if constexpr (std::rank<T>::value > 2) info.name += "[" + emp::to_string(std::extent<T,2>::value) + "]";
         if constexpr (std::rank<T>::value > 3) info.name += "[" + emp::to_string(std::extent<T,3>::value) + "]";
         if constexpr (std::rank<T>::value > 4) info.name += "[" + emp::to_string(std::extent<T,4>::value) + "]";
-        if constexpr (std::rank<T>::value > 5) info.name += "[...]";        
+        if constexpr (std::rank<T>::value > 5) info.name += "[...]";
       }
       else if constexpr (emp::is_pointer<T>()) {
         info.name = type_id.GetRemovePointerTypeID().GetName() + '*';
@@ -479,4 +480,4 @@ namespace std {
   }
 }
 
-#endif
+#endif // #ifndef EMP_META_TYPEID_HPP_INCLUDE

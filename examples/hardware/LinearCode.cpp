@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  LinearCode.cpp
+ *  @file LinearCode.cpp
  *  @brief This is example code for using LinearCode.hpp
  */
 

@@ -1,48 +1,49 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A versatile and non-patterned pseudo-random-number generator.
-//
-//  Status: DESIGN
-//
-//  Constructor:
-//    Random(int _seed=-1)
-//      _seed is the random number seed that will produce a unique pseudo-random sequence.
-//      (a value of -1 indicates that the seed should be based off of a combination of time
-//      and the memory position of the random number generator, in case multiple generators
-//      start at the same time.)
-//
-//  Other useful functions:
-//    double GetDouble()
-//    double GetDouble(double max)
-//    double GetDouble(double min, double max)
-//      Retrive a random double in the range [min, max).  By default, min=0.0 and max=1.0.
-//
-//    int GetInt(int max)
-//    int GetInt(int min, int max)
-//    uint32_t GetUInt(uint32_t max)
-//    uint32_t GetUInt(uint32_t min, uint32_t max)
-//      Retrive a random int or uint in the range [min, max).  By default, min=0.
-//
-//    bool P(double p)
-//      Tests a random value [0,1) against a given probability p, and returns true of false.
-//
-//    double GetRandNormal(const double mean, const double std)
-//    uint32_t GetRandPoisson(const double n, double p)
-//    uint32_t GetRandPoisson(const double mean)
-//    uint32_t GetRandBinomial(const double n, const double p)
-//      Draw a value from the given distributions
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file ce_random.hpp
+ *  @brief A versatile and non-patterned pseudo-random-number generator.
+ *
+ *  Status: DESIGN
+ *
+ *  Constructor:
+ *    Random(int _seed=-1)
+ *      _seed is the random number seed that will produce a unique pseudo-random sequence.
+ *      (a value of -1 indicates that the seed should be based off of a combination of time
+ *      and the memory position of the random number generator, in case multiple generators
+ *      start at the same time.)
+ *
+ *  Other useful functions:
+ *    double GetDouble()
+ *    double GetDouble(double max)
+ *    double GetDouble(double min, double max)
+ *      Retrive a random double in the range [min, max).  By default, min=0.0 and max=1.0.
+ *
+ *    int GetInt(int max)
+ *    int GetInt(int min, int max)
+ *    uint32_t GetUInt(uint32_t max)
+ *    uint32_t GetUInt(uint32_t min, uint32_t max)
+ *      Retrive a random int or uint in the range [min, max).  By default, min=0.
+ *
+ *    bool P(double p)
+ *      Tests a random value [0,1) against a given probability p, and returns true of false.
+ *
+ *    double GetRandNormal(const double mean, const double std)
+ *    uint32_t GetRandPoisson(const double n, double p)
+ *    uint32_t GetRandPoisson(const double mean)
+ *    uint32_t GetRandBinomial(const double n, const double p)
+ *      Draw a value from the given distributions
+ */
 
-#ifndef EMP_CE_RANDOM_H
-#define EMP_CE_RANDOM_H
+#ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_RANDOM_HPP_INCLUDE
+#define EMP_IN_PROGRESS_CONSTEXPR_CE_RANDOM_HPP_INCLUDE
 
 // #include <algorithm>
-#include <ctime>
 #include <climits>
 #include <cmath>
+#include <ctime>
 #include <iterator>
 #include <unistd.h>
 
@@ -346,4 +347,4 @@ namespace emp {
 
 } // END emp namespace
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_RANDOM_HPP_INCLUDE

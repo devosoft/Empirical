@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2020.
  *
- *  @file  File.hpp
+ *  @file File.hpp
  *  @brief The File object maintains a simple, in-memory file.
  *  @note Status: BETA
  *
@@ -12,9 +12,9 @@
  *
  */
 
+#ifndef EMP_IO_FILE_HPP_INCLUDE
+#define EMP_IO_FILE_HPP_INCLUDE
 
-#ifndef EMP_FILE_H
-#define EMP_FILE_H
 
 #include <fstream>
 #include <functional>
@@ -135,7 +135,7 @@ namespace emp {
     /// Load an entire input stream into a file.
     File & Load(std::istream & input) {
       while (!input.eof()) {
-	      LoadLine(input);
+        LoadLine(input);
       }
       return *this;
     }
@@ -154,7 +154,7 @@ namespace emp {
     /// Write this file to a provided output stream.
     File & Write(std::ostream & output) {
       for (std::string & cur_line : lines) {
-	      output << cur_line << '\n';
+        output << cur_line << '\n';
       }
       return *this;
     }
@@ -204,14 +204,14 @@ namespace emp {
 
     /// Keep only strings that contain a specific substring.
     File & KeepIfContains(const std::string & pattern) {
-      return KeepIf( 
+      return KeepIf(
         [&pattern](const std::string & line){ return line.find(pattern) != std::string::npos; }
       );
     }
 
     /// Remove all strings that contain a specific substring.
     File & RemoveIfContains(const std::string & pattern) {
-      return KeepIf( 
+      return KeepIf(
         [&pattern](const std::string & line){ return line.find(pattern) == std::string::npos; }
       );
     }
@@ -336,4 +336,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IO_FILE_HPP_INCLUDE

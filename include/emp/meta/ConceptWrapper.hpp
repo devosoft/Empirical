@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2021.
  *
- *  @file  ConceptWrapper.hpp
+ *  @file ConceptWrapper.hpp
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
  *
  *  Starting in future versions of C++, a concept is a set of requirements for a class to be used
@@ -94,8 +94,8 @@
  *
  */
 
-#ifndef EMP_CONCEPT_WRAPPER_H
-#define EMP_CONCEPT_WRAPPER_H
+#ifndef EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
+#define EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
 
 #include <string>
 #include <utility>
@@ -335,5 +335,5 @@
 #define EMP_BUILD_CONCEPT__PROCESS_PROTECTED(...) protected: __VA_ARGS__
 
 
-#endif
 
+#endif // #ifndef EMP_META_CONCEPTWRAPPER_HPP_INCLUDE

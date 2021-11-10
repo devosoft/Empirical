@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  Cache.hpp
+ *  @file Cache.hpp
  *  @brief similar to an std::unordered_map, but all lookups come with a function to generate the result should the lookup fail.
  *  @note Status: BETA
  */
 
-#ifndef EMP_CACHE_H
-#define EMP_CACHE_H
+#ifndef EMP_DATASTRUCTS_CACHE_HPP_INCLUDE
+#define EMP_DATASTRUCTS_CACHE_HPP_INCLUDE
 
 #include <functional>
 #include <unordered_map>
@@ -17,11 +17,11 @@
 namespace emp {
 
   template <class KEY,                                        // Cache::key_type
-	    class T,                                                // Cache::mapped_type
-	    class HASH = std::hash<KEY>,                            // Cache::hasher
-	    class PRED = std::equal_to<KEY>,                        // Cache::key_equal
-	    class ALLOC = std::allocator< std::pair<const KEY,T> >  // Cache::allocator_type
-	   >
+      class T,                                                // Cache::mapped_type
+      class HASH = std::hash<KEY>,                            // Cache::hasher
+      class PRED = std::equal_to<KEY>,                        // Cache::key_equal
+      class ALLOC = std::allocator< std::pair<const KEY,T> >  // Cache::allocator_type
+     >
   class Cache {
   private:
     std::unordered_map<KEY, T, HASH, PRED, ALLOC> cache_map;
@@ -69,4 +69,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_CACHE_HPP_INCLUDE

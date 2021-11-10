@@ -1,23 +1,23 @@
-#ifndef EMP_JS_UTILS_H
-#define EMP_JS_UTILS_H
-
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  js_utils.hpp
+ *  @file js_utils.hpp
  *  @brief Tools for passing data between C++ and Javascript.
  */
+
+#ifndef EMP_WEB_JS_UTILS_HPP_INCLUDE
+#define EMP_WEB_JS_UTILS_HPP_INCLUDE
 
 #include <map>
 #include <string>
 #include <typeinfo>
 
-#include "../base/assert.hpp"
-#include "../base/vector.hpp"
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/map.hpp"
+#include "../base/vector.hpp"
 
 #include "init.hpp"
 
@@ -92,20 +92,20 @@ namespace emp {
     }
 
     MAIN_THREAD_EM_ASM({
-    	var curr_array = emp_i.__incoming_array;
-    	var depth = 0;
+      var curr_array = emp_i.__incoming_array;
+      var depth = 0;
 
-    	// Make sure that we're at the right depth, in case of recursive call.
-    	while (curr_array.length > 0) {
-    	  var next_index = getValue($4+(depth*4), "i32");
-    	  depth += 1;
-    	  curr_array = curr_array[next_index];
-    	}
+      // Make sure that we're at the right depth, in case of recursive call.
+      while (curr_array.length > 0) {
+        var next_index = getValue($4+(depth*4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
 
-    	// Iterate over array, get values, and add them to incoming array.
-    	for (i=0; i<$1; i++) {
+      // Iterate over array, get values, and add them to incoming array.
+      for (i=0; i<$1; i++) {
         curr_array.push(getValue($0+(i*$2), UTF8ToString($3)));
-    	}
+      }
     }, &values[0], values.size(), type_size, type_string.c_str(), recursive_el.data());
   }
 
@@ -155,52 +155,52 @@ namespace emp {
 
     // Initialize objects in Javascript
     MAIN_THREAD_EM_ASM({
-    	var curr_array = emp_i.__incoming_array;
-    	var depth = 0;
+      var curr_array = emp_i.__incoming_array;
+      var depth = 0;
 
-    	// Make sure that we're at the right depth, in case of recursive call.
-    	while (curr_array.length > 0) {
-    	  var next_index = getValue($1+(depth*4), "i32");
-    	  depth += 1;
-    	  curr_array = curr_array[next_index];
-    	}
+      // Make sure that we're at the right depth, in case of recursive call.
+      while (curr_array.length > 0) {
+        var next_index = getValue($1+(depth*4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
 
-    	// Append empty objects
-    	for (i=0; i<$0; i++) {
-    	  var new_obj = {};
-    	  curr_array.push(new_obj);
-    	}
+      // Append empty objects
+      for (i=0; i<$0; i++) {
+        var new_obj = {};
+        curr_array.push(new_obj);
+      }
     }, values.size(), recursive_el.data());
 
     for (std::size_t j = 0; j<values.size(); j++) { // Iterate over array
       for (std::size_t i = 0; i<values[j].var_names.size(); i++) { // Iterate over object members
 
-      	// Get variable name and type for this member variable
-      	std::string var_name = values[j].var_names[i];
-      	std::string type_string = map_type_names[values[j].var_types[i].name()];
-      	// Make sure member variable is an allowed type
-      	emp_assert((map_type_names.find(values[j].var_types[i].name())
-      		    != map_type_names.end()), values[j].var_types[i].name());
+        // Get variable name and type for this member variable
+        std::string var_name = values[j].var_names[i];
+        std::string type_string = map_type_names[values[j].var_types[i].name()];
+        // Make sure member variable is an allowed type
+        emp_assert((map_type_names.find(values[j].var_types[i].name())
+              != map_type_names.end()), values[j].var_types[i].name());
 
         // Load data into array of objects
         MAIN_THREAD_EM_ASM({
-    	    var curr_array = emp_i.__incoming_array;
-    	    var depth = 0;
+          var curr_array = emp_i.__incoming_array;
+          var depth = 0;
 
-    	    // Make sure we are at the right depth, in case of recursive call.
-    	    while (curr_array[0].length > 0) {
-    	      var next_index = getValue($4+(depth*4), "i32");
-    	      depth += 1;
-    	      curr_array = curr_array[next_index];
-    	    }
+          // Make sure we are at the right depth, in case of recursive call.
+          while (curr_array[0].length > 0) {
+            var next_index = getValue($4+(depth*4), "i32");
+            depth += 1;
+            curr_array = curr_array[next_index];
+          }
 
-    	    if (UTF8ToString($1) == "string") {
-    	      curr_array[$3][UTF8ToString($2)] = UTF8ToString($0);
-    	    } else {
-    	      curr_array[$3][UTF8ToString($2)] = getValue($0, UTF8ToString($1));
-    	    }
-    	  }, values[j].pointers[i], type_string.c_str(), var_name.c_str(),
-    	  j, recursive_el.data());
+          if (UTF8ToString($1) == "string") {
+            curr_array[$3][UTF8ToString($2)] = UTF8ToString($0);
+          } else {
+            curr_array[$3][UTF8ToString($2)] = getValue($0, UTF8ToString($1));
+          }
+        }, values[j].pointers[i], type_string.c_str(), var_name.c_str(),
+        j, recursive_el.data());
       }
     }
   }
@@ -218,10 +218,15 @@ namespace emp {
   // This version of the function handles nested arrays with recursive calls
   // until a non-array type is found.
   template<std::size_t SIZE1, std::size_t SIZE2, typename T>
+<<<<<<< HEAD
   void pass_array_to_javascript(
     const emp::array<emp::array<T, SIZE1>, SIZE2> & values,
 		emp::vector<int> recursive_el = emp::vector<int>()
   ) {
+=======
+  void pass_array_to_javascript(emp::array<emp::array<T, SIZE1>, SIZE2> values,
+        emp::vector<int> recursive_el = emp::vector<int>()) {
+>>>>>>> master
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
@@ -230,16 +235,16 @@ namespace emp {
 
     // Append empty arrays to array that we are currently handling in recursion
     MAIN_THREAD_EM_ASM({
-    	var curr_array = emp_i.__incoming_array;
-    	var depth = 0;
-    	while (curr_array.length > 0) {
-    	  var next_index = getValue($0+(depth*4), "i32");
-    	  depth += 1;
-    	  curr_array = curr_array[next_index];
-    	}
-    	for (i=0; i<$1; i++) {
-    	  curr_array.push([]);
-    	}
+      var curr_array = emp_i.__incoming_array;
+      var depth = 0;
+      while (curr_array.length > 0) {
+        var next_index = getValue($0+(depth*4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
+      for (i=0; i<$1; i++) {
+        curr_array.push([]);
+      }
     }, recursive_el.data(), values.size());
 
     // Make recursive calls - recursive_els specifies coordinates of array we're
@@ -254,10 +259,15 @@ namespace emp {
   // This version of the function handles nested vectors with recursive calls
   // until a non-array type is found.
   template<typename T>
+<<<<<<< HEAD
   void pass_array_to_javascript(
     const emp::vector<emp::vector<T> > & values,
 		emp::vector<int> recursive_el = emp::vector<int>()
   ) {
+=======
+  void pass_array_to_javascript(emp::vector<emp::vector<T> > values,
+        emp::vector<int> recursive_el = emp::vector<int>()) {
+>>>>>>> master
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
@@ -266,16 +276,16 @@ namespace emp {
 
     // Append empty arrays to array that we are currently handling in recursion
     MAIN_THREAD_EM_ASM({
-    	var curr_array = emp_i.__incoming_array;
-    	var depth = 0;
-    	while (curr_array.length > 0) {
-    	  var next_index = getValue($0+(depth*4), "i32");
-    	  depth += 1;
-    	  curr_array = curr_array[next_index];
-    	}
-    	for (i=0; i<$1; i++) {
-    	  curr_array.push([]);
-    	}
+      var curr_array = emp_i.__incoming_array;
+      var depth = 0;
+      while (curr_array.length > 0) {
+        var next_index = getValue($0+(depth*4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
+      for (i=0; i<$1; i++) {
+        curr_array.push([]);
+      }
     }, recursive_el.data(), values.size());
 
     // Make recursive calls - recursive_els specifies coordinates of array we are
@@ -316,11 +326,11 @@ namespace emp {
 
     //Write emp.__outgoing_array contents to a buffer
     T * buffer = (T*) MAIN_THREAD_EM_ASM_INT({
-    	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
+      var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
 
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
-    	}
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
+        setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
+      }
 
       return buffer;
     }, type_size, type_string.c_str());
@@ -354,13 +364,13 @@ namespace emp {
 
     // Write emp.__outgoing_array contents to a buffer
     T * buffer = (T*) MAIN_THREAD_EM_ASM_INT({
-    	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
+      var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
 
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
-    	}
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
+        setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
+      }
 
-    	return buffer;
+      return buffer;
     }, type_size, type_string.c_str());
 
     // Populate array from buffer
@@ -420,16 +430,16 @@ namespace emp {
     emp_assert(arr.size() == MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
-    	// Since we're treating each char as it's own string, each one
-    	// will be null-termianted. So we malloc length*2 addresses.
+      // Since we're treating each char as it's own string, each one
+      // will be null-termianted. So we malloc length*2 addresses.
       var new_length = emp_i.__outgoing_array.length*2;
-    	var buffer = Module._malloc(new_length);
+      var buffer = Module._malloc(new_length);
 
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
-    	}
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
+        stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
+      }
 
-    	return buffer;
+      return buffer;
     });
 
     for (size_t i=0; i<arr.size(); i++) {
@@ -449,15 +459,15 @@ namespace emp {
   void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) {
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
-    	// Since we're treating each char as it's own string, each one
-    	// will be null-termianted. So we malloc length*2 addresses.
-    	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
+      // Since we're treating each char as it's own string, each one
+      // will be null-termianted. So we malloc length*2 addresses.
+      var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
-    	}
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
+        stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
+      }
 
-    	return buffer;
+      return buffer;
     });
 
     for (int i=0; i<MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}); i++) {
@@ -478,24 +488,24 @@ namespace emp {
     emp_assert(arr.size() == MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
-    	// Figure how much memory to allocate
-    	var arr_size = 0;
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  arr_size += emp_i.__outgoing_array[i].length + 1;
-    	}
+      // Figure how much memory to allocate
+      var arr_size = 0;
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
+        arr_size += emp_i.__outgoing_array[i].length + 1;
+      }
 
-    	var buffer = Module._malloc(arr_size);
+      var buffer = Module._malloc(arr_size);
 
-    	// Track place in memory to write too
-    	var cumulative_size = 0;
+      // Track place in memory to write too
+      var cumulative_size = 0;
       var cur_length = 0;
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
         cur_length = emp_i.__outgoing_array[i].length + 1;
-    	  stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
-    	  cumulative_size += cur_length;
-    	}
+        stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
+        cumulative_size += cur_length;
+      }
 
-    	return buffer;
+      return buffer;
     });
 
     // Track place in memory to read from
@@ -518,24 +528,24 @@ namespace emp {
   void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) {
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
-    	// Figure how much memory to allocate
-    	var arr_size = 0;
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  arr_size += emp_i.__outgoing_array[i].length + 1;
-    	}
+      // Figure how much memory to allocate
+      var arr_size = 0;
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
+        arr_size += emp_i.__outgoing_array[i].length + 1;
+      }
 
-    	var buffer = Module._malloc(arr_size);
+      var buffer = Module._malloc(arr_size);
 
-    	// Track place in memory to write too
-    	var cumulative_size = 0;
+      // Track place in memory to write too
+      var cumulative_size = 0;
       var cur_length = 0;
-    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+      for (i=0; i<emp_i.__outgoing_array.length; i++) {
         cur_length = emp_i.__outgoing_array[i].length + 1;
-    	  stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
-    	  cumulative_size += cur_length;
-    	}
+        stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
+        cumulative_size += cur_length;
+      }
 
-    	return buffer;
+      return buffer;
     });
 
     // Track place in memory to read from
@@ -570,8 +580,8 @@ namespace emp {
 
     for (size_t i = 0; i < arr.size(); i++) {
       MAIN_THREAD_EM_ASM({
-	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
-	    }, i);
+        emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
+      }, i);
       pass_array_to_cpp(arr[i], true);
     }
 
@@ -604,7 +614,7 @@ namespace emp {
 
     for (int i = 0; i < size; i++) {
       MAIN_THREAD_EM_ASM({
-	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
+        emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
       }, i);
       while ((int)arr.size() <= i) {
         arr.push_back(emp::vector<T>());
@@ -756,4 +766,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_JS_UTILS_HPP_INCLUDE

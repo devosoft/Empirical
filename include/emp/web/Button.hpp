@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018.
  *
- *  @file  Button.hpp
+ *  @file Button.hpp
  *  @brief Create/control an HTML button and call a specified function when that button is clicked.
  *
  *  Use example:
@@ -27,8 +27,8 @@
  *    bool IsDisabled() const
  */
 
-#ifndef EMP_WEB_BUTTON_H
-#define EMP_WEB_BUTTON_H
+#ifndef EMP_WEB_BUTTON_HPP_INCLUDE
+#define EMP_WEB_BUTTON_HPP_INCLUDE
 
 #include "init.hpp"
 #include "Widget.hpp"
@@ -153,4 +153,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_BUTTON_HPP_INCLUDE

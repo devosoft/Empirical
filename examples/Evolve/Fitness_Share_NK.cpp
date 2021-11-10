@@ -1,15 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file uses the Fitness Sharing functionality defined in evo::World.h
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file Fitness_Share_NK.cpp
+ *  @brief This file uses the Fitness Sharing functionality defined in evo::World.hpp
+ */
 
 #include <iostream>
 
+#include "emp/bits/BitSet.hpp"
 #include "emp/Evolve/NK-const.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/bits/BitSet.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
 

@@ -1,12 +1,18 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Distribution.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/math/Distribution.hpp"
 #include "emp/math/Random.hpp"
-
-#include <sstream>
-#include <iostream>
 
 /// Ensures that
 /// 1) A == B

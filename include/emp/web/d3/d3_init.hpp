@@ -1,5 +1,14 @@
-#ifndef D3_INIT_H
-#define D3_INIT_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file d3_init.hpp
+ *  @brief TODO.
+ */
+
+#ifndef EMP_WEB_D3_D3_INIT_HPP_INCLUDE
+#define EMP_WEB_D3_D3_INIT_HPP_INCLUDE
 
 #include "../web.hpp"
 

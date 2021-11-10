@@ -1,14 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2020
+ *
+ *  @file JSWrap.cpp
+ */
 
 #include <functional>
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/init.hpp"
 #include "emp/web/JSWrap.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 
 // --- These structs are used to test JSWrap ---
 struct JSDataObject {

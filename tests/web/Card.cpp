@@ -1,17 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file Card.cpp
+ */
 
 #include <functional>
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
-#include "emp/web/Document.hpp"
-#include "emp/web/Div.hpp"
-#include "emp/web/web.hpp"
 #include "emp/prefab/Card.hpp"
-
+#include "emp/web/Div.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 // Test that the Card class properly gets attached and laid out via emp::web::Document.
 struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
@@ -28,8 +31,9 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
    *
    *  <div id="static_card_body" class="card-body">
    *    <div id="div_body">
-   *      <span id="emp__1">body content</span>
+   *      <span id="emp__1">body content 1</span>
    *    </div>
+   *    <span id="emp__1">body content 2</span>
    *  </div>
    *
    * </div>
@@ -45,8 +49,8 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
     static_card.AddHeaderContent("Static Card Title");
     emp::web::Div body("div_body");
     static_card.AddBodyContent(body);
-    body << "body content";
-
+    body << "body content 1";
+    static_card << "body content 2";
   }
 
   void Describe() override {
@@ -141,8 +145,8 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
             chai.assert.isTrue(document.getElementById('static_card_body').classList.contains('card-body'));
           });
 
-          it('should have one child', function() {
-            chai.assert.equal($("#static_card_body").children().length, 1);
+          it('should have two children', function() {
+            chai.assert.equal($("#static_card_body").children().length, 2);
           });
 
           it('should have child div#div_body', function() {
@@ -167,6 +171,10 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
             it('should have child of type span', function() {
               chai.assert.equal(child.children[0].nodeName, "SPAN");
             });
+          });
+
+          it('should have a child of type span', function() {
+            chai.assert.equal($("#static_card_body").children()[1].nodeName, "SPAN");
           });
         });
       });
@@ -196,6 +204,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
    *  <div id="open_card_body" class="card-body , collapse show , open_card_collapse">
    *    <span id="emp__5">
    *      <p>collapsible card body</p>
+   *      <p>alternatively inserted text</p>
    *    </span>
    *  </div>
    *
@@ -212,6 +221,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
     emp::web::Div header("div_header");
     open_card.AddHeaderContent(header);
     open_card.AddBodyContent("<p>collapsible card body</p>");
+    open_card << "<p>alternatively insterted text</p>";
     header << "<h3>init open title</h3>";
 
   }
@@ -448,20 +458,30 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
               chai.assert.equal(child.nodeName, "SPAN");
             });
 
-            it('should have one child', function() {
-              chai.assert.equal(child.childElementCount, 1);
+            it('should have two children', function() {
+              chai.assert.equal(child.childElementCount, 2);
             });
           });
 
           describe("Grandchild", function() {
-            const grandchild = $("#open_card_body").children()[0].children[0];
+            const grandchild1 = $("#open_card_body").children()[0].children[0];
 
             it('should be a p element', function() {
-              chai.assert.equal(grandchild.nodeName, "P");
+              chai.assert.equal(grandchild1.nodeName, "P");
             });
 
             it('should have no children', function() {
-              chai.assert.equal(grandchild.childElementCount, 0);
+              chai.assert.equal(grandchild1.childElementCount, 0);
+            });
+
+            const grandchild2 = $("#open_card_body").children()[0].children[1];
+
+            it('should be a p element', function() {
+              chai.assert.equal(grandchild2.nodeName, "P");
+            });
+
+            it('should have no children', function() {
+              chai.assert.equal(grandchild2.childElementCount, 0);
             });
           });
         });

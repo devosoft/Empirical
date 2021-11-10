@@ -22,8 +22,8 @@
  *   EMP_SETUP_DATAPOD(ClassName, var1, var2, ...)
  *
  *  Where ClassName is the target class' name and var1, var2, etc are the names of the
- *  member variables that also need to be stored.  Note that member variables can either
- *  be either built-in types or custom types that have also had DataPods setup in them.
+ *  member variables that also need to be stored.  Note that member variables can be
+ *  either built-in types or custom types that have also had DataPods setup in them.
  *
  *  If the target class is a derived class, you must use either:
  *
@@ -44,17 +44,19 @@
  *  @todo To deal with pointers we should recurse, but keep map to new pointer locations.
  *  @todo Setup a more robust method for dealing with arbitrary strings so we don't have
  *        to worry about collisions in streams (JSon format??)
- *  @todo Setup a (compressed) binary save formmat in DataPods in addition to JSon.
+ *  @todo Setup a (compressed) binary save format in DataPods in addition to JSon.
  *  @todo Setup promised synergistic interactions with config and tuple_struct to auto
  *        store and load without any additional effort on the part of the library user.
  */
 
-#ifndef EMP_SERIALIZE_H
-#define EMP_SERIALIZE_H
+#ifndef EMP_IO_SERIALIZE_HPP_INCLUDE
+#define EMP_IO_SERIALIZE_HPP_INCLUDE
 
 #include <iostream>
 
+#include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+
 #include "serialize_macros.hpp"
 
 namespace emp {
@@ -63,14 +65,16 @@ namespace serialize {
   /// A DataPod managed information about another class for serialization.
   class DataPod {
   protected:
-    std::ostream * os;
-    std::istream * is;
-    bool own_os = false;
+    emp::Ptr<std::ostream> os = nullptr;  // Pointer to streams to use for reading and writing.
+    emp::Ptr<std::istream> is = nullptr;
+    bool own_os = false;                  // Are we supposed to delete these streams on destruction?
     bool own_is = false;
 
     void ClearData() {
-      if (own_os && os) delete os;
-      if (own_is && is) delete is;
+      if (own_os && os) os.Delete();
+      if (own_is && is) is.Delete();
+      os = nullptr;
+      is = nullptr;
     }
   public:
     DataPod(std::ostream & _os, std::istream & _is) : os(&_os), is(&_is) { ; }
@@ -209,4 +213,4 @@ namespace serialize {
 }
 }
 
-#endif
+#endif // #ifndef EMP_IO_SERIALIZE_HPP_INCLUDE

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2019
  *
- *  @file  mem_track.hpp
+ *  @file mem_track.hpp
  *  @brief A set of macros to track how many instances of specific classes are made.
  *  @note Status: BETA
  *
@@ -23,8 +23,8 @@
  *   Also, can try using JS maps instead?  (only when using Emscripten.)
  */
 
-#ifndef EMP_MEM_TRACK
-#define EMP_MEM_TRACK
+#ifndef EMP_DEBUG_MEM_TRACK_HPP_INCLUDE
+#define EMP_DEBUG_MEM_TRACK_HPP_INCLUDE
 
 
 // If EMP_NDEBUG is turned on, turn off mem checks.
@@ -33,10 +33,11 @@
 #endif
 
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "../base/map.hpp"
+
 #include "alert.hpp"
 
 #ifdef EMP_NO_MEM_CHECK
@@ -117,4 +118,4 @@ namespace emp {
 #endif
 
 
-#endif
+#endif // #ifndef EMP_DEBUG_MEM_TRACK_HPP_INCLUDE

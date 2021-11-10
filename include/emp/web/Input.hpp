@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Input.hpp
+ *  @file Input.hpp
  *  @brief Create/control an HTML input and call a specified function when it receives input.
  *
  *  Use example:
@@ -27,8 +27,8 @@
  *    bool IsDisabled() const
  */
 
-#ifndef EMP_WEB_Input_H
-#define EMP_WEB_Input_H
+#ifndef EMP_WEB_INPUT_HPP_INCLUDE
+#define EMP_WEB_INPUT_HPP_INCLUDE
 
 
 #include "Widget.hpp"
@@ -259,7 +259,7 @@ namespace web {
       Info()->callback = in_cb;
       InputInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void(std::string)>( [b_info](std::string new_val){b_info->DoChange(new_val);} )  );
-      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);");
+      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ['checkbox', 'radio'].includes(this.type) ? (this.checked ? '1' : '0') : this.value);");
       // Allows user to set the checkbox to start out on/checked
       if (in_type.compare("checkbox") == 0 && is_checked){
         this->SetAttr("checked", "true");
@@ -350,4 +350,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_INPUT_HPP_INCLUDE

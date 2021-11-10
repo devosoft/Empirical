@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using info theory tools.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file info_theory.cpp
+ *  @brief Some examples code for using info theory tools.
+ */
 
 #include <iostream>
 
@@ -19,4 +21,3 @@ int main()
   emp::vector<int> vals2 = {20, 40, 20};
   std::cout << emp::Entropy(vals2) << std::endl;
 }
-

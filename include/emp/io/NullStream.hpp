@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  NullStream.hpp
+ *  @file NullStream.hpp
  *  @brief A handy no-operation output stream.
  *  @note Status: BETA
  */
 
-#ifndef EMP_NULLSTREAM_H
-#define EMP_NULLSTREAM_H
+#ifndef EMP_IO_NULLSTREAM_HPP_INCLUDE
+#define EMP_IO_NULLSTREAM_HPP_INCLUDE
 
 #include <iostream>
 
@@ -36,4 +36,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IO_NULLSTREAM_HPP_INCLUDE
