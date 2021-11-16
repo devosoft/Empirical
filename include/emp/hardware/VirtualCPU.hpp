@@ -272,7 +272,9 @@ namespace emp{
         int FindLabel(const nop_vec_t& label, size_t start_idx){
           if(label.size() == 0) return -1;
           for(size_t offset = 1; offset < genome_working.size(); ++offset){
-            if(CompareSequences(label, genome_working[start_idx + offset].nop_vec)) return offset;
+            size_t idx = start_idx + offset < genome_working.size() ?
+              start_idx + offset : start_idx + offset - genome_working.size();
+            if(CompareSequences(label, genome_working[idx].nop_vec)) return offset;
           }
           return -1;
         }
