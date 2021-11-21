@@ -254,6 +254,9 @@ namespace emp {
       return layout_ptr->GetType(GetID(name));
     }
 
+    bool IsNumeric(size_t id) const { return GetType(id).IsArithmetic(); }
+    bool IsNumeric(const std::string & name) const { return IsNumeric(GetID(name)); }
+
     /// Get the memory at the target position, assume it is the provided type, and convert the
     /// value found there to double.
     double GetAsDouble(size_t id, TypeID type_id) const {
