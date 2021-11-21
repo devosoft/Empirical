@@ -117,6 +117,8 @@ namespace emp {
 
       bool IsValid() const { return pos < ts->size(); }
       bool AtEnd() const { return pos == ts->size(); }
+
+      operator bool() const { return IsValid(); }
     };
 
     size_t size() const { return tokens.size(); }
@@ -144,7 +146,7 @@ namespace emp {
     static constexpr int MAX_ID = 255;      ///< IDs count down so that first ones have priority.
     static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
 
-    emp::vector<TokenInfo> token_set;       ///< List of all active tokens.
+    emp::vector<TokenInfo> token_set;       ///< List of all active tokens types.
     emp::map<std::string, int> token_map;   ///< Map of token names to id.
     int cur_token_id = MAX_ID;              ///< Which ID should the next new token get?
     mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
