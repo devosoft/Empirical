@@ -31,7 +31,7 @@
 namespace emp {
   class DataMapParser {
 
-    using value_fun_t = std::function<double(emp::DataMap &)>;
+    using value_fun_t = std::function<double(const emp::DataMap &)>;
     using pos_t = emp::TokenStream::Iterator;
 
     static constexpr const bool verbose = false;
@@ -97,7 +97,7 @@ namespace emp {
       ValueType & operator=(value_fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
 
       value_fun_t AsFun() {
-        if (type==FUNCTION) return fun; else return [v=value](emp::DataMap &){ return v; };
+        if (type==FUNCTION) return fun; else return [v=value](const emp::DataMap &){ return v; };
       }
     };
 
@@ -266,7 +266,7 @@ namespace emp {
         ++pos;
         ValueType val = ParseValue(dm, pos);
         if (val.type == ValueType::VALUE) { return op(val.value); }
-        else { return (value_fun_t) [fun=val.fun,op](emp::DataMap & dm){ return op(fun(dm)); }; }
+        else { return (value_fun_t) [fun=val.fun,op](const emp::DataMap & dm){ return op(fun(dm)); }; }
       }
 
       // If we have parentheses, process the contents
@@ -308,23 +308,23 @@ namespace emp {
         switch (args.size()) {
         case 0:
           if (!functions[name].fun0) AddError("Function '", name, "' requires arguments.");
-          out_fun = [fun=functions[name].fun0](emp::DataMap & /*dm*/) { return fun(); };
+          out_fun = [fun=functions[name].fun0](const emp::DataMap & /*dm*/) { return fun(); };
           break;
         case 1:
           if (!functions[name].fun1) AddError("Function '", name, "' cannot have 1 arguments.");
-          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](emp::DataMap & dm) {
+          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](const emp::DataMap & dm) {
             return fun(arg0(dm));
           };
           break;
         case 2:
           if (!functions[name].fun2) AddError("Function '", name, "' cannot have 2 arguments.");
-          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](emp::DataMap & dm) {
+          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](const emp::DataMap & dm) {
             return fun(arg0(dm), arg1(dm));
           };
           break;
         case 3:
           if (!functions[name].fun3) AddError("Function '", name, "' cannot have 3 arguments.");
-          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](emp::DataMap & dm) {
+          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](const emp::DataMap & dm) {
             return fun(arg0(dm), arg1(dm), arg2(dm));
           };
           break;
@@ -338,7 +338,7 @@ namespace emp {
       if (!dm.HasName(name)) AddError("Unknown data map entry '", name, "'.");
       size_t id = dm.GetID(name);
       dm_names.insert(name);    // Store this name in the list of those used.
-      return (value_fun_t) [id](emp::DataMap & dm){ return dm.GetAsDouble(id); };
+      return (value_fun_t) [id](const emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
 
     ValueType ParseMath(const DataMap & dm, pos_t & pos, size_t prec_limit=0) {
@@ -362,17 +362,17 @@ namespace emp {
           if (val1.type == ValueType::VALUE) {
             if (val2.type == ValueType::VALUE) { val1 = op.fun(val1.value, val2.value); }
             else {
-              val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](emp::DataMap & dm){
+              val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](const emp::DataMap & dm){
                 return op_fun(val1_num, val2_fun(dm));
               };
             }
           } else {
             if (val2.type == ValueType::VALUE) {
-              val1 = (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](emp::DataMap & dm){
+              val1 = (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](const emp::DataMap & dm){
                 return op_fun(val1_fun(dm), val2_num);
               };
             } else {
-              val1 = (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](emp::DataMap & dm){
+              val1 = (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](const emp::DataMap & dm){
                 return op_fun(val1_fun(dm), val2_fun(dm));
               };
             }
@@ -401,7 +401,7 @@ namespace emp {
 
       // If this value is fixed, turn it into a function.
       if (val.type == ValueType::VALUE) {
-        return [out=val.value](emp::DataMap &){ return out; };
+        return [out=val.value](const emp::DataMap &){ return out; };
       }
 
       // Otherwise return the function produced.
@@ -409,7 +409,7 @@ namespace emp {
         return val.fun;
       #else
         // If we are in debug mode, save the original datamap and double-check compatability.
-        return [fun=val.fun,&orig_layout=dm.GetLayout()](emp::DataMap & dm){
+        return [fun=val.fun,&orig_layout=dm.GetLayout()](const emp::DataMap & dm){
           emp_assert(dm.HasLayout(orig_layout));
           return fun(dm);
       };
