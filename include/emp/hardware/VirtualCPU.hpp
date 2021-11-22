@@ -18,6 +18,7 @@
 #include "../base/array.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../base/unordered_map.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "../io/File.hpp"
