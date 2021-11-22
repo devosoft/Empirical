@@ -133,8 +133,26 @@ TEST_CASE("Test string_utils", "[tools]")
 
   CHECK(emp::is_digits("391830581734"));
   CHECK(!emp::is_digits("3h91830581734"));
+  CHECK(!emp::is_digits("3.14"));
+  CHECK(!emp::is_digits("8.5e-6"));
+  CHECK(!emp::is_digits("9e27"));
+
+  CHECK(emp::is_number("391830581734"));
+  CHECK(!emp::is_number("3h91830581734"));
+  CHECK(emp::is_number("3.14"));
+  CHECK(emp::is_number("8.5e-6"));
+  CHECK(emp::is_number("9e27"));
+  CHECK(!emp::is_number("e"));
+  CHECK(!emp::is_number("-.e"));
+  CHECK(!emp::is_number("-4.5e"));
+  CHECK(emp::is_number("-4.5e+4"));
+  CHECK(!emp::is_number("."));
+  CHECK(emp::is_number(".1"));
+  CHECK(!emp::is_number("1."));
+
   CHECK(emp::is_alphanumeric("39adg18af3tj05ykty81734"));
   CHECK(!emp::is_alphanumeric("39adg18af?3tj05ykty81734"));
+
   CHECK(emp::is_literal_char("'f'"));
   CHECK(emp::is_literal_char("' '"));
   CHECK(!emp::is_literal_char("f"));
