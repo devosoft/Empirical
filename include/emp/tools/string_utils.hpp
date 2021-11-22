@@ -13,7 +13,7 @@
  *    -- CLASSIFICATION --
  *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
  *    bool is_literal_char(const std::string & value)
- *    bool is_literal_string(const std::string & value)
+ *    bool is_literal_string(const std::string & value, type="\"")
  *    bool is_composed_of(const std::string & test_str, const std::string & char_set)
  *    bool is_digits(const std::string & test_str)
  *    bool is_number(const std::string & test_str)
@@ -251,28 +251,34 @@ namespace emp {
   
 
   /// Test if an input string is properly formated as a literal string.
-  static inline bool is_literal_string(const std::string & value) {
-    // A literal string must begin and end with a double quote and contain only valid characters.
-    if (value.size() < 2) return false;
-    if (value[0] != '"' || value.back() != '"') return false;
+  static inline bool is_literal_string(const std::string & value,
+                                       const std::string & quote_marks="\"") {
+    if (value.size() < 2) return false;               // Two short to contain even quote marks!
+    char quote = value[0];
+    if (!is_one_of(quote, quote_marks)) return false; // Must be working with allowed quote mark.
+    if (value.back() != quote) return false;          // Must use same quote at front and back.
 
     // Are all of the characters valid?
     for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == '"') return false;  // Cannot have a raw double-quote in the middle.
-      if (value[pos] == '\\') {
-        if (pos == value.size()-2) return false;  // Backslash must have char to escape.
+      if (value[pos] == quote) return false;          // Cannot have a raw quote in the middle.
+      if (value[pos] == '\\') {                       // Allow escaped characters...
+        if (pos == value.size()-2) return false;      // Backslash must have char to escape.
 
-        // Move to the next char and make sure it's legal to be escaped.
+        // Move to the next char and make sure it is legal to be escaped.
         // @CAO Expand on options!
         pos++;
         switch (value[pos]) {
+          case 'b':   // Backspace
+          case 'f':   // Form feed
           case 'n':   // Newline
           case 'r':   // Return
           case 't':   // Tab
+          case 'v':   // Vertical tab.
           case '0':   // Empty (character 0)
           case '\\':  // Backslash
           case '"':   // Double quote
           case '\'':  // Single quote
+          case '`':   // Back quote
             continue;
           default:
             return false;
@@ -287,14 +293,17 @@ namespace emp {
   }
 
   /// Test if an input string is properly formated as a literal string.
-  static inline std::string diagnose_literal_string(const std::string & value) {
+  static inline std::string diagnose_literal_string(const std::string & value,
+                                                    const std::string & quote_marks="\"") {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (value.size() < 2) return "Too short!";
-    if (value[0] != '"' || value.back() != '"') return "Must begin an end in quotes.";
+    char quote = value[0];
+    if (!is_one_of(quote, quote_marks)) return "Must begin an end in quotes.";
+    if (value.back() != quote) return "Begin and end quotes must match.";
 
     // Are all of the characters valid?
     for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == '"') return "Has a floating double quote.";  // Cannot have a raw double-quote in the middle.
+      if (value[pos] == quote) return "Has a floating quote.";
       if (value[pos] == '\\') {
         if (pos == value.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
 
@@ -302,13 +311,17 @@ namespace emp {
         // @CAO Expand on options!
         pos++;
         switch (value[pos]) {
+          case 'b':   // Backspace
+          case 'f':   // Form feed
           case 'n':   // Newline
           case 'r':   // Return
           case 't':   // Tab
+          case 'v':   // Vertical tab.
           case '0':   // Empty (character 0)
           case '\\':  // Backslash
           case '"':   // Double quote
           case '\'':  // Single quote
+          case '`':   // Back quote
             continue;
           default:
             return "Unknown escape charater.";
@@ -372,10 +385,17 @@ namespace emp {
     return (pos == str.size()) && has_digit(str);
   }
 
-  /// Determine if there are any letters or digits anywhere in a string.
+  /// Determine if string is only letters or digits.
   inline bool is_alphanumeric(const std::string & str) {
+    if (str.size() == 0) return false;      // If string is empty, there are NO characters.
+    return AlphanumericCharSet().Has(str);  // Otherwise return false if any character is not a digit.
+  }
+
+  /// Determine if string is only letters, digits, or underscore ('_').
+  inline bool is_identifier(const std::string & str) {
     if (str.size() == 0) return false;   // If string is empty, there are NO characters.
-    return AlphanumericCharSet().Has(str);      // Otherwise return false if any character is not a digit.
+    if (is_digit(str[0])) return false;  // Identifiers cannot begin with a number.
+    return IDCharSet().Has(str);         // Otherwise return false if any character is not a digit.
   }
 
   /// Determine if a specified set of characters appears anywhere in a string.
@@ -667,10 +687,12 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  static inline std::string from_literal_string(const std::string & value) {
-    emp_assert(is_literal_string(value), value, diagnose_literal_string(value));
-    // Given the assert, we can assume the string DOES contain a literal representation,
-    // and we just need to convert it.
+  static inline std::string from_literal_string(const std::string & value,
+                                                [[maybe_unused]] const std::string & quote_marks="\"")
+  {
+    emp_assert(is_literal_string(value, quote_marks),
+               value, diagnose_literal_string(value, quote_marks));
+    // Given the assert, assume string DOES contain a literal string representation.
 
     std::string out_string;
     out_string.reserve(value.size()-2);  // Make a guess on final size.
@@ -686,9 +708,12 @@ namespace emp {
       pos++;
 
       switch (value[pos]) {
+        case 'b': out_string.push_back('\b'); break;   // Backspace
+        case 'f': out_string.push_back('\f'); break;   // Form feed
         case 'n': out_string.push_back('\n'); break;   // Newline
         case 'r': out_string.push_back('\r'); break;   // Return
         case 't': out_string.push_back('\t'); break;   // Tab
+        case 'v': out_string.push_back('\v'); break;   // Vertical tab
         case '0': out_string.push_back('\0'); break;   // Empty (character 0)
         case '\\': out_string.push_back('\\'); break;  // Backslash
         case '"': out_string.push_back('"'); break;    // Double quote
