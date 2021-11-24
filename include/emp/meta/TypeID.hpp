@@ -493,10 +493,16 @@ namespace emp {
 
   /// Setup a bunch of standard type names to be more readable.
   void SetupTypeNames() {
-
-    // Built-in types.
     GetTypeID<void>().SetName("void");
 
+    // Probably replaced later, but good to have for systems where it's not.
+    GetTypeID<size_t>().SetName("size_t");
+    GetTypeID<long>().SetName("long");
+    GetTypeID<long long>().SetName("long long");
+    GetTypeID<unsigned long>().SetName("unsigned long");
+    GetTypeID<unsigned long long>().SetName("unsigned long long");
+
+    // Main built-in types.
     GetTypeID<bool>().SetName("bool");
     GetTypeID<double>().SetName("double");
     GetTypeID<float>().SetName("float");
