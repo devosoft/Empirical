@@ -74,7 +74,7 @@ namespace emp {
     /// Determine if we have an ID.
     bool HasID(size_t id) const { return emp::Has(setting_map, id); }
 
-    /// Detemine if we have the correct type of a specific variable ID.
+    /// Determine if we have the correct type of a specific variable ID.
     template <typename T>
     bool IsType(size_t id) const {
       emp_assert(Has(setting_map, id), id);
@@ -95,6 +95,15 @@ namespace emp {
     emp::TypeID GetType(size_t id) const {
       emp_assert(HasID(id), id);
       return setting_map.find(id)->second.type;
+    }
+
+    /// Determine is entry is some form of numeric type.
+    bool IsNumeric(size_t id) const {
+      return GetType(id).IsArithmetic();
+    }
+
+    bool IsNumeric(const std::string & name) const {
+      return IsNumeric(GetID(name));
     }
 
     /// Prevent this layout from being modified.
