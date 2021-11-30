@@ -31,6 +31,9 @@ namespace emp {
 
     void SetDataMap(emp::DataMap & in_dm) { data_map = in_dm; }
 
+    emp::DataLayout & GetDataLayout() { return data_map.GetLayout(); }
+    const emp::DataLayout & GetDataLayout() const { return data_map.GetLayout(); }
+
     bool HasTraitID(size_t id) const { return data_map.HasID(id); }
     bool HasTrait(const std::string & name) const { return data_map.HasName(name); }
     template <typename T>
