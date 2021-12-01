@@ -254,7 +254,7 @@ namespace emp {
     }
 
     /// Helpers for parsing.
-    ValueType ParseValue(const DataMap & dm, pos_t & pos) {
+    ValueType ParseValue(const DataLayout & layout, pos_t & pos) {
       if constexpr (verbose) {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
@@ -264,7 +264,7 @@ namespace emp {
         if constexpr (verbose) std::cout << "Found UNARY OP: " << pos->lexeme << std::endl;
         auto op = unary_ops[pos->lexeme];
         ++pos;
-        ValueType val = ParseValue(dm, pos);
+        ValueType val = ParseValue(layout, pos);
         if (val.type == ValueType::VALUE) { return op(val.value); }
         else { return (value_fun_t) [fun=val.fun,op](const emp::DataMap & dm){ return op(fun(dm)); }; }
       }
@@ -273,7 +273,7 @@ namespace emp {
       if (pos->lexeme == "(") {
         if constexpr (verbose) std::cout << "Found: OPEN PAREN" << std::endl;
         ++pos;
-        ValueType val = ParseMath(dm, pos);
+        ValueType val = ParseMath(layout, pos);
         if (pos->lexeme != ")") return AddError("Expected ')', but found '", pos->lexeme, "'.");
         ++pos;
         return val;
@@ -298,7 +298,7 @@ namespace emp {
         ++pos;
         emp::vector<ValueType> args;
         while(pos->lexeme != ")") {
-          args.push_back(ParseMath(dm, pos));
+          args.push_back(ParseMath(layout, pos));
           if (pos->lexeme == ",") ++pos;
         }
         ++pos;
@@ -334,15 +334,15 @@ namespace emp {
         return out_fun;
       }
 
-      // This must be a DataMap entry name.
-      if (!dm.HasName(name)) AddError("Unknown data map entry '", name, "'.");
-      size_t id = dm.GetID(name);
+      // This must be a DataLayout entry name.
+      if (!layout.HasName(name)) AddError("Unknown data map entry '", name, "'.");
+      size_t id = layout.GetID(name);
       dm_names.insert(name);    // Store this name in the list of those used.
       return (value_fun_t) [id](const emp::DataMap & dm){ return dm.GetAsDouble(id); };
     }
 
-    ValueType ParseMath(const DataMap & dm, pos_t & pos, size_t prec_limit=0) {
-      ValueType val1 = ParseValue(dm, pos);
+    ValueType ParseMath(const DataLayout & layout, pos_t & pos, size_t prec_limit=0) {
+      ValueType val1 = ParseValue(layout, pos);
 
       if constexpr (verbose) {
         if (pos.IsValid()) {
@@ -358,7 +358,7 @@ namespace emp {
           const BinaryOperator & op = binary_ops[pos->lexeme];
           if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
           ++pos;
-          ValueType val2 = ParseMath(dm, pos, op.prec);
+          ValueType val2 = ParseMath(layout, pos, op.prec);
           if (val1.type == ValueType::VALUE) {
             if (val2.type == ValueType::VALUE) { val1 = op.fun(val1.value, val2.value); }
             else {
@@ -392,12 +392,12 @@ namespace emp {
     /// that takes a datamap (of the example type) loads in the values of "foo" and "bar", and
     /// returns the result of the above equation.
 
-    value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
+    value_fun_t BuildMathFunction(const DataLayout & layout, const std::string & expression) {
       emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
       if constexpr (verbose) tokens.Print();
       dm_names.clear();    // Reset the names used from data map.
       pos_t pos = tokens.begin();
-      ValueType val = ParseMath(dm, pos);
+      ValueType val = ParseMath(layout, pos);
 
       // If this value is fixed, turn it into a function.
       if (val.type == ValueType::VALUE) {
@@ -409,7 +409,7 @@ namespace emp {
         return val.fun;
       #else
         // If we are in debug mode, save the original datamap and double-check compatability.
-        return [fun=val.fun,&orig_layout=dm.GetLayout()](const emp::DataMap & dm){
+        return [fun=val.fun,&orig_layout=layout](const emp::DataMap & dm){
           emp_assert(dm.HasLayout(orig_layout));
           return fun(dm);
       };
