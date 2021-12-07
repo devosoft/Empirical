@@ -37,6 +37,7 @@ namespace emp {
         if(nop_vec[0] == inst_lib_t::GetID("NopB")) return 1;
         if(nop_vec[0] == inst_lib_t::GetID("NopC")) return 2;
         else emp_error("Invalid nop!");
+        return 0;
       }
       else return default_idx;
     }
@@ -106,12 +107,12 @@ namespace emp {
       // TODO: Handle input
     }
     static void Inst_H_Alloc(hardware_t & hw, const inst_t & inst) {
-      hw.genome_working.resize(hw.genome.size() * 2);
+      hw.genome_working.resize(hw.genome.size() * 2, 0);
       hw.regs[0] = hw.genome.size();
     }
     static void Inst_H_Divide(hardware_t & hw, const inst_t & inst) {
       if(hw.read_head >= hw.genome.size()){
-        hw.genome_working.resize(hw.read_head);
+        hw.genome_working.resize(hw.read_head, 0);
         hw.ResetHardware();
         hw.inst_ptr = hw.genome.size() - 1;
       }
@@ -249,10 +250,10 @@ namespace emp {
         inst_lib.AddInst("ScopeReg", Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
       */
 
-        for (size_t i = 0; i < hardware_t::NUM_REGS; i++) {
-          inst_lib.AddArg(to_string((int)i), i);                   // Args can be called by value
-          inst_lib.AddArg(to_string("Reg", 'A'+(char)i), i);  // ...or as a register.
-        }
+        //for (size_t i = 0; i < hardware_t::NUM_REGS; i++) {
+        //  inst_lib.AddArg(to_string((int)i), i);                   // Args can be called by value
+        //  inst_lib.AddArg(to_string("Reg", 'A'+(char)i), i);  // ...or as a register.
+        //}
       }
 
       return inst_lib;
