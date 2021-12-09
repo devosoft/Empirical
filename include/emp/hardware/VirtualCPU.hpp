@@ -9,7 +9,6 @@
  *
  *  @TODO
  *    - Figure out how to default instructions
- *    - Does ResetHardware reset working genome? 
  *    - Should PushInst update labels?
  *      - SetInst
  *    - Rename nop and label methods
@@ -281,6 +280,7 @@ namespace emp{
         read_head = 0;
         write_head = 0;
         copied_inst_id_vec.clear();
+        genome_working = genome;
        }
       /// Reset the entire CPU to a starting state, without a genome.
       void Reset() {
@@ -289,26 +289,41 @@ namespace emp{
         ResetHardware();     // Reset the full hardware
       }
       void CurateNops(){ 
-        if(!are_nops_counted) CountNops();
-        label_idx_vec.clear();
-        size_t nop_idx = 0;
-        size_t nop_id = 0;
         bool label_inst_present = GetInstLib()->IsInst("Label");
         size_t label_inst_id = label_inst_present ? GetInstLib()->GetID("Label") : 0;
-        for(size_t inst_idx = 0; inst_idx < genome_working.GetSize(); ++inst_idx){
-          genome_working[inst_idx].nop_vec.clear();
-          if(label_inst_present && (genome_working[inst_idx].id == label_inst_id)){
-            label_idx_vec.push_back(inst_idx);
-          }
-          for(size_t idx = 1; idx < genome_working.size(); ++idx){
-            nop_idx = (inst_idx + idx < genome_working.size()) ? 
-                inst_idx + idx : 
-                (inst_idx + idx) - genome_working.size();
-            nop_id = genome_working[nop_idx].id;
-            if(emp::Has(nop_id_to_idx_map, nop_id))
-              genome_working[inst_idx].nop_vec.push_back(nop_id_to_idx_map[nop_id]);
-            else 
-              break;
+
+        if(!are_nops_counted) CountNops();
+        label_idx_vec.clear();
+        // Start by filling the nop vector of the last instruction
+        for(size_t inst_idx = 0; inst_idx < genome_working.GetSize() - 1; ++inst_idx){
+          if(emp::Has(nop_id_to_idx_map, genome_working[inst_idx].id))
+            genome_working[genome_working.size() - 1].nop_vec.push_back(
+                genome_working[inst_idx].id);
+          else
+            break;
+        }
+        // If the last index is a label, record it! 
+        if(label_inst_present && 
+            (genome_working[genome_working.size() - 1].id == label_inst_id))
+          label_idx_vec.push_back(genome_working.size() - 1);
+        // Now iterate backward over the genome, filling in each instruction's nop vector
+        // Example, our genome looks like xyzabc where only a, b, and c are nops
+        // If we are on index 2 (z), we see it is followed by a nop. 
+        // Thus, we copy the next instruction into the nop vector [a]
+        // Then we copy THAT instruction's nop vector, too: [a,b,c]
+        // By going in reverse order, all following instructions already have a nop vec
+        size_t inst_idx = 0;
+        for(auto it = genome_working.rbegin() + 1; it != genome_working.rend(); ++it){
+          if(emp::Has(nop_id_to_idx_map, (it - 1)->id)){
+            it->nop_vec.resize( (it - 1)->nop_vec.size() + 1 );
+            it->nop_vec[0] = (it - 1)->id;
+            std::copy( 
+                (it - 1)->nop_vec.begin(), 
+                (it - 1)->nop_vec.end(), 
+                it->nop_vec.begin() + 1);
+           if(label_inst_present && (it->id == label_inst_id)) // Record pos if inst is label
+              label_idx_vec.push_back(inst_idx);
+           ++inst_idx;
           }
         }
         needs_nops_curated = false;
