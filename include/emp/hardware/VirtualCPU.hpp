@@ -9,7 +9,6 @@
  *
  *  @TODO
  *    - Figure out how to default instructions
- *    - Look into error tracking (does it just need removed?) 
  *    - Does ResetHardware reset working genome? 
  *    - Should PushInst update labels?
  *      - SetInst
@@ -100,8 +99,6 @@ namespace emp{
       size_t read_head;
       size_t write_head;
 
-      size_t errors;
-
       genome_t genome;
       genome_t genome_working;
       emp::vector<size_t> copied_inst_id_vec;
@@ -114,7 +111,7 @@ namespace emp{
       //// CONSTRUCTORS / DESTRUCTOR
       VirtualCPU(const genome_t & in_genome)
           : regs(), inputs(), outputs(), 
-          inst_ptr(0), flow_head(0), read_head(0), write_head(0), errors(0),
+          inst_ptr(0), flow_head(0), read_head(0), write_head(0),
           genome(in_genome), genome_working(in_genome){
         Initialize();
         ResetHardware();
@@ -283,7 +280,6 @@ namespace emp{
         flow_head = 0;
         read_head = 0;
         write_head = 0;
-        errors = 0;             // Clear all errors.
         copied_inst_id_vec.clear();
        }
       /// Reset the entire CPU to a starting state, without a genome.
