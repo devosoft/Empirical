@@ -23,23 +23,15 @@
  *  - The library user if the problem is due to mis-use of library functionality.
  *  - The library developers if something that should be impossible occurs.
  * 
- *  The content of this file is targeting the first two groups; library developers should use asserts
+ *  The content of this file primarily targets the first group; developers should prefer asserts
  *  to ensure that supposedly "impossible" situations do not occur.
  *
  *  NOTES:
- *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings,
- *    but can be responded to and don't automatically halt execution like errors.
- *  - Warnings should always detail what should be done differently to surpress the warning.
+ *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings
+ *    and can be responded to rather than automatically halting execution like errors.
+ *  - Warnings should always detail what should be done differently to surpress that warning.
  *
- *
- *  @todo We should move over to a pure replacement for exceptions.
- *    - Different types of exceptions can trigger a signal.  Actions should return a bool
- *      indicating whether the exception was fixed.
- *    - Remaining exceptions are recorded and passed back up the chain to (hopefully) be caught.
- *    - Uncaught exceptions should have a default behavior when Resolved.  Exceptions could have
- *      various resolve times: Next exception added, Next exception check, when ResolveExceptions()
- *      is run, End of program, or ASAP. (perhaps)
-*/
+ */
 
 #ifndef EMP_NOTIFY_HPP
 #define EMP_NOTIFY_HPP
@@ -67,7 +59,7 @@ namespace notify {
 
   /// Staticly stored data about current notifications.
   struct NotifyData {
-    std::unordered_map<std::string, response_t> except_handelers; // Specialty handlers for exceptions
+    std::unordered_map<std::string, response_t> except_handlers; // Specialty handlers for exceptions
     emp::vector<ExceptInfo> except_queue;                         // Unresolved exceptions
     std::array<response_t, (size_t) Type::NUM_TYPES> handlers;    // Default handlers for notifications
     std::array<bool, (size_t) Type::NUM_TYPES> exit_on;           // Should we exit on given msg type?
@@ -111,16 +103,17 @@ namespace notify {
   template <typename... Ts>
   static bool Notify(Type type, Ts... args) {
     NotifyData & data = GetData();
+    size_t type_id = (size_t) type;
 
     // Setup the message in a string stream.
     std::stringstream ss;
     ((ss << std::forward<Ts>(args)), ...);
 
     // Run the appropriate handler
-    bool result = data.handlers[type](ss.str());
+    bool result = data.handlers[type_id](ss.str());
 
     // Test if we are supposed to exit.
-    if (data.exit_on[type]) data.exit_handler(1);
+    if (data.exit_on[type_id]) data.exit_handler(1);
 
     // And return the success result.
     return result;
@@ -128,19 +121,19 @@ namespace notify {
 
   /// Send out a regular notification.
   template <typename... Ts>
-  static bool Message(Ts... args) { Notify(Type::MESSAGE, std::forward<Ts>(args)...); }
+  static bool Message(Ts... args) { return Notify(Type::MESSAGE, std::forward<Ts>(args)...); }
 
   /// Send out a DEBUG notification.
   template <typename... Ts>
-  static bool Debug(Ts... args) { Notify(Type::DEBUG, std::forward<Ts>(args)...); }
+  static bool Debug(Ts... args) { return Notify(Type::DEBUG, std::forward<Ts>(args)...); }
 
   /// Send out a notification of a WARNING.
   template <typename... Ts>
-  static bool Warning(Ts... args) { Notify(Type::WARNING, std::forward<Ts>(args)...); }
+  static bool Warning(Ts... args) { return Notify(Type::WARNING, std::forward<Ts>(args)...); }
 
   /// Send out a notification of an ERROR.
   template <typename... Ts>
-  static bool Error(Ts... args) { Notify(Type::ERROR, std::forward<Ts>(args)...); }
+  static bool Error(Ts... args) { return Notify(Type::ERROR, std::forward<Ts>(args)...); }
 
 
   /// Send out a notification of an Exception.
@@ -159,18 +152,18 @@ namespace notify {
 
     // If so, see if it can resolve the problem.
     if (it != data.except_handlers.end()) {
-      result = data.except_handelers[id](ss.str()); 
+      result = data.except_handlers[id](ss.str()); 
     }
 
     // If it's unresolved, try the default handler
     if (!result) {
-      result = data.handlers[Type::EXCEPTION](ss.str());
+      result = data.handlers[(size_t) Type::EXCEPTION](ss.str());
     }
 
     // If still unresolved, either give up or save the exception for later analysis.
     if (!result) {
-      if (data.exit_on[Type::EXCEPTION]) data.exit_handler(1);
-      data.except_queue.emplace_back{id, ss.str()};
+      if (data.exit_on[(size_t) Type::EXCEPTION]) data.exit_handler(1);
+      data.except_queue.push_back(ExceptInfo{id, ss.str()});
     }
 
     return result;
@@ -226,16 +219,19 @@ namespace notify {
   static void SetExitOnError(bool in=true) { GetData().exit_on[(size_t) Type::ERROR] = in; }
   static void SetExitOnException(bool in=true) { GetData().exit_on[(size_t) Type::EXCEPTION] = in; }
 
-  static void SetMessageHandler(response_t in) { GetData().handlers[Type::MESSAGE] = in; }
-  static void SetDebugHandler(response_t in) { GetData().handlers[Type::DEBUG] = in; }
-  static void SetWarningHandler(response_t in) { GetData().handlers[Type::WARNING] = in; }
-  static void SetErrorHandler(response_t in) { GetData().handlers[Type::ERROR] = in; }
-  static void SetExceptionHandler(response_t in) { GetData().handlers[Type::EXCEPTION] = in; }
+  template <typename FUN_T>
+  static void SetExitHandler(FUN_T in) { GetData().exit_handler = in; }
+
+  static void SetMessageHandler(response_t in) { GetData().handlers[(size_t) Type::MESSAGE] = in; }
+  static void SetDebugHandler(response_t in) { GetData().handlers[(size_t) Type::DEBUG] = in; }
+  static void SetWarningHandler(response_t in) { GetData().handlers[(size_t) Type::WARNING] = in; }
+  static void SetErrorHandler(response_t in) { GetData().handlers[(size_t) Type::ERROR] = in; }
+  static void SetExceptionHandler(response_t in) { GetData().handlers[(size_t) Type::EXCEPTION] = in; }
   static void SetExceptionHandler(const std::string & id, response_t in) {
-    GetData().except_handelers[id] = in;
+    GetData().except_handlers[id] = in;
   }
   static void ClearExceptionHandler(const std::string & id) {
-    GetData().except_handelers.erase(id);
+    GetData().except_handlers.erase(id);
   }
 
 }
