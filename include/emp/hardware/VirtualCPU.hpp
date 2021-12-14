@@ -4,11 +4,8 @@
  *  @date 2017-2021.
  *
  *  @file  VirtualCPU.hpp
- *  @brief This is a simple virtual CPU that can be extended into multiple architectures
- *    e.g., Avidians, Push, SignalGP
+ *  @brief A simple virtual CPU styled after the original and extended Avidian architectures. 
  *
- *  @TODO
- *    - Add docstrings
  */
 
 #ifndef EMP_VIRTUAL_CPU_H
