@@ -9,6 +9,7 @@
  *  @TODO
  *    - Expanded heads?
  *    - expanded_nop_args useful?
+ *    - Consider changing default return value for search functions
  *
  */
 
@@ -373,9 +374,10 @@ namespace emp{
        }
       /// Reset the entire CPU to a starting state, clearing the genome 
       void Reset() {
-        genome.resize(0,0);    // Clear out genome
-        genome_working.resize(0,0);    // Clear out genome
-        ResetHardware();     // Reset the full hardware
+        genome.resize(0,0);         // Clear out genome
+        genome_working.resize(0,0); // Clear out working genome
+        label_idx_vec.clear();      // No labels if genome is empty
+        ResetHardware();            // Reset the full hardware
       }
       /// Compile NOP instructions in genome into useful nop vectors for each instruction, 
       /// and records the position of all LABEL instructions
@@ -467,7 +469,7 @@ namespace emp{
         }
         return res_vec;
       }
-      /// Check if two vectors of NOP instructions (as indices) are identical
+      /// Check if a vector of NOP instructions is the same as the START of another vector 
       bool CompareNopSequences(const nop_vec_t& search_vec, const nop_vec_t& compare_vec){
         if(search_vec.size() > compare_vec.size()) return false;
         if(search_vec.size() == 0 || compare_vec.size() == 0) return false;
@@ -481,7 +483,7 @@ namespace emp{
       bool CheckIfLastCopied(const nop_vec_t& label){
         if(label.size() > copied_inst_id_vec.size()) return false;
         if(label.size() == 0) return false;
-        int idx = label.size() - 1;;
+        int idx = label.size() - 1;
         for(auto copied_it = copied_inst_id_vec.rbegin(); copied_it != copied_inst_id_vec.rend(); copied_it++){
           if(*copied_it != label[idx])
             return false;
@@ -502,19 +504,20 @@ namespace emp{
         if(start_local){
           bool start_found = false;
           for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
-            if(label_idx_vec[label_idx_vec.size() - offset - 1] <= inst_ptr){
+            if(label_idx_vec[label_idx_vec.size() - offset - 1] < inst_ptr){
+              start_label_vec_idx = label_idx_vec.size() - offset - 1;
               start_found = true;
               break;
             }
           }
           if(!start_found) start_label_vec_idx = label_idx_vec.size() - 1;
-          for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
-            const size_t idx = 
-              label_idx_vec[
-                (start_label_vec_idx - offset + label_idx_vec.size()) % label_idx_vec.size()
-              ];
-            if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
-          }
+        }
+        for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
+          const size_t idx = 
+            label_idx_vec[
+              (start_label_vec_idx - offset + label_idx_vec.size()) % label_idx_vec.size()
+            ];
+          if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
         }
         return inst_ptr;
       }
@@ -525,22 +528,22 @@ namespace emp{
       /// start of the genome
       /// @param reverse If true, traverse the genome backward. If false, traverse forward
       size_t FindLabel(bool start_local, bool reverse = false){
-        if(reverse) FindLabel_Reverse(start_local);
+        if(reverse) return FindLabel_Reverse(start_local);
         const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
         size_t start_label_vec_idx = 0;
         if(start_local){
           bool start_found = false;
           for(; start_label_vec_idx < label_idx_vec.size(); ++start_label_vec_idx){
-            if(label_idx_vec[start_label_vec_idx] >= inst_ptr){
+            if(label_idx_vec[start_label_vec_idx] > inst_ptr){
               start_found = true;
               break;
             }
           }
           if(!start_found) start_label_vec_idx = 0;
-          for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
-            const size_t idx = label_idx_vec[(start_label_vec_idx + offset) % label_idx_vec.size()];
-            if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
-          }
+        }
+        for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
+          const size_t idx = label_idx_vec[(start_label_vec_idx + offset) % label_idx_vec.size()];
+          if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
         }
         return inst_ptr;
       }
@@ -550,7 +553,7 @@ namespace emp{
       /// @param search_vec The sequence of NOP instructions to search for
       /// @param start_idx Position in the genom to start the search 
       size_t FindNopSequence_Reverse(const nop_vec_t& search_vec, size_t start_idx){
-        for(size_t offset = 0; offset < genome_working.size(); ++offset){
+        for(size_t offset = 1; offset < genome_working.size() + 1; ++offset){
           const size_t idx = (start_idx - offset + genome_working.size()) % genome_working.size();
           if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
         }
@@ -563,8 +566,8 @@ namespace emp{
       /// @param start_local If true, search from instruction pointer. If false, search from 
       /// start of the genome
       size_t FindNopSequence_Reverse(const nop_vec_t& search_vec, bool start_local){
-        size_t start_idx = genome_working.size() - 1;
-        if(start_local && inst_ptr != 0) start_idx = inst_ptr - 1;
+        size_t start_idx = 0;
+        if(start_local && inst_ptr != 0) start_idx = inst_ptr;
         return FindNopSequence_Reverse(search_vec, start_idx);
       }
       /// Search up the genome (backward) for a sequence of NOP instructions 
@@ -583,8 +586,8 @@ namespace emp{
       /// @param start_idx Position in the genom to start the search 
       size_t FindNopSequence(const nop_vec_t& search_vec, size_t start_idx, 
           bool reverse = false){
-        if(reverse) FindNopSequence_Reverse(search_vec, start_idx);
-        for(size_t offset = 0; offset < genome_working.size(); ++offset){
+        if(reverse) return FindNopSequence_Reverse(search_vec, start_idx);
+        for(size_t offset = 1; offset < genome_working.size() + 1; ++offset){
           const size_t idx = (start_idx + offset) % genome_working.size(); 
           if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
         }
@@ -599,8 +602,8 @@ namespace emp{
       /// @param reverse If true, traverse the genome backward. If false, traverse forward
       size_t FindNopSequence(const nop_vec_t& search_vec, bool start_local, 
           bool reverse = false){
-        size_t start_idx = 0;
-        if(start_local) start_idx = inst_ptr + 1;
+        size_t start_idx = genome_working.size() - 1;
+        if(start_local) start_idx = inst_ptr;
         return FindNopSequence(search_vec, start_idx, reverse);
       }
       /// Search up the genome (backward) for a sequence of NOP instructions 
@@ -649,7 +652,7 @@ namespace emp{
         AdvanceIP();
       }
       /// Process the next SERIES of instructions, directed by the instruction pointer.
-      void Process(size_t num_inst, bool verbose) { 
+      void Process(size_t num_inst = 1, bool verbose = true) { 
         for (size_t i = 0; i < num_inst; i++) SingleProcess(verbose); 
       }
     
@@ -693,7 +696,6 @@ namespace emp{
         for(size_t reg_idx = 0; reg_idx < regs.size(); ++reg_idx){
           ostr << "[" << reg_idx << "] " << regs[reg_idx] << std::endl;
         }
-        ostr << std::endl;
       }
   
   }; // End VirtualCPU class

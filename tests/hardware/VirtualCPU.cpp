@@ -7,154 +7,14 @@
 #include <sstream>
 #include <iostream>
 
-/*
-  Variables:
-    [ ] NUM_STACKS is actually used
-    [ ] Number of registers can be set
-    [ ] Number of registers can be changed 
-    [ ] Number of nops can be set
-    [ ] Number of nops can be changed 
-    [ ] We map the nops to their indices (and back) correctly
-    [ ] *INSTRUCTIONS struct
-      [ ] Constructors assign values correctly
-      [ ] Comparison operators work correctly
-      [ ] Set functions as expected
-      [ ] Defaults???
-      [ ] Args???
-    [ ] Correct number of registers is initialized 
-    [ ] Correct number of inputs are initialized
-    [ ] Correct number of outputs are initialized
-    [ ] Correct number of stacks are initialized
-    [ ] We default to the first stack
-    [ ] Heads are initialized to the start of the genome:
-      [ ] IP
-      [ ] Read 
-      [ ] Write
-      [ ] Flow
-      [ ] Expanded heads
-    [ ] Genome is initialized by constructor?
-    [ ] Working genome is based on the actual genoem
-    [ ] Copied instructions are initially non-existent
-    [ ] We have no labels by default
-    [ ] Nops need curated by default
-    [ ] Default to NON-expanded nop set
-
-   Constructors:
-    [ ] Variables are initialized as expected (see above)
-    [ ] First constructor sets the genome appropriately
-    [ ] Default constructor gives us a default genome (which is???)
-    [ ] Copy constructor functions as expected (defaults???)
-    [ ] Move constructor functions as expected
-   
-   Methods:
-    [ ] GetSize returns genome size
-    [ ] Reset heads resets:
-      [ ] Registers
-      [ ] Heads
-      [ ] Stacks
-      [ ] Inputs
-      [ ] Outputs
-      [ ] Working genome ???
-      [ ] Copied instructions
-    [ ] Reset
-      [ ] ResetHardware
-      [ ] Reset genome
-      [ ] Reset working genome
-      [ ] Labels
-    [ ] SetInptuts sets ALL inputs
-    [ ] GetOutputs returns ALL outputs 
-    [ ] GetInstLib returns correct pointer to instruction library
-    [ ] PushInst adds the instruction to the end of the genome AND working genome
-      [ ] Update labels?
-      [ ] By index 
-      [ ] By name
-      [ ] By copy
-      [ ] By copy (multiple times)
-    [ ] PushDefaultInst pushes the first instruction in the library
-      [ ] Update labels?
-    [ ] ResetIP resets IP to 0
-    [ ] AdvanceIP moves IP forward and wraps around genome end if needed
-    [ ] SetIP assigns IP to certain location and wraps around genome end if needed
-    [ ] ResetRH resets RH to 0
-    [ ] AdvanceRH moves RH forward and wraps around genome end if needed
-    [ ] ResetRH resets RH to 0
-    [ ] AdvanceWH moves WH forward and wraps around genome end if needed
-    [ ] ResetWH resets WH to 0
-    [ ] AdvanceWH moves WH forward and wraps around genome end if needed
-    [ ] ResetFH resets FH to 0
-    [ ] AdvanceFH moves FH forward and wraps around genome end if needed
-    [ ] SetFH assigns FH to certain location and wraps around genome end if needed
-    [ ] ResetModdedHead resets head to 0
-    [ ] AdvanceModdedHead moves head forward and wraps around genome end if needed
-    [ ] SetModdedHead assigns head to certain location and wraps around genome end if needed
-    [ ] GetComplementIdx returns the complement of a single nop 
-      [ ] Standard nops
-      [ ] Expanded nops
-    [ ] GetComplementLabel returns the complemented sequences of nops (rename) 
-      [ ] Standard nops
-      [ ] Expanded nops
-    [ ] CompareSequences determines if two nop vectors are identical
-      [ ] Check length too!
-    [ ] Find label searches for a nop sequence starting a particular index
-    [ ] Find complement searches for the complement of a nop sequence, starting at a given idx
-    [ ] CheckIfLastCopied only returns true if the nop vector was the last thing copied
-    [ ] CheckIfLastCopiedComplement does ^ but for the complement of the nop vector
-    [ ] FindMarkedLabel will search for the nop string at the current genome index
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] reverse parameter reverses search direction
-      [ ] Only looks at labels
-    [ ] FindMarkedLabel_Reverse will search backwardfor the nop string at the current 
-        genome index
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] Only looks at labels
-    [ ] FindSequences functions as FindLabel but looks at all nops, not just labels
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] reverse parameter reverses search direction
-    [ ] FindSequences_Reverse functions as FindLabel but looks at all nops, not just labels
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] Only looks at labels
-    [ ] StackPush pushes the register value onto the active stack
-    [ ] StackPop pops the top value of the active stack and stores it in a register
-    [ ] StackSwap actually swaps the active stack
-    [ ] CurateNops
-      [ ] Counts nops if needed
-      [ ] Finds all labels
-      [ ] Add nops to preceeding instructions nop_vec
-      [ ] Wraps?
-      [ ] Sets boolean flag to false
-    [ ] CountNops
-      [ ] Calculates the number of nops
-      [ ] Maps nop ids to indices
-      [ ] Maps nop indices to ids
-    [ ] ExpandRegisters
-      [ ] Count nops if needed
-      [ ] Sets num_regs variable
-      [ ] Resizes register vector
-    [ ] SingleProcess
-      [ ] Do bookkeeping as needed based on flags
-      [ ] Process the next instruction
-      [ ] Auto-advance IP?
-    [ ] Process
-      [ ] Calls SingleProcess N times
-    [ ] GetRandomInst returns a random instruction within the instruction library
-    [ ] SetInst overwrites an instruction in the genome/working genome
-      [ ] Recalcuates labels/nops?
-    [ ] RandomizeInst calls SetInst on the genome position, but with a random instruction
-    [ ] GetString returns a string representation of the working genome
-    [ ] GetOriginalString returns a string representation of the (non-working) genome
-    [ ] Print details dumps registers and such to the stream
-    [ ] Load 
-      [ ] Loads genome from a stream
-      [ ] That stream can be a file
-*/
-
-/*
+/* TODO
   [ ] *INSTRUCTIONS struct
     [ ] Constructors assign values correctly
     [ ] Comparison operators work correctly
     [ ] Set functions as expected
     [ ] Defaults???
     [ ] Args???
+  [ ] Expanded heads???
 */
 
 // VirtualCPU is currently constructed to always be derived from.
@@ -423,46 +283,61 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
     [X] Default constructor gives us a default genome (empty)
     [X] Genome constructor sets genome/working genome 
     [X] Copy constructor functions as expected 
-    [ ] Move constructor functions as expected
+    [X] Move constructor functions as expected
     [X] Working genome is based on the actual genome
-    [ ] Variables are initialized as expected for each constructor (see above)
+    [X] Variables are initialized as expected for each constructor (see above)
       [X] All defaults for default constructor
       [X] All but genome/working genome defaults for genome constructor
       [X] All variables copied over for copy constructor
-      [ ] All variables moved for move constructor
+      [X] All variables moved for move constructor
   */
 }
 TEST_CASE("VirtualCPU_Getters", "[Hardware]") {
-  Derived cpu;
-  // Basic getters
-  CHECK(cpu.GetNumRegs() == 3);
-  CHECK(cpu.GetNumRegs() == cpu.regs.size()); 
-  CHECK(cpu.GetNumNops() == 3);
-  // Genome getters
-  CHECK(cpu.GetGenomeSize() == 0);
-  CHECK(cpu.GetWorkingGenomeSize() == 0);
-  emp::Random random(1000);
-  cpu.PushRandom(random, 10);
-  CHECK(cpu.GetGenomeSize() == 10);
-  CHECK(cpu.GetWorkingGenomeSize() == 10);
-  cpu.genome_working.push_back(cpu.GetRandomInst(random));
-  CHECK(cpu.GetGenomeSize() == 10);
-  CHECK(cpu.GetWorkingGenomeSize() == 11);
-  // Outputs
-  CHECK(cpu.GetOutputs().size() == 0);
-  for(size_t idx = 0; idx < 5; ++idx) cpu.outputs[idx] = idx * idx;
-  CHECK(cpu.GetOutputs().size() == 5);
-  for(size_t idx = 0; idx < 5; ++idx) CHECK(cpu.outputs[idx] == idx * idx);
-  // Instruction library 
-  CHECK(cpu.GetInstLib().Raw() == &Derived::inst_lib_t::DefaultInstLib()); 
-
+  { // Default case
+    Derived cpu;
+    // Basic getters
+    CHECK(cpu.GetNumRegs() == 3);
+    CHECK(cpu.GetNumRegs() == cpu.regs.size()); 
+    CHECK(cpu.GetNumNops() == 3);
+    // Genome getters
+    CHECK(cpu.GetGenomeSize() == 0);
+    CHECK(cpu.GetWorkingGenomeSize() == 0);
+    emp::Random random(1000);
+    cpu.PushRandom(random, 10);
+    CHECK(cpu.GetGenomeSize() == 10);
+    CHECK(cpu.GetWorkingGenomeSize() == 10);
+    cpu.genome_working.push_back(cpu.GetRandomInst(random));
+    CHECK(cpu.GetGenomeSize() == 10);
+    CHECK(cpu.GetWorkingGenomeSize() == 11);
+    // Outputs
+    CHECK(cpu.GetOutputs().size() == 0);
+    for(size_t idx = 0; idx < 5; ++idx) cpu.outputs[idx] = idx * idx;
+    CHECK(cpu.GetOutputs().size() == 5);
+    for(size_t idx = 0; idx < 5; ++idx) CHECK(cpu.outputs[idx] == idx * idx);
+    // Instruction library 
+    CHECK(cpu.GetInstLib().Raw() == &Derived::inst_lib_t::DefaultInstLib()); 
+  }
+  {
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("NopE", Derived::inst_lib_t::Inst_NopC, 0, "No-operation E");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // Basic getters
+    CHECK(cpu.GetNumRegs() == 5);
+    CHECK(cpu.GetNumRegs() == cpu.regs.size()); 
+    CHECK(cpu.GetNumNops() == 5);
+  }
   /*
-    [ ] GetNumNops returns 
+    [X] GetNumNops returns 
       [X] 3 by default
-      [ ] Something else if we stuff more nops in the instruction set
-    [ ] GetNumRegs returns 
+       [X] Something else if we stuff more nops in the instruction set
+    [X] GetNumRegs returns 
       [X] 3 by default
-      [ ] Something else if we stuff more nops in the instruction set
+      [X] Something else if we stuff more nops in the instruction set
     [X] GetGenomeSize returns original genome size
     [X] GetWorkingGenomeSize returns working genome size
     [X] GetOutputs returns ALL outputs 
@@ -903,6 +778,7 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
         CHECK(cpu.write_head == 0); // All heads default to 0
         CHECK(cpu.flow_head == 0);  // All heads default to 0
         CHECK(cpu.copied_inst_id_vec.size() == 0); // No instructions copied
+        CHECK(cpu.label_idx_vec.size() == 0); // No labels in empty genome
     }
   }
   { // CountNops and ExpandRegisters
@@ -1028,11 +904,11 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
       [X] Outputs
       [X] Working genome ???
       [X] Copied instructions
-    [ ] Reset
+    [X] Reset
       [X] ResetHardware
       [X] Reset genome
       [X] Reset working genome
-      [ ] Labels
+      [X] Labels
     [X] CurateNops
       [X] Counts nops if needed
       [X] Finds all labels
@@ -1049,141 +925,583 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
   */
 }
 TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
+  { // GetComplementIdx
+    { // Standard instruction set
+      Derived cpu;
+      CHECK(cpu.GetComplementNop(0) == 1); // A->B
+      CHECK(cpu.GetComplementNop(1) == 2); // B->C
+      CHECK(cpu.GetComplementNop(2) == 0); // C->A
+    }
+    { // Extended instruction set
+      Derived::inst_lib_t inst_lib;
+      inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+      inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+      inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+      inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+      inst_lib.AddInst("NopE", Derived::inst_lib_t::Inst_NopC, 0, "No-operation E");
+      Derived::genome_t genome = Derived::genome_t(inst_lib);
+      Derived cpu(genome);
+      CHECK(cpu.GetComplementNop(0) == 1); // A->B
+      CHECK(cpu.GetComplementNop(1) == 2); // B->C
+      CHECK(cpu.GetComplementNop(2) == 3); // C->D
+      CHECK(cpu.GetComplementNop(3) == 4); // D->E
+      CHECK(cpu.GetComplementNop(4) == 0); // E->A
+    }
+  }
+  { // GetComplementLabel
+    { // Standard instruction set
+      Derived cpu;
+      emp::vector<size_t> v {2, 1, 0, 0, 2, 1};
+      emp::vector<size_t> res = cpu.GetComplementNopSequence(v);
+      CHECK(res[0] == 0); // C->A
+      CHECK(res[1] == 2); // B->C
+      CHECK(res[2] == 1); // A->B
+      CHECK(res[3] == 1); // A->B
+      CHECK(res[4] == 0); // C->A
+      CHECK(res[5] == 2); // B->C
+    }
+    { // Extended instruction set
+      Derived::inst_lib_t inst_lib;
+      inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+      inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+      inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+      inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+      inst_lib.AddInst("NopE", Derived::inst_lib_t::Inst_NopC, 0, "No-operation E");
+      Derived::genome_t genome = Derived::genome_t(inst_lib);
+      Derived cpu(genome);
+      emp::vector<size_t> v {2, 1, 0, 0, 2, 1, 3, 4, 3, 1, 4};
+      emp::vector<size_t> res = cpu.GetComplementNopSequence(v);
+      CHECK(res[0] == 3); // C->D
+      CHECK(res[1] == 2); // B->C
+      CHECK(res[2] == 1); // A->B
+      CHECK(res[3] == 1); // A->B
+      CHECK(res[4] == 3); // C->D
+      CHECK(res[5] == 2); // B->C
+      CHECK(res[6] == 4); // D->E
+      CHECK(res[7] == 0); // E->A
+      CHECK(res[8] == 4); // D->E
+      CHECK(res[9] == 2); // B->C
+      CHECK(res[10] ==0); // E->A
+    }
+  }
+  { // CompareNopSequences
+    // Note: here we only use three nops. However, this code is dealing solely with size_ts so
+    //    it should generalize (there are no checks on if the nop is invalid)
+    Derived cpu;
+    // Perfect match
+    emp::vector<size_t> v_1_a {0, 1, 2, 1, 0 };
+    emp::vector<size_t> v_1_b {0, 1, 2, 1, 0 };
+    CHECK(cpu.CompareNopSequences(v_1_a, v_1_b));
+    // Second vector can be longer than first
+    emp::vector<size_t> v_2_a {0, 1, 2, 1, 0 };
+    emp::vector<size_t> v_2_b {0, 1, 2, 1, 0, 1, 2 };
+    CHECK(cpu.CompareNopSequences(v_2_a, v_2_b));
+    // First vector CANNOT be longer than second
+    emp::vector<size_t> v_3_a {0, 1, 2, 1, 0, 1, 2 };
+    emp::vector<size_t> v_3_b {0, 1, 2, 1, 0 };
+    CHECK(!cpu.CompareNopSequences(v_3_a, v_3_b));
+    // First vector CANNOT be empty
+    emp::vector<size_t> v_4_a { };
+    emp::vector<size_t> v_4_b {0, 1, 2, 1, 0 };
+    CHECK(!cpu.CompareNopSequences(v_4_a, v_4_b));
+    // Second vector CANNOT be empty
+    emp::vector<size_t> v_5_a {0, 1, 2};
+    emp::vector<size_t> v_5_b { };
+    CHECK(!cpu.CompareNopSequences(v_5_a, v_5_b));
+    // Both vectors CANNOT be empty
+    emp::vector<size_t> v_6_a { };
+    emp::vector<size_t> v_6_b { };
+    CHECK(!cpu.CompareNopSequences(v_6_a, v_6_b));
+    // Mismatch -> return false
+    emp::vector<size_t> v_7_a {0, 1, 2 };
+    emp::vector<size_t> v_7_b {0, 2, 2 };
+    CHECK(!cpu.CompareNopSequences(v_7_a, v_7_b));
+    // Match occurs after mismatch -> still fail
+    emp::vector<size_t> v_8_a {0, 1, 2 };
+    emp::vector<size_t> v_8_b {0, 2, 2, 0, 1, 2};
+    CHECK(!cpu.CompareNopSequences(v_8_a, v_8_b));
+  }
+  { // CheckIfLastCopied
+    Derived cpu;
+    cpu.copied_inst_id_vec = {0, 1, 2};
+    // True
+    CHECK(cpu.CheckIfLastCopied({0, 1, 2}));
+    CHECK(cpu.CheckIfLastCopied({1, 2}));
+    CHECK(cpu.CheckIfLastCopied({2}));
+    CHECK(cpu.CheckIfLastCopied({2}));
+    // False
+    CHECK(!cpu.CheckIfLastCopied({1})); // Mismatch
+    CHECK(!cpu.CheckIfLastCopied({0, 2, 2})); // Mismatch with correct size
+    CHECK(!cpu.CheckIfLastCopied({0, 1, 2, 0})); // Too long
+    CHECK(!cpu.CheckIfLastCopied({})); // Empty 
+  }
+  { // FindLabel_Reverse(start_local)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x L A B x L C D x A B  x  C  D  x  L  A  B  x  D  A
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+    std::stringstream sstr;
+    sstr << "Add\nLabel\nNopA\nNopB\nAdd\nLabel\nNopC\nNopD\n"
+            "Add\nNopA\nNopB\nAdd\nNopC\nNopD\nAdd\nLabel\nNopA\nNopB\nAdd\nNopD\nNopA";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    // Does start_local actually factor in?
+    cpu.inst_ptr = 8;
+    CHECK(cpu.FindLabel_Reverse(true) == 1);
+    CHECK(cpu.FindLabel_Reverse(false) == 15);
+    // If we have only one label with that nop sequence, it returns regardless of start_local
+    // Also, ensure Nops after NopC work too
+    cpu.inst_ptr = 11;
+    CHECK(cpu.FindLabel_Reverse(true) == 5);
+    CHECK(cpu.FindLabel_Reverse(false) == 5);
+    // If instruction pointer is on the only label with that sequence, return inst_ptr
+    cpu.inst_ptr = 5;
+    CHECK(cpu.FindLabel_Reverse(true) == 5);
+    CHECK(cpu.FindLabel_Reverse(false) == 5);
+    // If instruction pointer is on a label and another match exists, 
+    // Return it if start_local = true
+    // Return depending on position if start_local = false
+    cpu.inst_ptr = 15;
+    CHECK(cpu.FindLabel_Reverse(true) == 1);
+    CHECK(cpu.FindLabel_Reverse(false) == 15);
+    // If no matching label found, return instruction pointer
+    cpu.inst_ptr = 18;
+    CHECK(cpu.FindLabel_Reverse(true) == 18);
+    CHECK(cpu.FindLabel_Reverse(false) == 18);
+  }
+  { // FindLabel(start_local, reverse = false)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x L A B x L C D x A B  x  C  D  x  L  A  B  x  D  A
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+    std::stringstream sstr;
+    sstr << "Add\nLabel\nNopA\nNopB\nAdd\nLabel\nNopC\nNopD\n"
+            "Add\nNopA\nNopB\nAdd\nNopC\nNopD\nAdd\nLabel\nNopA\nNopB\nAdd\nNopD\nNopA";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    { // Use FindLabel_Reverse tests if reverse = true
+      // Does start_local actually factor in?
+      cpu.inst_ptr = 8;
+      CHECK(cpu.FindLabel(true, true) == 1);
+      CHECK(cpu.FindLabel(false, true) == 15);
+      // If we have only one label with that sequence, it returns regardless of start_local
+      // Also, ensure Nops after NopC work too
+      cpu.inst_ptr = 11;
+      CHECK(cpu.FindLabel(true, true) == 5);
+      CHECK(cpu.FindLabel(false, true) == 5);
+      // If instruction pointer is on the only label with that sequence, return inst_ptr
+      cpu.inst_ptr = 5;
+      CHECK(cpu.FindLabel(true, true) == 5);
+      CHECK(cpu.FindLabel(false, true) == 5);
+      // If instruction pointer is on a label and another match exists, 
+      // Return it if start_local = true
+      // Return depending on position if start_local = false
+      cpu.inst_ptr = 15;
+      CHECK(cpu.FindLabel(true, true) == 1);
+      CHECK(cpu.FindLabel(false, true) == 15);
+      // If no matching label found, return instruction pointer
+      cpu.inst_ptr = 18;
+      CHECK(cpu.FindLabel(true, true) == 18);
+      CHECK(cpu.FindLabel(false, true) == 18);
+    }
+    { // reverse = false
+      // Does start_local actually factor in?
+      cpu.inst_ptr = 8;
+      CHECK(cpu.FindLabel(true) == 15);
+      CHECK(cpu.FindLabel(false) == 1);
+      // If we have only one label with that sequence, it returns regardless of start_local
+      // Also, ensure Nops after NopC work too
+      cpu.inst_ptr = 11;
+      CHECK(cpu.FindLabel(true) == 5);
+      CHECK(cpu.FindLabel(false) == 5);
+      // If instruction pointer is on the only label with that sequence, return inst_ptr
+      cpu.inst_ptr = 5;
+      CHECK(cpu.FindLabel(true) == 5);
+      CHECK(cpu.FindLabel(false) == 5);
+      // If instruction pointer is on a label and another match exists, 
+      // Return it if start_local = true
+      // Return depending on position if start_local = false
+      cpu.inst_ptr = 15;
+      CHECK(cpu.FindLabel(true) == 1);
+      CHECK(cpu.FindLabel(false) == 1);
+      // If no matching label found, return instruction pointer
+      cpu.inst_ptr = 18;
+      CHECK(cpu.FindLabel(true) == 18);
+      CHECK(cpu.FindLabel(false) == 18);
+    }
+  }
+  { //FindNopSequence_Reverse(search_vec, start_idx)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopA\nAdd\nNopA\nNopB\nAdd\nNopB\nNopA\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    // Keep instruction pointer at beginning of genome and use start_idx instead
+    cpu.inst_ptr = 2; 
+    // Ensure start_idx is used and search does not include the current instruction pointer
+    CHECK(cpu.FindNopSequence_Reverse({0, 1}, (size_t)0) == 16);
+    CHECK(cpu.FindNopSequence_Reverse({0, 1}, (size_t)6) == 0);
+    CHECK(cpu.FindNopSequence_Reverse({0, 1}, (size_t)16) == 6);
+    // If sequence only appears once, always return it (also check if NopD is valid)
+    CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)0) == 13);
+    CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)12) == 13);
+    CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)13) == 13);
+    CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)14) == 13);
+    CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)18) == 13);
+    // Found sequence can have extra nops 
+    CHECK(cpu.FindNopSequence_Reverse({1}, (size_t)0) == 17);
+    CHECK(cpu.FindNopSequence_Reverse({1}, (size_t)9) == 7);
+    CHECK(cpu.FindNopSequence_Reverse({1}, (size_t)17) == 9);
+    // If pattern not found, return instruction pointer 
+    CHECK(cpu.FindNopSequence_Reverse({1,1,1}, (size_t)0) == 2);
+    CHECK(cpu.FindNopSequence_Reverse({1,1,1}, (size_t)9) == 2);
+    CHECK(cpu.FindNopSequence_Reverse({1,1,1}, (size_t)17) == 2);
+  }
+  { //FindNopSequence_Reverse(search_vec, start_local)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopA\nAdd\nNopA\nNopB\nAdd\nNopB\nNopA\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    // Ensure result always matches the already-tested overload that uses start_idx 
+    emp::vector<emp::vector<size_t>> test_vectors;
+    test_vectors.push_back(emp::vector<size_t>({0,1}));
+    test_vectors.push_back(emp::vector<size_t>({3,3}));
+    test_vectors.push_back(emp::vector<size_t>({1}));
+    test_vectors.push_back(emp::vector<size_t>({1,1,1}));
+    for(emp::vector<size_t> v : test_vectors){
+      for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
+        cpu.inst_ptr = idx;
+        CHECK(cpu.FindNopSequence_Reverse(v, true) == 
+            cpu.FindNopSequence_Reverse(v, (size_t)cpu.inst_ptr));
+        CHECK(cpu.FindNopSequence_Reverse(v, false) == 
+            cpu.FindNopSequence_Reverse(v, (size_t)0));
+      }
+    }
+  }
+  { //FindNopSequence_Reverse(start_local)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopA\nAdd\nNopA\nNopB\nAdd\nNopB\nNopA\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    // Ensure result always matches the already-tested overload that uses start_idx 
+    emp::vector<emp::vector<size_t>> test_vectors;
+    test_vectors.push_back(emp::vector<size_t>({0,1}));
+    test_vectors.push_back(emp::vector<size_t>({3,3}));
+    test_vectors.push_back(emp::vector<size_t>({1}));
+    test_vectors.push_back(emp::vector<size_t>({1,1,1}));
+    for(emp::vector<size_t> v : test_vectors){
+      for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
+        cpu.inst_ptr = idx;
+        CHECK(cpu.FindNopSequence_Reverse(true) == 
+            cpu.FindNopSequence_Reverse(
+                cpu.genome_working[cpu.inst_ptr].nop_vec, (size_t)cpu.inst_ptr
+            )
+        );
+        CHECK(cpu.FindNopSequence_Reverse(false) == 
+            cpu.FindNopSequence_Reverse(cpu.genome_working[cpu.inst_ptr].nop_vec, (size_t)0));
+      }
+    }
+  }
+  { //FindNopSequence(search_vec, start_idx, reverse = false)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopA\nAdd\nNopA\nNopB\nAdd\nNopB\nNopA\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    // Keep instruction pointer at beginning of genome and use start_idx instead
+    cpu.inst_ptr = 15; 
+    // Ensure start_idx is used and search does not include the current instruction pointer
+    CHECK(cpu.FindNopSequence({0, 1}, (size_t)0) == 6);
+    CHECK(cpu.FindNopSequence({0, 1}, (size_t)6) == 16);
+    CHECK(cpu.FindNopSequence({0, 1}, (size_t)16) ==0);
+    // If sequence only appears once, always return it (also check if NopD is valid)
+    CHECK(cpu.FindNopSequence({3, 3}, (size_t)0) == 13);
+    CHECK(cpu.FindNopSequence({3, 3}, (size_t)12) == 13);
+    CHECK(cpu.FindNopSequence({3, 3}, (size_t)13) == 13);
+    CHECK(cpu.FindNopSequence({3, 3}, (size_t)14) == 13);
+    CHECK(cpu.FindNopSequence({3, 3}, (size_t)18) == 13);
+    // Found sequence can have extra nops 
+    CHECK(cpu.FindNopSequence(emp::vector<size_t>({1}), (size_t)0) == 1);
+    CHECK(cpu.FindNopSequence(emp::vector<size_t>({1}), (size_t)9) == 17);
+    CHECK(cpu.FindNopSequence(emp::vector<size_t>({1}), (size_t)17) == 1);
+    // If pattern not found, return instruction pointer 
+    CHECK(cpu.FindNopSequence({1,1,1}, (size_t)0) == cpu.inst_ptr);
+    CHECK(cpu.FindNopSequence({1,1,1}, (size_t)9) == cpu.inst_ptr);
+    CHECK(cpu.FindNopSequence({1,1,1}, (size_t)17) == cpu.inst_ptr);
+    { // Reverse
+      emp::vector<emp::vector<size_t>> test_vectors;
+      test_vectors.push_back(emp::vector<size_t>({0,1}));
+      test_vectors.push_back(emp::vector<size_t>({3,3}));
+      test_vectors.push_back(emp::vector<size_t>({1}));
+      test_vectors.push_back(emp::vector<size_t>({1,1,1}));
+      for(emp::vector<size_t> v : test_vectors){
+        for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
+          CHECK(cpu.FindNopSequence(v, idx, true) == cpu.FindNopSequence_Reverse(v, idx));
+        }
+      }
+    }
+  }
+  { //FindNopSequence(search_vec, start_local, reverse = false)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopA\nAdd\nNopA\nNopB\nAdd\nNopB\nNopA\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    cpu.inst_ptr = 15; 
+    emp::vector<emp::vector<size_t>> test_vectors;
+    test_vectors.push_back(emp::vector<size_t>({0,1}));
+    test_vectors.push_back(emp::vector<size_t>({3,3}));
+    test_vectors.push_back(emp::vector<size_t>({1}));
+    test_vectors.push_back(emp::vector<size_t>({1,1,1}));
+    // Ensure output matches that of previously-tested overload
+    for(emp::vector<size_t> v : test_vectors){
+      for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
+        cpu.inst_ptr = idx;
+        CHECK(cpu.FindNopSequence(v, true, false) == cpu.FindNopSequence(v, cpu.inst_ptr));
+        CHECK(cpu.FindNopSequence(v, true, true) == cpu.FindNopSequence(v,cpu.inst_ptr,true));
+        CHECK(cpu.FindNopSequence(v, false, false) == 
+            cpu.FindNopSequence(v,cpu.GetWorkingGenomeSize() - 1));
+        CHECK(cpu.FindNopSequence(v, false, true) == 
+            cpu.FindNopSequence(v,cpu.GetWorkingGenomeSize() - 1,true));
+      }
+    }
+  }
+  { //FindNopSequence(start_local, reverse = false)
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopA\nAdd\nNopA\nNopB\nAdd\nNopB\nNopA\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    // Verify output matches previously tested overload
+    for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
+      cpu.inst_ptr = idx;
+      CHECK(cpu.FindNopSequence(true, false) == 
+          cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec, cpu.inst_ptr));
+      CHECK(cpu.FindNopSequence(true, true) == 
+          cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec, cpu.inst_ptr, true));
+      CHECK(cpu.FindNopSequence(false, false) == 
+          cpu.FindNopSequence(
+              cpu.genome_working[cpu.inst_ptr].nop_vec, cpu.GetWorkingGenomeSize() - 1
+          )
+      );
+      CHECK(cpu.FindNopSequence(false, true) == 
+          cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec, 
+              cpu.GetWorkingGenomeSize() - 1,true
+          )
+     );
+    }
+  }
   /*
-    [ ] GetComplementIdx returns the complement of a single nop 
-      [ ] Standard nops
-      [ ] Expanded nops
-    [ ] GetComplementLabel returns the complemented sequences of nops (rename) 
-      [ ] Standard nops
-      [ ] Expanded nops
-    [ ] CompareSequences determines if two nop vectors are identical
-      [ ] Check length too!
-    [ ] Find label searches for a nop sequence starting a particular index
-    [ ] Find complement searches for the complement of a nop sequence, starting at a given idx
-    [ ] CheckIfLastCopied only returns true if the nop vector was the last thing copied
-    [ ] CheckIfLastCopiedComplement does ^ but for the complement of the nop vector
-    [ ] FindMarkedLabel will search for the nop string at the current genome index
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] reverse parameter reverses search direction
-      [ ] Only looks at labels
-    [ ] FindMarkedLabel_Reverse will search backwardfor the nop string at the current 
-        genome index
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] Only looks at labels
-    [ ] FindSequences functions as FindLabel but looks at all nops, not just labels
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] reverse parameter reverses search direction
-    [ ] FindSequences_Reverse functions as FindLabel but looks at all nops, not just labels
-      [ ] start_local parameter will force search to start at current genome index
-      [ ] Only looks at labels
+    [X] GetComplementIdx returns the complement of a single nop 
+      [X] Standard nops
+      [X] Expanded nops
+    [X] GetComplementLabel returns the complemented sequences of nops (rename) 
+      [X] Standard nops
+      [X] Expanded nops
+    [X] CompareSequences determines if two nop vectors are identical
+      [X] Check length too!
+    [X] CheckIfLastCopied only returns true if the nop vector was the last thing copied
+    [X] FindLabel_Reverse(start_local){
+    [X] FindLabel(start_local, reverse = false) 
+    [X] FindNopSequence_Reverse(search_vec, start_idx) 
+    [X] FindNopSequence_Reverse(search_vec, start_local) 
+    [X] FindNopSequence_Reverse(start_local) 
+    [X] FindNopSequence(search_vec, start_idx, reverse = false) 
+    [X] FindNopSequence(search_vec, start_local, reverse = false) 
+    [X] FindNopSequence(start_local, reverse = false) 
   */
 }
 TEST_CASE("VirtualCPU_Stack_Methods", "[Hardware]") {
+  Derived cpu;
+  // Default stack
+  CHECK(cpu.active_stack_idx == 0); 
+  cpu.regs[0] = 1;
+  cpu.regs[1] = 2;
+  cpu.regs[2] = 3;
+  cpu.StackPush(0);
+  CHECK(cpu.stacks[0].size() == 1); 
+  CHECK(cpu.stacks[0][0] == 1); 
+  cpu.StackPush(2);
+  CHECK(cpu.stacks[0].size() == 2); 
+  CHECK(cpu.stacks[0][1] == 3); 
+  cpu.StackPop(0);
+  CHECK(cpu.stacks[0].size() == 1); 
+  CHECK(cpu.regs[0] == 3); 
+  // Swap stacks
+  cpu.StackSwap();
+  CHECK(cpu.active_stack_idx == 1); 
+  cpu.regs[0] = 1;
+  cpu.regs[1] = 2;
+  cpu.regs[2] = 3;
+  cpu.StackPush(0);
+  CHECK(cpu.stacks[1].size() == 1); 
+  CHECK(cpu.stacks[1][0] == 1); 
+  cpu.StackPush(2);
+  CHECK(cpu.stacks[1].size() == 2); 
+  CHECK(cpu.stacks[1][1] == 3); 
+  cpu.StackPop(0);
+  CHECK(cpu.stacks[1].size() == 1); 
+  CHECK(cpu.regs[0] == 3); 
+  // Swap back
+  cpu.StackSwap();
+  CHECK(cpu.active_stack_idx == 0); 
   /*
-    [ ] StackPush pushes the register value onto the active stack
-    [ ] StackPop pops the top value of the active stack and stores it in a register
-    [ ] StackSwap actually swaps the active stack
+    [X] StackPush pushes the register value onto the active stack
+    [X] StackPop pops the top value of the active stack and stores it in a register
+    [X] StackSwap actually swaps the active stack
   */
 }
 TEST_CASE("VirtualCPU_Processing_Methods", "[Hardware]") {
+  // SingleProcess(verbose = true)
+  Derived cpu;
+  cpu.PushDefaultInst(10);
+  CHECK(cpu.GetGenomeSize() == 10);
+  CHECK(cpu.GetWorkingGenomeSize() == 10);
+  CHECK(cpu.nops_need_curated);
+  CHECK(cpu.inst_ptr == 0);
+  cpu.SingleProcess(false);
+  CHECK(cpu.inst_ptr == 1); // IP incremented
+  CHECK(!cpu.nops_need_curated); // IP incremented
+  cpu.SingleProcess(false);
+  CHECK(cpu.inst_ptr == 2); // IP incremented
+  // Process(count = 1, verbose = true)
+  cpu.nops_need_curated = true;
+  cpu.Process();
+  CHECK(cpu.inst_ptr == 3); // IP incremented
+  CHECK(!cpu.nops_need_curated); // IP incremented
+  cpu.Process(4, false);
+  CHECK(cpu.inst_ptr == 7); // IP incremented count times
+  cpu.Process(5, false);
+  CHECK(cpu.inst_ptr == 2); // IP wraps
   /*
-    [ ] SingleProcess
-      [ ] Do bookkeeping as needed based on flags
-      [ ] Process the next instruction
-      [ ] Auto-advance IP?
-    [ ] Process
-      [ ] Calls SingleProcess N times
+    [X] SingleProcess
+      [X] Do bookkeeping as needed based on flags
+      [X] Process the next instruction
+      [X] Auto-advance IP?
+    [X] Process
+      [X] Calls SingleProcess N times
   */
 }
 TEST_CASE("VirtualCPU_String_Methods", "[Hardware]") {
+    Derived::inst_lib_t inst_lib;
+    inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
+    inst_lib.AddInst("NopB", Derived::inst_lib_t::Inst_NopB, 0, "No-operation B");
+    inst_lib.AddInst("NopC", Derived::inst_lib_t::Inst_NopC, 0, "No-operation C");
+    inst_lib.AddInst("NopD", Derived::inst_lib_t::Inst_NopC, 0, "No-operation D");
+    inst_lib.AddInst("Label", Derived::inst_lib_t::Inst_NopC, 0, "Fake label");
+    inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
+    Derived::genome_t genome = Derived::genome_t(inst_lib);
+    Derived cpu(genome);
+    // x A B x B D x A B x B  D  C  x  D  D  L  A  B
+    // 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+    std::stringstream sstr;
+    sstr << "Add\nNopA\nNopB\nAdd\nNopB\nNopD\nAdd\nNopA\nNopB\nAdd\nNopB\nNopD\nNopC\n"
+            "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
+    cpu.Load(sstr);
+    cpu.CurateNops();
+    CHECK(cpu.GetGenomeString() == "[19]fabfbdfabfbdcfddeab");
+    CHECK(cpu.GetWorkingGenomeString() == "[19]fabfbdfabfbdcfddeab");
+    cpu.genome_working.resize(3, 0);
+    CHECK(cpu.GetGenomeString() == "[19]fabfbdfabfbdcfddeab");
+    CHECK(cpu.GetWorkingGenomeString() == "[3]fab");
+    std::stringstream ostr;
+    cpu.PrintDetails(ostr);
+    std::cout << ostr.str();
+    CHECK(ostr.str().size() > 0);
+    emp::vector<std::string> string_vec;
+    std::string output_str = ostr.str();
+    emp::slice(ostr.str(), string_vec, '\n');
+    CHECK(string_vec.size() == 5);
+    CHECK(string_vec[0] == "IP: 0 RH: 0 WH: 0 FH: 0(nops: 4; regs: 4)");
+    CHECK(string_vec[1] == "[0] 0");
+    CHECK(string_vec[2] == "[1] 1");
+    CHECK(string_vec[3] == "[2] 2");
+    CHECK(string_vec[4] == "[3] 3\n"); // last line gets to keep its newline character
   /*
-    [ ] GetString returns a string representation of the working genome
-    [ ] GetOriginalString returns a string representation of the (non-working) genome
-    [ ] Print details dumps registers and such to the stream
+    [X] GetWorkingGenomeString returns a string representation of the working genome
+    [X] GetGenomeString returns a string representation of the (non-working) genome
+    [X] Print details dumps registers and such to the stream
   */
 }
-  /*
-	//REQUIRE(gp.GetInstLib() == gp2.GetInstLib());
-	//REQUIRE(gp.GetSize() == 0);
-	//REQUIRE(gp.GetIP() == 0);
-	//REQUIRE(gp.GetInput(3) == 0.0);
-	//REQUIRE(gp.GetOutput(7) == 0.0);
-	//REQUIRE(gp.GetNumInputs() == 0.0);
-	//REQUIRE(gp.GetNumOutputs() == 0.0);
-	//REQUIRE(gp.GetNumTraits() == 0.0);
-	//REQUIRE(gp.GetNumErrors() == 0.0);
-
-	//// instructions
-	//gp.PushInst(0, 0);
-	//gp.PushInst("Dec", 1);
-	//REQUIRE(gp.GetInst(0).id == 0);
-	//REQUIRE(gp.GetInst(1).id == 1);
-	//gp.SetInst(0, 2, 0);
-	//REQUIRE(gp.GetInst(0).id == 2);
-
-	//// traits
-	//gp.PushTrait(4.0);
-	//REQUIRE(gp.GetNumTraits() == 1);
-	//REQUIRE(gp.GetTrait(0) == 4.0);
-	//gp.PushTrait(2.0);
-	//gp.PushTrait(3.0);
-	//emp::vector<double> traits = gp.GetTraits();
-	//for(size_t i=0; i<traits.size();i++)
-	//{
-	//	if(std::fmod(traits[i],2) != 0.0)
-	//	{
-	//		gp.SetTrait(i, traits[i]*2.0);
-	//	}
-	//}
-	//REQUIRE(gp.GetTrait(2) == 6.0);
-
-	//gp.IncErrors();
-	//REQUIRE(gp.GetNumErrors() == 1);
-
-	//// RandomizeInst PushRandom
-	//emp::Random rnd(1200);
-	//gp.PushRandom(rnd);
-	//REQUIRE(gp.GetGenome().size() == 3);
-	//gp.RandomizeInst(0, rnd);
-	//if(gp.GetInst(0).id != 2)
-	//{
-	//	// on clang, random seed doesn't create the same instructions
-	//	gp.SetInst(0, 2, 4, 10, 15);
-	//	gp.SetInst(2, 2, 9, 8, 13);
-	//}
-	//REQUIRE(gp.GetInst(0).id == 2); // !4 10 15
-	//REQUIRE(gp.GetInst(1).id == 1);
-	//REQUIRE(gp.GetInst(2).id == 2); // !9 8 13
-
-	//// SingleProcess
-	//REQUIRE(gp.GetReg(9) == 9.0);
-	//gp.SetIP(2);
-	//gp.SingleProcess();
-	//REQUIRE(gp.GetReg(9) == 0.0);
-
-	//// ProcessInst
-	//REQUIRE(gp.GetReg(4) == 4.0);
-	//gp.ProcessInst(gp.GetInst(0));
-	//REQUIRE(gp.GetReg(4.0) == 0.0);
-	//gp.ProcessInst(gp.GetInst(0));
-	//REQUIRE(gp.GetReg(4.0) == 1.0);
-
-	//// Inputs
-	//std::unordered_map<int, double> inpts({{0, 2.0},{1, 6.0},{2, 34.0}});
-	//gp.SetInputs(inpts);
-	//REQUIRE(gp.GetNumInputs() == 3);
-	//REQUIRE(gp.GetInputs() == inpts);
-	//REQUIRE(gp.GetInput(0) == 2.0);
-	//gp.SetInput(0, 46.0);
-	//REQUIRE(gp.GetInput(0) == 46.0);
-
-	//// Outputs
-	//std::unordered_map<int, double> otpts({{0, 72.0},{1, 8.0},{2, 18.0}});
-	//gp.SetOutputs(otpts);
-	//REQUIRE(gp.GetNumOutputs() == 3);
-	//REQUIRE(gp.GetOutputs() == otpts);
-	//REQUIRE(gp.GetOutput(0) == 72.0);
-	//gp.SetOutput(0, 22.0);
-	//REQUIRE(gp.GetOutput(0) == 22.0);
-  //
-  */
