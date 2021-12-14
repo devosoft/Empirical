@@ -58,14 +58,14 @@ namespace emp {
     }
     static void Inst_If_Not_Equal(hardware_t & hw, const inst_t & inst) { 
       size_t idx_1 = hw.GetInstLib()->FirstNopToRegIdx(inst.nop_vec, 1);
-      size_t idx_2 = hw.GetComplementIdx(idx_1);
+      size_t idx_2 = hw.GetComplementNop(idx_1);
       if(hw.regs[idx_1] == hw.regs[idx_2])
         hw.AdvanceIP(1);
       if(inst.nop_vec.size()) hw.AdvanceIP(1); 
     }
     static void Inst_If_Less(hardware_t & hw, const inst_t & inst) { 
       size_t idx_1 = hw.GetInstLib()->FirstNopToRegIdx(inst.nop_vec, 1);
-      size_t idx_2 = hw.GetComplementIdx(idx_1);
+      size_t idx_2 = hw.GetComplementNop(idx_1);
       if(hw.regs[idx_1] >= hw.regs[idx_2])
         hw.AdvanceIP(1);
       if(inst.nop_vec.size()) hw.AdvanceIP(1); 
@@ -127,7 +127,7 @@ namespace emp {
       // TODO: Mutation
     }
     static void Inst_H_Search(hardware_t & hw, const inst_t & inst) {
-      int res = hw.FindComplementLabel(inst.nop_vec, hw.inst_ptr);
+      int res = hw.FindNopSequence(hw.GetComplementNopSequence(inst.nop_vec), hw.inst_ptr);
       if(res == -1){ // Fail
         hw.regs[1] = 0;
         hw.regs[2] = 0;
@@ -180,7 +180,7 @@ namespace emp {
     }
     static void Inst_If_Label(hardware_t & hw, const inst_t & inst) {
       hw.AdvanceIP(inst.nop_vec.size());
-      if(!hw.CheckIfLastCopiedComplement(inst.nop_vec)) hw.AdvanceIP();
+      if(!hw.CheckIfLastCopied(hw.GetComplementNopSequence(inst.nop_vec))) hw.AdvanceIP();
     }
     static void Inst_Set_Flow(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 2 : inst.nop_vec[0];

@@ -9,11 +9,7 @@
  *
  *  @TODO
  *    - Figure out best way to default instructions
- *    - Should PushInst update labels?
- *      - SetInst
- *    - Rename nop and label methods
  *    - Add docstrings
- *    - Curate nops should wrap
  */
 
 #ifndef EMP_VIRTUAL_CPU_H
@@ -150,6 +146,7 @@ namespace emp{
         file.RemoveComments("#");  // Remove all comments beginning with -- (including --> and ----)
         file.CompressWhitespace();  // Trim down remaining whitespace.
         file.Apply( [this](std::string & info){ PushInst(info); } );
+        needs_nops_curated = true;
         return true;
       }
       bool Load(const std::string & filename) { 
@@ -160,16 +157,19 @@ namespace emp{
         const size_t id = GetInstLib()->GetID(idx);
         genome.emplace_back(idx, id);
         genome_working.emplace_back(idx, id);
+        needs_nops_curated = true;
       }
       /// Add a new instruction to the end of the genome, by NAME and args.
       void PushInst(const std::string & name) {
         std::cout << "Pushing " << name << std::endl;
         PushInst(GetInstLib()->GetIndex(name));
+        needs_nops_curated = true;
       }
       /// Add a specified new instruction to the end of the genome.
       void PushInst(const inst_t & inst) { 
         genome.emplace_back(inst); 
         genome_working.emplace_back(inst); 
+        needs_nops_curated = true;
       }
       /// Add multiple copies of a specified instruction to the end of the genome.
       void PushInst(const inst_t & inst, size_t count) {
@@ -177,10 +177,12 @@ namespace emp{
         for (size_t i = 0; i < count; i++) genome.emplace_back(inst);
         genome_working.reserve(genome.size() + count);
         for (size_t i = 0; i < count; i++) genome_working.emplace_back(inst);
+        needs_nops_curated = true;
       }
       /// Add one or more default instructions to the end of the genome.
       void PushDefaultInst(size_t count=1) { 
         PushInst( inst_t(0, GetInstLib()->GetID(0)), count ); 
+        needs_nops_curated = true;
       }
       inst_t GetRandomInst(Random & rand) {
         size_t idx = rand.GetUInt(GetInstLib()->GetSize());
@@ -190,12 +192,17 @@ namespace emp{
       void SetInst(size_t pos, const inst_t & inst) { 
         genome[pos] = inst; 
         genome_working[pos] = inst;
+        needs_nops_curated = true;
       }
-      void RandomizeInst(size_t pos, Random & rand) { SetInst(pos, GetRandomInst(rand) ); }
+      void RandomizeInst(size_t pos, Random & rand) { 
+        SetInst(pos, GetRandomInst(rand) ); 
+        needs_nops_curated = true;
+      }
       void PushRandom(Random & random, const size_t count=1) {
         for (size_t i = 0; i < count; i++) {
           PushInst(GetRandomInst(random));
         }
+        needs_nops_curated = true;
       }
 
 
@@ -355,37 +362,24 @@ namespace emp{
 
 
       //// NOP SEQUENCE METHODS
-      size_t GetComplementIdx(size_t idx){
+      size_t GetComplementNop(size_t idx){
         if(idx >= num_nops - 1) return 0;
         else return idx + 1;
       }
-      nop_vec_t GetComplementLabel(const nop_vec_t& nop_vec){
+      nop_vec_t GetComplementNopSequence(const nop_vec_t& nop_vec){
         nop_vec_t res_vec;
         for(size_t nop : nop_vec){
-          res_vec.push_back(GetComplementIdx(nop));
+          res_vec.push_back(GetComplementNop(nop));
         }
         return res_vec;
       }
-        bool CompareSequences(const nop_vec_t& search_vec, const nop_vec_t& compare_vec){
-          if(search_vec.size() > compare_vec.size()) return false;
-          if(search_vec.size() == 0 || compare_vec.size() == 0) return false;
-          for(size_t idx = 0; idx < search_vec.size(); ++idx){
-            if(search_vec[idx] != compare_vec[idx]) return false;
-          }
-          return true;
+      bool CompareNopSequences(const nop_vec_t& search_vec, const nop_vec_t& compare_vec){
+        if(search_vec.size() > compare_vec.size()) return false;
+        if(search_vec.size() == 0 || compare_vec.size() == 0) return false;
+        for(size_t idx = 0; idx < search_vec.size(); ++idx){
+          if(search_vec[idx] != compare_vec[idx]) return false;
         }
-        int FindLabel(const nop_vec_t& label, size_t start_idx){
-          if(label.size() == 0) return -1;
-          for(size_t offset = 1; offset < genome_working.size(); ++offset){
-            size_t idx = start_idx + offset < genome_working.size() ?
-              start_idx + offset : start_idx + offset - genome_working.size();
-            if(CompareSequences(label, genome_working[idx].nop_vec)) return offset;
-          }
-          return -1;
-        }
-      int FindComplementLabel(const nop_vec_t& label, size_t start_idx){
-        nop_vec_t comp_label = GetComplementLabel(label);
-        return FindLabel(comp_label, start_idx);
+        return true;
       }
       bool CheckIfLastCopied(const nop_vec_t& label){
         if(label.size() > copied_inst_id_vec.size()) return false;
@@ -400,11 +394,7 @@ namespace emp{
         }
         return true;
       }
-      bool CheckIfLastCopiedComplement(const nop_vec_t& label){
-        nop_vec_t comp_label = GetComplementLabel(label);
-        return CheckIfLastCopied(comp_label);
-      }
-      size_t FindMarkedLabel_Reverse(bool start_local){
+      size_t FindLabel_Reverse(bool start_local){
         const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
         size_t start_label_vec_idx =  label_idx_vec.size() - 1;
         if(start_local){
@@ -421,13 +411,13 @@ namespace emp{
               label_idx_vec[
                 (start_label_vec_idx - offset + label_idx_vec.size()) % label_idx_vec.size()
               ];
-            if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+            if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
           }
         }
         return inst_ptr;
       }
-      size_t FindMarkedLabel(bool start_local, bool reverse = false){
-        if(reverse) FindMarkedLabel_Reverse(start_local);
+      size_t FindLabel(bool start_local, bool reverse = false){
+        if(reverse) FindLabel_Reverse(start_local);
         const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
         size_t start_label_vec_idx = 0;
         if(start_local){
@@ -441,31 +431,45 @@ namespace emp{
           if(!start_found) start_label_vec_idx = 0;
           for(size_t offset = 0; offset < label_idx_vec.size(); ++offset){
             const size_t idx = label_idx_vec[(start_label_vec_idx + offset) % label_idx_vec.size()];
-            if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+            if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
           }
         }
         return inst_ptr;
       }
-      size_t FindSequence_Reverse(bool start_local){
-        const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
-        size_t start_idx = genome_working.size() - 1;
-        if(start_local && inst_ptr != 0) start_idx = inst_ptr - 1;
+      size_t FindNopSequence_Reverse(const nop_vec_t& search_vec, size_t start_idx){
         for(size_t offset = 0; offset < genome_working.size(); ++offset){
           const size_t idx = (start_idx - offset + genome_working.size()) % genome_working.size();
-          if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+          if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
         }
         return inst_ptr;
       }
-      size_t FindSequence(bool start_local, bool reverse = false){
-        if(reverse) FindSequence_Reverse(start_local);
+      size_t FindNopSequence_Reverse(const nop_vec_t& search_vec, bool start_local){
+        size_t start_idx = genome_working.size() - 1;
+        if(start_local && inst_ptr != 0) start_idx = inst_ptr - 1;
+        return FindNopSequence_Reverse(search_vec, start_idx);
+      }
+      size_t FindNopSequence_Reverse(bool start_local){
         const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
-        size_t start_idx = 0;
-        if(start_local) start_idx = inst_ptr + 1;
+        return FindNopSequence_Reverse(search_vec, start_local);
+      }
+      size_t FindNopSequence(const nop_vec_t& search_vec, size_t start_idx, 
+          bool reverse = false){
+        if(reverse) FindNopSequence_Reverse(search_vec, start_idx);
         for(size_t offset = 0; offset < genome_working.size(); ++offset){
           const size_t idx = (start_idx + offset) % genome_working.size(); 
-          if(CompareSequences(search_vec, genome_working[idx].nop_vec)) return idx;
+          if(CompareNopSequences(search_vec, genome_working[idx].nop_vec)) return idx;
         }
         return inst_ptr;
+      }
+      size_t FindNopSequence(const nop_vec_t& search_vec, bool start_local, 
+          bool reverse = false){
+        size_t start_idx = 0;
+        if(start_local) start_idx = inst_ptr + 1;
+        return FindNopSequence(search_vec, start_idx, reverse);
+      }
+      size_t FindNopSequence(bool start_local, bool reverse = false){
+        const nop_vec_t search_vec = genome_working[inst_ptr].nop_vec;
+        return FindNopSequence(search_vec, start_local, reverse);
       }
 
 
