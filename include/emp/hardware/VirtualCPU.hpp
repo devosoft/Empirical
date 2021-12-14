@@ -6,6 +6,10 @@
  *  @file  VirtualCPU.hpp
  *  @brief A simple virtual CPU styled after the original and extended Avidian architectures. 
  *
+ *  @TODO
+ *    - Expanded heads?
+ *    - expanded_nop_args useful?
+ *
  */
 
 #ifndef EMP_VIRTUAL_CPU_H
@@ -81,7 +85,7 @@ namespace emp{
       using inst_lib_t = VirtualCPU_InstLib<derived_t, data_t, 0>;
       using genome_t = Genome<Instruction, inst_lib_t>;
       using nop_vec_t = emp::vector<size_t>;
-      using stack_t = emp::vector<double>;
+      using stack_t = emp::vector<data_t>;
     
     protected:
       size_t num_regs = 0;  ///< Number of registers found in this CPU
@@ -94,7 +98,7 @@ namespace emp{
       bool are_regs_expanded = false;  ///< Flag signaling if the number of registers have 
                                        ///< been expanded to accomodate the number of NOP 
                                        ///< instructions in the library
-      bool needs_nops_curated = true;  ///< Flag signaling that NOP instructions need curated
+      bool nops_need_curated = true;  ///< Flag signaling that NOP instructions need curated
       bool expanded_nop_args = false;  ///< Flag signaling that CPU is used the expanded 
       //////// CPU COMPONENTS 
       emp::vector<data_t> regs;                ///< Vector of registers
@@ -134,10 +138,10 @@ namespace emp{
       }
       /// Create a default VirtualCPU (no genome sequence, default instruction set)
       VirtualCPU() : 
-        VirtualCPU(genome_t(inst_lib_t::DefaultInstLib())) {
-          Initialize();
-         ResetHardware(); 
-        }
+          VirtualCPU(genome_t(inst_lib_t::DefaultInstLib())) {
+        Initialize();
+        ResetHardware(); 
+      }
       /// Create a perfect copy of passed VirtualCPU
       VirtualCPU(const VirtualCPU &) = default;
       /// Default move constructor
@@ -150,7 +154,7 @@ namespace emp{
       /// Return size of original genome
       size_t GetGenomeSize() const { return genome.GetSize(); }
       /// Return size of working genome
-      size_t GetWorkingGenomeSize() const { return genome.GetSize(); }
+      size_t GetWorkingGenomeSize() const { return genome_working.GetSize(); }
       /// Return the number of registers in the CPU
       size_t GetNumRegs() const { return num_regs; }
       /// Return the number of NOP instructions found in the CPU's instruction library
@@ -171,13 +175,14 @@ namespace emp{
       //////// GENOME & INSTRUCTION MANIPULATION 
       /// Load instructions from input stream
       bool Load(std::istream & input) {
+        Reset();
         File file(input);
         file.RemoveComments("--");  // Remove all comments beginning with -- (including --> and ----)
         file.RemoveComments("//");  // Remove all comments beginning with -- (including --> and ----)
         file.RemoveComments("#");  // Remove all comments beginning with -- (including --> and ----)
         file.CompressWhitespace();  // Trim down remaining whitespace.
         file.Apply( [this](std::string & info){ PushInst(info); } );
-        needs_nops_curated = true;
+        nops_need_curated = true;
         return true;
       }
       /// Load instructions from file
@@ -190,19 +195,18 @@ namespace emp{
         const size_t id = GetInstLib()->GetID(idx);
         genome.emplace_back(idx, id);
         genome_working.emplace_back(idx, id);
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Add a new instruction to the end of the genome, by name
       void PushInst(const std::string & name) {
-        std::cout << "Pushing " << name << std::endl;
         PushInst(GetInstLib()->GetIndex(name));
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Add a specified new instruction to the end of the genome
       void PushInst(const inst_t & inst) { 
         genome.emplace_back(inst); 
         genome_working.emplace_back(inst); 
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Add multiple copies of a specified instruction to the end of the genome
       void PushInst(const inst_t & inst, size_t count) {
@@ -210,7 +214,7 @@ namespace emp{
         for (size_t i = 0; i < count; i++) genome.emplace_back(inst);
         genome_working.reserve(genome.size() + count);
         for (size_t i = 0; i < count; i++) genome_working.emplace_back(inst);
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Return the first instruction in the instruction library
       inst_t GetDefaultInst(){
@@ -219,7 +223,7 @@ namespace emp{
       /// Add one or more default instructions to the end of the genome
       void PushDefaultInst(size_t count=1) { 
         PushInst( inst_t(0, GetInstLib()->GetID(0)), count ); 
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Return a random instruction from the instruction library
       inst_t GetRandomInst(Random & rand) {
@@ -231,19 +235,19 @@ namespace emp{
       void SetInst(size_t pos, const inst_t & inst) { 
         genome[pos] = inst; 
         genome_working[pos] = inst;
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Overwrite the instruction at the given genome index with a random instruction 
       void RandomizeInst(size_t pos, Random & rand) { 
         SetInst(pos, GetRandomInst(rand) ); 
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
       /// Add a random instruction from the instruction library to the end of the genome
       void PushRandom(Random & random, const size_t count=1) {
         for (size_t i = 0; i < count; i++) {
           PushInst(GetRandomInst(random));
         }
-        needs_nops_curated = true;
+        nops_need_curated = true;
       }
 
 
@@ -251,6 +255,18 @@ namespace emp{
       /// Move the instruction pointer to the beginning of the genome
       void ResetIP(){
         inst_ptr = 0;
+      }
+      /// Move the read head to the beginning of the genome
+      void ResetRH(){
+        read_head = 0;
+      }
+      /// Move the write head to the beginning of the genome
+      void ResetWH(){
+        write_head = 0;
+      }
+      /// Move the flow head to the beginning of the genome
+      void ResetFH(){
+        flow_head = 0;
       }
       /// Advance the instruction pointer so many steps and wrap around the end of the genome
       void AdvanceIP(size_t steps=1){
@@ -292,6 +308,14 @@ namespace emp{
         flow_head = pos;
         flow_head %= genome_working.size();
       }
+      /// Set the specified head (which can wrap) to the beginning of the genom, 
+      void ResetModdedHead(size_t head_idx){
+        size_t modded_idx = head_idx % 4;
+        if(modded_idx == 0) SetIP(0);
+        else if(modded_idx == 1) SetRH(0);
+        else if(modded_idx == 2) SetWH(0);
+        else if(modded_idx == 3) SetFH(0);
+      }
       /// Set the specified head (which can wrap) to the given genome position, 
       /// wrap around the end of the genome 
       void SetModdedHead(size_t head_idx, size_t pos){
@@ -303,7 +327,7 @@ namespace emp{
       }
       /// Advance the specified head (which can wrap) the given number of instructions, 
       /// wrap around the end of the genome 
-      void AdvanceModdedHead(size_t head_idx, size_t steps){
+      void AdvanceModdedHead(size_t head_idx, size_t steps=1){
         size_t modded_idx = head_idx % 4;
         if(modded_idx == 0) AdvanceIP(steps);
         else if(modded_idx == 1) AdvanceRH(steps);
@@ -326,10 +350,11 @@ namespace emp{
       void Initialize(){
         CountNops();
         ExpandRegisters();
+        ResetHardware();
       }
       /// Reset just the CPU hardware, but keep the original genome
       virtual void ResetHardware() {
-        // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
+        // Initialize registers to their position.  So Reg0 = 0 and Reg11 = 11.
         for (size_t i = 0; i < num_regs; i++) {
           regs[i] = (data_t) i;
         }
@@ -342,6 +367,7 @@ namespace emp{
         flow_head = 0;
         read_head = 0;
         write_head = 0;
+        active_stack_idx = 0;
         copied_inst_id_vec.clear();
         genome_working = genome;
        }
@@ -354,6 +380,10 @@ namespace emp{
       /// Compile NOP instructions in genome into useful nop vectors for each instruction, 
       /// and records the position of all LABEL instructions
       void CurateNops(){ 
+        if(genome_working.size() == 0){
+          nops_need_curated = false;
+          return;
+        }
         bool label_inst_present = GetInstLib()->IsInst("Label");
         size_t label_inst_id = label_inst_present ? GetInstLib()->GetID("Label") : 0;
 
@@ -377,7 +407,6 @@ namespace emp{
         // Thus, we copy the next instruction into the nop vector [a]
         // Then we copy THAT instruction's nop vector, too: [a,b,c]
         // By going in reverse order, all following instructions already have a nop vec
-        size_t inst_idx = 0;
         for(auto it = genome_working.rbegin() + 1; it != genome_working.rend(); ++it){
           if(emp::Has(nop_id_set, (it - 1)->id)){
             it->nop_vec.resize( (it - 1)->nop_vec.size() + 1 );
@@ -386,19 +415,19 @@ namespace emp{
                 (it - 1)->nop_vec.begin(), 
                 (it - 1)->nop_vec.end(), 
                 it->nop_vec.begin() + 1);
-           if(label_inst_present && (it->id == label_inst_id)) // Record pos if inst is label
-              label_idx_vec.push_back(inst_idx);
-           ++inst_idx;
           }
         }
-        needs_nops_curated = false;
+        for(size_t inst_idx = 0; inst_idx < genome_working.size(); ++inst_idx){
+           if(genome_working[inst_idx].id == label_inst_id) // Record pos if inst is label
+              label_idx_vec.push_back(inst_idx);
+        }
+        nops_need_curated = false;
       }
       /// Determine the number of sequential NOP instructions in the instruction library
       ///
       /// Starts at NopA and continues from there. Any missing instructions force count to
       /// stop. Last possible NOP instruction is NopW, as NopX is a special case in Avida. 
       void CountNops(){
-        std::cout << "\n\nCounting nops!" << std::endl;
         num_nops = 0;
         nop_id_set.clear();
         are_nops_counted = true;
@@ -416,7 +445,6 @@ namespace emp{
       /// instruction library
       void ExpandRegisters(){
         if(!are_nops_counted) CountNops();
-        std::cout << "Expanding registers! " << "Nops: " << num_nops << std::endl;
         are_regs_expanded = true;
         num_regs = num_nops;
         regs.resize(num_regs);
@@ -612,7 +640,7 @@ namespace emp{
       void SingleProcess(bool verbose = true) {
         emp_assert(genome_working.GetSize() > 0);  // A genome must exist to be processed.
         if(!are_regs_expanded) ExpandRegisters();
-        if(needs_nops_curated) CurateNops();
+        if(nops_need_curated) CurateNops();
         if(verbose){
           GetInstLib()->GetName(genome_working[inst_ptr].idx);
           PrintDetails();
