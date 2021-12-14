@@ -8,13 +8,12 @@
  *    e.g., Avidians, Push, SignalGP
  *
  *  @TODO
- *    - Figure out how to default instructions
+ *    - Figure out best way to default instructions
  *    - Should PushInst update labels?
  *      - SetInst
  *    - Rename nop and label methods
  *    - Add docstrings
  *    - Curate nops should wrap
- *    
  */
 
 #ifndef EMP_VIRTUAL_CPU_H
@@ -334,90 +333,16 @@ namespace emp{
         nop_id_to_idx_map.clear();
         nop_idx_to_id_map.clear();
         are_nops_counted = true;
-        if(GetInstLib()->IsInst("NopA")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopA");
-          nop_id_to_idx_map[id] = 0;
-          nop_idx_to_id_map[0] = id;
+        for(size_t idx = 0; idx < 23 ; ++idx){ // Stop before X!
+          std::string nop_name = (std::string)"Nop" + (char)('A' + idx);
+          if(GetInstLib()->IsInst(nop_name)){
+            num_nops++;
+            size_t id = GetInstLib()->GetID(nop_name);
+            nop_id_to_idx_map[id] = idx;
+            nop_idx_to_id_map[idx] = id;
+          }
+          else return;
         }
-        else return;
-        if(GetInstLib()->IsInst("NopB")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopB");
-          nop_id_to_idx_map[id] = 1;
-          nop_idx_to_id_map[1] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopC")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopC");
-          nop_id_to_idx_map[id] = 2;
-          nop_idx_to_id_map[2] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopD")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopD");
-          nop_id_to_idx_map[id] = 3;
-          nop_idx_to_id_map[3] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopE")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopE");
-          nop_id_to_idx_map[id] = 4;
-          nop_idx_to_id_map[4] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopF")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopF");
-          nop_id_to_idx_map[id] = 5;
-          nop_idx_to_id_map[5] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopG")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopG");
-          nop_id_to_idx_map[id] = 6;
-          nop_idx_to_id_map[6] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopH")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopH");
-          nop_id_to_idx_map[id] = 7;
-          nop_idx_to_id_map[7] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopI")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopI");
-          nop_id_to_idx_map[id] = 8;
-          nop_idx_to_id_map[8] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopJ")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopJ");
-          nop_id_to_idx_map[id] = 9;
-          nop_idx_to_id_map[9] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopK")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopK");
-          nop_id_to_idx_map[id] = 10;
-          nop_idx_to_id_map[10] = id;
-        }
-        else return;
-        if(GetInstLib()->IsInst("NopL")){
-          num_nops++;
-          size_t id = GetInstLib()->GetID("NopL");
-          nop_id_to_idx_map[id] = 11;
-          nop_idx_to_id_map[11] = id;
-        }
-        else return;
       }
       void ExpandRegisters(){
         if(!are_nops_counted) CountNops();
@@ -580,7 +505,7 @@ namespace emp{
     
 
       //// STATE TO STRING FUNCTIONS
-      std::string GetString(){
+      std::string GetWorkingGenomeString(){
         std::stringstream sstr;
         sstr << "[" << genome_working.size() << "]";
         for(size_t idx = 0; idx < genome_working.size(); idx++){
@@ -590,7 +515,7 @@ namespace emp{
         }
         return sstr.str();
       }
-      std::string GetOriginalString(){
+      std::string GetGenomeString(){
         std::stringstream sstr;
         sstr << "[" << genome.size() << "]";
         for(size_t idx = 0; idx < genome.size(); idx++){
@@ -600,17 +525,16 @@ namespace emp{
         }
         return sstr.str();
       }
-      void PrintDetails(){
-        std::cout << "IP: " << inst_ptr;
-        std::cout << " RH: " << read_head;
-        std::cout << " WH: " << write_head;
-        std::cout << " FH: " << flow_head;
-        std::cout << "(nops: " << num_nops << "; regs: " << num_regs << ")" << std::endl;
+      void PrintDetails(std::ostream& ostr = std::cout){
+        ostr << "IP: " << inst_ptr;
+        ostr << " RH: " << read_head;
+        ostr << " WH: " << write_head;
+        ostr << " FH: " << flow_head;
+        ostr << "(nops: " << num_nops << "; regs: " << num_regs << ")" << std::endl;
         for(size_t reg_idx = 0; reg_idx < regs.size(); ++reg_idx){
-          std::cout << "[" << reg_idx << "] " << regs[reg_idx] << std::endl;
+          ostr << "[" << reg_idx << "] " << regs[reg_idx] << std::endl;
         }
-        std::cout << std::endl;
-
+        ostr << std::endl;
       }
   
   }; // End VirtualCPU class
