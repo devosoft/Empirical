@@ -25,13 +25,16 @@ TEST_CASE("Test notifications", "[base]")
   emp::notify::SetMessageHandler([&message_results](const std::string & msg){ message_results.push_back(msg); return true; });
   emp::notify::SetWarningHandler([&warning_results](const std::string & msg){ warning_results.push_back(msg); return true; });
   emp::notify::SetErrorHandler([&error_results](const std::string & msg){ error_results.push_back(msg); return true; });
-  emp::notify::SetExceptionHandler([&exception_results](const std::string & msg){ exception_results.push_back(msg); return true; });
+  emp::notify::SetExceptionHandler(
+    [&exception_results](const std::string & id, const std::string & /*msg*/){
+      exception_results.push_back(id); return true;
+    });
 
   size_t special_count = 0;
   emp::notify::SetExceptionHandler(
     "PASS",
-    [&special_results, &special_count](const std::string & msg) {
-      special_results.push_back(msg);
+    [&special_results, &special_count](const std::string & id, const std::string & /*msg*/) {
+      special_results.push_back(id);
       ++special_count;
       return true;
     }
@@ -39,8 +42,8 @@ TEST_CASE("Test notifications", "[base]")
 
   emp::notify::SetExceptionHandler(
     "FAIL",
-    [&special_results, &special_count](const std::string & msg) {
-      special_results.push_back(msg);
+    [&special_results, &special_count](const std::string & id, const std::string & /*msg*/) {
+      special_results.push_back(id);
       ++special_count;
       return false;
     }
@@ -75,7 +78,7 @@ TEST_CASE("Test notifications", "[base]")
   emp::notify::Exception("UNKNOWN2", "This is a brand new unknown expression.");
   emp::notify::Exception("UNKNOWN", "This is the original unknown expression once again.");
 
-  CHECK(exception_results.size() == 4); // Only unknown expressions should end up here.
+  CHECK(exception_results.size() == 6); // Only unknown and FAIL expressions should end up here.
   CHECK(special_results.size() == 3);   // Both PASS and FAIL should be found here.
   CHECK(exception_results.back() == "UNKNOWN");
   CHECK(special_results.back() == "FAIL");
