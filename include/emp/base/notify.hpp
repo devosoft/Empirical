@@ -50,6 +50,7 @@ namespace notify {
   using response_t = std::function<bool(const std::string & /*id*/, const std::string & /*desc*/)>;
   using no_id_response_t = std::function<bool(const std::string & /*desc*/)>;
   using response_vec_t = emp::vector<response_t>;
+  using exit_handler_t = std::function<void(size_t)>;
 
   /// Information about an exception that has occurred.
   struct ExceptInfo {
@@ -80,7 +81,7 @@ namespace notify {
     std::array<response_t, (size_t) Type::NUM_TYPES> handlers;    // Default handlers for notifications
     std::array<bool, (size_t) Type::NUM_TYPES> exit_on;           // Should we exit on given msg type?
 
-    std::function<void(size_t)> exit_handler;
+    emp::vector<exit_handler_t> exit_handlers;                    // Set of handlers to run on exit.
 
     NotifyData() {
       // Setup the default handlers and exit rules.
@@ -123,12 +124,25 @@ namespace notify {
         };
       exit_on[(size_t) Type::EXCEPTION] = true;  // When unhandled...
 
-      exit_handler = [](size_t code){ exit(code); };
+      // The initial exit handler should actually exit, using the appropriate exit code.
+      exit_handlers.push_back( [](size_t code){ exit(code); } );
     }
   };
 
   /// Central call to obtain NotifyData singleton.
   static NotifyData & GetData() { static NotifyData data; return data; }
+
+  /// Generic exit handler that calls all of the provided functions.
+  static void Exit(size_t exit_code) {
+    NotifyData & data = GetData();
+
+    // Run exit handlers from most recently added to oldest.
+    for (auto it = data.exit_handlers.rbegin();
+          it != data.exit_handlers.rend();
+          ++it) {
+      (*it)(1);
+    }
+  }
 
   /// Generic Notification where type must be specified.
   template <typename... Ts>
@@ -144,7 +158,7 @@ namespace notify {
     bool result = data.handlers[type_id](TypeName(type), ss.str());
 
     // Test if we are supposed to exit.
-    if (data.exit_on[type_id]) data.exit_handler(1);
+    if (data.exit_on[type_id]) Exit(1);
 
     // And return the success result.
     return result;
@@ -193,7 +207,7 @@ namespace notify {
 
     // If still unresolved, either give up or save the exception for later analysis.
     if (!result) {
-      if (data.exit_on[(size_t) Type::EXCEPTION]) data.exit_handler(1);
+      if (data.exit_on[(size_t) Type::EXCEPTION]) Exit(1);
       data.except_queue.push_back(ExceptInfo{id, ss.str()});
     }
 
@@ -244,21 +258,30 @@ namespace notify {
     }
   }
 
+  template <typename FUN_T>
+  static void AddExitHandler(FUN_T in) { GetData().exit_handlers.push_back(in); }
+  static void ClearExitHandlers() { GetData().exit_handlers.resize(0); }
+
+  static void ReplaceExitHandlers() { ClearExitHandlers(); }
+
+  template <typename FUN1_T, typename... FUN_Ts>
+  static void ReplaceExitHandlers(FUN1_T in, FUN_Ts... extra) {
+    ReplaceExitHandlers(extra...);
+    AddExitHandler(in);
+  }
+
   static void SetExitOnMessage(bool in=true) { GetData().exit_on[(size_t) Type::MESSAGE] = in; }
   static void SetExitOnDebug(bool in=true) { GetData().exit_on[(size_t) Type::DEBUG] = in; }
   static void SetExitOnWarning(bool in=true) { GetData().exit_on[(size_t) Type::WARNING] = in; }
   static void SetExitOnError(bool in=true) { GetData().exit_on[(size_t) Type::ERROR] = in; }
   static void SetExitOnException(bool in=true) { GetData().exit_on[(size_t) Type::EXCEPTION] = in; }
 
-  template <typename FUN_T>
-  static void SetExitHandler(FUN_T in) { GetData().exit_handler = in; }
-
   static void SetMessageHandler(response_t in) { GetData().handlers[(size_t) Type::MESSAGE] = in; }
   static void SetDebugHandler(response_t in) { GetData().handlers[(size_t) Type::DEBUG] = in; }
   static void SetWarningHandler(response_t in) { GetData().handlers[(size_t) Type::WARNING] = in; }
   static void SetErrorHandler(response_t in) { GetData().handlers[(size_t) Type::ERROR] = in; }
   static void SetExceptionHandler(response_t in) { GetData().handlers[(size_t) Type::EXCEPTION] = in; }
-  static void SetExceptionHandler(const std::string & id, response_t in) {
+  static void AddExceptionHandler(const std::string & id, response_t in) {
     GetData().except_handlers[id].push_back(in);
   }
   static void ClearExceptionHandler(const std::string & id) {
@@ -281,8 +304,8 @@ namespace notify {
   static void SetExceptionHandler(no_id_response_t in) {
     SetExceptionHandler( [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
   }
-  static void SetExceptionHandler(const std::string & id, no_id_response_t in) {
-    SetExceptionHandler( id, [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
+  static void AddExceptionHandler(const std::string & id, no_id_response_t in) {
+    AddExceptionHandler( id, [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
   }
 
 }
