@@ -31,7 +31,7 @@ TEST_CASE("Test notifications", "[base]")
     });
 
   size_t special_count = 0;
-  emp::notify::SetExceptionHandler(
+  emp::notify::AddExceptionHandler(
     "PASS",
     [&special_results, &special_count](const std::string & id, const std::string & /*msg*/) {
       special_results.push_back(id);
@@ -40,7 +40,7 @@ TEST_CASE("Test notifications", "[base]")
     }
   );
 
-  emp::notify::SetExceptionHandler(
+  emp::notify::AddExceptionHandler(
     "FAIL",
     [&special_results, &special_count](const std::string & id, const std::string & /*msg*/) {
       special_results.push_back(id);
@@ -50,7 +50,7 @@ TEST_CASE("Test notifications", "[base]")
   );
 
   size_t exit_count = 0;
-  emp::notify::SetExitHandler( [&exit_count](size_t exit_code){ ++exit_count; (void) exit_code; } );
+  emp::notify::ReplaceExitHandlers( [&exit_count](size_t exit_code){ ++exit_count; (void) exit_code; } );
 
   CHECK(message_results.size() == 0);
   emp::notify::Message("Message1");
