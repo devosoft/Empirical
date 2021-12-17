@@ -59,17 +59,41 @@ namespace notify {
   };
 
   enum class Type { MESSAGE=0, DEBUG, WARNING, ERROR, EXCEPTION, NUM_TYPES };
+  static constexpr size_t num_types = static_cast<size_t>(Type::NUM_TYPES);
 
-  std::string TypeName(Type type) {
-    switch (type) {
-      case Type::MESSAGE: return "Message";
-      case Type::DEBUG: return "Debug";
-      case Type::WARNING: return "WARNING";
-      case Type::ERROR: return "ERROR";
-      case Type::EXCEPTION: return "EXCEPTION";
-      default: return "Unknown";
+  template <typename FUN_T> struct HandlerSet;
+
+  template <typename RETURN_T, typename... ARGS>
+  struct HandlerSet<RETURN_T(ARGS...)> {
+    using fun_t = std::function<RETURN_T(ARGS...)>;
+    emp::vector<fun_t> handlers;
+
+    // Trigger all handlers (or until one succeeds)
+    RETURN_T Trigger(ARGS... args) {
+      // Run handlers from most recently added to oldest.
+      for (auto it = handlers.rbegin();
+            it != handlers.rend();
+            ++it) {
+        // If we have a void return, run everything; otherwise just run until we get a "true"
+        if constexpr (std::is_same<RETURN_T, void>()) (*it)(args...);
+        else if constexpr (std::is_same<RETURN_T, bool>()) {
+          bool result = (*it)(args...);
+          if (result) break;                 // Stop if any handler succeeded.
+        }
+      }
     }
-  }
+
+    template <typename FUN_T>
+    static void Add(fun_t in) { handlers.push_back(in); }
+    static void Clear() { handlers.resize(0); }
+    static void Replace() { Clear(); }
+
+    template <typename... FUN_Ts>
+    static void Replace(fun_t in, FUN_Ts... extra) {
+      Replace(extra...);
+      Add(in);
+    }
+  };
 
   /// Staticly stored data about current notifications.
   struct NotifyData {
@@ -78,8 +102,8 @@ namespace notify {
     std::unordered_map<std::string, response_vec_t> except_handlers;
 
     emp::vector<ExceptInfo> except_queue;                         // Unresolved exceptions
-    std::array<response_t, (size_t) Type::NUM_TYPES> handlers;    // Default handlers for notifications
-    std::array<bool, (size_t) Type::NUM_TYPES> exit_on;           // Should we exit on given msg type?
+    std::array<response_t, num_types> handlers;    // Default handlers for notifications
+    std::array<bool, num_types> exit_on;           // Should we exit on given msg type?
 
     emp::vector<exit_handler_t> exit_handlers;                    // Set of handlers to run on exit.
 
@@ -131,6 +155,18 @@ namespace notify {
 
   /// Central call to obtain NotifyData singleton.
   static NotifyData & GetData() { static NotifyData data; return data; }
+
+  /// Convert a type to a human-readable string.
+  static std::string TypeName(Type type) {
+    switch (type) {
+      case Type::MESSAGE: return "Message";
+      case Type::DEBUG: return "Debug";
+      case Type::WARNING: return "WARNING";
+      case Type::ERROR: return "ERROR";
+      case Type::EXCEPTION: return "EXCEPTION";
+      default: return "Unknown";
+    }
+  }
 
   /// Generic exit handler that calls all of the provided functions.
   static void Exit(size_t exit_code) {
