@@ -47,10 +47,9 @@
 
 namespace emp {
 namespace notify {
-  using response_t = std::function<bool(const std::string & /*id*/, const std::string & /*desc*/)>;
-  using no_id_response_t = std::function<bool(const std::string & /*desc*/)>;
-  using response_vec_t = emp::vector<response_t>;
-  using exit_handler_t = std::function<void(size_t)>;
+  using response_t = bool(const std::string & /*id*/, const std::string & /*desc*/);
+  using no_id_response_t = bool(const std::string & /*desc*/);
+  using exit_handler_t = void(size_t);
 
   /// Information about an exception that has occurred.
   struct ExceptInfo {
@@ -63,13 +62,13 @@ namespace notify {
 
   template <typename FUN_T> struct HandlerSet;
 
-  template <typename RETURN_T, typename... ARGS>
-  struct HandlerSet<RETURN_T(ARGS...)> {
-    using fun_t = std::function<RETURN_T(ARGS...)>;
+  template <typename RETURN_T, typename... PARAM_Ts>
+  struct HandlerSet<RETURN_T(PARAM_Ts...)> {
+    using fun_t = std::function<RETURN_T(PARAM_Ts...)>;
     emp::vector<fun_t> handlers;
 
     // Trigger all handlers (or until one succeeds)
-    RETURN_T Trigger(ARGS... args) {
+    RETURN_T Trigger(PARAM_Ts... args) {
       // Run handlers from most recently added to oldest.
       for (auto it = handlers.rbegin();
             it != handlers.rend();
@@ -83,13 +82,12 @@ namespace notify {
       }
     }
 
-    template <typename FUN_T>
-    static void Add(fun_t in) { handlers.push_back(in); }
-    static void Clear() { handlers.resize(0); }
-    static void Replace() { Clear(); }
+    void Add(fun_t in) { handlers.push_back(in); }
+    void Clear() { handlers.resize(0); }
+    void Replace() { Clear(); }
 
     template <typename... FUN_Ts>
-    static void Replace(fun_t in, FUN_Ts... extra) {
+    void Replace(fun_t in, FUN_Ts... extra) {
       Replace(extra...);
       Add(in);
     }
@@ -99,57 +97,63 @@ namespace notify {
   struct NotifyData {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
-    std::unordered_map<std::string, response_vec_t> except_handlers;
+    std::unordered_map<std::string, HandlerSet<response_t>> except_handlers;
+    std::array<HandlerSet<response_t>, num_types> handlers;  // Default handlers for notifications
+    std::array<bool, num_types> exit_on;                     // Should we exit on given msg type?
+    HandlerSet<exit_handler_t> exit_handlers;                // Set of handlers to run on exit.
 
-    emp::vector<ExceptInfo> except_queue;                         // Unresolved exceptions
-    std::array<response_t, num_types> handlers;    // Default handlers for notifications
-    std::array<bool, num_types> exit_on;           // Should we exit on given msg type?
+    emp::vector<ExceptInfo> except_queue;                    // Unresolved exceptions
 
-    emp::vector<exit_handler_t> exit_handlers;                    // Set of handlers to run on exit.
+    HandlerSet<response_t> & GetHandler(Type type) { return handlers[(size_t) type]; }
 
     NotifyData() {
       // Setup the default handlers and exit rules.
-      handlers[(size_t) Type::MESSAGE] = 
+      GetHandler(Type::MESSAGE).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cout << msg << std::endl;
           return true;
-        };
+        }
+      );
       exit_on[(size_t) Type::MESSAGE] = false;
 
-      handlers[(size_t) Type::DEBUG] = 
+      GetHandler(Type::DEBUG).Add(
 #ifdef NDEBUG
-        [](const std::string & /*id*/, const std::string & msg){ return true; };
+        [](const std::string & /*id*/, const std::string & msg){ return true; }
 #else
         [](const std::string & /*id*/, const std::string & msg) {
           std::cout << "Debug: " << msg << std::endl;
           return true;
-        };
+        }
 #endif
+      );
       exit_on[(size_t) Type::DEBUG] = false;
 
-      handlers[(size_t) Type::WARNING] = 
+      GetHandler(Type::WARNING).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "WARNING: " << msg << std::endl;
           return true;
-        };
+        }
+      );
       exit_on[(size_t) Type::WARNING] = false;
 
-      handlers[(size_t) Type::ERROR] = 
+      GetHandler(Type::ERROR).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "ERROR: " << msg << std::endl;
           return true;
-        };
+        }
+      );
       exit_on[(size_t) Type::ERROR] = true;
 
-      handlers[(size_t) Type::EXCEPTION] = 
+      GetHandler(Type::EXCEPTION).Add(
         [](const std::string & id, const std::string & msg) {
           std::cerr << "EXCEPTION (" << id << "): " << msg << std::endl;
           return false;
-        };
+        }
+      );
       exit_on[(size_t) Type::EXCEPTION] = true;  // When unhandled...
 
       // The initial exit handler should actually exit, using the appropriate exit code.
-      exit_handlers.push_back( [](size_t code){ exit(code); } );
+      exit_handlers.Add( [](size_t code){ exit(code); } );
     }
   };
 
@@ -171,13 +175,7 @@ namespace notify {
   /// Generic exit handler that calls all of the provided functions.
   static void Exit(size_t exit_code) {
     NotifyData & data = GetData();
-
-    // Run exit handlers from most recently added to oldest.
-    for (auto it = data.exit_handlers.rbegin();
-          it != data.exit_handlers.rend();
-          ++it) {
-      (*it)(1);
-    }
+    data.exit_handlers.Trigger(exit_code);
   }
 
   /// Generic Notification where type must be specified.
@@ -191,7 +189,7 @@ namespace notify {
     ((ss << std::forward<Ts>(args)), ...);
 
     // Run the appropriate handler
-    bool result = data.handlers[type_id](TypeName(type), ss.str());
+    bool result = data.handlers[type_id].Trigger(TypeName(type), ss.str());
 
     // Test if we are supposed to exit.
     if (data.exit_on[type_id]) Exit(1);
@@ -226,15 +224,9 @@ namespace notify {
     std::stringstream ss;
     ((ss << std::forward<Ts>(args)), ...);
 
-    bool result = false;
-
     // Retrieve the exception handlers that we have for this type of exception.
     auto & handlers = data.except_handlers[id];
-
-    // See if any of them resolve they problem (trying the most recent first).
-    for (auto it = handlers.rbegin(); it != handlers.rend() && result == false; ++it) {
-      result |= (*it)(id, ss.str());
-    }
+    bool result = handlers.Trigger(id, ss.str());
 
     // If it's unresolved, try the default handler
     if (!result) {
@@ -294,55 +286,11 @@ namespace notify {
     }
   }
 
-  template <typename FUN_T>
-  static void AddExitHandler(FUN_T in) { GetData().exit_handlers.push_back(in); }
-  static void ClearExitHandlers() { GetData().exit_handlers.resize(0); }
-
-  static void ReplaceExitHandlers() { ClearExitHandlers(); }
-
-  template <typename FUN1_T, typename... FUN_Ts>
-  static void ReplaceExitHandlers(FUN1_T in, FUN_Ts... extra) {
-    ReplaceExitHandlers(extra...);
-    AddExitHandler(in);
-  }
-
   static void SetExitOnMessage(bool in=true) { GetData().exit_on[(size_t) Type::MESSAGE] = in; }
   static void SetExitOnDebug(bool in=true) { GetData().exit_on[(size_t) Type::DEBUG] = in; }
   static void SetExitOnWarning(bool in=true) { GetData().exit_on[(size_t) Type::WARNING] = in; }
   static void SetExitOnError(bool in=true) { GetData().exit_on[(size_t) Type::ERROR] = in; }
   static void SetExitOnException(bool in=true) { GetData().exit_on[(size_t) Type::EXCEPTION] = in; }
-
-  static void SetMessageHandler(response_t in) { GetData().handlers[(size_t) Type::MESSAGE] = in; }
-  static void SetDebugHandler(response_t in) { GetData().handlers[(size_t) Type::DEBUG] = in; }
-  static void SetWarningHandler(response_t in) { GetData().handlers[(size_t) Type::WARNING] = in; }
-  static void SetErrorHandler(response_t in) { GetData().handlers[(size_t) Type::ERROR] = in; }
-  static void SetExceptionHandler(response_t in) { GetData().handlers[(size_t) Type::EXCEPTION] = in; }
-  static void AddExceptionHandler(const std::string & id, response_t in) {
-    GetData().except_handlers[id].push_back(in);
-  }
-  static void ClearExceptionHandler(const std::string & id) {
-    GetData().except_handlers.erase(id);
-  }
-
-  // Allow handlers that don't use the ID.
-  static void SetMessageHandler(no_id_response_t in) {
-    SetMessageHandler( [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
-  }
-  static void SetDebugHandler(no_id_response_t in) {
-    SetDebugHandler( [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
-  }
-  static void SetWarningHandler(no_id_response_t in) {
-    SetWarningHandler( [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
-  }
-  static void SetErrorHandler(no_id_response_t in) {
-    SetErrorHandler( [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
-  }
-  static void SetExceptionHandler(no_id_response_t in) {
-    SetExceptionHandler( [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
-  }
-  static void AddExceptionHandler(const std::string & id, no_id_response_t in) {
-    AddExceptionHandler( id, [fun=in](const std::string &, const std::string & msg){ return fun(msg); } );
-  }
 
 }
 }
