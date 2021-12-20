@@ -104,11 +104,11 @@ namespace notify {
 
     emp::vector<ExceptInfo> except_queue;                    // Unresolved exceptions
 
-    HandlerSet<response_t> & GetHandler(Type type) { return handlers[(size_t) type]; }
+    HandlerSet<response_t> & GetHandlers(Type type) { return handlers[(size_t) type]; }
 
     NotifyData() {
       // Setup the default handlers and exit rules.
-      GetHandler(Type::MESSAGE).Add(
+      GetHandlers(Type::MESSAGE).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cout << msg << std::endl;
           return true;
@@ -116,7 +116,7 @@ namespace notify {
       );
       exit_on[(size_t) Type::MESSAGE] = false;
 
-      GetHandler(Type::DEBUG).Add(
+      GetHandlers(Type::DEBUG).Add(
 #ifdef NDEBUG
         [](const std::string & /*id*/, const std::string & msg){ return true; }
 #else
@@ -128,7 +128,7 @@ namespace notify {
       );
       exit_on[(size_t) Type::DEBUG] = false;
 
-      GetHandler(Type::WARNING).Add(
+      GetHandlers(Type::WARNING).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "WARNING: " << msg << std::endl;
           return true;
@@ -136,7 +136,7 @@ namespace notify {
       );
       exit_on[(size_t) Type::WARNING] = false;
 
-      GetHandler(Type::ERROR).Add(
+      GetHandlers(Type::ERROR).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "ERROR: " << msg << std::endl;
           return true;
@@ -144,7 +144,7 @@ namespace notify {
       );
       exit_on[(size_t) Type::ERROR] = true;
 
-      GetHandler(Type::EXCEPTION).Add(
+      GetHandlers(Type::EXCEPTION).Add(
         [](const std::string & id, const std::string & msg) {
           std::cerr << "EXCEPTION (" << id << "): " << msg << std::endl;
           return false;
@@ -159,6 +159,12 @@ namespace notify {
 
   /// Central call to obtain NotifyData singleton.
   static NotifyData & GetData() { static NotifyData data; return data; }
+  auto & MessageHandlers() { return GetData().GetHandlers(Type::MESSAGE); }
+  auto & DebugHandlers() { return GetData().GetHandlers(Type::DEBUG); }
+  auto & WarningHandlers() { return GetData().GetHandlers(Type::WARNING); }
+  auto & ErrorHandlers() { return GetData().GetHandlers(Type::ERROR); }
+  auto & ExceptionHandlers() { return GetData().GetHandlers(Type::EXCEPTION); }
+  auto & ExitHandlers() { return GetData().exit_handlers; }
 
   /// Convert a type to a human-readable string.
   static std::string TypeName(Type type) {
@@ -230,7 +236,7 @@ namespace notify {
 
     // If it's unresolved, try the default handler
     if (!result) {
-      result = data.handlers[(size_t) Type::EXCEPTION](id, ss.str());
+      result = data.handlers[(size_t) Type::EXCEPTION].Trigger(id, ss.str());
     }
 
     // If still unresolved, either give up or save the exception for later analysis.
