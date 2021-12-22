@@ -62,24 +62,32 @@ namespace notify {
   enum class Type { MESSAGE=0, DEBUG, WARNING, ERROR, EXCEPTION, NUM_TYPES };
   static constexpr size_t num_types = static_cast<size_t>(Type::NUM_TYPES);
 
+  /// Convert a type to a human-readable string.
+  static std::string TypeName(Type type) {
+    switch (type) {
+      case Type::MESSAGE: return "Message";
+      case Type::DEBUG: return "Debug";
+      case Type::WARNING: return "WARNING";
+      case Type::ERROR: return "ERROR";
+      case Type::EXCEPTION: return "EXCEPTION";
+      default: return "Unknown";
+    }
+  }
+
   // Maintain a specified collection of handlers.
   class HandlerSet {
   private:
     using fun_t = std::function<response_t>;
-    std::unordered_map<std::string, emp::vector<fun_t>> handler_map;
-    bool exit_on_fail = false;
+    emp::vector<fun_t> handlers;
 
   public:
     HandlerSet() {}
-
-    bool GetExitOnFail() const { return exit_on_fail; }
-    void SetExitOnFail(bool in=true) { exit_on_fail = in; }
+    HandlerSet(const HandlerSet &) = default;
+    HandlerSet(HandlerSet &&) = default;
+    ~HalnderSet() { }
 
     /// Trigger all handlers associated with a given ID.
-    bool TriggerID(const std::string & id, const std::string & message) {
-      // Get the handlers with this ID.
-      const auto & handlers = handler_map[id];
-
+    bool Trigger(const std::string & message, std::any data) {
       // Run handlers from most recently added to oldest.
       for (auto it = handlers.rbegin();
             it != handlers.rend();
@@ -89,39 +97,24 @@ namespace notify {
         if (result) return true;           // Stop if any handler succeeded.
       }
 
-      // If we are not using the default id, try those next.
-      if (id == "__unnamed__") return false;
-      const auto & default_handlers = handler_map["__unnamed__"];
-
-      // Again, go through default handlers from most recent to oldest.
-      for (auto it = default_handlers.rbegin();
-            it != default_handlers.rend();
-            ++it) {
-        // If we have a void return, run everything; otherwise just run until "true" result
-        bool result = (*it)(message);
-        if (result) return true;           // Stop if any handler succeeded.
-      }
+      return false;
     }
 
-    // Trigger all unnamed handlers (or until one succeeds)
-    bool Trigger(const std::string & message)  { return TriggerID("__unnamed__", message); }
-
-    // Add a function associated with a specified ID.
-    HandlerSet & Add(const std::string & id, fun_t in) { handler_map[id].push_back(in); return *this; }
-
-    // Add a generic function associated with a specified ID.
-    HandlerSet & Add(std::function<bool(const std::string & /*message*/)> in) {
-      Add("__unnamed__", [in=in](const std::string & /*id*/, const std::string & message){ return in(message); });
-      return *this;
+    // Trigger without providing data.
+    bool Trigger(const std::string & message)  {
+      return Trigger(message, 0);
     }
 
-    HandlerSet & Add(fun_t in) { Add("__unnamed__", in); return *this; }
+    // Add a function to this set.
+    HandlerSet & Add(fun_t in) { handlers.push_back(in); return *this; }
 
-    HandlerSet & Clear(const std::string & id) { handler_map[id].resize(0); return *this; }
-    HandlerSet & Clear() { handler_map.clear(); return *this; }
+    // Clear all handlers associated with a given id.
+    HandlerSet & Clear() { handlers.resize(0); return *this; }
  
+    /// Replace all handlers with nothing (i.e., clear them)
     void Replace() { Clear(); }
 
+    /// Replace all handelers with the generic ones provided.
     template <typename... FUN_Ts>
     void Replace(fun_t in, FUN_Ts... extra) {
       Replace(extra...);
@@ -133,11 +126,11 @@ namespace notify {
   struct NotifyData {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
-    std::array<HandlerSet<response_t>, num_types> handlers;  // Default handlers for notifications
+    std::unordered_map<std::string, HandlerSet> handler_map;
     emp::vector<std::function<exit_fun_t>> exit_funs;        // Set of handlers to run on exit.
     emp::vector<ExceptInfo> except_queue;                    // Unresolved exceptions
 
-    HandlerSet<response_t> & GetHandlers(Type type) { return handlers[static_cast<size_t>(type)]; }
+    HandlerSet & GetHandlers(Type type) { return handlers[static_cast<size_t>(type)]; }
 
     NotifyData() {
       // Setup the default handlers and exit rules.
@@ -146,7 +139,7 @@ namespace notify {
           std::cout << msg << std::endl;
           return true;
         }
-      ).SetExitOnFail(false);
+      );
 
       GetHandlers(Type::DEBUG).Add(
 #ifdef NDEBUG
@@ -157,21 +150,21 @@ namespace notify {
           return true;
         }
 #endif
-      ).SetExitOnFail(false);
+      );
 
       GetHandlers(Type::WARNING).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "WARNING: " << msg << std::endl;
           return true;
         }
-      ).SetExitOnFail(false);
+      );
 
       GetHandlers(Type::ERROR).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "ERROR: " << msg << std::endl;
           return true;
         }
-      ).SetExitOnFail(true);
+      );
 
       GetHandlers(Type::EXCEPTION).Add(
         [](const std::string & id, const std::string & msg) {
@@ -193,18 +186,6 @@ namespace notify {
   auto & ErrorHandlers() { return GetData().GetHandlers(Type::ERROR); }
   auto & ExceptionHandlers() { return GetData().GetHandlers(Type::EXCEPTION); }
   auto & ExitHandlers() { return GetData().exit_funs; }
-
-  /// Convert a type to a human-readable string.
-  static std::string TypeName(Type type) {
-    switch (type) {
-      case Type::MESSAGE: return "Message";
-      case Type::DEBUG: return "Debug";
-      case Type::WARNING: return "WARNING";
-      case Type::ERROR: return "ERROR";
-      case Type::EXCEPTION: return "EXCEPTION";
-      default: return "Unknown";
-    }
-  }
 
   /// Generic exit handler that calls all of the provided functions.
   static void Exit(size_t exit_code) {
