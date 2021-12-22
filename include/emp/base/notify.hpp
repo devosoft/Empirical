@@ -84,16 +84,16 @@ namespace notify {
     HandlerSet() {}
     HandlerSet(const HandlerSet &) = default;
     HandlerSet(HandlerSet &&) = default;
-    ~HalnderSet() { }
+    ~HandlerSet() { }
 
     /// Trigger all handlers associated with a given ID.
-    bool Trigger(const std::string & message, std::any data) {
+    bool Trigger(const std::string & id, const std::string & message, std::any data) {
       // Run handlers from most recently added to oldest.
       for (auto it = handlers.rbegin();
             it != handlers.rend();
             ++it) {
         // Run until "true" result
-        bool result = (*it)(message);
+        bool result = (*it)(id, message);
         if (result) return true;           // Stop if any handler succeeded.
       }
 
@@ -101,8 +101,8 @@ namespace notify {
     }
 
     // Trigger without providing data.
-    bool Trigger(const std::string & message)  {
-      return Trigger(message, 0);
+    bool Trigger(const std::string & id, const std::string & message)  {
+      return Trigger(id, message, 0);
     }
 
     // Add a function to this set.
@@ -130,18 +130,18 @@ namespace notify {
     emp::vector<std::function<exit_fun_t>> exit_funs;        // Set of handlers to run on exit.
     emp::vector<ExceptInfo> except_queue;                    // Unresolved exceptions
 
-    HandlerSet & GetHandlers(Type type) { return handlers[static_cast<size_t>(type)]; }
+    HandlerSet & GetHandler(Type type) { return handler_map[TypeName(type)]; }
 
     NotifyData() {
       // Setup the default handlers and exit rules.
-      GetHandlers(Type::MESSAGE).Add(
+      GetHandler(Type::MESSAGE).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cout << msg << std::endl;
           return true;
         }
       );
 
-      GetHandlers(Type::DEBUG).Add(
+      GetHandler(Type::DEBUG).Add(
 #ifdef NDEBUG
         [](const std::string & /*id*/, const std::string & msg){ return true; }
 #else
@@ -152,26 +152,26 @@ namespace notify {
 #endif
       );
 
-      GetHandlers(Type::WARNING).Add(
+      GetHandler(Type::WARNING).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "WARNING: " << msg << std::endl;
           return true;
         }
       );
 
-      GetHandlers(Type::ERROR).Add(
+      GetHandler(Type::ERROR).Add(
         [](const std::string & /*id*/, const std::string & msg) {
           std::cerr << "ERROR: " << msg << std::endl;
           return true;
         }
       );
 
-      GetHandlers(Type::EXCEPTION).Add(
+      GetHandler(Type::EXCEPTION).Add(
         [](const std::string & id, const std::string & msg) {
           std::cerr << "EXCEPTION (" << id << "): " << msg << std::endl;
           return false;
         }
-      ).SetExitOnFail(true);  // When unhandled...
+      );
 
       // The initial exit handler should actually exit, using the appropriate exit code.
       exit_funs.push_back( [](size_t code){ exit(code); } );
@@ -180,11 +180,11 @@ namespace notify {
 
   /// Central call to obtain NotifyData singleton.
   static NotifyData & GetData() { static NotifyData data; return data; }
-  auto & MessageHandlers() { return GetData().GetHandlers(Type::MESSAGE); }
-  auto & DebugHandlers() { return GetData().GetHandlers(Type::DEBUG); }
-  auto & WarningHandlers() { return GetData().GetHandlers(Type::WARNING); }
-  auto & ErrorHandlers() { return GetData().GetHandlers(Type::ERROR); }
-  auto & ExceptionHandlers() { return GetData().GetHandlers(Type::EXCEPTION); }
+  auto & MessageHandlers() { return GetData().GetHandler(Type::MESSAGE); }
+  auto & DebugHandlers() { return GetData().GetHandler(Type::DEBUG); }
+  auto & WarningHandlers() { return GetData().GetHandler(Type::WARNING); }
+  auto & ErrorHandlers() { return GetData().GetHandler(Type::ERROR); }
+  auto & ExceptionHandlers() { return GetData().GetHandler(Type::EXCEPTION); }
   auto & ExitHandlers() { return GetData().exit_funs; }
 
   /// Generic exit handler that calls all of the provided functions.
@@ -199,17 +199,14 @@ namespace notify {
   template <typename... Ts>
   static bool Notify(Type type, Ts... args) {
     NotifyData & data = GetData();
-    size_t type_id = (size_t) type;
+    const std::string id = TypeName(type);
 
     // Setup the message in a string stream.
     std::stringstream ss;
     ((ss << std::forward<Ts>(args)), ...);
 
     // Run the appropriate handler
-    bool result = data.handlers[type_id].Trigger(TypeName(type), ss.str());
-
-    // Test if we are supposed to exit.
-    if (data.handlers[type_id].GetExitOnFail()) Exit(1);
+    bool result = data.handler_map[id].Trigger(id, ss.str());
 
     // And return the success result.
     return result;
@@ -229,7 +226,11 @@ namespace notify {
 
   /// Send out a notification of an ERROR.
   template <typename... Ts>
-  static bool Error(Ts... args) { return Notify(Type::ERROR, std::forward<Ts>(args)...); }
+  static bool Error(Ts... args) {
+    bool success = Notify(Type::ERROR, std::forward<Ts>(args)...);
+    if (!success) Exit(1);
+    return success;
+  }
 
 
   /// Send out a notification of an Exception.
@@ -245,10 +246,7 @@ namespace notify {
     bool result = ExceptionHandlers().Trigger(id, ss.str());
 
     // If unresolved, either give up or save the exception for later analysis.
-    if (!result) {
-      if (ExceptionHandlers().GetExitOnFail()) Exit(1);
-      data.except_queue.push_back(ExceptInfo{id, ss.str()});
-    }
+    if (!result) data.except_queue.push_back(ExceptInfo{id, ss.str()});
 
     return result;
   }
@@ -296,14 +294,6 @@ namespace notify {
       }
     }
   }
-
-  static void SetExitOnFail(Type type, bool in=true) { GetData().GetHandlers(type).SetExitOnFail(in); }
-
-  static void SetExitOnMessage(bool in=true) { SetExitOnFail(Type::MESSAGE, in); }
-  static void SetExitOnDebug(bool in=true) { SetExitOnFail(Type::DEBUG, in); }
-  static void SetExitOnWarning(bool in=true) { SetExitOnFail(Type::WARNING, in); }
-  static void SetExitOnError(bool in=true) { SetExitOnFail(Type::ERROR, in); }
-  static void SetExitOnException(bool in=true) { SetExitOnFail(Type::EXCEPTION, in); }
 
 }
 }
