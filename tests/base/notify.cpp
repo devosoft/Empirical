@@ -22,16 +22,17 @@ TEST_CASE("Test notifications", "[base]")
   emp::vector<std::string> exception_results;
   emp::vector<std::string> special_results;
 
-  emp::notify::SetMessageHandler([&message_results](const std::string & msg){ message_results.push_back(msg); return true; });
-  emp::notify::SetWarningHandler([&warning_results](const std::string & msg){ warning_results.push_back(msg); return true; });
-  emp::notify::SetErrorHandler([&error_results](const std::string & msg){ error_results.push_back(msg); return true; });
-  emp::notify::SetExceptionHandler(
+  emp::notify::MessageHandlers().Add([&message_results](const std::string & msg){ message_results.push_back(msg); return true; });
+  emp::notify::WarningHandlers().Add([&warning_results](const std::string & msg){ warning_results.push_back(msg); return true; });
+  emp::notify::ErrorHandlers().Add([&error_results](const std::string & msg){ error_results.push_back(msg); return true; });
+  emp::notify::AddHandler(
     [&exception_results](const std::string & id, const std::string & /*msg*/){
       exception_results.push_back(id); return true;
-    });
+    }
+  );
 
   size_t special_count = 0;
-  emp::notify::AddExceptionHandler(
+  emp::notify::AddHandler(
     "PASS",
     [&special_results, &special_count](const std::string & id, const std::string & /*msg*/) {
       special_results.push_back(id);
@@ -40,7 +41,7 @@ TEST_CASE("Test notifications", "[base]")
     }
   );
 
-  emp::notify::AddExceptionHandler(
+  emp::notify::AddHandler(
     "FAIL",
     [&special_results, &special_count](const std::string & id, const std::string & /*msg*/) {
       special_results.push_back(id);
