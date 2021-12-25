@@ -58,7 +58,7 @@ namespace notify {
   using id_arg_t = const id_t &;
   using message_arg_t = const message_t &;
   using response_t = bool(id_arg_t, message_arg_t, except_data_t);
-  using exit_fun_t = void(size_t);
+  using exit_fun_t = std::function<void(size_t)>;
 
   /// Information about an exception that has occurred.
   struct ExceptInfo {
@@ -154,7 +154,7 @@ namespace notify {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
     std::unordered_map<id_t, HandlerSet> handler_map;
-    emp::vector<std::function<exit_fun_t>> exit_funs;        // Set of handlers to run on exit.
+    emp::vector<exit_fun_t> exit_funs;        // Set of handlers to run on exit.
     emp::vector<ExceptInfo> except_queue;                    // Unresolved exceptions
 
     HandlerSet & GetHandler(Type type) { return handler_map[TypeID(type)]; }
@@ -211,7 +211,15 @@ namespace notify {
   auto & DebugHandlers() { return GetData().GetHandler(Type::DEBUG); }
   auto & WarningHandlers() { return GetData().GetHandler(Type::WARNING); }
   auto & ErrorHandlers() { return GetData().GetHandler(Type::ERROR); }
-  auto & ExitHandlers() { return GetData().exit_funs; }
+
+  static void AddExitHandler(exit_fun_t fun) { GetData().exit_funs.push_back(fun); }
+  static void ClearExitHandlers() { GetData().exit_funs.resize(0); }
+  static void ReplaceExitHandlers() { ClearExitHandlers(); }
+  template <typename... FUN_Ts>
+  static void ReplaceExitHandlers(exit_fun_t fun, FUN_Ts... extras) {
+    ReplaceExitHandlers(extras...);
+    AddExitHandler(fun);
+  }
 
   /// Generic exit handler that calls all of the provided functions.
   static void Exit(size_t exit_code) {
@@ -225,7 +233,7 @@ namespace notify {
   template <typename... Ts>
   static bool Notify(Type type, Ts... args) {
     NotifyData & data = GetData();
-    const std::string id = TypeID(type);
+    const id_t id = TypeID(type);
 
     // Setup the message in a string stream.
     std::stringstream ss;
@@ -258,16 +266,30 @@ namespace notify {
     return success;
   }
 
+  /// Add a handler for a particular exception type.
+  template <typename FUN_T>
+  static HandlerSet & AddHandler(id_arg_t id, FUN_T fun) {
+    return GetData().handler_map[id].Add(fun);
+  }
+
+  /// Add a generic handler.
+  template <typename FUN_T>
+  static HandlerSet & AddHandler(FUN_T fun) {
+    return GetData().handler_map["__generic__"].Add(fun);
+  }
 
   /// Send out a notification of an Exception.
   template <typename... Ts>
-  static bool Exception(id_arg_t id, message_arg_t message, except_data_t except_data) { 
+  static bool Exception(id_arg_t id, message_arg_t message, except_data_t except_data=0) { 
     NotifyData & data = GetData();
 
     // Retrieve the exception handlers that we have for this type of exception.
     bool result = data.handler_map[id].Trigger(id, message, except_data);
 
-    // If unresolved, either give up or save the exception for later analysis.
+    // If unresolved, see if a generic handler can help.
+    if (!result) result = data.handler_map["__generic__"].Trigger(id, message, except_data);
+
+    // If still unresolved, either give up or save the exception for later analysis.
     if (!result) data.except_queue.push_back(ExceptInfo{id, message, except_data});
 
     return result;
