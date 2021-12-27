@@ -155,8 +155,8 @@ namespace notify {
     // that they arrive (most recent will be last)
     std::unordered_map<id_t,HandlerSet> handler_map; // Map of all handlers to use for notifications.
     emp::vector<exit_fun_t> exit_funs;               // Set of handlers to run on exit.
-    emp::vector<ExceptInfo> notify_queue;            // Unresolved notifications (typically exceptions)
-    size_t next_id = 0;                              // Which queue entry should be processed next?
+    emp::vector<ExceptInfo> except_queue;            // Unresolved exceptions after handlers have run
+    emp::vector<ExceptInfo> pause_queue;             // Unresolved notifications during pause
     bool is_paused = false;                          // When paused, save notifications until unpaused.
 
     HandlerSet & GetHandler(Type type) { return handler_map[TypeID(type)]; }
@@ -243,7 +243,7 @@ namespace notify {
 
     // If we are are paused, save this notification for later.
     if (data.is_paused) {
-      data.notify_queue.push_back(ExceptInfo{id, ss.str(), 0});      
+      data.pause_queue.push_back(ExceptInfo{id, ss.str(), 0});      
     }
 
     // Otherwise run the appropriate handler
@@ -299,27 +299,27 @@ namespace notify {
     if (!result) result = data.handler_map["__generic__"].Trigger(id, message, except_data);
 
     // If still unresolved, either give up or save the exception for later analysis.
-    if (!result) data.notify_queue.push_back(ExceptInfo{id, message, except_data});
+    if (!result) data.except_queue.push_back(ExceptInfo{id, message, except_data});
 
     return result;
   }
 
   /// Retrieve a vector of ALL unresolved exceptions.
-  static const emp::vector<ExceptInfo> & GetExceptions() { return GetData().notify_queue; }
+  static const emp::vector<ExceptInfo> & GetExceptions() { return GetData().except_queue; }
 
   /// Retrieve the first unresolved exception with a given id.
   static ExceptInfo GetException(id_arg_t id) {
-    for (ExceptInfo & x : GetData().notify_queue) if (x.id == id) return x;
+    for (ExceptInfo & x : GetData().except_queue) if (x.id == id) return x;
     return ExceptInfo{};
   }
 
   /// Return a total count of how many unresolved exceptions are left.
-  static size_t CountExceptions() { return GetData().notify_queue.size(); }
+  static size_t CountExceptions() { return GetData().except_queue.size(); }
 
   /// Return a total count of how many unresolved exceptions have a given id.
   static size_t CountExceptions(id_arg_t id) {
     size_t count = 0;
-    for (ExceptInfo & x : GetData().notify_queue) if (x.id == id) ++count;
+    for (ExceptInfo & x : GetData().except_queue) if (x.id == id) ++count;
     return count;
   }
 
@@ -328,21 +328,21 @@ namespace notify {
 
   /// Identify whether there are any unresolved exceptions with a given id.
   static bool HasException(id_arg_t id) {
-    for (ExceptInfo & x : GetData().notify_queue) if (x.id == id) return true;
+    for (ExceptInfo & x : GetData().except_queue) if (x.id == id) return true;
     return false;
   }
 
   /// Remove all unresolved exceptions.
-  static void ClearExceptions() { GetData().notify_queue.resize(0); }
+  static void ClearExceptions() { GetData().except_queue.resize(0); }
 
   /// Remove first exception with a given id.
   static void ClearException(id_arg_t id) {
-    auto & notify_queue = GetData().notify_queue;
-    for (size_t i = 0; i < notify_queue.size(); ++i) {
-      if (notify_queue[i].id == id) {
+    auto & except_queue = GetData().except_queue;
+    for (size_t i = 0; i < except_queue.size(); ++i) {
+      if (except_queue[i].id == id) {
         // If exception is NOT in the last position, move last position earlier and reduce size.
-        if (i < notify_queue.size() - 1) notify_queue[i] = notify_queue.back();
-        notify_queue.resize(notify_queue.size() - 1);
+        if (i < except_queue.size() - 1) except_queue[i] = except_queue.back();
+        except_queue.resize(except_queue.size() - 1);
         return;
       }
     }
