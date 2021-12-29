@@ -83,4 +83,37 @@ TEST_CASE("Test notifications", "[base]")
   CHECK(special_results.size() == 3);   // Both PASS and FAIL should be found here.
   CHECK(exception_results.back() == "UNKNOWN");
   CHECK(special_results.back() == "FAIL");
+
+
+  double x = 0.0;
+  emp::notify::AddHandler(
+    "INC",
+    [&x](const std::string & /*id*/, const std::string & /*msg*/) { x+=1.0; return true; }
+  );
+  emp::notify::AddHandler(
+    "DOUBLE",
+    [&x](const std::string & /*id*/, const std::string & /*msg*/) { x*=2.0; return true; }
+  );
+
+  emp::notify::Exception("DOUBLE");
+  CHECK(x == 0.0);
+  emp::notify::Exception("INC");
+  CHECK(x == 1.0);
+  emp::notify::Exception("DOUBLE");
+  CHECK(x == 2.0);
+
+  emp::notify::Pause();  // Stop actually running notifications!
+
+  emp::notify::Exception("INC");
+  CHECK(x == 2.0);
+  emp::notify::Exception("INC");
+  CHECK(x == 2.0);
+  emp::notify::Exception("DOUBLE");
+  CHECK(x == 2.0);
+  emp::notify::Exception("DOUBLE");
+  CHECK(x == 2.0);
+
+  emp::notify::Unpause();  // Turn notifications back on; should occur in the correct order!
+  CHECK(x == 16.0);
+  
 }
