@@ -315,9 +315,13 @@ namespace notify {
   }
 
   /// Send out a notification of an Exception.
-  template <typename... Ts>
-  static bool Exception(id_arg_t id, message_arg_t message, except_data_t except_data=0) { 
+  static bool Exception(id_arg_t id, message_arg_t message="", except_data_t except_data=0) { 
     NotifyData & data = GetData();
+
+    if (data.is_paused) {
+      data.pause_queue.push_back(ExceptInfo{id, message, except_data});
+      return true;      
+    }
 
     // Retrieve the exception handlers that we have for this type of exception.
     bool result = data.handler_map[id].Trigger(id, message, except_data);
