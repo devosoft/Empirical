@@ -115,6 +115,11 @@ namespace notify {
       return Trigger(id, message, 0);
     }
 
+    // Trigger from a stored notification.
+    bool Trigger(const ExceptInfo & info) {
+      return Trigger(info.id, info.message, info.data);
+    }
+
     // Add a function to this set.
     HandlerSet & Add(fun_t in) { handlers.push_back(in); return *this; }
 
@@ -243,17 +248,39 @@ namespace notify {
 
     // If we are are paused, save this notification for later.
     if (data.is_paused) {
-      data.pause_queue.push_back(ExceptInfo{id, ss.str(), 0});      
+      data.pause_queue.push_back(ExceptInfo{id, ss.str(), 0});
+      return true;      
     }
 
-    // Otherwise run the appropriate handler
-    else {
-      bool result = data.handler_map[id].Trigger(id, ss.str());
-    }
+    bool result = data.handler_map[id].Trigger(id, ss.str());
 
     // And return the success result.
     return result;
   }
+
+  static void Pause() {
+    NotifyData & data = GetData();
+    data.is_paused = true;
+  }
+
+  static void Unpause() {
+    NotifyData & data = GetData();
+
+    // Step through the notifications that have accrued.
+    for (size_t i = 0; i < data.pause_queue.size(); ++i) {
+      auto & notice = data.pause_queue[i];
+      bool result = data.handler_map[notice.id].Trigger(notice);
+      if (!result) {  // Failed; move to exception queue or exit if error.
+        if (notice.id == "ERROR") Exit(1);
+        data.except_queue.push_back(notice);
+      }
+    }
+
+    data.pause_queue.resize(0);   // Clear out the queue.
+
+    data.is_paused = false;
+  }
+
 
   /// Send out a regular notification.
   template <typename... Ts>
