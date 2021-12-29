@@ -116,4 +116,17 @@ TEST_CASE("Test notifications", "[base]")
   emp::notify::Unpause();  // Turn notifications back on; should occur in the correct order!
   CHECK(x == 16.0);
   
+  // Add a handler that actually uses the extra data passed in.
+  emp::notify::AddHandler(
+    "MULT",
+    [&x](const std::string & /*id*/, const std::string & /*msg*/, std::any val) {
+      x *= std::any_cast<double>(val);
+      return true;
+    }
+  );
+
+  emp::notify::Exception("MULT", "Test multiplying by 3", 3.0);
+  emp::notify::Exception("MULT", "Test dividing by two", 0.5);
+  CHECK(x == 24.0);
+
 }
