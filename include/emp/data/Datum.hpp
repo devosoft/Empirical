@@ -43,6 +43,9 @@ namespace emp {
     }
     ~Datum() { if (!is_num) FreeString(); }
 
+    bool IsDouble() const { return is_num; }   ///< Is this natively stored as a double?
+    bool IsString() const { return !is_num; }  ///< Is this natively stored as a string?
+
     double AsDouble() const {
       if (is_num) return num;
       return std::stod(str);
@@ -73,6 +76,35 @@ namespace emp {
     Datum & operator=(double in) { return Set(in); }
     Datum & operator=(const std::string & in) { return Set(in); }
     Datum & operator=(const Datum & in) { return Set(in); }
+
+    bool operator==(double in) const { return AsDouble() == in; }
+    bool operator!=(double in) const { return AsDouble() != in; }
+    bool operator< (double in) const { return AsDouble() <  in; }
+    bool operator<=(double in) const { return AsDouble() <= in; }
+    bool operator> (double in) const { return AsDouble() >  in; }
+    bool operator>=(double in) const { return AsDouble() >= in; }
+
+    bool operator==(const std::string & in) const { return AsString() == in; }
+    bool operator!=(const std::string & in) const { return AsString() != in; }
+    bool operator< (const std::string & in) const { return AsString() <  in; }
+    bool operator<=(const std::string & in) const { return AsString() <= in; }
+    bool operator> (const std::string & in) const { return AsString() >  in; }
+    bool operator>=(const std::string & in) const { return AsString() >= in; }
+
+    bool operator==(const Datum & in) const {
+      if (is_num && in.is_num) return num == in.num;   // Both numbers
+      if (!is_num && !in.is_num) return str == in.str; // Both strings
+      return AsDouble() == in.AsDouble() && AsString() == in.AsString(); // Mixed - check both!
+    }
+    bool operator!=(const Datum & in) const { return !(*this == in); }
+    bool operator< (const Datum & in) const {
+      if (is_num && in.is_num) return num < in.num;    // Both numbers
+      return AsString() < in.AsString();               // Otherwise treat as strings.
+    }
+    bool operator> (const Datum & in) const { return in < *this; }
+    bool operator<=(const Datum & in) const { return !(in < *this); }
+    bool operator>=(const Datum & in) const { return !(*this < in); }
+
   };
 
 }
