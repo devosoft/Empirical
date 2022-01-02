@@ -70,7 +70,7 @@ namespace emp {
 
         // Symbols should have least priority.  They include any solitary character not listed
         // above, or pre-specified multi-character groups.
-        token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
+        token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"~==\"|\"~!=\"|\"~<\"|\"~>\"|\"~<=\"|\"~>=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
       }
 
       bool IsID(const emp::Token & token) const noexcept { return token.token_id == token_identifier; }
@@ -182,11 +182,20 @@ namespace emp {
       unary_ops[op] = fun;
     }
 
+    static int ApproxCompare(double x, double y) {
+      static constexpr double APPROX_FRACTION = 8192.0;
+      double margin = y / APPROX_FRACTION;
+      if (x < y - margin) return -1;
+      if (x > y + margin) return 1;
+      return 0;
+    }
+
     void AddDefaultOperators() {
             // Setup the unary operators for the parser.
       AddOp("+", [](double x) { return x; });
       AddOp("-", [](double x) { return -x; });
       AddOp("!", [](double x) { return (double) (x==0.0); });
+
 
       // Setup the default binary operators for the parser.
       size_t prec = 0;  // Precedence level of each operator...
@@ -194,10 +203,16 @@ namespace emp {
       binary_ops["&&"].Set( ++prec, [](double x, double y){ return (x!=0.0)&&(y!=0.0); } );
       binary_ops["=="].Set( ++prec, [](double x, double y){ return x == y; } );
       binary_ops["!="].Set(   prec, [](double x, double y){ return x != y; } );
+      binary_ops["~=="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) == 0; } );
+      binary_ops["~!="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) != 0; } );
       binary_ops["<"] .Set( ++prec, [](double x, double y){ return x < y; } );
       binary_ops["<="].Set(   prec, [](double x, double y){ return x <= y; } );
       binary_ops[">"] .Set(   prec, [](double x, double y){ return x > y; } );
       binary_ops[">="].Set(   prec, [](double x, double y){ return x >= y; } );
+      binary_ops["~<"].Set(   prec, [](double x, double y){ return ApproxCompare(x,y) == -1; } );
+      binary_ops["~<="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) != 1; } );
+      binary_ops["~>"].Set(   prec, [](double x, double y){ return ApproxCompare(x,y) == 1; } );
+      binary_ops["~>="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) != -1; } );
       binary_ops["+"] .Set( ++prec, [](double x, double y){ return x + y; } );
       binary_ops["-"] .Set(   prec, [](double x, double y){ return x - y; } );
       binary_ops["*"] .Set( ++prec, [](double x, double y){ return x * y; } );
