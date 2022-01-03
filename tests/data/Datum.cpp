@@ -101,4 +101,17 @@ TEST_CASE("Test Datum", "[data]")
   CHECK(d3 <= 678);
   CHECK(d3 >= 234);
   CHECK(d3 > 0);
+  
+  double x = d1;
+  std::string y = d1;
+
+  CHECK(x == 789);
+  CHECK(y == "789");
+
+  x = d2;
+  y = d2.AsString();
+
+  CHECK(x == 123.0);
+  CHECK(y == "123.000000");
+
 }
