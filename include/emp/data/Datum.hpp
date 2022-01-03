@@ -36,6 +36,7 @@ namespace emp {
     Datum() : num(0.0), is_num(true) { }
     Datum(double in) : num(in), is_num(true) { }
     Datum(const std::string & in) : is_num(false) { InitString(in); }
+    Datum(const char * in) : is_num(false) { InitString(in); }
     Datum(const Datum & in) {
       is_num = in.is_num;
       if (is_num) num = in.num;
@@ -51,61 +52,73 @@ namespace emp {
       return std::stod(str);
     }
 
-    const std::string & AsString() const {
+    std::string AsString() const {
       if (is_num) return std::to_string(num);
       return str;
     }
 
-    Datum & Set(double in) {
-      if (!is_num) FreeString();  // If this were previously a string, clean it up!
+    operator double() const { return AsDouble(); }
+    operator std::string() const { return AsString(); }
+
+    Datum & SetDouble(double in) {  // If this were previously a string, clean it up!
+      if (!is_num) {
+        FreeString();  
+        is_num = true;
+      }
       num = in;
       return *this;
     }
 
-    Datum & Set(const std::string & in) {
-      if (is_num) InitString(in);  // If this were previously a num, change to string.
-      else str = in;               // Already a string; just change its value.
+    Datum & SetString(const std::string & in) {
+      if (is_num) {        // If this were previously a num, change to string.
+        InitString(in);  
+        is_num = false;
+      }
+      else str = in;       // Already a string; just change its value.
       return *this;
     }
 
     Datum & Set(const Datum & in) {
-      if (in.is_num) return Set(in.num);
-      else return Set(in.str);
+      if (in.is_num) return SetDouble(in.num);
+      else return SetString(in.str);
     }
 
-    Datum & operator=(double in) { return Set(in); }
-    Datum & operator=(const std::string & in) { return Set(in); }
-    Datum & operator=(const Datum & in) { return Set(in); }
+    Datum & operator=(double in) { std::cout<<"Ping1\n"; return SetDouble(in); }
+    Datum & operator=(const std::string & in) { std::cout<<"Ping2\n"; return SetString(in); }
+    Datum & operator=(const char * in) { std::cout<<"Ping3\n"; return SetString(in); }
+    Datum & operator=(const Datum & in) { std::cout<<"Ping4\n"; return Set(in); }
 
-    bool operator==(double in) const { return AsDouble() == in; }
-    bool operator!=(double in) const { return AsDouble() != in; }
-    bool operator< (double in) const { return AsDouble() <  in; }
-    bool operator<=(double in) const { return AsDouble() <= in; }
-    bool operator> (double in) const { return AsDouble() >  in; }
-    bool operator>=(double in) const { return AsDouble() >= in; }
-
-    bool operator==(const std::string & in) const { return AsString() == in; }
-    bool operator!=(const std::string & in) const { return AsString() != in; }
-    bool operator< (const std::string & in) const { return AsString() <  in; }
-    bool operator<=(const std::string & in) const { return AsString() <= in; }
-    bool operator> (const std::string & in) const { return AsString() >  in; }
-    bool operator>=(const std::string & in) const { return AsString() >= in; }
-
-    bool operator==(const Datum & in) const {
-      if (is_num && in.is_num) return num == in.num;   // Both numbers
-      if (!is_num && !in.is_num) return str == in.str; // Both strings
-      return AsDouble() == in.AsDouble() && AsString() == in.AsString(); // Mixed - check both!
+    int CompareNumber(double rhs) const {
+      const double val = AsDouble();
+      return (val == rhs) ? 0 : ((val < rhs) ? -1 : 1);
     }
-    bool operator!=(const Datum & in) const { return !(*this == in); }
-    bool operator< (const Datum & in) const {
-      if (is_num && in.is_num) return num < in.num;    // Both numbers
-      return AsString() < in.AsString();               // Otherwise treat as strings.
+
+    int CompareString(const std::string & rhs) const {
+      if (is_num) {
+        const std::string val = std::to_string(num);
+        return (val == rhs) ? 0 : ((val < rhs) ? -1 : 1);
+      }
+      return (str == rhs) ? 0 : ((str < rhs) ? -1 : 1);
     }
-    bool operator> (const Datum & in) const { return in < *this; }
-    bool operator<=(const Datum & in) const { return !(in < *this); }
-    bool operator>=(const Datum & in) const { return !(*this < in); }
+
+    int Compare(double rhs) const { return CompareNumber(rhs); }
+    int Compare(const std::string & rhs) const { return CompareString(rhs); }
+    int Compare(const char * rhs) const { return CompareString(rhs); }
+    int Compare(const Datum & rhs) const { return (rhs.is_num) ? CompareNumber(rhs) : CompareString(rhs); }
+
+    template<typename T> bool operator==(T && rhs) const { return Compare(std::forward<T>(rhs)) == 0; }
+    template<typename T> bool operator!=(T && rhs) const { return Compare(std::forward<T>(rhs)) != 0; }
+    template<typename T> bool operator< (T && rhs) const { return Compare(std::forward<T>(rhs)) == -1; }
+    template<typename T> bool operator>=(T && rhs) const { return Compare(std::forward<T>(rhs)) != -1; }
+    template<typename T> bool operator> (T && rhs) const { return Compare(std::forward<T>(rhs)) == 1; }
+    template<typename T> bool operator<=(T && rhs) const { return Compare(std::forward<T>(rhs)) != 1; }
 
   };
+
+  std::ostream & operator<<(std::ostream & out, const emp::Datum & d) {
+    out << d.AsString();
+    return out;
+  }
 
 }
 
