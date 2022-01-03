@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
+ *  @date 2021-2022.
  *
  *  @file  Datum.hpp
  *  @brief A single piece of data, either a value or a string.
@@ -47,6 +47,14 @@ namespace emp {
     bool IsDouble() const { return is_num; }   ///< Is this natively stored as a double?
     bool IsString() const { return !is_num; }  ///< Is this natively stored as a string?
 
+    /// If we know Datum is a Double, we can request its native form.
+    double & NativeDouble() { emp_assert(is_num); return num; }
+    double NativeDouble() const { emp_assert(is_num); return num; }
+
+    /// If we know Datum is a String, we can request its native form.
+    std::string & NativeString() { emp_assert(!is_num); return str; }
+    const std::string & NativeString() const { emp_assert(!is_num); return str; }
+
     double AsDouble() const {
       if (is_num) return num;
       return std::stod(str);
@@ -83,10 +91,10 @@ namespace emp {
       else return SetString(in.str);
     }
 
-    Datum & operator=(double in) { std::cout<<"Ping1\n"; return SetDouble(in); }
-    Datum & operator=(const std::string & in) { std::cout<<"Ping2\n"; return SetString(in); }
-    Datum & operator=(const char * in) { std::cout<<"Ping3\n"; return SetString(in); }
-    Datum & operator=(const Datum & in) { std::cout<<"Ping4\n"; return Set(in); }
+    Datum & operator=(double in) { return SetDouble(in); }
+    Datum & operator=(const std::string & in) { return SetString(in); }
+    Datum & operator=(const char * in) { return SetString(in); }
+    Datum & operator=(const Datum & in) { return Set(in); }
 
     int CompareNumber(double rhs) const {
       const double val = AsDouble();
