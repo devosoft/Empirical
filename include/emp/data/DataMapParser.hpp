@@ -21,7 +21,7 @@
 #include <cmath>
 #include <string>
 
-#include "../base/error.hpp"
+#include "../base/notify.hpp"
 #include "../compiler/Lexer.hpp"
 #include "../compiler/regex_utils.hpp"
 
@@ -142,16 +142,10 @@ namespace emp {
     std::set<std::string> dm_names;
 
     // Track the number of errors and the function to call when errors occur.
-    size_t error_count = 0;
-    using error_fun_t = std::function<void(const std::string &)>;
-    error_fun_t error_fun =
-     [](const std::string & msg){ std::cerr << "ERROR: " << msg << std::endl; };
-
     template<typename... Ts>
-    ValueType AddError(Ts &&... args) {
-      error_fun( emp::to_string(args...) );
-      ++error_count;
-      return ValueType();
+    ValueType ParseError(Ts &&... args) {
+      emp::notify::Exception("DataMapParser::PARSE_ERROR", emp::to_string(args...), this);
+      return ValueType{};
     }
 
   public:
@@ -161,12 +155,6 @@ namespace emp {
         AddDefaultFunctions();
       }
     }
-
-    bool HasErrors() const { return error_count; }
-    size_t NumErrors() const { return error_count; }
-
-    error_fun_t GetErrorFun() const { return error_fun; }
-    void SetErrorFun(error_fun_t in_fun) { error_fun = in_fun; }
 
     /// Get the set of names that the most recently generated function accesses in DataMap.
     const std::set<std::string> & GetNamesUsed() const { return dm_names; }
@@ -296,7 +284,7 @@ namespace emp {
         if constexpr (verbose) std::cout << "Found: OPEN PAREN" << std::endl;
         ++pos;
         ValueType val = ParseMath(layout, pos);
-        if (pos->lexeme != ")") return AddError("Expected ')', but found '", pos->lexeme, "'.");
+        if (pos->lexeme != ")") return ParseError("Expected ')', but found '", pos->lexeme, "'.");
         ++pos;
         return val;
       }
@@ -313,7 +301,7 @@ namespace emp {
         size_t id = emp::from_string<size_t>(pos->lexeme.substr(1));
         ++pos;
         if (id >= external_vals.size()) {
-          AddError("Invalid access into external variable (\"$", id, "\"): Does not exist.");
+          ParseError("Invalid access into external variable (\"$", id, "\"): Does not exist.");
         }
         return external_vals[id];
       }
@@ -326,7 +314,7 @@ namespace emp {
       const bool is_fun = (pos.IsValid() && pos->lexeme == "(");
 
       if (is_fun) {
-        if (!emp::Has(functions, name)) return AddError("Call to unknown function '", name,"'.");
+        if (!emp::Has(functions, name)) return ParseError("Call to unknown function '", name,"'.");
         ++pos;
         emp::vector<ValueType> args;
         while(pos->lexeme != ")") {
@@ -339,35 +327,35 @@ namespace emp {
         value_fun_t out_fun;
         switch (args.size()) {
         case 0:
-          if (!functions[name].fun0) AddError("Function '", name, "' requires arguments.");
+          if (!functions[name].fun0) ParseError("Function '", name, "' requires arguments.");
           out_fun = [fun=functions[name].fun0](const emp::DataMap & /*dm*/) { return fun(); };
           break;
         case 1:
-          if (!functions[name].fun1) AddError("Function '", name, "' cannot have 1 arguments.");
+          if (!functions[name].fun1) ParseError("Function '", name, "' cannot have 1 arguments.");
           out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](const emp::DataMap & dm) {
             return fun(arg0(dm));
           };
           break;
         case 2:
-          if (!functions[name].fun2) AddError("Function '", name, "' cannot have 2 arguments.");
+          if (!functions[name].fun2) ParseError("Function '", name, "' cannot have 2 arguments.");
           out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](const emp::DataMap & dm) {
             return fun(arg0(dm), arg1(dm));
           };
           break;
         case 3:
-          if (!functions[name].fun3) AddError("Function '", name, "' cannot have 3 arguments.");
+          if (!functions[name].fun3) ParseError("Function '", name, "' cannot have 3 arguments.");
           out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](const emp::DataMap & dm) {
             return fun(arg0(dm), arg1(dm), arg2(dm));
           };
           break;
         default:
-          AddError("Too many arguments for function '", name, "'.");
+          ParseError("Too many arguments for function '", name, "'.");
         }
         return out_fun;
       }
 
       // This must be a DataLayout entry name.
-      if (!layout.HasName(name)) AddError("Unknown data map entry '", name, "'.");
+      if (!layout.HasName(name)) ParseError("Unknown data map entry '", name, "'.");
       size_t id = layout.GetID(name);
       dm_names.insert(name);    // Store this name in the list of those used.
       return (value_fun_t) [id](const emp::DataMap & dm){ return dm.GetAsDouble(id); };
@@ -411,7 +399,7 @@ namespace emp {
           }
         }
 
-        else AddError("Operator '", pos->lexeme, "' NOT found!");
+        else ParseError("Operator '", pos->lexeme, "' NOT found!");
       }
 
       // @CAO Make sure there's not a illegal lexeme here.
