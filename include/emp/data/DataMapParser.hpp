@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
+ *  @date 2021-2022.
  *
  *  @file  DataMapParser.hpp
  *  @brief Useful functions for working with DataMaps and AnnotatedTypes.
@@ -42,6 +42,7 @@ namespace emp {
       int token_number;       ///< Token id for literal numbers
       int token_string;       ///< Token id for literal strings
       int token_char;         ///< Token id for literal characters
+      int token_external;     ///< Token id for an external value that was passed in
       int token_symbol;       ///< Token id for other symbols
 
     public:
@@ -68,6 +69,10 @@ namespace emp {
         // its ascii value.
         token_char = AddToken("Literal Character", "'([^'\n\\\\]|\\\\.)+'");
 
+        // An external value that was passed in will be a dollar sign ('$') followed by the
+        // position of the value to be used (e.g., '$3').
+        token_external = AddToken("External Value", "[$][0-9]+");
+
         // Symbols should have least priority.  They include any solitary character not listed
         // above, or pre-specified multi-character groups.
         token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"~==\"|\"~!=\"|\"~<\"|\"~>\"|\"~<=\"|\"~>=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
@@ -77,6 +82,7 @@ namespace emp {
       bool IsNumber(const emp::Token & token) const noexcept { return token.token_id == token_number; }
       bool IsString(const emp::Token & token) const noexcept { return token.token_id == token_string; }
       bool IsChar(const emp::Token & token) const noexcept { return token.token_id == token_char; }
+      bool IsExternal(const emp::Token & token) const noexcept { return token.token_id == token_external; }
       bool IsSymbol(const emp::Token & token) const noexcept { return token.token_id == token_symbol; }
     };
 
@@ -130,6 +136,7 @@ namespace emp {
     std::unordered_map<std::string, std::function<double(double)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
+    emp::vector<double> external_vals;
 
     // The set of data map entries accessed when the last function was parsed.
     std::set<std::string> dm_names;
@@ -301,6 +308,16 @@ namespace emp {
         return result;
       }
 
+      // Similar for an external value
+      if (lexer.IsExternal(*pos)) {
+        size_t id = emp::from_string<size_t>(pos->lexeme.substr(1));
+        ++pos;
+        if (id >= external_vals.size()) {
+          AddError("Invalid access into external variable (\"$", id, "\"): Does not exist.");
+        }
+        return external_vals[id];
+      }
+
       // Otherwise it should be and identifier!
       const std::string & name = pos->lexeme;
       ++pos;
@@ -407,7 +424,14 @@ namespace emp {
     /// that takes a datamap (of the example type) loads in the values of "foo" and "bar", and
     /// returns the result of the above equation.
 
-    value_fun_t BuildMathFunction(const DataLayout & layout, const std::string & expression) {
+    template <typename... EXTRA_Ts>
+    value_fun_t BuildMathFunction(
+      const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
+      const std::string & expression,   ///< The primary expression to convert.
+      EXTRA_Ts... extras                ///< Extra numerical arguments (accessed as $0, $1, etc.)
+    ) {
+      external_vals = emp::vector<double>{static_cast<double>(extras)...};
+
       emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
       if constexpr (verbose) tokens.Print();
       dm_names.clear();    // Reset the names used from data map.
@@ -431,12 +455,14 @@ namespace emp {
       #endif
     }
 
-    value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
-      return BuildMathFunction(dm.GetLayout(), expression);
+    template <typename... EXTRA_Ts>
+    value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression, EXTRA_Ts... extras) {
+      return BuildMathFunction(dm.GetLayout(), expression, extras...);
     }
 
-    double RunMathFunction(const DataMap & dm, const std::string & expression) {
-      auto fun = BuildMathFunction(dm.GetLayout(), expression);
+    template <typename... EXTRA_Ts>
+    double RunMathFunction(const DataMap & dm, const std::string & expression, EXTRA_Ts... extras) {
+      auto fun = BuildMathFunction(dm.GetLayout(), expression, extras...);
       return fun(dm);
     }
 
