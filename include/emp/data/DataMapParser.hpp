@@ -431,6 +431,15 @@ namespace emp {
       #endif
     }
 
+    value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression) {
+      return BuildMathFunction(dm.GetLayout(), expression);
+    }
+
+    double RunMathFunction(const DataMap & dm, const std::string & expression) {
+      auto fun = BuildMathFunction(dm.GetLayout(), expression);
+      return fun(dm);
+    }
+
   };
 }
 
