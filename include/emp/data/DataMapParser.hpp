@@ -427,11 +427,8 @@ namespace emp {
     template <typename... EXTRA_Ts>
     value_fun_t BuildMathFunction(
       const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
-      const std::string & expression,   ///< The primary expression to convert.
-      EXTRA_Ts... extras                ///< Extra numerical arguments (accessed as $0, $1, etc.)
+      const std::string & expression    ///< The primary expression to convert.
     ) {
-      external_vals = emp::vector<double>{static_cast<double>(extras)...};
-
       emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
       if constexpr (verbose) tokens.Print();
       dm_names.clear();    // Reset the names used from data map.
@@ -453,6 +450,30 @@ namespace emp {
           return fun(dm);
       };
       #endif
+    }
+
+    /// BuildMathFunction can have extra, external values provided, to be accesses as $0, $1, etc.
+    template <typename... EXTRA_Ts>
+    value_fun_t BuildMathFunction(
+      const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
+      const std::string & expression,   ///< The primary expression to convert.
+      double extra1,                    ///< Extra numerical argument, accessed as $0
+      EXTRA_Ts... extras                ///< Extra numerical arguments (accessed as $1, $2, etc.)
+    ) {
+      external_vals = emp::vector<double>{extra1, static_cast<double>(extras)...};
+      return BuildMathFunction(layout, expression);
+    }
+
+    /// External values can also be provided in the form of a vector.
+    /// BuildMathFunction can have extra, external values provided, to be accesses as $0, $1, etc.
+    template <typename... EXTRA_Ts>
+    value_fun_t BuildMathFunction(
+      const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
+      const std::string & expression,   ///< The primary expression to convert.
+      const emp::vector<double> & extra_values
+    ) {
+      external_vals = extra_values;
+      return BuildMathFunction(layout, expression);
     }
 
     template <typename... EXTRA_Ts>
