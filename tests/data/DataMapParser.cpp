@@ -55,8 +55,10 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( parser.RunMathFunction(dmA, "(1+2) * 2") == 6.0 );
   CHECK( parser.RunMathFunction(dmA, "(3*3 + 4**2) ** 0.5") == 5.0 );
 
+  // Test with external variables.
+  CHECK( parser.RunMathFunction(dmA, "$0 + $1 * $2", 1.4, 2, 7.1) == 15.6 );
 
-  // Now, try to use these with variables!
+  // Now, try to use these with DataMap variables!
 
   auto fun = parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
   CHECK( fun(dmA) == 9.5 );
@@ -245,4 +247,18 @@ TEST_CASE("Test DataMap", "[data]")
   fun = parser.BuildMathFunction(dmA, "FROM_SCALE(val3, 1.5, 11.5)");
   CHECK( fun(dmA) == 0.15 );
   CHECK( fun(dmB) == 0.25 );
+
+
+  // Test with more extra values.
+  double multiple = 2.0;
+  std::string expression = "(val1 + val2 + 2*val3) * $0";
+
+  fun = parser.BuildMathFunction(dmA, expression, multiple);
+  CHECK( fun(dmA) == 19 );
+  CHECK( fun(dmB) == 144.75 );
+
+  multiple = 1.0;
+  fun = parser.BuildMathFunction(dmA, expression, multiple);
+  CHECK( fun(dmA) == 9.5 );
+  CHECK( fun(dmB) == 72.375 );
 }
