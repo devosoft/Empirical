@@ -28,54 +28,37 @@ TEST_CASE("Test DataMap", "[data]")
   emp::DataMapParser parser;
 
   // Test a bunch of constant math.
-  auto fun = parser.BuildMathFunction(dmA, "5.5 + 4");
-  CHECK( fun(dmA) == 9.5 );
-  CHECK( fun(dmB) == 9.5 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 - 4");
-  CHECK( fun(dmA) == 1.5 );
-  CHECK( fun(dmB) == 1.5 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 * 4");
-  CHECK( fun(dmA) == 22.0 );
-  CHECK( fun(dmB) == 22.0 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 / 4");
-  CHECK( fun(dmA) == 1.375 );
-  CHECK( fun(dmB) == 1.375 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 % 4");
-  CHECK( fun(dmA) == 1.5 );
-  CHECK( fun(dmB) == 1.5 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 ** 4");
-  CHECK( fun(dmA) == 915.0625 );
-  CHECK( fun(dmB) == 915.0625 );
-
-  fun = parser.BuildMathFunction(dmA, "30.25 ** 0.5");
-  CHECK( fun(dmA) == 5.5 );
-  CHECK( fun(dmB) == 5.5 );
-
-  fun = parser.BuildMathFunction(dmA, "64 %% 4");
-  CHECK( fun(dmA) == 3.0 );
-  CHECK( fun(dmB) == 3.0 );
-
-  fun = parser.BuildMathFunction(dmA, "1 + 2 * 2");
-  CHECK( fun(dmA) == 5.0 );
-  CHECK( fun(dmB) == 5.0 );
-
-  fun = parser.BuildMathFunction(dmA, "(1+2) * 2");
-  CHECK( fun(dmA) == 6.0 );
-  CHECK( fun(dmB) == 6.0 );
-
-  fun = parser.BuildMathFunction(dmA, "(3*3 + 4**2) ** 0.5");
-  CHECK( fun(dmA) == 5.0 );
-  CHECK( fun(dmB) == 5.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 || 0)") == 0.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 || 1) + (1 || 0) + (1 || 1)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 && 1) + (1 && 0) + (1 && 1)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 == 0) + (1 == 1.000000001) + (1.1 == 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~== 0) + (1 ~== 1.000000001) + (1.1 ~== 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 != 0) + (1 != 1.000000001) + (1.1 != 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~!= 0) + (1 ~!= 1.000000001) + (1.1 ~!= 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 < 0) + (1 < 1.000000001) + (1.1 < 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~< 0) + (1 ~< 1.000000001) + (1.1 ~< 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 <= 0) + (1 <= 1.000000001) + (1.1 <= 1.2)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~<= 0) + (1 ~<= 1.000000001) + (1.1 ~<= 1.2)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 > 0) + (1 > 0.999999999) + (1.3 > 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~> 0) + (1 ~> 0.999999999) + (1.3 ~> 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 >= 0) + (1 >= 1.000000001) + (1.3 >= 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~>= 0) + (1 ~>= 1.000000001) + (1.3 ~>= 1.2)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 + 4") == 9.5 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 - 4") == 1.5 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 * 4") == 22.0 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 / 4") == 1.375 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 % 4") == 1.5 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 ** 4") == 915.0625 );
+  CHECK( parser.RunMathFunction(dmA, "30.25 ** 0.5") == 5.5 );
+  CHECK( parser.RunMathFunction(dmA, "64 %% 4") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "1 + 2 * 2") == 5.0 );
+  CHECK( parser.RunMathFunction(dmA, "(1+2) * 2") == 6.0 );
+  CHECK( parser.RunMathFunction(dmA, "(3*3 + 4**2) ** 0.5") == 5.0 );
 
 
   // Now, try to use these with variables!
 
-  fun = parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
+  auto fun = parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
