@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  Action.hpp
+ *  @file Signal.hpp
  *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
  *  @note Status: Beta
  *
@@ -11,16 +11,16 @@
  *  @todo Signals should have default parameters so not all need be supplied when triggered.
  */
 
+#ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE
+#define EMP_CONTROL_SIGNAL_HPP_INCLUDE
 
-#ifndef EMP_CONTROL_SIGNAL
-#define EMP_CONTROL_SIGNAL
 
 #include <map>
 #include <string>
 
-#include "../meta/TypePack.hpp"
-#include "../functional/FunctionSet.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../functional/FunctionSet.hpp"
+#include "../meta/TypePack.hpp"
 
 #include "Action.hpp"
 
@@ -376,4 +376,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE

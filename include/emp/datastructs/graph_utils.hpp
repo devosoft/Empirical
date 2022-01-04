@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  graph_utils.hpp
+ *  @file graph_utils.hpp
  *  @brief This file provides a number of tools for manipulating graphs.
  *  @note Status: BETA
  */
 
-#ifndef EMP_GRAPH_UTILS_H
-#define EMP_GRAPH_UTILS_H
+#ifndef EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE
 
 #include <fstream>
 #include <iostream>
@@ -18,10 +18,11 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "vector_utils.hpp"
-#include "../math/random_utils.hpp"
 #include "../math/Random.hpp"
+#include "../math/random_utils.hpp"
+
 #include "Graph.hpp"
+#include "vector_utils.hpp"
 
 namespace emp {
 
@@ -38,9 +39,9 @@ namespace emp {
     // Put the mapped edges into the new graph.
     for (size_t from = 0; from < N; from++) {
       for (size_t to = 0; to < N; to++) {
-	if (in_graph.HasEdge(from, to)) {
-	  out_graph.AddEdge( v_map[from], v_map[to] );
-	}
+        if (in_graph.HasEdge(from, to)) {
+          out_graph.AddEdge( v_map[from], v_map[to] );
+        }
       }
     }
 
@@ -345,4 +346,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE

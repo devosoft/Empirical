@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2019
  *
- *  @file  GenericFunction.hpp
+ *  @file GenericFunction.hpp
  *  @brief Based on std::function, but with a common base class.
  *  @note Status: ALPHA
  *
@@ -11,11 +11,11 @@
  *    template argument, rather than listing all types.
  */
 
-
-#ifndef EMP_GENERIC_FUNCTION_H
-#define EMP_GENERIC_FUNCTION_H
+#ifndef EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE
+#define EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE
 
 #include <functional>
+
 #include "../base/assert.hpp"
 
 namespace emp {
@@ -119,4 +119,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE

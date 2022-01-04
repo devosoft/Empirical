@@ -8,22 +8,22 @@
  *  @note Status: BETA
  */
 
+#ifndef EMP_MATH_STATS_HPP_INCLUDE
+#define EMP_MATH_STATS_HPP_INCLUDE
 
-#ifndef EMP_STATS_H
-#define EMP_STATS_H
-
+#include <cmath>
+#include <functional>
+#include <set>
 #include <type_traits>
 #include <unordered_map>
-#include <cmath>
-#include <vector>
-#include <set>
 #include <unordered_set>
-#include <functional>
+#include <vector>
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
-#include "../meta/type_traits.hpp"
 #include "../datastructs/vector_utils.hpp"
+#include "../meta/type_traits.hpp"
+
 #include "math.hpp"
 
 namespace emp {
@@ -219,7 +219,7 @@ namespace emp {
 
 }
 
-#endif
-
 //Base class outputs most recent
 //Write derived class
+
+#endif // #ifndef EMP_MATH_STATS_HPP_INCLUDE

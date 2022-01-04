@@ -40,7 +40,7 @@ OPTION 2: Equals for assignments; strings in quotes, so vars don't need $ to tra
        include CONFIG_DIR + "/opt1-events.cfg"
 
 
-OPTION 3: 
+OPTION 3:
 
        WORLD_X = 1000
        WORLD_Y = 1000

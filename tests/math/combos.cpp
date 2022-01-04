@@ -1,10 +1,16 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file combos.cpp
+ */
+
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/math/combos.hpp"
-
-#include <sstream>
 
 TEST_CASE("Test combos", "[math]")
 {

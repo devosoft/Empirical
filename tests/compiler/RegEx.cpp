@@ -1,4 +1,13 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021-2022.
+ *
+ *  @file RegEx.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -30,7 +39,7 @@ TEST_CASE("Test RegEx", "[compiler]")
 	std::string reS = re.AsString();
 	CHECK(reS == "\"1|2\"");
 
-	// test all the prints
+  // test all the prints
 
 	// Try to hit all the different structs in RegEx.h
 	emp::RegEx re2("\"r.*\"");

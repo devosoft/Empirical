@@ -1,13 +1,18 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ContiguousStream.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/io/ContiguousStream.hpp"
 #include "emp/math/Random.hpp"
-
-#include <sstream>
-#include <iostream>
-
 
 TEST_CASE("Test ContiguousStreamBuf", "[io]")
 {

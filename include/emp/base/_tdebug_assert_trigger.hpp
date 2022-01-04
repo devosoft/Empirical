@@ -8,8 +8,8 @@
  *  @note For internal use.
  */
 
-#ifndef EMP_TDEBUG_ASSERT_TRIGGER_HPP
-#define EMP_TDEBUG_ASSERT_TRIGGER_HPP
+#ifndef EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE
+#define EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE
 
 #include <string>
 
@@ -40,4 +40,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_TDEBUG_ASSERT_TRIGGER_HPP
+#endif // #ifndef EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE

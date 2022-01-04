@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2022
  *
- *  @file  debug.hpp
+ *  @file debug.hpp
  *  @brief Basic tools for use in developing high-assurance code.
  *  @note Status: BETA
  */
 
-#ifndef EMP_DEBUG_H
-#define EMP_DEBUG_H
+#ifndef EMP_DEBUG_DEBUG_HPP_INCLUDE
+#define EMP_DEBUG_DEBUG_HPP_INCLUDE
 
 #include <iostream>
 #include <set>
@@ -58,4 +58,4 @@ namespace emp {
   #define emp_debug(...) { BlockRelease(true); emp::emp_debug_print(__VA_ARGS__); }
 }
 
-#endif
+#endif // #ifndef EMP_DEBUG_DEBUG_HPP_INCLUDE

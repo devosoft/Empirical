@@ -24,8 +24,8 @@
  *  spring an assertion error and print the value of a.
  */
 
-#ifndef EMP_ASSERT_WARNING_HPP
-#define EMP_ASSERT_WARNING_HPP
+#ifndef EMP_BASE_ASSERT_WARNING_HPP_INCLUDE
+#define EMP_BASE_ASSERT_WARNING_HPP_INCLUDE
 
 #include "always_assert_warning.hpp"
 
@@ -52,4 +52,4 @@
 #endif
 
 
-#endif // #ifndef EMP_ASSERT_WARNING_HPP
+#endif // #ifndef EMP_BASE_ASSERT_WARNING_HPP_INCLUDE

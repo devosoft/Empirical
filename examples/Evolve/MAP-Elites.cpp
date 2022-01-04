@@ -1,12 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file explores the MAP-Elites selection scheme.
-//
-//  In this example, we will be evolving 4-digit integers.
-//  The two traits measured are nunmber of bits and value mod 31.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file MAP-Elites.cpp
+ *  @brief This file explores the MAP-Elites selection scheme.
+ *
+ *  In this example, we will be evolving 4-digit integers.
+ *  The two traits measured are nunmber of bits and value mod 31.
+ */
 
 #include <iostream>
 

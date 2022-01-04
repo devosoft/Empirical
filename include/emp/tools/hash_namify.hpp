@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file  hash_namify.hpp
+ *  @file hash_namify.hpp
  *  @brief A method for mapping hash values to intuitive names.
  */
 
-#ifndef EMP_HASH_NAMIFY_H
-#define EMP_HASH_NAMIFY_H
+#ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
+#define EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
 
 #include <string>
 
@@ -2731,4 +2731,4 @@ namespace internal {
 
 } // namespace emp
 
-#endif
+#endif // #ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE

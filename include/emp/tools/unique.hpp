@@ -3,17 +3,17 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020
  *
- *  @file  unique.hpp
+ *  @file unique.hpp
  *  @brief Methods to generate UIDs.
  */
 
-#ifndef EMP_UNIQUE_HPP
-#define EMP_UNIQUE_HPP
+#ifndef EMP_TOOLS_UNIQUE_HPP_INCLUDE
+#define EMP_TOOLS_UNIQUE_HPP_INCLUDE
 
 #include <functional>
 #include <iostream>
-#include <type_traits>
 #include <sstream>
+#include <type_traits>
 
 #include "../base/assert.hpp"
 
@@ -39,4 +39,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_UNIQUE_HPP
+#endif // #ifndef EMP_TOOLS_UNIQUE_HPP_INCLUDE

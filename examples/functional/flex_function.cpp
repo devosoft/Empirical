@@ -1,11 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::flex_function
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file flex_function.cpp
+ *  @brief Some examples code for using emp::flex_function
+ */
 
 #include <iostream>
+
 #include "emp/functional/flex_function.hpp"
 
 int Sum4(int a1, int a2, int a3, int a4) {

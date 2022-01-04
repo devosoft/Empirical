@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  BitSorter.h
+ *  @file BitSorter.cpp
  *  @brief This is example code for using BitSorter.h
  */
 

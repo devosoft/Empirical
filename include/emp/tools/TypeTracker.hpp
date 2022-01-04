@@ -18,18 +18,18 @@
  *  @todo Functions should be able to have fixed type values mixed in.
  */
 
-#ifndef EMP_TYPE_TRACKER_H
-#define EMP_TYPE_TRACKER_H
+#ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
+#define EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
 
 #include <unordered_map>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../meta/meta.hpp"
 #include "../base/Ptr.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../functional/GenericFunction.hpp"
 #include "../math/math.hpp"
+#include "../meta/meta.hpp"
 
 namespace emp {
 
@@ -260,4 +260,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE

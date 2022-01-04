@@ -1,10 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Build graphs of various types in the standard format.
-//  NOTE: All questions can be answered by providing command-line arguements.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file make_graph.cpp
+ *  @brief Build graphs of various types in the standard format.
+ *
+ *  NOTE: All questions can be answered by providing command-line arguments.
+ */
 
 #include <iostream>
 
@@ -13,15 +16,15 @@
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/datastructs/Graph.hpp"
 #include "../../../include/emp/datastructs/graph_utils.hpp"
+#include "../../../include/emp/datastructs/vector_utils.hpp"
 #include "../../../include/emp/math/Random.hpp"
 #include "../../../include/emp/math/random_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
-#include "../../../include/emp/datastructs/vector_utils.hpp"
 
 int GetValue(const std::string & query,
-	     emp::vector<std::string> & args,
-	     uint32_t & cur_arg,
-	     int max_val=-1)
+       emp::vector<std::string> & args,
+       uint32_t & cur_arg,
+       int max_val=-1)
 {
   if (cur_arg < args.size()) {  // We already have value from the command line!
     return std::stoi( args[cur_arg++] );
@@ -57,7 +60,7 @@ int main(int argc, char* argv[])
               << "  4 - Grid" << std::endl
               << "  5 - Lossy Grid" << std::endl
               << "  6 - Linked Cliques" << std::endl
-	            << "  7 - Hamiltonion Cycle (with solution)" << std::endl
+              << "  7 - Hamiltonion Cycle (with solution)" << std::endl
               << "  8 - Random DAG" << std::endl
               << "  9 - Multiple Random Components" << std::endl
               << " 10 - Random Weighted" << std::endl;

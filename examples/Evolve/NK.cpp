@@ -1,16 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file explores the template defined in evo::Population.h with an NK landscape.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file NK.cpp
+ *  @brief This file explores the template defined in evo::Population.h with an NK landscape.
+ */
 
 #include <iostream>
 
+#include "emp/bits/BitVector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/Evolve/NK.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
 EMP_BUILD_CONFIG( NKConfig,

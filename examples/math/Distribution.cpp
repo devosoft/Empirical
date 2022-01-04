@@ -1,13 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018-2020.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::Distribution are derived classes.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018-2020
+ *
+ *  @file Distribution.cpp
+ *  @brief Some examples code for using emp::Distribution and derived classes.
+ */
 
 #include <iostream>
-#include "emp/math/Random.hpp"
+
 #include "emp/math/Distribution.hpp"
+#include "emp/math/Random.hpp"
 
 int main()
 {
@@ -37,8 +40,8 @@ int main()
   }
 
   std::cout << "Average of " << test_count << " = "
-	    << (((double) total) / (double) test_count)
-	    << std::endl;
+      << (((double) total) / (double) test_count)
+      << std::endl;
 
 
   //emp::NegativeBinomial nbi10(0.5, 2);
@@ -47,7 +50,7 @@ int main()
   std::cout << "\n-- Negative Binomial--\n";
 
   std::cout << "size = " << nbi10.GetSize() << std::endl
-	    << "total_prob = " << nbi10.GetTotalProb() << std::endl;
+      << "total_prob = " << nbi10.GetTotalProb() << std::endl;
 
   // for (size_t i = 0; i < 10; i++) {
   for (size_t i = 9; i < 40; i++) {

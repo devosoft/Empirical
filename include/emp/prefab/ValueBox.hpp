@@ -1,5 +1,14 @@
-#ifndef EMP_VALUE_BOX_HPP
-#define EMP_VALUE_BOX_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ValueBox.hpp
+ *  @brief UI subcomponent for ConfigPanel and ReadoutPanel.
+ */
+
+#ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
+#define EMP_PREFAB_VALUEBOX_HPP_INCLUDE
 
 #include <cmath>
 
@@ -297,4 +306,4 @@ namespace emp::prefab {
   };
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE

@@ -1,12 +1,20 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file mini_evoke.cpp
+ */
+
 #include <algorithm>
 
 #include "../../tools/mem_track.h"
 
 #include "../../geometry/Physics2D.h"
 #include "../../tools/Random.h"
-#include "../../UI/UI.h"
-#include "../../UI/canvas_utils.h"
 #include "../../UI/Animate.h"
+#include "../../UI/canvas_utils.h"
+#include "../../UI/UI.h"
 
 namespace UI = emp::UI;
 
@@ -27,7 +35,7 @@ const emp::vector<std::string> color_map =
         "#bffff2", "#00ccff", "#163159", "#180059", "#4b394d", "#ff0066"
         } );
 
-  
+
 struct Evoke {
   dPHYSICS physics;
   emp::Random random;
@@ -107,7 +115,7 @@ void EvokeAnim_Basic(int colors_used, const std::string & canvas_name, Evoke & e
     if (evoke.random.P(cur_repro_prob) || num_bodies == 1) {
       emp::Angle repro_angle(evoke.random.GetDouble(2.0 * emp::PI));
       auto * new_body = body->BuildOffspring( repro_angle.GetPoint(0.1) );
-      
+
       new_body->SetBirthTime(birth_time);
       if (use_eco) {
         if (new_ids.size() && evoke.random.P(0.05)) {
@@ -130,7 +138,7 @@ void EvokeAnim_Basic(int colors_used, const std::string & canvas_name, Evoke & e
 
   auto & canvas = doc.Canvas(canvas_name);
   emp::UI::Draw(canvas, evoke.physics.GetSurface(), color_map);
-  
+
   // canvas.Refresh();
 }
 
@@ -153,7 +161,7 @@ int main() {
   evoke_eco.anim.SetCallback(EvokeAnim_Eco);
 
   auto & main_table = doc.AddTable(6, 2);
-  
+
   main_table.GetCell(0,0).SetHeader();
   main_table << "High Change Potential";
   main_table.GetCell(1,0);
@@ -165,7 +173,7 @@ int main() {
       if (evoke_change.anim.GetActive()) but.Label("Pause");  // Setup proper label on button.
       else but.Label("Play");
       but.Update();                                           // Redraw the button.
-    }, "Play", "button_change").Size(50,30);  
+    }, "Play", "button_change").Size(50,30);
   emp::UI::Draw(doc.Canvas("canvas_change"), evoke_change.physics.GetSurface(), color_map);
 
 
@@ -180,7 +188,7 @@ int main() {
       if (evoke_novel.anim.GetActive()) but.Label("Pause");  // Setup proper label on button.
       else but.Label("Play");
       but.Update();                                           // Redraw the button.
-    }, "Play", "button_novel").Size(50,30);  
+    }, "Play", "button_novel").Size(50,30);
   emp::UI::Draw(doc.Canvas("canvas_novel"), evoke_novel.physics.GetSurface(), color_map);
 
 
@@ -195,7 +203,7 @@ int main() {
       if (evoke_eco.anim.GetActive()) but.Label("Pause");  // Setup proper label on button.
       else but.Label("Play");
       but.Update();                                           // Redraw the button.
-    }, "Play", "button_eco").Size(50,30);  
+    }, "Play", "button_eco").Size(50,30);
   emp::UI::Draw(doc.Canvas("canvas_eco"), evoke_eco.physics.GetSurface(), color_map);
 
 
@@ -204,7 +212,7 @@ int main() {
 
   main_table.GetCell(3,1).SetHeader();
   main_table << "High Complexity Potential";
-                                    
+
 
 
   // auto & canvas_novel = doc.AddCanvas(cw, ch, "canvas_novel");

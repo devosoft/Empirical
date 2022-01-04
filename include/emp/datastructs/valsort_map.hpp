@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  valsort_map.hpp
+ *  @file valsort_map.hpp
  *  @brief This file defines a map that is sorted by value, not key.
  *  @note Status: ALPHA
  *
@@ -15,8 +15,8 @@
  *  the same set of results, except in value order.  (reverse versions of each work as well)
  */
 
-#ifndef EMP_VALSORT_MAP_H
-#define EMP_VALSORT_MAP_H
+#ifndef EMP_DATASTRUCTS_VALSORT_MAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_VALSORT_MAP_HPP_INCLUDE
 
 #include <map>
 #include <set>
@@ -84,6 +84,4 @@ namespace emp {
   };
 }
 
-#endif
-
-
+#endif // #ifndef EMP_DATASTRUCTS_VALSORT_MAP_HPP_INCLUDE

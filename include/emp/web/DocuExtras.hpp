@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2019
  *
- *  @file  DocuExtras.hpp
+ *  @file DocuExtras.hpp
  *  @brief Control the styling and attributes of an existing div without nuking
 *   the content inside it.
  *
  */
 
-#ifndef EMP_WEB_DOCUEXTRAS_H
-#define EMP_WEB_DOCUEXTRAS_H
+#ifndef EMP_WEB_DOCUEXTRAS_HPP_INCLUDE
+#define EMP_WEB_DOCUEXTRAS_HPP_INCLUDE
 
 #include "Animate.hpp"
 #include "Text.hpp"
@@ -131,4 +131,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_DOCUEXTRAS_HPP_INCLUDE

@@ -1,25 +1,27 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2021.
  *
- *  @file  math.hpp
+ *  @file math.hpp
  *  @brief Useful mathematical functions (that are constexpr when possible.)
  *  @note Status: BETA (though new functions are added frequently)
  */
 
+#ifndef EMP_MATH_MATH_HPP_INCLUDE
+#define EMP_MATH_MATH_HPP_INCLUDE
 
-#ifndef EMP_MATH_H
-#define EMP_MATH_H
 
-#include <initializer_list>
 #include <algorithm>
 #include <cmath>
+#include <initializer_list>
+#include <numeric>
 
 #include "../base/assert.hpp"
 #include "../meta/reflection.hpp"
-#include "Random.hpp"
+
 #include "constants.hpp"
+#include "Random.hpp"
 
 namespace emp {
 
@@ -363,23 +365,22 @@ namespace emp {
 
   // Number theory functions
 
-  /// Greatest Common Divisor - uses Euclidian method.
+  /// Greatest Common Divisor
   template <typename T>
-  T GCD(T v1, T v2) {
+  [[deprecated("Replaced by std::gcd")]]
+  constexpr T GCD(const T v1, const T v2) {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
-    if (v1 < v2) std::swap(v1,v2);        // v1 should always be larger.
-    const T remainder = v1 % v2;
-    if (remainder == 0) return v2;       // If v2 perfectly divides v1, we have our answer!
-    return GCD<T>(v1, remainder);         // Otherwise repeat on the lower value and remainder.
+    return std::gcd<T, T>(v1, v2);
   }
 
   /// Least common multiple
   template <typename T>
-  T LCM(T v1, T v2) {
+  [[deprecated("Replaced by std::lcm")]]
+  constexpr T LCM(const T v1, const T v2) {
     emp_assert(v1 > 0 && v2 > 0, v1, v2); // Must both be positive values.
-    return (v1 / GCD(v1,v2)) * v2;
+    return std::lcm<T, T>(v1, v2);
   }
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_MATH_HPP_INCLUDE

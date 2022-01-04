@@ -16,9 +16,9 @@
  *        whether those iterators are valid.
  */
 
+#ifndef EMP_BASE_VECTOR_HPP_INCLUDE
+#define EMP_BASE_VECTOR_HPP_INCLUDE
 
-#ifndef EMP_VECTOR_H
-#define EMP_VECTOR_H
 
 #include <initializer_list>
 #include <iterator>
@@ -356,4 +356,4 @@ namespace emp {
 //   };
 // }
 
-#endif
+#endif // #ifndef EMP_BASE_VECTOR_HPP_INCLUDE

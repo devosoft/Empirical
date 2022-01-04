@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  flex_function.hpp
+ *  @file flex_function.hpp
  *  @brief Based on std::function, but holds default parameter values for calls with fewer args.
  *  @note Status: ALPHA
  */
 
+#ifndef EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_INCLUDE
+#define EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_INCLUDE
 
-#ifndef EMP_FLEX_FUNCTION_H
-#define EMP_FLEX_FUNCTION_H
 
 #include <functional>
 #include <tuple>
@@ -85,4 +85,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_INCLUDE

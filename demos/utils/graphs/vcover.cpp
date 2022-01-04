@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Determine the minimum vertex cover for a graph provided on standard input.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file vcover.cpp
+ *  @brief Determine the minimum vertex cover for a graph provided on standard input.
+ */
 
 #include <iostream>
 #include <map>
@@ -13,8 +15,8 @@
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/datastructs/Graph.hpp"
 #include "../../../include/emp/datastructs/graph_utils.hpp"
-#include "../../../include/emp/tools/string_utils.hpp"
 #include "../../../include/emp/tools/SolveState.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
 
 bool verbose;   // Should we print extra information about solving progress?
 bool debug;     // Should we print extra information to help diagnose problems?

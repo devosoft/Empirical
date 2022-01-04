@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  CanvasShape.hpp
+ *  @file CanvasShape.hpp
  *  @brief Define simple shapes to draw on a canvas.
  *
  *  Canvas shapes can be definied in detail, describing how they modify a canvas.
@@ -13,9 +13,9 @@
  *    CanvasRect
  */
 
+#ifndef EMP_WEB_CANVASSHAPE_HPP_INCLUDE
+#define EMP_WEB_CANVASSHAPE_HPP_INCLUDE
 
-#ifndef EMP_WEB_CANVAS_SHAPE_H
-#define EMP_WEB_CANVAS_SHAPE_H
 
 #include <string>
 
@@ -257,4 +257,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_CANVASSHAPE_HPP_INCLUDE

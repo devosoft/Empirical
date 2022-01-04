@@ -1,11 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::Random
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file constants.cpp
+ */
 
 #include <iostream>
+
 #include "emp/math/constants.hpp"
 
 #define TEST_PRINT(T) std::cout << "MaxValue<" << #T << ">() = " << (uint64_t) emp::MaxValue<T>() << std::endl;

@@ -4,6 +4,8 @@
 
 test: test-native test-examples test-web
 
+test-demos: test-native-demos test-web-demos
+
 test-examples: test-native-examples test-web-examples
 
 test-native: test-native-regular test-native-fulldebug test-native-opt test-native-examples
@@ -16,6 +18,13 @@ test-native-fulldebug:
 
 test-native-opt:
 	cd tests && make opt
+
+test-native-demos:
+	cd demos && make native-test
+	cd demos && make native-test-debug
+
+test-web-demos:
+	cd demos && make web-test
 
 test-native-examples:
 	cd examples && make native-test
@@ -53,7 +62,9 @@ install-coverage-dependencies:
 	cd third-party && make install-coverage-dependencies
 
 clean:
-	cd docs && make clean
+	cd doc && make clean
+	cd demos && make clean
+	cd examples && make clean
 	cd tests && make clean
 
 clean-dep:

@@ -1,10 +1,20 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file EventDrivenGP.cpp
+ */
+
 // ------- DEPRECATED -------
-#include <iostream>
-#include <fstream>
-#include "hardware/EventDrivenGP.h"
 #include "base/Ptr.h"
-#include "tools/Random.h"
+
+#include <fstream>
+#include <iostream>
+
+#include "hardware/EventDrivenGP.h"
 #include "tools/BitSet.h"
+#include "tools/Random.h"
 
 int main() {
   std::cout << "Testing EventDrivenGP." << std::endl;

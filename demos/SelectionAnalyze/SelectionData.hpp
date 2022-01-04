@@ -1,12 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This class maintains all of the fitness data for a population of organisms.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file SelectionData.hpp
+ *  @brief This class maintains all of the fitness data for a population of organisms.
+ */
 
+#ifndef DEMOS_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE
+#define DEMOS_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE
 
-#ifndef SELECTION_DATA_H
-#define SELECTION_DATA_H
 
 #include <iostream>
 #include <map>
@@ -16,9 +19,9 @@
 
 #include "emp/base/vector.hpp"
 #include "emp/bits/BitVector.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 #include "emp/io/File.hpp"
 #include "emp/math/random_utils.hpp"
-#include "emp/datastructs/vector_utils.hpp"
 
 class SelectionData {
 private:
@@ -592,4 +595,4 @@ public:
   }
 };
 
-#endif
+#endif // #ifndef DEMOS_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE

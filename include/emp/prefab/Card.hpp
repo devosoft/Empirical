@@ -1,5 +1,14 @@
-#ifndef EMP_CARD_HPP
-#define EMP_CARD_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Card.hpp
+ *  @brief Wraps a Bootstrap card.
+ */
+
+#ifndef EMP_PREFAB_CARD_HPP_INCLUDE
+#define EMP_PREFAB_CARD_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"
@@ -223,4 +232,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_CARD_HPP_INCLUDE

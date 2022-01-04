@@ -1,6 +1,15 @@
-#include "emp/tools/attrs.hpp"
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file attrs.cpp
+ */
+
 #include <array>
 #include <iostream>
+
+#include "emp/tools/attrs.hpp"
 
 using namespace emp::tools;
 

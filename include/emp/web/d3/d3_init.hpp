@@ -1,11 +1,22 @@
-#ifndef D3_INIT_H
-#define D3_INIT_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file d3_init.hpp
+ *  @brief TODO.
+ */
+
+#ifndef EMP_WEB_D3_D3_INIT_HPP_INCLUDE
+#define EMP_WEB_D3_D3_INIT_HPP_INCLUDE
 
 #include <iostream>
 
 #include "../../base/errors.hpp"
+
 #include "../init.hpp"
 #include "../JSWrap.hpp"
+
 #include "utils.hpp"
 
 // #ifdef __EMSCRIPTEN__
@@ -120,7 +131,7 @@ namespace D3 {
     ///
     /// Example:
     ///
-    /// 
+    ///
     /// `D3::FormatFunction rounded = D3::FormatFunction(".2f");
     ///
     ///  std::function<double, int, int)> tooltip_display =
@@ -131,7 +142,7 @@ namespace D3 {
     ///  D3::Selection example_selection = D3::SelectAll("circle");
     ///
     ///  example_selection.SetupToolTip(tip);'
-    /// 
+    ///
     ///
     /// Mousing over a circle in the example selection will display
     /// "Data: " followed by the value of d, rounded to two decimal points.
@@ -202,8 +213,8 @@ namespace D3 {
         char * buffer = (char *) EM_ASM_INT({
           var text = js.objects[$0]($1);
           var buffer = Module._malloc(text.length+1);
-    	  Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
-    	  return buffer;
+          Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
+          return buffer;
         }, this->id, d);
         std::string result = std::string(buffer);
         free(buffer);
@@ -258,4 +269,4 @@ namespace D3 {
   };
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_D3_INIT_HPP_INCLUDE

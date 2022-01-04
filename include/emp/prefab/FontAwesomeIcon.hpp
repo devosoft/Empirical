@@ -1,9 +1,18 @@
-#ifndef EMP_FONT_AWESOME_ICON_HPP
-#define EMP_FONT_AWESOME_ICON_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file FontAwesomeIcon.hpp
+ *  @brief Wraps Font Awesome's icons.
+ */
+
+#ifndef EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE
+#define EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
-#include "../web/Element.hpp"
 #include "../web/Div.hpp"
+#include "../web/Element.hpp"
 #include "../web/Widget.hpp"
 
 namespace emp {
@@ -40,4 +49,4 @@ namespace prefab {
 }
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE

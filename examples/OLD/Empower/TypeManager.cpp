@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::TypeManage
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file TypeManager.cpp
+ *  @brief Some examples code for using emp::TypeManager
+ */
 
 #include <iostream>
 
@@ -12,9 +14,9 @@
 
 void PrintType(const emp::Type & type) {
   std::cout << "type '" << type.GetName()
-	    << "' had id " << type.GetID()
-	    << " and size " << type.GetSize()
-	    << std::endl;
+      << "' had id " << type.GetID()
+      << " and size " << type.GetSize()
+      << std::endl;
 }
 
 int main()

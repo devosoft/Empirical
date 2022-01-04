@@ -135,4 +135,3 @@ valsort_map.h
 
 vector_utils.h
   A set of simple functions to manipulate emp::vector
-

@@ -1,16 +1,21 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file BitVector.cpp
+ */
+
+#include <limits>
+#include <map>
+#include <ratio>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include "emp/base/vector.hpp"
 #include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
-
-#include <sstream>
-#include <map>
-#include <limits>
-#include <ratio>
-
-#include "emp/base/vector.hpp"
 
 TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   // Create a size 50 bit vector, default to all zeros.
@@ -63,7 +68,7 @@ TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   REQUIRE( bv8.CountOnes() == 9 );
 
   // Some random BitVectors
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv9(1000, random);            // 50/50 chance for each bit.
   const size_t bv9_ones = bv9.CountOnes();
   REQUIRE( bv9_ones >= 400 );
@@ -148,9 +153,9 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
   emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
   emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv1k(1000, random, 0.75);
-  
+
   // Make sure all sizes are correct.
   REQUIRE( bv0.GetSize() == 0 );
   REQUIRE( bv1.GetSize() == 1 );
@@ -238,7 +243,7 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
 }
 
 TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
-  // Make sure range-based accessors still work when there are no bits. 
+  // Make sure range-based accessors still work when there are no bits.
   emp::BitVector bv0(0);
   bv0.SetRange(0,0);
   bv0.SetAll();
@@ -248,7 +253,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv0.Toggle(0,0);
   REQUIRE( bv0.GetSize() == 0 );
 
-  // Now try range-based accessors on a single bit. 
+  // Now try range-based accessors on a single bit.
   emp::BitVector bv1(1, false);  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
   bv1.Set(0);                    REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
   bv1.Clear(0);                  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
@@ -329,7 +334,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv88.SetRange(64,66); REQUIRE(bv88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
   // A larger BitVector with lots of random tests.
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv1k(1000, random, 0.65);
   size_t num_ones = bv1k.CountOnes();  REQUIRE(num_ones > 550);
   bv1k.Toggle();                       REQUIRE(bv1k.CountOnes() == 1000 - num_ones);
@@ -370,7 +375,7 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
 }
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
-  emp::Random random;
+  emp::Random random(1);
   emp::BitVector bv(1000);
 
   REQUIRE(bv.None() == true);
@@ -492,7 +497,7 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
 TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
   constexpr size_t num_bits = 145;
   constexpr size_t num_bytes = 19;
-  
+
   emp::BitVector bv(num_bits);
   REQUIRE(bv.GetSize() == num_bits);
   REQUIRE(bv.GetNumBytes() == num_bytes);
@@ -613,7 +618,7 @@ TEST_CASE("7: Test functions that analyze and manipulate ones", "[bits]") {
   REQUIRE(bv.LongestSegmentOnes() == 7);
 
   // Try again with Find, this time with a random sequence of ones.
-  emp::Random random;
+  emp::Random random(1);
   bv.Randomize(random);
   size_t count = 0;
   for (int i = bv.FindOne(); i != -1; i = bv.FindOne(i+1)) count++;
@@ -829,12 +834,12 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
 }
 
 TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
-	emp::BitVector bv(10);
+  emp::BitVector bv(10);
   REQUIRE(bv.GetSize() == 10);
   REQUIRE(bv.CountOnes() == 0);
   REQUIRE(bv.CountZeros() == 10);
 
-	bv.Resize(1000);
+  bv.Resize(1000);
   REQUIRE(bv.GetSize() == 1000);
   REQUIRE(bv.CountOnes() == 0);
   REQUIRE(bv.CountZeros() == 1000);
@@ -844,7 +849,7 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
   REQUIRE(bv.CountOnes() == 1000);
   REQUIRE(bv.CountZeros() == 0);
 
-  emp::Random random;
+  emp::Random random(1);
   bv.Randomize(random);
   REQUIRE(bv.CountOnes() == bv.CountOnes_Sparse());
   size_t num_ones = bv.CountOnes();
@@ -894,377 +899,377 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
 TEST_CASE("Test BitVector", "[bits]")
 {
 
-	// Constructor
-	emp::BitVector bv(10);
+  // Constructor
+  emp::BitVector bv(10);
 
-	// Get Size
-	REQUIRE( (bv.GetSize() == 10) );
-	REQUIRE( (bv.size() == 10) );
+  // Get Size
+  REQUIRE( (bv.GetSize() == 10) );
+  REQUIRE( (bv.size() == 10) );
 
-	// Set & Get
-	bv.Set(0);
-	REQUIRE(bv.Get(0));
-	bv.Set(1, false);
-	REQUIRE(!bv.Get(1));
+  // Set & Get
+  bv.Set(0);
+  REQUIRE(bv.Get(0));
+  bv.Set(1, false);
+  REQUIRE(!bv.Get(1));
 
-	// Assignment operator
-	emp::BitVector bv1(10);
-	bv1 = bv;
-	REQUIRE(bv1 == bv);
-	REQUIRE(bv1.Get(0));
-	emp::BitVector bv20(20);
-	emp::BitVector bv30(30);
-	bv20.Set(1);
-	REQUIRE(bv20.Get(1));
-	bv20 = bv;
-	REQUIRE(bv20 == bv);
-	REQUIRE(bv20.size()==bv.size());
-	REQUIRE(!bv20.Get(1));
-	bv20 = bv30;
-	REQUIRE(!bv20.Get(1));
-	REQUIRE(bv20 == bv30);
+  // Assignment operator
+  emp::BitVector bv1(10);
+  bv1 = bv;
+  REQUIRE(bv1 == bv);
+  REQUIRE(bv1.Get(0));
+  emp::BitVector bv20(20);
+  emp::BitVector bv30(30);
+  bv20.Set(1);
+  REQUIRE(bv20.Get(1));
+  bv20 = bv;
+  REQUIRE(bv20 == bv);
+  REQUIRE(bv20.size()==bv.size());
+  REQUIRE(!bv20.Get(1));
+  bv20 = bv30;
+  REQUIRE(!bv20.Get(1));
+  REQUIRE(bv20 == bv30);
 
-	// Resize
-	bv1.Set(9);
-	bv1.resize(8);
-	REQUIRE( (bv1.GetSize() == 8) );
-	REQUIRE( (bv1.GetByte(0) == 1) );
-	bv1.resize(128);
-	REQUIRE( (bv1.GetSize() == 128) );
-	REQUIRE( (bv1.GetByte(1) == 0) );
+  // Resize
+  bv1.Set(9);
+  bv1.resize(8);
+  REQUIRE( (bv1.GetSize() == 8) );
+  REQUIRE( (bv1.GetByte(0) == 1) );
+  bv1.resize(128);
+  REQUIRE( (bv1.GetSize() == 128) );
+  REQUIRE( (bv1.GetByte(1) == 0) );
 
-	// Comparison operators
-	REQUIRE((bv1 != bv));
-	bv1.Resize(10);
-	REQUIRE((bv1 == bv));
-	REQUIRE((bv1 >= bv));
-	REQUIRE((bv1 <= bv));
-	bv.Set(1);
-	REQUIRE((bv > bv1));
-	REQUIRE((bv >= bv1));
+  // Comparison operators
+  REQUIRE((bv1 != bv));
+  bv1.Resize(10);
+  REQUIRE((bv1 == bv));
+  REQUIRE((bv1 >= bv));
+  REQUIRE((bv1 <= bv));
+  bv.Set(1);
+  REQUIRE((bv > bv1));
+  REQUIRE((bv >= bv1));
 
-	// Set & Get Byte
-	emp::BitVector bv2(32);
-	bv2.SetByte(0, 128);
-	bv2.SetByte(1, 255);
-	REQUIRE((bv2.GetByte(0) == 128));
-	REQUIRE((bv2.GetByte(1) == 255));
+  // Set & Get Byte
+  emp::BitVector bv2(32);
+  bv2.SetByte(0, 128);
+  bv2.SetByte(1, 255);
+  REQUIRE((bv2.GetByte(0) == 128));
+  REQUIRE((bv2.GetByte(1) == 255));
 
-	// Count Ones
-	REQUIRE((bv2.CountOnes() == 9));
-	REQUIRE((bv2.CountOnes_Sparse() == 9));
-	REQUIRE((bv2.count() == 9));
+  // Count Ones
+  REQUIRE((bv2.CountOnes() == 9));
+  REQUIRE((bv2.CountOnes_Sparse() == 9));
+  REQUIRE((bv2.count() == 9));
 
-	// Any All None SetAll Clear
-	REQUIRE(bool(bv2)); // operator bool()
-	REQUIRE(bool(bv2[7])); // bool operator[]
-	REQUIRE(bv2.any());
-	REQUIRE(!bv2.all());
-	REQUIRE(!bv2.none());
-	bv2.SetAll();
-	REQUIRE(!bv2.none());
-	REQUIRE(bv2.all());
-	bv2.Clear();
-	REQUIRE(bv2.none());
-	REQUIRE(!bv2.all());
+  // Any All None SetAll Clear
+  REQUIRE(bool(bv2)); // operator bool()
+  REQUIRE(bool(bv2[7])); // bool operator[]
+  REQUIRE(bv2.any());
+  REQUIRE(!bv2.all());
+  REQUIRE(!bv2.none());
+  bv2.SetAll();
+  REQUIRE(!bv2.none());
+  REQUIRE(bv2.all());
+  bv2.Clear();
+  REQUIRE(bv2.none());
+  REQUIRE(!bv2.all());
 
-	// Prints
-	std::stringstream ss;
-	emp::BitVector bv3(8);
-	bv3.SetByte(0,255);
-	bv3.Print(ss);
-	REQUIRE((ss.str() == "11111111"));
-	ss.str(std::string()); // clear ss
+  // Prints
+  std::stringstream ss;
+  emp::BitVector bv3(8);
+  bv3.SetByte(0,255);
+  bv3.Print(ss);
+  REQUIRE((ss.str() == "11111111"));
+  ss.str(std::string()); // clear ss
 
-	ss << bv3;
-	REQUIRE((ss.str() == "11111111"));
-	ss.str(std::string()); // clear ss
+  ss << bv3;
+  REQUIRE((ss.str() == "11111111"));
+  ss.str(std::string()); // clear ss
 
-	bv3.SetByte(0,130);
-	bv3.PrintOneIDs(ss);
-	REQUIRE((ss.str() == "1 7"));
-	ss.str(std::string()); // clear ss
+  bv3.SetByte(0,130);
+  bv3.PrintOneIDs(ss);
+  REQUIRE((ss.str() == "1 7"));
+  ss.str(std::string()); // clear ss
 
-	bv3.PrintArray(ss);
-	REQUIRE((ss.str() == "01000001"));
-	ss.str(std::string()); // clear ss
+  bv3.PrintArray(ss);
+  REQUIRE((ss.str() == "01000001"));
+  ss.str(std::string()); // clear ss
 
-	// Find & Pop Bit
-	bv3.SetByte(0,74);
-	REQUIRE((bv3.PopOne() == 1));
-	REQUIRE((bv3.CountOnes() == 2));
-	REQUIRE((bv3.GetByte(0) == 72));
-	REQUIRE((bv3.FindOne() == 3));
-	REQUIRE((bv3.FindOne(4) == 6));
-	bv3.PopOne();
-	bv3.PopOne();
-	REQUIRE((bv3.FindOne() == -1));
-	REQUIRE((bv3.FindOne(2) == -1));
-	REQUIRE((bv3.PopOne() == -1));
+  // Find & Pop Bit
+  bv3.SetByte(0,74);
+  REQUIRE((bv3.PopOne() == 1));
+  REQUIRE((bv3.CountOnes() == 2));
+  REQUIRE((bv3.GetByte(0) == 72));
+  REQUIRE((bv3.FindOne() == 3));
+  REQUIRE((bv3.FindOne(4) == 6));
+  bv3.PopOne();
+  bv3.PopOne();
+  REQUIRE((bv3.FindOne() == -1));
+  REQUIRE((bv3.FindOne(2) == -1));
+  REQUIRE((bv3.PopOne() == -1));
 
-	// Get Ones
-	emp::vector<size_t> ones = bv3.GetOnes();
-	REQUIRE((ones.size() == 0));
-	bv3.SetByte(0,10);
-	ones = bv3.GetOnes();
-	REQUIRE((ones[0] == 1));
-	REQUIRE((ones[1] == 3));
+  // Get Ones
+  emp::vector<size_t> ones = bv3.GetOnes();
+  REQUIRE((ones.size() == 0));
+  bv3.SetByte(0,10);
+  ones = bv3.GetOnes();
+  REQUIRE((ones[0] == 1));
+  REQUIRE((ones[1] == 3));
 
-	// Larger BitVector
-	emp::BitVector bv4(96);
-	bv4.SetByte(1,1);
-	bv4.PrintFields(ss);
-	REQUIRE(ss.str() == "00000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000100000000");
+  // Larger BitVector
+  emp::BitVector bv4(96);
+  bv4.SetByte(1,1);
+  bv4.PrintFields(ss);
+  REQUIRE(ss.str() == "00000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000100000000");
 
-	// test single set.
-	bv4[62] = 1;
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000000000 0100000000000000000000000000000000000000000000000000000100000000");
-	// test toggle of range (across boundary)
-	bv4.Toggle(61, 70);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000111111 1010000000000000000000000000000000000000000000000000000100000000");
-	// test clearing a range in a single field.
-	bv4.Clear(65, 69);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000100001 1010000000000000000000000000000000000000000000000000000100000000");
-	// test toggling a larger range
-	bv4.Toggle(55, 75);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000011111011110 0101111110000000000000000000000000000000000000000000000100000000");
-	// test clearing a field across bounderies
-	bv4.Clear(56, 74);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+  // test single set.
+  bv4[62] = 1;
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000000000 0100000000000000000000000000000000000000000000000000000100000000");
+  // test toggle of range (across boundary)
+  bv4.Toggle(61, 70);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000111111 1010000000000000000000000000000000000000000000000000000100000000");
+  // test clearing a range in a single field.
+  bv4.Clear(65, 69);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000100001 1010000000000000000000000000000000000000000000000000000100000000");
+  // test toggling a larger range
+  bv4.Toggle(55, 75);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000011111011110 0101111110000000000000000000000000000000000000000000000100000000");
+  // test clearing a field across bounderies
+  bv4.Clear(56, 74);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
 
-	// Even longer bit vector (to test operations that span multiple fields)
-	bv4.Resize(300);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
-	// test setting a range that spans three fields.
-	bv4.SetRange(100, 250);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111111 1111111111111111111111111111111111111111111111111111111111111111 1111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
-	// test clearing a full field.
-	bv4.Clear(128,192);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111111 0000000000000000000000000000000000000000000000000000000000000000 1111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
-	// test clearing slightly more than a full field.
-	bv4.Clear(127,193);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111110 0000000000000000000000000000000000000000000000000000000000000000 0111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
-	// test setting a full field.
-	bv4.SetRange(128,192);
-	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
-	REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111110 1111111111111111111111111111111111111111111111111111111111111111 0111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
-	ss.str(std::string()); // clear ss
+  // Even longer bit vector (to test operations that span multiple fields)
+  bv4.Resize(300);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000000000000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+  // test setting a range that spans three fields.
+  bv4.SetRange(100, 250);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111111 1111111111111111111111111111111111111111111111111111111111111111 1111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+  // test clearing a full field.
+  bv4.Clear(128,192);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111111 0000000000000000000000000000000000000000000000000000000000000000 1111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+  // test clearing slightly more than a full field.
+  bv4.Clear(127,193);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111110 0000000000000000000000000000000000000000000000000000000000000000 0111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+  // test setting a full field.
+  bv4.SetRange(128,192);
+  ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+  REQUIRE(ss.str() == "00000000000000000000000000000000000000000000 0000001111111111111111111111111111111111111111111111111111111110 1111111111111111111111111111111111111111111111111111111111111111 0111111111111111111111111111000000000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+  ss.str(std::string()); // clear ss
 
 
-	// Logic operators
-	emp::BitVector bv5(8);
-	bv5.SetByte(0,28);
-	REQUIRE((bv3.CountOnes() == 8-((~bv3).CountOnes())));
-	REQUIRE(((bv3 & bv5).GetByte(0) == 8));
-	REQUIRE(((bv3 | bv5).GetByte(0) == 30));
-	REQUIRE(((bv3 ^ bv5).GetByte(0) == 22));
-	REQUIRE(((bv3 << 2).GetByte(0) == 40));
-	REQUIRE(((bv5 >> 2).GetByte(0) == 7));
+  // Logic operators
+  emp::BitVector bv5(8);
+  bv5.SetByte(0,28);
+  REQUIRE((bv3.CountOnes() == 8-((~bv3).CountOnes())));
+  REQUIRE(((bv3 & bv5).GetByte(0) == 8));
+  REQUIRE(((bv3 | bv5).GetByte(0) == 30));
+  REQUIRE(((bv3 ^ bv5).GetByte(0) == 22));
+  REQUIRE(((bv3 << 2).GetByte(0) == 40));
+  REQUIRE(((bv5 >> 2).GetByte(0) == 7));
 
-	// Compound operators
-	bv5 &= bv3;
-	REQUIRE((bv5.GetByte(0) == 8));
-	bv5 |= bv3;
-	REQUIRE((bv5.GetByte(0) == 10));
-	bv5 ^= bv3;
-	REQUIRE((bv5.GetByte(0) == 0));
-	bv3 >>= 2;
-	REQUIRE((bv3.GetByte(0) == 2));
-	bv3 <<= 4;
-	REQUIRE((bv3.GetByte(0) == 32));
+  // Compound operators
+  bv5 &= bv3;
+  REQUIRE((bv5.GetByte(0) == 8));
+  bv5 |= bv3;
+  REQUIRE((bv5.GetByte(0) == 10));
+  bv5 ^= bv3;
+  REQUIRE((bv5.GetByte(0) == 0));
+  bv3 >>= 2;
+  REQUIRE((bv3.GetByte(0) == 2));
+  bv3 <<= 4;
+  REQUIRE((bv3.GetByte(0) == 32));
 
-	// Hash
-	emp::BitVector bv_a(2);
-	bv_a.Set(0);
-	emp::BitVector bv_b(2);
-	bv_b.Set(0);
-	REQUIRE(bv_a.Hash() == bv_b.Hash());
-	bv_b.Set(0, false);
-	REQUIRE(bv_a.Hash() != bv_b.Hash());
-	bv_b.Set(0, true);
+  // Hash
+  emp::BitVector bv_a(2);
+  bv_a.Set(0);
+  emp::BitVector bv_b(2);
+  bv_b.Set(0);
+  REQUIRE(bv_a.Hash() == bv_b.Hash());
+  bv_b.Set(0, false);
+  REQUIRE(bv_a.Hash() != bv_b.Hash());
+  bv_b.Set(0, true);
 
-	// EQU_SELF
-	REQUIRE(bv_a.EQU_SELF(bv_b).all());
-	// bv_a = 01, bv_b = 01, ~(01 ^ 01) = 11
-	REQUIRE(bv_a.GetByte(0) == 3);
-	REQUIRE(bv_b.GetByte(0) == 1);
-	REQUIRE(!(bv_a.EQU_SELF(bv_b).all()));
-	// bv_a = 11, bv_b = 01, ~(11 ^ 01) = 01
-	REQUIRE(bv_a.GetByte(0) == 1);
-	REQUIRE(bv_b.GetByte(0) == 1);
+  // EQU_SELF
+  REQUIRE(bv_a.EQU_SELF(bv_b).all());
+  // bv_a = 01, bv_b = 01, ~(01 ^ 01) = 11
+  REQUIRE(bv_a.GetByte(0) == 3);
+  REQUIRE(bv_b.GetByte(0) == 1);
+  REQUIRE(!(bv_a.EQU_SELF(bv_b).all()));
+  // bv_a = 11, bv_b = 01, ~(11 ^ 01) = 01
+  REQUIRE(bv_a.GetByte(0) == 1);
+  REQUIRE(bv_b.GetByte(0) == 1);
 
-	// NAND SELF
-	// bv_a = 01, bv_b = 01, ~(01 & 01) = 10
-	REQUIRE(bv_a.NAND_SELF(bv_b) == ~bv_b);
-	REQUIRE(bv_a.GetByte(0) == 2);
+  // NAND SELF
+  // bv_a = 01, bv_b = 01, ~(01 & 01) = 10
+  REQUIRE(bv_a.NAND_SELF(bv_b) == ~bv_b);
+  REQUIRE(bv_a.GetByte(0) == 2);
 
-	// NOR SELF
-	// bv_a = 10, bv_b = 01, ~(10 | 01) = 00
-	REQUIRE(bv_a.NOR_SELF(bv_b).none());
-	REQUIRE(bv_a.GetByte(0) == 0);
+  // NOR SELF
+  // bv_a = 10, bv_b = 01, ~(10 | 01) = 00
+  REQUIRE(bv_a.NOR_SELF(bv_b).none());
+  REQUIRE(bv_a.GetByte(0) == 0);
 
-	// NOT SELF
-	REQUIRE(bv_a.NOT_SELF().all());
+  // NOT SELF
+  REQUIRE(bv_a.NOT_SELF().all());
 
-	// EQU
-	emp::BitVector bv_c(3);
-	bv_c.SetByte(0,2);
-	emp::BitVector bv_d(3);
-	bv_d.SetByte(0,2);
-	REQUIRE(bv_c.EQU(bv_d).all());
-	REQUIRE(bv_c.GetByte(0) == 2);
+  // EQU
+  emp::BitVector bv_c(3);
+  bv_c.SetByte(0,2);
+  emp::BitVector bv_d(3);
+  bv_d.SetByte(0,2);
+  REQUIRE(bv_c.EQU(bv_d).all());
+  REQUIRE(bv_c.GetByte(0) == 2);
 
-	// NAND
-	REQUIRE(bv_c.NAND(bv_d) == ~bv_c);
-	REQUIRE(bv_c.GetByte(0) == 2);
+  // NAND
+  REQUIRE(bv_c.NAND(bv_d) == ~bv_c);
+  REQUIRE(bv_c.GetByte(0) == 2);
 
-	// NOR
-	REQUIRE(bv_c.NOR(bv_d) == ~bv_c);
-	REQUIRE(bv_c.GetByte(0) == 2);
+  // NOR
+  REQUIRE(bv_c.NOR(bv_d) == ~bv_c);
+  REQUIRE(bv_c.GetByte(0) == 2);
 
-	// Bit proxy compound assignment operators
-	// AND
-	// bv_c = 010
-	bv_c[0] &= 1;
-	REQUIRE(bv_c[0] == 0);
-	REQUIRE(bv_c[1] == 1);
-	bv_c[1] &= 0;
-	REQUIRE(bv_c[1] == 0);
-	// OR
-	// bv_d = 010
-	bv_d[1] |= 0;
-	REQUIRE(bv_d[1] == 1);
-	bv_d[0] |= 1;
-	REQUIRE(bv_d[0] == 1);
-	bv_d[2] |= 0;
-	REQUIRE(bv_d[2] == 0);
-	// XOR
-	// bv_c = 000
-	bv_c[0] ^= 1;
-	REQUIRE(bv_c[0] == 1);
-	bv_c[0] ^= 1;
-	REQUIRE(bv_c[0] == 0);
-	//PLUS
-	// bv_d = 011
-	bv_d[2] += 1;
-	REQUIRE(bv_d[2] == 1);
-	// MINUS
-	// bv_d = 111
-	bv_d[1] -= 1;
-	REQUIRE(bv_d[1] == 0);
-	// TIMES
-	//bv_d = 101
-	bv_d[2] *= 1;
-	REQUIRE(bv_d[2] == 1);
-	bv_d[0] *= 0;
-	REQUIRE(bv_d[0] == 0);
-	// DIV
-	// bv_c = 000
-	bv_c[0] /= 1;
-	REQUIRE(bv_c[0] == 0);
+  // Bit proxy compound assignment operators
+  // AND
+  // bv_c = 010
+  bv_c[0] &= 1;
+  REQUIRE(bv_c[0] == 0);
+  REQUIRE(bv_c[1] == 1);
+  bv_c[1] &= 0;
+  REQUIRE(bv_c[1] == 0);
+  // OR
+  // bv_d = 010
+  bv_d[1] |= 0;
+  REQUIRE(bv_d[1] == 1);
+  bv_d[0] |= 1;
+  REQUIRE(bv_d[0] == 1);
+  bv_d[2] |= 0;
+  REQUIRE(bv_d[2] == 0);
+  // XOR
+  // bv_c = 000
+  bv_c[0] ^= 1;
+  REQUIRE(bv_c[0] == 1);
+  bv_c[0] ^= 1;
+  REQUIRE(bv_c[0] == 0);
+  //PLUS
+  // bv_d = 011
+  bv_d[2] += 1;
+  REQUIRE(bv_d[2] == 1);
+  // MINUS
+  // bv_d = 111
+  bv_d[1] -= 1;
+  REQUIRE(bv_d[1] == 0);
+  // TIMES
+  //bv_d = 101
+  bv_d[2] *= 1;
+  REQUIRE(bv_d[2] == 1);
+  bv_d[0] *= 0;
+  REQUIRE(bv_d[0] == 0);
+  // DIV
+  // bv_c = 000
+  bv_c[0] /= 1;
+  REQUIRE(bv_c[0] == 0);
 
-	// GetUInt SetUInt
-	emp::BitVector bv_e(5);
-	bv_e.SetUInt(0, 16);
-	REQUIRE(bv_e.GetUInt(0) == 16);
+  // GetUInt SetUInt
+  emp::BitVector bv_e(5);
+  bv_e.SetUInt(0, 16);
+  REQUIRE(bv_e.GetUInt(0) == 16);
 
-	// Shift Left
-	emp::BitVector bv_f(128);
-	bv_f.SetAll();
-	REQUIRE(bv_f.all());
-	bv_f <<= 127;
-	REQUIRE(bv_f.count() == 1);
-	bv_f <<= 1;
-	REQUIRE(bv_f.none());
+  // Shift Left
+  emp::BitVector bv_f(128);
+  bv_f.SetAll();
+  REQUIRE(bv_f.all());
+  bv_f <<= 127;
+  REQUIRE(bv_f.count() == 1);
+  bv_f <<= 1;
+  REQUIRE(bv_f.none());
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
 }
 
 TEST_CASE("Test MaskHigh, MaskLow", "[bits]") {
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
-	// Test MaskHigh, MaskLow
-	emp::BitVector a(0);
-	a.Insert(0,true, 7);
-	REQUIRE(a.Get(0));
-	REQUIRE(a.Get(1));
-	REQUIRE(a.Get(2));
+  // Test MaskHigh, MaskLow
+  emp::BitVector a(0);
+  a.Insert(0,true, 7);
+  REQUIRE(a.Get(0));
+  REQUIRE(a.Get(1));
+  REQUIRE(a.Get(2));
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
 }
 
 TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
-	// Pop Back and Push Back
-	emp::BitVector bv_g(0);    // Empty BitVector
-	bv_g.PushBack(true);       // 1
-	bv_g.PushBack(true);       // 11
-	bv_g.PushBack(false);      // 110
-	REQUIRE(bv_g.Get(0));
-	REQUIRE(bv_g.Get(1));
-	REQUIRE(!bv_g.PopBack());  // 11
-	REQUIRE(bv_g.size() == 2);
+  // Pop Back and Push Back
+  emp::BitVector bv_g(0);    // Empty BitVector
+  bv_g.PushBack(true);       // 1
+  bv_g.PushBack(true);       // 11
+  bv_g.PushBack(false);      // 110
+  REQUIRE(bv_g.Get(0));
+  REQUIRE(bv_g.Get(1));
+  REQUIRE(!bv_g.PopBack());  // 11
+  REQUIRE(bv_g.size() == 2);
 
-	// Insert and Delete
-	bv_g.Insert(1, true);      // 111
-	REQUIRE(bv_g.Get(0));
-	REQUIRE(bv_g.Get(1));
-	REQUIRE(bv_g.Get(2));
-	REQUIRE(bv_g.size() == 3);
+  // Insert and Delete
+  bv_g.Insert(1, true);      // 111
+  REQUIRE(bv_g.Get(0));
+  REQUIRE(bv_g.Get(1));
+  REQUIRE(bv_g.Get(2));
+  REQUIRE(bv_g.size() == 3);
 
-	bv_g.Insert(1, true);      // 1111
-	REQUIRE(bv_g.Get(3));
-	REQUIRE(bv_g.Get(2));
-	REQUIRE(bv_g.Get(1));
-	REQUIRE(bv_g.Get(0));
-	REQUIRE(bv_g.size() == 4);
+  bv_g.Insert(1, true);      // 1111
+  REQUIRE(bv_g.Get(3));
+  REQUIRE(bv_g.Get(2));
+  REQUIRE(bv_g.Get(1));
+  REQUIRE(bv_g.Get(0));
+  REQUIRE(bv_g.size() == 4);
 
-	bv_g.Insert(1, false);     // 10111
-	REQUIRE(bv_g.Get(0));
-	REQUIRE(!bv_g.Get(1));
-	REQUIRE(bv_g.Get(2));
-	REQUIRE(bv_g.Get(3));
+  bv_g.Insert(1, false);     // 10111
+  REQUIRE(bv_g.Get(0));
+  REQUIRE(!bv_g.Get(1));
+  REQUIRE(bv_g.Get(2));
+  REQUIRE(bv_g.Get(3));
 
-	bv_g.Delete(0);            // 0111
-	REQUIRE(bv_g.size() == 4);
-	REQUIRE(!bv_g.Get(0));
-	bv_g.Delete(1, 2);         // 01
-	REQUIRE(bv_g.size() == 2);
-	REQUIRE(bv_g.Get(1));
+  bv_g.Delete(0);            // 0111
+  REQUIRE(bv_g.size() == 4);
+  REQUIRE(!bv_g.Get(0));
+  bv_g.Delete(1, 2);         // 01
+  REQUIRE(bv_g.size() == 2);
+  REQUIRE(bv_g.Get(1));
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
 }
 
 TEST_CASE("Another Test BitVector", "[bits]") {
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
   emp::BitVector bv10(10);
   emp::BitVector bv32(32);
@@ -1290,9 +1295,9 @@ TEST_CASE("Another Test BitVector", "[bits]") {
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
 //  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
 }
 
@@ -1321,7 +1326,7 @@ TEST_CASE("Test range of BitVector constructors.", "[bits]")
 // TEST_CASE("BitVector padding bits protected", "[bits]") {
 // #ifdef TDEBUG
 
-// 	REQUIRE(emp::assert_last_fail == 0);
+//   REQUIRE(emp::assert_last_fail == 0);
 
 //   for (size_t i = 1; i < 32; ++i) {
 
@@ -1344,9 +1349,9 @@ TEST_CASE("Test range of BitVector constructors.", "[bits]")
 // }
 
 TEST_CASE("BitVector regression test for #277", "[bits]") {
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
   emp::BitVector vec1(4);
   emp::BitVector vec2(4);
@@ -1358,8 +1363,8 @@ TEST_CASE("BitVector regression test for #277", "[bits]") {
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec1[i]);
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec2[i]);
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // #ifdef TDEBUG
+  // REQUIRE(emp::assert_last_fail == 0);
+  // #endif
 
 }

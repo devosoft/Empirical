@@ -1,16 +1,18 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The TraitDef class maintains a category of measuments about another class.
-//
-//  Each trait is associated with a name, a description, and a type.  Instance of that
-//  trait are of type TraitValue.  A TraitManager contains information about a group of
-//  related traits, and a TraitSet is a set of TraitValues.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file Trait.hpp
+ *  @brief The TraitDef class maintains a category of measuments about another class.
+ *
+ *  Each trait is associated with a name, a description, and a type.  Instance of that
+ *  trait are of type TraitValue.  A TraitManager contains information about a group of
+ * related traits, and a TraitSet is a set of TraitValues.
+ */
 
-#ifndef EMP_TRAIT_H
-#define EMP_TRAIT_H
+#ifndef EMP_IN_PROGRESS_TRAIT_HPP_INCLUDE
+#define EMP_IN_PROGRESS_TRAIT_HPP_INCLUDE
 
 #include <string>
 #include <tuple>
@@ -198,4 +200,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_TRAIT_HPP_INCLUDE

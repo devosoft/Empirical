@@ -160,9 +160,9 @@
  *    
  */
 
+#ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
+#define EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
 
-#ifndef EMP_STRING_UTILS_H
-#define EMP_STRING_UTILS_H
 
 #include <algorithm>
 #include <cctype>
@@ -1486,4 +1486,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE

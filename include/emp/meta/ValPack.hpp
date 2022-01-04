@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  ValPack.hpp
+ *  @file ValPack.hpp
  *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
  *
  *  Any built-in type can be added to ValPack to be manipulated at compile time.
  */
 
+#ifndef EMP_META_VALPACK_HPP_INCLUDE
+#define EMP_META_VALPACK_HPP_INCLUDE
 
-#ifndef EMP_VAL_PACK_H
-#define EMP_VAL_PACK_H
 
 #include "meta.hpp"
 
@@ -274,4 +274,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_META_VALPACK_HPP_INCLUDE

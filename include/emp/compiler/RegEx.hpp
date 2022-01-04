@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  RegEx.hpp
+ *  @file RegEx.hpp
  *  @brief Basic regular expression handler.
  *  @note Status: BETA
  *
@@ -31,20 +31,21 @@
  *
  *  @todo Need to implement  ^ and $ (beginning and end of line)
  *  @todo Need to implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respecitvely)
-*/
+ */
 
-#ifndef EMP_REGEX_H
-#define EMP_REGEX_H
+#ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
+#define EMP_COMPILER_REGEX_HPP_INCLUDE
 
 
 #include <ostream>
 #include <sstream>
 #include <string>
 
-#include "../base/vector.hpp"
 #include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 #include "../bits/BitSet.hpp"
 #include "../tools/string_utils.hpp"
+
 #include "lexer_utils.hpp"
 #include "NFA.hpp"
 
@@ -562,4 +563,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE

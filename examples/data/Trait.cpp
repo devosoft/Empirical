@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Trait.cc
+ *  @file Trait.cpp
  *  @brief An example file for Trait and TraitSet classes.
  */
 

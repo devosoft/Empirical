@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Selector.hpp
+ *  @file Selector.hpp
  *  @brief Specs for the Selector widget.
  *
  *  A Selector widget provides the user with a pull-down menu.  It can be
@@ -21,8 +21,8 @@
  *  while the third option will call the provided lambda function.
  */
 
-#ifndef EMP_WEB_SELECTOR_H
-#define EMP_WEB_SELECTOR_H
+#ifndef EMP_WEB_SELECTOR_HPP_INCLUDE
+#define EMP_WEB_SELECTOR_HPP_INCLUDE
 
 
 #include "../base/vector.hpp"
@@ -188,4 +188,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_SELECTOR_HPP_INCLUDE

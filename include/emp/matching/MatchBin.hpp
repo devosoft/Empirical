@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef EMP_MATCH_BIN_HPP
-#define EMP_MATCH_BIN_HPP
+#ifndef EMP_MATCHING_MATCHBIN_HPP_INCLUDE
+#define EMP_MATCHING_MATCHBIN_HPP_INCLUDE
 
 // the default log filename can be set by passing
 // '-D filename.csv' to the compiler
@@ -17,31 +17,31 @@
 #define EMP_LOG_MATCHBIN_FILENAME "matchbin_log.csv"
 #endif
 
-#include <iostream>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
 #include <algorithm>
-#include <stdexcept>
+#include <atomic>
+#include <functional>
+#include <iostream>
 #include <limits>
-#include <ratio>
 #include <math.h>
 #include <mutex>
+#include <ratio>
 #include <shared_mutex>
+#include <stdexcept>
 #include <string>
-#include <atomic>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
 #include "../base/assert.hpp"
+#include "../base/errors.hpp"
 #include "../base/optional.hpp"
 #include "../base/vector.hpp"
-#include "../datastructs/IndexMap.hpp"
 #include "../bits/BitSet.hpp"
-#include "../matching/matchbin_utils.hpp"
 #include "../data/DataFile.hpp"
 #include "../data/DataNode.hpp"
-#include "../base/errors.hpp"
+#include "../datastructs/IndexMap.hpp"
+#include "../matching/matchbin_utils.hpp"
 
 namespace emp {
   template <
@@ -1003,4 +1003,4 @@ void load(
 
 } // namespace cereal
 
-#endif // #ifndef EMP_MATCH_BIN_HPP
+#endif // #ifndef EMP_MATCHING_MATCHBIN_HPP_INCLUDE

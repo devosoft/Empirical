@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file vcover.cpp
+ */
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -6,8 +14,8 @@
 #include "emp/config/command_line.hpp"
 #include "emp/datastructs/Graph.hpp"
 #include "emp/datastructs/graph_utils.hpp"
-#include "emp/tools/string_utils.hpp"
 #include "emp/tools/SolveState.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #include <emscripten.h>
 

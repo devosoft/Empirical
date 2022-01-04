@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code demonstrating use of the error system.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file errors.cpp
+ *  @brief Some examples code demonstrating use of the error system.
+ */
 
 #include <iostream>
 

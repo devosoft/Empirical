@@ -1,64 +1,71 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Ptr.cpp
+ */
+
 //#ifndef EMP_TRACK_MEM
 //#define EMP_TRACK_MEM
 
-#define CATCH_CONFIG_MAIN
+
+#include <functional>
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/Ptr.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <functional>
-
 TEST_CASE("Test Ptr", "[base]")
 {
-	emp::SetPtrDebug();
-	REQUIRE(emp::GetPtrDebug());
+  emp::SetPtrDebug();
+  REQUIRE(emp::GetPtrDebug());
 
-	int arr[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	emp::PtrInfo ptrInfo(arr, 10);
-	REQUIRE(ptrInfo.IsArray());
-	REQUIRE(ptrInfo.IsActive());
-	REQUIRE(ptrInfo.OK());
+  int arr[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  emp::PtrInfo ptrInfo(arr, 10);
+  REQUIRE(ptrInfo.IsArray());
+  REQUIRE(ptrInfo.IsActive());
+  REQUIRE(ptrInfo.OK());
 
-	int arr1[5] = {-4, -3, -2, -1, 0};
-	auto & tracker = emp::PtrTracker::Get();
-	tracker.NewArray(arr1, 5 * sizeof(int));
-	REQUIRE(tracker.HasPtr(arr1));
-	size_t arr1ID = tracker.GetCurID(arr1);
-	REQUIRE(tracker.IsActiveID(arr1ID));
+  int arr1[5] = {-4, -3, -2, -1, 0};
+  auto & tracker = emp::PtrTracker::Get();
+  tracker.NewArray(arr1, 5 * sizeof(int));
+  REQUIRE(tracker.HasPtr(arr1));
+  size_t arr1ID = tracker.GetCurID(arr1);
+  REQUIRE(tracker.IsActiveID(arr1ID));
 
-	emp::Ptr<int> arr1ptr(arr1, 5, false);
-	REQUIRE(!arr1ptr.IsNull());
+  emp::Ptr<int> arr1ptr(arr1, 5, false);
+  REQUIRE(!arr1ptr.IsNull());
 
-	// attempts to delete const array fails, error: "discards qualifiers"
+  // attempts to delete const array fails, error: "discards qualifiers"
 
-	arr1ptr.NewArray(10);
-	//REQUIRE(arr1ptr.DebugGetArrayBytes() == (10 * sizeof(int)));
+  arr1ptr.NewArray(10);
+  //REQUIRE(arr1ptr.DebugGetArrayBytes() == (10 * sizeof(int)));
 
 #ifdef EMP_TRACK_MEM
-	size_t arr1ptrID = tracker.GetCurID(arr1ptr.Raw());
-	REQUIRE(tracker.IsActiveID(arr1ptrID));
+  size_t arr1ptrID = tracker.GetCurID(arr1ptr.Raw());
+  REQUIRE(tracker.IsActiveID(arr1ptrID));
 #endif
-	arr1ptr.DeleteArray();
+  arr1ptr.DeleteArray();
 #ifdef EMP_TRACK_MEM
-	REQUIRE(!tracker.IsActiveID(arr1ptrID));
+  REQUIRE(!tracker.IsActiveID(arr1ptrID));
 #endif
 
-	tracker.MarkDeleted(arr1ID);
-	REQUIRE(!tracker.IsActiveID(arr1ID));
+  tracker.MarkDeleted(arr1ID);
+  REQUIRE(!tracker.IsActiveID(arr1ID));
 
-	int num = 123;
-	int* num_ptr = &num;
-	emp::Ptr<int> numPtr(num_ptr);
-	emp::Ptr<int> numPtr2(num_ptr);
-	REQUIRE( numPtr.operator==(num_ptr) );
-	REQUIRE( numPtr.operator>=(num_ptr) );
-	REQUIRE( numPtr.operator<=(num_ptr) );
-	REQUIRE( !(numPtr.operator!=(numPtr2)) );
-	REQUIRE( numPtr.operator>=(numPtr2) );
-	REQUIRE( numPtr.operator<=(numPtr2) );
+  int num = 123;
+  int* num_ptr = &num;
+  emp::Ptr<int> numPtr(num_ptr);
+  emp::Ptr<int> numPtr2(num_ptr);
+  REQUIRE( numPtr.operator==(num_ptr) );
+  REQUIRE( numPtr.operator>=(num_ptr) );
+  REQUIRE( numPtr.operator<=(num_ptr) );
+  REQUIRE( !(numPtr.operator!=(numPtr2)) );
+  REQUIRE( numPtr.operator>=(numPtr2) );
+  REQUIRE( numPtr.operator<=(numPtr2) );
 }
 
 TEST_CASE("Another Test Ptr", "[base]")

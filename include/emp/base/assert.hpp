@@ -25,8 +25,8 @@
  *  trigger an assertion error and print the value of a.
  */
 
-#ifndef EMP_ASSERT_HPP
-#define EMP_ASSERT_HPP
+#ifndef EMP_BASE_ASSERT_HPP_INCLUDE
+#define EMP_BASE_ASSERT_HPP_INCLUDE
 
 #include "always_assert.hpp"
 
@@ -54,4 +54,4 @@
 #endif
 
 
-#endif // #ifndef EMP_ASSERT_HPP
+#endif // #ifndef EMP_BASE_ASSERT_HPP_INCLUDE

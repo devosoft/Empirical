@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2021.
  *
- *  @file  AvidaGP.hpp
+ *  @file AvidaGP.hpp
  *  @brief This is a simple, efficient CPU for and applied version of Avida.
  *
  *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
@@ -15,9 +15,9 @@
  *    commands...
  */
 
+#ifndef EMP_HARDWARE_AVIDAGP_HPP_INCLUDE
+#define EMP_HARDWARE_AVIDAGP_HPP_INCLUDE
 
-#ifndef EMP_AVIDA_GP_H
-#define EMP_AVIDA_GP_H
 
 #include <fstream>
 #include <iostream>
@@ -61,7 +61,7 @@ namespace emp {
       arg_set_t args;
 
       Instruction(size_t _id=0, size_t a0=0, size_t a1=0, size_t a2=0)
-	      : id(_id), args() { args[0] = a0; args[1] = a1; args[2] = a2; }
+        : id(_id), args() { args[0] = a0; args[1] = a1; args[2] = a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
 
@@ -77,7 +77,7 @@ namespace emp {
       bool operator<=(const Instruction & in) const { return !(in < *this); }
 
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
-	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
+        { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
     };
 
     struct ScopeInfo {
@@ -591,4 +591,4 @@ namespace std {
   }
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_AVIDAGP_HPP_INCLUDE

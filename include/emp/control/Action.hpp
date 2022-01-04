@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  Action.hpp
+ *  @file Action.hpp
  *  @brief A mechanism to abstract functions from their underlying type and provide run-time names.
  *  @note Status: Beta
  *
@@ -11,8 +11,8 @@
  *  @todo Allow for named arguments to facilite intepreted functions.
  */
 
-#ifndef EMP_CONTROL_ACTION
-#define EMP_CONTROL_ACTION
+#ifndef EMP_CONTROL_ACTION_HPP_INCLUDE
+#define EMP_CONTROL_ACTION_HPP_INCLUDE
 
 #include <functional>
 #include <string>
@@ -130,4 +130,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_CONTROL_ACTION_HPP_INCLUDE

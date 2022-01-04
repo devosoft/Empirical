@@ -1,14 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file explores the template defined in evo::Population.h with an NK landscape.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file NK.cpp
+ *  @brief This file explores the template defined in evo::Population.h with an NK landscape.
+ */
 
 #include <iostream>
 
 #include "../NKWorld.hpp"
-
 
 int main(int argc, char* argv[])
 {

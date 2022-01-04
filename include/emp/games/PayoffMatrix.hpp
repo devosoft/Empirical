@@ -1,13 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple game theory payoff matrix.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2021
+ *
+ *  @file PayoffMatrix.hpp
+ *  @brief A simple game theory payoff matrix.
+ *
+ */
 
-
-#ifndef EMP_GAME_PAYOFF_MATRIX_H
-#define EMP_GAME_PAYOFF_MATRIX_H
+#ifndef EMP_GAMES_PAYOFFMATRIX_HPP_INCLUDE
+#define EMP_GAMES_PAYOFFMATRIX_HPP_INCLUDE
 
 #include <unordered_map>
 
@@ -65,4 +67,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_GAMES_PAYOFFMATRIX_HPP_INCLUDE

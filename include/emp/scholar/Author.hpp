@@ -1,19 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Basic information about an author.
-//
-//
-//  Developer notes:
-//  * Prefixs (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
-//  * Most parts of names can be auto-detected.
-//  * GetName() (with formatting) needs to be implemented (notes below)
-//  * Consider using ce_string for inputs?  And making other aspects const experession?
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file Author.hpp
+ *  @brief Basic information about an author.
+ *
+ *  Developer notes:
+ *    * Prefixs (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
+ *    * Most parts of names can be auto-detected.
+ *    * GetName() (with formatting) needs to be implemented (notes below)
+ *    * Consider using ce_string for inputs?  And making other aspects const experession?
+ */
 
-#ifndef EMP_AUTHOR_H
-#define EMP_AUTHOR_H
+#ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
+#define EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
 
 #include <string>
 
@@ -171,4 +172,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE

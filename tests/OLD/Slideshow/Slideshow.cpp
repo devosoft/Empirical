@@ -1,6 +1,10 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015
+ *
+ *  @file Slideshow.cpp
+ */
 
 #include "../../UI/UI.h"
 
@@ -18,7 +22,7 @@ int main() {
   UI::Initialize();
   emp::SetBackgroundColor("gray");
   emp::SetColor("cyan");
-  
+
   show.ActivateKeypress();
 
   show << UI::Text("authors") << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";

@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Generate a series of string pairs with a prescribed number of changes between them.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file string_gen.cpp
+ *  @brief Generate a series of string pairs with a prescribed number of changes between them.
+ */
 
 #include <iostream>
 #include <string>

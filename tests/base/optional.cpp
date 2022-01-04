@@ -1,18 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file optional.cpp
+ */
 
-#define CATCH_CONFIG_MAIN
+#include <iostream>
+#include <sstream>
+#include <utility>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/assert.hpp"
 #include "emp/base/optional.hpp"
 #include "emp/base/vector.hpp"
-
-#include <utility>
-#include <sstream>
-#include <iostream>
 
 TEST_CASE("Test optional bad access", "[base]") {
 

@@ -1,13 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  A simple parser for the Empirical configuration language.
-//
-//  This parser is being implemented as a pushdown automata.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ConfigParser.hpp
+ *  @brief A simple parser for the Empirical configuration language.
+ *
+ *  This parser is being implemented as a pushdown automata.
+ */
 
-#ifndef EMP_CONFIG_PARSER_H
-#define EMP_CONFIG_PARSER_H
+#ifndef EMP_IN_PROGRESS_CONFIGPARSER_HPP_INCLUDE
+#define EMP_IN_PROGRESS_CONFIGPARSER_HPP_INCLUDE
 
 #include <map>
 #include <string>
@@ -76,4 +79,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_CONFIGPARSER_HPP_INCLUDE

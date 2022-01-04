@@ -1,21 +1,22 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//  Previously named Surface2D.h
-//
-//
-//  This file defines a templated class to represent a 2D suface capable of maintaining data
-//  about which 2D bodies are currently on that surface and rapidly identifying if they are
-//  overlapping.
-//
-//  BODY_TYPE is the class that represents the body geometry.
-//
-//  Developer Notes:
-//  * Should add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)
-//  * Incorporate physics?  Can have various plug-in modules.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Surface.hpp
+ *  @brief This file defines a templated class to represent a 2D suface capable of maintaining data
+ *  about which 2D bodies are currently on that surface and rapidly identifying if they are
+ *  overlapping.
+ *
+ *  BODY_TYPE is the class that represents the body geometry.
+ *
+ *  Developer Notes:
+ *  * Should add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)
+ *  * Incorporate physics?  Can have various plug-in modules.
+ */
 
-#ifndef EMP_SURFACE2_H
-#define EMP_SURFACE2_H
+#ifndef EMP_GEOMETRY_SURFACE_HPP_INCLUDE
+#define EMP_GEOMETRY_SURFACE_HPP_INCLUDE
 
 #include <algorithm>
 #include <functional>
@@ -431,4 +432,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_GEOMETRY_SURFACE_HPP_INCLUDE

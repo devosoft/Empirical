@@ -1,11 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file string_utils.cpp
+ */
 
-#define CATCH_CONFIG_MAIN
+#include "../third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/tools/string_utils.hpp"
-#include "../third-party/Catch/single_include/catch2/catch.hpp"
 
 TEST_CASE("Test string_utils", "[tools]")
 {
@@ -564,28 +567,43 @@ TEST_CASE("Test to_web_safe_string", "[tools]" ){
 
 TEST_CASE("Test format_string", "[tools]") {
 
+<<<<<<< HEAD
 	CHECK( emp::format_string("") == "" );
 	CHECK( emp::format_string("%s hi", "twee") == "twee hi" );
 	CHECK( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+=======
+  REQUIRE( emp::format_string("") == "" );
+  REQUIRE( emp::format_string("%s hi", "twee") == "twee hi" );
+  REQUIRE( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+>>>>>>> origin
 
-	const std::string multiline{ R"(
-		my code;
-		%s
-		more code;
-	)" };
-	const std::string replacement{ "foo code;" };
+  const std::string multiline{ R"(
+    my code;
+    %s
+    more code;
+  )" };
+  const std::string replacement{ "foo code;" };
 
 
+<<<<<<< HEAD
 	CHECK( emp::format_string(multiline, replacement.c_str()) == R"(
 		my code;
 		foo code;
 		more code;
 	)" );
+=======
+  REQUIRE( emp::format_string(multiline, replacement.c_str()) == R"(
+    my code;
+    foo code;
+    more code;
+  )" );
+>>>>>>> origin
 
 }
 
 TEST_CASE("Test repeat", "[tools]") {
 
+<<<<<<< HEAD
 	CHECK( emp::repeat("", 0) == "" );
 	CHECK( emp::repeat("", 1) == "" );
 	CHECK( emp::repeat("", 2) == "" );
@@ -593,6 +611,15 @@ TEST_CASE("Test repeat", "[tools]") {
 	CHECK( emp::repeat("abc", 0) == "" );
 	CHECK( emp::repeat("abc", 1) == "abc" );
 	CHECK( emp::repeat("abc", 2) == "abcabc" );
+=======
+  REQUIRE( emp::repeat("", 0) == "" );
+  REQUIRE( emp::repeat("", 1) == "" );
+  REQUIRE( emp::repeat("", 2) == "" );
+
+  REQUIRE( emp::repeat("abc", 0) == "" );
+  REQUIRE( emp::repeat("abc", 1) == "abc" );
+  REQUIRE( emp::repeat("abc", 2) == "abcabc" );
+>>>>>>> origin
 
 }
 

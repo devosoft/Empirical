@@ -1,10 +1,16 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file bitset_utils.cpp
+ */
+
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/bits/bitset_utils.hpp"
-
-#include <sstream>
 
 TEST_CASE("Test bitset_utils", "[bits]")
 {
