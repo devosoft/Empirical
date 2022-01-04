@@ -6,7 +6,7 @@ FLAGS = -std=c++17 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-fi
 default: test
 
 cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
+	$(CXX) $(FLAGS) $< -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
@@ -18,7 +18,7 @@ test-prep:
 	mkdir -p temp
 
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
+	$(CXX) $(FLAGS) $< -o $@.out
 	# execute test; on fail, run again and backtrace
 	./$@.out \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
