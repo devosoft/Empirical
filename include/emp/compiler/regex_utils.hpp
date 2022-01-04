@@ -12,6 +12,7 @@
 #define EMP_REGEX_UTILS_HPP
 
 #include <string>
+
 #include "RegEx.hpp"
 
 namespace emp {

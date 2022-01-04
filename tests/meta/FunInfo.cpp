@@ -6,8 +6,8 @@
 #include <string>
 #include <type_traits>
 
-#include "emp/base/vector.hpp"
 #include "emp/base/Ptr.hpp"
+#include "emp/base/vector.hpp"
 #include "emp/meta/FunInfo.hpp"
 #include "emp/tools/string_utils.hpp"
 

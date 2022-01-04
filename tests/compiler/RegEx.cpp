@@ -11,11 +11,11 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/compiler/RegEx.hpp"
-
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include "emp/compiler/RegEx.hpp"
 
 TEST_CASE("Test RegEx", "[compiler]")
 {
