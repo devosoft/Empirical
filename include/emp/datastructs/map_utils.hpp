@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2022.
  *
  *  @file map_utils.hpp
  *  @brief A set of simple functions to manipulate maps.
@@ -11,6 +11,7 @@
 #ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 #define EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 
+#include <algorithm>
 #include <map>
 #include <unordered_map>
 
