@@ -1,11 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2021.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021-2022.
+ *
+ *  @file char_utils.cpp
+ */
 
-#define CATCH_CONFIG_MAIN
+#include "../third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/tools/char_utils.hpp"
-#include "../third-party/Catch/single_include/catch2/catch.hpp"
 
 TEST_CASE("Test char_utils", "[tools]")
 {
