@@ -358,6 +358,18 @@ namespace emp {
   inline bool has_digit_at(const std::string & str, size_t pos) { return DigitCharSet().HasAt(str, pos); }
   inline bool has_letter_at(const std::string & str, size_t pos) { return LetterCharSet().HasAt(str, pos); }
 
+  /// Determine if there are only lowercase letters in a string.
+  inline bool is_lower(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO letters.
+    return LowerCharSet().Has(str);      // Otherwise return false if any character is not lower.
+  }
+
+  /// Determine if there are only uppercase letters in a string.
+  inline bool is_upper(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO letters.
+    return UpperCharSet().Has(str);      // Otherwise return false if any character is not upper.
+  }
+
   /// Determine if there are only digits in a string.
   inline bool is_digits(const std::string & str) {    
     if (str.size() == 0) return false;   // If string is empty, there are NO digits.
