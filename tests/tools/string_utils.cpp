@@ -567,15 +567,9 @@ TEST_CASE("Test to_web_safe_string", "[tools]" ){
 
 TEST_CASE("Test format_string", "[tools]") {
 
-<<<<<<< HEAD
 	CHECK( emp::format_string("") == "" );
 	CHECK( emp::format_string("%s hi", "twee") == "twee hi" );
 	CHECK( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
-=======
-  REQUIRE( emp::format_string("") == "" );
-  REQUIRE( emp::format_string("%s hi", "twee") == "twee hi" );
-  REQUIRE( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
->>>>>>> origin
 
   const std::string multiline{ R"(
     my code;
@@ -585,25 +579,16 @@ TEST_CASE("Test format_string", "[tools]") {
   const std::string replacement{ "foo code;" };
 
 
-<<<<<<< HEAD
 	CHECK( emp::format_string(multiline, replacement.c_str()) == R"(
 		my code;
 		foo code;
 		more code;
 	)" );
-=======
-  REQUIRE( emp::format_string(multiline, replacement.c_str()) == R"(
-    my code;
-    foo code;
-    more code;
-  )" );
->>>>>>> origin
 
 }
 
 TEST_CASE("Test repeat", "[tools]") {
 
-<<<<<<< HEAD
 	CHECK( emp::repeat("", 0) == "" );
 	CHECK( emp::repeat("", 1) == "" );
 	CHECK( emp::repeat("", 2) == "" );
@@ -611,15 +596,6 @@ TEST_CASE("Test repeat", "[tools]") {
 	CHECK( emp::repeat("abc", 0) == "" );
 	CHECK( emp::repeat("abc", 1) == "abc" );
 	CHECK( emp::repeat("abc", 2) == "abcabc" );
-=======
-  REQUIRE( emp::repeat("", 0) == "" );
-  REQUIRE( emp::repeat("", 1) == "" );
-  REQUIRE( emp::repeat("", 2) == "" );
-
-  REQUIRE( emp::repeat("abc", 0) == "" );
-  REQUIRE( emp::repeat("abc", 1) == "abc" );
-  REQUIRE( emp::repeat("abc", 2) == "abcabc" );
->>>>>>> origin
 
 }
 
