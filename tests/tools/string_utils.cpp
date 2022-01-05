@@ -579,11 +579,11 @@ TEST_CASE("Test format_string", "[tools]") {
   const std::string replacement{ "foo code;" };
 
 
-	CHECK( emp::format_string(multiline, replacement.c_str()) == R"(
-		my code;
-		foo code;
-		more code;
-	)" );
+  CHECK( emp::format_string(multiline, replacement.c_str()) == R"(
+    my code;
+    foo code;
+    more code;
+  )" );
 
 }
 
