@@ -5,8 +5,8 @@
 
 #include "../../../include/emp/base/Ptr.hpp"
 #include "../../../include/emp/base/vector.hpp"
-#include "../../../include/emp/bits/BitVector.hpp"
 #include "../../../include/emp/bits/BitSet.hpp"
+#include "../../../include/emp/bits/BitVector.hpp"
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/datastructs/map_utils.hpp"
 #include "../../../include/emp/datastructs/vector_utils.hpp"
