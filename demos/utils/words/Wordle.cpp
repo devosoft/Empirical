@@ -1,3 +1,4 @@
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -83,6 +84,7 @@ struct WordData {
   emp::BitSet<26> letters;
   size_t max_options = 0;     // Maximum number of word options after used as a guess.
   double ave_options = 0.0;   // Average number of options after used as a guess.
+  double entropy = 0.0;       // What is the entropy (and thus information gained) for this choice?
 
   WordData(const std::string & in_word) : word(in_word) {
     for (char x : word) letters.Set(x - 'a');
@@ -96,6 +98,7 @@ private:
   emp::vector<PositionClues> clues;                // A PositionClues object for each position.
   std::unordered_map<std::string, size_t> pos_map; // Map of words to their position ids.
   emp::BitVector start_options;                    // Current options.
+  size_t start_count;                              // Count of start options (cached)
 
   bool verbose = true;
 
@@ -151,7 +154,8 @@ public:
   }
 
   void ResetOptions() {
-    start_options.resize(words.size());
+    start_count = words.size();
+    start_options.resize(start_count);
     start_options.SetAll();
   }
 
@@ -197,6 +201,7 @@ public:
     } else {
       start_options &= clues[pos].here[let_id].words;
     }
+    start_count = start_options.CountOnes();
   }
 
   emp::BitVector AnalyzeGuess(const std::string & guess, const WordData & answer) {
@@ -226,15 +231,19 @@ public:
   void AnalyzeGuess(WordData & guess) {
     size_t max_options = 0;
     size_t total_options = 0;
+    double entropy = 0.0;
 
     // Scan through all possible answers...    
     for (WordData & answer : words) {
       size_t options = AnalyzeGuess(guess.word, answer).CountOnes();
       if (options > max_options) max_options = options;
       total_options += options;
+      const double p = static_cast<double>(options) / static_cast<double>(start_count);
+      entropy -= p * std::log2(p);
     }
     guess.max_options = max_options;
     guess.ave_options = static_cast<double>(total_options) / static_cast<double>(words.size());
+    guess.entropy = entropy;
   }
 
   void Analyze() {
@@ -248,19 +257,24 @@ public:
     std::string guess(word_length, 'a');
     size_t best_max_options = 10000;
     double best_ave_options = 10000.0;
+    double best_entropy = 0.0;
     std::string best_max_options_word = "";
     std::string best_ave_options_word = "";
+    std::string best_entropy_word = "";
 
     size_t silent_count = 0;  // Keep a count of how many loops since out last output.
     while (true) {
       size_t max_options = 0;
       size_t total_options = 0;
+      double entropy = 0.0;
 
       // Scan through all possible answers...    
       for (WordData & answer : words) {
         size_t options = AnalyzeGuess(guess, answer).CountOnes();
         if (options > max_options) max_options = options;
         total_options += options;
+        const double p = static_cast<double>(options) / static_cast<double>(start_count);
+        entropy -= p * std::log2(p);
       }
       double ave_options = static_cast<double>(total_options) / static_cast<double>(words.size());
 
@@ -275,6 +289,12 @@ public:
         best_ave_options = ave_options;
         best_ave_options_word = guess;
         std::cout << "New best AVE options: " << guess << " : " << ave_options << std::endl;
+        silent_count = 0;
+      }
+      if (entropy > best_entropy) {
+        best_entropy = entropy;
+        best_entropy_word = guess;
+        std::cout << "New best ENTROPY: " << guess << " : " << entropy << std::endl;
         silent_count = 0;
       }
       if (silent_count >= 10000) {
@@ -311,6 +331,7 @@ public:
       std::cout << word.word
                 << ", " << word.max_options
                 << ", " << word.ave_options
+                << ", " << word.entropy
                 << std::endl;
     }
   }
@@ -339,10 +360,10 @@ int main(int argc, char* argv[])
   }
 
   word_set.Preprocess();
-  // word_set.AddClue(0,'a',Result::NOWHERE);
-  // word_set.AddClue(1,'l',Result::NOWHERE);
+  // word_set.AddClue(0,'a',Result::ELSEWHERE);
+  // word_set.AddClue(1,'l',Result::ELSEWHERE);
   // word_set.AddClue(2,'o',Result::NOWHERE);
-  // word_set.AddClue(3,'e',Result::HERE);
+  // word_set.AddClue(3,'e',Result::NOWHERE);
   // word_set.AddClue(4,'s',Result::NOWHERE);
 
   word_set.Analyze();
