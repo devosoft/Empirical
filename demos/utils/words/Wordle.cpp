@@ -14,6 +14,8 @@
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
+constexpr size_t MAX_LETTER_REPEAT = 4;
+
 // Get the ID (0-26) associated with a letter.
 size_t ToID(char letter) {
   emp_assert(letter >= 'a' && letter <= 'z');
@@ -45,8 +47,8 @@ struct PositionClues {
 // All of the clues for zero or more instances of a given letter.
 struct LetterClues {
   size_t letter;  // [0-25]
-  std::array<Clue, 10> at_least;  // Are there at least x instances letter? (0 is meaningless)
-  std::array<Clue, 10> exactly;   // Are there exactly x instances letter?
+  std::array<Clue, MAX_LETTER_REPEAT+1> at_least; ///< Are there at least x instances of letter? (0 is meaningless)
+  std::array<Clue, MAX_LETTER_REPEAT+1> exactly;  ///< Are there exactly x instances of letter?
 
   void SetNumWords(size_t num_words) {
     for (auto & x : at_least) x.words.resize(num_words);
@@ -195,24 +197,35 @@ public:
       let_clues[let].letter = let;
     }
 
+    // Counters for number of letters.
+    emp::array<uint8_t, 26> letter_counts;
+
     // Loop through each word, indicating which clues it is consistent with.
     for (size_t word_id = 0; word_id < words.size(); ++word_id) {
       const std::string & word = words[word_id].word;
 
       // Figure out which letters are in this word.
-      emp::BitSet<26> letters = words[word_id].letters;
+      std::fill(letter_counts.begin(), letter_counts.end(), 0);      // Reset counters to zero.
+      for (const char letter : word) ++letter_counts[ToID(letter)];  // Count letters.
 
-      // Now figure out what clues it is consistent with.
+      // Setup the LETTER clues that word is consistent with.
+      for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
+        const size_t cur_count = letter_counts[letter_id];       
+        let_clues[letter_id].exactly[cur_count].words.Set(word_id);
+        for (uint8_t count = 0; count < cur_count; ++count) {
+          let_clues[letter_id].at_least[count].words.Set(word_id);
+        }
+      }
+
+      // Now figure out what POSITION clues it is consistent with.
       for (size_t pos=0; pos < word.size(); ++pos) {
-        const char cur_letter = word[pos];
+        const size_t cur_letter = ToID(word[pos]);
         // Incorrect letter for alternatives at this position.
         for (size_t letter_id = 0; letter_id < 26; ++letter_id) {
-          if (letter_id == ToID(cur_letter)) {                     // Letter is HERE.
-            clues[pos].here[letter_id].words.Set(word_id);
-          } else if (letters.Has(letter_id)) {                   // Letter is ELSEWHERE
-            clues[pos].elsewhere[letter_id].words.Set(word_id);
+          if (letter_id == cur_letter) {                         // Letter is HERE.
+            pos_clues[pos].here[letter_id].words.Set(word_id);
           } else {                                               // Letter is NOT IN WORD
-            clues[pos].nowhere[letter_id].words.Set(word_id);
+            pos_clues[pos].not_here[letter_id].words.Set(word_id);
           }
         }
       }
@@ -221,18 +234,47 @@ public:
     ResetOptions();
   }
 
-  /// Limit starting options based on a specific clue.
-  void AddClue(size_t pos, char letter, Result result) {
-    size_t let_id = ToID(letter);
-    if (result == Result::NOWHERE) {
-      start_options &= clues[pos].nowhere[let_id].words;
-    } else if (result == Result::ELSEWHERE) {
-      start_options &= clues[pos].elsewhere[let_id].words;
-    } else {
-      start_options &= clues[pos].here[let_id].words;
+  // Limit the current options based on a single clue.
+  // That consists of a word and a result.
+  // The result is a series of letters:
+  //  H : Here
+  //  E : Elsewhere
+  //  N : Nowhere
+
+  void AddClues(const std::string & word, const std::string & result) {
+    emp_assert(word.size() == result.size());
+
+    emp::array<uint8_t, 26> letter_counts;
+    emp::BitSet<26> letter_fail;
+
+    // First add clues for here/not_here and collect letter information.
+    for (size_t i = 0; i < word.size(); ++i) {
+      const size_t cur_letter = ToID(word[i]);
+      if (result[i] == 'H') {
+        start_options &= pos_clues[i].here[cur_letter].words;
+        ++letter_counts[cur_letter];
+      } else if (result[i] == 'E') {
+        start_options &= pos_clues[i].not_here[cur_letter].words;
+        ++letter_counts[cur_letter];
+      } else {  // Must be 'N'
+        start_options &= pos_clues[i].not_here[cur_letter].words;
+        letter_fail.Set(cur_letter);
+      }
     }
-    start_count = start_options.CountOnes();
+
+    // Next add letter clues.
+    for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
+      const size_t let_count = letter_counts[letter_id];
+      if (let_count) {
+        start_options &= let_clues[letter_id].at_least[let_count].words;
+      }
+      if (letter_fail.Has(letter_id)) {
+        start_options &= let_clues[letter_id].exactly[let_count].words;
+      }
+    }
   }
+
+
 
   emp::BitVector AnalyzeGuess(const std::string & guess, const WordData & answer) {
     // Loop through all possible answers to see how much a word cuts down choices.
@@ -240,7 +282,7 @@ public:
 
     for (size_t pos = 0; pos < word_length; ++pos) {
       const size_t guess_letter = ToID(guess[pos]);
-      if (guess[pos] == answer.word[pos]) {        // CORRECT GUESS FOR POSITION!
+      if (guess[pos] == answer.word[pos]) {             // CORRECT GUESS FOR POSITION!
         options &= clues[pos].here[guess_letter].words;
       } else if (answer.letters.Has(guess_letter)) {    // WRONG POSITION
         options &= clues[pos].elsewhere[guess_letter].words;
