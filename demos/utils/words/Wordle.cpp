@@ -14,47 +14,16 @@
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
-enum class Result { NOWHERE=0, ELSEWHERE, HERE };
+// Get the ID (0-26) associated with a letter.
+size_t ToID(char letter) {
+  emp_assert(letter >= 'a' && letter <= 'z');
+  return static_cast<size_t>(letter - 'a');
+}
 
-/// A collection of results for a whole word.
-struct ResultSet {
-  emp::vector<Result> results;
-
-  static const emp::vector<size_t> & PlaceValues(const size_t num_results) {
-    static emp::vector<size_t> place_values;
-    if (place_values.size() == 0) {
-      place_values.resize(num_results);
-      size_t value = 1;
-      for (size_t i = 0; i < num_results; ++i) {
-        place_values[i] = value;
-        value *= 3;
-      }
-    }
-    return place_values;
-  }
-
-  ResultSet(const emp::vector<Result> & in) : results(in) { }
-  ResultSet(size_t size, size_t id) : results(size) {
-    emp::vector<size_t> place_values = PlaceValues(results.size());
-    for (size_t i = results.size()-1; i < results.size(); --i) {
-      if (id > place_values[i]) {
-        size_t value = id / place_values[i];
-        results[i] = (Result) value;
-        id -= value * place_values[i];
-      }
-    }
-  }
-  ResultSet(const ResultSet &) = default;
-
-  size_t ToID() {
-    emp::vector<size_t> place_values = PlaceValues(results.size());
-    size_t id = 0;
-    for (size_t i = 0; i < results.size(); ++i) {
-      id += place_values[i] * (size_t) results[i];
-    }
-    return id;
-  }
-};
+char ToLetter(size_t id) {
+  emp_assert(id < 26);
+  return static_cast<char>(id + 'a');
+}
 
 // A clue is a given letter, position, and result
 struct Clue {
@@ -63,65 +32,117 @@ struct Clue {
 
 // All of the clues for a given position.
 struct PositionClues {
-  std::array<Clue, 26> nowhere;
-  std::array<Clue, 26> elsewhere;
-  std::array<Clue, 26> here;
+  size_t pos;
+  std::array<Clue, 26> not_here;  // Is a given letter NOT at this position?
+  std::array<Clue, 26> here;      // Is a given letter at this position?
 
   void SetNumWords(size_t num_words) {
-    for (auto & x : nowhere) x.words.resize(num_words);
-    for (auto & x : elsewhere) x.words.resize(num_words);
+    for (auto & x : not_here) x.words.resize(num_words);
     for (auto & x : here) x.words.resize(num_words);
   }
 };
 
-// Trying to build a full tree of solutions...
-struct SolveState {
-  emp::BitVector words;
+// All of the clues for zero or more instances of a given letter.
+struct LetterClues {
+  size_t letter;  // [0-25]
+  std::array<Clue, 10> at_least;  // Are there at least x instances letter? (0 is meaningless)
+  std::array<Clue, 10> exactly;   // Are there exactly x instances letter?
+
+  void SetNumWords(size_t num_words) {
+    for (auto & x : at_least) x.words.resize(num_words);
+    for (auto & x : exactly) x.words.resize(num_words);
+  }
+};
+
+class Result {
+public:
+  enum result_t { NOWHERE, ELSEWHERE, HERE };
+
+private:
+  emp::vector<result_t> results;
+  size_t id;
+
+  static emp::vector<size_t> & GetMagnitudes(const size_t max_pos) {
+    static emp::vector<size_t> magnitudes;
+    if (magnitudes.size() <= max_pos) {
+      magnitudes.resize(max_pos+1);
+      size_t base = 1;
+      for (auto & x : magnitudes) { x = base; base *= 3; }
+    }
+    return magnitudes;
+  }
+
+  // Assume that we have results, calculate the correct ID.
+  void CalcID() {
+    size_t base = 1;
+    id = 0;
+    for (result_t r : results) { id += static_cast<size_t>(r) * base; base *= 3; }
+  }
+
+  // Assume that we have an ID, calculate the correct results.
+  void CalcResults() {
+    emp::vector<size_t> & magnitudes = GetMagnitudes(results.size());
+    size_t tmp_id = id;
+    for (size_t i = 0; i < results.size(); ++i) {
+      size_t cur_result = tmp_id / magnitudes[i];
+      results[i] = static_cast<result_t>(cur_result);
+      tmp_id -= cur_result * magnitudes[i];
+    }
+  }
+
+public:
+  Result(size_t num_results, size_t _id) : results(num_results), id(_id) { CalcResults(); }
+  Result(const emp::vector<result_t> & _results) : results(_results) { CalcID(); }
+  Result(const Result & result) = default;
+  Result(Result && result) = default;
+  Result & operator=(const Result & result) = default;
+  Result & operator=(Result && result) = default;
+
+  size_t GetID() const { return id; }
+  size_t GetSize() const { return results.size(); }
+  size_t GetIDCap() const { return GetMagnitudes(results.size())[results.size()]; }
 };
 
 struct WordData {
   std::string word;
-  emp::BitSet<26> letters;
-  size_t max_options = 0;     // Maximum number of word options after used as a guess.
-  double ave_options = 0.0;   // Average number of options after used as a guess.
-  double entropy = 0.0;       // What is the entropy (and thus information gained) for this choice?
+  emp::BitSet<26> letters;        // What letters are in this word?
+  emp::BitSet<26> multi_letters;  // What letters are in this word more than once?
+  size_t max_options = 0;         // Maximum number of word options after used as a guess.
+  double ave_options = 0.0;       // Average number of options after used as a guess.
+  double entropy = 0.0;           // What is the entropy (and thus information gained) for this choice?
 
   WordData(const std::string & in_word) : word(in_word) {
-    for (char x : word) letters.Set(x - 'a');
+    for (char x : word) {
+      size_t let_id = ToID(x);
+      if (letters.Has(let_id)) multi_letters.Set(let_id);
+      else letters.Set(let_id);
+    }
   }
 };
 
 class WordSet {
 private:
-  size_t word_length;
-  emp::vector<WordData> words;
-  emp::vector<PositionClues> clues;                // A PositionClues object for each position.
-  std::unordered_map<std::string, size_t> pos_map; // Map of words to their position ids.
-  emp::BitVector start_options;                    // Current options.
-  size_t start_count;                              // Count of start options (cached)
+  size_t word_length;                              ///< Length of all words in this Wordle
+  emp::vector<WordData> words;                     ///< Data about all words in this Wordle
+  emp::vector<PositionClues> pos_clues;            ///< A PositionClues object for each position.
+  emp::array<LetterClues,26> let_clues;            ///< Clues based off the number of letters.
+  std::unordered_map<std::string, size_t> pos_map; ///< Map of words to their position ids.
+  emp::BitVector start_options;                    ///< Current options.
+  size_t start_count;                              ///< Count of start options (cached)
 
   bool verbose = true;
-
-  // Get the ID (0-26) associated with a letter.
-  size_t ID(char letter) {
-    emp_assert(letter >= 'a' && letter <= 'z');
-    return static_cast<size_t>(letter - 'a');
-  }
-
-  char LET(size_t id) {
-    emp_assert(id < 26);
-    return (char) (id + 'a');
-  }
 
 public:
   WordSet(size_t length=5) : word_length(length) { }
 
+  /// Include a single word into this WordSet.
   void AddWord(std::string & in_word) {
-    size_t id = words.size();
-    pos_map[in_word] = id;
-    words.emplace_back(in_word);
+    size_t id = words.size();      // Set the ID for this word.
+    pos_map[in_word] = id;         // Keep track of the ID for this word.
+    words.emplace_back(in_word);   // Setup the word data.
   }
 
+  /// Load a whole series for words (from a file) into this WordSet
   void Load(std::istream & is, std::ostream & os) {
     // Load in all of the words.
     std::string in_word;
@@ -153,17 +174,26 @@ public:
     if (verbose) std::cerr << "Loaded " << words.size() << " valid words." << std::endl;
   }
 
+  /// Clear out all prior guess information.
   void ResetOptions() {
     start_count = words.size();
     start_options.resize(start_count);
     start_options.SetAll();
   }
 
-  // Once the words are loaded, Preprocess will collect info.
+  /// Once the words are loaded, Preprocess will collect info.
   void Preprocess() {
-    // Setup all clue info to know the number of words.
-    clues.resize(word_length);
-    for (auto & x : clues) x.SetNumWords(words.size());
+    // Setup all position clue info to know the number of words.
+    pos_clues.resize(word_length);
+    for (size_t i=0; i < pos_clues.size(); ++i) {
+      pos_clues[i].pos = i;
+      pos_clues[i].SetNumWords(words.size());
+    }
+
+    // Setup all letter clue information
+    for (size_t let=0; let < 26; let++) {
+      let_clues[let].letter = let;
+    }
 
     // Loop through each word, indicating which clues it is consistent with.
     for (size_t word_id = 0; word_id < words.size(); ++word_id) {
@@ -177,7 +207,7 @@ public:
         const char cur_letter = word[pos];
         // Incorrect letter for alternatives at this position.
         for (size_t letter_id = 0; letter_id < 26; ++letter_id) {
-          if (letter_id == ID(cur_letter)) {                     // Letter is HERE.
+          if (letter_id == ToID(cur_letter)) {                     // Letter is HERE.
             clues[pos].here[letter_id].words.Set(word_id);
           } else if (letters.Has(letter_id)) {                   // Letter is ELSEWHERE
             clues[pos].elsewhere[letter_id].words.Set(word_id);
@@ -193,7 +223,7 @@ public:
 
   /// Limit starting options based on a specific clue.
   void AddClue(size_t pos, char letter, Result result) {
-    size_t let_id = ID(letter);
+    size_t let_id = ToID(letter);
     if (result == Result::NOWHERE) {
       start_options &= clues[pos].nowhere[let_id].words;
     } else if (result == Result::ELSEWHERE) {
@@ -209,7 +239,7 @@ public:
     emp::BitVector options(start_options);
 
     for (size_t pos = 0; pos < word_length; ++pos) {
-      const size_t guess_letter = ID(guess[pos]);
+      const size_t guess_letter = ToID(guess[pos]);
       if (guess[pos] == answer.word[pos]) {        // CORRECT GUESS FOR POSITION!
         options &= clues[pos].here[guess_letter].words;
       } else if (answer.letters.Has(guess_letter)) {    // WRONG POSITION
@@ -324,9 +354,29 @@ public:
     std::cout << " (" << count << " words found)" << std::endl;
   }
 
+  void SortWords(const std::string & sort_type="max") {
+    using wd_t = const WordData &;
+    if (sort_type == "max") {
+      emp::Sort(words, [](wd_t w1, wd_t w2){
+        if (w1.max_options == w2.max_options) return w1.ave_options < w2.ave_options; // tiebreak
+        return w1.max_options < w2.max_options;
+      } );
+    } else if (sort_type == "ave") {
+      emp::Sort(words, [](wd_t w1, wd_t w2){
+        if (w1.ave_options == w2.ave_options) return w1.max_options < w2.max_options; // tiebreak
+        return w1.ave_options < w2.ave_options;
+      } );
+    } else if (sort_type == "entropy") {
+      emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.entropy < w2.entropy; } );
+    } else if (sort_type == "alpha") {
+      emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.word < w2.word; } );
+    }
+    for (size_t i = 0; i < words.size(); i++) { pos_map[words[i].word] = i; } // Update ID tracking.
+  }
+
   /// Print all of the results, sorted by max number of options.
   void PrintResults() {
-    emp::Sort(words, [](const WordData & w1, const WordData & w2){ return w1.max_options < w2.max_options; });
+    SortWords();
     for (auto & word : words) {
       std::cout << word.word
                 << ", " << word.max_options
