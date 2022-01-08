@@ -57,8 +57,33 @@ public:
   /// Create a result by a result vector.
   Result(const emp::vector<result_t> & _results) : results(_results) { CalcID(); }
 
-  /// Create a result by a string.
+  /// Create a result by a result string.
   Result(const std::string & result_str) { FromString(result_str); }
+
+  /// Create a result by an guess and answer pair.
+  Result(const std::string & guess, const std::string & answer) : results(guess.size()) {
+    emp_assert(guess.size() == answer.size());
+    emp::BitVector used(answer.size());
+    // Test perfect matches.
+    for (size_t i = 0; i < guess.size(); ++i) {
+      if (guess[i] == answer[i]) { results[i] = HERE; used.Set(i); }
+    }
+    // Test offset matches.
+    for (size_t i = 0; i < guess.size(); ++i) {
+      if (guess[i] == answer[i]) continue;            // already matched.
+      bool found = false;
+      for (size_t j = 0; j < answer.size(); ++j) {    // seek a match elsewhere in answer!
+        if (!used.Has(j) && guess[i] == answer[j]) {
+          results[i] = ELSEWHERE;                     // found letter elsewhere!
+          used.Set(j);                                // make sure this letter is noted as used.
+          found = true;
+          break;                                      // move on to next letter; we found this one.
+        }
+      }
+      if (!found) results[i] = NOWHERE;
+    }
+    CalcID();                                         // Now that we know the symbols, figure out the ID.
+  }
 
   Result(const Result & result) = default;
   Result(Result && result) = default;
@@ -70,4 +95,8 @@ public:
   size_t GetID() const { return id; }
   size_t GetSize() const { return results.size(); }
   size_t GetIDCap() const { return GetMagnitudes(results.size())[results.size()]; }
+
+  result_t operator[](size_t id) const { return results[id]; }
+
+  size_t size() const { return results.size(); }
 };
