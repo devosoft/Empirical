@@ -189,23 +189,24 @@ public:
   //  E : Elsewhere
   //  N : Nowhere
 
-  void AddClues(const std::string & word, const std::string & result) {
+  emp::BitVector EvalResult(const std::string & word, const Result & result) {
     emp_assert(word.size() == result.size());
 
     emp::array<uint8_t, 26> letter_counts;
     emp::BitSet<26> letter_fail;
+    emp::BitVector options = start_options;
 
     // First add clues for here/not_here and collect letter information.
     for (size_t i = 0; i < word.size(); ++i) {
       const size_t cur_letter = ToID(word[i]);
-      if (result[i] == 'H') {
-        start_options &= pos_clues[i].here[cur_letter];
+      if (result[i] == Result::HERE) {
+        options &= pos_clues[i].here[cur_letter];
         ++letter_counts[cur_letter];
-      } else if (result[i] == 'E') {
-        start_options &= pos_clues[i].not_here[cur_letter];
+      } else if (result[i] == Result::ELSEWHERE) {
+        options &= pos_clues[i].not_here[cur_letter];
         ++letter_counts[cur_letter];
       } else {  // Must be 'N'
-        start_options &= pos_clues[i].not_here[cur_letter];
+        options &= pos_clues[i].not_here[cur_letter];
         letter_fail.Set(cur_letter);
       }
     }
@@ -214,12 +215,14 @@ public:
     for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
       const size_t let_count = letter_counts[letter_id];
       if (let_count) {
-        start_options &= let_clues[letter_id].at_least[let_count];
+        options &= let_clues[letter_id].at_least[let_count];
       }
       if (letter_fail.Has(letter_id)) {
-        start_options &= let_clues[letter_id].exactly[let_count];
+        options &= let_clues[letter_id].exactly[let_count];
       }
     }
+
+    return options;
   }
 
 
