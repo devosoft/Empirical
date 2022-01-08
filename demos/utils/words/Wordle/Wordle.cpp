@@ -4,15 +4,17 @@
 #include <string>
 #include <unordered_map>
 
-#include "../../../include/emp/base/Ptr.hpp"
-#include "../../../include/emp/base/vector.hpp"
-#include "../../../include/emp/bits/BitSet.hpp"
-#include "../../../include/emp/bits/BitVector.hpp"
-#include "../../../include/emp/config/command_line.hpp"
-#include "../../../include/emp/datastructs/map_utils.hpp"
-#include "../../../include/emp/datastructs/vector_utils.hpp"
-#include "../../../include/emp/io/File.hpp"
-#include "../../../include/emp/tools/string_utils.hpp"
+#include "emp/base/Ptr.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/bits/BitSet.hpp"
+#include "emp/bits/BitVector.hpp"
+#include "emp/config/command_line.hpp"
+#include "emp/datastructs/map_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
+#include "emp/io/File.hpp"
+#include "emp/tools/string_utils.hpp"
+
+#include "Result.hpp"
 
 constexpr size_t MAX_LETTER_REPEAT = 4;
 
@@ -27,82 +29,28 @@ char ToLetter(size_t id) {
   return static_cast<char>(id + 'a');
 }
 
-// A clue is a given letter, position, and result
-struct Clue {
-  emp::BitVector words;  // IDs of words consistent with this clue.
-};
-
 // All of the clues for a given position.
 struct PositionClues {
   size_t pos;
-  std::array<Clue, 26> not_here;  // Is a given letter NOT at this position?
-  std::array<Clue, 26> here;      // Is a given letter at this position?
+  std::array<emp::BitVector, 26> not_here;  // Is a given letter NOT at this position?
+  std::array<emp::BitVector, 26> here;      // Is a given letter at this position?
 
   void SetNumWords(size_t num_words) {
-    for (auto & x : not_here) x.words.resize(num_words);
-    for (auto & x : here) x.words.resize(num_words);
+    for (auto & x : not_here) x.resize(num_words);
+    for (auto & x : here) x.resize(num_words);
   }
 };
 
 // All of the clues for zero or more instances of a given letter.
 struct LetterClues {
   size_t letter;  // [0-25]
-  std::array<Clue, MAX_LETTER_REPEAT+1> at_least; ///< Are there at least x instances of letter? (0 is meaningless)
-  std::array<Clue, MAX_LETTER_REPEAT+1> exactly;  ///< Are there exactly x instances of letter?
+  std::array<emp::BitVector, MAX_LETTER_REPEAT+1> at_least; ///< Are there at least x instances of letter? (0 is meaningless)
+  std::array<emp::BitVector, MAX_LETTER_REPEAT+1> exactly;  ///< Are there exactly x instances of letter?
 
   void SetNumWords(size_t num_words) {
-    for (auto & x : at_least) x.words.resize(num_words);
-    for (auto & x : exactly) x.words.resize(num_words);
+    for (auto & x : at_least) x.resize(num_words);
+    for (auto & x : exactly) x.resize(num_words);
   }
-};
-
-class Result {
-public:
-  enum result_t { NOWHERE, ELSEWHERE, HERE };
-
-private:
-  emp::vector<result_t> results;
-  size_t id;
-
-  static emp::vector<size_t> & GetMagnitudes(const size_t max_pos) {
-    static emp::vector<size_t> magnitudes;
-    if (magnitudes.size() <= max_pos) {
-      magnitudes.resize(max_pos+1);
-      size_t base = 1;
-      for (auto & x : magnitudes) { x = base; base *= 3; }
-    }
-    return magnitudes;
-  }
-
-  // Assume that we have results, calculate the correct ID.
-  void CalcID() {
-    size_t base = 1;
-    id = 0;
-    for (result_t r : results) { id += static_cast<size_t>(r) * base; base *= 3; }
-  }
-
-  // Assume that we have an ID, calculate the correct results.
-  void CalcResults() {
-    emp::vector<size_t> & magnitudes = GetMagnitudes(results.size());
-    size_t tmp_id = id;
-    for (size_t i = 0; i < results.size(); ++i) {
-      size_t cur_result = tmp_id / magnitudes[i];
-      results[i] = static_cast<result_t>(cur_result);
-      tmp_id -= cur_result * magnitudes[i];
-    }
-  }
-
-public:
-  Result(size_t num_results, size_t _id) : results(num_results), id(_id) { CalcResults(); }
-  Result(const emp::vector<result_t> & _results) : results(_results) { CalcID(); }
-  Result(const Result & result) = default;
-  Result(Result && result) = default;
-  Result & operator=(const Result & result) = default;
-  Result & operator=(Result && result) = default;
-
-  size_t GetID() const { return id; }
-  size_t GetSize() const { return results.size(); }
-  size_t GetIDCap() const { return GetMagnitudes(results.size())[results.size()]; }
 };
 
 struct WordData {
@@ -211,9 +159,9 @@ public:
       // Setup the LETTER clues that word is consistent with.
       for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
         const size_t cur_count = letter_counts[letter_id];       
-        let_clues[letter_id].exactly[cur_count].words.Set(word_id);
+        let_clues[letter_id].exactly[cur_count].Set(word_id);
         for (uint8_t count = 0; count < cur_count; ++count) {
-          let_clues[letter_id].at_least[count].words.Set(word_id);
+          let_clues[letter_id].at_least[count].Set(word_id);
         }
       }
 
@@ -223,9 +171,9 @@ public:
         // Incorrect letter for alternatives at this position.
         for (size_t letter_id = 0; letter_id < 26; ++letter_id) {
           if (letter_id == cur_letter) {                         // Letter is HERE.
-            pos_clues[pos].here[letter_id].words.Set(word_id);
+            pos_clues[pos].here[letter_id].Set(word_id);
           } else {                                               // Letter is NOT IN WORD
-            pos_clues[pos].not_here[letter_id].words.Set(word_id);
+            pos_clues[pos].not_here[letter_id].Set(word_id);
           }
         }
       }
@@ -251,13 +199,13 @@ public:
     for (size_t i = 0; i < word.size(); ++i) {
       const size_t cur_letter = ToID(word[i]);
       if (result[i] == 'H') {
-        start_options &= pos_clues[i].here[cur_letter].words;
+        start_options &= pos_clues[i].here[cur_letter];
         ++letter_counts[cur_letter];
       } else if (result[i] == 'E') {
-        start_options &= pos_clues[i].not_here[cur_letter].words;
+        start_options &= pos_clues[i].not_here[cur_letter];
         ++letter_counts[cur_letter];
       } else {  // Must be 'N'
-        start_options &= pos_clues[i].not_here[cur_letter].words;
+        start_options &= pos_clues[i].not_here[cur_letter];
         letter_fail.Set(cur_letter);
       }
     }
@@ -266,10 +214,10 @@ public:
     for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
       const size_t let_count = letter_counts[letter_id];
       if (let_count) {
-        start_options &= let_clues[letter_id].at_least[let_count].words;
+        start_options &= let_clues[letter_id].at_least[let_count];
       }
       if (letter_fail.Has(letter_id)) {
-        start_options &= let_clues[letter_id].exactly[let_count].words;
+        start_options &= let_clues[letter_id].exactly[let_count];
       }
     }
   }
