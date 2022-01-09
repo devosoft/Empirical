@@ -16,78 +16,80 @@
 
 #include "Result.hpp"
 
-constexpr size_t MAX_LETTER_REPEAT = 4;
 
-// Get the ID (0-26) associated with a letter.
-size_t ToID(char letter) {
-  emp_assert(letter >= 'a' && letter <= 'z');
-  return static_cast<size_t>(letter - 'a');
-}
-
-char ToLetter(size_t id) {
-  emp_assert(id < 26);
-  return static_cast<char>(id + 'a');
-}
-
-// All of the clues for a given position.
-struct PositionClues {
-  size_t pos;
-  std::array<emp::BitVector, 26> not_here;  // Is a given letter NOT at this position?
-  std::array<emp::BitVector, 26> here;      // Is a given letter at this position?
-
-  void SetNumWords(size_t num_words) {
-    for (auto & x : not_here) x.resize(num_words);
-    for (auto & x : here) x.resize(num_words);
-  }
-};
-
-// All of the clues for zero or more instances of a given letter.
-struct LetterClues {
-  size_t letter;  // [0-25]
-  std::array<emp::BitVector, MAX_LETTER_REPEAT+1> at_least; ///< Are there at least x instances of letter? (0 is meaningless)
-  std::array<emp::BitVector, MAX_LETTER_REPEAT+1> exactly;  ///< Are there exactly x instances of letter?
-
-  void SetNumWords(size_t num_words) {
-    for (auto & x : at_least) x.resize(num_words);
-    for (auto & x : exactly) x.resize(num_words);
-  }
-};
-
-struct WordData {
-  std::string word;
-  emp::BitSet<26> letters;        // What letters are in this word?
-  emp::BitSet<26> multi_letters;  // What letters are in this word more than once?
-  size_t max_options = 0;         // Maximum number of word options after used as a guess.
-  double ave_options = 0.0;       // Average number of options after used as a guess.
-  double entropy = 0.0;           // What is the entropy (and thus information gained) for this choice?
-
-  WordData(const std::string & in_word) : word(in_word) {
-    for (char x : word) {
-      size_t let_id = ToID(x);
-      if (letters.Has(let_id)) multi_letters.Set(let_id);
-      else letters.Set(let_id);
-    }
-  }
-};
-
+template <size_t WORD_SIZE=5>
 class WordSet {
 private:
-  size_t word_length;                              ///< Length of all words in this Wordle
+  constexpr size_t MAX_LETTER_REPEAT = 4;
+  using word_list_t = emp::BitVector;
+
+  // Get the ID (0-26) associated with a letter.
+  size_t ToID(char letter) {
+    emp_assert(letter >= 'a' && letter <= 'z');
+    return static_cast<size_t>(letter - 'a');
+  }
+
+  char ToLetter(size_t id) {
+    emp_assert(id < 26);
+    return static_cast<char>(id + 'a');
+  }
+
+  // All of the clues for a given position.
+  struct PositionClues {
+    size_t pos;
+    std::array<word_list_t, 26> here;      // Is a given letter at this position?
+
+    void SetNumWords(size_t num_words) {
+      for (auto & x : here) x.resize(num_words);
+    }
+  };
+
+  // All of the clues for zero or more instances of a given letter.
+  struct LetterClues {
+    size_t letter;  // [0-25]
+    std::array<word_list_t, MAX_LETTER_REPEAT+1> at_least; ///< Are there at least x instances of letter? (0 is meaningless)
+    std::array<word_list_t, MAX_LETTER_REPEAT+1> exactly;  ///< Are there exactly x instances of letter?
+
+    void SetNumWords(size_t num_words) {
+      for (auto & x : at_least) x.resize(num_words);
+      for (auto & x : exactly) x.resize(num_words);
+    }
+  };
+
+  struct WordData {
+    std::string word;
+    // Pre=processed data
+    emp::BitSet<26> letters;        // What letters are in this word?
+    emp::BitSet<26> multi_letters;  // What letters are in this word more than once?
+    std::array<word_list_t, Result<WORD_SIZE>::NUM_IDS> next_words;
+
+    // Collected data
+    size_t max_options = 0;         // Maximum number of word options after used as a guess.
+    double ave_options = 0.0;       // Average number of options after used as a guess.
+    double entropy = 0.0;           // What is the entropy (and thus information gained) for this choice?
+
+    WordData(const std::string & in_word) : word(in_word) {
+      for (char x : word) {
+        size_t let_id = ToID(x);
+        if (letters.Has(let_id)) multi_letters.Set(let_id);
+        else letters.Set(let_id);
+      }
+    }
+  };
+
   emp::vector<WordData> words;                     ///< Data about all words in this Wordle
-  emp::vector<PositionClues> pos_clues;            ///< A PositionClues object for each position.
+  emp::array<PositionClues, WORD_SIZE> pos_clues;  ///< A PositionClues object for each position.
   emp::array<LetterClues,26> let_clues;            ///< Clues based off the number of letters.
   std::unordered_map<std::string, size_t> pos_map; ///< Map of words to their position ids.
-  emp::BitVector start_options;                    ///< Current options.
+  word_list_t start_options;                    ///< Current options.
   size_t start_count;                              ///< Count of start options (cached)
 
   bool verbose = true;
 
 public:
-  WordSet(size_t length=5) : word_length(length) { }
-
   /// Include a single word into this WordSet.
   void AddWord(std::string & in_word) {
-    size_t id = words.size();      // Set the ID for this word.
+    size_t id = words.size();      // Set a unique ID for this word.
     pos_map[in_word] = id;         // Keep track of the ID for this word.
     words.emplace_back(in_word);   // Setup the word data.
   }
@@ -102,7 +104,7 @@ public:
     while (is) {
       is >> in_word;
       // Only keep words of the correct size and all lowercase.
-      if (in_word.size() != word_length) { wrong_size_count++; continue; }
+      if (in_word.size() != WORD_SIZE) { wrong_size_count++; continue; }
       if (!emp::is_lower(in_word)) { invalid_char_count++; continue; }
       if (emp::Has(pos_map, in_word)) { dup_count++; continue; }
       AddWord(in_word);
@@ -134,8 +136,7 @@ public:
   /// Once the words are loaded, Preprocess will collect info.
   void Preprocess() {
     // Setup all position clue info to know the number of words.
-    pos_clues.resize(word_length);
-    for (size_t i=0; i < pos_clues.size(); ++i) {
+    for (size_t i=0; i < WORD_SIZE; ++i) {
       pos_clues[i].pos = i;
       pos_clues[i].SetNumWords(words.size());
     }
@@ -168,18 +169,18 @@ public:
       // Now figure out what POSITION clues it is consistent with.
       for (size_t pos=0; pos < word.size(); ++pos) {
         const size_t cur_letter = ToID(word[pos]);
-        // Incorrect letter for alternatives at this position.
-        for (size_t letter_id = 0; letter_id < 26; ++letter_id) {
-          if (letter_id == cur_letter) {                         // Letter is HERE.
-            pos_clues[pos].here[letter_id].Set(word_id);
-          } else {                                               // Letter is NOT IN WORD
-            pos_clues[pos].not_here[letter_id].Set(word_id);
-          }
-        }
+        pos_clues[pos].here[cur_letter].Set(word_id);
       }
     }
 
     ResetOptions();
+
+    // Loop through words one more time, filling out result lists.
+    for (auto & word_info : words) {
+      for (size_t result_id = 0; result_id < Result<WORD_SIZE>::NUM_IDS; ++result_id) {
+        word_info.next_words[result_id] = EvalGuess(word_info.word, result_it);
+      }
+    }
   }
 
   // Limit the current options based on a single clue.
@@ -189,24 +190,25 @@ public:
   //  E : Elsewhere
   //  N : Nowhere
 
-  emp::BitVector EvalResult(const std::string & word, const Result & result) {
-    emp_assert(word.size() == result.size());
+  word_list_t EvalGuess(const std::string & guess, const Result & result) {
+    emp_assert(guess.size() == WORD_SIZE);
+    emp_assert(result.size() == WORD_SIZE);
 
     emp::array<uint8_t, 26> letter_counts;
     emp::BitSet<26> letter_fail;
-    emp::BitVector options = start_options;
+    word_list_t word_options = start_options;
 
-    // First add clues for here/not_here and collect letter information.
-    for (size_t i = 0; i < word.size(); ++i) {
-      const size_t cur_letter = ToID(word[i]);
+    // First add letter clues and collect letter information.
+    for (size_t i = 0; i < WORD_SIZE; ++i) {
+      const size_t cur_letter = ToID(guess[i]);
       if (result[i] == Result::HERE) {
-        options &= pos_clues[i].here[cur_letter];
+        word_options &= pos_clues[i].here[cur_letter];
         ++letter_counts[cur_letter];
       } else if (result[i] == Result::ELSEWHERE) {
-        options &= pos_clues[i].not_here[cur_letter];
+        word_options &= ~pos_clues[i].here[cur_letter];
         ++letter_counts[cur_letter];
       } else {  // Must be 'N'
-        options &= pos_clues[i].not_here[cur_letter];
+        word_options &= ~pos_clues[i].here[cur_letter];
         letter_fail.Set(cur_letter);
       }
     }
@@ -215,41 +217,18 @@ public:
     for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
       const size_t let_count = letter_counts[letter_id];
       if (let_count) {
-        options &= let_clues[letter_id].at_least[let_count];
+        word_options &= let_clues[letter_id].at_least[let_count];
       }
       if (letter_fail.Has(letter_id)) {
-        options &= let_clues[letter_id].exactly[let_count];
+        word_options &= let_clues[letter_id].exactly[let_count];
       }
     }
 
-    return options;
+    return word_options;
   }
 
 
 
-  emp::BitVector AnalyzeGuess(const std::string & guess, const WordData & answer) {
-    // Loop through all possible answers to see how much a word cuts down choices.
-    emp::BitVector options(start_options);
-
-    for (size_t pos = 0; pos < word_length; ++pos) {
-      const size_t guess_letter = ToID(guess[pos]);
-      if (guess[pos] == answer.word[pos]) {             // CORRECT GUESS FOR POSITION!
-        options &= clues[pos].here[guess_letter].words;
-      } else if (answer.letters.Has(guess_letter)) {    // WRONG POSITION
-        options &= clues[pos].elsewhere[guess_letter].words;
-      } else {                                          // WRONG CHARACTER
-        options &= clues[pos].nowhere[guess_letter].words;
-      }
-    }
-
-    return options;
-  }
-
-  // Slow way to manually call on specific words; brute-force find the entires for each.
-  emp::BitVector AnalyzeGuess(const std::string & guess, const std::string & answer) {
-    if (!emp::Has(pos_map, answer)) std::cerr << "UNKNOWN WORD: " << answer << std::endl;
-    return AnalyzeGuess(guess, words[pos_map[answer]]);
-  }
 
   void AnalyzeGuess(WordData & guess) {
     size_t max_options = 0;
@@ -277,7 +256,7 @@ public:
 
   /// Also analyze non-word guesses.
   void AnalyzeAll() {
-    std::string guess(word_length, 'a');
+    std::string guess(WORD_SIZE, 'a');
     size_t best_max_options = 10000;
     double best_ave_options = 10000.0;
     double best_entropy = 0.0;
@@ -326,18 +305,18 @@ public:
       }
 
       // Now move on to the next word...
-      size_t inc_pos = word_length - 1;  // find the first non-z letter.
-      while (inc_pos < word_length && guess[inc_pos] == 'z') {
+      size_t inc_pos = WORD_SIZE - 1;  // find the first non-z letter.
+      while (inc_pos < WORD_SIZE && guess[inc_pos] == 'z') {
         guess[inc_pos] = 'a';
         --inc_pos;
       }
-      if (inc_pos == word_length) break;
+      if (inc_pos == WORD_SIZE) break;
       ++guess[inc_pos];
     }
   }
 
   /// Print all of the words with a given set of IDs.
-  void PrintWords(const emp::BitVector & word_ids) {
+  void PrintWords(const word_list_t & word_ids) {
     size_t count = 0;
     for (int id = word_ids.FindOne(); id >= 0; id = word_ids.FindOne(id+1)) {
       if (count) std::cout << ",";
@@ -390,7 +369,7 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  WordSet word_set(5);
+  WordSet<5> word_set;
 
   if (args.size() == 1) word_set.Load(std::cin, std::cout);
   else {
