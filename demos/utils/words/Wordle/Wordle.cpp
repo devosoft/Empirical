@@ -20,16 +20,17 @@
 template <size_t WORD_SIZE=5>
 class WordSet {
 private:
-  constexpr size_t MAX_LETTER_REPEAT = 4;
+  static constexpr size_t MAX_LETTER_REPEAT = 4;
   using word_list_t = emp::BitVector;
+  using result_t = Result<WORD_SIZE>;
 
   // Get the ID (0-26) associated with a letter.
-  size_t ToID(char letter) {
+  static size_t ToID(char letter) {
     emp_assert(letter >= 'a' && letter <= 'z');
     return static_cast<size_t>(letter - 'a');
   }
 
-  char ToLetter(size_t id) {
+  static char ToLetter(size_t id) {
     emp_assert(id < 26);
     return static_cast<char>(id + 'a');
   }
@@ -61,7 +62,7 @@ private:
     // Pre=processed data
     emp::BitSet<26> letters;        // What letters are in this word?
     emp::BitSet<26> multi_letters;  // What letters are in this word more than once?
-    std::array<word_list_t, Result<WORD_SIZE>::NUM_IDS> next_words;
+    std::array<word_list_t, result_t::NUM_IDS> next_words;
 
     // Collected data
     size_t max_options = 0;         // Maximum number of word options after used as a guess.
@@ -133,6 +134,70 @@ public:
     start_options.SetAll();
   }
 
+  // Limit the current options based on a single guess and its result.
+
+  word_list_t EvalGuess(const std::string & guess, const result_t & result) {
+    emp_assert(guess.size() == WORD_SIZE);
+    emp_assert(result.size() == WORD_SIZE);
+
+    emp::array<uint8_t, 26> letter_counts;
+    emp::BitSet<26> letter_fail;
+    word_list_t word_options = start_options;
+
+    // First add letter clues and collect letter information.
+    for (size_t i = 0; i < WORD_SIZE; ++i) {
+      const size_t cur_letter = ToID(guess[i]);
+      if (result[i] == result_t::HERE) {
+        word_options &= pos_clues[i].here[cur_letter];
+        ++letter_counts[cur_letter];
+      } else if (result[i] == result_t::ELSEWHERE) {
+        word_options &= ~pos_clues[i].here[cur_letter];
+        ++letter_counts[cur_letter];
+      } else {  // Must be 'N'
+        word_options &= ~pos_clues[i].here[cur_letter];
+        letter_fail.Set(cur_letter);
+      }
+    }
+
+    // Next add letter clues.
+    for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
+      const size_t let_count = letter_counts[letter_id];
+      if (let_count) {
+        word_options &= let_clues[letter_id].at_least[let_count];
+      }
+      if (letter_fail.Has(letter_id)) {
+        word_options &= let_clues[letter_id].exactly[let_count];
+      }
+    }
+
+    return word_options;
+  }
+
+
+  void AnalyzeGuess(WordData & guess, const word_list_t & cur_words) {
+    size_t max_options = 0;
+    size_t total_options = 0;
+    size_t option_count = 0;
+    double entropy = 0.0;
+    const double word_count = static_cast<double>(words.size());
+
+    // Scan through all of the possible result IDs.
+    for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+      word_list_t next_options = guess.next_words[result_id] & cur_words;
+      size_t num_options = next_options.CountOnes();
+      if (num_options > max_options) max_options = num_options;
+      total_options += num_options * num_options;
+      option_count++;
+      double p = static_cast<double>(num_options) / word_count;
+      if (p > 0.0) entropy -= p * std::log2(p);
+    }
+
+    guess.max_options = max_options;
+    guess.ave_options = static_cast<double>(total_options) / static_cast<double>(words.size());
+    guess.entropy = entropy;
+  }
+
+
   /// Once the words are loaded, Preprocess will collect info.
   void Preprocess() {
     // Setup all position clue info to know the number of words.
@@ -144,6 +209,7 @@ public:
     // Setup all letter clue information
     for (size_t let=0; let < 26; let++) {
       let_clues[let].letter = let;
+      let_clues[let].SetNumWords(words.size());
     }
 
     // Counters for number of letters.
@@ -175,145 +241,75 @@ public:
 
     ResetOptions();
 
-    // Loop through words one more time, filling out result lists.
+    // Loop through words one more time, filling out result lists and collecting data.
     for (auto & word_info : words) {
-      for (size_t result_id = 0; result_id < Result<WORD_SIZE>::NUM_IDS; ++result_id) {
-        word_info.next_words[result_id] = EvalGuess(word_info.word, result_it);
+      for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+        word_info.next_words[result_id] = EvalGuess(word_info.word, result_id);
       }
+      AnalyzeGuess(word_info, start_options);
     }
   }
 
-  // Limit the current options based on a single clue.
-  // That consists of a word and a result.
-  // The result is a series of letters:
-  //  H : Here
-  //  E : Elsewhere
-  //  N : Nowhere
+  // /// Also analyze non-word guesses.
+  // void AnalyzeAll() {
+  //   std::string guess(WORD_SIZE, 'a');
+  //   size_t best_max_options = 10000;
+  //   double best_ave_options = 10000.0;
+  //   double best_entropy = 0.0;
+  //   std::string best_max_options_word = "";
+  //   std::string best_ave_options_word = "";
+  //   std::string best_entropy_word = "";
 
-  word_list_t EvalGuess(const std::string & guess, const Result & result) {
-    emp_assert(guess.size() == WORD_SIZE);
-    emp_assert(result.size() == WORD_SIZE);
+  //   size_t silent_count = 0;  // Keep a count of how many loops since out last output.
+  //   while (true) {
+  //     size_t max_options = 0;
+  //     size_t total_options = 0;
+  //     double entropy = 0.0;
 
-    emp::array<uint8_t, 26> letter_counts;
-    emp::BitSet<26> letter_fail;
-    word_list_t word_options = start_options;
+  //     // Scan through all possible answers...    
+  //     for (WordData & answer : words) {
+  //       size_t options = AnalyzeGuess(guess, answer).CountOnes();
+  //       if (options > max_options) max_options = options;
+  //       total_options += options;
+  //       const double p = static_cast<double>(options) / static_cast<double>(start_count);
+  //       entropy -= p * std::log2(p);
+  //     }
+  //     double ave_options = static_cast<double>(total_options) / static_cast<double>(words.size());
 
-    // First add letter clues and collect letter information.
-    for (size_t i = 0; i < WORD_SIZE; ++i) {
-      const size_t cur_letter = ToID(guess[i]);
-      if (result[i] == Result::HERE) {
-        word_options &= pos_clues[i].here[cur_letter];
-        ++letter_counts[cur_letter];
-      } else if (result[i] == Result::ELSEWHERE) {
-        word_options &= ~pos_clues[i].here[cur_letter];
-        ++letter_counts[cur_letter];
-      } else {  // Must be 'N'
-        word_options &= ~pos_clues[i].here[cur_letter];
-        letter_fail.Set(cur_letter);
-      }
-    }
+  //     ++silent_count;
+  //     if (max_options < best_max_options) {
+  //       best_max_options = max_options;
+  //       best_max_options_word = guess;
+  //       std::cout << "New best MAX options: " << guess << " : " << max_options << std::endl;
+  //       silent_count = 0;
+  //     }
+  //     if (ave_options < best_ave_options) {
+  //       best_ave_options = ave_options;
+  //       best_ave_options_word = guess;
+  //       std::cout << "New best AVE options: " << guess << " : " << ave_options << std::endl;
+  //       silent_count = 0;
+  //     }
+  //     if (entropy > best_entropy) {
+  //       best_entropy = entropy;
+  //       best_entropy_word = guess;
+  //       std::cout << "New best ENTROPY: " << guess << " : " << entropy << std::endl;
+  //       silent_count = 0;
+  //     }
+  //     if (silent_count >= 10000) {
+  //       std::cout << "...processing... ('" << guess << "')" << std::endl;
+  //       silent_count = 0;
+  //     }
 
-    // Next add letter clues.
-    for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
-      const size_t let_count = letter_counts[letter_id];
-      if (let_count) {
-        word_options &= let_clues[letter_id].at_least[let_count];
-      }
-      if (letter_fail.Has(letter_id)) {
-        word_options &= let_clues[letter_id].exactly[let_count];
-      }
-    }
-
-    return word_options;
-  }
-
-
-
-
-  void AnalyzeGuess(WordData & guess) {
-    size_t max_options = 0;
-    size_t total_options = 0;
-    double entropy = 0.0;
-
-    // Scan through all possible answers...    
-    for (WordData & answer : words) {
-      size_t options = AnalyzeGuess(guess.word, answer).CountOnes();
-      if (options > max_options) max_options = options;
-      total_options += options;
-      const double p = static_cast<double>(options) / static_cast<double>(start_count);
-      entropy -= p * std::log2(p);
-    }
-    guess.max_options = max_options;
-    guess.ave_options = static_cast<double>(total_options) / static_cast<double>(words.size());
-    guess.entropy = entropy;
-  }
-
-  void Analyze() {
-    for (int id = start_options.FindOne(); id >= 0; id = start_options.FindOne(id+1)) {
-      AnalyzeGuess(words[id]);
-    }
-  }
-
-  /// Also analyze non-word guesses.
-  void AnalyzeAll() {
-    std::string guess(WORD_SIZE, 'a');
-    size_t best_max_options = 10000;
-    double best_ave_options = 10000.0;
-    double best_entropy = 0.0;
-    std::string best_max_options_word = "";
-    std::string best_ave_options_word = "";
-    std::string best_entropy_word = "";
-
-    size_t silent_count = 0;  // Keep a count of how many loops since out last output.
-    while (true) {
-      size_t max_options = 0;
-      size_t total_options = 0;
-      double entropy = 0.0;
-
-      // Scan through all possible answers...    
-      for (WordData & answer : words) {
-        size_t options = AnalyzeGuess(guess, answer).CountOnes();
-        if (options > max_options) max_options = options;
-        total_options += options;
-        const double p = static_cast<double>(options) / static_cast<double>(start_count);
-        entropy -= p * std::log2(p);
-      }
-      double ave_options = static_cast<double>(total_options) / static_cast<double>(words.size());
-
-      ++silent_count;
-      if (max_options < best_max_options) {
-        best_max_options = max_options;
-        best_max_options_word = guess;
-        std::cout << "New best MAX options: " << guess << " : " << max_options << std::endl;
-        silent_count = 0;
-      }
-      if (ave_options < best_ave_options) {
-        best_ave_options = ave_options;
-        best_ave_options_word = guess;
-        std::cout << "New best AVE options: " << guess << " : " << ave_options << std::endl;
-        silent_count = 0;
-      }
-      if (entropy > best_entropy) {
-        best_entropy = entropy;
-        best_entropy_word = guess;
-        std::cout << "New best ENTROPY: " << guess << " : " << entropy << std::endl;
-        silent_count = 0;
-      }
-      if (silent_count >= 10000) {
-        std::cout << "...processing... ('" << guess << "')" << std::endl;
-        silent_count = 0;
-      }
-
-      // Now move on to the next word...
-      size_t inc_pos = WORD_SIZE - 1;  // find the first non-z letter.
-      while (inc_pos < WORD_SIZE && guess[inc_pos] == 'z') {
-        guess[inc_pos] = 'a';
-        --inc_pos;
-      }
-      if (inc_pos == WORD_SIZE) break;
-      ++guess[inc_pos];
-    }
-  }
+  //     // Now move on to the next word...
+  //     size_t inc_pos = WORD_SIZE - 1;  // find the first non-z letter.
+  //     while (inc_pos < WORD_SIZE && guess[inc_pos] == 'z') {
+  //       guess[inc_pos] = 'a';
+  //       --inc_pos;
+  //     }
+  //     if (inc_pos == WORD_SIZE) break;
+  //     ++guess[inc_pos];
+  //   }
+  // }
 
   /// Print all of the words with a given set of IDs.
   void PrintWords(const word_list_t & word_ids) {
@@ -382,13 +378,12 @@ int main(int argc, char* argv[])
   }
 
   word_set.Preprocess();
-  // word_set.AddClue(0,'a',Result::ELSEWHERE);
-  // word_set.AddClue(1,'l',Result::ELSEWHERE);
-  // word_set.AddClue(2,'o',Result::NOWHERE);
-  // word_set.AddClue(3,'e',Result::NOWHERE);
-  // word_set.AddClue(4,'s',Result::NOWHERE);
+  // word_set.AddClue(0,'a',result_t::ELSEWHERE);
+  // word_set.AddClue(1,'l',result_t::ELSEWHERE);
+  // word_set.AddClue(2,'o',result_t::NOWHERE);
+  // word_set.AddClue(3,'e',result_t::NOWHERE);
+  // word_set.AddClue(4,'s',result_t::NOWHERE);
 
-  word_set.Analyze();
   word_set.PrintResults();
 //  word_set.AnalyzeAll();
 }
