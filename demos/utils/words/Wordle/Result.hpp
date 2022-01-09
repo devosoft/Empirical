@@ -1,45 +1,54 @@
+#include "emp/base/array.hpp"
 #include "emp/base/error.hpp"
-#include "emp/base/vector.hpp"
+#include "emp/math/math.hpp"
 
+template <size_t WORD_SIZE=5>
 class Result {
 public:
-  enum result_t { NOWHERE, ELSEWHERE, HERE };
+  enum PositionResult { NOWHERE, ELSEWHERE, HERE };
+  static constexpr size_t NUM_IDS = emp::Pow(3, WORD_SIZE);
 
 private:
-  emp::vector<result_t> results;
+  using results_t = emp::array<PositionResult, WORD_SIZE>;
+
+  results_t results;
   size_t id;
 
-  static emp::vector<size_t> & GetMagnitudes(const size_t max_pos) {
-    static emp::vector<size_t> magnitudes;
-    if (magnitudes.size() <= max_pos) {
-      magnitudes.resize(max_pos+1);
-      size_t base = 1;
-      for (auto & x : magnitudes) { x = base; base *= 3; }
+  /// Return a result array where each index is an associated (unique) possible result set.
+  const results_t & LookupResult(size_t result_id) {
+    static emp::array<results_t, NUM_IDS> result_array;
+    static bool init = false;
+
+    // If this is our first time requsting the result array, generate it.
+    if (!init) {
+      init = true;
+      for (size_t id = 0; id < NUM_IDS; ++id) {
+        size_t tmp_id = id;
+        for (size_t pos = WORD_SIZE-1; pos < WORD_SIZE; --pos) {
+          size_t magnitude = emp::Pow(3, pos);
+          size_t cur_result = tmp_id / magnitude;
+          results[pos] = static_cast<PositionResult>(cur_result);
+          tmp_id -= cur_result * magnitude;
+        }
+      }
     }
-    return magnitudes;
+    return result_array[result_id];
   }
 
-  // Assume that we have results, calculate the correct ID.
+  /// Assume that we have results, calculate the associated ID.
   void CalcID() {
     size_t base = 1;
     id = 0;
-    for (result_t r : results) { id += static_cast<size_t>(r) * base; base *= 3; }
+    for (PositionResult r : results) { id += static_cast<size_t>(r) * base; base *= 3; }
   }
 
-  // Assume that we have an ID, calculate the correct results.
-  void CalcResults() {
-    emp::vector<size_t> & magnitudes = GetMagnitudes(results.size());
-    size_t tmp_id = id;
-    for (size_t i = 0; i < results.size(); ++i) {
-      size_t cur_result = tmp_id / magnitudes[i];
-      results[i] = static_cast<result_t>(cur_result);
-      tmp_id -= cur_result * magnitudes[i];
-    }
-  }
+  /// Assume that we have an ID, lookup the correct results.
+  void CalcResults() { results = LookupResult(id); }
 
+  /// Convert a results string of 'N's, 'E's, and 'W's into a Results object.
   void FromString(const std::string & result_str) {
-    results.resize(result_str.size());
-    for (size_t i=0; i < results.size(); ++i) {
+    emp_assert(result_str.size() == WORD_SIZE);
+    for (size_t i=0; i < WORD_SIZE; ++i) {
       switch (result_str[i]) {
       case 'N': case 'n': results[i] = NOWHERE;   break;
       case 'E': case 'e': results[i] = ELSEWHERE; break;
@@ -52,17 +61,18 @@ private:
 
 public:
   /// Create a result by id.
-  Result(size_t num_results, size_t _id) : results(num_results), id(_id) { CalcResults(); }
+  Result(size_t _id) : id(_id) { CalcResults(); }
 
-  /// Create a result by a result vector.
-  Result(const emp::vector<result_t> & _results) : results(_results) { CalcID(); }
+  /// Create a result by a result array.
+  Result(const results_t & _results) : results(_results) { CalcID(); }
 
   /// Create a result by a result string.
   Result(const std::string & result_str) { FromString(result_str); }
 
   /// Create a result by an guess and answer pair.
-  Result(const std::string & guess, const std::string & answer) : results(guess.size()) {
-    emp_assert(guess.size() == answer.size());
+  Result(const std::string & guess, const std::string & answer) {
+    emp_assert(guess.size() == WORD_SIZE);
+    emp_assert(answer.size() == WORD_SIZE);
     emp::BitVector used(answer.size());
     // Test perfect matches.
     for (size_t i = 0; i < guess.size(); ++i) {
@@ -92,11 +102,16 @@ public:
   Result & operator=(const Result & result) = default;
   Result & operator=(Result && result) = default;
 
+  bool operator==(const Result & in) const { return id == in.id; }
+  bool operator!=(const Result & in) const { return id != in.id; }
+  bool operator< (const Result & in) const { return id <  in.id; }
+  bool operator<=(const Result & in) const { return id <= in.id; }
+  bool operator> (const Result & in) const { return id >  in.id; }
+  bool operator>=(const Result & in) const { return id >= in.id; }
+
   size_t GetID() const { return id; }
-  size_t GetSize() const { return results.size(); }
-  size_t GetIDCap() const { return GetMagnitudes(results.size())[results.size()]; }
+  size_t GetSize() const { return WORD_SIZE; }
+  size_t size() const { return WORD_SIZE; }
 
-  result_t operator[](size_t id) const { return results[id]; }
-
-  size_t size() const { return results.size(); }
+  PositionResult operator[](size_t id) const { return results[id]; }
 };
