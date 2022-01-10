@@ -397,6 +397,7 @@ public:
     PrintWordData(words[pos_map[word]]);
   }
 
+  // Reorder words.  NOTE: This is destructive to all word_list data!
   void SortWords(const std::string & sort_type="max") {
     using wd_t = const WordData &;
     if (sort_type == "max") {
@@ -411,7 +412,7 @@ public:
       } );
     } else if (sort_type == "entropy") {
       emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.entropy < w2.entropy; } );
-    } else if (sort_type == "alpha") {
+    } else if (sort_type == "word") {
       emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.word < w2.word; } );
     }
     for (size_t i = 0; i < words.size(); i++) { pos_map[words[i].word] = i; } // Update ID tracking.
@@ -426,6 +427,59 @@ public:
                 << ", " << word.ave_options
                 << ", " << word.entropy
                 << std::endl;
+    }
+  }
+
+  /// Print out all words as HTML.
+  void PrintHTMLWord(const WordData & word) const {
+    std::string filename = emp::to_string("web/words/", word.word, ".html");
+    std::ofstream of(filename);
+
+    // const std::string black("&#11035;");
+    static const std::string white("&#11036;");
+    static const std::string green("&#129001;");
+    static const std::string yellow("&#129000;");
+
+    of << "<!doctype html>\n<html lang=\"en\">\n<head>\n <title>Wordle Analysis: '"
+       << word.word << "'</title>\n</head>\n<body>\n";
+
+    of << "<h3>Wordle Analysis: " << word.word << "</h3>\n\n";
+    of << "Worst case words remaining: " << word.max_options << "<br>\n";
+    of << "Expected words remaining: " << word.ave_options << "<br>\n";
+    of << "Information provided: " << word.entropy << "<br>\n<p>\n";
+
+    // Loop through all possible results.
+    for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+      result_t result(result_id);
+      word_list_t result_words = word.next_words[result_id];
+
+      of << result.ToString(green, yellow, white) << " (" << result_words.CountOnes() << " words) : ";
+
+      for (int id = result_words.FindOne(); id >= 0; id = result_words.FindOne(id+1)) {
+        of << "<a href=\""  << words[id].word << ".html\">" << words[id].word << "</a> ";
+      }
+
+      of << "<br>\n";
+    }
+
+
+    of << "</body>\n</html>\n";
+
+    os << "Printed file '" << filename << "'." << std::endl;
+  }
+
+  void PrintHTMLWordID(int id) const { PrintHTMLWord(words[(size_t) id]); }
+  void PrintHTMLWord(const std::string & word) {
+    PrintHTMLWord(words[pos_map[word]]);
+  }
+
+  void PrintHTML() {
+    size_t count = 0;
+    std::cout << "Printing HTML files..." << std::endl;
+    size_t step = words.size() / 100;
+    for (auto & word : words) {
+      if (count % step == 0) { std::cout << "."; std::cout.flush(); }
+      PrintHTMLWord(word);
     }
   }
 
@@ -449,6 +503,7 @@ int main(int argc, char* argv[])
 
   WordSet<5> word_set(*is_ptr, *os_ptr);
   word_set.Load();
+  word_set.SortWords("word");
 
   word_set.Preprocess();
   // word_set.AddClue(0,'a',result_t::ELSEWHERE);
@@ -460,10 +515,12 @@ int main(int argc, char* argv[])
   // word_set.PrintLetterClues('x');
   // word_set.PrintPosClues(0);
   // word_set.PrintWordData(0);
-  word_set.PrintWordData("aloes");
+  // word_set.PrintWordData("aloes");
   // word_set.PrintResults();
   // word_set.AnalyzeAll();
-
+  // word_set.PrintHTMLWordID(0);
+  // word_set.PrintHTMLWord("aloes");
+  word_set.PrintHTML();
 
   if (args.size() > 1) is_ptr.Delete();
   if (args.size() > 2) os_ptr.Delete();
