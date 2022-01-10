@@ -19,7 +19,7 @@ jobs:
       - run: sudo apt-get install -qq rename
       - run: ./ci/test_tidy.sh
   tidy-macos:
-    name: Test Tidy Enforcement MacOS Compatibility
+    name: Test MacOS Tidy Enforcement
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
