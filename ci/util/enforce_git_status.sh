@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # adapted from https://superuser.com/a/731431
-if [[ "$(basename -- "$0")" == "script.sh" ]]; then
+if [[ "$(basename -- "$0")" == "enforce_git_status.sh" ]]; then
   echo "$0 may not be run, it must be sourced" >&2
   exit 1
 fi
