@@ -15,7 +15,7 @@ private:
   size_t id;
 
   /// Return a result array where each index is an associated (unique) possible result set.
-  const results_t & LookupResult(size_t result_id) {
+  static const results_t & LookupResult(size_t result_id) {
     static emp::array<results_t, NUM_IDS> result_array;
     static bool init = false;
 
@@ -25,13 +25,14 @@ private:
       for (size_t id = 0; id < NUM_IDS; ++id) {
         size_t tmp_id = id;
         for (size_t pos = WORD_SIZE-1; pos < WORD_SIZE; --pos) {
-          size_t magnitude = emp::Pow(3, pos);
-          size_t cur_result = tmp_id / magnitude;
-          results[pos] = static_cast<PositionResult>(cur_result);
+          const size_t magnitude = emp::Pow(3, pos);
+          const size_t cur_result = tmp_id / magnitude;
+          result_array[id][pos] = static_cast<PositionResult>(cur_result);
           tmp_id -= cur_result * magnitude;
         }
       }
     }
+
     return result_array[result_id];
   }
 
@@ -114,4 +115,14 @@ public:
   size_t size() const { return WORD_SIZE; }
 
   PositionResult operator[](size_t id) const { return results[id]; }
+
+  std::string ToString() {
+    std::string out; // = emp::to_string(id, "-");
+    for (auto x : results) {
+      if (x == HERE) out += 'H';
+      else if (x == ELSEWHERE) out += 'E';
+      else if (x == NOWHERE) out += 'N';
+    }
+    return out;
+  }
 };
