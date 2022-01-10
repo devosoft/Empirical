@@ -131,12 +131,16 @@ public:
     return true;
   }
 
-  std::string ToString() const {
+  std::string ToString(
+    const std::string & here="H",
+    const std::string & elsewhere="E",
+    const std::string & nowhere="N"
+  ) const {
     std::string out; // = emp::to_string(id, "-");
     for (auto x : results) {
-      if (x == HERE) out += 'H';
-      else if (x == ELSEWHERE) out += 'E';
-      else if (x == NOWHERE) out += 'N';
+      if (x == HERE) out += here;
+      else if (x == ELSEWHERE) out += elsewhere;
+      else if (x == NOWHERE) out += nowhere;
     }
     return out;
   }
