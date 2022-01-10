@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
+
 SOURCE_HASH=$( find -path ./third-party -prune -false -o -type f | sort | xargs cat | sha1sum )
 
 make clean

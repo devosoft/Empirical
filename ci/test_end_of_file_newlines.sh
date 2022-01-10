@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
+
 # refuse to continue if uncommitted changes are present
 . ./ci/util/enforce_git_status.sh
 

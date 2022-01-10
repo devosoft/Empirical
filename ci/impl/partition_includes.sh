@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
+
 TARGETS=$(find . -type f \( -name "*.hpp" -o -name "*.cpp" \) ! -path "./third-party/*" ! -path "./node_modules/*")
 
 for filename in ${TARGETS}

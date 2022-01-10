@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
+
 # license notice boilerplate for source files that aren't in include/
 
 for filename in $(find . -name '*.cpp' -type f ! -path "./third-party/*") $(find . -name '*.hpp' -type f ! -path "./third-party/*" ! -path "./include/*"); do

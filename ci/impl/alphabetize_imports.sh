@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
+
 TARGETS=$(find . -type f \( -name "*.py" -o -name "*.ipynb" \) ! -path "./third-party/*")
 
 for filename in ${TARGETS}
