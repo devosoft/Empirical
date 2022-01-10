@@ -663,13 +663,19 @@ namespace emp {
     [[nodiscard]] inline BitVector operator~() const { return NOT(); }
 
     /// Operator bitwise AND...
-    [[nodiscard]] inline BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
+    [[nodiscard]] inline BitVector operator&(const BitVector & ar2) const {
+      emp_assert(size() == ar2.size()); return AND(ar2);
+    }
 
     /// Operator bitwise OR...
-    [[nodiscard]] inline BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
+    [[nodiscard]] inline BitVector operator|(const BitVector & ar2) const {
+      emp_assert(size() == ar2.size()); return OR(ar2);
+    }
 
     /// Operator bitwise XOR...
-    [[nodiscard]] inline BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
+    [[nodiscard]] inline BitVector operator^(const BitVector & ar2) const {
+      emp_assert(size() == ar2.size()); return XOR(ar2);
+    }
 
     /// Operator shift left...
     [[nodiscard]] inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
@@ -678,13 +684,19 @@ namespace emp {
     [[nodiscard]] inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
     /// Compound operator bitwise AND...
-    BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
+    BitVector & operator&=(const BitVector & ar2) {
+      emp_assert(size() == ar2.size()); return AND_SELF(ar2);
+    }
 
     /// Compound operator bitwise OR...
-    BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
+    BitVector & operator|=(const BitVector & ar2) {
+      emp_assert(size() == ar2.size()); return OR_SELF(ar2);
+    }
 
     /// Compound operator bitwise XOR...
-    BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
+    BitVector & operator^=(const BitVector & ar2) {
+      emp_assert(size() == ar2.size()); return XOR_SELF(ar2);
+    }
 
     /// Compound operator for shift left...
     BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
