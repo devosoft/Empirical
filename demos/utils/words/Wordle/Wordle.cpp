@@ -324,14 +324,28 @@ public:
   // }
 
   /// Print all of the words with a given set of IDs.
-  void PrintWords(const word_list_t & word_ids) {
+  void PrintWords(const word_list_t & word_ids, size_t max_count=(size_t)-1) const {
+    std::cout << "(" << word_ids.CountOnes() << " words) ";
     size_t count = 0;
     for (int id = word_ids.FindOne(); id >= 0; id = word_ids.FindOne(id+1)) {
       if (count) std::cout << ",";
       std::cout << words[id].word;
-      ++count;
+      if (++count == max_count) {
+        if (id > 0) std::cout << " ...";
+        break;
+      }
     }
-    std::cout << " (" << count << " words found)" << std::endl;
+    // std::cout << " (" << word_is.CountOnes() << " words)" << std::endl;
+  }
+
+  void PrintPosClues(size_t pos) const {
+    const PositionClues & clue = pos_clues[pos];
+    std::cout << "Position " << pos << ":\n";
+    for (uint8_t i = 0; i < 26; ++i) {
+      std::cout << " '" << clue.let << "' : ";
+      PrintWords(clue.here[i], 10);
+      std::cout << std::endl;
+    }
   }
 
   void PrintWordData(const WordData & word) const {
@@ -346,18 +360,8 @@ public:
     for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
       result_t result(result_id);
       word_list_t result_words = word.next_words[result_id];
-      const size_t result_count = result_words.CountOnes();
-      std::cout << result_id << " - " << result.ToString() << " (" << result_count << "): ";
-      size_t print_count = 0;
-      for (int word_id = result_words.FindOne();          // Step through words in this result.
-           word_id >= 0;
-           word_id = result_words.FindOne(word_id+1)) {
-        std::cout << " " << words[word_id].word;          // Print the next word in this group.
-        if (++print_count >= 10) {
-          if (word_id > 0) std::cout << " ...";
-          break;                   // Print at most 10 words.
-        }
-      }
+      std::cout << result_id << " - " << result.ToString() << " ";
+      PrintWords(result_words, 10);
       std::cout << std::endl;
     }
   }
@@ -426,7 +430,8 @@ int main(int argc, char* argv[])
   // word_set.AddClue(3,'e',result_t::NOWHERE);
   // word_set.AddClue(4,'s',result_t::NOWHERE);
 
-  word_set.PrintWordData(0);
+  word_set.PrintPosClues(0);
+  // word_set.PrintWordData(0);
   // word_set.PrintResults();
   // word_set.AnalyzeAll();
 }
