@@ -18,6 +18,15 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq rename
       - run: ./ci/test_tidy.sh
+  tidy-macos:
+    name: Test Tidy Enforcement MacOS Compatibility
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: brew install coreutils findutils gnu-sed gawk grep rename
+      - run: ./ci/test_tidy.sh
   test:
     name: Tests
     runs-on: ubuntu-18.04
