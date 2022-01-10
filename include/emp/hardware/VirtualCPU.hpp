@@ -244,7 +244,7 @@ namespace emp{
         nops_need_curated = true;
       }
       /// Add a random instruction from the instruction library to the end of the genome
-      void PushRandom(Random & random, const size_t count=1) {
+      void PushRandomInst(Random & random, const size_t count=1) {
         for (size_t i = 0; i < count; i++) {
           PushInst(GetRandomInst(random));
         }
