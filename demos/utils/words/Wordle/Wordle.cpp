@@ -85,9 +85,14 @@ private:
   word_list_t start_options;                    ///< Current options.
   size_t start_count;                              ///< Count of start options (cached)
 
+  std::istream & is;
+  std::ostream & os;
+
   bool verbose = true;
 
 public:
+  WordSet(std::istream & _is, std::ostream & _os) : is(_is), os(_os) { }
+
   /// Include a single word into this WordSet.
   void AddWord(std::string & in_word) {
     size_t id = words.size();      // Set a unique ID for this word.
@@ -96,7 +101,7 @@ public:
   }
 
   /// Load a whole series for words (from a file) into this WordSet
-  void Load(std::istream & is, std::ostream & os) {
+  void Load() {
     // Load in all of the words.
     std::string in_word;
     size_t wrong_size_count = 0;
@@ -248,12 +253,15 @@ public:
 
     // Loop through words one more time, filling out result lists and collecting data.
     size_t word_count = 0;
+    const size_t step = words.size() / 100;
     for (auto & word_info : words) {
-      if (++word_count % 10 == 0) {
+      if (++word_count % step == 0) {
         std::cout << ".";
         std::cout.flush();
       }
       for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+        Result result(result_id);
+        if (!result.IsValid(word_info.word)) continue;
         word_info.next_words[result_id] = EvalGuess(word_info.word, result_id);
       }
       AnalyzeGuess(word_info, start_options);
@@ -385,6 +393,9 @@ public:
   }
 
   void PrintWordData(size_t id) const { PrintWordData(words[id]); }
+  void PrintWordData(const std::string & word) {
+    PrintWordData(words[pos_map[word]]);
+  }
 
   void SortWords(const std::string & sort_type="max") {
     using wd_t = const WordData &;
@@ -417,6 +428,7 @@ public:
                 << std::endl;
     }
   }
+
 };
 
 int main(int argc, char* argv[])
@@ -429,17 +441,14 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  WordSet<5> word_set;
+  emp::Ptr<std::istream> is_ptr = &std::cin;
+  if (args.size() > 1) is_ptr = emp::NewPtr<std::ifstream>(args[1]);
 
-  if (args.size() == 1) word_set.Load(std::cin, std::cout);
-  else {
-    std::ifstream in_file{args[1]};
-    if (args.size() == 2) word_set.Load(in_file, std::cout);
-    else {
-      std::ofstream out_file{args[2]};
-      word_set.Load(in_file, out_file);
-    }
-  }
+  emp::Ptr<std::ostream> os_ptr = &std::cout;
+  if (args.size() > 2) os_ptr = emp::NewPtr<std::ofstream>(args[2]);
+
+  WordSet<5> word_set(*is_ptr, *os_ptr);
+  word_set.Load();
 
   word_set.Preprocess();
   // word_set.AddClue(0,'a',result_t::ELSEWHERE);
@@ -450,7 +459,12 @@ int main(int argc, char* argv[])
 
   // word_set.PrintLetterClues('x');
   // word_set.PrintPosClues(0);
-  word_set.PrintWordData(0);
+  // word_set.PrintWordData(0);
+  word_set.PrintWordData("aloes");
   // word_set.PrintResults();
   // word_set.AnalyzeAll();
+
+
+  if (args.size() > 1) is_ptr.Delete();
+  if (args.size() > 2) os_ptr.Delete();
 }
