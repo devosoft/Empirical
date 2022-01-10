@@ -116,7 +116,22 @@ public:
 
   PositionResult operator[](size_t id) const { return results[id]; }
 
-  std::string ToString() {
+  // Test if this result is valid for the given word.
+  bool IsValid(const std::string & word) const {
+    // Disallow letters marked "NOWHERE" that are subsequently marked "ELSEWHERE"
+    // (other order is okay).
+    for (size_t pos = 0; pos < WORD_SIZE-1; ++pos) {
+      if (results[pos] == NOWHERE) {
+        for (size_t pos2 = pos+1; pos2 < WORD_SIZE; ++pos2) {
+          if (results[pos2] == ELSEWHERE && word[pos] == word[pos2]) return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  std::string ToString() const {
     std::string out; // = emp::to_string(id, "-");
     for (auto x : results) {
       if (x == HERE) out += 'H';
