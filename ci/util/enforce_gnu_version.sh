@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # enforce run as source, not as script
 # adapted from https://superuser.com/a/731431

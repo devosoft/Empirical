@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # enforce use of GNU version of coreutils
 . ./ci/util/enforce_gnu_utils.sh

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # adapted from https://superuser.com/a/731431
 if [[ "$(basename -- "$0")" == "enforce_git_status.sh" ]]; then

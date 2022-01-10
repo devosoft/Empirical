@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # adapted from https://apple.stackexchange.com/a/88812
 echo "========================================================================="

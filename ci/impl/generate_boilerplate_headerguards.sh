@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 # assumes docstring boilerplate is already in place
 
 # enforce use of GNU version of coreutils

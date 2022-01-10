@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # adapted from https://stackoverflow.com/a/57102498/
 if ! [[ "$("${1}" --version)" =~ "Free Software Foundation" ]];
