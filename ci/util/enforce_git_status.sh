@@ -10,6 +10,6 @@ fi
 # adapted from https://stackoverflow.com/a/40535565
 if ! [[ -z $(git status -s) ]];
 then
-  ./ci/print_uncommitted_changes_warning.sh
+  ./ci/util/print_uncommitted_changes_warning.sh
   exit 1
 fi
