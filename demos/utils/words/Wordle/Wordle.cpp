@@ -230,7 +230,7 @@ public:
       for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
         const size_t cur_count = letter_counts[letter_id];       
         let_clues[letter_id].exactly[cur_count].Set(word_id);
-        for (uint8_t count = 0; count < cur_count; ++count) {
+        for (uint8_t count = 0; count <= cur_count; ++count) {
           let_clues[letter_id].at_least[count].Set(word_id);
         }
       }
@@ -348,6 +348,21 @@ public:
     }
   }
 
+  void PrintLetterClues(char letter) const {
+    const LetterClues & clue = let_clues[ToID(letter)];
+    std::cout << "Letter '" << clue.letter << "':\n";
+    for (size_t i = 0; i <= MAX_LETTER_REPEAT; ++i) {
+      std::cout << "EXACTLY " << i << ":  ";
+      PrintWords(clue.exactly[i], 20);
+      std::cout << std::endl;
+    }
+    for (size_t i = 0; i <= MAX_LETTER_REPEAT; ++i) {
+      std::cout << "AT LEAST " << i << ": ";
+      PrintWords(clue.at_least[i], 20);
+      std::cout << std::endl;
+    }
+  }
+
   void PrintWordData(const WordData & word) const {
     std::cout << "WORD:     " << word.word << std::endl;
     std::cout << "Letters:  " << word.letters << std::endl;
@@ -357,13 +372,16 @@ public:
     std::cout << "Entropy:  " << word.entropy << std::endl;
     std::cout << std::endl;
 
+    size_t total_count = 0;
     for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
       result_t result(result_id);
       word_list_t result_words = word.next_words[result_id];
       std::cout << result_id << " - " << result.ToString() << " ";
       PrintWords(result_words, 10);
+      total_count += result_words.CountOnes();
       std::cout << std::endl;
     }
+    std::cout << "Total Count: " << total_count << std::endl;
   }
 
   void PrintWordData(size_t id) const { PrintWordData(words[id]); }
@@ -430,8 +448,9 @@ int main(int argc, char* argv[])
   // word_set.AddClue(3,'e',result_t::NOWHERE);
   // word_set.AddClue(4,'s',result_t::NOWHERE);
 
-  word_set.PrintPosClues(0);
-  // word_set.PrintWordData(0);
+  // word_set.PrintLetterClues('x');
+  // word_set.PrintPosClues(0);
+  word_set.PrintWordData(0);
   // word_set.PrintResults();
   // word_set.AnalyzeAll();
 }
