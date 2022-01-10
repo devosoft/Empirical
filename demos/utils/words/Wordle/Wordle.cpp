@@ -141,6 +141,7 @@ public:
     emp_assert(result.size() == WORD_SIZE);
 
     emp::array<uint8_t, 26> letter_counts;
+    std::fill(letter_counts.begin(), letter_counts.end(), 0);
     emp::BitSet<26> letter_fail;
     word_list_t word_options = start_options;
 
@@ -200,6 +201,8 @@ public:
 
   /// Once the words are loaded, Preprocess will collect info.
   void Preprocess() {
+    std::cout << "Beginning pre-process phase..." << std::endl;
+
     // Setup all position clue info to know the number of words.
     for (size_t i=0; i < WORD_SIZE; ++i) {
       pos_clues[i].pos = i;
@@ -239,15 +242,24 @@ public:
       }
     }
 
+    std::cout << "...clues are initialized..." << std::endl;
+
     ResetOptions();
 
     // Loop through words one more time, filling out result lists and collecting data.
+    size_t word_count = 0;
     for (auto & word_info : words) {
+      if (++word_count % 10 == 0) {
+        std::cout << ".";
+        std::cout.flush();
+      }
       for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
         word_info.next_words[result_id] = EvalGuess(word_info.word, result_id);
       }
       AnalyzeGuess(word_info, start_options);
     }
+
+    std::cout << "...words are analyzed..." << std::endl;
   }
 
   // /// Also analyze non-word guesses.
@@ -322,6 +334,36 @@ public:
     std::cout << " (" << count << " words found)" << std::endl;
   }
 
+  void PrintWordData(const WordData & word) const {
+    std::cout << "WORD:     " << word.word << std::endl;
+    std::cout << "Letters:  " << word.letters << std::endl;
+    std::cout << "Multi:    " << word.multi_letters << std::endl;
+    std::cout << "MAX Opts: " << word.max_options << std::endl;
+    std::cout << "AVE Opts: " << word.ave_options << std::endl;
+    std::cout << "Entropy:  " << word.entropy << std::endl;
+    std::cout << std::endl;
+
+    for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+      result_t result(result_id);
+      word_list_t result_words = word.next_words[result_id];
+      const size_t result_count = result_words.CountOnes();
+      std::cout << result_id << " - " << result.ToString() << " (" << result_count << "): ";
+      size_t print_count = 0;
+      for (int word_id = result_words.FindOne();          // Step through words in this result.
+           word_id >= 0;
+           word_id = result_words.FindOne(word_id+1)) {
+        std::cout << " " << words[word_id].word;          // Print the next word in this group.
+        if (++print_count >= 10) {
+          if (word_id > 0) std::cout << " ...";
+          break;                   // Print at most 10 words.
+        }
+      }
+      std::cout << std::endl;
+    }
+  }
+
+  void PrintWordData(size_t id) const { PrintWordData(words[id]); }
+
   void SortWords(const std::string & sort_type="max") {
     using wd_t = const WordData &;
     if (sort_type == "max") {
@@ -384,6 +426,7 @@ int main(int argc, char* argv[])
   // word_set.AddClue(3,'e',result_t::NOWHERE);
   // word_set.AddClue(4,'s',result_t::NOWHERE);
 
-  word_set.PrintResults();
-//  word_set.AnalyzeAll();
+  word_set.PrintWordData(0);
+  // word_set.PrintResults();
+  // word_set.AnalyzeAll();
 }
