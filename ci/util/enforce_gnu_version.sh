@@ -14,9 +14,12 @@ fi
 if ./ci/util/is_gnu_version.sh "${1}";
 then
   : # nop
-elif . ./ci/util/try_setup_gstar_alias.sh "${1}";
+elif ./ci/util/is_gnu_version.sh "g${1}";
 then
-  . ./ci/util/enforce_gnu_version.sh
+  echo "using g${1} as ${1}"
+  # alias gX as X
+  # adapted from https://stackoverflow.com/a/7145401
+  eval "function ${1} { \"g${1}\" \"\$@\"; }"
 else
   echo "GNU enforcement for ${1} failed"
   exit 1
