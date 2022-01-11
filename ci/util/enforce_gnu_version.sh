@@ -22,5 +22,6 @@ then
   eval "function ${1} { \"g${1}\" \"\$@\"; }"
 else
   echo "GNU enforcement for ${1} failed"
+  ./ci/util/print_nongnu_warning.sh
   exit 1
 fi

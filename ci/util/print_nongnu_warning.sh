@@ -15,5 +15,5 @@ echo "brew install gnu-sed"
 echo "brew install gawk"
 echo "brew install grep"
 echo
-echo "BSD users will also need to find a way"
+echo "other BSD users will also need to find a way"
 echo "to install GNU coreutils to their g* aliases"
