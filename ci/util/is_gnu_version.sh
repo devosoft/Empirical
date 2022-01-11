@@ -14,7 +14,11 @@ if ! command -v "${1}" &> /dev/null;
 then
   echo "${1} unavailable"
   exit 1
-  # adapted from https://stackoverflow.com/a/57102498/
+elif ! "${1}" --version &>/dev/null;
+then
+  echo "${1} version info unavailable"
+  exit 1
+# adapted from https://stackoverflow.com/a/57102498/
 elif ! [[ "$("${1}" --version)" =~ "Free Software Foundation" ]];
 then
   echo "non-GNU ${1} detected"
