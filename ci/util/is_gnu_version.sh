@@ -9,7 +9,7 @@ if ! [[ "$(basename -- "$0")" == "is_gnu_version.sh" ]]; then
 fi
 
 
-# adapted from https://stackoverflow.com/a/677212/17332200
+# adapted from https://stackoverflow.com/a/677212/
 if ! command -v "${1}" &> /dev/null;
 then
   echo "${1} unavailable"
