@@ -411,7 +411,7 @@ public:
         return w1.ave_options < w2.ave_options;
       } );
     } else if (sort_type == "entropy") {
-      emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.entropy < w2.entropy; } );
+      emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.entropy > w2.entropy; } );
     } else if (sort_type == "word") {
       emp::Sort(words, [](wd_t w1, wd_t w2){ return w1.word < w2.word; } );
     }
@@ -449,7 +449,8 @@ public:
     of << "Information provided: " << word.entropy << "<br>\n<p>\n";
 
     // Loop through all possible results.
-    for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+    // for (size_t result_id = 0; result_id < result_t::NUM_IDS; ++result_id) {
+    for (size_t result_id = result_t::NUM_IDS-1; result_id < result_t::NUM_IDS; --result_id) {
       result_t result(result_id);
       word_list_t result_words = word.next_words[result_id];
 
@@ -473,6 +474,45 @@ public:
     PrintHTMLWord(words[pos_map[word]]);
   }
 
+  void PrintHTMLIndex(const std::string & order) {
+    SortWords(order);
+    std::string filename = emp::to_string("web/index-", order, ".html");
+    std::ofstream of(filename);
+
+    of << "<!doctype html>\n<html lang=\"en\">\n<head>\n <title>Wordle Analysis: INDEX"
+       "</title>\n</head>\n<body>\n"
+       "<h2>Analysis of Wordle Guesses</h2>\n"
+       "<p>\nWhen a guess is made in a game of Wordle, the results limit the set of words for the answer."
+       " A more useful guess will limit the remaining possibilities to be as small as possible."
+       " But the question remains: Which word should we choose first?"
+       " Here are some analyses to help make that decision.\n"
+       "<p>\nBelow are a list of 5-letter words "
+       "(from <a href=\"https://www-cs-faculty.stanford.edu/~knuth/sgb-words.txt\">here</a>)"
+       " with data on each.  The columns are:<br>\n"
+       "<table><tr><td><b>ExpectedWords</b>:"
+       "           <td>The average number of possible words if this were your first guess. (smaller is better!)</tr>\n"
+       "       <tr><td><b>MaximumWords</b>:"
+       "           <td>The largest possible number of words remaining after this guess. (smaller is better!)</tr>\n"
+       "       <tr><td><b>Information</b>:"
+       "           <td>The number of bits of information this guess provides about the final answer. (larger is better!)</tr>\n"
+       "</table><p>\n"
+       "Click on any column to sort by it. "
+       "Click on any word to see the exact breakdown of how possible first guesses limit future options.\n"
+       "<p>\n";
+
+    of << "<table><tr><th><a href=\"index-word.html\">Word</a>"
+       << "<th><a href=\"index-ave.html\">ExpectedWords</a>"
+       << "<th><a href=\"index-max.html\">MaximumWords</a>"
+       << "<th><a href=\"index-entropy.html\">Information</a></tr>\n";
+    for (const auto & word : words) {
+      of << "<tr><td><a href=\"words/" << word.word << ".html\">" << word.word << "</a>"
+         << "<td>" << word.ave_options
+         << "<td>" << word.max_options
+         << "<td>" << word.entropy
+         << "</tr>\n";        
+    }
+  }
+
   void PrintHTML() {
     size_t count = 0;
     std::cout << "Printing HTML files..." << std::endl;
@@ -481,6 +521,10 @@ public:
       if (count % step == 0) { std::cout << "."; std::cout.flush(); }
       PrintHTMLWord(word);
     }
+    PrintHTMLIndex("ave");
+    PrintHTMLIndex("entropy");
+    PrintHTMLIndex("max");
+    PrintHTMLIndex("word");
   }
 
 };
