@@ -20,6 +20,9 @@ then
   # alias gX as X
   # adapted from https://stackoverflow.com/a/7145401
   eval "function ${1} { \"g${1}\" \"\$@\"; }"
+  # export alias to subshells
+  # adapted from https://unix.stackexchange.com/a/22867
+  export -f "${1}"
 else
   echo "GNU enforcement for ${1} failed"
   ./ci/util/print_nongnu_warning.sh
