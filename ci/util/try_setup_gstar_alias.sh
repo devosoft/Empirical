@@ -16,7 +16,6 @@ then
   echo "using g${1} as ${1}"
   # adapted from https://stackoverflow.com/a/7145401
   eval "function "${1}" { \"g${1}\" \"\$@\"; }"
-  exit 0
 else
   echo "g${1} alias not available"
   exit 1
