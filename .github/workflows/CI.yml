@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - run: brew install coreutils findutils gnu-sed gawk grep rename
+      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
