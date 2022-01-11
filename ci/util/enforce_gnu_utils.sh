@@ -8,6 +8,6 @@ if [[ "$(basename -- "$0")" == "enforce_gnu_utils.sh" ]]; then
   exit 1
 fi
 
-for util in "awk" "find" "grep" "sed" "sha1sum" "sort" "xargs"; do
+for util in "awk" "find" "grep" "sed" "seq" "sha1sum" "sort" "xargs"; do
   . ./ci/util/enforce_gnu_version.sh "${util}"
 done
