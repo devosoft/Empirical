@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# enforce use of GNU version of coreutils
+# (ensuring GNU utils at startup reduces redundant verbosity)
+. ./ci/util/enforce_gnu_utils.sh
+
 echo "Running tidyness enforcement tests..."
 echo "See https://empirical.readthedocs.io/en/latest/dev/guide-to-testing.html#tidyness-enforcement for info on tidyness enforcement."
 echo "(Including how to automatically generate tidyness fixes if tidyness enforcement detects tidyness issues.)"
