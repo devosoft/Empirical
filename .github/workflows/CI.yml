@@ -26,6 +26,8 @@ jobs:
         with:
           submodules: 'recursive'
       - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
+      # adapted from https://stackoverflow.com/a/42878119
+      - run: brew link sphinx-doc --force
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
