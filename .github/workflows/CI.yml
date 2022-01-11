@@ -16,7 +16,7 @@ jobs:
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq rename
+      - run: sudo apt-get install -qq rename python3-sphinx
       - run: ./ci/test_tidy.sh
   test-macos-tidy:
     name: Test Tidy Enforcement on MacOS
