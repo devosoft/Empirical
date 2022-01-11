@@ -18,8 +18,8 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq rename
       - run: ./ci/test_tidy.sh
-  tidy-macos:
-    name: Test MacOS Tidy Enforcement
+  test-macos-tidy:
+    name: Test Tidy Enforcement on MacOS
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
@@ -125,6 +125,7 @@ jobs:
       - test-web
       - test-coverage
       - test-documentation
+      - test-macos-tidy
     steps:
       - uses: actions/checkout@v2
         with:
