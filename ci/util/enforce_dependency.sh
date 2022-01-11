@@ -16,5 +16,5 @@ then
   echo "${1} unavailable, refusing to continue"
   echo
   echo "use your local package manager to install it"
-  echo "i.e., brew on MacOS, apt or yum on Linux, etc."
+  echo "i.e., brew on macOS, apt or yum on Linux, etc."
 fi

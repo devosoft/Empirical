@@ -19,7 +19,7 @@ jobs:
       - run: sudo apt-get install -qq rename python3-sphinx
       - run: ./ci/test_tidy.sh
   test-macos-tidy:
-    name: Test Tidy Enforcement on MacOS
+    name: Test Tidy Enforcement on macOS
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2

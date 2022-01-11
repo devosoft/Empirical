@@ -5,7 +5,7 @@ set -e
 echo "========================================================================="
 echo "GNU coreutils unavailable, refusing to continue"
 echo
-echo "on MacOS, use homebrew <https://brew.sh/>"
+echo "on macOS, use homebrew <https://brew.sh/>"
 echo "to easily install GNU coreutils to their g* aliases"
 echo "(ex. find -> gfind, etc.)"
 echo
