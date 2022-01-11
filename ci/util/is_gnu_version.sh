@@ -2,7 +2,7 @@
 set -e
 
 # adapted from https://stackoverflow.com/a/677212/17332200
-if command -v "${1}" &> /dev/null;
+if ! command -v "${1}" &> /dev/null;
 then
   echo "${1} unavailable"
   exit 1
