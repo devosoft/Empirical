@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# enforce run as script, not as source
+# adapted from https://superuser.com/a/731431
+if ! [[ "$(basename -- "$0")" == "is_gnu_version.sh" ]]; then
+  echo "$0 may not be sourced, it must be run" >&2
+  exit 1
+fi
+
+
 # adapted from https://stackoverflow.com/a/677212/17332200
 if ! command -v "${1}" &> /dev/null;
 then
