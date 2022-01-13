@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2022
+ *
+ *  @file DataMapParser.cpp
+ */
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
@@ -12,7 +20,7 @@ TEST_CASE("Test DataMap", "[data]")
   dmA.AddVar<int>("val3", 3);
   dmA.AddVar<char>("char", 'A');
   dmA.AddVar<double>("val4", 256.0);
-  
+
   emp::DataMap dmB(dmA);
   dmB.Get<double>("val1") = 0.125;
   dmB.Get<double>("val2") = 64.25;

@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021-2022.
+ *
+ *  @file FunInfo.cpp
+ */
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
