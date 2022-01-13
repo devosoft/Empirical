@@ -6,10 +6,10 @@
  *  @file char_utils.hpp
  *  @brief Simple functions and tools to manipulate individual characters.
  *  @note Status: BETA
- * 
+ *
  *  Available Class
  *    CharSet - A collection of characters for use in other functions.
- * 
+ *
  *  Available Functions
  *    bool is_whitespace(char test_char)
  *    bool is_upper_letter(char test_char)
@@ -21,7 +21,7 @@
  *    bool is_one_of(char test_char, const std::string & char_set)
  *    bool is_valid(char test_char )
  *    bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
- *    
+ *
  */
 
 #ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
@@ -60,7 +60,7 @@ namespace emp {
     }
     bool HasAny(const std::string & str) const {
       for (CHAR_T c : str) if (Has(c)) return true;
-      return false;      
+      return false;
     }
     bool HasAt(const std::string & str, size_t pos) const {
       return (pos < str.size()) && Has(str[pos]);
@@ -143,7 +143,7 @@ namespace emp {
     std::string AsString() const {
       std::string out("[");
       for (CHAR_T c : *this) out += c;
-      return out += ']';      
+      return out += ']';
     }
   };
 

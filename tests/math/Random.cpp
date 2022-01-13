@@ -53,10 +53,10 @@ TEST_CASE("Test Random", "[math]")
 
   REQUIRE( value_series == value_series3 );
 
-	// Get Double
-	double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
-	REQUIRE(r_d >= 0.0);
-	REQUIRE(r_d < 5.0);
+  // Get Double
+  double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
+  REQUIRE(r_d >= 0.0);
+  REQUIRE(r_d < 5.0);
 
   // Get UInt
   size_t r_ui = rnd.GetUInt(emp::Range<size_t>(0,5));

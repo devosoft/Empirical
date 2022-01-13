@@ -12,127 +12,127 @@
 
 TEST_CASE("Test string_utils", "[tools]")
 {
-	const std::string empt = emp::empty_string();
-	CHECK(empt == "");
+  const std::string empt = emp::empty_string();
+  CHECK(empt == "");
 
-	CHECK('\0' == (char) NULL);
-	std::string zero = emp::to_escaped_string('\0');
-	CHECK(zero != "\0");
-	CHECK(zero == "\\0");
+  CHECK('\0' == (char) NULL);
+  std::string zero = emp::to_escaped_string('\0');
+  CHECK(zero != "\0");
+  CHECK(zero == "\\0");
 
-	CHECK(emp::to_escaped_string((char)1) == "\\001");
-	CHECK(emp::to_escaped_string((char)2) == "\\002");
-	CHECK(emp::to_escaped_string((char)3) == "\\003");
-	CHECK(emp::to_escaped_string((char)4) == "\\004");
-	CHECK(emp::to_escaped_string((char)5) == "\\005");
-	CHECK(emp::to_escaped_string((char)6) == "\\006");
+  CHECK(emp::to_escaped_string((char)1) == "\\001");
+  CHECK(emp::to_escaped_string((char)2) == "\\002");
+  CHECK(emp::to_escaped_string((char)3) == "\\003");
+  CHECK(emp::to_escaped_string((char)4) == "\\004");
+  CHECK(emp::to_escaped_string((char)5) == "\\005");
+  CHECK(emp::to_escaped_string((char)6) == "\\006");
 
-	std::string to_escp = "\b";
-	std::string escaped = emp::to_escaped_string(to_escp);
-	CHECK(escaped[0] == '\\');
-	CHECK(escaped[1] == 'b');
+  std::string to_escp = "\b";
+  std::string escaped = emp::to_escaped_string(to_escp);
+  CHECK(escaped[0] == '\\');
+  CHECK(escaped[1] == 'b');
 
-	std::string string1 = "\a\v\f\r";
-	std::string string2 = emp::to_escaped_string(string1);
-	CHECK(string2[1] == 'a');
-	CHECK(string2[3] == 'v');
-	CHECK(string2[5] == 'f');
-	CHECK(string2[7] == 'r');
-	CHECK(string2[0] == '\\');
+  std::string string1 = "\a\v\f\r";
+  std::string string2 = emp::to_escaped_string(string1);
+  CHECK(string2[1] == 'a');
+  CHECK(string2[3] == 'v');
+  CHECK(string2[5] == 'f');
+  CHECK(string2[7] == 'r');
+  CHECK(string2[0] == '\\');
 
-	CHECK(emp::to_escaped_string((char)14) == "\\016");
-	CHECK(emp::to_escaped_string((char)15) == "\\017");
-	CHECK(emp::to_escaped_string((char)16) == "\\020");
-	CHECK(emp::to_escaped_string((char)17) == "\\021");
-	CHECK(emp::to_escaped_string((char)18) == "\\022");
-	CHECK(emp::to_escaped_string((char)19) == "\\023");
-	CHECK(emp::to_escaped_string((char)20) == "\\024");
-	CHECK(emp::to_escaped_string((char)21) == "\\025");
-	CHECK(emp::to_escaped_string((char)22) == "\\026");
-	CHECK(emp::to_escaped_string((char)23) == "\\027");
-	CHECK(emp::to_escaped_string((char)24) == "\\030");
-	CHECK(emp::to_escaped_string((char)25) == "\\031");
-	CHECK(emp::to_escaped_string((char)26) == "\\032");
-	CHECK(emp::to_escaped_string((char)27) == "\\033");
-	CHECK(emp::to_escaped_string((char)28) == "\\034");
-	CHECK(emp::to_escaped_string((char)29) == "\\035");
-	CHECK(emp::to_escaped_string((char)30) == "\\036");
-	CHECK(emp::to_escaped_string((char)31) == "\\037");
+  CHECK(emp::to_escaped_string((char)14) == "\\016");
+  CHECK(emp::to_escaped_string((char)15) == "\\017");
+  CHECK(emp::to_escaped_string((char)16) == "\\020");
+  CHECK(emp::to_escaped_string((char)17) == "\\021");
+  CHECK(emp::to_escaped_string((char)18) == "\\022");
+  CHECK(emp::to_escaped_string((char)19) == "\\023");
+  CHECK(emp::to_escaped_string((char)20) == "\\024");
+  CHECK(emp::to_escaped_string((char)21) == "\\025");
+  CHECK(emp::to_escaped_string((char)22) == "\\026");
+  CHECK(emp::to_escaped_string((char)23) == "\\027");
+  CHECK(emp::to_escaped_string((char)24) == "\\030");
+  CHECK(emp::to_escaped_string((char)25) == "\\031");
+  CHECK(emp::to_escaped_string((char)26) == "\\032");
+  CHECK(emp::to_escaped_string((char)27) == "\\033");
+  CHECK(emp::to_escaped_string((char)28) == "\\034");
+  CHECK(emp::to_escaped_string((char)29) == "\\035");
+  CHECK(emp::to_escaped_string((char)30) == "\\036");
+  CHECK(emp::to_escaped_string((char)31) == "\\037");
 
-	CHECK(emp::to_escaped_string('\'') == "\\\'");
-	CHECK(emp::to_escaped_string('\\') == "\\\\");
+  CHECK(emp::to_escaped_string('\'') == "\\\'");
+  CHECK(emp::to_escaped_string('\\') == "\\\\");
 
-	std::string up = "A String!";
-	CHECK(emp::to_upper(up) == "A STRING!");
-	CHECK(emp::to_lower(up) == "a string!");
+  std::string up = "A String!";
+  CHECK(emp::to_upper(up) == "A STRING!");
+  CHECK(emp::to_lower(up) == "a string!");
 
-	CHECK(emp::to_roman_numeral(500000) == "");
-	CHECK(emp::to_roman_numeral(50) == "L");
-	CHECK(emp::to_roman_numeral(562) == "DLXII");
-	CHECK(emp::to_roman_numeral(2128) == "MMCXXVIII");
-	CHECK(emp::to_roman_numeral(-999) == "-CMXCIX");
-	CHECK(emp::to_roman_numeral(444) == "CDXLIV");
+  CHECK(emp::to_roman_numeral(500000) == "");
+  CHECK(emp::to_roman_numeral(50) == "L");
+  CHECK(emp::to_roman_numeral(562) == "DLXII");
+  CHECK(emp::to_roman_numeral(2128) == "MMCXXVIII");
+  CHECK(emp::to_roman_numeral(-999) == "-CMXCIX");
+  CHECK(emp::to_roman_numeral(444) == "CDXLIV");
 
-	CHECK(emp::is_idchar('a'));
-	CHECK(emp::is_idchar('_'));
-	CHECK(emp::is_idchar('5'));
-	CHECK(!emp::is_idchar('?'));
+  CHECK(emp::is_idchar('a'));
+  CHECK(emp::is_idchar('_'));
+  CHECK(emp::is_idchar('5'));
+  CHECK(!emp::is_idchar('?'));
 
-	CHECK(emp::is_one_of('v',"uvwxyz"));
-	CHECK(emp::is_one_of(';',"!?.,;:'()"));
-	CHECK(!emp::is_one_of('a',"!?.,;:'()"));
+  CHECK(emp::is_one_of('v',"uvwxyz"));
+  CHECK(emp::is_one_of(';',"!?.,;:'()"));
+  CHECK(!emp::is_one_of('a',"!?.,;:'()"));
 
-	CHECK(emp::is_composed_of("aabcccabbcccabcbca","abc"));
-	CHECK(!emp::is_composed_of("aabcccabbcccxxbcbca","abc"));
+  CHECK(emp::is_composed_of("aabcccabbcccabcbca","abc"));
+  CHECK(!emp::is_composed_of("aabcccabbcccxxbcbca","abc"));
 
-	CHECK(emp::has_whitespace("This string has lots of space!\n"));
-	CHECK(emp::has_whitespace("abcdefghijklmnop\nqrstuvwxyz"));
-	CHECK(!emp::has_whitespace("none"));
+  CHECK(emp::has_whitespace("This string has lots of space!\n"));
+  CHECK(emp::has_whitespace("abcdefghijklmnop\nqrstuvwxyz"));
+  CHECK(!emp::has_whitespace("none"));
 
-	CHECK(emp::has_upper_letter("--Uppercase Letters--"));
-	CHECK(!emp::has_upper_letter("lowercase..."));
-	CHECK(emp::has_lower_letter("~Lots of Lowercase~"));
-	CHECK(!emp::has_lower_letter("ALL UPPERCASE!!"));
+  CHECK(emp::has_upper_letter("--Uppercase Letters--"));
+  CHECK(!emp::has_upper_letter("lowercase..."));
+  CHECK(emp::has_lower_letter("~Lots of Lowercase~"));
+  CHECK(!emp::has_lower_letter("ALL UPPERCASE!!"));
 
-	CHECK(emp::has_letter(",./';'[]-6q82348962"));
-	CHECK(!emp::has_letter("1-2-3-4-5"));
-	CHECK(emp::has_digit("!@#$%^&*()0987654321"));
-	CHECK(!emp::has_digit("!@#$%^&*()abcdefg"));
-	CHECK(emp::has_alphanumeric("all letters"));
-	CHECK(emp::has_alphanumeric("12345"));
-	CHECK(emp::has_alphanumeric("s0m3 l3tt3r5 @nd num83r5"));
-	CHECK(!emp::has_alphanumeric(")(!*#@&#^%&!"));
+  CHECK(emp::has_letter(",./';'[]-6q82348962"));
+  CHECK(!emp::has_letter("1-2-3-4-5"));
+  CHECK(emp::has_digit("!@#$%^&*()0987654321"));
+  CHECK(!emp::has_digit("!@#$%^&*()abcdefg"));
+  CHECK(emp::has_alphanumeric("all letters"));
+  CHECK(emp::has_alphanumeric("12345"));
+  CHECK(emp::has_alphanumeric("s0m3 l3tt3r5 @nd num83r5"));
+  CHECK(!emp::has_alphanumeric(")(!*#@&#^%&!"));
 
-	CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","aeiou"));
-	CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","abc123"));
-	CHECK(!emp::has_one_of("abcdefghijklmnopqrstuvwxyz","12345"));
+  CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","aeiou"));
+  CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","abc123"));
+  CHECK(!emp::has_one_of("abcdefghijklmnopqrstuvwxyz","12345"));
 
-	CHECK(emp::is_valid("aaaaaaaaa", [](char x) { return (x == 'a'); } ));
-	CHECK( !(emp::is_valid("aaaabaaaa", [](char x) { return (x == 'a'); })) );
+  CHECK(emp::is_valid("aaaaaaaaa", [](char x) { return (x == 'a'); } ));
+  CHECK( !(emp::is_valid("aaaabaaaa", [](char x) { return (x == 'a'); })) );
 
-	std::string start = "a string.";
-	CHECK(emp::string_pop_fixed(start, 9) == "a string.");
-	CHECK(start == "");
+  std::string start = "a string.";
+  CHECK(emp::string_pop_fixed(start, 9) == "a string.");
+  CHECK(start == "");
 
-	CHECK(emp::string_get("John Doe"," ") == "John");
-	CHECK(emp::string_get_line("Line1\nLine2\nLine3") == "Line1");
+  CHECK(emp::string_get("John Doe"," ") == "John");
+  CHECK(emp::string_get_line("Line1\nLine2\nLine3") == "Line1");
 
-	std::string hello = "!!h&&e#l!!&l###o&!!";
-	emp::remove_chars(hello, "!&#");
-	CHECK(hello == "hello");
+  std::string hello = "!!h&&e#l!!&l###o&!!";
+  emp::remove_chars(hello, "!&#");
+  CHECK(hello == "hello");
 
-	std::string email = "you@example.com";
-	emp::remove_punctuation(email);
-	CHECK(email == "youexamplecom");
+  std::string email = "you@example.com";
+  emp::remove_punctuation(email);
+  CHECK(email == "youexamplecom");
 
-	emp::vector<std::string> numbers;
-	numbers.push_back("1");
-	numbers.push_back("2");
-	numbers.push_back("3");
-	emp::vector<int> int_numbers = emp::from_strings<int>(numbers);
-	CHECK(int_numbers[0] == 1);
-	CHECK(int_numbers[1] == 2);
-	CHECK(int_numbers[2] == 3);
+  emp::vector<std::string> numbers;
+  numbers.push_back("1");
+  numbers.push_back("2");
+  numbers.push_back("3");
+  emp::vector<int> int_numbers = emp::from_strings<int>(numbers);
+  CHECK(int_numbers[0] == 1);
+  CHECK(int_numbers[1] == 2);
+  CHECK(int_numbers[2] == 3);
 
   CHECK(emp::is_digits("391830581734"));
   CHECK(!emp::is_digits("3h91830581734"));
@@ -171,9 +171,9 @@ TEST_CASE("Test string_utils", "[tools]")
   CHECK(emp::from_literal_string("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
 
   // TODO: try this with more arguments
-	int one;
-	emp::from_string<int>("1", one);
-	CHECK(one == 1);
+  int one;
+  emp::from_string<int>("1", one);
+  CHECK(one == 1);
 }
 
 
@@ -567,9 +567,9 @@ TEST_CASE("Test to_web_safe_string", "[tools]" ){
 
 TEST_CASE("Test format_string", "[tools]") {
 
-	CHECK( emp::format_string("") == "" );
-	CHECK( emp::format_string("%s hi", "twee") == "twee hi" );
-	CHECK( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+  CHECK( emp::format_string("") == "" );
+  CHECK( emp::format_string("%s hi", "twee") == "twee hi" );
+  CHECK( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
 
   const std::string multiline{ R"(
     my code;
@@ -589,13 +589,13 @@ TEST_CASE("Test format_string", "[tools]") {
 
 TEST_CASE("Test repeat", "[tools]") {
 
-	CHECK( emp::repeat("", 0) == "" );
-	CHECK( emp::repeat("", 1) == "" );
-	CHECK( emp::repeat("", 2) == "" );
+  CHECK( emp::repeat("", 0) == "" );
+  CHECK( emp::repeat("", 1) == "" );
+  CHECK( emp::repeat("", 2) == "" );
 
-	CHECK( emp::repeat("abc", 0) == "" );
-	CHECK( emp::repeat("abc", 1) == "abc" );
-	CHECK( emp::repeat("abc", 2) == "abcabc" );
+  CHECK( emp::repeat("abc", 0) == "" );
+  CHECK( emp::repeat("abc", 1) == "abc" );
+  CHECK( emp::repeat("abc", 2) == "abcabc" );
 
 }
 

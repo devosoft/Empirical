@@ -80,7 +80,7 @@
  *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
  *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can
  *    do it, the improvement in cache performance could be dramatic.
- * 
+ *
  *  - Rename DataLayout and MemoryImage to DataMapLayout and DataMapMemory
  */
 

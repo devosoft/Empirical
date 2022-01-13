@@ -119,7 +119,7 @@ TEST_CASE("Test notifications", "[base]")
 
   emp::notify::Unpause();  // Turn notifications back on; should occur in the correct order!
   CHECK(x == 16.0);
-  
+
   // Add a handler that actually uses the extra data passed in.
   emp::notify::AddHandler(
     "MULT",

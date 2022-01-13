@@ -12,14 +12,14 @@
 
 TEST_CASE("Test char_utils", "[tools]")
 {
-	CHECK(emp::is_idchar('a'));
-	CHECK(emp::is_idchar('_'));
-	CHECK(emp::is_idchar('5'));
-	CHECK(!emp::is_idchar('?'));
+  CHECK(emp::is_idchar('a'));
+  CHECK(emp::is_idchar('_'));
+  CHECK(emp::is_idchar('5'));
+  CHECK(!emp::is_idchar('?'));
 
-	CHECK(emp::is_one_of('v',"uvwxyz"));
-	CHECK(emp::is_one_of(';',"!?.,;:'()"));
-	CHECK(!emp::is_one_of('a',"!?.,;:'()"));
+  CHECK(emp::is_one_of('v',"uvwxyz"));
+  CHECK(emp::is_one_of(';',"!?.,;:'()"));
+  CHECK(!emp::is_one_of('a',"!?.,;:'()"));
 
   // TEST1: lets test our conversion to an escaped string.
   const std::string special_string = "This\t5tr1ng\nis\non THREE (3) \"_lines_\".";

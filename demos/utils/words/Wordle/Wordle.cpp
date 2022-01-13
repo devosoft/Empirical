@@ -174,7 +174,7 @@ public:
     }
 
     // Next add letter clues.
-    for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
+    for (size_t letter_id = 0; letter_id < 26; ++letter_id) {
       const size_t let_count = letter_counts[letter_id];
       if (let_count) {
         word_options &= let_clues[letter_id].at_least[let_count];
@@ -240,8 +240,8 @@ public:
       for (const char letter : word) ++letter_counts[ToID(letter)];  // Count letters.
 
       // Setup the LETTER clues that word is consistent with.
-      for (size_t letter_id = 0; letter_id < 26; ++letter_id) { 
-        const size_t cur_count = letter_counts[letter_id];       
+      for (size_t letter_id = 0; letter_id < 26; ++letter_id) {
+        const size_t cur_count = letter_counts[letter_id];
         let_clues[letter_id].exactly[cur_count].Set(word_id);
         for (uint8_t count = 0; count <= cur_count; ++count) {
           let_clues[letter_id].at_least[count].Set(word_id);
@@ -294,7 +294,7 @@ public:
   //     size_t total_options = 0;
   //     double entropy = 0.0;
 
-  //     // Scan through all possible answers...    
+  //     // Scan through all possible answers...
   //     for (WordData & answer : words) {
   //       size_t options = AnalyzeGuess(guess, answer).CountOnes();
   //       if (options > max_options) max_options = options;
@@ -517,7 +517,7 @@ public:
          << "<td>" << word.ave_options
          << "<td>" << word.max_options
          << "<td>" << word.entropy
-         << "</tr>\n";        
+         << "</tr>\n";
     }
   }
 
