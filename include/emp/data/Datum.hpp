@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021-2022.
  *
- *  @file  Datum.hpp
+ *  @file Datum.hpp
  *  @brief A single piece of data, either a value or a string.
  *  @note Status: ALPHA
  * 
@@ -12,8 +12,8 @@
  *    for strings, so could try shifting over.
  */
 
-#ifndef EMP_DATUM_HPP
-#define EMP_DATUM_HPP
+#ifndef EMP_DATA_DATUM_HPP_INCLUDE
+#define EMP_DATA_DATUM_HPP_INCLUDE
 
 #include <string>
 
@@ -130,4 +130,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATUM_HPP_INCLUDE

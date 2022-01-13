@@ -15,8 +15,8 @@
  *  - Will not currently handle return by reference!
  */
 
-#ifndef EMP_FUN_INFO_HPP
-#define EMP_FUN_INFO_HPP
+#ifndef EMP_META_FUNINFO_HPP_INCLUDE
+#define EMP_META_FUNINFO_HPP_INCLUDE
 
 #include <functional>
 
@@ -253,4 +253,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_META_FUNINFO_HPP_INCLUDE

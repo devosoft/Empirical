@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021-2022.
  *
- *  @file  DataMapParser.hpp
+ *  @file DataMapParser.hpp
  *  @brief Useful functions for working with DataMaps and AnnotatedTypes.
  *  @note Status: ALPHA
  * 
@@ -15,8 +15,8 @@
  *  - Add in a type system (String, double, vectors, etc.)
  */
 
-#ifndef EMP_DATA_MAP_PARSER_HPP
-#define EMP_DATA_MAP_PARSER_HPP
+#ifndef EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
+#define EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
 
 #include <cmath>
 #include <string>
@@ -478,4 +478,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAMAPPARSER_HPP_INCLUDE

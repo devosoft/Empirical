@@ -2,6 +2,9 @@
 #include "emp/base/error.hpp"
 #include "emp/math/math.hpp"
 
+#ifndef DEMOS_UTILS_WORDS_WORDLE_RESULT_HPP_INCLUDE
+#define DEMOS_UTILS_WORDS_WORDLE_RESULT_HPP_INCLUDE
+
 template <size_t WORD_SIZE=5>
 class Result {
 public:
@@ -145,3 +148,5 @@ public:
     return out;
   }
 };
+
+#endif // #ifndef DEMOS_UTILS_WORDS_WORDLE_RESULT_HPP_INCLUDE

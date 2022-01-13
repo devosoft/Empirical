@@ -24,9 +24,9 @@
  *    
  */
 
+#ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
+#define EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
 
-#ifndef EMP_CHAR_UTILS_H
-#define EMP_CHAR_UTILS_H
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -216,4 +216,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE

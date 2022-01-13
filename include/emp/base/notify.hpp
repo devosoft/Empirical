@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  notify.hpp
+ *  @file notify.hpp
  *  @brief Tools to alert users of messages (including errors and warnings) in a consistant manner.
  *  @note Status: ALPHA
  *
@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef EMP_NOTIFY_HPP
-#define EMP_NOTIFY_HPP
+#ifndef EMP_BASE_NOTIFY_HPP_INCLUDE
+#define EMP_BASE_NOTIFY_HPP_INCLUDE
 
 #include <any>
 #include <array>
@@ -383,4 +383,4 @@ namespace notify {
 }
 
 
-#endif
+#endif // #ifndef EMP_BASE_NOTIFY_HPP_INCLUDE
