@@ -10,7 +10,7 @@ successfully compile a simple "Hello World" for both targets.
 
 ## Install: Native C++ Compiler
 
-In the Unix-verse (e.g., Linux / MacOS) commonly used compilers include
+In the Unix-verse (e.g., Linux / macOS) commonly used compilers include
 `gcc` and `clang`. From this point onwards, we assume that you're
 working with `gcc`. Unless you really know what you're doing, you'll
 want to have `gcc` installed. The good news is: you might already!
@@ -24,7 +24,7 @@ which gcc
 If `which` spits out a path, then you have `gcc` installed! If `which`
 says "not found," you'll need to go ahead and install `gcc`. For
 Linux users, your package manager (e.g., `yum`, `apt`, etc.) is probably
-the way to go about this. For MacOS users, you'll need to get Apple's
+the way to go about this. For macOS users, you'll need to get Apple's
 "Command Line Tools for Xcode." Either way, give it a quick web search
 (e.g., "install gcc on [my operating system]") and there should be
 plenty of how-to guides that walk you through step-by-step.

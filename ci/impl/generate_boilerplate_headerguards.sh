@@ -1,5 +1,10 @@
 #!/bin/bash
+set -e
+
 # assumes docstring boilerplate is already in place
+
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
 
 for filename in $(cd include && find -- * -name '*.hpp' -type f); do
 
