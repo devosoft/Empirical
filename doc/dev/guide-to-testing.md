@@ -185,4 +185,4 @@ Warning: `./ci/test_tidy.sh` is potentially destructive.
 Make sure you don't have any uncommitted changes you don't have saved elsewhere.
 (Maybe `git stash` or make a copy your local file tree.)
 
-Bonus: run `./ci/generate_boilerplate.sh` when you create a new source file in `include/` to autogenerate headerguards and stub file docstrings.
+Bonus: run `./ci/impl/generate_boilerplate.sh` when you create a new source file in `include/` to autogenerate headerguards and stub file docstrings.

@@ -1,4 +1,8 @@
 #!/bin/bash
+set -e
+
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
 
 # license notice boilerplate for source files that aren't in include/
 

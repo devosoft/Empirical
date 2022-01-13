@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # adapted from https://stackoverflow.com/a/835561
 # and https://stackoverflow.com/a/4327720

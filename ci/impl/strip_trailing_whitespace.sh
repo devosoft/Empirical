@@ -1,4 +1,8 @@
 #!/bin/bash
+set -e
+
+# enforce use of GNU version of coreutils
+. ./ci/util/enforce_gnu_utils.sh
 
 # greq -qI tests if file is binary
 # adapted from https://stackoverflow.com/a/29689345
