@@ -15,5 +15,13 @@ echo "brew install gnu-sed"
 echo "brew install gawk"
 echo "brew install grep"
 echo
+echo "if you use MacPorts, run"
+echo
+echo "sudo port install coreutils"
+echo "sudo port install findutils"
+echo "sudo port install gsed"
+echo "sudo port install gawk"
+echo "sudo port install grep"
+echo
 echo "other BSD users will also need to find a way"
 echo "to install GNU coreutils to their g* aliases"
