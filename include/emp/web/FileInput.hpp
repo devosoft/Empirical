@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2022.
  *
  *  @file FileInput.hpp
  *  @brief Specs for the FileInput widget (click on to upload a file)
@@ -112,7 +112,7 @@ namespace web {
 
     /// Create a new FileInput; supply the function to call with the file contents as a File object
     /// (and optionally the HTML identifier to be used).
-    FileInput(const std::function<void(const emp::File &)> & cb, const std::string & in_id="")
+    FileInput(const std::function<void(const emp::File &)> & cb, const std::string & /*in_id*/="")
       : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); } ) { ; }
 
     /// Load a pre-existing FileInput object.

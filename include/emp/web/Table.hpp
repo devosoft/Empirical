@@ -709,7 +709,7 @@ namespace web {
 
     /// Apply CSS to target cell.
     template <typename SETTING_TYPE>
-    Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value) {
+    Table & CellCSS(size_t row_id, [[maybe_unused]] size_t col_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       emp_assert(col_id >= 0 && col_id < Info()->row_count);
       Info()->rows[row_id].extras.style.Set(setting, value);

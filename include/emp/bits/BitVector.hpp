@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
+ *  @date 2016-2022.
  *
  *  @file BitVector.hpp
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
@@ -69,7 +69,7 @@ namespace emp {
     static constexpr size_t MAX_BITS = (size_t) -1;         ///< Value larger than any bit ID.
 
     // Number of bits needed to specify position in a field + mask
-    static constexpr size_t FIELD_LOG2 = emp::Log2(FIELD_BITS);
+    static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
     static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
 
     size_t num_bits;        ///< Total number of bits are we using
@@ -250,7 +250,7 @@ namespace emp {
 
     /// Set bits to 0 in the range [start, stop)
     BitVector & Clear(const size_t start, const size_t stop)
-      { return ApplyRange([](field_t){ return 0; }, start, stop); }
+      { return ApplyRange([](field_t) -> size_t { return 0; }, start, stop); }
 
 
     /// Const index operator -- return the bit at the specified position.
@@ -297,7 +297,7 @@ namespace emp {
                        const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set all bits randomly, with a given number of ones.
-    BitVector & ChooseRandom(Random & random, const int target_ones,
+    BitVector & ChooseRandom(Random & random, const size_t target_ones,
                              const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Flip random bits with a given probability.
@@ -492,6 +492,11 @@ namespace emp {
     ///
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
+    /// Special version of FindOne takes int; most common way to call.
+    [[nodiscard]] int FindOne(int start_pos) const {
+      return FindOne(static_cast<size_t>(start_pos));
+    }
+
     /// Deprecated version of FindOne().
     [[deprecated("Renamed to more accurate FindOne(start_pos)")]]
     [[nodiscard]] int FindBit(const size_t start_pos) const;
@@ -664,17 +669,20 @@ namespace emp {
 
     /// Operator bitwise AND...
     [[nodiscard]] inline BitVector operator&(const BitVector & ar2) const {
-      emp_assert(size() == ar2.size()); return AND(ar2);
+      emp_assert(size() == ar2.size(), size(), ar2.size());
+      return AND(ar2);
     }
 
     /// Operator bitwise OR...
     [[nodiscard]] inline BitVector operator|(const BitVector & ar2) const {
-      emp_assert(size() == ar2.size()); return OR(ar2);
+      emp_assert(size() == ar2.size(), size(), ar2.size());
+      return OR(ar2);
     }
 
     /// Operator bitwise XOR...
     [[nodiscard]] inline BitVector operator^(const BitVector & ar2) const {
-      emp_assert(size() == ar2.size()); return XOR(ar2);
+      emp_assert(size() == ar2.size(), size(), ar2.size());
+      return XOR(ar2);
     }
 
     /// Operator shift left...
@@ -900,25 +908,26 @@ namespace emp {
     }
     else {  // For big BitVectors, manual rotating is faster
       // Note: we already modded shift_size by num_bits, so no need to mod by FIELD_SIZE
-      const int field_shift = ( shift_size + EndGap() ) / FIELD_BITS;
+      const size_t field_shift = ( shift_size + EndGap() ) / FIELD_BITS;
 
       // If we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
       // to account for the filler that gets pulled out of the middle
-      const int bit_shift = NumEndBits() && (shift_size + field_shift ? EndGap() : 0) % FIELD_BITS;
-      const int bit_overflow = FIELD_BITS - bit_shift;
+      const size_t field_gap = field_shift ? EndGap() : 0;
+      const size_t bit_shift = NumEndBits() && (shift_size + field_gap) % FIELD_BITS;
+      const size_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
       auto field_span = FieldSpan();
       std::rotate(
         field_span.rbegin(),
-        field_span.rbegin()+field_shift,
+        field_span.rbegin()+static_cast<int>(field_shift),
         field_span.rend()
       );
 
       // if necessary, shift filler bits out of the middle
       if (NumEndBits()) {
-        const int filler_idx = (LastField() + field_shift) % NUM_FIELDS;
-        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+        const size_t filler_idx = (LastField() + field_shift) % NUM_FIELDS;
+        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
           bits[i-1] |= bits[i] << NumEndBits();
           bits[i] >>= (FIELD_BITS - NumEndBits());
         }
@@ -934,7 +943,7 @@ namespace emp {
           bits[LastField()]
         );
 
-        for (int i = LastField(); i > 0; --i) {
+        for (size_t i = LastField(); i > 0; --i) {
           bits[i] <<= bit_shift;
           bits[i] |= (bits[i-1] >> bit_overflow);
         }
@@ -978,7 +987,7 @@ namespace emp {
       // for big BitVectors, manual rotating is faster
 
       const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-      const int bit_shift = shift_size % FIELD_BITS;
+      const size_t bit_shift = shift_size % FIELD_BITS;
       const field_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
@@ -991,8 +1000,8 @@ namespace emp {
 
       // if necessary, shift filler bits out of the middle
       if (NumEndBits()) {
-        const int filler_idx = LastField() - field_shift;
-        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+        const size_t filler_idx = LastField() - field_shift;
+        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
           bits[i-1] |= bits[i] << NumEndBits();
           bits[i] >>= (FIELD_BITS - NumEndBits());
         }
@@ -1383,7 +1392,7 @@ namespace emp {
   }
 
   /// Set all bits randomly, with a given number of them being on.
-  BitVector & BitVector::ChooseRandom(Random & random, const int target_ones,
+  BitVector & BitVector::ChooseRandom(Random & random, const size_t target_ones,
                                       const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_BITS) stop_pos = num_bits;
 
@@ -1392,7 +1401,7 @@ namespace emp {
 
     const size_t target_size = stop_pos - start_pos;
     emp_assert(target_ones >= 0);
-    emp_assert(target_ones <= (int) target_size);
+    emp_assert(target_ones <= target_size);
 
     // Approximate the probability of ones as a starting point.
     double p = ((double) target_ones) / (double) target_size;
@@ -1596,7 +1605,7 @@ namespace emp {
     if (max_one < 64) return (double) GetUInt64(0);
 
     // To grab the most significant field, figure out how much to shift it by.
-    const int shift_bits = max_one - 63;
+    const size_t shift_bits = static_cast<size_t>(max_one) - 63;
     double out_value = (double) (*this >> shift_bits).GetUInt64(0);
 
     out_value *= emp::Pow2(shift_bits);
@@ -1784,11 +1793,11 @@ namespace emp {
   /// Find the most-significant set-bit.
   int BitVector::FindMaxOne() const {
     // Find the max field with a one.
-    int max_field = NumFields() - 1;
-    while (max_field >= 0 && bits[max_field] == 0) max_field--;
+    size_t max_field = NumFields() - 1;
+    while (max_field > 0 && bits[max_field] == 0) max_field--;
 
     // If there are no ones, return -1.
-    if (max_field == -1) return -1;
+    if (bits[max_field] == 0) return -1;
 
     const field_t field = bits[max_field]; // Save a local copy of this field.
     field_t mask = (field_t) -1;           // Mask off the bits still under consideration.
@@ -2015,9 +2024,9 @@ namespace emp {
     // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
     for (size_t i = 0; i < NumBytes(); ++i) {
       unsigned char & b = BytePtr()[i];
-      b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-      b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-      b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+      b = static_cast<unsigned char>( (b & 0xF0) >> 4 | (b & 0x0F) << 4 );
+      b = static_cast<unsigned char>( (b & 0xCC) >> 2 | (b & 0x33) << 2 );
+      b = static_cast<unsigned char>( (b & 0xAA) >> 1 | (b & 0x55) << 1 );
     }
 
     // shift out filler bits
@@ -2075,34 +2084,34 @@ namespace emp {
 
       // note that we already modded shift_size by num_bits
       // so there's no need to mod by FIELD_SIZE here
-      int field_shift = NumEndBits() ? (
+      size_t field_shift = NumEndBits() ? (
         (shift_size + FIELD_BITS - NumEndBits()) / FIELD_BITS
       ) : (
         shift_size / FIELD_BITS
       );
       // if we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
       // more to account for the filler that gets pulled out of the middle
-      int bit_shift = NumEndBits() && field_shift ? (
+      size_t bit_shift = NumEndBits() && field_shift ? (
         (shift_size + FIELD_BITS - NumEndBits()) % FIELD_BITS
       ) : (
         shift_size % FIELD_BITS
       );
-      int bit_overflow = FIELD_BITS - bit_shift;
+      size_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
       if (field_shift) {
         auto field_span = FieldSpan();
         std::rotate(
           field_span.rbegin(),
-          field_span.rbegin()+field_shift,
+          field_span.rbegin()+static_cast<int>(field_shift),
           field_span.rend()
         );
       }
 
       // if necessary, shift filler bits out of the middle
       if (NumEndBits()) {
-        const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
-        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+        const size_t filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
+        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
           bits[i-1] |= bits[i] << NumEndBits();
           bits[i] >>= (FIELD_BITS - NumEndBits());
         }
@@ -2118,7 +2127,7 @@ namespace emp {
           bits[LAST_FIELD]
         );
 
-        for (int i = LAST_FIELD; i > 0; --i) {
+        for (size_t i = LAST_FIELD; i > 0; --i) {
           bits[i] <<= bit_shift;
           bits[i] |= (bits[i-1] >> bit_overflow);
         }
@@ -2157,7 +2166,7 @@ namespace emp {
     } else {
 
       field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-      int bit_shift = shift_size % FIELD_BITS;
+      size_t bit_shift = shift_size % FIELD_BITS;
       field_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
@@ -2172,8 +2181,8 @@ namespace emp {
 
       // if necessary, shift filler bits out of the middle
       if (NumEndBits()) {
-        int filler_idx = LAST_FIELD - field_shift;
-        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+        size_t filler_idx = LAST_FIELD - field_shift;
+        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
           bits[i-1] |= bits[i] << NumEndBits();
           bits[i] >>= (FIELD_BITS - NumEndBits());
         }

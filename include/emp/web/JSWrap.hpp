@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2022.
  *
  *  @file JSWrap.hpp
  *  @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
@@ -204,7 +204,7 @@ namespace emp {
 
   template <typename JSON_TYPE, int ARG_ID>
   struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
-    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+    static void LoadJSDataArg(JSON_TYPE & /*arg_var*/) {
         MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };
@@ -304,7 +304,7 @@ namespace emp {
 
   template <typename JSON_TYPE>
   struct StoreTuple<JSON_TYPE, 0> {
-    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+    static void StoreJSDataArg(const JSON_TYPE & /*ret_var*/) {
       MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };

@@ -88,6 +88,7 @@ struct WordData {
   size_t max_options = 0;     // Maximum number of word options after used as a guess.
   double ave_options = 0.0;   // Average number of options after used as a guess.
   double entropy = 0.0;       // What is the entropy (and thus information gained) for this choice?
+  bool is_active = false;
 
   WordData(const std::string & in_word) : word(in_word) {
     for (char x : word) letters.Set(x - 'a');
@@ -207,6 +208,14 @@ public:
     start_count = start_options.CountOnes();
   }
 
+  void AddClue(std::string word, std::string result) {
+    for (size_t i = 0; i < word.size(); ++i) {
+      if (result[i] == 'N') AddClue(i, word[i], Result::NOWHERE);
+      else if (result[i] == 'E') AddClue(i, word[i], Result::ELSEWHERE);
+      else if (result[i] == 'H') AddClue(i, word[i], Result::HERE);
+    }
+  }
+
   emp::BitVector AnalyzeGuess(const std::string & guess, const WordData & answer) {
     // Loop through all possible answers to see how much a word cuts down choices.
     emp::BitVector options(start_options);
@@ -250,7 +259,8 @@ public:
   }
 
   void Analyze() {
-    for (int id = start_options.FindOne(); id >= 0; id = start_options.FindOne(id+1)) {
+    // for (int id = start_options.FindOne(); id >= 0; id = start_options.FindOne(id+1)) {
+    for (size_t id = 0; id < words.size(); ++id) {
       AnalyzeGuess(words[id]);
     }
   }
@@ -329,12 +339,20 @@ public:
 
   /// Print all of the results, sorted by max number of options.
   void PrintResults() {
-    emp::Sort(words, [](const WordData & w1, const WordData & w2){ return w1.max_options < w2.max_options; });
+    for (size_t i = 0; i < words.size(); ++i) {
+      words[i].is_active = start_options.Has(i);
+    }
+    emp::Sort(words, [](const WordData & w1, const WordData & w2){
+      if (w1.is_active == w2.is_active) {
+	return w1.max_options < w2.max_options;
+      }
+      return w2.is_active;
+    });
     for (auto & word : words) {
       std::cout << word.word
                 << ", " << word.max_options
                 << ", " << word.ave_options
-                << ", " << word.entropy
+                << ", " << word.is_active
                 << std::endl;
     }
   }
@@ -363,12 +381,33 @@ int main(int argc, char* argv[])
   }
 
   word_set.Preprocess();
-  word_set.AddClue(0,'a',Result::NOWHERE);
-  word_set.AddClue(1,'l',Result::HERE);
-  word_set.AddClue(2,'o',Result::NOWHERE);
-  word_set.AddClue(3,'e',Result::NOWHERE);
-  word_set.AddClue(4,'s',Result::ELSEWHERE);
 
+  //word_set.AddClue("aloes", "NNNEN");
+  word_set.AddClue("rates", "NENEN");
+  // word_set.AddClue("login", "ENNEN");
+  // word_set.AddClue("dimly", "NHNHH");
+  //  word_set.AddClue("finch", "NNNNN");
+
+  /*
+  word_set.AddClue(0,'a',Result::NOWHERE);
+  word_set.AddClue(1,'l',Result::NOWHERE);
+  word_set.AddClue(2,'o',Result::NOWHERE);
+  word_set.AddClue(3,'e',Result::ELSEWHERE);
+  word_set.AddClue(4,'s',Result::NOWHERE);
+
+  word_set.AddClue(0,'d',Result::NOWHERE);
+  word_set.AddClue(1,'i',Result::ELSEWHERE);
+  word_set.AddClue(2,'r',Result::NOWHERE);
+  word_set.AddClue(3,'t',Result::NOWHERE);
+  word_set.AddClue(4,'y',Result::NOWHERE);
+
+  word_set.AddClue(0,'h',Result::NOWHERE);
+  word_set.AddClue(1,'e',Result::NOWHERE);
+  word_set.AddClue(2,'n',Result::NOWHERE);
+  word_set.AddClue(3,'g',Result::NOWHERE);
+  word_set.AddClue(4,'e',Result::HERE);
+  */
+  
   word_set.Analyze();
   word_set.PrintResults();
 //  word_set.AnalyzeAll();

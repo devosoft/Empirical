@@ -165,7 +165,7 @@ namespace emp {
     inline uint64_t GetUInt64(const uint64_t max) noexcept {
       if (max <= RAND_CAP) return (uint64_t) GetUInt(max);  // Don't need extra precision.
 
-      size_t mask = emp::MaskUsed(max);              // Create a mask for just the bits we need.
+      uint64_t mask = emp::MaskUsed(max);            // Create a mask for just the bits we need.
       uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
       while (val >= max) val = GetUInt64() & mask;   // Grab new values until we find a valid one.
 

@@ -1041,8 +1041,7 @@ namespace emp {
     #pragma GCC diagnostic ignored "-Wformat-security"
 
     // Extra space for '\0'
-    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
-    emp_assert( size >= 0 );
+    const size_t size = static_cast<size_t>(std::snprintf(nullptr, 0, format.c_str(), args...) + 1);
 
     emp::vector<char> buf( size );
     std::snprintf( buf.data(), size, format.c_str(), args... );

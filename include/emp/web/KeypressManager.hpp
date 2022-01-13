@@ -127,7 +127,7 @@ namespace web {
         "To specify uppercase, you'll need to monitor for the shift modifier associated with a KeypressEvent."
       );
 
-      key = std::toupper(key);
+      key = static_cast<char>(std::toupper(key));
 
       fun_map[order] =
         [key, cb_fun](const KeyboardEvent & evt)

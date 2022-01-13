@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
+ *  @date 2022.
  *
  *  @file char_utils.hpp
  *  @brief Simple functions and tools to manipulate individual characters.
@@ -45,15 +45,15 @@ namespace emp {
   public:
     CharSetBase() : char_set() { }
 
-    CharSetBase(CHAR_T in_char) { char_set[in_char] = true; }
+    CharSetBase(CHAR_T in_char) { char_set[static_cast<size_t>(in_char)] = true; }
     CharSetBase(const std::string & in_chars) {
-      for (CHAR_T x : in_chars) char_set[x] = true;
+      for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;
     }
     CharSetBase(const this_t &) = default;
     this_t & operator=(const this_t &) = default;
 
     size_t GetMaxChar() const noexcept { return MAX_CHAR; }
-    bool Has(CHAR_T index) const { return char_set[index]; }
+    bool Has(CHAR_T index) const { return char_set[static_cast<size_t>(index)]; }
     bool Has(const std::string & str) const {
       for (CHAR_T c : str) if (!Has(c)) return false;
       return true;
@@ -66,7 +66,7 @@ namespace emp {
       return (pos < str.size()) && Has(str[pos]);
     }
 
-    bool operator[](CHAR_T index) const { return char_set[index]; }
+    bool operator[](CHAR_T index) const { return char_set[static_cast<size_t>(index)]; }
 
     /// Count up the number of characters in the set.
     size_t GetSize() const noexcept {
@@ -75,8 +75,14 @@ namespace emp {
       return size;
     }
 
-    CharSetBase<CHAR_T,MAX_CHAR> & Set(CHAR_T c) { char_set[c] = true; return *this; }
-    CharSetBase<CHAR_T,MAX_CHAR> & Clear(CHAR_T c) { char_set[c] = false; return *this; }
+    CharSetBase<CHAR_T,MAX_CHAR> & Set(CHAR_T c) {
+      char_set[static_cast<size_t>(c)] = true;
+      return *this;
+    }
+    CharSetBase<CHAR_T,MAX_CHAR> & Clear(CHAR_T c) {
+      char_set[static_cast<size_t>(c)] = false;
+      return *this;
+    }
 
     /// Set a range of characters INCLUSIVE of c1 and c2.
     CharSetBase<CHAR_T,MAX_CHAR> & SetRange(CHAR_T c1, CHAR_T c2) {
