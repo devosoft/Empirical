@@ -213,6 +213,32 @@ namespace emp {
     /// @param std Standard deviation of distribution.
     inline double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
 
+    /// @return A random variable drawn from a pareto distribution.
+    /// @param alpha Shape parameter (default 1).
+    /// @param lower_bound Lower bound (default 1).
+    /// @param upper_bound Upper bound (default infinity, unbounded).
+    inline double GetRandPareto(
+      const double alpha=1.0,
+      const double lower_bound=1.0,
+      const double upper_bound=std::numeric_limits<double>::infinity()
+    ) {
+      emp_assert( alpha > 0.0 );
+      emp_assert( lower_bound >= 0.0, lower_bound );
+      emp_assert( lower_bound <= upper_bound, lower_bound, upper_bound );
+      if (lower_bound == upper_bound) return lower_bound;
+      // uses inverse transform sampling method
+      // see https://en.wikipedia.org/wiki/Inverse_transform_sampling
+      // and https://en.wikipedia.org/wiki/Pareto_distribution
+      // notebook with validation and testing
+      // https://colab.research.google.com/drive/1sUQe_JTnRnxdDUKObbEtzke_byqTTx_U
+
+      const double unif_lb = std::pow(lower_bound / upper_bound, alpha);
+      constexpr double unif_ub = 1.0;
+      const double unif_sample = GetDouble(unif_lb, unif_ub);
+
+      return lower_bound / std::pow(unif_sample, 1.0/alpha);
+    }
+
     /// Generate a random variable drawn from a Poisson distribution.
     inline uint32_t GetRandPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);

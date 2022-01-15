@@ -3,9 +3,12 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
+#include "emp/base/vector.hpp"
+#include "emp/data/DataNode.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
 
+#include <cmath>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -16,6 +19,7 @@
 #include <climits>
 #include <unordered_set>
 #include <ratio>
+#include <tuple>
 
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
@@ -289,4 +293,68 @@ TEST_CASE("Another Test random", "[math]")
     // std::cout << k << ": " << v.first << ", " << v.second << std::endl;
     REQUIRE(v.first + v.second == 0);
   }
+}
+
+TEST_CASE("GetRandPareto", "[math]") {
+
+  emp::Random rand(1);
+
+  // check all sampled values are within distribution support
+  for (size_t i{}; i < std::kilo::num; ++i) {
+    REQUIRE( rand.GetRandPareto(i+1.0) > 0 );
+    REQUIRE( rand.GetRandPareto(1.0, i) >= i );
+    REQUIRE( rand.GetRandPareto(i+0.5, i) >= i );
+    REQUIRE( rand.GetRandPareto(1.0, 0.0, i) <= i );
+    REQUIRE( rand.GetRandPareto(i+1.0, 0.0, i) <= i );
+  }
+
+  for (double alpha : emp::vector<double>{0.5, 1.0, 1.5, 5.0}) {
+    for (auto [lbound, ubound] : emp::vector<std::tuple<double, double>>{
+      {0.1, std::numeric_limits<double>::infinity()},
+      {0.1, 10.0},
+      {1.0, std::numeric_limits<double>::infinity()},
+      {1.0, 10.0},
+      {4.0, 20.0}
+    }) {
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> samples;
+      for (size_t i{}; i < std::kilo::num; ++i) samples.Add(
+        rand.GetRandPareto(alpha, lbound, ubound)
+      );
+
+      // https://en.wikipedia.org/wiki/Pareto_distribution#:~:text=Bounded%20Pareto%20distribution%5Bedit%5D
+      const double expected_mean = (alpha == 1.0)
+      ? (
+        ubound * lbound
+        / (ubound - lbound)
+      ) * std::log(
+        ubound / lbound
+      )
+      : (
+        std::pow(lbound, alpha)
+        / (1.0 - std::pow(lbound/ubound, alpha))
+      ) * (
+        alpha / (alpha - 1.0)
+      ) * (
+        1.0 / std::pow(lbound, alpha - 1.0)
+        - 1.0 / std::pow(ubound, alpha - 1.0)
+      );
+
+      const double actual_mean = samples.GetMean();
+
+      // expected value is unbounded for alpha < 1 without upper bound
+      if (alpha > 1.0 || std::isfinite(ubound)) REQUIRE( actual_mean == Approx(expected_mean).epsilon(0.10) );
+
+      const double expected_median = lbound * std::pow(
+        1.0 - 0.5 * (
+          1.0 - std::pow(lbound / ubound, alpha)
+        ),
+        -1.0/alpha
+      );
+      const double actual_median = samples.GetMedian();
+
+       REQUIRE( actual_median == Approx(expected_median).epsilon(0.10) );
+
+    }
+  }
+
 }
