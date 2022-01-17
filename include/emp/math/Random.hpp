@@ -240,6 +240,22 @@ namespace emp {
       return lower_bound / std::pow(unif_sample, 1.0/alpha);
     }
 
+    /// @return A random variable drawn from a pareto distribution.
+    /// @param alpha Shape parameter (default 1).
+    /// @param lambda Scale parameter (default 1).
+    /// @param upper_bound Upper bound (default infinity, unbounded).
+    /// See <https://en.wikipedia.org/wiki/Lomax_distribution>
+    inline double GetRandLomax(
+      const double alpha=1.0,
+      const double lambda=1.0,
+      const double upper_bound=std::numeric_limits<double>::infinity()
+    ) {
+      emp_assert( alpha > 0.0, alpha );
+      emp_assert( lambda > 0.0, lambda );
+      emp_assert( upper_bound >= 0.0, upper_bound );
+      return GetRandPareto(alpha, lambda, upper_bound) - lambda;
+    }
+
     /// Generate a random variable drawn from a Poisson distribution.
     inline uint32_t GetRandPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);

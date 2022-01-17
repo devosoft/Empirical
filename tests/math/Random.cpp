@@ -317,7 +317,7 @@ TEST_CASE("GetRandPareto", "[math]") {
       {4.0, 20.0}
     }) {
       emp::DataNode<double, emp::data::Stats, emp::data::Log> samples;
-      for (size_t i{}; i < std::kilo::num; ++i) samples.Add(
+      for (size_t i{}; i < 10 * std::kilo::num; ++i) samples.Add(
         rand.GetRandPareto(alpha, lbound, ubound)
       );
 
@@ -353,6 +353,71 @@ TEST_CASE("GetRandPareto", "[math]") {
       const double actual_median = samples.GetMedian();
 
        REQUIRE( actual_median == Approx(expected_median).epsilon(0.10) );
+
+    }
+  }
+
+}
+
+TEST_CASE("GetRandLomax", "[math]") {
+
+  emp::Random rand(1);
+
+  // check all sampled values are within distribution support
+  for (size_t i{1}; i < std::kilo::num; ++i) {
+    REQUIRE( rand.GetRandLomax(i) >= 0.0 );
+    REQUIRE( rand.GetRandLomax(1.0, i) >= 0.0 );
+    REQUIRE( rand.GetRandLomax(i+0.5, i) >= .0 );
+    REQUIRE( rand.GetRandLomax(1.0, 0.1, i) <= i );
+    REQUIRE( rand.GetRandLomax(i+1.0, 0.1, i) <= i );
+  }
+
+  for (double alpha : emp::vector<double>{0.5, 1.0, 1.5, 5.0}) {
+    for (auto [lambda, ubound] : emp::vector<std::tuple<double, double>>{
+      {0.1, std::numeric_limits<double>::infinity()},
+      {0.1, 10.0},
+      {1.0, std::numeric_limits<double>::infinity()},
+      {1.0, 10.0},
+      {4.0, 20.0}
+    }) {
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> samples;
+      for (size_t i{}; i < 10 * std::kilo::num; ++i) samples.Add(
+        rand.GetRandLomax(alpha, lambda, ubound)
+      );
+
+      const double expected_mean = (alpha == 1.0)
+      ? (
+        ubound * lambda
+        / (ubound - lambda)
+      ) * std::log(
+        ubound / lambda
+      ) - lambda
+      : (
+        std::pow(lambda, alpha)
+        / (1.0 - std::pow(lambda/ubound, alpha))
+      ) * (
+        alpha / (alpha - 1.0)
+      ) * (
+        1.0 / std::pow(lambda, alpha - 1.0)
+        - 1.0 / std::pow(ubound, alpha - 1.0)
+      ) - lambda;
+
+      const double actual_mean = samples.GetMean();
+
+      // expected value is unbounded for alpha < 1 without upper bound
+      if (alpha > 1.0 || std::isfinite(ubound)) {
+        REQUIRE( actual_mean == Approx(expected_mean).epsilon(0.10) );
+      }
+
+      const double expected_median = lambda * std::pow(
+        1.0 - 0.5 * (
+          1.0 - std::pow(lambda / ubound, alpha)
+        ),
+        -1.0/alpha
+      ) - lambda;
+      const double actual_median = samples.GetMedian();
+
+      REQUIRE( actual_median == Approx(expected_median).epsilon(0.10) );
 
     }
   }
