@@ -300,12 +300,12 @@ TEST_CASE("GetRandPareto", "[math]") {
   emp::Random rand(1);
 
   // check all sampled values are within distribution support
-  for (size_t i{}; i < std::kilo::num; ++i) {
-    REQUIRE( rand.GetRandPareto(i+1.0) > 0 );
+  for (size_t i{1}; i < std::kilo::num; ++i) {
+    REQUIRE( rand.GetRandPareto(i) > 0 );
     REQUIRE( rand.GetRandPareto(1.0, i) >= i );
     REQUIRE( rand.GetRandPareto(i+0.5, i) >= i );
-    REQUIRE( rand.GetRandPareto(1.0, 0.0, i) <= i );
-    REQUIRE( rand.GetRandPareto(i+1.0, 0.0, i) <= i );
+    REQUIRE( rand.GetRandPareto(1.0, 0.1, i) <= i );
+    REQUIRE( rand.GetRandPareto(i+1.0, 0.1, i) <= i );
   }
 
   for (double alpha : emp::vector<double>{0.5, 1.0, 1.5, 5.0}) {
