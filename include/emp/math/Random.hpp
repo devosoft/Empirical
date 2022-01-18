@@ -253,7 +253,7 @@ namespace emp {
       emp_assert( alpha > 0.0, alpha );
       emp_assert( lambda > 0.0, lambda );
       emp_assert( upper_bound >= 0.0, upper_bound );
-      return GetRandPareto(alpha, lambda, upper_bound) - lambda;
+      return GetRandPareto(alpha, lambda, upper_bound + lambda) - lambda;
     }
 
     /// Generate a random variable drawn from a Poisson distribution.

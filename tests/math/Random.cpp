@@ -387,19 +387,19 @@ TEST_CASE("GetRandLomax", "[math]") {
 
       const double expected_mean = (alpha == 1.0)
       ? (
-        ubound * lambda
-        / (ubound - lambda)
+        (ubound+lambda) * lambda
+        / ubound
       ) * std::log(
-        ubound / lambda
+        (ubound+lambda) / lambda
       ) - lambda
       : (
         std::pow(lambda, alpha)
-        / (1.0 - std::pow(lambda/ubound, alpha))
+        / (1.0 - std::pow(lambda/(ubound+lambda), alpha))
       ) * (
         alpha / (alpha - 1.0)
       ) * (
         1.0 / std::pow(lambda, alpha - 1.0)
-        - 1.0 / std::pow(ubound, alpha - 1.0)
+        - 1.0 / std::pow(ubound+lambda, alpha - 1.0)
       ) - lambda;
 
       const double actual_mean = samples.GetMean();
@@ -411,7 +411,7 @@ TEST_CASE("GetRandLomax", "[math]") {
 
       const double expected_median = lambda * std::pow(
         1.0 - 0.5 * (
-          1.0 - std::pow(lambda / ubound, alpha)
+          1.0 - std::pow(lambda / (ubound+lambda), alpha)
         ),
         -1.0/alpha
       ) - lambda;
