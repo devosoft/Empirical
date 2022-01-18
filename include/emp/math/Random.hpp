@@ -256,6 +256,91 @@ namespace emp {
       return GetRandPareto(alpha, lambda, upper_bound + lambda) - lambda;
     }
 
+    /// @return A random variable drawn from a distribution with symmetric
+    /// pareto tails extending both positively and negatively from zero.
+    /// @param alpha Shape parameter (default 1).
+    /// @param lambda Scale parameter (default 1).
+    /// @param lower_bound Lower bound (default -infinity, unbounded).
+    /// @param upper_bound Upper bound (default infinity, unbounded).
+    /// Inspired by <https://doi.org/10.1109/TBC.2004.834013>
+    inline double GetRandZeroSymmetricPareto(
+      const double alpha=1.0,
+      const double lambda=1.0,
+      const double lower_bound=-std::numeric_limits<double>::infinity(),
+      const double upper_bound=std::numeric_limits<double>::infinity()
+    ) {
+      emp_assert( alpha > 0.0, alpha );
+      emp_assert( lower_bound <= 0, lower_bound );
+      emp_assert( upper_bound >= 0, upper_bound );
+
+      // see https://colab.research.google.com/drive/1x404xeSBFADYiVbp-OmzFKPcJJextkYL for derivations
+
+      const double n = std::min(std::abs(lower_bound), upper_bound);
+      const double m = std::max(std::abs(lower_bound), upper_bound);
+
+      // probability of picking on the skinny side of zero
+      const double p_skinny_side = (
+          1.0
+          - std::pow(lambda / (n + lambda), alpha)
+        ) / (
+          2.0
+          - std::pow(lambda / (n + lambda), alpha)
+          - std::pow(lambda / (m + lambda), alpha)
+      );
+      emp_assert(
+        std::isfinite(p_skinny_side)
+        && std::clamp(p_skinny_side, 0.0, 0.5001) == p_skinny_side,
+        p_skinny_side
+      );
+
+      // probability of picking on the fat side of zero
+      [[maybe_unused]] // used for debugging and testing
+      const double p_fat_side = [&](){
+        if (n == m) return 0.5;
+        const double res_addend = (
+          1.0 / (
+            2.0
+            - std::pow( lambda/(n + lambda), alpha)
+            - std::pow( lambda/(m + lambda), alpha)
+          )
+        );
+
+        double res_subtrahend_denom = (
+          std::pow( (m + lambda), alpha )
+          * (2.0 * std::pow( lambda, -alpha) - std::pow(n + lambda, -alpha))
+          - 1.0
+        );
+        // need a fallback way to calculate for numerical stability
+        if (std::isnan(res_subtrahend_denom)) res_subtrahend_denom = (
+          2.0 * std::pow( (m + lambda)/lambda, alpha )
+          - std::pow( (m + lambda)/(n + lambda), alpha )
+          - 1.0
+        );
+        return res_addend - 1.0 / res_subtrahend_denom;
+      }(); // end p_fat_side calculation
+      emp_assert(
+        std::isfinite(p_fat_side)
+        && std::clamp(p_fat_side, 0.4999, 1.0001) == p_fat_side,
+        p_fat_side
+      );
+
+      // assert p_fat_side and p_skinny_side are complimentary outcomes
+      emp_assert( std::abs(1.0 - p_fat_side - p_skinny_side) < 0.001 );
+
+      // is the fat side of the distribution negative?
+      const bool skinny_side_is_positive = std::abs(lower_bound) > upper_bound;
+
+      // pick which side of zero to draw from then do draw with a lomax dist
+      if (P(p_skinny_side) == skinny_side_is_positive) {
+        // draw from positive side
+        return GetRandLomax(alpha, lambda, upper_bound);
+      } else {
+        // draw from negative side
+        return -GetRandLomax(alpha, lambda, std::abs(lower_bound));
+      }
+
+    }
+
     /// Generate a random variable drawn from a Poisson distribution.
     inline uint32_t GetRandPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);

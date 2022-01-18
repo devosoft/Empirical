@@ -423,3 +423,135 @@ TEST_CASE("GetRandLomax", "[math]") {
   }
 
 }
+
+TEST_CASE("GetRandZeroSymmetricPareto output range", "[math]") {
+
+  emp::Random rand(1);
+
+  // check all sampled values are within distribution support
+  for (int i{1}; i < std::kilo::num; ++i) {
+    REQUIRE( !std::isnan(rand.GetRandZeroSymmetricPareto(i)) );
+    REQUIRE( !std::isnan(rand.GetRandZeroSymmetricPareto(i, i)) );
+    REQUIRE( !std::isnan(rand.GetRandZeroSymmetricPareto(i+0.5, i-0.5)) );
+
+    REQUIRE( rand.GetRandZeroSymmetricPareto(1.0, 0.1, 0.0, i) <= i );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(1.0, 0.1, 0.0, i) >= 0.0 );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(1.0, 0.1, -i, 0.0) <= 0.0 );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(1.0, 0.1, -i, 0.0) >= -i );
+
+    REQUIRE( rand.GetRandZeroSymmetricPareto(1.0, 0.1, -i, i) <= i );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(1.0, 0.1, -i, i) >= -i );
+
+    REQUIRE( rand.GetRandZeroSymmetricPareto(i+1.0, i+0.1, 0.0, i) <= i );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(i+1.0, i+0.1, 0.0, i) >= 0.0 );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(i+1.0, i+0.1, -i, 0.0) <= 0.0 );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(i+1.0, i+0.1, -i, 0.0) >= -i );
+
+    REQUIRE( rand.GetRandZeroSymmetricPareto(i+1.0, i+0.1, -i, i) <= i );
+    REQUIRE( rand.GetRandZeroSymmetricPareto(i+1.0, i+0.1, -i, i) >= -i );
+
+  }
+
+}
+
+TEST_CASE("GetRandZeroSymmetricPareto fat/skinny tails", "[math]") {
+
+  emp::Random rand(1);
+
+  for (double alpha : emp::vector<double>{0.5, 1.0, 1.5, 2.0}) {
+  for (double lambda : emp::vector<double>{0.5, 1.0, 1.5, 2.0}) {
+    for (auto [innerb, outerb] : emp::vector<std::tuple<double, double>>{
+      {0.1, std::numeric_limits<double>::infinity()},
+      {0.1, 10.0},
+      {1.0, std::numeric_limits<double>::infinity()},
+      {1.0, 10.0},
+      {4.0, 20.0}
+    }) {
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> fwd_samples;
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> bwd_samples;
+      for (size_t i{}; i < 10*std::kilo::num; ++i) {
+        fwd_samples.Add(
+          rand.GetRandZeroSymmetricPareto(alpha, lambda, -innerb, outerb)
+        );
+        bwd_samples.Add(
+          rand.GetRandZeroSymmetricPareto(alpha, lambda, -outerb, innerb)
+        );
+      }
+
+      REQUIRE(fwd_samples.GetMean() > 0.0);
+      // for extreme parameterizations, medians might reasonably
+      // be close to zero but of opposite expected sign
+      REQUIRE(fwd_samples.GetMedian() > -0.01);
+      REQUIRE(fwd_samples.GetMedian() < fwd_samples.GetMean());
+
+      REQUIRE(bwd_samples.GetMean() < 0.0);
+      REQUIRE(bwd_samples.GetMedian() < 0.01);
+      REQUIRE(bwd_samples.GetMedian() > bwd_samples.GetMean());
+
+      // can't do this test with means because of extreme variance
+      // due to extreme effect outliers
+      REQUIRE(
+        fwd_samples.GetMedian()
+        == Approx(-bwd_samples.GetMedian()).epsilon(0.1).margin(0.1)
+      );
+      REQUIRE(
+        fwd_samples.GetPercentile(20)
+        == Approx(-bwd_samples.GetPercentile(80)).epsilon(0.2).margin(0.1)
+      );
+      REQUIRE(
+        fwd_samples.GetPercentile(80)
+        == Approx(-bwd_samples.GetPercentile(20)).epsilon(0.2).margin(0.1)
+      );
+
+    }
+
+  }
+  }
+
+}
+
+TEST_CASE("GetRandZeroSymmetricPareto even tails", "[math]") {
+
+  emp::Random rand(1);
+
+  for (double alpha : emp::vector<double>{0.5, 1.0, 1.5, 2.0}) {
+  for (double lambda : emp::vector<double>{0.5, 1.0, 1.5, 2.0}) {
+    for (auto bound : emp::vector<double>{
+      0.1, 1.0, 4.0, 10.0, 20.0, std::numeric_limits<double>::infinity()
+    }) {
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> raw_samples;
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> abs_samples;
+      emp::DataNode<double, emp::data::Stats, emp::data::Log> control_samples;
+      for (size_t i{}; i < 10*std::kilo::num; ++i) {
+        raw_samples.Add(
+          rand.GetRandZeroSymmetricPareto(alpha, lambda, -bound, bound)
+        );
+        abs_samples.Add( std::abs(
+          rand.GetRandZeroSymmetricPareto(alpha, lambda, -bound, bound)
+        ));
+        control_samples.Add( rand.GetRandLomax(alpha, lambda, bound) );
+      }
+
+      REQUIRE(abs_samples.GetMean() > abs_samples.GetMedian());
+      // can't do this test with means because of extreme variance
+      // due to extreme effect outliers
+      REQUIRE( raw_samples.GetMedian() == Approx(0).epsilon(0.1).margin(0.1) );
+      REQUIRE(
+        abs_samples.GetMedian()
+        == Approx(control_samples.GetMedian()).epsilon(0.1).margin(0.1)
+      );
+      REQUIRE(
+        abs_samples.GetPercentile(20)
+        == Approx(control_samples.GetPercentile(20)).epsilon(0.2).margin(0.1)
+      );
+      REQUIRE(
+        abs_samples.GetPercentile(80)
+        == Approx(control_samples.GetPercentile(80)).epsilon(0.2).margin(0.1)
+      );
+
+    }
+
+  }
+  }
+
+}
