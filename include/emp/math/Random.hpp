@@ -230,8 +230,10 @@ namespace emp {
       // uses inverse transform sampling method
       // see https://en.wikipedia.org/wiki/Inverse_transform_sampling
       // and https://en.wikipedia.org/wiki/Pareto_distribution
-      // notebook with validation and testing
-      // https://colab.research.google.com/drive/1sUQe_JTnRnxdDUKObbEtzke_byqTTx_U
+
+      // see https://gist.github.com/mmore500/b6de0158a8851ce6e3d65105ed35197f
+      // for validation and testing
+      // url has also been archived on the archive.org wayback machine
 
       const double unif_lb = std::pow(lower_bound / upper_bound, alpha);
       constexpr double unif_ub = 1.0;
@@ -273,7 +275,9 @@ namespace emp {
       emp_assert( lower_bound <= 0, lower_bound );
       emp_assert( upper_bound >= 0, upper_bound );
 
-      // see https://colab.research.google.com/drive/1x404xeSBFADYiVbp-OmzFKPcJJextkYL for derivations
+      // see https://gist.github.com/mmore500/2b95ef3279e49fc1780b3b319c35083a
+      // for derivations and validation
+      // url has also been archived on the archive.org wayback machine
 
       const double n = std::min(std::abs(lower_bound), upper_bound);
       const double m = std::max(std::abs(lower_bound), upper_bound);
