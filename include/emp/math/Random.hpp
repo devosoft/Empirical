@@ -22,6 +22,79 @@
 #include "Range.hpp"
 
 namespace emp {
+
+namespace impl {
+
+// implementation helper for GetRandZeroSymmetricPareto
+double calc_p_zero_symmetric_pareto_fat_side(
+  const double alpha, const double lambda, const double m, const double n
+) {
+
+  if (n == m) return 0.5;
+
+  const double res_addend = (
+    1.0 / (
+      2.0
+      - std::pow( lambda/(n + lambda), alpha)
+      - std::pow( lambda/(m + lambda), alpha)
+    )
+  );
+
+  double res_subtrahend_denom;
+  res_subtrahend_denom = (
+    std::pow( (m + lambda), alpha )
+    * (2.0 * std::pow( lambda, -alpha) - std::pow(n + lambda, -alpha))
+    - 1.0
+  );
+  // need a fallback way to calculate for numerical stability
+  if (std::isnan(res_subtrahend_denom)) res_subtrahend_denom = (
+    2.0 * std::pow( (m + lambda)/lambda, alpha )
+    - std::pow( (m + lambda)/(n + lambda), alpha )
+    - 1.0
+  );
+
+  const double res = res_addend - 1.0 / res_subtrahend_denom;
+  emp_assert(
+    std::isfinite(res)
+    && std::clamp(res, 0.4999, 1.0001) == res,
+    res
+  );
+  return res;
+
+}
+
+// implementation helper for GetRandZeroSymmetricPareto
+double calc_p_zero_symmetric_pareto_skinny_side(
+  const double alpha, const double lambda, const double m, const double n
+) {
+
+  const double res = (
+      1.0
+      - std::pow(lambda / (n + lambda), alpha)
+    ) / (
+      2.0
+      - std::pow(lambda / (n + lambda), alpha)
+      - std::pow(lambda / (m + lambda), alpha)
+  );
+  emp_assert(
+    std::isfinite(res)
+    && std::clamp(res, 0.0, 0.5001) == res,
+    res
+  );
+
+  // assert p_fat_side and p_skinny_side are complimentary outcomes
+  emp_assert( std::abs(
+    1.0
+    - calc_p_zero_symmetric_pareto_fat_side(alpha, lambda, m, n)
+    - res
+  ) < 0.001, res );
+
+  return res;
+
+}
+
+} // namespace impl
+
   using namespace emp;
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
@@ -283,53 +356,10 @@ namespace emp {
       const double m = std::max(std::abs(lower_bound), upper_bound);
 
       // probability of picking on the skinny side of zero
-      const double p_skinny_side = (
-          1.0
-          - std::pow(lambda / (n + lambda), alpha)
-        ) / (
-          2.0
-          - std::pow(lambda / (n + lambda), alpha)
-          - std::pow(lambda / (m + lambda), alpha)
-      );
-      emp_assert(
-        std::isfinite(p_skinny_side)
-        && std::clamp(p_skinny_side, 0.0, 0.5001) == p_skinny_side,
-        p_skinny_side
-      );
-
-      // probability of picking on the fat side of zero
-      [[maybe_unused]] // used for debugging and testing
-      const double p_fat_side = [&](){
-        if (n == m) return 0.5;
-        const double res_addend = (
-          1.0 / (
-            2.0
-            - std::pow( lambda/(n + lambda), alpha)
-            - std::pow( lambda/(m + lambda), alpha)
-          )
+      const double p_skinny_side
+        = impl::calc_p_zero_symmetric_pareto_skinny_side(
+          alpha, lambda, m, n
         );
-
-        double res_subtrahend_denom = (
-          std::pow( (m + lambda), alpha )
-          * (2.0 * std::pow( lambda, -alpha) - std::pow(n + lambda, -alpha))
-          - 1.0
-        );
-        // need a fallback way to calculate for numerical stability
-        if (std::isnan(res_subtrahend_denom)) res_subtrahend_denom = (
-          2.0 * std::pow( (m + lambda)/lambda, alpha )
-          - std::pow( (m + lambda)/(n + lambda), alpha )
-          - 1.0
-        );
-        return res_addend - 1.0 / res_subtrahend_denom;
-      }(); // end p_fat_side calculation
-      emp_assert(
-        std::isfinite(p_fat_side)
-        && std::clamp(p_fat_side, 0.4999, 1.0001) == p_fat_side,
-        p_fat_side
-      );
-
-      // assert p_fat_side and p_skinny_side are complimentary outcomes
-      emp_assert( std::abs(1.0 - p_fat_side - p_skinny_side) < 0.001 );
 
       // is the fat side of the distribution negative?
       const bool skinny_side_is_positive = std::abs(lower_bound) > upper_bound;
