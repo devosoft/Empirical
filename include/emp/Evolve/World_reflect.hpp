@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  World_reflect.hpp
+ *  @file World_reflect.hpp
  *  @brief Handle reflection on organisms to setup reasonable defaults in World.
  *
  *  @note None of the functions defined here should be called from outside the world object;
@@ -11,8 +11,8 @@
  *        LIBRARY developers working on World.
  */
 
-#ifndef EMP_EVO_WORLD_REFLECT_H
-#define EMP_EVO_WORLD_REFLECT_H
+#ifndef EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
 
 #include <functional>
 #include <type_traits>
@@ -150,4 +150,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE

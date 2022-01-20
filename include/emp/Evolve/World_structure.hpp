@@ -1,24 +1,24 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2022.
  *
- *  @file  World_structure.hpp
+ *  @file World_structure.hpp
  *  @brief Functions for popular world structure methods.
  */
 
-#ifndef EMP_EVO_WORLD_STRUCTURE_H
-#define EMP_EVO_WORLD_STRUCTURE_H
+#ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
+#define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 
 #include <set>
 
+#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "../base/array.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "../data/Trait.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
-#include "../datastructs/vector_utils.hpp"
 
 namespace emp {
 
@@ -51,7 +51,7 @@ namespace emp {
     bool IsActive() const { return pop_id == 0; }
     bool IsValid() const { return index != invalid_id; }
 
-    WorldPosition & SetActive(bool _active=true) { pop_id = 0; return *this; }
+    WorldPosition & SetActive(bool /*_active*/=true) { pop_id = 0; return *this; }
     WorldPosition & SetPopID(size_t _id) { emp_assert(_id <= invalid_id); pop_id = (uint32_t) _id; return *this; }
     WorldPosition & SetIndex(size_t _id) { emp_assert(_id <= invalid_id); index = (uint32_t) _id; return *this; }
     WorldPosition & MarkInvalid() { index = invalid_id; pop_id = invalid_id; return *this; }
@@ -485,7 +485,7 @@ namespace emp {
           emp_assert(org_bins[i] < num_total_bins, i, org_bins[i], num_total_bins,
                      world.GetNumOrgs());
         }
-        size_t org_count = 0;
+        [[maybe_unused]] size_t org_count = 0;
         for (size_t i = 0; i < num_total_bins; i++) {
           org_count += bin_ids[i].size();
           for (size_t org_id : bin_ids[i]) {
@@ -517,7 +517,7 @@ namespace emp {
     // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
-    world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
+    world.SetAddInjectFun( [/*&world, traits,*/ world_size, info_ptr](Ptr<ORG> new_org) {
       size_t pos = info_ptr->GetBirthPos(world_size);
       return WorldPosition(pos);
     });
@@ -538,7 +538,7 @@ namespace emp {
     });
 
     // Birth is effectively the same as inject.
-    world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, WorldPosition parent_pos) {
+    world.SetAddBirthFun( [/*&world, traits,*/ world_size, info_ptr](Ptr<ORG> new_org, WorldPosition parent_pos) {
       (void) parent_pos;
       size_t pos = info_ptr->GetBirthPos(world_size);
       return WorldPosition(pos);
@@ -556,4 +556,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE

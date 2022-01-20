@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  scales.hpp
+ *  @file scales.hpp
  *  @brief Tools for scaling graph axes in D3.
  */
 
-#ifndef EMP_D3_SCALES_H
-#define EMP_D3_SCALES_H
+#ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
+#define EMP_WEB_D3_SCALES_HPP_INCLUDE
 
 #include "d3_init.hpp"
 #include "utils.hpp"
@@ -64,8 +64,8 @@ namespace D3 {
     Scale Copy() {
       int new_id = EM_ASM_INT_V({return js.objects.next_id++});
       MAIN_THREAD_EM_ASM({
-	    js.objects[$1] = js.objects[$0].copy();
-    }, this->id, new_id);
+        js.objects[$1] = js.objects[$0].copy();
+      }, this->id, new_id);
       return Scale(new_id);
     }
 
@@ -86,8 +86,8 @@ namespace D3 {
         result = js.objects[$0]($1);
         // console.log(result);
         var buffer = Module._malloc(result.length+1);
-	      Module.stringToUTF8(result, buffer, result.length*4+1);
-	      return buffer;
+        Module.stringToUTF8(result, buffer, result.length*4+1);
+        return buffer;
 
       },this->id, input);
 
@@ -111,7 +111,7 @@ namespace D3 {
     template <typename T>
     double InvertExtent(T y) {
       return EM_ASM_DOUBLE({return js.objects[$0].invertExtent($1);},
-			   this->id, y);
+         this->id, y);
     }
   };
 
@@ -152,7 +152,7 @@ namespace D3 {
       //TODO: format is technically optional, but what is the point of this
       //function without it?
       MAIN_THREAD_EM_ASM({js.objects[$0].tick($1, UTF8ToString($2));},
-		  this->id, count, format.c_str());
+      this->id, count, format.c_str());
       return *this;
     }
   };
@@ -190,9 +190,9 @@ namespace D3 {
 
     LinearScale& Nice(int count = -1) {
       if (count != -1){
-	    MAIN_THREAD_EM_ASM({js.objects[$0].nice($1);}, this->id, count);
+        MAIN_THREAD_EM_ASM({js.objects[$0].nice($1);}, this->id, count);
       } else {
-	    MAIN_THREAD_EM_ASM({js.objects[$0].nice();}, this->id);
+        MAIN_THREAD_EM_ASM({js.objects[$0].nice();}, this->id);
       }
       return *this;
     }
@@ -277,4 +277,4 @@ namespace D3 {
   };
 }
 
-#endif
+#endif // #ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE

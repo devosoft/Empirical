@@ -1,7 +1,19 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file NKWorld.hpp
+ *
+ */
+
+#ifndef DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE
+#define DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE
+
+#include "emp/bits/BitVector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/Evolve/NK.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
 using BitOrg = emp::BitVector;
@@ -91,7 +103,7 @@ struct NKWorld : public emp::World<BitOrg> {
     //   if (n+K < N) {
     //     lexi_funs[n] = [this,n](const BitOrg & org){
     //       const size_t cur_val = (org >> n).GetUInt(0) & emp::MaskLow<size_t>(K+1);
-	  //       return landscape.GetFitness(n, cur_val);
+    //       return landscape.GetFitness(n, cur_val);
     //     };
     //   } else {
     //     lexi_funs[n] = [this,n](const BitOrg & org){
@@ -114,4 +126,7 @@ struct NKWorld : public emp::World<BitOrg> {
       std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
     }
   }
+
 };
+
+#endif // #ifndef DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE

@@ -1,13 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  A class to manage circles in a 2D plane.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Circle2D.hpp
+ *  @brief A class to manage circles in a 2D plane.
+ */
 
-
-#ifndef EMP_CIRCLE_2D_H
-#define EMP_CIRCLE_2D_H
-
+#ifndef EMP_GEOMETRY_CIRCLE2D_HPP_INCLUDE
+#define EMP_GEOMETRY_CIRCLE2D_HPP_INCLUDE
 
 #include "Point2D.hpp"
 
@@ -57,4 +58,4 @@ namespace emp {
   using Circle = Circle2D<double>;
 }
 
-#endif
+#endif // #ifndef EMP_GEOMETRY_CIRCLE2D_HPP_INCLUDE

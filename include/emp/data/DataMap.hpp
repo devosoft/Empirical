@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2021.
  *
- *  @file  DataMap.hpp
+ *  @file DataMap.hpp
  *  @brief A DataMap links names to arbitrary object types.
  *  @note Status: ALPHA
  *
@@ -80,23 +80,23 @@
  *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
  *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can
  *    do it, the improvement in cache performance could be dramatic.
- * 
+ *
  *  - Rename DataLayout and MemoryImage to DataMapLayout and DataMapMemory
  */
 
-#ifndef EMP_DATA_MAP_H
-#define EMP_DATA_MAP_H
+#ifndef EMP_DATA_DATAMAP_HPP_INCLUDE
+#define EMP_DATA_DATAMAP_HPP_INCLUDE
 
-#include <string>
 #include <cstring>        // For std::memcpy
+#include <string>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../meta/TypeID.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "MemoryImage.hpp"
 #include "DataLayout.hpp"
+#include "MemoryImage.hpp"
 
 namespace emp {
 
@@ -107,6 +107,8 @@ namespace emp {
 
     DataMap(emp::Ptr<DataLayout> in_layout_ptr, size_t in_size)
       : memory(in_size), layout_ptr(in_layout_ptr) { ; }
+
+    // -- Helper functions --
 
     /// If the current layout is shared, make a copy of it.
     void MakeLayoutUnique() {
@@ -254,6 +256,9 @@ namespace emp {
       return layout_ptr->GetType(GetID(name));
     }
 
+    bool IsNumeric(size_t id) const { return GetType(id).IsArithmetic(); }
+    bool IsNumeric(const std::string & name) const { return IsNumeric(GetID(name)); }
+
     /// Get the memory at the target position, assume it is the provided type, and convert the
     /// value found there to double.
     double GetAsDouble(size_t id, TypeID type_id) const {
@@ -297,11 +302,17 @@ namespace emp {
       return layout_ptr == &in_layout;
     }
 
+    /// Test if this DataMap has ANY layout.
+    bool HasLayout() const { return layout_ptr; }
+
     /// Test if this DataMap is using the identical layout as another DataMap.
     bool SameLayout(const emp::DataMap & in_dm) const {
       return layout_ptr == in_dm.layout_ptr;
       // @CAO: Should we also see if it's using a different layout object, but otherwise identical?
     }
+
+    /// Get the DataLayout so that it can be used elsewhere.
+    emp::DataLayout & GetLayout() { return *layout_ptr; }
 
     /// Get the DataLayout so that it can be used elsewhere.
     const emp::DataLayout & GetLayout() const { return *layout_ptr; }
@@ -318,4 +329,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAMAP_HPP_INCLUDE

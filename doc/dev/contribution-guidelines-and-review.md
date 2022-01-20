@@ -99,7 +99,7 @@ An example header might look like:
  *
  *  If you want to prevent pointers to pointers (a common source of errors, but MAY be done
  *  intentionally) you can define EMP_NO_PTR_TO_PTR
- * 
+ *
  *  If you trip an assert, you can re-do the run a track a specific pointer by defining
  *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will
  *  allow you to track the pointer more easily in a debugger.
@@ -113,7 +113,7 @@ An example header might look like:
 
 Each class should have at least a one-sentence description of the goals of that
 class (unless it is the ONLY class in a file and the descriptions would be identical).
-Each function should have at least a one-sentence description; parameters and 
+Each function should have at least a one-sentence description; parameters and
 return value should also be described unless obvious from the function/parameter names.
 
 Sections of code should have a comment at the top, explaining what this section does.
@@ -149,7 +149,7 @@ Vim users can run:
 
 to automagically check the spelling within the file being edited.
 
-If there is an Empirical replacement for a standard C++ feature in 
+If there is an Empirical replacement for a standard C++ feature in
 the include/emp/base/ directory, you should use that replacement.
 Specific cases include:
 > -  Use emp::Ptr<> instead of raw pointers.

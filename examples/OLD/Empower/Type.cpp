@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::Type
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Type.cpp
+ *  @brief Some examples code for using emp::Type
+ */
 
 #include <iostream>
 
@@ -11,14 +13,14 @@
 
 void PrintType(emp::Type & type) {
   std::cout << "type '" << type.GetName()
-	    << "' had id " << type.GetID()
-	    << " and size " << type.GetSize()
-	    << std::endl;
+      << "' had id " << type.GetID()
+      << " and size " << type.GetSize()
+      << std::endl;
   std::cout << "   IsType<int> = " << type.IsType<int>()
-	    << "   IsType<double> = " << type.IsType<double>()
-	    << "   IsType<string> = " << type.IsType<std::string>()
-	    << "   IsType<bool> = " << type.IsType<bool>()
-	    << std::endl;
+      << "   IsType<double> = " << type.IsType<double>()
+      << "   IsType<string> = " << type.IsType<std::string>()
+      << "   IsType<bool> = " << type.IsType<bool>()
+      << std::endl;
 }
 
 int main()

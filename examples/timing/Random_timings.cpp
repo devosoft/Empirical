@@ -1,8 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Some code testing the speed of random operations.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file Random_timings.cpp
+ *  @brief Some code testing the speed of random operations.
+ */
 
 #include <algorithm>     // For std::sort
 #include <ctime>         // For std::clock
@@ -37,14 +40,14 @@ int main()
   std::clock_t total_time = std::clock() - start_time;
 
   std::cout << "Testing Random::GetUInt()."
-	    << "  Doing " << N_UInt << " tests "
-	    << " with " << buckets << " buckets;"
-	    << " expecting ~" << expected_per_bucket << " per_bucket.\n";
+      << "  Doing " << N_UInt << " tests "
+      << " with " << buckets << " buckets;"
+      << " expecting ~" << expected_per_bucket << " per_bucket.\n";
 
   for (size_t i = 0; i < 10; i++) {
     std::cout << "hits[" << i << "] = " << hit_counts[i]
-	      << "     hits[" << buckets-i << "] = " << hit_counts[buckets-i]
-	      << "\n";
+        << "     hits[" << buckets-i << "] = " << hit_counts[buckets-i]
+        << "\n";
   }
 
   std::cout << " time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
@@ -69,9 +72,9 @@ int main()
   total_time = std::clock() - start_time;
 
   std::cout << "\nTesting Random::P()."
-	    << "  Doing " << N_P << " tests;"
-	    << " expecting ~" << expected << " hits.\n"
-	    << "  num hits = " << success_count
+      << "  Doing " << N_P << " tests;"
+      << " expecting ~" << expected << " hits.\n"
+      << "  num hits = " << success_count
             << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
             << " seconds." << std::endl;
 
@@ -92,9 +95,9 @@ int main()
   total_time = std::clock() - start_time;
 
   std::cout << "\nTesting Random::RandFill()."
-	    << "  Doing " << N_P << " tests;"
-	    << " expecting ~" << expected << " hits.\n"
-	    << "  num hits = " << success_count
+      << "  Doing " << N_P << " tests;"
+      << " expecting ~" << expected << " hits.\n"
+      << "  num hits = " << success_count
             << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
             << " seconds." << std::endl;
 

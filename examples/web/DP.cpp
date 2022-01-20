@@ -1,6 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file DP.cpp
+ */
 
 #include <string>
 
@@ -99,8 +103,8 @@ int main()
   auto tdesc = doc.AddDiv("tdesc");
   tdesc.SetWidth(width);
   tdesc << "<p>How did we solve this problem?  Consider the recursive approach.  If we knew the best possible score if we had only the first <i>n</i>-2 words, and we also knew the best possible score for the first <i>n</i>-1 words, do these values help us find the best score for all <i>n</i> words?</p>"
-	<< "<p>Yes!</p>"
-	<< "<p>For word <i>n</i>, we can either exclude the word from the answer (and just use the anser same score as <i>n</i>-1) -or- we can include it.  If we include it, we must exclude <i>n</i>-1, so we take the length of word <i>n</i> and add it to the best score for the first <i>n</i>-2 words.</p>";
+  << "<p>Yes!</p>"
+  << "<p>For word <i>n</i>, we can either exclude the word from the answer (and just use the anser same score as <i>n</i>-1) -or- we can include it.  If we include it, we must exclude <i>n</i>-1, so we take the length of word <i>n</i> and add it to the best score for the first <i>n</i>-2 words.</p>";
   tdesc << "<p>Here is the table that we use to perform this calculation:</p>";
 
   auto table = doc.AddTable((size_t)3, (size_t)1, "table");

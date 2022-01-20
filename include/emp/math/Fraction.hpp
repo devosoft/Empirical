@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  Fraction.hpp
+ *  @file Fraction.hpp
  *  @brief Tools to maintain a more exact fraction (rather than lose precision as a double)
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_FRACTION_H
-#define EMP_FRACTION_H
+#ifndef EMP_MATH_FRACTION_HPP_INCLUDE
+#define EMP_MATH_FRACTION_HPP_INCLUDE
 
 #include "math.hpp"
 
@@ -41,4 +41,4 @@ namespace emp {
     int64_t GetDenomonator() const { return denom; }
   };
 
-#endif
+#endif // #ifndef EMP_MATH_FRACTION_HPP_INCLUDE

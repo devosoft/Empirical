@@ -1,19 +1,21 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This ap maintains a slideshow based on the UI tools.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file Slideshow.hpp
+ *
+ */
 
-#ifndef EMP_SLIDESHOW_H
-#define EMP_SLIDESHOW_H
-
+#ifndef DEMOS_SLIDESHOW_HPP_INCLUDE
+#define DEMOS_SLIDESHOW_HPP_INCLUDE
 
 #include <string>
 
 #include "emp/base/vector.hpp"
 #include "emp/web/emfunctions.hpp"
-#include "emp/web/web.hpp"
 #include "emp/web/KeypressManager.hpp"
+#include "emp/web/web.hpp"
 
 namespace emp {
 
@@ -188,4 +190,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef DEMOS_SLIDESHOW_HPP_INCLUDE

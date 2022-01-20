@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Type.hpp
+ *  @file Type.hpp
  *  @brief A collection of information about how to manage variables of a specified type.
  */
 
-#ifndef EMP_EMPOWER_TYPE_H
-#define EMP_EMPOWER_TYPE_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
 
 #include <functional>
 #include <string>
@@ -71,7 +71,7 @@ namespace emp {
 
     /// Destructor for type T at a specified MemoryImage position
     void Destruct(size_t mem_pos, MemoryImage & mem_image) const {
-	    mem_image.GetPtr<T>(mem_pos)->~T();
+      mem_image.GetPtr<T>(mem_pos)->~T();
     }
 
     /// Set the variable of the provided type at this memory position to the provided string.
@@ -102,4 +102,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE

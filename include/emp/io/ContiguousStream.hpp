@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  ContiguousStream.hpp
+ *  @file ContiguousStream.hpp
  *  @brief Useful for streaming data to contiguous memory.
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_CONTIGUOUS_STREAM_H
-#define EMP_CONTIGUOUS_STREAM_H
+#ifndef EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
+#define EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
 
 #include <iostream>
 
@@ -185,4 +185,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifdef EMP_CONTIGUOUS_STREAM_H
+#endif // #ifndef EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE

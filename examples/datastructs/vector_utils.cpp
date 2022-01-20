@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017-2020.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using vector_utils.h
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017-2020
+ *
+ *  @file vector_utils.cpp
+ *  @brief Some examples code for using vector_utils.hpp
+ */
 
 #include <iostream>
 

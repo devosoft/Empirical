@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  VarInfo.hpp
+ *  @file VarInfo.hpp
  *  @brief Generic info about a single variable (across MemoryImages)
  */
 
-#ifndef EMP_EMPOWER_VAR_INFO_H
-#define EMP_EMPOWER_VAR_INFO_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_VARINFO_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_VARINFO_HPP_INCLUDE
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -57,4 +57,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_VARINFO_HPP_INCLUDE

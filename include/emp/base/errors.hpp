@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  errors.hpp
+ *  @file errors.hpp
  *  @brief Tools to help manage various problems in command-line or Emscripten-based applications.
  *  @note Status: ALPHA
  *
@@ -34,10 +34,10 @@
  *    - Uncaught exceptions should have a default behavior when Resolved.  Exceptions could have
  *      various resolve times: Next exception added, Next exception check, when ResolveExceptions()
  *      is run, End of program, or ASAP. (perhaps)
-*/
+ */
 
-#ifndef EMP_ERRORS_H
-#define EMP_ERRORS_H
+#ifndef EMP_BASE_ERRORS_HPP_INCLUDE
+#define EMP_BASE_ERRORS_HPP_INCLUDE
 
 #include <iostream>
 #include <map>
@@ -166,4 +166,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_BASE_ERRORS_HPP_INCLUDE

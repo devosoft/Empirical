@@ -3,13 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  MemoryIStream.hpp
+ *  @file MemoryIStream.hpp
  *  @brief Useful for streaming data from contiguous memory.
  *  @note Status: RELEASE
  */
 
- #include <streambuf>
- #include <istream>
+#ifndef EMP_IO_MEMORYISTREAM_HPP_INCLUDE
+#define EMP_IO_MEMORYISTREAM_HPP_INCLUDE
+
+#include <istream>
+#include <streambuf>
 
 namespace emp {
 
@@ -33,3 +36,5 @@ namespace emp {
   };
 
 }
+
+#endif // #ifndef EMP_IO_MEMORYISTREAM_HPP_INCLUDE

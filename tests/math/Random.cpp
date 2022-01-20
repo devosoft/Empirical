@@ -1,34 +1,39 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Random.cpp
+ */
+
+#include <algorithm>
+#include <climits>
+#include <deque>
+#include <fstream>
+#include <limits>
+#include <numeric>
+#include <ratio>
+#include <sstream>
+#include <string>
+#include <unordered_set>
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/vector.hpp>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
-
 
 #include "emp/math/Random.hpp"
 #include "emp/math/random_utils.hpp"
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <deque>
-#include <algorithm>
-#include <limits>
-#include <numeric>
-#include <climits>
-#include <unordered_set>
-#include <ratio>
-
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
-
 TEST_CASE("Test Random", "[math]")
 {
-	// Get Seed
-	emp::Random rnd(1);
-	REQUIRE(rnd.GetSeed() == 1);
-	rnd.ResetSeed(5);
-	REQUIRE(rnd.GetSeed() == 5);
+  // Get Seed
+  emp::Random rnd(1);
+  REQUIRE(rnd.GetSeed() == 1);
+  rnd.ResetSeed(5);
+  REQUIRE(rnd.GetSeed() == 5);
 
   // Grab 100 random values.
   std::array<double, 100> value_series;
@@ -48,43 +53,43 @@ TEST_CASE("Test Random", "[math]")
 
   REQUIRE( value_series == value_series3 );
 
-	// Get Double
-	double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
-	REQUIRE(r_d >= 0.0);
-	REQUIRE(r_d < 5.0);
+  // Get Double
+  double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
+  REQUIRE(r_d >= 0.0);
+  REQUIRE(r_d < 5.0);
 
-	// Get UInt
-	size_t r_ui = rnd.GetUInt(emp::Range<size_t>(0,5));
-	REQUIRE(r_ui < 5);
+  // Get UInt
+  size_t r_ui = rnd.GetUInt(emp::Range<size_t>(0,5));
+  REQUIRE(r_ui < 5);
 
-	// Get Int
-	int r_i = rnd.GetInt(emp::Range<int>(-5,5));
-	REQUIRE(r_i >= -5);
-	REQUIRE(r_i < 5);
+  // Get Int
+  int r_i = rnd.GetInt(emp::Range<int>(-5,5));
+  REQUIRE(r_i >= -5);
+  REQUIRE(r_i < 5);
 
-	// Get UInt64
-	uint64_t ui64 = rnd.GetUInt64(100);
-	REQUIRE(ui64 < 100);
+  // Get UInt64
+  uint64_t ui64 = rnd.GetUInt64(100);
+  REQUIRE(ui64 < 100);
 
-	ui64 = rnd.GetUInt64(100000000000);
-	REQUIRE(ui64 < 100000000000);
+  ui64 = rnd.GetUInt64(100000000000);
+  REQUIRE(ui64 < 100000000000);
 
-	// Values are consistent when random seeded with 5
-	double rndNormal = rnd.GetRandNormal(5.0, 0.1);
-	REQUIRE( std::abs(rndNormal - 5.0) < 0.5 );
+  // Values are consistent when random seeded with 5
+  double rndNormal = rnd.GetRandNormal(5.0, 0.1);
+  REQUIRE( std::abs(rndNormal - 5.0) < 0.5 );
 
-	REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
+  REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
 
   size_t b1_result = rnd.GetRandBinomial(3000, 0.1);
-	REQUIRE(b1_result > 250);
-	REQUIRE(b1_result < 350);
+  REQUIRE(b1_result > 250);
+  REQUIRE(b1_result < 350);
 
   size_t b2_result = rnd.GetRandBinomial(100, 0.3);
-	REQUIRE(b2_result > 15);
-	REQUIRE(b2_result < 50);
+  REQUIRE(b2_result > 15);
+  REQUIRE(b2_result < 50);
 
-	emp::RandomStdAdaptor randomStd(rnd);
-	REQUIRE(randomStd(4) == 1);
+  emp::RandomStdAdaptor randomStd(rnd);
+  REQUIRE(randomStd(4) == 1);
 
   REQUIRE(rnd.GetRandGeometric(1) == 1);
   REQUIRE(rnd.GetRandGeometric(0) == std::numeric_limits<uint32_t>::infinity());

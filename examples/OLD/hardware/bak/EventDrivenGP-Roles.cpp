@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file EventDrivenGP-Roles.cpp
+ */
+
 // ------- DEPRECATED -------
 // Example evolving EventDrivenGP.
 // Environment: Here, we evolve EventDrivenGP programs in a Deme/group setting. Each deme consists of
@@ -14,11 +22,12 @@
 #include <iostream>
 #include <unordered_set>
 #include <utility>
-#include "hardware/EventDrivenGP.h"
+
 #include "base/Ptr.h"
-#include "tools/Random.h"
-#include "tools/BitSet.h"
 #include "Evo/World.h"
+#include "hardware/EventDrivenGP.h"
+#include "tools/BitSet.h"
+#include "tools/Random.h"
 
 using event_t = typename emp::EventDrivenGP::event_t;
 using event_lib_t = typename emp::EventDrivenGP::event_lib_t;

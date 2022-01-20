@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019.
  *
- *  @file  DataLayout.hpp
+ *  @file DataLayout.hpp
  *  @brief A mapping of names to variables stored in a MemoryImage.
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_DATA_LAYOUT_H
-#define EMP_DATA_LAYOUT_H
+#ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
+#define EMP_DATA_DATALAYOUT_HPP_INCLUDE
 
 #include <string>
 #include <unordered_map>
@@ -74,7 +74,7 @@ namespace emp {
     /// Determine if we have an ID.
     bool HasID(size_t id) const { return emp::Has(setting_map, id); }
 
-    /// Detemine if we have the correct type of a specific variable ID.
+    /// Determine if we have the correct type of a specific variable ID.
     template <typename T>
     bool IsType(size_t id) const {
       emp_assert(Has(setting_map, id), id);
@@ -95,6 +95,15 @@ namespace emp {
     emp::TypeID GetType(size_t id) const {
       emp_assert(HasID(id), id);
       return setting_map.find(id)->second.type;
+    }
+
+    /// Determine is entry is some form of numeric type.
+    bool IsNumeric(size_t id) const {
+      return GetType(id).IsArithmetic();
+    }
+
+    bool IsNumeric(const std::string & name) const {
+      return IsNumeric(GetID(name));
     }
 
     /// Prevent this layout from being modified.
@@ -217,4 +226,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE

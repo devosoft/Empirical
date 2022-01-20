@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  BitArray.hpp
+ *  @file BitArray.hpp
  *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
  *  @note Status: RELEASE
  *
@@ -12,14 +12,14 @@
  *        option is to do this well ONCE with a macro that properly fills in the details.
  */
 
+#ifndef EMP_BITS_BITARRAY_HPP_INCLUDE
+#define EMP_BITS_BITARRAY_HPP_INCLUDE
 
-#ifndef EMP_BIT_ARRAY_HPP
-#define EMP_BIT_ARRAY_HPP
 
-#include <iostream>
-#include <initializer_list>
-#include <cstring>
 #include <bitset>
+#include <cstring>
+#include <initializer_list>
+#include <iostream>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -30,8 +30,8 @@
 #include "../meta/type_traits.hpp"
 #include "../polyfill/span.hpp"
 
-#include "bitset_utils.hpp"
 #include "_bitset_helpers.hpp"
+#include "bitset_utils.hpp"
 
 namespace emp {
 
@@ -265,7 +265,7 @@ namespace emp {
     /// Set all bits randomly, with a fixed number of them being ones.
     BitArray & ChooseRandom(Random & random, const size_t target_ones,
                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
-    
+
     /// Flip random bits with a given probability.
     BitArray & FlipRandom(Random & random, const double p,
                         const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
@@ -288,7 +288,7 @@ namespace emp {
     /// Unset  a specified number of random bits (does not check if already zero.)
     BitArray & ClearRandomCount(Random & random, const size_t num_bits);
 
-    // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
+    // =========  Comparison Operators  ========== //
 
     template <size_t T2, bool L2>
     [[nodiscard]] bool operator==(const BitArray<T2,L2> & in) const;
@@ -312,7 +312,7 @@ namespace emp {
     explicit operator bool() const { return Any(); }
 
 
-    // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
+    // =========  Access Groups of bits  ========= //
 
     /// Retrive the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
@@ -346,7 +346,7 @@ namespace emp {
 
     /// Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
-    
+
     /// Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
@@ -384,7 +384,7 @@ namespace emp {
 
     /// Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
-    
+
     /// Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
@@ -410,7 +410,7 @@ namespace emp {
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
-    // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
+    // =========  Other Analyses  ========= //
 
     /// A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash() const noexcept;
@@ -459,7 +459,7 @@ namespace emp {
     [[nodiscard]] size_t LongestSegmentOnes() const;
 
 
-    // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
+    // =========  Print/String Functions  ========= //
 
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
@@ -601,7 +601,7 @@ namespace emp {
     /// Wraps if it underflows.
     /// Returns this object.
     BitArray & SUB_SELF(const BitArray & array2);
-    
+
     /// Operator bitwise NOT...
     [[nodiscard]] BitArray operator~() const { return NOT(); }
 
@@ -996,7 +996,7 @@ namespace emp {
 
     /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & 
+  BitArray<NUM_BITS,ZERO_LEFT> &
   BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
@@ -1004,7 +1004,7 @@ namespace emp {
 
   /// Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  BitArray<NUM_BITS,ZERO_LEFT> & 
+  BitArray<NUM_BITS,ZERO_LEFT> &
   BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
@@ -1026,7 +1026,7 @@ namespace emp {
     const size_t from_bit
   ) {
     // Only check for same-ness if the two types are the same.
-    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_array != this);
+    if constexpr (FROM_BITS == NUM_BITS) { emp_assert(&from_array != this); }
 
     emp_assert(from_bit < FROM_BITS);
 
@@ -1089,7 +1089,7 @@ namespace emp {
 
   template <size_t NUM_BITS, bool ZERO_LEFT>
   bool BitArray<NUM_BITS,ZERO_LEFT>::Get(size_t index) const {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     return (bits[field_id] & (((field_t)1U) << pos_id)) != 0;
@@ -1121,7 +1121,7 @@ namespace emp {
   /// Flip a single bit
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t index) {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
@@ -1489,7 +1489,7 @@ namespace emp {
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in the BitArray.
   template <size_t NUM_BITS, bool ZERO_LEFT>
-  size_t BitArray<NUM_BITS,ZERO_LEFT>::CountOnes() const { 
+  size_t BitArray<NUM_BITS,ZERO_LEFT>::CountOnes() const {
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.
@@ -2090,4 +2090,4 @@ namespace std
     };
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITARRAY_HPP_INCLUDE

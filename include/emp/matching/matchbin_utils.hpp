@@ -9,12 +9,12 @@
  *
  */
 
+#ifndef EMP_MATCHING_MATCHBIN_UTILS_HPP_INCLUDE
+#define EMP_MATCHING_MATCHBIN_UTILS_HPP_INCLUDE
 
-#ifndef EMP_MATCH_BIN_UTILS_H
-#define EMP_MATCH_BIN_UTILS_H
 
 #include "../matching/matchbin_metrics.hpp"
-#include "../matching/matchbin_selectors.hpp"
 #include "../matching/matchbin_regulators.hpp"
+#include "../matching/matchbin_selectors.hpp"
 
-#endif
+#endif // #ifndef EMP_MATCHING_MATCHBIN_UTILS_HPP_INCLUDE

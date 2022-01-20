@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  DynamicString.hpp
+ *  @file DynamicString.hpp
  *  @brief A string handler where sections update dynamically based on functions.
  *  @note Status: BETA
  */
 
+#ifndef EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE
+#define EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE
 
-#ifndef EMP_DYNAMIC_STRING_H
-#define EMP_DYNAMIC_STRING_H
 
 #include <functional>
 #include <string>
@@ -94,4 +94,4 @@ namespace std {
   }
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE

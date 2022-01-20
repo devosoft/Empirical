@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Examples for DataNode demonstrating how to track different types of data.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file DataNode.cpp
+ *  @brief Examples for DataNode demonstrating how to track different types of data.
+ */
 
 #include <iostream>
 
@@ -107,20 +109,20 @@ int main()
   hist_data.Add(1,2,1,19);
 
   std::cout << "hist_data.GetHistMin() = " << hist_data.GetHistMin()
-	    << "; expected 1" << std::endl;
+      << "; expected 1" << std::endl;
   std::cout << "hist_data.GetHistWidth(5) = " << hist_data.GetHistWidth(5)
-	    << "; expected 2" << std::endl;
+      << "; expected 2" << std::endl;
 
   std::cout << "hist_data.GetBinMins() = " << emp::to_string(hist_data.GetBinMins())
-	    << "; expected emp::vector<double>({1,3,5,7,9,11,13,15,17,19}" << std::endl;
+      << "; expected emp::vector<double>({1,3,5,7,9,11,13,15,17,19}" << std::endl;
 
   std::cout << "hist_data.GetHistCount(9) = " << hist_data.GetHistCount(9)
-	    << "; expected 1" << std::endl;
+      << "; expected 1" << std::endl;
   std::cout << "hist_data.GetHistCounts() = " << emp::to_string(hist_data.GetHistCounts())
-	    << "; expected emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}" << std::endl;
+      << "; expected emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}" << std::endl;
 
   hist_data.Reset();
   std::cout << "hist_data.GetHistCounts() = " << emp::to_string(hist_data.GetHistCounts())
-	    << "; expected emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}" << std::endl;
+      << "; expected emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}" << std::endl;
 
 }

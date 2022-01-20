@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  DataManager.hpp
+ *  @file DataManager.hpp
  *  @brief DataManager handles a set of DataNode objects with the same tracking settings.
  */
 
-#ifndef EMP_DATA_MANAGER_H
-#define EMP_DATA_MANAGER_H
+#ifndef EMP_DATA_DATAMANAGER_HPP_INCLUDE
+#define EMP_DATA_DATAMANAGER_HPP_INCLUDE
 
 #include <map>
 #include <string>
@@ -105,7 +105,7 @@ namespace emp {
      * ```
      * DataManager<int, data::Current, data::Range> my_data_manager;
      * my_data_manager.Add("my_node_name");
-     * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  
+     * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);
      * ```*/
     template <typename... Ts>
     void AddData(const std::string & name, Ts... extra) {
@@ -124,4 +124,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAMANAGER_HPP_INCLUDE

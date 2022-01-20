@@ -14,8 +14,8 @@
  *  If EMP_NDEBUG is set then it reverts back to std::map.
  */
 
-#ifndef EMP_MAP_H
-#define EMP_MAP_H
+#ifndef EMP_BASE_MAP_HPP_INCLUDE
+#define EMP_BASE_MAP_HPP_INCLUDE
 
 #include <initializer_list>
 #include <map>
@@ -143,4 +143,4 @@ namespace emp {
 
 
 
-#endif
+#endif // #ifndef EMP_BASE_MAP_HPP_INCLUDE

@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  BitSet.hpp
+ *  @file BitSet.hpp
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features; aliases BitArray.
  *  @note Status: RELEASE
  *
  */
 
+#ifndef EMP_BITS_BITSET_HPP_INCLUDE
+#define EMP_BITS_BITSET_HPP_INCLUDE
 
-#ifndef EMP_BIT_SET_HPP
-#define EMP_BIT_SET_HPP
 
 #include "BitArray.hpp"
 
@@ -22,4 +22,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITSET_HPP_INCLUDE

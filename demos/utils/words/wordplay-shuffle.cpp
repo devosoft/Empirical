@@ -1,21 +1,23 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-// Find words that are a shuffle of another workd.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file wordplay-shuffle.cpp
+ *  @brief Find words that are a shuffle of another word.
+ */
 
 #include <iostream>
 #include <set>
 
 #include "../../../include/emp/base/assert.hpp"
-#include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/config/ArgManager.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
+#include "../../../include/emp/datastructs/vector_utils.hpp"
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/math/math.hpp"
-#include "../../../include/emp/datastructs/set_utils.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
-#include "../../../include/emp/datastructs/vector_utils.hpp"
 
 int main(int argc, char* argv[])
 {

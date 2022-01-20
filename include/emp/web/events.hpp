@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  events.hpp
+ *  @file events.hpp
  *  @brief Event handlers that use JQuery.
  *
  *  @todo Events can be further sub-divided and built up (similar to DataNode objects) so that we
@@ -15,8 +15,8 @@
  *    it might not actually be a speedup.
  */
 
-#ifndef EMP_WEB_EVENTS_H
-#define EMP_WEB_EVENTS_H
+#ifndef EMP_WEB_EVENTS_HPP_INCLUDE
+#define EMP_WEB_EVENTS_HPP_INCLUDE
 
 #include <utility>
 
@@ -154,4 +154,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_EVENTS_HPP_INCLUDE

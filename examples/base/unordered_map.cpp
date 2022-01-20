@@ -1,6 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file unordered_map.cpp
+ */
 
 #include <algorithm>
 
@@ -21,8 +25,8 @@ int main()
 
   for (auto [key, value] : test_map) {
     std::cout << "  key = " << key
- 	      << "  value = " << value
- 	      << std::endl;
+         << "  value = " << value
+         << std::endl;
   }
 
 
@@ -30,8 +34,8 @@ int main()
   std::cout << "\nCopy (by constructor):\n";
   for (auto [key, value] : test_map_copy) {
     std::cout << "  key = " << key
- 	      << "  value = " << value
- 	      << std::endl;
+         << "  value = " << value
+         << std::endl;
   }
 
   test_map[67] = "Sixty Seven (New!!)";
@@ -40,8 +44,8 @@ int main()
   std::cout << "\nCopy2 (by operator):\n";
   for (auto [key, value] : test_map_copy) {
     std::cout << "  key = " << key
- 	      << "  value = " << value
- 	      << std::endl;
+         << "  value = " << value
+         << std::endl;
   }
 
 
@@ -55,14 +59,14 @@ int main()
   test_map2["counter"] = 0;
 
   std::cout << test_map2["one"] << " + "
-	    << test_map2["two"] << " = "
-	    << test_map2["three"] << std::endl;
+      << test_map2["two"] << " = "
+      << test_map2["three"] << std::endl;
 
   test_map2["counter"] = test_map2["one"] + test_map2["two"];
   test_map2["counter"] += test_map2["three"];
 
   std::cout << (2 * test_map2["counter"] * 2) << " = " << 24
-	    << std::endl;
+      << std::endl;
 
 
 }

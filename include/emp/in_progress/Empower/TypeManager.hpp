@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  TypeManager.hpp
+ *  @file TypeManager.hpp
  *  @brief Handles creation or retrieval of type objects.
  */
 
-#ifndef EMP_EMPOWER_TYPE_MANAGER_H
-#define EMP_EMPOWER_TYPE_MANAGER_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
 
 #include <functional>
 #include <string>
@@ -58,4 +58,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE

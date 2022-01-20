@@ -1,16 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple class to track value pairs of any kind, optimized for points in 2D Space
-//
-//  Note: For maximal efficiency, prefer SquareMagnitude() and SquareDistance()
-//        over Magnitude() and Distance() as the latter require a square-root.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Point2D.hpp
+ *  @brief A simple class to track value pairs of any kind, optimized for points in 2D Space.
+ *
+ * @note For maximal efficiency, prefer SquareMagnitude() and SquareDistance()
+ * over Magnitude() and Distance() as the latter require a square-root.
+ */
 
-
-#ifndef EMP_POINT_2D_H
-#define EMP_POINT_2D_H
+#ifndef EMP_GEOMETRY_POINT2D_HPP_INCLUDE
+#define EMP_GEOMETRY_POINT2D_HPP_INCLUDE
 
 #include <cmath>
 #include <iostream>
@@ -115,4 +116,4 @@ namespace std {
   }
 }
 
-#endif
+#endif // #ifndef EMP_GEOMETRY_POINT2D_HPP_INCLUDE

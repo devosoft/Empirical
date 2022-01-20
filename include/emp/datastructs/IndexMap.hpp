@@ -1,19 +1,18 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2021.
  *
- *  @file  IndexMap.hpp
+ *  @file IndexMap.hpp
  *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
  *
  *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
- *  @todo Should operator[] index by element count or by weight?
  *  @todo Make Raw*() function private.
  */
 
-#ifndef EMP_INDEX_MAP_H
-#define EMP_INDEX_MAP_H
+#ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
 
 #include "../base/vector.hpp"
 
@@ -41,13 +40,14 @@ namespace emp {
     /// Which ID is the right child of the ID provided?
     size_t RightID(size_t id) const { return 2*id + 2; }
 
-    /// Sift through the nodes to find the where index zero maps to.
+    /// Sift through the nodes to find where index zero maps to.
     size_t CalcZeroOffset() const {
       size_t id = 0;
       while (id < num_items - 1) id = LeftID(id);
       return id - (num_items - 1);
     }
 
+    /// Convert an item ID to the internal position where it's stored.
     size_t ToInternalID(size_t id) const {
       return (id + zero_offset) % num_items + num_items-1;
     }
@@ -56,8 +56,32 @@ namespace emp {
       return (id + _offset) % _items + _items-1;
     }
 
+    /// Convert and internal position to the item ID to which it refers.
     size_t ToExternalID(size_t id) const {
       return (id + 1 - zero_offset) % num_items;
+    }
+
+    // Collect the weight at the specified index of the array (no conversions)
+    double RawWeight(size_t id) const { return weights[id]; }
+
+    // Collect the probability at the specified index of the array (no conversions)
+    double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
+
+    /// Adjust the weight associated with a particular index in the map.
+    /// @param id is the identification number of the item whose weight is being adjusted.
+    /// @param new_weight is the new weight for that entry.
+    void RawAdjust(size_t id, const double new_weight) {
+      // Update this node.
+      const double weight_diff = new_weight - weights[id]; // Track change size for tree weights.
+      weights[id] = new_weight;                            // Update THIS item weight
+
+      if (needs_refresh) return;     // If we already need a refresh don't update tree weights!
+
+      // Update tree to root.
+      while (id > 0) {
+        id = ParentID(id);
+        weights[id] += weight_diff;
+      }
     }
 
     /// A Proxy class so that an index can be treated as an l-value.
@@ -94,7 +118,10 @@ namespace emp {
     }
     IndexMap(size_t _items, double init_weight)
       : num_items(_items), zero_offset(CalcZeroOffset()), needs_refresh(true)
-      , weights(num_items, init_weight) { ; }
+      , weights(num_items*2-1, 0.0)
+    {
+      if (init_weight != 0.0) AdjustAll(init_weight);
+    }
     IndexMap(const IndexMap &) = default;
     IndexMap(IndexMap &&) = default;
     ~IndexMap() = default;
@@ -108,11 +135,9 @@ namespace emp {
     double GetWeight() const { ResolveRefresh(); return weights[0]; }
 
     /// What is the current weight of the specified index?
-    double RawWeight(size_t id) const { return weights[id]; }
     double GetWeight(size_t id) const { return RawWeight(ToInternalID(id)); }
 
     /// What is the probability of the specified index being selected?
-    double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
     double GetProb(size_t id) const { return RawProb(ToInternalID(id)); }
 
     /// Change the number of indices in the map.
@@ -159,23 +184,6 @@ namespace emp {
       else weights.resize(2*new_size - 1);    // Else size for N values and N-1 internal nodes.
       num_items = new_size;
       Clear();
-    }
-
-    /// Adjust the weight associated with a particular index in the map.
-    /// @param id is the identification number of the item whose weight is being adjusted.
-    /// @param new_weight is the new weight for that entry.
-    void RawAdjust(size_t id, const double new_weight) {
-      // Update this node.
-      const double weight_diff = new_weight - weights[id]; // Track change size for tree weights.
-      weights[id] = new_weight;                            // Update THIS item weight
-
-      if (needs_refresh) return;     // If we already need a refresh don't update tree weights!
-
-      // Update tree to root.
-      while (id > 0) {
-        id = ParentID(id);
-        weights[id] += weight_diff;
-      }
     }
 
     void Adjust(size_t id, const double new_weight) { RawAdjust(ToInternalID(id), new_weight); }
@@ -250,4 +258,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE

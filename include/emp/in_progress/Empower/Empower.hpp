@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Empower.hpp
+ *  @file Empower.hpp
  *  @brief A scripting language built inside of C++
  *
  *  Empower is a scripting language built inside of Empirical to simplify and the use of fast
@@ -29,8 +29,8 @@
  *  @todo Allow nested namespaces to be branched at any level (so outer levels share vars)
  */
 
-#ifndef EMP_EMPOWER_H
-#define EMP_EMPOWER_H
+#ifndef EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE
 
 #include <functional>
 #include <map>
@@ -93,16 +93,16 @@ namespace emp {
 
     public:
       Var(size_t _id, size_t _pos, MemoryImage & mem)
-	      : info_id(_id), mem_pos(_pos), mem_ptr(&mem) { ; }
+        : info_id(_id), mem_pos(_pos), mem_ptr(&mem) { ; }
       Var(const Var &) = default;
 
       template <typename T>
       T & Restore() {
         // Make sure function is restoring the correct type.
         emp_assert( mem_ptr->GetEmpower().vars[info_id].type_id ==
-		    mem_ptr->GetEmpower().GetTypeID<T>() );
+          mem_ptr->GetEmpower().GetTypeID<T>() );
 
-      	// Convertthis memory to a reference that can be returned.
+        // Convert this memory to a reference that can be returned.
         return mem_ptr->GetRef<T>(mem_pos);
       }
     };
@@ -150,7 +150,7 @@ namespace emp {
       Type(size_t _id, const std::string & _name, size_t _size,
            const dconstruct_fun_t & dc_fun, const cconstruct_fun_t & cc_fun,
            const copy_fun_t & c_fun, const destruct_fun_t & d_fun)
-	      : type_id(_id), type_name(_name), mem_size(_size)
+        : type_id(_id), type_name(_name), mem_size(_size)
         , dconstruct_fun(dc_fun), cconstruct_fun(cc_fun)
         , copy_fun(c_fun), destruct_fun(d_fun) { ; }
     };
@@ -171,7 +171,7 @@ namespace emp {
       /// Loop through all variables stored in this memory image and copy each of them.
       for (const VarInfo & v : vars) {
         const Type & type = types[v.type_id];
-      	type.dconstruct_fun(v, new_image);
+        type.dconstruct_fun(v, new_image);
       }
     }
 
@@ -180,7 +180,7 @@ namespace emp {
       /// Loop through all variables stored in this memory image and copy each of them.
       for (const VarInfo & v : vars) {
         const Type & type = types[v.type_id];
-      	type.cconstruct_fun(v, from_image, to_image);
+        type.cconstruct_fun(v, from_image, to_image);
       }
     }
 
@@ -190,7 +190,7 @@ namespace emp {
       /// Loop through all variables stored in this memory image and copy each of them.
       for (const VarInfo & v : vars) {
         const Type & type = types[v.type_id];
-      	type.copy_fun(v, from_image, to_image);
+        type.copy_fun(v, from_image, to_image);
       }
     }
 
@@ -200,7 +200,7 @@ namespace emp {
       /// Loop through all variables stored in this memory image and destruct each of them.
       for (const VarInfo & v : vars) {
         const Type & type = types[v.type_id];
-      	type.destruct_fun(v, image);
+        type.destruct_fun(v, image);
       }
     }
 
@@ -238,7 +238,7 @@ namespace emp {
         to_image.GetRef<T>(mem_pos) = from_image.GetRef<T>(mem_pos);
       };
       destruct_fun_t destruct_fun = [](const VarInfo & var_info, MemoryImage & mem) {
-	      mem.GetPtr<T>(var_info.mem_pos)->~T();
+        mem.GetPtr<T>(var_info.mem_pos)->~T();
       };
 
       types.emplace_back(type_id, type_name, mem_size, dconstruct_fun, cconstruct_fun, copy_fun, destruct_fun);
@@ -306,4 +306,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE

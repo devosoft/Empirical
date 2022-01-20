@@ -3,17 +3,18 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  emfunctions.hpp
+ *  @file emfunctions.hpp
  *  @brief Specialized, useful function for Empirical.
  */
 
-#ifndef EMP_EM_FUNCTIONS_H
-#define EMP_EM_FUNCTIONS_H
+#ifndef EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
+#define EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
 
 #include <functional>
 
 #include "../debug/alert.hpp"
 #include "../tools/string_utils.hpp"
+
 #include "JSWrap.hpp"
 
 namespace emp {
@@ -120,4 +121,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_WEB_EMFUNCTIONS_HPP_INCLUDE

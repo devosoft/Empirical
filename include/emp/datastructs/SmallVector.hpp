@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  SmallVector.hpp
+ *  @file SmallVector.hpp
  *  @brief A drop-in replacement for std::vector with optimization to handle
  *  small vector sizes without dynamic allocation. It contains some number of
  *  elements in-place, which allows it to avoid heap allocation when the actual
@@ -15,8 +15,8 @@
  *  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#ifndef EMP_SMALL_VECTOR_HPP
-#define EMP_SMALL_VECTOR_HPP
+#ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
+#define EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
 
 #include <algorithm>
 #include <cassert>
@@ -974,4 +974,4 @@ namespace std {
 
 } // end namespace std
 
-#endif // EMP_SMALL_VECTOR_HPP
+#endif // #ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE

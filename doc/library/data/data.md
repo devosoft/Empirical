@@ -60,4 +60,3 @@ for collecting data over the course of a computational experiment.
   :project: Empirical
   :no-link:
 ```
-

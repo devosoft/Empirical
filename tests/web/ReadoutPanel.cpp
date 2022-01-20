@@ -1,13 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2021.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ReadoutPanel.cpp
+ */
 
 #include "emp/base/assert.hpp"
-#include "emp/tools/string_utils.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
-#include "emp/web/Document.hpp"
-#include "emp/web/web.hpp"
 #include "emp/prefab/ReadoutPanel.hpp"
+#include "emp/tools/string_utils.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 int num_anim_steps;
 int live_variable;

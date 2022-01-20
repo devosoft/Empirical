@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2019
  *
- *  @file  ra_set.hpp
+ *  @file ra_set.hpp
  *  @brief This file defines a Random Access Set template.
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_RA_SET_H
-#define EMP_RA_SET_H
+#ifndef EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
+#define EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
 
 #include <map>
 
@@ -70,8 +70,8 @@ namespace emp {
       // Move the former last value to the now-empty spot.
       const size_t last_pos = vals.size() - 1;
       if (pos != last_pos) {
-      	vals[pos] = vals[last_pos];
-      	id_map[vals[pos]] = pos;
+        vals[pos] = vals[last_pos];
+        id_map[vals[pos]] = pos;
       }
       vals.resize(last_pos);
       return true;
@@ -83,4 +83,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE

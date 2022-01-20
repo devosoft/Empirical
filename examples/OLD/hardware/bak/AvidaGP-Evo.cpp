@@ -1,13 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file AvidaGP-Evo.cpp
+ */
 
 #include <iostream>
 
+#include "evo/World.h"
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "evo/World.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {

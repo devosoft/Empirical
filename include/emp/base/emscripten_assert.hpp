@@ -7,8 +7,8 @@
  *  @brief Assert evaluated only in debug mode with Emscripten.
  */
 
-#ifndef EMP_EMSCRIPTEN_ASSERT_HPP
-#define EMP_EMSCRIPTEN_ASSERT_HPP
+#ifndef EMP_BASE_EMSCRIPTEN_ASSERT_HPP_INCLUDE
+#define EMP_BASE_EMSCRIPTEN_ASSERT_HPP_INCLUDE
 
 #include "assert.hpp"
 
@@ -22,4 +22,4 @@
   #define emp_emscripten_assert(...)
 #endif
 
-#endif // #ifndef EMP_EMSCRIPTEN_ASSERT_HPP
+#endif // #ifndef EMP_BASE_EMSCRIPTEN_ASSERT_HPP_INCLUDE

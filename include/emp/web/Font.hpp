@@ -3,16 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Font.hpp
+ *  @file Font.hpp
  *  @brief Maintains basic information about a font to be used in HTML.
  */
 
+#ifndef EMP_WEB_FONT_HPP_INCLUDE
+#define EMP_WEB_FONT_HPP_INCLUDE
 
-#ifndef EMP_FONT_H
-#define EMP_FONT_H
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "color_map.hpp"
 #include "Style.hpp"
@@ -40,7 +40,7 @@ namespace web {
     Font(const Font &) = default;
     Font(Font &&) = default;
     Font(const std::string & _family="Helvetica", int _size=15,
-	       const std::string & _color="black", bool _bold=false, bool _italic=false)
+         const std::string & _color="black", bool _bold=false, bool _italic=false)
       : family(_family), size(_size), color(_color)
       , is_bold(_bold), is_italic(_italic), is_smallcaps(false)
       , is_underlined(false), is_overlined(false), is_linethrough(false), is_wavy_line(false)  { ; }
@@ -185,4 +185,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_FONT_HPP_INCLUDE

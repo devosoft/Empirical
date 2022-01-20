@@ -1,5 +1,14 @@
-#ifndef EMP_PLOT_EMP
-#define EMP_PLOT_EMP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file attrs.hpp
+ *  @brief TODO.
+ */
+
+#ifndef EMP_TOOLS_ATTRS_HPP_INCLUDE
+#define EMP_TOOLS_ATTRS_HPP_INCLUDE
 
 #include <algorithm>
 #include <iostream>
@@ -971,4 +980,4 @@ namespace emp {
   }  // namespace tools
 }  // namespace emp
 
-#endif  // EMP_PLOT_EMP
+#endif // #ifndef EMP_TOOLS_ATTRS_HPP_INCLUDE

@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef EMP_RANKED_SELECTOR_HPP
-#define EMP_RANKED_SELECTOR_HPP
+#ifndef EMP_MATCHING_SELECTORS_STATIC_RANKEDSELECTOR_HPP_INCLUDE
+#define EMP_MATCHING_SELECTORS_STATIC_RANKEDSELECTOR_HPP_INCLUDE
 
 #include <algorithm>
 #include <numeric>
@@ -115,4 +115,4 @@ struct RankedSelector {
 } // namespace statics
 } // namespace emp
 
-#endif // #ifndef EMP_RANKED_SELECTOR_HPP
+#endif // #ifndef EMP_MATCHING_SELECTORS_STATIC_RANKEDSELECTOR_HPP_INCLUDE

@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Image.hpp
+ *  @file Image.hpp
  *  @brief Easily load an image and place it in a document.
  */
 
+#ifndef EMP_WEB_IMAGE_HPP_INCLUDE
+#define EMP_WEB_IMAGE_HPP_INCLUDE
 
-#ifndef EMP_WEB_IMAGE_H
-#define EMP_WEB_IMAGE_H
 
 #include "Widget.hpp"
 
@@ -94,4 +94,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_IMAGE_HPP_INCLUDE

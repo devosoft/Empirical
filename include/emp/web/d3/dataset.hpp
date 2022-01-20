@@ -3,19 +3,19 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  dataset.hpp
+ *  @file dataset.hpp
  *  @brief Tools to maintain data in D3.
  */
 
-#ifndef EMP_D3_LOAD_DATA_H
-#define EMP_D3_LOAD_DATA_H
+#ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE
+#define EMP_WEB_D3_DATASET_HPP_INCLUDE
 
 #include <functional>
 
 #include "d3_init.hpp"
 
-#include "../JSWrap.hpp"
 #include "../js_utils.hpp"
+#include "../JSWrap.hpp"
 #include "../../tools/string_utils.hpp"
 
 namespace D3 {
@@ -223,14 +223,14 @@ namespace D3 {
     }
 
     void Parse(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),	\
-				  accessor.c_str())
-	}
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),  \
+          accessor.c_str())
+      }
 
     void ParseRows(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),	\
-				  accessor.c_str())
-	}
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),  \
+          accessor.c_str())
+      }
 
     /// Put the last row of the array into arr
     template <std::size_t N, typename T>
@@ -248,4 +248,4 @@ namespace D3 {
 };
 
 
-#endif
+#endif // #ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE

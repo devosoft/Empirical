@@ -211,13 +211,13 @@ RUN \
 RUN \
   /etc/init.d/xvfb start \
    && \
-  cd /opt/Empirical/tests \
+  make test-web-ConfigPanel -C /opt/Empirical/tests/web \
     && \
-  make test-web \
+  make test-native-ConfigPanel -C /opt/Empirical/tests/web \
     && \
-  make test-base \
+  make test-vector -C /opt/Empirical/tests/base \
     && \
-  make clean \
+  make clean -C /opt/Empirical/tests \
     && \
   echo "representative tests passed!"
 
@@ -254,8 +254,10 @@ RUN \
   && \
   echo "installed karma-firefox-launcher"
 
+# @mmore500 10-2021: python3 -m pip fixes UnicodeDecodeError
+# when installing charset-normalizer from github
 RUN \
-  pip install -r /opt/Empirical/third-party/requirements.txt \
+  python3 -m pip install -r /opt/Empirical/third-party/requirements.txt \
     && \
   echo "installed documentation build requirements"
 

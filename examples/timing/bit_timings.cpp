@@ -1,18 +1,21 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Some code testing the speed of operations on BitSet and BitVector.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020-2021
+ *
+ *  @file bit_timings.cpp
+ *  @brief Some code testing the speed of operations on BitSet and BitVector.
+ */
 
 #include <algorithm>     // For std::max
 #include <ctime>         // For std::clock
 #include <iomanip>       // For std::setw
 #include <map>
 
-#include "emp/bits/BitVector.hpp"
 #include "emp/base/array.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/bits/BitSet.hpp"
+#include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
 #define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 100000, 1000000
@@ -28,7 +31,7 @@ template <typename T>
 double TimeFunction(T && fun) {
   std::clock_t start_time = std::clock();
   fun();
-  std::clock_t total_time = std::clock() - start_time; 
+  std::clock_t total_time = std::clock() - start_time;
   return total_time / (double) CLOCKS_PER_SEC;
 }
 
@@ -139,7 +142,7 @@ struct SpeedTester {
 
       std::cout << std::left
                 << "  size: " << std::setw(7) << size
-                << "  count: " << std::setw(7) << obj_count              
+                << "  count: " << std::setw(7) << obj_count
                 << "  BitSet: " << std::setw(8) << bs_timings[name][size]
                 << "  BitVector: " << std::setw(8) << bv_timings[name][size]
                 << "  Ratio: " << std::setw(8) << (bs_timings[name][size] / bv_timings[name][size])
@@ -176,5 +179,5 @@ int main()
   SpeedTester speed_tester;
 
   speed_tester.RunTests();
-  speed_tester.PrintResults();  
+  speed_tester.PrintResults();
 }

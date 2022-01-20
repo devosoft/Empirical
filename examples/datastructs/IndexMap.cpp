@@ -1,14 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Some examples code for using emp::Random
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file IndexMap.cpp
+ */
 
 #include <iostream>
+
 #include "emp/base/vector.hpp"
-#include "emp/math/Random.hpp"
 #include "emp/datastructs/IndexMap.hpp"
+#include "emp/math/Random.hpp"
 
 int main()
 {

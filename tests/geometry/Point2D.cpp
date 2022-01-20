@@ -1,5 +1,13 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file Point2D.cpp
+ */
+
 #include <vector>
-#define CATCH_CONFIG_MAIN
+
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/geometry/Point2D.hpp"
@@ -57,4 +65,3 @@ TEST_CASE("Test Point2D", "[geometry]")
   REQUIRE(points[2].GetRot180().Magnitude() == 13);
   REQUIRE(points[2].GetRot270().Magnitude() == 13);
 }
-

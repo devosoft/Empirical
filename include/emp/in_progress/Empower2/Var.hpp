@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Var.hpp
+ *  @file Var.hpp
  *  @brief A collection of information about a single, instantiated variable in Empower
  *
  *
@@ -15,8 +15,8 @@
  *    - Potentially slower at going through different variables in an org since not all clustered.
  */
 
-#ifndef EMP_VAR_H
-#define EMP_VAR_H
+#ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
+#define EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
 
 #include <string>
 
@@ -144,4 +144,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE

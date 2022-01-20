@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  TypeMap.hpp
+ *  @file TypeMap.hpp
  *  @brief A class that will map types to values of a designated type.
  *  @note Status: BETA
  */
 
-#ifndef EMP_TYPE_MAP_H
-#define EMP_TYPE_MAP_H
+#ifndef EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE
 
 #include <unordered_map>
 
@@ -74,4 +74,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE

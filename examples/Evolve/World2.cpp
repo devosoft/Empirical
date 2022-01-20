@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file is an example for using the re-vamped World template.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file World2.cpp
+ *  @brief This file is an example for using the re-vamped World template.
+ */
 
 #ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM

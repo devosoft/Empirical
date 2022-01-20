@@ -1,16 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  ce_string defines a limited array object for use within a constexpr class or function.
-//
-//  STATUS: ALPHA
-//
-//  Note: this class will be slow if used at run-time without conversion to an array or vector.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file ce_array.hpp
+ *  @brief ce_array defines a limited array object for use within a constexpr class or function.
+ *
+ * STATUS: ALPHA
+ *
+ */
 
-#ifndef EMP_CE_ARRAY_H
-#define EMP_CE_ARRAY_H
+#ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_ARRAY_HPP_INCLUDE
+#define EMP_IN_PROGRESS_CONSTEXPR_CE_ARRAY_HPP_INCLUDE
 
 #include <type_traits>
 
@@ -126,4 +127,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_ARRAY_HPP_INCLUDE

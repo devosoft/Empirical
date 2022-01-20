@@ -1,9 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file Tween.cpp
+ */
 
-#include "emp/web/web.hpp"
 #include "emp/web/Tween.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 UI::Document doc("emp_base");

@@ -1,9 +1,18 @@
-#ifndef EMP_READOUT_PANEL_HPP
-#define EMP_READOUT_PANEL_HPP
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file ReadoutPanel.hpp
+ *  @brief UI framework for live statistic readouts.
+ */
+
+#ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
+#define EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
 
 #include "../tools/string_utils.hpp"
-#include "../web/Div.hpp"
 #include "../web/Animate.hpp"
+#include "../web/Div.hpp"
 
 #include "Card.hpp"
 #include "ValueBox.hpp"
@@ -208,4 +217,4 @@ namespace emp::prefab {
   };
 }
 
-#endif
+#endif // #ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE

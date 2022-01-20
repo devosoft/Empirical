@@ -6,27 +6,18 @@
  *  @file string_utils.hpp
  *  @brief Simple functions to manipulate strings.
  *  @note Status: RELEASE
- * 
+ *
  *  Available Functions
  *    const std::string & empty_string()               - Reference to an empty string for null returns
- * 
+ *
  *    -- CLASSIFICATION --
- *    size_t count(const std::string & str, char c)    - Count the occurances of c in str.
+ *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
  *    bool is_literal_char(const std::string & value)
- *    bool is_literal_string(const std::string & value)
- *    bool is_whitespace(char test_char)
- *    bool is_upper_letter(char test_char)
- *    bool is_lower_letter(char test_char)
- *    bool is_letter(char test_char)
- *    bool is_digit(char test_char)
- *    bool is_alphanumeric(char test_char)
- *    bool is_idchar(char test_char)
- *    bool is_one_of(char test_char, const std::string & char_set)
+ *    bool is_literal_string(const std::string & value, type="\"")
  *    bool is_composed_of(const std::string & test_str, const std::string & char_set)
  *    bool is_digits(const std::string & test_str)
+ *    bool is_number(const std::string & test_str)
  *    bool is_alphanumeric(const std::string & test_str)
- *    bool is_valid(char test_char )
- *    bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
  *    bool is_valid(const std::string & test_str, FUNS... funs)
  *    bool has_whitespace(const std::string & test_str)
  *    bool has_upper_letter(const std::string & test_str)
@@ -34,16 +25,19 @@
  *    bool has_letter(const std::string & test_str)
  *    bool has_digit(const std::string & test_str)
  *    bool has_alphanumeric(const std::string & test_str)
- *    bool has_idchar(const std::string & test_str)
  *    bool has_one_of(const std::string & test_str, const std::string & char_set)
  *    bool has_prefix(const std::string & in_string, const std::string & prefix)
- * 
+ *    bool has_char_at(const std::string & str, char c, size_t pos)
+ *    bool has_one_of_at(const std::string & str, const std::string & opts, size_t pos)
+ *    bool has_digit_at(const std::string & str, size_t pos)
+ *    bool has_letter_at(const std::string & str, size_t pos)
+ *
  *    -- SEARCHING --
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
  *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results, bool ignore_quoted=false)
  *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool ignore_quoted=false)
- * 
+ *
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
  *    std::string to_escaped_string(const std::string & value)
@@ -106,7 +100,7 @@
  *    std::string to_string(...)
  *    void from_string(const std::string & str, ...)
  *    std::string join(const emp::vector<T> & v, std::string join_str)
- *    
+ *
  *    -- ANSI TOOLS --
  *    char ANSI_ESC()
  *    std::string ANSI_Reset()
@@ -157,18 +151,18 @@
  *    std::string ANSI_BrightMagentaBG()
  *    std::string ANSI_BrightCyanBG()
  *    std::string ANSI_BrightWhiteBG()
- *    
+ *
  *    to_ansi_bold(const std::string & _in)
  *    to_ansi_italic(const std::string & _in)
  *    to_ansi_underline(const std::string & _in)
  *    to_ansi_blink(const std::string & _in)
  *    to_ansi_reverse(const std::string & _in)
- *    
+ *
  */
 
+#ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
+#define EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
 
-#ifndef EMP_STRING_UTILS_H
-#define EMP_STRING_UTILS_H
 
 #include <algorithm>
 #include <cctype>
@@ -193,6 +187,8 @@
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
 #include "../meta/type_traits.hpp"
+
+#include "char_utils.hpp"
 
 namespace emp {
 
@@ -252,31 +248,37 @@ namespace emp {
     // If we made it here without a problem, it must be correct!
     return true;
   }
-  
+
 
   /// Test if an input string is properly formated as a literal string.
-  static inline bool is_literal_string(const std::string & value) {
-    // A literal string must begin and end with a double quote and contain only valid characters.
-    if (value.size() < 2) return false;
-    if (value[0] != '"' || value.back() != '"') return false;
+  static inline bool is_literal_string(const std::string & value,
+                                       const std::string & quote_marks="\"") {
+    if (value.size() < 2) return false;               // Two short to contain even quote marks!
+    char quote = value[0];
+    if (!is_one_of(quote, quote_marks)) return false; // Must be working with allowed quote mark.
+    if (value.back() != quote) return false;          // Must use same quote at front and back.
 
     // Are all of the characters valid?
     for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == '"') return false;  // Cannot have a raw double-quote in the middle.
-      if (value[pos] == '\\') {
-        if (pos == value.size()-2) return false;  // Backslash must have char to escape.
+      if (value[pos] == quote) return false;          // Cannot have a raw quote in the middle.
+      if (value[pos] == '\\') {                       // Allow escaped characters...
+        if (pos == value.size()-2) return false;      // Backslash must have char to escape.
 
-        // Move to the next char and make sure it's legal to be escaped.
+        // Move to the next char and make sure it is legal to be escaped.
         // @CAO Expand on options!
         pos++;
         switch (value[pos]) {
+          case 'b':   // Backspace
+          case 'f':   // Form feed
           case 'n':   // Newline
           case 'r':   // Return
           case 't':   // Tab
+          case 'v':   // Vertical tab.
           case '0':   // Empty (character 0)
           case '\\':  // Backslash
           case '"':   // Double quote
           case '\'':  // Single quote
+          case '`':   // Back quote
             continue;
           default:
             return false;
@@ -291,14 +293,17 @@ namespace emp {
   }
 
   /// Test if an input string is properly formated as a literal string.
-  static inline std::string diagnose_literal_string(const std::string & value) {
+  static inline std::string diagnose_literal_string(const std::string & value,
+                                                    const std::string & quote_marks="\"") {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (value.size() < 2) return "Too short!";
-    if (value[0] != '"' || value.back() != '"') return "Must begin an end in quotes.";
+    char quote = value[0];
+    if (!is_one_of(quote, quote_marks)) return "Must begin an end in quotes.";
+    if (value.back() != quote) return "Begin and end quotes must match.";
 
     // Are all of the characters valid?
     for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == '"') return "Has a floating double quote.";  // Cannot have a raw double-quote in the middle.
+      if (value[pos] == quote) return "Has a floating quote.";
       if (value[pos] == '\\') {
         if (pos == value.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
 
@@ -306,13 +311,17 @@ namespace emp {
         // @CAO Expand on options!
         pos++;
         switch (value[pos]) {
+          case 'b':   // Backspace
+          case 'f':   // Form feed
           case 'n':   // Newline
           case 'r':   // Return
           case 't':   // Tab
+          case 'v':   // Vertical tab.
           case '0':   // Empty (character 0)
           case '\\':  // Backslash
           case '"':   // Double quote
           case '\'':  // Single quote
+          case '`':   // Back quote
             continue;
           default:
             return "Unknown escape charater.";
@@ -326,47 +335,6 @@ namespace emp {
     return "Good!";
   }
 
-  /// Determine if a character is whitespace.
-  inline bool is_whitespace(char test_char) {
-    return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');
-  }
-
-  /// Determine if a character is an uppercase letter.
-  inline bool is_upper_letter(char test_char) {
-    return (test_char >= 'A' && test_char <= 'Z');
-  }
-
-  /// Determine if a character is a lowercase letter.
-  inline bool is_lower_letter(char test_char) {
-    return (test_char >= 'a' && test_char <= 'z');
-  }
-
-  /// Determine if a character is a letter of any kind.
-  inline bool is_letter(char test_char) {
-    return is_upper_letter(test_char) || is_lower_letter(test_char);
-  }
-
-  /// Determine if a character is a digit.
-  inline bool is_digit(char test_char) {
-    return (test_char >= '0' && test_char <= '9');
-  }
-
-  /// Determine if a character is a letter or digit.
-  inline bool is_alphanumeric(char test_char) {
-    return is_letter(test_char) || is_digit(test_char);
-  }
-
-  /// Determine if a character is a letter, digit, or underscore.
-  inline bool is_idchar(char test_char) {
-    return is_alphanumeric(test_char) || test_char == '_';
-  }
-
-  /// Determine if a character is in a set of characters (represented as a string)
-  static inline bool is_one_of(char test_char, const std::string & char_set) {
-    for (char x : char_set) if (test_char == x) return true;
-    return false;
-  }
-
   /// Determine if a string is composed only of a set of characters (represented as a string)
   static inline bool is_composed_of(const std::string & test_str, const std::string & char_set) {
     for (char x : test_str) if (!is_one_of(x, char_set)) return false;
@@ -374,83 +342,84 @@ namespace emp {
   }
 
   /// Determine if there is whitespace anywhere in a string.
-  inline bool has_whitespace(const std::string & test_str) {
-    for (char c : test_str) if (is_whitespace(c)) return true;
-    return false;
+  inline bool has_whitespace(const std::string & str) { return WhitespaceCharSet().HasAny(str); }
+  inline bool has_upper_letter(const std::string & str) { return UpperCharSet().HasAny(str); }
+  inline bool has_lower_letter(const std::string & str) { return LowerCharSet().HasAny(str); }
+  inline bool has_letter(const std::string & str) { return LetterCharSet().HasAny(str); }
+  inline bool has_digit(const std::string & str) { return DigitCharSet().HasAny(str); }
+  inline bool has_alphanumeric(const std::string & str) { return AlphanumericCharSet().HasAny(str); }
+
+  inline bool has_char_at(const std::string & str, char c, size_t pos) {
+    return (pos < str.size()) && (str[pos] == c);
+  }
+  inline bool has_one_of_at(const std::string & str, const std::string & opts, size_t pos) {
+    return (pos < str.size()) && is_one_of(str[pos], opts);
+  }
+  inline bool has_digit_at(const std::string & str, size_t pos) { return DigitCharSet().HasAt(str, pos); }
+  inline bool has_letter_at(const std::string & str, size_t pos) { return LetterCharSet().HasAt(str, pos); }
+
+  /// Determine if there are only lowercase letters in a string.
+  inline bool is_lower(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO letters.
+    return LowerCharSet().Has(str);      // Otherwise return false if any character is not lower.
   }
 
-  /// Determine if there are any uppercase letters in a string.
-  inline bool has_upper_letter(const std::string & test_str) {
-    for (char c : test_str) if (is_upper_letter(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any lowercase letters in a string.
-  inline bool has_lower_letter(const std::string & test_str) {
-    for (char c : test_str) if (is_lower_letter(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any letters in a string.
-  inline bool has_letter(const std::string & test_str) {
-    for (char c : test_str) if (is_letter(c)) return true;
-    return false;
-  }
-
-  /// Determine if there are any digits in a string.
-  inline bool has_digit(const std::string & test_str) {
-    for (char c : test_str) if (is_digit(c)) return true;
-    return false;
+  /// Determine if there are only uppercase letters in a string.
+  inline bool is_upper(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO letters.
+    return UpperCharSet().Has(str);      // Otherwise return false if any character is not upper.
   }
 
   /// Determine if there are only digits in a string.
-  inline bool is_digits(const std::string & test_str) {
-    // If string is empty, there are no digits.
-    if (test_str.size() == 0) return false;
-
-    // Otherwise return false if any character is not a digit.
-    for (char c : test_str) if (!is_digit(c)) return false;
-    return true;
+  inline bool is_digits(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO digits.
+    return DigitCharSet().Has(str);      // Otherwise return false if any character is not a digit.
   }
 
-  /// Determine if there are any letters or digits anywhere in a string.
-  inline bool has_alphanumeric(const std::string & test_str) {
-    for (char c : test_str) if (is_alphanumeric(c)) return true;
-    return false;
+  /// Determine if this string represents a proper number.
+  inline bool is_number(const std::string & str) {
+    if (str.size() == 0) return false;             // If string is empty, not a number!
+    size_t pos = 0;
+    if (has_one_of_at(str, "+-", pos)) ++pos;      // skip leading +/-
+    while (has_digit_at(str, pos)) ++pos;          // Any number of digits (zero is okay)
+    if (has_char_at(str, '.', pos)) {              // If there's a DECIMAL PLACE, look for more digits.
+      ++pos;                                       // Skip over the dot.
+      if (!has_digit_at(str, pos++)) return false; // Must have at least one digit after '.'
+      while (has_digit_at(str, pos)) ++pos;        // Any number of digits.
+    }
+    if (has_one_of_at(str, "eE", pos)) {           // If there's an e... SCIENTIFIC NOTATION
+      ++pos;                                       // Skip over the e.
+      if (has_one_of_at(str, "+-", pos)) ++pos;    // skip leading +/-
+      if (!has_digit_at(str, pos++)) return false; // Must have at least one digit after 'e'
+      while (has_digit_at(str, pos)) ++pos;        // Allow for MORE digits.
+    }
+    // If we've made it to the end of the string AND there was at least one digit, success!
+    return (pos == str.size()) && has_digit(str);
   }
 
-  /// Determine if there are any letters or digits anywhere in a string.
-  inline bool is_alphanumeric(const std::string & test_str) {
-    for (char c : test_str) if (!is_alphanumeric(c)) return false;
-    return true;
+  /// Determine if string is only letters or digits.
+  inline bool is_alphanumeric(const std::string & str) {
+    if (str.size() == 0) return false;      // If string is empty, there are NO characters.
+    return AlphanumericCharSet().Has(str);  // Otherwise return false if any character is not a digit.
   }
 
-  /// Determine if there are any letters, digit, or underscores anywhere in a string.
-  inline bool has_idchar(const std::string & test_str) {
-    for (char c : test_str) if (is_idchar(c)) return true;
-    return false;
+  /// Determine if string is only letters, digits, or underscore ('_').
+  inline bool is_identifier(const std::string & str) {
+    if (str.size() == 0) return false;   // If string is empty, there are NO characters.
+    if (is_digit(str[0])) return false;  // Identifiers cannot begin with a number.
+    return IDCharSet().Has(str);         // Otherwise return false if any character is not a digit.
   }
 
   /// Determine if a specified set of characters appears anywhere in a string.
-  static inline bool has_one_of(const std::string & test_str, const std::string & char_set) {
-    for (char c : test_str) if (is_one_of(c, char_set)) return true;
+  static inline bool has_one_of(const std::string & str, const std::string & char_set) {
+    for (char c : str) if (is_one_of(c, char_set)) return true;
     return false;
-  }
-
-
-  /// If no functions are provided to is_valid(), always return false as base case.
-  inline bool is_valid(char /* test_char */ ) { return false; }
-
-  /// Determine if a character passes any of the test functions provided.
-  template <typename... FUNS>
-  inline bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
-    return fun1(test_char) || is_valid(test_char, funs...);
   }
 
   /// For a string to be valid, each character must pass at least one provided function.
   template <typename... FUNS>
-  static inline bool is_valid(const std::string & test_str, FUNS... funs) {
-    for (char x : test_str) if ( !is_valid(x, funs...) ) return false;
+  static inline bool is_valid(const std::string & str, FUNS... funs) {
+    for (char x : str) if ( !is_valid(x, funs...) ) return false;
     return true;
   }
 
@@ -458,7 +427,7 @@ namespace emp {
   inline bool has_prefix(const std::string & in_string, const std::string & prefix) {
     if (prefix.size() > in_string.size()) return false;
     for (size_t i = 0; i < prefix.size(); ++i) {
-      if (in_string[i] != prefix[i]) return false;      
+      if (in_string[i] != prefix[i]) return false;
     }
     return true;
   }
@@ -473,7 +442,7 @@ namespace emp {
     for (size_t pos = start_pos + 1; pos < in_string.size(); ++pos) {
       // If we have a backslash, does not end on this or next char.
       if (in_string[pos] == '\\') {
-        ++pos;  
+        ++pos;
         continue;
       }
       // If we found the close-quote, pop to here.
@@ -730,10 +699,12 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  static inline std::string from_literal_string(const std::string & value) {
-    emp_assert(is_literal_string(value), value, diagnose_literal_string(value));
-    // Given the assert, we can assume the string DOES contain a literal representation,
-    // and we just need to convert it.
+  static inline std::string from_literal_string(const std::string & value,
+                                                [[maybe_unused]] const std::string & quote_marks="\"")
+  {
+    emp_assert(is_literal_string(value, quote_marks),
+               value, diagnose_literal_string(value, quote_marks));
+    // Given the assert, assume string DOES contain a literal string representation.
 
     std::string out_string;
     out_string.reserve(value.size()-2);  // Make a guess on final size.
@@ -749,9 +720,12 @@ namespace emp {
       pos++;
 
       switch (value[pos]) {
+        case 'b': out_string.push_back('\b'); break;   // Backspace
+        case 'f': out_string.push_back('\f'); break;   // Form feed
         case 'n': out_string.push_back('\n'); break;   // Newline
         case 'r': out_string.push_back('\r'); break;   // Return
         case 't': out_string.push_back('\t'); break;   // Tab
+        case 'v': out_string.push_back('\v'); break;   // Vertical tab
         case '0': out_string.push_back('\0'); break;   // Empty (character 0)
         case '\\': out_string.push_back('\\'); break;  // Backslash
         case '"': out_string.push_back('"'); break;    // Double quote
@@ -1067,8 +1041,7 @@ namespace emp {
     #pragma GCC diagnostic ignored "-Wformat-security"
 
     // Extra space for '\0'
-    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
-    emp_assert( size >= 0 );
+    const size_t size = static_cast<size_t>(std::snprintf(nullptr, 0, format.c_str(), args...) + 1);
 
     emp::vector<char> buf( size );
     std::snprintf( buf.data(), size, format.c_str(), args... );
@@ -1524,4 +1497,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE

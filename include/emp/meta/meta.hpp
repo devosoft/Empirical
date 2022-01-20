@@ -1,17 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2021.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  A bunch of C++ Template Meta-programming tricks.
-//
-//
-//  Developer notes:
-//  * Right now test_type<> returns false if a template can't resolve, but if it's true it checks
-//    if a value field is present; if so that determines success.  The reason for this choice was
-//    to make sure that true_type and false_type are handled correctly (with built-in type_tratis)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2021
+ *
+ *  @file meta.hpp
+ *  @brief A bunch of C++ Template Meta-programming tricks.
+ *
+ *  Developer notes:
+ *  * Right now test_type<> returns false if a template can't resolve, but if it's true it checks
+ *    if a value field is present; if so that determines success.  The reason for this choice was
+ *    to make sure that true_type and false_type are handled correctly (with built-in type_tratis)
+ */
 
-#ifndef EMP_META_H
-#define EMP_META_H
+#ifndef EMP_META_META_HPP_INCLUDE
+#define EMP_META_META_HPP_INCLUDE
 
 #include <functional>
 #include <tuple>
@@ -31,6 +33,30 @@ namespace emp {
   template <typename T1, typename... Ts> using first_type = T1;
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
+
+  // Index into a template parameter pack to grab a specific type.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  namespace internal {
+    template <size_t ID, typename T, typename... Ts>
+    struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
+
+    template <typename T, typename... Ts> struct pack_id_impl<0,T,Ts...> { using type = T; };
+  }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
+
+  /// Pick a specific position from a type pack.
+  template <size_t ID, typename... Ts>
+  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
+
+  /// Trim off the last type from a pack.
+  template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
+
+  /// A struct declaration with no definition to show a type name in a compile time error.
+  template <typename...> struct ShowType;
+
+  /// A false type that does NOT resolve in unexecuted if-constexpr branches.
+  /// By Brian Bi; from: https://stackoverflow.com/questions/69501472/best-way-to-trigger-a-compile-time-error-if-no-if-constexprs-succeed
+  template <class T> struct dependent_false : std::false_type {};
 
   /// Create a placeholder template to substitute for a real type.
   template <int> struct PlaceholderType;
@@ -73,23 +99,6 @@ namespace emp {
 
     return out_v;
   }
-
-  // Index into a template parameter pack to grab a specific type.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <size_t ID, typename T, typename... Ts>
-    struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
-
-    template <typename T, typename... Ts>
-    struct pack_id_impl<0,T,Ts...> { using type = T; };
-  }
-
-  template <size_t ID, typename... Ts>
-  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-  // Trim off the last type from a pack.
-  template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
 
   // Trick to call a function using each entry in a parameter pack.
 #define EMP_EXPAND_PPACK(PPACK) ::emp::run_and_ignore{ 0, ((PPACK), void(), 0)... }
@@ -328,5 +337,4 @@ namespace emp {
 
 }
 
-
-#endif
+#endif // #ifndef EMP_META_META_HPP_INCLUDE

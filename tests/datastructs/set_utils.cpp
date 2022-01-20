@@ -1,13 +1,17 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file set_utils.cpp
+ */
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/datastructs/set_utils.hpp"
-
-#include <sstream>
-#include <iostream>
-
-
 
 TEST_CASE("Test set utils", "[datastructs]") {
   std::set<int> s1;

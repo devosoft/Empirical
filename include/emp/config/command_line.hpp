@@ -1,37 +1,38 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains tools for dealing with command-line arguments (argv and argc).
-//
-//  Functions here include:
-//
-//    emp::vector<std::string> args_to_strings(int argc, char* argv[]);
-//        - Convert the standard command-line args to a more managable vector of strings.
-//
-//    int find_arg(const emp::vector<std::string> & args, const std::string & pattern);
-//        - Return index where a specified argument can be found (or -1 if it doesn't exist).
-//
-//    bool has_arg(const emp::vector<std::string> & args, const std::string & pattern);
-//        - Return true if a particular argument was set on the command line
-//
-//    bool use_arg(emp::vector<std::string> & args, const std::string & pattern);
-//        - Same as has_arg(), but remove the argument from the set of available args.
-//
-//
-//    Development notes:
-//    * Add has_flag() and use_flag() functions to more gracefully handle flags.
-//      For example, if -a and -b are legal flags, -ab should trigger both of them.
-//
-//    * Process arguments from left to right, rather than out of order?
-//
-//    * Identify errors if arguments to a flag begin with a '-' and should be a
-//      flag themselves?  Or, more generally, recognize if an argument is clearly
-//      the wrong type (e.g., a string where an int was expected)?
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file command_line.hpp
+ *  @brief This file contains tools for dealing with command-line arguments (argv and argc).
+ *
+ *  Functions here include:
+ *
+ *    emp::vector<std::string> args_to_strings(int argc, char* argv[]);
+ *        - Convert the standard command-line args to a more managable vector of strings.
+ *
+ *    int find_arg(const emp::vector<std::string> & args, const std::string & pattern);
+ *        - Return index where a specified argument can be found (or -1 if it doesn't exist).
+ *
+ *    bool has_arg(const emp::vector<std::string> & args, const std::string & pattern);
+ *        - Return true if a particular argument was set on the command line
+ *
+ *    bool use_arg(emp::vector<std::string> & args, const std::string & pattern);
+ *        - Same as has_arg(), but remove the argument from the set of available args.
+ *
+ *
+ *    Development notes:
+ *    * Add has_flag() and use_flag() functions to more gracefully handle flags.
+ *      For example, if -a and -b are legal flags, -ab should trigger both of them.
+ *
+ *    * Process arguments from left to right, rather than out of order?
+ *
+ *    * Identify errors if arguments to a flag begin with a '-' and should be a
+ *      flag themselves?  Or, more generally, recognize if an argument is clearly
+ */
 
-#ifndef EMP_COMMAND_LINE_H
-#define EMP_COMMAND_LINE_H
+#ifndef EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
+#define EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
 
 #include <string>
 
@@ -114,4 +115,4 @@ namespace emp {
   using namespace cl;
 }
 
-#endif
+#endif // #ifndef EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE

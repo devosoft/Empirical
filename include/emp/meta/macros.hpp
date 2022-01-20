@@ -78,8 +78,8 @@
  *      W(A,B,a,b,c,d), W(A,B,e,f,g,h), W(A,B,i,j,k,l)
  */
 
-#ifndef EMP_MACROS_H
-#define EMP_MACROS_H
+#ifndef EMP_META_MACROS_HPP_INCLUDE
+#define EMP_META_MACROS_HPP_INCLUDE
 
 #include <utility>  // For declval
 
@@ -1178,4 +1178,4 @@
 #define EMP_ASSEMBLE_MERGE(A, B) A ## B
 /// @endcond
 
-#endif
+#endif // #ifndef EMP_META_MACROS_HPP_INCLUDE

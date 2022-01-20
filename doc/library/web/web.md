@@ -241,5 +241,5 @@ d3/d3
 ```{eval-rst}
 .. doxygenfile:: emp/web/WidgetExtras.hpp
   :project: Empirical
-  :no-link: 
+  :no-link:
 ```

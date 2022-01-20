@@ -91,7 +91,7 @@ be able to configure aspects of them in code.
 
 For one, we should be able to access components of World from an object.  A simple way of
 doing this is to store components as tuples and have templated accessors.  In the example
-above, world.GetOrg<0>() could return the sheep prototype, while world.GetOrg<1> would 
+above, world.GetOrg<0>() could return the sheep prototype, while world.GetOrg<1> would
 return the wolf prototype.
 
 Any updates to details may be needed to be done before the config object is accessed.  For

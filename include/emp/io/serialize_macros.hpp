@@ -8,9 +8,9 @@
  *  @note Status: ALPHA
  */
 
+#ifndef EMP_IO_SERIALIZE_MACROS_HPP_INCLUDE
+#define EMP_IO_SERIALIZE_MACROS_HPP_INCLUDE
 
-#ifndef EMP_SERIALIZE_MACROS_H
-#define EMP_SERIALIZE_MACROS_H
 
 #include "../meta/macros.hpp"
 
@@ -51,4 +51,4 @@
 #define EMP_CALL_BASE_1(BASE1) BASE1(pod),
 #define EMP_CALL_BASE_2(BASE1, BASE2) BASE1(pod), BASE2(pod),
 
-#endif
+#endif // #ifndef EMP_IO_SERIALIZE_MACROS_HPP_INCLUDE
