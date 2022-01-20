@@ -8,9 +8,9 @@
  *  @note Status: BETA
  */
 
+#ifndef EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
+#define EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
 
-#ifndef EMP_SOLVE_STATE_H
-#define EMP_SOLVE_STATE_H
 
 #include "../base/assert.hpp"
 
@@ -120,4 +120,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_SOLVESTATE_HPP_INCLUDE

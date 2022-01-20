@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Trait.hpp
+ *  @file Trait.hpp
  *  @brief Directly measure a target quality about a type of object.
  *
  *  These objects are able to measure a specific trait on another object.  They
  *  (will eventually) interface smoothly with DataNodes for data collection.
  */
 
-#ifndef EMP_DATA_TRAIT_H
-#define EMP_DATA_TRAIT_H
+#ifndef EMP_DATA_TRAIT_HPP_INCLUDE
+#define EMP_DATA_TRAIT_HPP_INCLUDE
 
 #include <string>
 
@@ -185,4 +185,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_TRAIT_HPP_INCLUDE

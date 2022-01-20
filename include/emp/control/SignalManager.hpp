@@ -1,13 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file defines the SignalManager class, which collects sets of Signals to be looked up
-//  or manipulated later.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file SignalManager.hpp
+ *  @brief This file defines the SignalManager class, which collects sets of Signals to be looked up
+ * or manipulated later.
+ */
 
-#ifndef EMP_CONTROL_SIGNAL_MANAGER
-#define EMP_CONTROL_SIGNAL_MANAGER
+#ifndef EMP_CONTROL_SIGNALMANAGER_HPP_INCLUDE
+#define EMP_CONTROL_SIGNALMANAGER_HPP_INCLUDE
 
 #include <string>
 #include <unordered_map>
@@ -92,4 +94,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONTROL_SIGNALMANAGER_HPP_INCLUDE

@@ -14,8 +14,8 @@
  *  @todo Consider adding EMP_TEST_APPROX to compare within a tollerance level.
  */
 
-#ifndef EMP_UNIT_TESTS_H
-#define EMP_UNIT_TESTS_H
+#ifndef EMP_TESTING_UNIT_TESTS_HPP_INCLUDE
+#define EMP_TESTING_UNIT_TESTS_HPP_INCLUDE
 
 #include <iostream>
 #include <sstream>
@@ -168,4 +168,4 @@ namespace emp {
   }                                                              \
   void emp_test_main_impl()
 
-#endif
+#endif // #ifndef EMP_TESTING_UNIT_TESTS_HPP_INCLUDE

@@ -8,9 +8,9 @@
  *  Aborts program in both debug and release mode, but does NOT terminate in TDEBUG for testing.
  */
 
+#ifndef EMP_BASE_ERROR_HPP_INCLUDE
+#define EMP_BASE_ERROR_HPP_INCLUDE
 
-#ifndef EMP_ERROR_HPP
-#define EMP_ERROR_HPP
 
 #include "_error_trigger.hpp"
 
@@ -19,4 +19,4 @@
     emp::trigger_emp_error(__FILE__, __LINE__, __VA_ARGS__);                   \
   } while(0)
 
-#endif // #ifndef EMP_ERROR_HPP
+#endif // #ifndef EMP_BASE_ERROR_HPP_INCLUDE

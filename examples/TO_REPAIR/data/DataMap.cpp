@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019-2020.
  *
- *  @file  DataMap.cc
+ *  @file DataMap.cpp
  *  @brief An example file for using DataMaps
  */
 
 #include <iostream>
 
-#include "emp/data/DataMap.hpp"
 #include "emp/bits/BitVector.hpp"
+#include "emp/data/DataMap.hpp"
 
 int main()
 {

@@ -11,8 +11,8 @@
  *  In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
  */
 
-#ifndef EMP_OPTIONAL_H
-#define EMP_OPTIONAL_H
+#ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE
+#define EMP_BASE_OPTIONAL_HPP_INCLUDE
 
 #include <optional>
 #include <type_traits>
@@ -112,4 +112,4 @@ namespace std {
 
 #endif
 
-#endif
+#endif // #ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE

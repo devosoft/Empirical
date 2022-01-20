@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  DataFile.hpp
+ *  @file DataFile.hpp
  *  @brief DataFile objects use DataNode objects to dynamically fill out file contents.
  */
 
-#ifndef EMP_DATA_FILE_H
-#define EMP_DATA_FILE_H
+#ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
+#define EMP_DATA_DATAFILE_HPP_INCLUDE
 
 #include <fstream>
 #include <functional>
@@ -17,9 +17,9 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "../meta/type_traits.hpp"
 #include "../functional/FunctionSet.hpp"
 #include "../io/NullStream.hpp"
+#include "../meta/type_traits.hpp"
 #include "../tools/string_utils.hpp"
 
 #include "DataNode.hpp"
@@ -103,8 +103,8 @@ namespace emp {
       emp_assert(step > 0);
       emp_assert(first < last);
       timing_fun = [first,step,last](size_t update) {
-	      if (update < first || update > last) return false;
-	      return ((update - first) % step) == 0;
+        if (update < first || update > last) return false;
+        return ((update - first) % step) == 0;
       };
     }
 
@@ -114,7 +114,7 @@ namespace emp {
     void SetSpacer(const std::string & _in) { line_spacer = _in; }
     /// Print a string at the end of each line. @param _in the string to print
     void SetLineEnd(const std::string & _in) { line_end = _in; }
-    /// Set line begin, delimeter, and line end characters. 
+    /// Set line begin, delimeter, and line end characters.
     /// @param b line-begin character. @param s column delimeter @param e line end character
     void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
       line_begin = b;
@@ -404,7 +404,7 @@ namespace emp {
     /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
     /// \c key and \c desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic 
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -414,7 +414,7 @@ namespace emp {
     /// @param desc Full description of this data (used by \c PrintHeaderComment)
     /// @param reset If this parameter is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
-    /// @param pull Should the node pull data before this statistic is calculated?    
+    /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
     void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       AddMean(node, "mean_" + key, "mean of " + desc, false, pull);
@@ -429,7 +429,7 @@ namespace emp {
     /// Requires that \c node have the \c data::Stats or \c data::FullStats modifier.
     /// \c key and \c desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic 
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -470,7 +470,7 @@ namespace emp {
 
     /// Add a set of functions that always pull the count of each bin of the histogram
     /// from \c node. Requires that \c node have the \c data::Histogram modifier.
-    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic 
+    /// Note: Setting \c pull and/or \c reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -680,7 +680,7 @@ namespace emp {
   /// @param filename is the name of the file to output to
   /// @param b character to print at the beggininning of each line
   /// @param s delimeter (i.e. what character to print between entries on each line)
-  /// @param e character to print at the end of each line  
+  /// @param e character to print at the end of each line
   template <typename CONTAINER>
   ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
                                                      const std::string & filename,
@@ -694,4 +694,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE

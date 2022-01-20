@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  EventDrivenGP.h
+ *  @file SignalGP.cpp
  *  @brief This is example code for using EventDrivenGP (SignalGP).
  */
 
@@ -11,8 +11,8 @@
 
 #include "emp/base/Ptr.hpp"
 #include "emp/hardware/EventDrivenGP.hpp"
-#include "emp/hardware/InstLib.hpp"
 #include "emp/hardware/EventLib.hpp"
+#include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
 
 // A few constants

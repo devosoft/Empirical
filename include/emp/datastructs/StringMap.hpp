@@ -19,9 +19,9 @@
  *  map anything. It links and has like 500 words like a dictionary. A StringMap is basically a dictionary.
  */
 
+#ifndef EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE
 
-#ifndef EMP_STRING_MAP_H
-#define EMP_STRING_MAP_H
 
 #include "../base/unordered_map.hpp"
 #include "../tools/string_utils.hpp"
@@ -95,4 +95,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE

@@ -3,15 +3,15 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  ValPack.hpp
+ *  @file ValPack.hpp
  *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
  *
  *  Any built-in type can be added to ValPack to be manipulated at compile time.
  */
 
+#ifndef EMP_META_VALPACK_HPP_INCLUDE
+#define EMP_META_VALPACK_HPP_INCLUDE
 
-#ifndef EMP_VAL_PACK_H
-#define EMP_VAL_PACK_H
 
 #include "meta.hpp"
 
@@ -26,11 +26,13 @@ namespace emp {
   // Anonymous implementations of ValPack interface.
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
+    // Helper.  DONE arg starts as true, but set to false when sequence finished.
     template <bool DONE, auto START, auto END, auto STEP, auto... VALS>
     struct vp_range {
       static constexpr auto NEXT = START + STEP;
       using type = typename vp_range<(NEXT >= END), NEXT, END, STEP, VALS..., START>::type;
     };
+    // Specialization for when DONE is true.
     template <auto START, auto END, auto STEP, auto... VALS>
     struct vp_range <true, START, END, STEP, VALS...> {
       using type = ValPack<VALS...>;
@@ -200,6 +202,9 @@ namespace emp {
     /// Find the overall maximum value in an ValPack.
     constexpr static auto Max() { return pop::Max(V1); }
 
+    /// Determine if the pack is sorted.
+    constexpr static bool IsSorted() { return V1 <= Min() && pop::IsSorted(); }
+
     /// Use each value in an ValPack as an index and return results as a tuple.
     template <typename T>
     constexpr static auto ApplyIndex(T && container) {
@@ -251,6 +256,8 @@ namespace emp {
     template <typename T>
     constexpr static auto Max(T floor) { return floor; }
 
+    constexpr static bool IsSorted() { return true; }
+
     static std::string ToString() { return ""; }
 
     static void PrintVals(std::ostream & /* os */=std::cout) { ; }
@@ -267,4 +274,4 @@ namespace emp {
   }
 }
 
-#endif
+#endif // #ifndef EMP_META_VALPACK_HPP_INCLUDE

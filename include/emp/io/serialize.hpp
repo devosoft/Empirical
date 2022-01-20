@@ -49,13 +49,14 @@
  *        store and load without any additional effort on the part of the library user.
  */
 
-#ifndef EMP_SERIALIZE_HPP
-#define EMP_SERIALIZE_HPP
+#ifndef EMP_IO_SERIALIZE_HPP_INCLUDE
+#define EMP_IO_SERIALIZE_HPP_INCLUDE
 
 #include <iostream>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+
 #include "serialize_macros.hpp"
 
 namespace emp {
@@ -212,4 +213,4 @@ namespace serialize {
 }
 }
 
-#endif
+#endif // #ifndef EMP_IO_SERIALIZE_HPP_INCLUDE

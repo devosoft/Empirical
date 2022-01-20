@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef EMP_ASSERT_MACROS_HPP
-#define EMP_ASSERT_MACROS_HPP
+#ifndef EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
+#define EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
 
 /// Basic elper macros...
 #define emp_assert_STRINGIFY(...) emp_assert_STRINGIFY_IMPL(__VA_ARGS__)
@@ -49,4 +49,4 @@
 #define emp_assert_TO_PAIRS19(X, ...) emp_assert_TO_PAIR(X) , emp_assert_TO_PAIRS18(__VA_ARGS__)
 #define emp_assert_TO_PAIRS20(X, ...) emp_assert_TO_PAIR(X) , emp_assert_TO_PAIRS19(__VA_ARGS__)
 
-#endif // #ifdef EMP_ASSERT_MACROS_HPP
+#endif // #ifndef EMP_BASE__ASSERT_MACROS_HPP_INCLUDE

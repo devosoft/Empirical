@@ -3,22 +3,23 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  layout.hpp
+ *  @file layout.hpp
  *  @brief Tools for laying out nodes in D3.
  */
 
-#ifndef EMP_D3_LAYOUT_H
-#define EMP_D3_LAYOUT_H
+#ifndef EMP_WEB_D3_LAYOUT_HPP_INCLUDE
+#define EMP_WEB_D3_LAYOUT_HPP_INCLUDE
+
+#include <array>
+#include <functional>
+
+#include "../../datastructs/tuple_struct.hpp"
+#include "../JSWrap.hpp"
 
 #include "d3_init.hpp"
 #include "dataset.hpp"
 #include "selection.hpp"
 #include "svg_shapes.hpp"
-#include "../../datastructs/tuple_struct.hpp"
-#include "../JSWrap.hpp"
-
-#include <functional>
-#include <array>
 
 namespace D3{
 
@@ -30,11 +31,11 @@ namespace D3{
 
   struct JSONTreeNode {
     EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-				   int, name,
-				   int, parent,
-                   double, y,
-                   int, depth
-				   )
+      int, name,
+      int, parent,
+      double, y,
+      int, depth
+    )
   };
 
   /// A TreeLayout can be used to visualize hierarchical data as a tree (a series of edges
@@ -158,16 +159,16 @@ namespace D3{
                     return "translate(" + d.y + "," + d.x + ")"; });
 
         node.attr("transform", function(d) {
-        		  return "translate(" + d.y + "," + d.x + ")"; });
+              return "translate(" + d.y + "," + d.x + ")"; });
 
         var link = js.objects[$3].selectAll("path.link")
-      	  .data(links, function(d) { return d.name; });
+          .data(links, function(d) { return d.name; });
 
         var linkExit = link.exit();
         // Enter the links.
         var linkEnter = link.enter().insert("path", "g")
-      	    .attr("class", "link")
-      	    .attr("d", function(d) {return "M" + d.y + "," + d.x
+            .attr("class", "link")
+            .attr("d", function(d) {return "M" + d.y + "," + d.x
          + "C" + (d.y + d.parent.y) / 2 + "," + d.x
          + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
          + " " + d.parent.y + "," + d.parent.x;})
@@ -201,4 +202,4 @@ namespace D3{
 }
 
 
-#endif
+#endif // #ifndef EMP_WEB_D3_LAYOUT_HPP_INCLUDE

@@ -1,6 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file Sudoku.cpp
+ */
 
 #include "emp/base/vector.hpp"
 #include "emp/web/web.hpp"
@@ -79,7 +83,7 @@ public:
     for (size_t r = 0; r < 9; r++) {
       for (size_t c = 0; c < 9; c++) {
         auto cell = table.GetCell(r,c);
-        cell.On("mousedown", [cell,r,c]() mutable {
+        cell.On("mousedown", [cell/*,r,c*/]() mutable {
           // doc.Div("table_bg").SetBackground("red");
           // cell.SetCSS("BackgroundColor", "grey");
           cell.Clear();

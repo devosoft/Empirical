@@ -3,24 +3,24 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  canvas_utils.hpp
+ *  @file canvas_utils.hpp
  *  @brief Various versions of the Draw() function to draw images onto a canvas.
  *
  *  Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
  *  such as a circle, a bit matrix, or a geometric surface.
  */
 
-#ifndef EMP_WEB_CANVAS_UTILS_H
-#define EMP_WEB_CANVAS_UTILS_H
-
-#include "Canvas.hpp"
+#ifndef EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
+#define EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
 
 #include "../base/vector.hpp"
+#include "../bits/BitMatrix.hpp"
 #include "../Evolve/StateGrid.hpp"
 #include "../geometry/Circle2D.hpp"
 #include "../geometry/Surface2D.hpp"
 #include "../geometry/Surface.hpp"
-#include "../bits/BitMatrix.hpp"
+
+#include "Canvas.hpp"
 #include "color_map.hpp"
 
 namespace emp {
@@ -339,4 +339,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_CANVAS_UTILS_HPP_INCLUDE

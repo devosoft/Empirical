@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
-
-/*
- * This file can be used to test triggering a mouse click by the user.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file ClickCollapseDemo.cpp
+ *  @brief This file can be used to test triggering a mouse click by the user.
+ *
  * It appears that .click() can be used to trigger a click.
  * Issues encountered:
  *  - When click() is called  on line 100 (1st call), it looks
@@ -27,15 +29,15 @@
  */
 
 #include <functional>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
-#include "emp/web/web.hpp"
 #include "emp/web/js_utils.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/web.hpp"
 
 #include "emp/prefab/Collapse.hpp"
 
@@ -106,7 +108,6 @@ struct Test_Collapse_One_Click : emp::web::BaseTest {
    *
    * </div>
    */
-
 
 
   Test_Collapse_One_Click()

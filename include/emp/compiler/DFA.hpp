@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  DFA.hpp
+ *  @file DFA.hpp
  *  @brief A Deterministic Finite Automata simulator.
  *  @note Status: BETA
  */
 
-#ifndef EMP_DFA_H
-#define EMP_DFA_H
+#ifndef EMP_COMPILER_DFA_HPP_INCLUDE
+#define EMP_COMPILER_DFA_HPP_INCLUDE
 
 #include <string>
 
@@ -130,4 +130,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_COMPILER_DFA_HPP_INCLUDE

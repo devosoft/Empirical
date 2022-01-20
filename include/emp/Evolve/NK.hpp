@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  NK.hpp
+ *  @file NK.hpp
  *  @brief This file provides code to build NK-based algorithms.
  *
  *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
@@ -15,8 +15,8 @@
  *    Based on K value, we should be able to do this automatically, so we could merge the two.
  */
 
-#ifndef EMP_EVO_NK_H
-#define EMP_EVO_NK_H
+#ifndef EMP_EVOLVE_NK_HPP_INCLUDE
+#define EMP_EVOLVE_NK_HPP_INCLUDE
 
 #include <array>
 
@@ -135,13 +135,13 @@ namespace emp {
       size_t mask = emp::MaskLow<size_t>(K+1);
       for (size_t i = 0; i < N; i++) {
         const size_t cur_val = (genome >> i).GetUInt(0) & mask;
-	      const double cur_fit = GetFitness(i, cur_val);
+        const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;
       }
       return total;
     }
 
-    /// Get the fitness of a site in a bitstring 
+    /// Get the fitness of a site in a bitstring
     // (pass by value so can be modified.)
     double GetSiteFitness(size_t n, BitVector genome) const {
       emp_assert(genome.GetSize() == N, genome.GetSize(), N);
@@ -152,7 +152,7 @@ namespace emp {
 
       size_t mask = emp::MaskLow<size_t>(K+1);
       const size_t cur_val = (genome >> n).GetUInt(0) & mask;
-	    return GetFitness(n, cur_val);
+      return GetFitness(n, cur_val);
     }
 
 
@@ -218,4 +218,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_EVOLVE_NK_HPP_INCLUDE

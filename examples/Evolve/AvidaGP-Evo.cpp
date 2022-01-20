@@ -3,16 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP-Evo.cc
+ *  @file AvidaGP-Evo.cpp
  *  @brief A test of AvidaGP with World; organisms must find squares of values.
  */
 
 #include <iostream>
 
+#include "emp/Evolve/World.hpp"
 #include "emp/hardware/AvidaGP.hpp"
 #include "emp/hardware/InstLib.hpp"
 #include "emp/math/Random.hpp"
-#include "emp/Evolve/World.hpp"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {

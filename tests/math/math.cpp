@@ -1,19 +1,25 @@
-#define CATCH_CONFIG_MAIN
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file math.cpp
+ */
+
+#include <algorithm>
+#include <climits>
+#include <deque>
+#include <iostream>
+#include <limits>
+#include <numeric>
+#include <ratio>
+#include <sstream>
+#include <unordered_set>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/math.hpp"
 #include "emp/data/DataNode.hpp"
-
-#include <sstream>
-#include <iostream>
-#include <deque>
-#include <algorithm>
-#include <limits>
-#include <numeric>
-#include <climits>
-#include <unordered_set>
-#include <ratio>
+#include "emp/math/math.hpp"
 
 TEST_CASE("Test Math", "[math]")
 {

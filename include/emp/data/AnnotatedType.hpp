@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  AnnotatedType.hpp
+ *  @file AnnotatedType.hpp
  *  @brief A base class to provide a DataMap and accessors to another class.
  *  @note Status: ALPHA
- * 
+ *
  */
 
-#ifndef EMP_ANNOTATED_TYPE_H
-#define EMP_ANNOTATED_TYPE_H
+#ifndef EMP_DATA_ANNOTATEDTYPE_HPP_INCLUDE
+#define EMP_DATA_ANNOTATEDTYPE_HPP_INCLUDE
 
 #include "../base/assert.hpp"
 #include "../meta/TypeID.hpp"
@@ -30,6 +30,9 @@ namespace emp {
     const emp::DataMap & GetDataMap() const { return data_map; }
 
     void SetDataMap(emp::DataMap & in_dm) { data_map = in_dm; }
+
+    emp::DataLayout & GetDataLayout() { return data_map.GetLayout(); }
+    const emp::DataLayout & GetDataLayout() const { return data_map.GetLayout(); }
 
     bool HasTraitID(size_t id) const { return data_map.HasID(id); }
     bool HasTrait(const std::string & name) const { return data_map.HasName(name); }
@@ -77,4 +80,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATA_ANNOTATEDTYPE_HPP_INCLUDE

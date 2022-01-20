@@ -1,16 +1,19 @@
 /**
- * doing any sort of copying of memo_functions seems to give my terminal a
- * stack overflow error (using mingw on windows 10)
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file memo_function.cpp
+ *  @note doing any sort of copying of memo_functions seems to give my terminal a stack overflow error (using mingw on windows 10)
+ *  @MAM not sure who left this comment about stack overflow on mingw...
  */
 
-#define CATCH_CONFIG_MAIN
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/functional/memo_function.hpp"
-
-#include <sstream>
-#include <iostream>
 
 TEST_CASE("Test memo_function", "[functional]")
 {

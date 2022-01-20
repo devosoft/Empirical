@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Animate.hpp
+ *  @file Animate.hpp
  *  @brief Manage animations on a web site.
  *
  *  To build an animation, you must provide a function to be run repeatedly.  When Start()
@@ -12,9 +12,9 @@
  *
  */
 
+#ifndef EMP_WEB_ANIMATE_HPP_INCLUDE
+#define EMP_WEB_ANIMATE_HPP_INCLUDE
 
-#ifndef EMP_WEB_ANIMATE_H
-#define EMP_WEB_ANIMATE_H
 
 #include <functional>
 
@@ -238,4 +238,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_ANIMATE_HPP_INCLUDE

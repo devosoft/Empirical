@@ -1,16 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file Widget.cpp
+ */
 
 #include <functional>
 #include <unordered_map>
 
 #include "emp/base/assert.hpp"
-#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Div.hpp"
 #include "emp/web/Document.hpp"
 #include "emp/web/Element.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
 #include "emp/web/web.hpp"
-#include "emp/web/Div.hpp"
 
 struct Test_WidgetWrapWith : emp::web::BaseTest {
 

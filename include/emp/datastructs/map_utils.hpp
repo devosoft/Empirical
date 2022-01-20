@@ -1,16 +1,17 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2022.
  *
- *  @file  map_utils.hpp
+ *  @file map_utils.hpp
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */
 
-#ifndef EMP_MAP_UTILS_H
-#define EMP_MAP_UTILS_H
+#ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
+#define EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 
+#include <algorithm>
 #include <map>
 #include <unordered_map>
 
@@ -25,6 +26,47 @@ namespace emp {
     return in_map.find(key) != in_map.end();
   }
 
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool AnyOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
+
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool AllOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::all_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::all_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
+
+  // Check to see if any of the elements in a map satisfy a function.
+  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
+  bool NoneOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+    // If the provided function takes just the element type, that's all we should give it.
+    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+      return std::none_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
+    }
+
+    // Otherwise provide both key and element.
+    else {
+      return std::none_of(c.begin(), c.end(), [fun](auto x){ return fun(x.first, x.second); });
+    }
+  }
 
   template <class MAP_T>
   inline auto Keys( const MAP_T & in_map) -> emp::vector<typename std::remove_const<decltype(in_map.begin()->first)>::type> {
@@ -90,4 +132,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE

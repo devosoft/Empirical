@@ -1,32 +1,33 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The ConfigManager templated class handles the building and configuration of new objects
-//  of the target type.
-//
-//  The manager is created with two keywords; one for the type of the managed class, and the
-//  other for the keyword to trigger commands for it.
-//
-//  For example, if we're configuring an instruction set, the type might be 'inst_set' and the
-//  keyword might be 'inst'.  Then the configuration file can have lines like:
-//
-//     new inst_lib 4stack
-//     inst nopA
-//     inst inc
-//     inst divide cycle_cost=10
-//     ...
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016
+ *
+ *  @file ConfigManager.hpp
+ *  @brief  The ConfigManager templated class handles the building and configuration of new objects
+ *  of the target type.
+ *
+ * The manager is created with two keywords; one for the type of the managed class, and the
+ * other for the keyword to trigger commands for it.
+ *
+ *  For example, if we're configuring an instruction set, the type might be 'inst_set' and the
+ *  keyword might be 'inst'.  Then the configuration file can have lines like:
+ *
+ *     new inst_lib 4stack
+ *     inst nopA
+ *     inst inc
+ *     inst divide cycle_cost=10
+ *     ...
+ */
 
-
-#ifndef EMP_CONFIG_MANAGER_H
-#define EMP_CONFIG_MANAGER_H
+#ifndef EMP_CONFIG_CONFIGMANAGER_HPP_INCLUDE
+#define EMP_CONFIG_CONFIGMANAGER_HPP_INCLUDE
 
 #include <functional>
 #include <iostream>
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "../base/errors.hpp"
 #include "../tools/string_utils.hpp"
@@ -109,4 +110,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_CONFIG_CONFIGMANAGER_HPP_INCLUDE

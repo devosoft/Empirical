@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  LinearCode.hpp
+ *  @file LinearCode.hpp
  *  @brief A linear sequence of instructions.
  */
 
-#ifndef EMP_LINEAR_CODE_H
-#define EMP_LINEAR_CODE_H
+#ifndef EMP_HARDWARE_LINEARCODE_HPP_INCLUDE
+#define EMP_HARDWARE_LINEARCODE_HPP_INCLUDE
 
 #include "../base/array.hpp"
 #include "../base/vector.hpp"
@@ -61,4 +61,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_HARDWARE_LINEARCODE_HPP_INCLUDE

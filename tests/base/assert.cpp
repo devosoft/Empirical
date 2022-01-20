@@ -1,17 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file assert.cpp
+ */
 
-#define CATCH_CONFIG_MAIN
 #undef NDEBUG
-#define TDEBUG 1
+
+#include <iostream>
+#include <sstream>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#define TDEBUG 1
 #include "emp/base/assert.hpp"
-
-#include <sstream>
-#include <iostream>
 
 TEST_CASE("Test assert", "[base]")
 {
@@ -47,7 +50,7 @@ TEST_CASE("Test assert", "[base]")
   REQUIRE(emp::assert_last_fail);
   emp::assert_clear();
   REQUIRE_FALSE(emp::assert_last_fail);
-  
+
   // Run through similar tests to ensure no holdovers from cleared assert.
   emp_assert(true);
   REQUIRE(emp::assert_last_fail == 0);
@@ -59,7 +62,7 @@ TEST_CASE("Test assert", "[base]")
   const int expected_line_num_2 = __LINE__ + 1; // Line must precede the assert for line num to pass
   emp_assert(2 > 3); // False! Trigger the assert
   REQUIRE(emp::assert_last_fail);
-  
+
 
   const std::string filename_2 = emp::assert_fail_info.filename;
   REQUIRE_THAT(filename_2, Catch::Matchers::EndsWith("assert.cpp"));

@@ -1,0 +1,39 @@
+#   @note This file is part of Empirical, https://github.com/devosoft/Empirical
+#   @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+#   @date 2020-2021
+#
+#   @file  .editorconfig
+#   @brief Configures developers' editors to Empirical coding standards.
+#
+#   Requires users to have an editorconfig extension installed on their editor.
+#   Adapted largely from https://EditorConfig.org.
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Matches multiple files with brace expansion notation
+# Set default charset and tab width
+[*.{js,py}]
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+# cpp and hpp file indentation
+[*.{cpp,hpp}]
+indent_style = space
+indent_size = 2
+
+# Makefile indentation
+[Makefile]
+indent_style = tab
+
+# Matches the exact files
+[{package.json,.travis.yml, CI.yml}]
+indent_style = space
+indent_size = 2

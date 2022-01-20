@@ -3,15 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  regex_utils.hpp
+ *  @file regex_utils.hpp
  *  @brief Helper functions for building regular expressions.
  *  @note Status: BETA
-*/
+ */
 
-#ifndef EMP_REGEX_UTILS_HPP
-#define EMP_REGEX_UTILS_HPP
+#ifndef EMP_COMPILER_REGEX_UTILS_HPP_INCLUDE
+#define EMP_COMPILER_REGEX_UTILS_HPP_INCLUDE
 
 #include <string>
+
 #include "RegEx.hpp"
 
 namespace emp {
@@ -43,4 +44,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_COMPILER_REGEX_UTILS_HPP_INCLUDE

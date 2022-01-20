@@ -11,7 +11,7 @@ mergeInto(LibraryManager.library, {
             duration: seconds
         };  // Fill out configuration info.
         emp_info.objs[settings_id+1] = 0; // Preserve for tween.
-        return settings_id;        
+        return settings_id;
     },
 
     EMP_Tween_Clone__deps: ['$emp_info'],
@@ -25,7 +25,7 @@ mergeInto(LibraryManager.library, {
         }
 
         emp_info.objs[settings_id+1] = 0; // Preserve for tween object.
-        return settings_id;        
+        return settings_id;
     },
 
 
@@ -113,7 +113,7 @@ mergeInto(LibraryManager.library, {
         });
         return obj_id;                                       // Return the Kinetic object id.
     },
-  
+
     my_js: function() {
         alert('hi');
     },

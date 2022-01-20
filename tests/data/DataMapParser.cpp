@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2022
+ *
+ *  @file DataMapParser.cpp
+ */
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
@@ -12,7 +20,7 @@ TEST_CASE("Test DataMap", "[data]")
   dmA.AddVar<int>("val3", 3);
   dmA.AddVar<char>("char", 'A');
   dmA.AddVar<double>("val4", 256.0);
-  
+
   emp::DataMap dmB(dmA);
   dmB.Get<double>("val1") = 0.125;
   dmB.Get<double>("val2") = 64.25;
@@ -28,54 +36,39 @@ TEST_CASE("Test DataMap", "[data]")
   emp::DataMapParser parser;
 
   // Test a bunch of constant math.
-  auto fun = parser.BuildMathFunction(dmA, "5.5 + 4");
-  CHECK( fun(dmA) == 9.5 );
-  CHECK( fun(dmB) == 9.5 );
+  CHECK( parser.RunMathFunction(dmA, "(0 || 0)") == 0.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 || 1) + (1 || 0) + (1 || 1)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 && 1) + (1 && 0) + (1 && 1)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 == 0) + (1 == 1.000000001) + (1.1 == 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~== 0) + (1 ~== 1.000000001) + (1.1 ~== 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 != 0) + (1 != 1.000000001) + (1.1 != 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~!= 0) + (1 ~!= 1.000000001) + (1.1 ~!= 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 < 0) + (1 < 1.000000001) + (1.1 < 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~< 0) + (1 ~< 1.000000001) + (1.1 ~< 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 <= 0) + (1 <= 1.000000001) + (1.1 <= 1.2)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~<= 0) + (1 ~<= 1.000000001) + (1.1 ~<= 1.2)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 > 0) + (1 > 0.999999999) + (1.3 > 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~> 0) + (1 ~> 0.999999999) + (1.3 ~> 1.2)") == 1.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 >= 0) + (1 >= 1.000000001) + (1.3 >= 1.2)") == 2.0 );
+  CHECK( parser.RunMathFunction(dmA, "(0 ~>= 0) + (1 ~>= 1.000000001) + (1.3 ~>= 1.2)") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 + 4") == 9.5 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 - 4") == 1.5 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 * 4") == 22.0 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 / 4") == 1.375 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 % 4") == 1.5 );
+  CHECK( parser.RunMathFunction(dmA, "5.5 ** 4") == 915.0625 );
+  CHECK( parser.RunMathFunction(dmA, "30.25 ** 0.5") == 5.5 );
+  CHECK( parser.RunMathFunction(dmA, "64 %% 4") == 3.0 );
+  CHECK( parser.RunMathFunction(dmA, "1 + 2 * 2") == 5.0 );
+  CHECK( parser.RunMathFunction(dmA, "(1+2) * 2") == 6.0 );
+  CHECK( parser.RunMathFunction(dmA, "(3*3 + 4**2) ** 0.5") == 5.0 );
 
-  fun = parser.BuildMathFunction(dmA, "5.5 - 4");
-  CHECK( fun(dmA) == 1.5 );
-  CHECK( fun(dmB) == 1.5 );
+  // Test with external variables.
+  CHECK( parser.RunMathFunction(dmA, "$0 + $1 * $2", 1.4, 2, 7.1) == 15.6 );
 
-  fun = parser.BuildMathFunction(dmA, "5.5 * 4");
-  CHECK( fun(dmA) == 22.0 );
-  CHECK( fun(dmB) == 22.0 );
+  // Now, try to use these with DataMap variables!
 
-  fun = parser.BuildMathFunction(dmA, "5.5 / 4");
-  CHECK( fun(dmA) == 1.375 );
-  CHECK( fun(dmB) == 1.375 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 % 4");
-  CHECK( fun(dmA) == 1.5 );
-  CHECK( fun(dmB) == 1.5 );
-
-  fun = parser.BuildMathFunction(dmA, "5.5 ** 4");
-  CHECK( fun(dmA) == 915.0625 );
-  CHECK( fun(dmB) == 915.0625 );
-
-  fun = parser.BuildMathFunction(dmA, "30.25 ** 0.5");
-  CHECK( fun(dmA) == 5.5 );
-  CHECK( fun(dmB) == 5.5 );
-
-  fun = parser.BuildMathFunction(dmA, "64 %% 4");
-  CHECK( fun(dmA) == 3.0 );
-  CHECK( fun(dmB) == 3.0 );
-
-  fun = parser.BuildMathFunction(dmA, "1 + 2 * 2");
-  CHECK( fun(dmA) == 5.0 );
-  CHECK( fun(dmB) == 5.0 );
-
-  fun = parser.BuildMathFunction(dmA, "(1+2) * 2");
-  CHECK( fun(dmA) == 6.0 );
-  CHECK( fun(dmB) == 6.0 );
-
-  fun = parser.BuildMathFunction(dmA, "(3*3 + 4**2) ** 0.5");
-  CHECK( fun(dmA) == 5.0 );
-  CHECK( fun(dmB) == 5.0 );
-
-
-  // Now, try to use these with variables!
-
-  fun = parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
+  auto fun = parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
@@ -262,4 +255,18 @@ TEST_CASE("Test DataMap", "[data]")
   fun = parser.BuildMathFunction(dmA, "FROM_SCALE(val3, 1.5, 11.5)");
   CHECK( fun(dmA) == 0.15 );
   CHECK( fun(dmB) == 0.25 );
+
+
+  // Test with more extra values.
+  double multiple = 2.0;
+  std::string expression = "(val1 + val2 + 2*val3) * $0";
+
+  fun = parser.BuildMathFunction(dmA, expression, multiple);
+  CHECK( fun(dmA) == 19 );
+  CHECK( fun(dmB) == 144.75 );
+
+  multiple = 1.0;
+  fun = parser.BuildMathFunction(dmA, expression, multiple);
+  CHECK( fun(dmA) == 9.5 );
+  CHECK( fun(dmB) == 72.375 );
 }

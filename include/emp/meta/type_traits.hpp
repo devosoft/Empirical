@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
  *
- *  @file  type_traits.hpp
+ *  @file type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
  */
 
+#ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE
+#define EMP_META_TYPE_TRAITS_HPP_INCLUDE
 
-#ifndef EMP_TYPE_TRAITS_H
-#define EMP_TYPE_TRAITS_H
 
 #include <functional>
 #include <tuple>
@@ -94,7 +94,7 @@ namespace emp {
   template <typename T> struct remove_std_function_type<std::function<T>> { using type = T; };
   template <typename T> using remove_std_function_t = typename remove_std_function_type<T>::type;
 
-  // Collect the reference type for any container.
+  // Collect the reference type for any standard container.
   template <typename T> struct element_type { using type = T; };
   template <template <typename...> class TMPL, typename T> struct element_type<TMPL<T>>  { using type = T; };
   template <typename T> using element_t = typename element_type<T>::type;
@@ -104,7 +104,7 @@ namespace emp {
   template <typename> struct is_emp_vector : std::false_type { };
   template <typename T, typename... Ts>
   struct is_emp_vector<emp::vector<T, Ts...>> : std::true_type { };
-  
+
 
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename> struct is_ptr_type : public std::false_type { };
@@ -625,4 +625,4 @@ namespace emp {
 
 }  // namespace emp
 
-#endif
+#endif // #ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE

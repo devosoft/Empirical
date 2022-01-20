@@ -31,4 +31,3 @@
   :project: Empirical
   :no-link:
 ```
-

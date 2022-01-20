@@ -1,12 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-
-#define CATCH_CONFIG_MAIN
-#include "third-party/Catch/single_include/catch2/catch.hpp"
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file color_map.cpp
+ */
 
 #include <iostream>
 #include <string>
+
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/assert.hpp"
 #include "emp/base/vector.hpp"

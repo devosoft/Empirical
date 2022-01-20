@@ -3,21 +3,21 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020-2021.
  *
- *  @file  StreamManager.hpp
+ *  @file StreamManager.hpp
  *  @brief The StreamManager object links names to files or other streams.
  *  @note  Status: BETA
  *
  *  @todo  Ideally should also work with emp::File
  */
 
+#ifndef EMP_IO_STREAMMANAGER_HPP_INCLUDE
+#define EMP_IO_STREAMMANAGER_HPP_INCLUDE
 
-#ifndef EMP_STREAM_MANAGER_H
-#define EMP_STREAM_MANAGER_H
 
 #include <fstream>
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 
@@ -138,10 +138,10 @@ namespace emp {
           else if constexpr (ACCESS == Access::IO)     ptr = NewPtr<std::fstream>(name);
           else emp_error("Unknown access type for file creation in StreamManager.");
         }
- 
+
         // Build string streams.
         else if constexpr (TYPE == Type::STRING)       ptr = NewPtr<std::stringstream>();
- 
+
         // Otherwise use std::cin or std::cout
         else {
           owned = false;  // Use a pre-existing stream.
@@ -158,7 +158,7 @@ namespace emp {
     // A default class for when we do not have a live stream.
     struct StreamInfo_None : public StreamInfo {
       StreamInfo_None() : StreamInfo("", false) { }
-      
+
       Type GetType() const override { return Type::NONE; }
       Access GetAccess() const override { return Access::NONE; }
       std::istream & GetInputStream() override { emp_error("No input stream!"); return GetDefaultStream(); }
@@ -196,7 +196,7 @@ namespace emp {
     }
 
     bool Has(const std::string & name) const { return emp::Has(streams, name); }
- 
+
     // Check to see if certain types of streams are being managed.
     bool HasInputFileStream(const std::string & name) const { return GetInfo(name).IsInputFile(); }
     bool HasOutputFileStream(const std::string & name) const { return GetInfo(name).IsOutputFile(); }
@@ -267,7 +267,7 @@ namespace emp {
       };
       return GetDefaultStream();
     }
-    
+
     /// Build a default output stream.
     std::ostream & AddOutputStream(const std::string & name) {
       emp_assert(!Has(name));
@@ -336,4 +336,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IO_STREAMMANAGER_HPP_INCLUDE

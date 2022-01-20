@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Canvas.hpp
+ *  @file Canvas.hpp
  *  @brief Manage an HTML canvas object.
  *
  */
 
+#ifndef EMP_WEB_CANVAS_HPP_INCLUDE
+#define EMP_WEB_CANVAS_HPP_INCLUDE
 
-#ifndef EMP_WEB_CANVAS_H
-#define EMP_WEB_CANVAS_H
 
 #include <string>
 
@@ -340,4 +340,4 @@ namespace web {
 }
 }
 
-#endif
+#endif // #ifndef EMP_WEB_CANVAS_HPP_INCLUDE

@@ -1,6 +1,16 @@
-#include <iostream>
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2021
+ *
+ *  @file SimplePDWorld.cpp
+ */
+
 #include <fstream>
+#include <iostream>
+
 #include "emp/config/ArgManager.hpp"
+
 #include "../SimplePDWorld.hpp"
 
 EMP_BUILD_CONFIG( PDWorldConfig,

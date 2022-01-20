@@ -3,19 +3,19 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file ExampleFail.cc
+ *  @file ExampleFail.cpp
  *  @brief An example file to show what FAILING unit tests look like, with commentary.
  */
 
-
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
+
+#include <string>
 
 #include "emp/testing/unit_tests.hpp"
 
 // You may also include any other files that you need for your specific tests.
 
-#include <string>
 #include "emp/tools/string_utils.hpp"
 
 // You may create an extra functions or macros that you may need.
