@@ -22,6 +22,7 @@
 
 namespace emp {
 
+
   /// ScopeType is used for scopes that we need to do something special at the end.
   /// Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
   enum class ScopeType { NONE=0, ROOT, BASIC, LOOP, FUNCTION };
@@ -39,6 +40,10 @@ namespace emp {
     using arg_t = ARG_T;
     using fun_t = std::function<void(hardware_t &, const inst_t &)>;
     using inst_properties_t = std::unordered_set<std::string>;
+  
+    struct InstructionBase{
+      virtual size_t GetIndex() const = 0;
+    };
 
     struct InstDef {
       size_t index;
@@ -101,12 +106,16 @@ namespace emp {
     size_t GetScopeArg(size_t idx) const { return inst_lib[idx].scope_arg; }
 
     /// Return the set of properties for the providxed instruction ID.
-    const inst_properties_t & GetProperties(size_t idx) const { return inst_lib[idx].properties; }
+    const inst_properties_t & GetProperties(size_t idx) const { 
+      return inst_lib[idx].properties; 
+    }
 
     char GetSymbol(size_t idx) const { return inst_lib[idx].symbol; }
 
     /// Does the given instruction ID have the given property value?
-    bool HasProperty(size_t idx, std::string property) const { return inst_lib[idx].properties.count(property); }
+    bool HasProperty(size_t idx, std::string property) const { 
+      return inst_lib[idx].properties.count(property); 
+    }
 
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
@@ -159,10 +168,10 @@ namespace emp {
                  const fun_t & fun_call,
                  size_t num_args=0,
                  const std::string & desc="",
-                 int _id = -1,
                  ScopeType scope_type=ScopeType::NONE,
                  size_t scope_arg=(size_t) -1,
-                 const inst_properties_t & inst_properties=inst_properties_t())
+                 const inst_properties_t & inst_properties=inst_properties_t(),
+                 int _id = -1)
     {
       const size_t idx = inst_lib.size();
       const size_t id = (_id >= 0) ? _id : inst_lib.size();
@@ -182,17 +191,16 @@ namespace emp {
     }
 
     /// Process a specified instruction in the provided hardware.
-    void ProcessInst(hardware_t & hw, const inst_t & inst) const {
-      inst_funs[inst.idx](hw, inst);
+    virtual void ProcessInst(hardware_t & hw, const inst_t & inst) const {
+      inst_funs[inst.GetIndex()](hw, inst);
     }
 
     /// Process a specified instruction on hardware that can be converted to the correct type.
     template <typename IN_HW>
     void ProcessInst(emp::Ptr<IN_HW> hw, const inst_t & inst) const {
       emp_assert( dynamic_cast<hardware_t*>(hw.Raw()) );
-      inst_funs[inst.idx](*(hw.template Cast<hardware_t>()), inst);
+      inst_funs[inst.GetIndex()](*(hw.template Cast<hardware_t>()), inst);
     }
-
 
     /// Write out a full genome to the provided ostream.
     void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {

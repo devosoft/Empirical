@@ -30,7 +30,6 @@ namespace emp {
 
     static constexpr size_t arg_count = ARG_COUNT;
 
-
     size_t FirstNopToRegIdx(const nop_vec_t& nop_vec, size_t default_idx) const{
       if(nop_vec.size()){
         if(nop_vec[0] == inst_lib_t::GetID("NopA")) return 0;

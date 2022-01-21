@@ -43,13 +43,24 @@ namespace emp{
   template <typename DERIVED>
   class VirtualCPU{
     public:
+      static constexpr size_t NUM_STACKS = 2; ///< Number of stacks in this CPU (currently 2)
+      struct Instruction;
+      
+      using derived_t = DERIVED;
+      using data_t = uint32_t;
+      using inst_t = Instruction;
+      using inst_lib_t = VirtualCPU_InstLib<derived_t, data_t, 0>;
+      using genome_t = Genome<Instruction, inst_lib_t>;
+      using nop_vec_t = emp::vector<size_t>;
+      using stack_t = emp::vector<data_t>;
+
       /// \brief Representation of a single instruction in the CPU's genome 
       ///
       /// Only contains the necessary information for which instruction is being represented
       /// as well as any data it needs in the genome. 
       /// Does NOT contain the actual logic of the instruction, nor the name. 
       /// These are handled by the instruction library itself.   
-      struct Instruction {
+      struct Instruction : public inst_lib_t::InstructionBase {
         size_t idx;                  /// Index of the instruction in the instruction library
         size_t id;                   /// Identifier for the instruction that gives the user 
                                      /// flexibility over the instruction (e.g., what symbol 
@@ -76,17 +87,10 @@ namespace emp{
 
         void Set(size_t _idx, size_t _id, emp::vector<size_t> _nop_vec = {})
           { idx = _idx; id = _id; nop_vec=_nop_vec;}
+
+        size_t GetIndex() const override { return idx; }
       };
 
-      static constexpr size_t NUM_STACKS = 2; ///< Number of stacks in this CPU (currently 2)
-      
-      using derived_t = DERIVED;
-      using data_t = uint32_t;
-      using inst_t = Instruction;
-      using inst_lib_t = VirtualCPU_InstLib<derived_t, data_t, 0>;
-      using genome_t = Genome<Instruction, inst_lib_t>;
-      using nop_vec_t = emp::vector<size_t>;
-      using stack_t = emp::vector<data_t>;
     
     protected:
       size_t num_regs = 0;  ///< Number of registers found in this CPU
@@ -370,7 +374,7 @@ namespace emp{
         write_head = 0;
         active_stack_idx = 0;
         copied_inst_id_vec.clear();
-        genome_working = genome;
+        //genome_working = genome;
        }
       /// Reset the entire CPU to a starting state, clearing the genome 
       void Reset() {
