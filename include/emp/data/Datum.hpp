@@ -6,7 +6,7 @@
  *  @file Datum.hpp
  *  @brief A single piece of data, either a value or a string.
  *  @note Status: ALPHA
- * 
+ *
  *  DEVELOPER NOTES:
  *  - For now, using unions, but this creates complications with non-trivial constructor/destructor
  *    for strings, so could try shifting over.
@@ -70,7 +70,7 @@ namespace emp {
 
     Datum & SetDouble(double in) {  // If this were previously a string, clean it up!
       if (!is_num) {
-        FreeString();  
+        FreeString();
         is_num = true;
       }
       num = in;
@@ -79,7 +79,7 @@ namespace emp {
 
     Datum & SetString(const std::string & in) {
       if (is_num) {        // If this were previously a num, change to string.
-        InitString(in);  
+        InitString(in);
         is_num = false;
       }
       else str = in;       // Already a string; just change its value.

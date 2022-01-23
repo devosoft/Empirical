@@ -6,7 +6,7 @@
  *  @file AnnotatedType.hpp
  *  @brief A base class to provide a DataMap and accessors to another class.
  *  @note Status: ALPHA
- * 
+ *
  */
 
 #ifndef EMP_DATA_ANNOTATEDTYPE_HPP_INCLUDE

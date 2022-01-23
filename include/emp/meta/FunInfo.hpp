@@ -6,11 +6,11 @@
  *  @file FunInfo.hpp
  *  @brief Wrap a function to provide more information about it.
  *  @note Status: ALPHA
- * 
+ *
  *  FunInfo will collect information about a provided function and facilitate
  *  manipulations.
- * 
- * 
+ *
+ *
  *  Developer Notes:
  *  - Will not currently handle return by reference!
  */
@@ -231,7 +231,7 @@ namespace emp {
   static auto ChangeTypes(FUN_T fun, R_CONVERTER_T ret_convert_fun, P_CONVERTER_T param_convert_fun)
   {
     auto partial = FunInfo<FUN_T>::template ChangeParameterTypes<NEW_T>(fun, param_convert_fun);
-    return FunInfo<decltype(partial)>::ChangeReturnType(partial, ret_convert_fun); 
+    return FunInfo<decltype(partial)>::ChangeReturnType(partial, ret_convert_fun);
   }
 
   /// Lock in a specified argument of a function.

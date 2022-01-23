@@ -12,7 +12,7 @@
  *  To get the unique type information for type T use:
  *    TypeID t = emp::GetTypeID<T>();
  *
- *  To make TypeID work more effectively with your custom class, implement the static member 
+ *  To make TypeID work more effectively with your custom class, implement the static member
  *  function EMPGetTypeName() which returns a string with its full name (including namespace).
  *    static std::string EMPGetTypeName() { return "myns::MyClass"; }
  *

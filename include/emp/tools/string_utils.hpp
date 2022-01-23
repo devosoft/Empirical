@@ -6,10 +6,10 @@
  *  @file string_utils.hpp
  *  @brief Simple functions to manipulate strings.
  *  @note Status: RELEASE
- * 
+ *
  *  Available Functions
  *    const std::string & empty_string()               - Reference to an empty string for null returns
- * 
+ *
  *    -- CLASSIFICATION --
  *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
  *    bool is_literal_char(const std::string & value)
@@ -31,13 +31,13 @@
  *    bool has_one_of_at(const std::string & str, const std::string & opts, size_t pos)
  *    bool has_digit_at(const std::string & str, size_t pos)
  *    bool has_letter_at(const std::string & str, size_t pos)
- * 
+ *
  *    -- SEARCHING --
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
  *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results, bool ignore_quoted=false)
  *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool ignore_quoted=false)
- * 
+ *
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
  *    std::string to_escaped_string(const std::string & value)
@@ -100,7 +100,7 @@
  *    std::string to_string(...)
  *    void from_string(const std::string & str, ...)
  *    std::string join(const emp::vector<T> & v, std::string join_str)
- *    
+ *
  *    -- ANSI TOOLS --
  *    char ANSI_ESC()
  *    std::string ANSI_Reset()
@@ -151,13 +151,13 @@
  *    std::string ANSI_BrightMagentaBG()
  *    std::string ANSI_BrightCyanBG()
  *    std::string ANSI_BrightWhiteBG()
- *    
+ *
  *    to_ansi_bold(const std::string & _in)
  *    to_ansi_italic(const std::string & _in)
  *    to_ansi_underline(const std::string & _in)
  *    to_ansi_blink(const std::string & _in)
  *    to_ansi_reverse(const std::string & _in)
- *    
+ *
  */
 
 #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
@@ -248,7 +248,7 @@ namespace emp {
     // If we made it here without a problem, it must be correct!
     return true;
   }
-  
+
 
   /// Test if an input string is properly formated as a literal string.
   static inline bool is_literal_string(const std::string & value,
@@ -371,13 +371,13 @@ namespace emp {
   }
 
   /// Determine if there are only digits in a string.
-  inline bool is_digits(const std::string & str) {    
+  inline bool is_digits(const std::string & str) {
     if (str.size() == 0) return false;   // If string is empty, there are NO digits.
     return DigitCharSet().Has(str);      // Otherwise return false if any character is not a digit.
   }
 
   /// Determine if this string represents a proper number.
-  inline bool is_number(const std::string & str) {    
+  inline bool is_number(const std::string & str) {
     if (str.size() == 0) return false;             // If string is empty, not a number!
     size_t pos = 0;
     if (has_one_of_at(str, "+-", pos)) ++pos;      // skip leading +/-
@@ -427,7 +427,7 @@ namespace emp {
   inline bool has_prefix(const std::string & in_string, const std::string & prefix) {
     if (prefix.size() > in_string.size()) return false;
     for (size_t i = 0; i < prefix.size(); ++i) {
-      if (in_string[i] != prefix[i]) return false;      
+      if (in_string[i] != prefix[i]) return false;
     }
     return true;
   }
@@ -442,7 +442,7 @@ namespace emp {
     for (size_t pos = start_pos + 1; pos < in_string.size(); ++pos) {
       // If we have a backslash, does not end on this or next char.
       if (in_string[pos] == '\\') {
-        ++pos;  
+        ++pos;
         continue;
       }
       // If we found the close-quote, pop to here.

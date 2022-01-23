@@ -253,7 +253,7 @@ public:
     size_t total_options = 0;
     double entropy = 0.0;
 
-    // Scan through all possible answers...    
+    // Scan through all possible answers...
     for (WordData & answer : words) {
       size_t options = AnalyzeGuess(guess.word, answer).CountOnes();
       if (options > max_options) max_options = options;
@@ -289,7 +289,7 @@ public:
       size_t total_options = 0;
       double entropy = 0.0;
 
-      // Scan through all possible answers...    
+      // Scan through all possible answers...
       for (WordData & answer : words) {
         size_t options = AnalyzeGuess(guess, answer).CountOnes();
         if (options > max_options) max_options = options;
@@ -352,7 +352,7 @@ public:
     }
     emp::Sort(words, [](const WordData & w1, const WordData & w2){
       if (w1.is_active == w2.is_active) {
-	return w1.max_options < w2.max_options;
+        return w1.max_options < w2.max_options;
       }
       return w2.is_active;
     });
@@ -415,7 +415,7 @@ int main(int argc, char* argv[])
   word_set.AddClue(3,'g',Result::NOWHERE);
   word_set.AddClue(4,'e',Result::HERE);
   */
-  
+
   word_set.Analyze();
   word_set.PrintResults();
 //  word_set.AnalyzeAll();

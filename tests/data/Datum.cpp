@@ -103,13 +103,13 @@ TEST_CASE("Test Datum", "[data]")
   CHECK(d2 <= "9");
   CHECK(d2 >= "0");
   CHECK(d2 > "0000000");
-  
+
   CHECK(d3 != 234);
   CHECK(d3 < 789);
   CHECK(d3 <= 678);
   CHECK(d3 >= 234);
   CHECK(d3 > 0);
-  
+
   double x = d1;
   std::string y = d1;
 

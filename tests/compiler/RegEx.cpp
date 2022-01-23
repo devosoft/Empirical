@@ -19,32 +19,32 @@
 
 TEST_CASE("Test RegEx", "[compiler]")
 {
-	emp::RegEx re("1|2");
-	CHECK(re.Test("1") == true);
-	CHECK(re.Test("2") == true);
-	CHECK(re.Test("12") == false);
+  emp::RegEx re("1|2");
+  CHECK(re.Test("1") == true);
+  CHECK(re.Test("2") == true);
+  CHECK(re.Test("12") == false);
 
-	// test operator=
-	emp::RegEx re0 = re;
-	CHECK(re0.Test("1") == true);
-	CHECK(re0.Test("2") == true);
-	CHECK(re0.Test("12") == false);
-	emp::RegEx re1("3|4");
-	re1 = re0;
-	CHECK(re1.Test("1") == true);
-	CHECK(re1.Test("2") == true);
-	CHECK(re1.Test("12") == false);
+  // test operator=
+  emp::RegEx re0 = re;
+  CHECK(re0.Test("1") == true);
+  CHECK(re0.Test("2") == true);
+  CHECK(re0.Test("12") == false);
+  emp::RegEx re1("3|4");
+  re1 = re0;
+  CHECK(re1.Test("1") == true);
+  CHECK(re1.Test("2") == true);
+  CHECK(re1.Test("12") == false);
 
-	// AsString
-	std::string reS = re.AsString();
-	CHECK(reS == "\"1|2\"");
+  // AsString
+  std::string reS = re.AsString();
+  CHECK(reS == "\"1|2\"");
 
   // test all the prints
 
-	// Try to hit all the different structs in RegEx.h
-	emp::RegEx re2("\"r.*\"");
-	//re2.PrintDebug();
-	//CHECK(re2.Test("\"rats\""));
+  // Try to hit all the different structs in RegEx.h
+  emp::RegEx re2("\"r.*\"");
+  //re2.PrintDebug();
+  //CHECK(re2.Test("\"rats\""));
 }
 
 TEST_CASE("Test regular expressions (RegEx)", "[compiler]")

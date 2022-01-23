@@ -17,12 +17,12 @@
  *
  *  Messages default to "standard out"; all of the other default to "standard error".  Handling of
  *  these notifications can all be overriden by either whole category or by specific tag.
- * 
+ *
  *  There are three possible recipients for all errors/warnings.
  *  - The end-user if the problem stems from inputs they provided to the executable.
  *  - The library user if the problem is due to mis-use of library functionality.
  *  - The library developers if something that should be impossible occurs.
- * 
+ *
  *  The content of this file primarily targets the first group; developers should prefer asserts
  *  to ensure that supposedly "impossible" situations do not occur.
  *
@@ -30,7 +30,7 @@
  *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings
  *    and can be responded to rather than automatically halting execution like errors.
  *  - Warnings should always detail what should be done differently to surpress that warning.
- * 
+ *
  *  DEVELOPER NOTES:
  *  - Add a Verbose() notification type?
  *
@@ -142,7 +142,7 @@ namespace notify {
 
     // Clear all handlers associated with a given id.
     HandlerSet & Clear() { handlers.resize(0); return *this; }
- 
+
     /// Replace all handlers with nothing (i.e., clear them)
     void Replace() { Clear(); }
 
@@ -249,7 +249,7 @@ namespace notify {
     // If we are are paused, save this notification for later.
     if (data.is_paused) {
       data.pause_queue.push_back(ExceptInfo{id, ss.str(), 0});
-      return true;      
+      return true;
     }
 
     bool result = data.handler_map[id].Trigger(id, ss.str());
@@ -315,12 +315,12 @@ namespace notify {
   }
 
   /// Send out a notification of an Exception.
-  static bool Exception(id_arg_t id, message_arg_t message="", except_data_t except_data=0) { 
+  static bool Exception(id_arg_t id, message_arg_t message="", except_data_t except_data=0) {
     NotifyData & data = GetData();
 
     if (data.is_paused) {
       data.pause_queue.push_back(ExceptInfo{id, message, except_data});
-      return true;      
+      return true;
     }
 
     // Retrieve the exception handlers that we have for this type of exception.

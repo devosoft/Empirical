@@ -7,12 +7,15 @@
  *
  */
 
-#include "emp/base/array.hpp"
-#include "emp/base/error.hpp"
-#include "emp/math/math.hpp"
-
 #ifndef DEMOS_UTILS_WORDS_WORDLE_RESULT_HPP_INCLUDE
 #define DEMOS_UTILS_WORDS_WORDLE_RESULT_HPP_INCLUDE
+
+#include <string>
+
+#include "emp/base/array.hpp"
+#include "emp/base/error.hpp"
+#include "emp/bits/BitVector.hpp"
+#include "emp/math/math.hpp"
 
 template <size_t WORD_SIZE=5>
 class Result {
