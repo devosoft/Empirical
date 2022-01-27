@@ -68,6 +68,8 @@ double calc_p_zero_symmetric_pareto_skinny_side(
   const double alpha, const double lambda, const double m, const double n
 ) {
 
+  if (n == m) return 0.5;
+
   const double res = (
       1.0
       - std::pow(lambda / (n + lambda), alpha)
