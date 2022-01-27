@@ -11,6 +11,7 @@
 #ifndef EMP_RANDOM_H
 #define EMP_RANDOM_H
 
+#include <algorithm>
 #include <ctime>
 #include <climits>
 #include <cmath>
