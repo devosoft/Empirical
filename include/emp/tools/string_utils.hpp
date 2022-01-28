@@ -89,6 +89,8 @@
  *    std::string_view view_string_to(const std::string_view & in_string, const char delim, size_t start_pos=0)
  *
  *    -- OTHER MANIPULATIONS --
+ *    std::string pad_front(const std::string & in_string, char padding, size_t target_size)
+ *    std::string pad_back(const std::string & in_string, char padding, size_t target_size)
  *    std::string repeat(const std::string& value, const size_t n)
  *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
  *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
@@ -1105,6 +1107,18 @@ namespace emp {
     size_t end_pos = start_pos;
     while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
     return view_string_range(in_string, start_pos, end_pos);
+  }
+
+  inline std::string pad_front(const std::string & in_str, char padding, size_t target_size) {
+    if (in_str.size() >= target_size) return in_str;
+    const size_t pad_size = target_size - in_str.size();
+    return std::string(pad_size, padding) + in_str;
+  }
+
+  inline std::string pad_back(const std::string & in_str, char padding, size_t target_size) {
+    if (in_str.size() >= target_size) return in_str;
+    const size_t pad_size = target_size - in_str.size();
+    return in_str + std::string(pad_size, padding);
   }
 
   /// Concatenate n copies of a string.
