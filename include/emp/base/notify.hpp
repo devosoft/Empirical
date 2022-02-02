@@ -8,8 +8,9 @@
  *  @note Status: ALPHA
  *
  *
- *  There are five types of notifications to consider:
+ *  There are a handful of notification types to consider:
  *  - Message: A simple notification.
+ *  - Verbose: Optional messages that can be activated by category.
  *  - Warning: Something looks suspicious, but is not technically a problem (don't exit)
  *  - Error: Something has gone horribly wrong and is impossible to recover from (exit)
  *  - Exception: Something didn't go the way we expected, but we can still recover (exit if not handled)
@@ -31,9 +32,6 @@
  *    and can be responded to rather than automatically halting execution like errors.
  *  - Warnings should always detail what should be done differently to surpress that warning.
  *
- *  DEVELOPER NOTES:
- *  - Add a Verbose() notification type?
- *
  */
 
 #ifndef EMP_BASE_NOTIFY_HPP_INCLUDE
@@ -46,6 +44,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "vector.hpp"
 
@@ -159,6 +158,7 @@ namespace notify {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
     std::unordered_map<id_t,HandlerSet> handler_map; // Map of all handlers to use for notifications.
+    std::unordered_set<std::string> verbose_set;     // Set of categories for verbose messages.
     emp::vector<exit_fun_t> exit_funs;               // Set of handlers to run on exit.
     emp::vector<ExceptInfo> except_queue;            // Unresolved exceptions after handlers have run
     emp::vector<ExceptInfo> pause_queue;             // Unresolved notifications during pause
@@ -312,6 +312,18 @@ namespace notify {
   template <typename FUN_T>
   static HandlerSet & AddHandler(FUN_T fun) {
     return GetData().handler_map["__generic__"].Add(fun);
+  }
+
+  /// Send out a notification of an "verbose" message.
+  template <typename... Ts>
+  static bool Verbose(const std::string & id, Ts... args) {
+    NotifyData & data = GetData();
+
+    if (data.verbose_set.count(id)) {
+      return Notify(Type::MESSAGE, std::forward<Ts>(args)...);
+    }
+
+    return false;
   }
 
   /// Send out a notification of an Exception.
