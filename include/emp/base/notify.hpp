@@ -314,6 +314,12 @@ namespace notify {
     return GetData().handler_map["__generic__"].Add(fun);
   }
 
+  /// Turn on a particular verbosity category.
+  void SetVerbose(std::string id, bool make_active=true) {
+    if (make_active) GetData().verbose_set.insert(id);
+    else GetData().verbose_set.erase(id);
+  }
+
   /// Send out a notification of an "verbose" message.
   template <typename... Ts>
   static bool Verbose(const std::string & id, Ts... args) {
