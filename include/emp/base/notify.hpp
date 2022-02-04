@@ -157,12 +157,12 @@ namespace notify {
   struct NotifyData {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
-    std::unordered_map<id_t,HandlerSet> handler_map; // Map of all handlers to use for notifications.
-    std::unordered_set<std::string> verbose_set;     // Set of categories for verbose messages.
-    emp::vector<exit_fun_t> exit_funs;               // Set of handlers to run on exit.
-    emp::vector<ExceptInfo> except_queue;            // Unresolved exceptions after handlers have run
-    emp::vector<ExceptInfo> pause_queue;             // Unresolved notifications during pause
-    bool is_paused = false;                          // When paused, save notifications until unpaused.
+    std::unordered_map<id_t,HandlerSet> handler_map;  // Map of all handlers to use for notifications.
+    std::unordered_map<std::string,bool> verbose_map; // Set of categories for verbose messages.
+    emp::vector<exit_fun_t> exit_funs;                // Set of handlers to run on exit.
+    emp::vector<ExceptInfo> except_queue;             // Unresolved exceptions after handlers have run
+    emp::vector<ExceptInfo> pause_queue;              // Unresolved notifications during pause
+    bool is_paused = false;                           // When paused, save notifications until unpaused.
 
     HandlerSet & GetHandler(Type type) { return handler_map[TypeID(type)]; }
 
@@ -316,8 +316,7 @@ namespace notify {
 
   /// Turn on a particular verbosity category.
   void SetVerbose(std::string id, bool make_active=true) {
-    if (make_active) GetData().verbose_set.insert(id);
-    else GetData().verbose_set.erase(id);
+    GetData().verbose_map[id] = make_active;
   }
 
   /// Send out a notification of an "verbose" message.
@@ -325,7 +324,7 @@ namespace notify {
   static bool Verbose(const std::string & id, Ts... args) {
     NotifyData & data = GetData();
 
-    if (data.verbose_set.count(id)) {
+    if (data.verbose_map[id]) {
       return Notify(Type::MESSAGE, std::forward<Ts>(args)...);
     }
 
