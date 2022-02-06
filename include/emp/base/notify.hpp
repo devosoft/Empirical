@@ -88,12 +88,19 @@ namespace notify {
     using fun_no_data_t = std::function<bool(id_arg_t, message_arg_t)>;
     using fun_msg_only_t = std::function<bool(message_arg_t)>;
     emp::vector<fun_t> handlers;
+    bool exit_on_fail = false;
 
   public:
     HandlerSet() {}
     HandlerSet(const HandlerSet &) = default;
     HandlerSet(HandlerSet &&) = default;
     ~HandlerSet() { }
+
+    bool GetExitOnFail() const { return exit_on_fail; }
+    HandlerSet & SetExitOnFail(bool _exit=true) {
+      exit_on_fail = _exit;
+      return *this;
+    }
 
     /// Trigger all handlers associated with a given ID.
     bool Trigger(id_arg_t id, message_arg_t message, except_data_t except_data) {
@@ -162,6 +169,7 @@ namespace notify {
     emp::vector<exit_fun_t> exit_funs;                // Set of handlers to run on exit.
     emp::vector<ExceptInfo> except_queue;             // Unresolved exceptions after handlers have run
     emp::vector<ExceptInfo> pause_queue;              // Unresolved notifications during pause
+    bool lethal_exceptions = true;                    // Should unresolved exceptions end the program?
     bool is_paused = false;                           // When paused, save notifications until unpaused.
 
     HandlerSet & GetHandler(Type type) { return handler_map[TypeID(type)]; }
@@ -206,6 +214,7 @@ namespace notify {
           return false;
         }
       );
+      GetHandler(Type::EXCEPTION).SetExitOnFail();
 
       // The initial exit handler should actually exit, using the appropriate exit code.
       exit_funs.push_back( [](size_t code){ exit(code); } );
@@ -308,10 +317,15 @@ namespace notify {
     return GetData().handler_map[id].Add(fun);
   }
 
-  /// Add a generic handler.
+  /// Add a generic exception handler.
   template <typename FUN_T>
   static HandlerSet & AddHandler(FUN_T fun) {
-    return GetData().handler_map["__generic__"].Add(fun);
+    return GetData().handler_map["EXCEPTION"].Add(fun);
+  }
+
+  /// Ignore exceptions of a specific type.
+  static HandlerSet & Ignore(id_arg_t id) {
+    return AddHandler(id, [](id_arg_t, message_arg_t){ return true; });
   }
 
   /// Turn on a particular verbosity category.
@@ -340,14 +354,20 @@ namespace notify {
       return true;
     }
 
-    // Retrieve the exception handlers that we have for this type of exception.
+    // Retrieve any specialized exception handlers for this type of exception.
     bool result = data.handler_map[id].Trigger(id, message, except_data);
 
-    // If unresolved, see if a generic handler can help.
-    if (!result) result = data.handler_map["__generic__"].Trigger(id, message, except_data);
+    // If unresolved, see if we should quit; else use a generic exceptionhandler.
+    if (!result) {
+      if (data.handler_map[id].GetExitOnFail()) Exit(1);
+      result = data.handler_map["EXCEPTION"].Trigger(id, message, except_data);
+    }
 
     // If still unresolved, either give up or save the exception for later analysis.
-    if (!result) data.except_queue.push_back(ExceptInfo{id, message, except_data});
+    if (!result) {
+      if (data.handler_map["EXCEPTION"].GetExitOnFail()) Exit(1);
+      data.except_queue.push_back(ExceptInfo{id, message, except_data});
+    }
 
     return result;
   }
