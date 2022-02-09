@@ -27,7 +27,7 @@ namespace emp {
 namespace impl {
 
 // implementation helper for GetRandZeroSymmetricPareto
-double calc_p_zero_symmetric_pareto_fat_side(
+inline double calc_p_zero_symmetric_pareto_fat_side(
   const double alpha, const double lambda, const double m, const double n
 ) {
 
@@ -65,7 +65,7 @@ double calc_p_zero_symmetric_pareto_fat_side(
 }
 
 // implementation helper for GetRandZeroSymmetricPareto
-double calc_p_zero_symmetric_pareto_skinny_side(
+inline double calc_p_zero_symmetric_pareto_skinny_side(
   const double alpha, const double lambda, const double m, const double n
 ) {
 
