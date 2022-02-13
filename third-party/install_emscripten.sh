@@ -22,10 +22,10 @@ cd emsdk
 git pull
 
 # Download and install the latest SDK tools.
-./emsdk install 3.1.13
+./emsdk install 3.1.3
 
 # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-./emsdk activate 3.1.13
+./emsdk activate 3.1.3
 
 # Activate PATH and other environment variables in the current terminal
 source ./emsdk_env.sh
