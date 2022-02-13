@@ -37,20 +37,16 @@ namespace D3 {
     /// Generate the string describing the path associated with [data]
     /// Assumes [data] is an array of 2-element arrays describing (x,y) coordinates and makes
     /// the line that connects them
-    template <typename T, size_t SIZE>
-    std::string Generate(emp::array<emp::array<T, 2>, SIZE> & data){
+    template<typename C, class = typename C::value_type>
+    std::string Generate(const C & data){
       emp::pass_array_to_javascript(data);
 
-      char * buffer = (char *)EM_ASM_INT({
+      MAIN_THREAD_EM_ASM({
         var result = emp_d3.objects[$0](emp_i.__incoming_array);
-        var buffer = Module._malloc(result.length+1);
-        Module.stringToUTF8(result, buffer, lengthBytesUTF8(result)+1);
-        return buffer;
+        emp.PassStringToCpp(result);
       }, this->id);
 
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
+      return emp::pass_str_to_cpp();
     }
 
     /// Draws the path associated with [data] onto the [s] selection (must contain a single SVG)

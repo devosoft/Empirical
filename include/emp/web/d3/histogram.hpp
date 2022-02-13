@@ -99,7 +99,12 @@ namespace D3 {
         /// @endcond
 
         Histogram& SetValueAccessor(std::string func) {
-            D3_CALLBACK_METHOD_1_ARG(value, func.c_str());
+            MAIN_THREAD_EM_ASM({
+                const id = $0;
+                const func_str = UTF8ToString($1);
+                var sel = emp_d3.find_function(func_str);
+                emp_d3.objects[id].value(sel);
+            }, this->id, func.c_str());
             return (*this);
         }
 
