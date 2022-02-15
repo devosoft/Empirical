@@ -130,6 +130,7 @@ namespace emp{
       size_t active_stack_idx = 0;             ///< Index of CPU's active stack
       emp::vector<size_t> copied_inst_id_vec;  ///< Vector of instructions that have been 
                                                ///< copied
+      size_t num_insts_executed = 0;
       
 
       //////// CONSTRUCTORS / DESTRUCTOR
@@ -346,6 +347,7 @@ namespace emp{
         else if(modded_idx == 1) return read_head;
         else if(modded_idx == 2) return write_head;
         else if(modded_idx == 3) return flow_head;
+        return inst_ptr;
       }
 
 
@@ -374,6 +376,7 @@ namespace emp{
         write_head = 0;
         active_stack_idx = 0;
         copied_inst_id_vec.clear();
+        num_insts_executed = 0;
         //genome_working = genome;
        }
       /// Reset the entire CPU to a starting state, clearing the genome 
@@ -654,6 +657,7 @@ namespace emp{
         }
         GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
         AdvanceIP();
+        num_insts_executed++;
       }
       /// Process the next SERIES of instructions, directed by the instruction pointer.
       void Process(size_t num_inst = 1, bool verbose = true) { 
