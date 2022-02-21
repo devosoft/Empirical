@@ -1023,8 +1023,38 @@ namespace emp {
     /// @returns the depth of the Most-Recent Common Ancestor; return -1 for none.
     int GetMRCADepth() const;
 
+    /// @returns a pointer to the Most-Recent Ancestor shared by two taxa.
+    Ptr<taxon_t> GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2) const;
+
     /// @returns the genetic diversity of the population.
     double CalcDiversity() const;
+
+    /// @returns vector containing the lineages of the specified taxon
+    emp::vector<Ptr<taxon_t>> GetLineage(Ptr<taxon_t> tax) const {
+      emp::vector<Ptr<taxon_t>> lineage;
+      lineage.push_back(tax);
+
+      while (tax) {
+        tax = Parent(tax);
+        lineage.push_back(tax);
+      }
+      return lineage;
+    }
+
+    /// @returns vector containing the lineages of the specified taxon
+    /// up to and including the MRCA, but not past the MRCA
+    emp::vector<Ptr<taxon_t>> GetLineageToMRCA(Ptr<taxon_t> tax) const {
+      GetMRCA();
+      emp::vector<Ptr<taxon_t>> lineage;
+      lineage.push_back(tax);
+
+      while (tax && tax != mrca) {
+        tax = Parent(tax);
+        lineage.push_back(tax);
+      }
+      return lineage;
+    }
+
 
     // ===== Output functions ====
 
@@ -1210,6 +1240,8 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, Ptr<taxon_t> parent) {
+    emp_assert(!store_position &&
+              "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.", store_position);
     return AddOrg(org, WorldPosition::invalid_id, parent);
   }
 
@@ -1580,6 +1612,30 @@ namespace emp {
     return -1;
   }
 
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2) const {
+    // Same taxon
+    if (t1 == t2) {
+      return t1;
+    }
+
+    // If not same, we have to actually do work
+    emp::vector<Ptr<taxon_t> > lineage1 = GetLineageToMRCA(t1);
+    emp::vector<Ptr<taxon_t> > lineage2 = GetLineageToMRCA(t2);
+
+    size_t l1 = lineage1.size() - 1;
+    size_t l2 = lineage2.size() - 1;
+
+    emp_assert(lineage1[l1] == lineage2[l2], 
+        "Both lineages should start with MRCA");
+    
+    while (lineage1[l1] == lineage2[l2]) {
+      l1--;
+      l2--;
+    }
+
+    return lineage1[l1+1];
+  }
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Helper for Colless function calculation
