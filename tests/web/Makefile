@@ -13,17 +13,20 @@ CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments 
 CXX_web := emcc
 OFLAGS_web := -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864
 
+# Extra flags that make debugging web stuff easier
+OFLAGS_web_debug := -s DEMANGLE_SUPPORT=1 -s NO_DISABLE_EXCEPTION_CATCHING -s ASSERTIONS=2
+
 #A bug in llvm compilers causes them to erroneously warn about braces around
 #initializer lists - to compile files with them, we need to remove -Werror
 OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]'
 
 test-web: $(addprefix test-web-, $(TEST_NAMES)) test-GetUrlParams
 
 test-web-%: %.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
-	$(CXX_web) $(CFLAGS_web) $< -o $@.js
+	$(CXX_web) $(CFLAGS_web) $(OFLAGS_web_debug) $< -o $@.js
 	cp ../../third-party/package.json .
 	npm install
 	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@

@@ -1,11 +1,26 @@
+function CrossOriginIsolationMiddlewareFactory(config) {
+  return function crossOriginIsolation(req, res, next) {
+      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+      res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+      next();
+  };
+}
+
 module.exports = function(config) {
   config.set({
+    customContextFile: "tests/web/context.html",
+    // customClientContextFile: "tests/web/client_with_context.html",
 
     // to enable commandline input
     client: {
       // args: config.name ? ["--name"] : [],
       // note that this works only with `karma start`, not `karma run`
       filename: config.filename,
+      // runInParent: true,
+        mocha: {
+          delay: false,
+        }
+
     },
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -36,14 +51,29 @@ module.exports = function(config) {
       'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js',
       {pattern: 'include/emp/prefab/LoadingModal.js'},
       // TODO: put all prefab dependencies in a directory and link it somehow
-      // {pattern: 'tests/web/CodeBlock/*', included: false},
+      {pattern: 'tests/web/CodeBlock/*', included: false},
       {pattern: 'tests/web/assets/*', included: false},
       {pattern: `tests/web/${config.filename}.js.map`, included: false},
-      {pattern: `tests/web/${config.filename}.js`},
-      {pattern: `tests/web/${config.filename}.wasm`, included: false, nocache:true},
-      {pattern: `tests/web/${config.filename}.wasm.map`, included: false, nocache:true}
+      {pattern: `tests/web/${config.filename}.js`, included: true},
+      {pattern: `tests/web/${config.filename}.wasm`, included: false},
+      {pattern: `tests/web/${config.filename}.wasm.map`, included: false}
     ],
 
+    mime: {
+      "application/wasm" : ["wasm"]
+    },
+
+    plugins: [
+      // load all default karma plugins (this would be the default value if we didn't specify the plugins manually)
+      'karma-*',
+      // add custom middleware plugin
+      { 'middleware:cross-origin-isolation': ['factory', CrossOriginIsolationMiddlewareFactory] }
+    ],
+
+
+    beforeMiddleware: [
+      'cross-origin-isolation',
+    ],    
 
     // list of files to exclude
     exclude: [
@@ -91,6 +121,8 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+
+    processKillTimeout: 1000000
   })
 }

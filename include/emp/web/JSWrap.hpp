@@ -31,7 +31,7 @@
  *
  *
  *  @todo Add a JSWrap that takes an object and method and does the bind automatically.
- *  @todo Build a non-enscripten version; it should still be callable from the C++ side, but
+ *  @todo Build a non-emscripten version; it should still be callable from the C++ side, but
  *        mostly to be able to test programs without Emscripten.
  *
  */
@@ -361,7 +361,7 @@ namespace emp {
 
 
     // The derived form of JSWrap_Callback knows the specific argument types of the function
-    // needed, keeps track of the function poninter, and has a tuple in which the arguments
+    // needed, keeps track of the function pointer, and has a tuple in which the arguments
     // can be loaded before a call is made.
 
     template <typename RET_TYPE, typename... ARG_TYPES>
@@ -519,7 +519,7 @@ namespace emp {
   }
 
 
-  /// If we want a quick, unnammed, disposable function, use JSWrapOnce
+  /// If we want a quick, un-nammed, disposable function, use JSWrapOnce
   template <typename FUN_TYPE>
   size_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
 
@@ -603,7 +603,7 @@ void empCppCallback(const size_t cb_id) {
 
   // dispatch the callback to the worker thread main was proxied to
 
-    const pthread_t proxy_pthread_id = EM_ASM_INT({
+    const pthread_t proxy_pthread_id = MAIN_THREAD_EM_ASM_INT({
 
       if ( Object.keys( PThread.pthreads ).length !== 0 ) {
         console.assert( Object.keys( PThread.pthreads ).length === 1 );
@@ -611,8 +611,7 @@ void empCppCallback(const size_t cb_id) {
       } else return 0;
 
     });
-
-    emscripten_async_queue_on_thread(
+    emscripten_dispatch_to_thread(
       proxy_pthread_id,
       EM_FUNC_SIG_VI, // VI = no return value, one argument
       (void*) &empDoCppCallback,

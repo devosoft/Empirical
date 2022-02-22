@@ -1,5 +1,63 @@
 
 <!-- NOTE: this file is NOT used by the automated testing system -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mocha Tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../third-party/node_modules/mocha/mocha.css" />
+    <script src="../../third-party/node_modules/mocha/mocha.js"></script>
+    <script src="../../third-party/node_modules/chai/chai.js"></script>
+    <script src="../../examples/web/jquery-1.11.2.min.js"></script>
+
+  </head>
+  <body>
+    <div id="mocha"></div>
+
+    <!-- <script src="https://unpkg.com/jquery/dist/jquery.js"></script> -->
+    <!-- <script src="https://unpkg.com/chai/chai.js"></script>
+    <script src="https://unpkg.com/mocha/mocha.js"></script> -->
+    
+    <script class="mocha-init">
+      mocha.setup('bdd');
+      // mocha.setup({
+      //   delay: false,
+      //   allowUncaught: true,
+      //   asyncOnly: true,
+      //   bail: true,
+      //   checkLeaks: true,
+      //   dryRun: true,
+      //   failZero: true,
+      //   forbidOnly: true,
+      //   forbidPending: true,
+      //   // global: ['MyLib'],
+      //   retries: 3,
+      //   // rootHooks: { beforeEach(done) { ... done();} },
+      //   slow: '100',
+      //   timeout: '10000',
+      //   ui: 'bdd'
+      // });
+        var assert = chai.assert;      
+      // mocha.checkLeaks();
+    </script>
+    <!-- <script src="test.array.js"></script>
+    <script src="test.object.js"></script>
+    <script src="test.xhr.js"></script> -->
+    <script class="mocha-exec">
+  
+      var Module = {
+      onRuntimeInitialized: function() {
+        console.log("rady")
+        mocha.run();
+      }
+    };
+    </script>
+    <script src="test-web-JSWrap.js"></script>
+  </body>
+</html>
+<!-- 
+
 <html>
     <head>
         <title> Tests </title>
@@ -26,11 +84,11 @@
         </script>
         <div id="line_graph"></div>
         <div id="tree_viz"></div>
-        <script src="test_visualizations.js"></script>
+        <script src="test-web-JSWrap.js"></script>
         <script>
         onload = function(){
           mocha.run();
         };
         </script>
     </body>
-</html>
+</html> -->
