@@ -99,7 +99,7 @@ jobs:
       - run: make install-test-dependencies
       - run: export CXX=clang++-7 && make install-coverage-dependencies
       - run: export CXX=clang++-7 && make coverage
-      - run: curl -s https://codecov.io/bash | bash
+      - uses: codecov/codecov-action@v2
   test-documentation:
     name: Test Documentation Build
     runs-on: ubuntu-18.04
