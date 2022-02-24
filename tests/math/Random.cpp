@@ -75,25 +75,25 @@ TEST_CASE("Test Random", "[math]")
   REQUIRE(ui64 < 100000000000);
 
   // Values are consistent when random seeded with 5
-  double rndNormal = rnd.GetRandNormal(5.0, 0.1);
+  double rndNormal = rnd.GetNormal(5.0, 0.1);
   REQUIRE( std::abs(rndNormal - 5.0) < 0.5 );
 
-  REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
+  REQUIRE(rnd.GetPoisson(1.0, 0.9) == 1.0);
 
-  size_t b1_result = rnd.GetRandBinomial(3000, 0.1);
+  size_t b1_result = rnd.GetBinomial(3000, 0.1);
   REQUIRE(b1_result > 250);
   REQUIRE(b1_result < 350);
 
-  size_t b2_result = rnd.GetRandBinomial(100, 0.3);
+  size_t b2_result = rnd.GetBinomial(100, 0.3);
   REQUIRE(b2_result > 15);
   REQUIRE(b2_result < 50);
 
   emp::RandomStdAdaptor randomStd(rnd);
   REQUIRE(randomStd(4) == 1);
 
-  REQUIRE(rnd.GetRandGeometric(1) == 1);
-  REQUIRE(rnd.GetRandGeometric(0) == std::numeric_limits<uint32_t>::infinity());
-  // REQUIRE(rnd.GetRandGeometric(.25) == 8);
+  REQUIRE(rnd.GetGeometric(1) == 1);
+  REQUIRE(rnd.GetGeometric(0) == std::numeric_limits<uint32_t>::infinity());
+  // REQUIRE(rnd.GetGeometric(.25) == 8);
 }
 
 TEST_CASE("Another Test random", "[math]")
