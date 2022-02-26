@@ -445,7 +445,7 @@ namespace emp {
     /// Generate a random variable drawn from a geometric distribution.
     inline uint32_t GetGeometric(double p) {
       emp_assert(p > 0.0 && p < 1.0, p);
-      return static_cast<uint32_t>( GetExponential(p) );
+      return static_cast<uint32_t>( GetExponential(p) ) + 1;
     }
 
   };
