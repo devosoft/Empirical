@@ -5,29 +5,48 @@
 #include "../../include/emp/math/Random.hpp"
 
 void TestGeometric(emp::Random & random, const double p, const size_t num_tests=1000) {
+  std::cout << "---- Geometric Tests: p = " << p << " ----\n";
+
+  ////////- Pre-processed distribution
   emp::NegativeBinomial dist(p, 1);
-  emp::vector<double> results;
 
   std::clock_t start_time = std::clock();
 
-  size_t total = 0;
+  double total = 0;
   for (size_t i = 0; i < num_tests; i++) {
     total += dist.PickRandom(random);
   }
 
   std::clock_t tot_time = std::clock() - start_time;
-  double result = 1000.0 * ((double) tot_time) / (double) CLOCKS_PER_SEC;
+  double result = ((double) tot_time) / (double) CLOCKS_PER_SEC;
 
-  std::cout << "Negative Binomial with p = " << p << " (and N=1)\n"
+  std::cout << "Negative Binomial Distribution with p = " << p << " (and N=1)\n"
             << "  time = " << result << " seconds.\n"
             << "  dist size = " << dist.GetSize() << "\n"
-            << "  total = " << total << "\n"
+            << "  average = " << (total / num_tests) << "\n"
             << std::endl;
+
+  ////////- Random call (no pre-process)
+  start_time = std::clock();
+
+  total = 0;
+  for (size_t i = 0; i < num_tests; i++) {
+    total += random.GetGeometric(p);
+  }
+
+  tot_time = std::clock() - start_time;
+  result = ((double) tot_time) / (double) CLOCKS_PER_SEC;
+
+  std::cout << "random.GetGeometric(p) with p = " << p << "\n"
+            << "  time = " << result << " seconds.\n"
+            << "  average = " << (total / num_tests) << "\n"
+            << std::endl;
+
 }
 
 int main()
 {
-  size_t num_tests = 1000000;
+  size_t num_tests = 10000000;
   emp::Random random;
 
   TestGeometric(random, 0.9, num_tests);
