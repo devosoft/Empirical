@@ -4,7 +4,7 @@
  *  @date 2017-2021.
  *
  *  @file InstLib.hpp
- *  @brief This file maintains information about instructions availabel in virtual hardware.
+ *  @brief This file maintains information about instructions available in virtual hardware.
  */
 
 #ifndef EMP_HARDWARE_INSTLIB_HPP_INCLUDE
