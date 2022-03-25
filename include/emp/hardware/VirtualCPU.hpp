@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2021.
+ *  @date 2021-2022.
  *
  *  @file  VirtualCPU.hpp
  *  @brief A simple virtual CPU styled after the original and extended Avidian architectures. 
@@ -38,7 +38,8 @@ namespace emp{
   ///
   /// This class represents a single virtual CPU following a genome of assembly-level 
   /// instructions. 
-  /// Each CPU features four heads, two stacks, multiple registers, and a circular genome.
+  /// By defaullt, eaach CPU features four heads, two stacks, multiple registers, and 
+  /// a circular genome.
   /// Both the original and extended architectures are supported. 
   template <typename DERIVED>
   class VirtualCPU{

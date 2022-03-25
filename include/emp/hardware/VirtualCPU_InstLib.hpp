@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2021-2022
  *
  *  @file  VirtualCPU_InstLib.hpp
  *  @brief A specialized version of InstLib to handle VirtualCPU Instructions.
@@ -56,18 +56,36 @@ namespace emp {
       --hw.regs[idx];
     }
     static void Inst_If_Not_Equal(hardware_t & hw, const inst_t & inst) { 
-      size_t idx_1 = hw.GetInstLib()->FirstNopToRegIdx(inst.nop_vec, 1);
-      size_t idx_2 = hw.GetComplementNop(idx_1);
-      if(hw.regs[idx_1] == hw.regs[idx_2])
-        hw.AdvanceIP(1);
-      if(inst.nop_vec.size()) hw.AdvanceIP(1); 
+      if(hw.expanded_nop_args){
+        size_t idx_op_1 = inst.nop_vec.size() < 1 ? 1 : inst.nop_vec[0];
+        size_t idx_op_2 = inst.nop_vec.size() < 2 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[1];
+        if(hw.regs[idx_op_1] == hw.regs[idx_op_2])
+          hw.AdvanceIP(1);
+        hw.AdvanceIP(inst.nop_vec.size()); 
+       }
+      else{
+        size_t idx_1 = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_2 = hw.GetComplementNop(idx_1);
+        if(hw.regs[idx_1] == hw.regs[idx_2])
+          hw.AdvanceIP(1);
+        if(inst.nop_vec.size()) hw.AdvanceIP(1); 
+      }
     }
     static void Inst_If_Less(hardware_t & hw, const inst_t & inst) { 
-      size_t idx_1 = hw.GetInstLib()->FirstNopToRegIdx(inst.nop_vec, 1);
-      size_t idx_2 = hw.GetComplementNop(idx_1);
-      if(hw.regs[idx_1] >= hw.regs[idx_2])
-        hw.AdvanceIP(1);
-      if(inst.nop_vec.size()) hw.AdvanceIP(1); 
+      if(hw.expanded_nop_args){
+        size_t idx_op_1 = inst.nop_vec.size() < 1 ? 1 : inst.nop_vec[0];
+        size_t idx_op_2 = inst.nop_vec.size() < 2 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[1];
+        if(hw.regs[idx_op_1] >= hw.regs[idx_op_2])
+          hw.AdvanceIP(1);
+        hw.AdvanceIP(inst.nop_vec.size()); 
+      }
+      else{
+        size_t idx_1 = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_2 = hw.GetComplementNop(idx_1);
+        if(hw.regs[idx_1] >= hw.regs[idx_2])
+          hw.AdvanceIP(1);
+        if(inst.nop_vec.size()) hw.AdvanceIP(1); 
+      }
     }
     static void Inst_Pop(hardware_t & hw, const inst_t & inst) { 
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
@@ -89,16 +107,44 @@ namespace emp {
       hw.regs[idx] <<= 1;
     }
     static void Inst_Add(hardware_t & hw, const inst_t & inst) {
-      size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
-      hw.regs[idx] = hw.regs[1] + hw.regs[2];
+      if(hw.expanded_nop_args){
+        size_t idx_res = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_op_1 = inst.nop_vec.size() < 2 ? idx_res : inst.nop_vec[1];
+        size_t idx_op_2 = inst.nop_vec.size() < 3 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[2];
+        hw.regs[idx_res] = hw.regs[idx_op_1] + hw.regs[idx_op_2];
+      }
+      else{
+        size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_2 = hw.GetComplementNop(idx);
+        hw.regs[idx] = hw.regs[idx] + hw.regs[idx_2];
+      }
     }
     static void Inst_Sub(hardware_t & hw, const inst_t & inst) {
-      size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
-      hw.regs[idx] = hw.regs[1] - hw.regs[2];
+      if(hw.expanded_nop_args){
+        size_t idx_res = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_op_1 = inst.nop_vec.size() < 2 ? idx_res : inst.nop_vec[1];
+        size_t idx_op_2 = inst.nop_vec.size() < 3 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[2];
+        hw.regs[idx_res] = hw.regs[idx_op_1] - hw.regs[idx_op_2];
+      }
+      else{
+        size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_2 = hw.GetComplementNop(idx);
+        hw.regs[idx] = hw.regs[idx] - hw.regs[idx_2];
+      }
     }
     static void Inst_Nand(hardware_t & hw, const inst_t & inst) {
-      size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
-      hw.regs[idx] = ~(hw.regs[1] & hw.regs[2]);
+      if(hw.expanded_nop_args){
+        size_t idx_res = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_op_1 = inst.nop_vec.size() < 2 ? idx_res : inst.nop_vec[1];
+        size_t idx_op_2 = inst.nop_vec.size() < 3 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[2];
+        hw.regs[idx_res] = ~(hw.regs[idx_op_1] & hw.regs[idx_op_2]);
+      }
+      else{
+        size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
+        size_t idx_2 = hw.GetComplementNop(idx);
+        hw.regs[idx] = hw.regs[idx] + hw.regs[idx_2];
+        hw.regs[idx] = ~(hw.regs[idx] & hw.regs[idx_2]);
+      }
     }
     static void Inst_IO(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
@@ -106,7 +152,7 @@ namespace emp {
       // TODO: Handle input
     }
     static void Inst_H_Alloc(hardware_t & hw, const inst_t & inst) {
-      hw.genome_working.resize(hw.genome.size() * 2, 0);
+      hw.genome_working.resize(hw.genome.size() * 2, hw.GetDefaultInst());
       hw.regs[0] = hw.genome.size();
     }
     static void Inst_H_Divide(hardware_t & hw, const inst_t & inst) {
@@ -114,6 +160,7 @@ namespace emp {
         hw.genome_working.resize(hw.read_head, 0);
         hw.ResetHardware();
         hw.inst_ptr = hw.genome.size() - 1;
+        std::cout << "Divide!" << std::endl;
       }
     }
     static void Inst_H_Copy(hardware_t & hw, const inst_t & inst) {
@@ -126,55 +173,55 @@ namespace emp {
       // TODO: Mutation
     }
     static void Inst_H_Search(hardware_t & hw, const inst_t & inst) {
-      int res = hw.FindNopSequence(hw.GetComplementNopSequence(inst.nop_vec), hw.inst_ptr);
-      if(res == -1){ // Fail
+      size_t res = hw.FindNopSequence(hw.GetComplementNopSequence(inst.nop_vec), hw.inst_ptr);
+      if(inst.nop_vec.size() == 0 || res == hw.inst_ptr){
         hw.regs[1] = 0;
         hw.regs[2] = 0;
-        hw.flow_head = hw.inst_ptr + 1;
+        hw.SetFH(hw.inst_ptr + 1);
       }
       else{
-        hw.regs[1] = res;
+        hw.regs[1] = (res - hw.inst_ptr) > 0 ? res - hw.inst_ptr : res + hw.genome_working.size() - res + hw.inst_ptr;
         hw.regs[2] = inst.nop_vec.size();
-        hw.flow_head = hw.inst_ptr + res + inst.nop_vec.size();
-        while(hw.flow_head >= hw.genome_working.size()) hw.flow_head -= hw.genome_working.size();
+        hw.SetFH(res + inst.nop_vec.size() + 1);
       }
     }
     static void Inst_Mov_Head(hardware_t & hw, const inst_t & inst) {
-      if(inst.nop_vec.empty())
-        hw.inst_ptr = hw.flow_head - 1;
+      if(hw.expanded_nop_args){
+        size_t dest_idx = hw.flow_head;
+        if(inst.nop_vec.size() >= 2) dest_idx = hw.GetModdedHead(inst.nop_vec[1]);
+        if(!inst.nop_vec.empty()) hw.SetModdedHead(inst.nop_vec[0], dest_idx);
+        else hw.SetIP(dest_idx);
+      }
       else{
-        if(inst.nop_vec[0] == 0)
-          hw.inst_ptr = hw.flow_head - 1;
-        else if(inst.nop_vec[0] == 1)
-          hw.read_head = hw.flow_head;
-        else if(inst.nop_vec[0] == 2)
-          hw.write_head = hw.flow_head;
+        if(!inst.nop_vec.empty()){
+          // IP is a special case because it auto advances!
+          if(inst.nop_vec[0] % 4 == 0) hw.SetIP(hw.flow_head - 1);
+          else hw.SetModdedHead(inst.nop_vec[0], hw.flow_head);
+        }
+        else hw.SetIP(hw.flow_head - 1);
       }
     }
     static void Inst_Jmp_Head(hardware_t & hw, const inst_t & inst) {
-      size_t& head = hw.inst_ptr;
-      if(!inst.nop_vec.empty()){
-        if(inst.nop_vec[0] == 0)
-          head = hw.inst_ptr;
-        else if(inst.nop_vec[0] == 1)
-          head = hw.read_head;
-        else if(inst.nop_vec[0] == 2)
-          head = hw.write_head;
+      if(hw.expanded_nop_args){
+        size_t jump_dist = hw.regs[1];
+        if(inst.nop_vec.size() >= 2) jump_dist = hw.regs[inst.nop_vec[1]];
+        if(!inst.nop_vec.empty()) hw.AdvanceModdedHead(inst.nop_vec[0], jump_dist);
+        else hw.AdvanceIP(jump_dist);
       }
-      head += hw.regs[2];
-      while(head >= hw.genome_working.size())
-        head -= hw.genome_working.size();
+      else{
+        if(!inst.nop_vec.empty()) hw.AdvanceModdedHead(inst.nop_vec[0], hw.regs[2]);
+        else hw.AdvanceIP(hw.regs[2]);
+      }
     }
     static void Inst_Get_Head(hardware_t & hw, const inst_t & inst) {
-      if(inst.nop_vec.empty())
-        hw.regs[2] = hw.inst_ptr;
+      if(hw.expanded_nop_args){
+        size_t head_val = inst.nop_vec.empty() ? hw.inst_ptr : hw.GetModdedHead(inst.nop_vec[0]);
+        if(inst.nop_vec.size() < 2) hw.regs[2] = head_val;
+        else hw.regs[inst.nop_vec[1]] = head_val;
+      }
       else{
-        if(inst.nop_vec[0] == 0)
-          hw.regs[2] = hw.inst_ptr;
-        else if(inst.nop_vec[0] == 1)
-          hw.regs[2] = hw.read_head;
-        else if(inst.nop_vec[0] == 2)
-          hw.regs[2] = hw.write_head;
+        if(inst.nop_vec.empty()) hw.regs[2] = hw.inst_ptr;
+        else hw.regs[2] = hw.GetModdedHead(inst.nop_vec[0]);
       }
     }
     static void Inst_If_Label(hardware_t & hw, const inst_t & inst) {
@@ -183,7 +230,7 @@ namespace emp {
     }
     static void Inst_Set_Flow(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 2 : inst.nop_vec[0];
-      hw.flow_head = hw.regs[idx];
+      hw.SetFH(hw.regs[idx]);
     }
 
 
