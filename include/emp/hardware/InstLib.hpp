@@ -42,6 +42,7 @@ namespace emp {
     using inst_properties_t = std::unordered_set<std::string>;
   
     struct InstructionBase{
+      virtual ~InstructionBase() {;}
       virtual size_t GetIndex() const = 0;
     };
 
@@ -82,10 +83,10 @@ namespace emp {
     InstLib() : inst_lib(), inst_funs(), name_map(), id_map(), arg_map() { ; }  ///< Default Constructor
     InstLib(const InstLib &) = delete;                               ///< Copy Constructor
     InstLib(InstLib &&) = delete;                                    ///< Move Constructor
-    ~InstLib() { ; }                                                  ///< Destructor
+    virtual ~InstLib() { ; }                                         ///< Destructor
 
-    InstLib & operator=(const InstLib &) = default;                   ///< Copy Operator
-    InstLib & operator=(InstLib &&) = default;                        ///< Move Operator
+    InstLib & operator=(const InstLib &) = default;                  ///< Copy Operator
+    InstLib & operator=(InstLib &&) = default;                       ///< Move Operator
 
     /// Return the name associated with the specified instruction ID.
     const std::string & GetName(size_t idx) const { return inst_lib[idx].name; }
