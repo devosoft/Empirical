@@ -1,11 +1,20 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2021.
+ *  @date 2015-2022.
  *
  *  @file IndexMap.hpp
- *  @brief A simple class to weight items differently within a container and return the correct index.
+ *  @brief Container that weights items and returns ID for a given weight position.
  *  @note Status: BETA
+ * 
+ *  An IndexMap is a container where each item has a specified weight (specified as a double).
+ *  The total weight of the container determines the max index point.  When indexing into the
+ *  container, each item is represented by a range of values equal to it's weight.  Randomly
+ *  indexing into the container will provide either item with a probability proportional to its
+ *  weight.
+ * 
+ *  In this regular IndexMap, all items are kept in order (so the map starts at 0, then 1, then
+ *  2, etc.)  If order is not required, UnorderedIndexMap is slightly faster.
  *
  *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
  *  @todo Make Raw*() function private.
