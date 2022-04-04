@@ -62,6 +62,10 @@ namespace emp {
       for (CHAR_T c : str) if (Has(c)) return true;
       return false;
     }
+    bool HasOnly(const std::string & str) const {
+      for (CHAR_T c : str) if (!Has(c)) return false;
+      return true;
+    }
     bool HasAt(const std::string & str, size_t pos) const {
       return (pos < str.size()) && Has(str[pos]);
     }
