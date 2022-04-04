@@ -20,6 +20,7 @@
  *    bool is_alphanumeric(const std::string & test_str)
  *    bool is_valid(const std::string & test_str, FUNS... funs)
  *    bool has_whitespace(const std::string & test_str)
+ *    bool has_nonwhitespace(const std::string & test_str)
  *    bool has_upper_letter(const std::string & test_str)
  *    bool has_lower_letter(const std::string & test_str)
  *    bool has_letter(const std::string & test_str)
@@ -345,6 +346,7 @@ namespace emp {
 
   /// Determine if there is whitespace anywhere in a string.
   inline bool has_whitespace(const std::string & str) { return WhitespaceCharSet().HasAny(str); }
+  inline bool has_nonwhitespace(const std::string & str) { return !WhitespaceCharSet().HasOnly(str); }
   inline bool has_upper_letter(const std::string & str) { return UpperCharSet().HasAny(str); }
   inline bool has_lower_letter(const std::string & str) { return LowerCharSet().HasAny(str); }
   inline bool has_letter(const std::string & str) { return LetterCharSet().HasAny(str); }
