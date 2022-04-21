@@ -62,6 +62,7 @@
  *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote)
  *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
  *    std::string format_string( const std::string& format, Args... args )
+ *    std::string replace_vars( const std::string& base, const MAP_T & map )
  *
  *    -- EXTRACTIONS and CROPPING --
  *    void remove_chars(std::string & in_string, std::string chars)
@@ -1057,6 +1058,36 @@ namespace emp {
 
   }
 
+  /// Find any instances of ${X} and replace with dictionary lookup of X.
+  template <typename MAP_T>
+  std::string replace_vars( const std::string& in_string, const MAP_T & var_map ) {
+    std::string result = in_string;
+
+    // Seek out instances of "${" to indicate the start of pre-processing.
+    for (size_t i = 0; i < result.size(); ++i) {
+      if (result[i] != '$') continue;   // Replacement tag must start with a '$'.
+      if (result.size() <= i+2) break;  // Not enough room for a replacement tag.
+      if (result[i+1] == '$') {         // Compress two $$ into one $
+        result.erase(i,1);
+        continue;
+      }
+      if (result[i+1] != '{') continue; // Eval must be surrounded by braces.
+
+      // If we made it this far, we have a starting match!
+      size_t end_pos = emp::find_paren_match(result, i+1, '{', '}', false);
+      if (end_pos == i+1) {
+        emp::notify::Exception("emp::string_utils::replace_vars::missing_close",
+                               "No close brace found in string_utils::replace_vars()",
+                               result);
+        return result; // Stop where we are... No end brace found!
+      }
+      auto replacement = var_map[ emp::view_string_range(result, i+2, end_pos) ];
+      result.replace(i, end_pos-i+1, replacement);   // Put into place.
+      i += replacement.size();                       // Continue at the next position...
+    }
+
+    return result;
+  }
 
   /// Provide a string_view on a given string
   static inline std::string_view view_string(const std::string_view & str) {
