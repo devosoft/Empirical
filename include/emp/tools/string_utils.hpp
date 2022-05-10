@@ -56,6 +56,7 @@
  *    void remove_whitespace(std::string & in_string)
  *    void remove_punctuation(std::string & in_string)
  *    std::string slugify(const std::string & in_string)
+ *    std::string combine_strings(const string_vec_t & strings, std::string spacer=" ")
  *    std::string to_english_list(const string_vec_t & strings)
  *    string_vec_t transform_strings(const string_vec_t & in_strings, std::function<std::string(const std::string &)> fun)
  *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
@@ -878,7 +879,23 @@ namespace emp {
 
   using string_vec_t = emp::vector<std::string>;
 
-  /// Convert a vector of strings to an English list, such as "one, two, three, and four."
+  static inline std::string combine_strings(const string_vec_t & strings, std::string spacer=" ") {
+    // If there are no input strings, return an empty string.
+    if (strings.size() == 0) { return ""; }
+
+    // If there is one string provided, return it by itself.
+    if (strings.size() == 1) { return strings[0]; }
+
+    // If there is more than one, separate with spaces.
+    std::string out_string = strings[0];
+    for (size_t i = 1; i < strings.size(); ++i) {
+      out_string += spacer;
+      out_string += strings[i];
+    }
+    return out_string;
+  }
+
+ /// Convert a vector of strings to an English list, such as "one, two, three, and four."
   static inline std::string to_english_list(const string_vec_t & strings) {
     // If there are no input strings, return an empty string.
     if (strings.size() == 0) { return ""; }
