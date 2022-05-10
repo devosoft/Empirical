@@ -4,7 +4,7 @@
  *  @date 2021-2022
  *
  *  @file  VirtualCPU_InstLib.hpp
- *  @brief A specialized version of InstLib to handle VirtualCPU Instructions.
+ *  @brief A specialized version of InstLib to handle VirtualCPU instructions.
  */
 
 #ifndef EMP_VIRTUAL_CPU_INST_LIB_H
@@ -16,9 +16,7 @@
 
 namespace emp {
 
-  /// VirtualCPU_InstLib is a pure-virtual class that defines a series of instructions that
-  /// can be used with VirtualCPU_Base or any of its derived classes.
-
+  /// \brief A pure-virtual class that defines a series of instructions for VirtualCPU_Base or any of its derived classes.
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   struct VirtualCPU_InstLib : public InstLib<HARDWARE_T, ARG_T, ARG_COUNT> {
     using hardware_t = HARDWARE_T;
@@ -28,25 +26,10 @@ namespace emp {
     using inst_t = typename hardware_t::inst_t;
     using nop_vec_t = typename hardware_t::nop_vec_t;
 
-    static constexpr size_t arg_count = ARG_COUNT;
-
-    size_t FirstNopToRegIdx(const nop_vec_t& nop_vec, size_t default_idx) const{
-      if(nop_vec.size()){
-        if(nop_vec[0] == inst_lib_t::GetID("NopA")) return 0;
-        if(nop_vec[0] == inst_lib_t::GetID("NopB")) return 1;
-        if(nop_vec[0] == inst_lib_t::GetID("NopC")) return 2;
-        else emp_error("Invalid nop!");
-        return 0;
-      }
-      else return default_idx;
-    }
-
     // Instructions
-    //
     static void Inst_NopA(hardware_t & hw, const inst_t & inst) { ; }
     static void Inst_NopB(hardware_t & hw, const inst_t & inst) { ; }
     static void Inst_NopC(hardware_t & hw, const inst_t & inst) { ; }
-    // One-input math
     static void Inst_Inc(hardware_t & hw, const inst_t & inst) { 
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       ++hw.regs[idx];
@@ -233,7 +216,7 @@ namespace emp {
       hw.SetFH(hw.regs[idx]);
     }
 
-
+    /// Maintain and return a singleton of default instructions
     static const this_t & DefaultInstLib() {
       static this_t inst_lib;
       if (inst_lib.GetSize() == 0) {
