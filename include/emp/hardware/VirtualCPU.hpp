@@ -644,6 +644,13 @@ namespace emp{
         active_stack_idx++;
         if(active_stack_idx >= NUM_STACKS) active_stack_idx = 0;
       }
+      /// Fetch the nth value of the specified stack 
+      data_t GetStackVal(size_t stack_idx, size_t val_idx){
+        emp_assert(stack_idx < NUM_STACKS);
+        emp_assert(val_idx < stacks[stack_idx].size());
+        size_t reverse_idx = stacks[stack_idx].size() - val_idx - 1;
+        return stacks[stack_idx][reverse_idx];
+      }
 
 
       //////// PROCESSING 
@@ -659,6 +666,11 @@ namespace emp{
         GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
         AdvanceIP();
         num_insts_executed++;
+        //std::cout << "[";
+        //for(size_t idx = 0; idx < stacks[0].size(); ++idx){
+        //  std::cout << stacks[0] << ", ";
+        //}
+        //std::cout << std::endl;
       }
       /// Process the next SERIES of instructions, directed by the instruction pointer.
       void Process(size_t num_inst = 1, bool verbose = true) { 
