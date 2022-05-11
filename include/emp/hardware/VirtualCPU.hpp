@@ -256,6 +256,23 @@ namespace emp{
         }
         nops_need_curated = true;
       }
+      /// Insert the given instruction at the specified genome position
+      void InsertInst(const inst_t& inst, const size_t idx){
+        genome.emplace(genome.begin() + idx, inst); 
+        genome_working.emplace(genome_working.begin() + idx, inst); 
+        nops_need_curated = true;
+      }
+      /// Inserts a random instruction at the given genome position
+      void InsertRandomInst(const size_t idx, emp::Random& random){
+        InsertInst(GetRandomInst(random), idx);
+      }
+      /// Remove the instruction at the specified genome position
+      void RemoveInst(const size_t idx){
+        genome.erase(genome.begin() + idx); 
+        genome_working.erase(genome_working.begin() + idx); 
+        nops_need_curated = true;
+      }
+
 
 
       //////// HEAD MANIPULATION
