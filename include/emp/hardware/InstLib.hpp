@@ -137,7 +137,7 @@ namespace emp {
     /// Return the ID of the instruction associated with the specified symbol.
     size_t GetID(char symbol) {
       emp_assert(symbol > 0);
-      return inst_lib[symbol_map[(size_t) symbol]].id;
+      return symbol_map[(size_t) symbol];
     }
     
     /// Return the ID of the instruction that has the specified name.
@@ -176,6 +176,7 @@ namespace emp {
     {
       const size_t idx = inst_lib.size();
       const size_t id = (_id >= 0) ? _id : inst_lib.size();
+      emp_assert(!Has(id_map, id), "ID is already in use!", id);
       const char symbol = (id < symbol_defaults.size()) ? symbol_defaults[id] : '+';
       inst_lib.emplace_back(idx, id, name, fun_call, num_args, desc, scope_type, scope_arg, 
           inst_properties, symbol);
@@ -183,6 +184,7 @@ namespace emp {
       name_map[name] = idx;
       id_map[id] = idx;
       symbol_map[(size_t) symbol] = id;
+      std::cout << "Registered instruction: " << name << " index: " << idx << "; id: " << id << "; symbol: " << symbol << std::endl;
     }
 
     /// Specify a keyword and arg value.
