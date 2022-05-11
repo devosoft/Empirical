@@ -36,6 +36,7 @@ namespace emp{
       }
     
     public:
+      CombinedBinomialDistribution() : p(0), cur_max_power(0){ ; }
       CombinedBinomialDistribution(double _p, size_t _starting_n) : p(_p), cur_max_power(0){
         Expand(_starting_n);
       }
@@ -51,6 +52,11 @@ namespace emp{
           }
         }
         return result;
+      }
+
+      void Setup(double _p, size_t _n){
+        p = _p; 
+        if(_n > (1ull << cur_max_power)) Expand(_n);
       }
 
       void Expand(size_t max_n){
