@@ -1,10 +1,10 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2021.
+ *  @date 2015-2022.
  *
  *  @file UnorderedIndexMap.hpp
- *  @brief A simple class to weight items differently within a container and return the correct index.
+ *  @brief Container that weights items and returns ID for a given weight position; order not guaranteed.
  *  @note Status: BETA
  *
  *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
@@ -44,7 +44,7 @@ namespace emp {
     class Proxy {
     private:
       UnorderedIndexMap & index_map;  ///< Which index map is this proxy from?
-      size_t id;             ///< Which id does it represent?
+      size_t id;                      ///< Which id does it represent?
     public:
       Proxy(UnorderedIndexMap & _im, size_t _id) : index_map(_im), id(_id) { ; }
       operator double() const { return index_map.RawWeight(id); }
