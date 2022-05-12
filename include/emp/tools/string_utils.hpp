@@ -188,6 +188,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
