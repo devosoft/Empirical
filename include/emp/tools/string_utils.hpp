@@ -1551,9 +1551,17 @@ namespace emp {
                                result);
         return result; // Stop where we are... No end brace found!
       }
-      auto replacement = var_map[ emp::view_string_range(result, i+2, end_pos) ];
-      result.replace(i, end_pos-i+1, replacement);   // Put into place.
-      i += replacement.size();                       // Continue at the next position...
+      
+      std::string key = result.substr(i+2, end_pos-i-2);
+      auto replacement_it = var_map.find(key);
+      if (replacement_it == var_map.end()) {
+        emp::notify::Exception("emp::string_utils::replace_vars::missing_var",
+                               "Lookup variable not found in var_map",
+                               key);
+        return result; // Stop here; variable could not be replaced.
+      }
+      result.replace(i, end_pos-i+1, replacement_it->second);   // Put into place.
+      i += replacement_it->second.size();                       // Continue at the next position...
     }
 
     return result;
