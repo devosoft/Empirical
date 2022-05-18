@@ -24,6 +24,7 @@
 #include "../base/notify.hpp"
 #include "../compiler/Lexer.hpp"
 #include "../compiler/regex_utils.hpp"
+#include "../math/Random.hpp"
 
 #include "AnnotatedType.hpp"
 #include "DataMap.hpp"
@@ -156,6 +157,9 @@ namespace emp {
       }
     }
 
+    DataMapParser(bool use_defaults, emp::Random & random) : DataMapParser(use_defaults)
+    { AddRandomFunctions(random); }
+
     /// Get the set of names that the most recently generated function accesses in DataMap.
     const std::set<std::string> & GetNamesUsed() const { return dm_names; }
 
@@ -261,6 +265,10 @@ namespace emp {
       functions["CLAMP"].Set3( [](double x, double y, double z){ return (x<y) ? y : (x>z) ? z : x; } );
       functions["TO_SCALE"].Set3( [](double x, double y, double z){ return (z-y)*x+y; } );
       functions["FROM_SCALE"].Set3( [](double x, double y, double z){ return (x-y) / (z-y); } );
+    }
+
+    void AddRandomFunctions(Random & random) {
+      functions["RAND"].Set2( [&random](double x, double y){ return random.GetDouble(x,y); } );
     }
 
     /// Helpers for parsing.

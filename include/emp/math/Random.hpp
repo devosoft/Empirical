@@ -380,7 +380,7 @@ namespace emp {
     // Distributions //
 
     /// Generate a random variable drawn from a unit normal distribution.
-    double GetRandNormal() noexcept {
+    double GetNormal() noexcept {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
@@ -397,18 +397,18 @@ namespace emp {
     /// @return A random variable drawn from a normal distribution.
     /// @param mean Center of distribution.
     /// @param std Standard deviation of distribution.
-    inline double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
+    inline double GetNormal(const double mean, const double std) { return mean + GetNormal() * std; }
 
     /// Generate a random variable drawn from a Poisson distribution.
-    inline uint32_t GetRandPoisson(const double n, const double p) {
+    inline uint32_t GetPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
       // Optimizes for speed and calculability using symetry of the distribution
-      if (p > .5) return (uint32_t) n - GetRandPoisson(n * (1 - p));
-      else return GetRandPoisson(n * p);
+      if (p > .5) return (uint32_t) n - GetPoisson(n * (1 - p));
+      else return GetPoisson(n * p);
     }
 
     /// Generate a random variable drawn from a Poisson distribution.
-    inline uint32_t GetRandPoisson(const double mean) {
+    inline uint32_t GetPoisson(const double mean) {
       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
       // Uses Rejection Method
       const double a = exp(-mean);
@@ -427,7 +427,7 @@ namespace emp {
     /// This function is exact, but slow.
     /// @see Random::GetApproxRandBinomial
     /// @see emp::Binomial in source/tools/Distribution.h
-    inline uint32_t GetRandBinomial(const double n, const double p) { // Exact
+    inline uint32_t GetBinomial(const double n, const double p) { // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
       emp_assert(n >= 0.0, n);
       // Actually try n Bernoulli events, each with probability p
@@ -436,17 +436,16 @@ namespace emp {
       return k;
     }
 
-    inline uint32_t GetRandGeometric(double p){
-      emp_assert(p >= 0 && p <= 1, "Pobabilities must be between 0 and 1");
-      // TODO: When we have warnings, add one for passing a really small number to
-      // this function. Alternatively, make this function not ludicrously slow with small numbers.
-      // Looks like return floor(ln(GetDouble())/ln(1-p)) might be sufficient?
-      if (p == 0) {
-        return std::numeric_limits<uint32_t>::infinity();
-      }
-      uint32_t result = 1;
-      while (!P(p)) { result++;}
-      return result;
+    /// Generate a random variable drawn from an exponential distribution.
+    inline double GetExponential(double p) {
+      emp_assert(p > 0.0 && p < 1.0, p);
+      return std::log(GetDouble()) / std::log(1.0 - p);
+    }
+
+    /// Generate a random variable drawn from a geometric distribution.
+    inline uint32_t GetGeometric(double p) {
+      emp_assert(p > 0.0 && p < 1.0, p);
+      return static_cast<uint32_t>( GetExponential(p) ) + 1;
     }
 
   };

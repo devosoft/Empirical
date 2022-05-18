@@ -61,8 +61,11 @@ namespace emp {
     }
 
     std::string AsString() const {
-      if (is_num) return std::to_string(num);
-      return str;
+      if (!is_num) return str;
+      std::stringstream ss;
+      ss << num;
+      return ss.str();
+      //return std::to_string(num);
     }
 
     operator double() const { return AsDouble(); }
