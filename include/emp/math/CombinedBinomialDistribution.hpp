@@ -46,7 +46,7 @@ namespace emp{
         size_t local_max_power = GetMaxPower(n);
         size_t result = 0;
         if(local_max_power > cur_max_power) Expand(n);
-        for(size_t power = 0; power < local_max_power; ++power){
+        for(size_t power = 0; power <= local_max_power; ++power){
           if( (n & (1 << power)) != 0){
             result += distribution_vec[power].PickRandom(random);
           }
