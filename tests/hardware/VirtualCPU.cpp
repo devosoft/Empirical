@@ -32,7 +32,7 @@ Derived CreateSeedCPU(){
   Derived cpu_init;
   emp::Random random(56);
   for(size_t i = 0; i < 10; ++i)
-    cpu_init.PushRandom(random);
+    cpu_init.PushRandomInst(random);
   // Make a change to the working genome
   while(cpu_init.genome[0] == cpu_init.genome_working[0])
     cpu_init.genome_working[0] = cpu_init.GetRandomInst(random);
@@ -303,7 +303,7 @@ TEST_CASE("VirtualCPU_Getters", "[Hardware]") {
     CHECK(cpu.GetGenomeSize() == 0);
     CHECK(cpu.GetWorkingGenomeSize() == 0);
     emp::Random random(1000);
-    cpu.PushRandom(random, 10);
+    cpu.PushRandomInst(random, 10);
     CHECK(cpu.GetGenomeSize() == 10);
     CHECK(cpu.GetWorkingGenomeSize() == 10);
     cpu.genome_working.push_back(cpu.GetRandomInst(random));
@@ -444,15 +444,15 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     CHECK(cpu.GetGenomeSize() == 20);
     CHECK(cpu.GetWorkingGenomeSize() == 20);
     CHECK(cpu.nops_need_curated);
-    // PushRandom(rand)
+    // PushRandomInst(rand)
     cpu.CurateNops();
-    cpu.PushRandom(random);
+    cpu.PushRandomInst(random);
     CHECK(cpu.GetGenomeSize() == 21);
     CHECK(cpu.GetWorkingGenomeSize() == 21);
     CHECK(cpu.nops_need_curated);
-    // PushRandom(rand, count)
+    // PushRandomInst(rand, count)
     cpu.CurateNops();
-    cpu.PushRandom(random, 9);
+    cpu.PushRandomInst(random, 9);
     CHECK(cpu.GetGenomeSize() == 30);
     CHECK(cpu.GetWorkingGenomeSize() == 30);
     CHECK(cpu.nops_need_curated);
@@ -502,7 +502,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
   { // Instruction pointer 
     Derived cpu;
     emp::Random random(10);
-    cpu.PushRandom(random, 10);
+    cpu.PushRandomInst(random, 10);
     CHECK(cpu.inst_ptr == 0);
     cpu.AdvanceIP();
     CHECK(cpu.inst_ptr == 1);
@@ -550,7 +550,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
   { // Read head 
     Derived cpu;
     emp::Random random(10);
-    cpu.PushRandom(random, 10);
+    cpu.PushRandomInst(random, 10);
     CHECK(cpu.read_head == 0);
     cpu.AdvanceRH();
     CHECK(cpu.read_head == 1);
@@ -598,7 +598,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
   { // Write head 
     Derived cpu;
     emp::Random random(10);
-    cpu.PushRandom(random, 10);
+    cpu.PushRandomInst(random, 10);
     CHECK(cpu.write_head == 0);
     cpu.AdvanceWH();
     CHECK(cpu.write_head == 1);
@@ -646,7 +646,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
   { // Flow head 
     Derived cpu;
     emp::Random random(10);
-    cpu.PushRandom(random, 10);
+    cpu.PushRandomInst(random, 10);
     CHECK(cpu.flow_head == 0);
     cpu.AdvanceFH();
     CHECK(cpu.flow_head == 1);
@@ -720,7 +720,7 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     CHECK(cpu.GetWorkingGenomeSize() == 11);
     cpu.ResetHardware();
     CHECK(cpu.GetGenomeSize() == 10);
-    CHECK(cpu.GetWorkingGenomeSize() == 10);
+    CHECK(cpu.GetWorkingGenomeSize() == 11);
     { // VARIABLES -- should default
         CHECK(cpu.active_stack_idx == 0);   // Default to first stack
         CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
