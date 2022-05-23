@@ -18,6 +18,7 @@
 #include <string>
 
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 
 namespace emp {
 
@@ -57,7 +58,15 @@ namespace emp {
 
     double AsDouble() const {
       if (is_num) return num;
-      return std::stod(str);
+      // Make sure we have a value here; otherwise provide a warning and return 0.0.
+      if (str.size() > 0 &&
+          (std::isdigit(str[0]) || (str[0] == '-' && str.size() > 1 && std::isdigit(str[1])))) {
+        return std::stod(str);
+      }
+
+      // Otherwise this string is invalid.
+      emp::notify::Warning("Cannot convert string '", str, "' to double.");
+      return 0.0;
     }
 
     std::string AsString() const {
