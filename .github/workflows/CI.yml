@@ -52,8 +52,8 @@ jobs:
           submodules: 'recursive'
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
-          with:
-            version: 11
+        with:
+          version: 11
       - run: sudo apt-get update -qq
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - run: sudo apt-get update -qq
