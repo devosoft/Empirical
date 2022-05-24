@@ -19,6 +19,7 @@
 
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"
+#include "../math/math.hpp"
 
 namespace emp {
 
@@ -132,6 +133,22 @@ namespace emp {
     template<typename T> bool operator>=(T && rhs) const { return Compare(std::forward<T>(rhs)) != -1; }
     template<typename T> bool operator> (T && rhs) const { return Compare(std::forward<T>(rhs)) == 1; }
     template<typename T> bool operator<=(T && rhs) const { return Compare(std::forward<T>(rhs)) != 1; }
+
+    Datum operator+(const Datum & in) const {
+      if (IsDouble()) return NativeDouble() + in.AsDouble();
+      return NativeString() + in.AsString();
+    }
+    Datum operator*(const Datum & in) const {
+      if (IsDouble()) return NativeDouble() * in.AsDouble();
+      std::string out_string;
+      size_t count = static_cast<size_t>(in.AsDouble());
+      out_string.reserve(NativeString().size() * count);
+      for (size_t i = 0; i < count; i++) out_string += NativeString();
+      return out_string;
+    }
+    Datum operator-(const Datum & in) const { return AsDouble() - in.AsDouble(); }
+    Datum operator/(const Datum & in) const { return AsDouble() / in.AsDouble(); }
+    Datum operator%(const Datum & in) const { return emp::Mod(AsDouble(), in.AsDouble()); }
 
   };
 
