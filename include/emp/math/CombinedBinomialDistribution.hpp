@@ -55,6 +55,8 @@ namespace emp{
       }
 
       void Setup(double _p, size_t _n){
+        distribution_vec.clear();
+        cur_max_power = 0;
         p = _p; 
         if(_n > (1ull << cur_max_power)) Expand(_n);
       }
