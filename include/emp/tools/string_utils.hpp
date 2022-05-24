@@ -56,12 +56,14 @@
  *    void remove_whitespace(std::string & in_string)
  *    void remove_punctuation(std::string & in_string)
  *    std::string slugify(const std::string & in_string)
+ *    std::string combine_strings(const string_vec_t & strings, std::string spacer=" ")
  *    std::string to_english_list(const string_vec_t & strings)
  *    string_vec_t transform_strings(const string_vec_t & in_strings, std::function<std::string(const std::string &)> fun)
  *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
  *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote)
  *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
  *    std::string format_string( const std::string& format, Args... args )
+ *    std::string replace_vars( const std::string& base, const MAP_T & map )
  *
  *    -- EXTRACTIONS and CROPPING --
  *    void remove_chars(std::string & in_string, std::string chars)
@@ -186,6 +188,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
@@ -210,133 +213,15 @@ namespace emp {
   }
 
   /// Test if an input string is properly formated as a literal character.
-  static inline bool is_literal_char(const std::string & value) {
-    // A literal char must beging with a single quote, contain a representation of a single
-    // character, and end with a single quote.
-    if (value.size() < 3) return false;
-    if (value[0] != '\'' || value.back() != '\'') return false;
-
-    // If there's only a single character in the quotes, it's USUALLY legal.
-    if (value.size() == 3) {
-      switch (value[1]) {
-        case '\'':         // Can't be a single quote (must be escaped!)
-        case '\\':         // Can't be a backslash (must be followed by something!)
-          return false;
-        default:
-          return true;
-      }
-    }
-
-    // If there are more characters, must be an escape sequence.
-    if (value.size() == 4) {
-      if (value[1] != '\\') return false;
-
-      // Identify legal escape sequences.
-      // @CAO Need more here!
-      switch (value[2]) {
-        case 'n':   // Newline
-        case 'r':   // Return
-        case 't':   // Tab
-        case '0':   // Empty (character 0)
-        case '\\':  // Backslash
-        case '\'':  // Single quote
-          return true;
-        default:
-          return false;
-      }
-    }
-
-    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
-
-    // If we made it here without a problem, it must be correct!
-    return true;
-  }
-
+  static inline bool is_literal_char(const std::string & value);
 
   /// Test if an input string is properly formated as a literal string.
   static inline bool is_literal_string(const std::string & value,
-                                       const std::string & quote_marks="\"") {
-    if (value.size() < 2) return false;               // Two short to contain even quote marks!
-    char quote = value[0];
-    if (!is_one_of(quote, quote_marks)) return false; // Must be working with allowed quote mark.
-    if (value.back() != quote) return false;          // Must use same quote at front and back.
-
-    // Are all of the characters valid?
-    for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == quote) return false;          // Cannot have a raw quote in the middle.
-      if (value[pos] == '\\') {                       // Allow escaped characters...
-        if (pos == value.size()-2) return false;      // Backslash must have char to escape.
-
-        // Move to the next char and make sure it is legal to be escaped.
-        // @CAO Expand on options!
-        pos++;
-        switch (value[pos]) {
-          case 'b':   // Backspace
-          case 'f':   // Form feed
-          case 'n':   // Newline
-          case 'r':   // Return
-          case 't':   // Tab
-          case 'v':   // Vertical tab.
-          case '0':   // Empty (character 0)
-          case '\\':  // Backslash
-          case '"':   // Double quote
-          case '\'':  // Single quote
-          case '`':   // Back quote
-            continue;
-          default:
-            return false;
-        }
-      }
-    }
-
-    // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
-
-    // If we made it here without a problem, it must be correct!
-    return true;
-  }
+                                       const std::string & quote_marks="\"");
 
   /// Test if an input string is properly formated as a literal string.
   static inline std::string diagnose_literal_string(const std::string & value,
-                                                    const std::string & quote_marks="\"") {
-    // A literal string must begin and end with a double quote and contain only valid characters.
-    if (value.size() < 2) return "Too short!";
-    char quote = value[0];
-    if (!is_one_of(quote, quote_marks)) return "Must begin an end in quotes.";
-    if (value.back() != quote) return "Begin and end quotes must match.";
-
-    // Are all of the characters valid?
-    for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == quote) return "Has a floating quote.";
-      if (value[pos] == '\\') {
-        if (pos == value.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
-
-        // Move to the next char and make sure it's legal to be escaped.
-        // @CAO Expand on options!
-        pos++;
-        switch (value[pos]) {
-          case 'b':   // Backspace
-          case 'f':   // Form feed
-          case 'n':   // Newline
-          case 'r':   // Return
-          case 't':   // Tab
-          case 'v':   // Vertical tab.
-          case '0':   // Empty (character 0)
-          case '\\':  // Backslash
-          case '"':   // Double quote
-          case '\'':  // Single quote
-          case '`':   // Back quote
-            continue;
-          default:
-            return "Unknown escape charater.";
-        }
-      }
-    }
-
-    // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
-
-    // If we made it here without a problem, it must be correct!
-    return "Good!";
-  }
+                                                    const std::string & quote_marks="\"");
 
   /// Determine if a string is composed only of a set of characters (represented as a string)
   static inline bool is_composed_of(const std::string & test_str, const std::string & char_set) {
@@ -500,68 +385,17 @@ namespace emp {
   }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
-  static inline std::string to_escaped_string(char value) {
-    // Start by quickly returning a string if it's easy.
-    std::stringstream ss;
-    if ( (value >= 40 && value < 91) || (value > 96 && value < 127)) {
-      ss << value;
-      return ss.str();
-    }
-    switch (value) {
-    case '\0': return "\\0";
-    case 1: return "\\001";
-    case 2: return "\\002";
-    case 3: return "\\003";
-    case 4: return "\\004";
-    case 5: return "\\005";
-    case 6: return "\\006";
-    case '\a': return "\\a";  // case  7 (audible bell)
-    case '\b': return "\\b";  // case  8 (backspace)
-    case '\t': return "\\t";  // case  9 (tab)
-    case '\n': return "\\n";  // case 10 (newline)
-    case '\v': return "\\v";  // case 11 (vertical tab)
-    case '\f': return "\\f";  // case 12 (form feed - new page)
-    case '\r': return "\\r";  // case 13 (carriage return)
-    case 14: return "\\016";
-    case 15: return "\\017";
-    case 16: return "\\020";
-    case 17: return "\\021";
-    case 18: return "\\022";
-    case 19: return "\\023";
-    case 20: return "\\024";
-    case 21: return "\\025";
-    case 22: return "\\026";
-    case 23: return "\\027";
-    case 24: return "\\030";
-    case 25: return "\\031";
-    case 26: return "\\032";
-    case 27: return "\\033";  // case 27 (ESC), sometimes \e
-    case 28: return "\\034";
-    case 29: return "\\035";
-    case 30: return "\\036";
-    case 31: return "\\037";
-
-    case '\"': return "\\\"";  // case 34
-    case '\'': return "\\\'";  // case 39
-    case '\\': return "\\\\";  // case 92
-    case 127: return "\\177";  // (delete)
-
-    // case '\?': return "\\\?";
-    default:
-      ss << value;
-      return ss.str();
-    };
-  }
+  [[nodiscard]] static inline std::string to_escaped_string(char value);
 
   /// Convert a full string to one that uses proper escape sequences, as needed.
-  static inline std::string to_escaped_string(const std::string & value) {
+  [[nodiscard]] static inline std::string to_escaped_string(const std::string & value) {
     std::stringstream ss;
     for (char c : value) { ss << to_escaped_string(c); }
     return ss.str();
   }
 
   /// Take a string and replace reserved HTML characters with character entities
-  inline std::string to_web_safe_string(const std::string & value) {
+  [[nodiscard]] inline std::string to_web_safe_string(const std::string & value) {
     std::string web_safe = value;
     std::regex apm("[&]");
     std::regex open_brace("[<]");
@@ -583,7 +417,7 @@ namespace emp {
   /// See https://en.wikipedia.org/wiki/Percent-encoding
   // adapted from https://stackoverflow.com/a/17708801
   template<bool encode_space=false>
-  std::string url_encode(const std::string &value) {
+  [[nodiscard]] std::string url_encode(const std::string &value) {
     std::ostringstream escaped;
     escaped.fill('0');
     escaped << std::hex;
@@ -612,7 +446,7 @@ namespace emp {
   /// See https://en.wikipedia.org/wiki/Percent-encoding
   // adapted from https://stackoverflow.com/a/29962178
   template<bool decode_plus=false>
-  std::string url_decode(const std::string& str){
+  [[nodiscard]] std::string url_decode(const std::string& str){
     std::string res;
 
     for (size_t i{}; i < str.size(); ++i) {
@@ -637,7 +471,7 @@ namespace emp {
   }
 
   /// Take a char and convert it to a C++-style literal.
-  static inline std::string to_literal(char value) {
+  [[nodiscard]] static inline std::string to_literal(char value) {
     std::stringstream ss;
     ss << "'" << to_escaped_string(value) << "'";
     return ss.str();
@@ -645,7 +479,7 @@ namespace emp {
 
   /// Take a string or iterable and convert it to a C++-style literal.
   // This is the version for string. The version for an iterable is below.
-  static inline std::string to_literal(const std::string & value) {
+  [[nodiscard]] static inline std::string to_literal(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -678,7 +512,7 @@ namespace emp {
 
   /// Convert a literal character representation to an actual string.
   /// (i.e., 'A', ';', or '\n')
-  static inline char from_literal_char(const std::string & value) {
+  [[nodiscard]] static inline char from_literal_char(const std::string & value) {
     emp_assert(is_literal_char(value));
     // Given the assert, we can assume the string DOES contain a literal representation,
     // and we just need to convert it.
@@ -703,48 +537,13 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  static inline std::string from_literal_string(const std::string & value,
-                                                [[maybe_unused]] const std::string & quote_marks="\"")
-  {
-    emp_assert(is_literal_string(value, quote_marks),
-               value, diagnose_literal_string(value, quote_marks));
-    // Given the assert, assume string DOES contain a literal string representation.
-
-    std::string out_string;
-    out_string.reserve(value.size()-2);  // Make a guess on final size.
-
-    for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      // If we don't have an escaped character, just move it over.
-      if (value[pos] != '\\') {
-        out_string.push_back(value[pos]);
-        continue;
-      }
-
-      // If we do have an escape character, convert it.
-      pos++;
-
-      switch (value[pos]) {
-        case 'b': out_string.push_back('\b'); break;   // Backspace
-        case 'f': out_string.push_back('\f'); break;   // Form feed
-        case 'n': out_string.push_back('\n'); break;   // Newline
-        case 'r': out_string.push_back('\r'); break;   // Return
-        case 't': out_string.push_back('\t'); break;   // Tab
-        case 'v': out_string.push_back('\v'); break;   // Vertical tab
-        case '0': out_string.push_back('\0'); break;   // Empty (character 0)
-        case '\\': out_string.push_back('\\'); break;  // Backslash
-        case '"': out_string.push_back('"'); break;    // Double quote
-        case '\'': out_string.push_back('\''); break;  // Single quote
-        default:
-          emp_assert(false, "unknown escape char used; probably need to update converter!");
-      }
-    }
-
-    return out_string;
-  }
-
+  [[nodiscard]] static inline std::string from_literal_string(
+    const std::string & value,
+    [[maybe_unused]] const std::string & quote_marks="\""
+  );
 
   /// Convert a string to all uppercase.
-  static inline std::string to_upper(std::string value) {
+  [[nodiscard]] static inline std::string to_upper(std::string value) {
     constexpr int char_shift = 'a' - 'A';
     for (auto & x : value) {
       if (x >= 'a' && x <= 'z') x = (char) (x - char_shift);
@@ -753,7 +552,7 @@ namespace emp {
   }
 
   /// Convert a string to all lowercase.
-  static inline std::string to_lower(std::string value) {
+  [[nodiscard]] static inline std::string to_lower(std::string value) {
     constexpr int char_shift = 'a' - 'A';
     for (auto & x : value) {
       if (x >= 'A' && x <= 'Z') x = (char) (x + char_shift);
@@ -762,7 +561,7 @@ namespace emp {
   }
 
   /// Make first letter of each word upper case
-  static inline std::string to_titlecase(std::string value) {
+  [[nodiscard]] static inline std::string to_titlecase(std::string value) {
     constexpr int char_shift = 'a' - 'A';
     bool next_upper = true;
     for (size_t i = 0; i < value.size(); i++) {
@@ -778,7 +577,7 @@ namespace emp {
   }
 
   /// Convert an integer to a roman numeral string.
-  static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
+  [[nodiscard]] static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
     else if (val > 3999) { ; } // Out of bounds; return a blank;
@@ -862,7 +661,7 @@ namespace emp {
   }
 
   /// Make a string safe(r)
-  static inline std::string slugify(const std::string & in_string) {
+  [[nodiscard]] static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
     remove_punctuation(res);
@@ -877,8 +676,25 @@ namespace emp {
 
   using string_vec_t = emp::vector<std::string>;
 
-  /// Convert a vector of strings to an English list, such as "one, two, three, and four."
-  static inline std::string to_english_list(const string_vec_t & strings) {
+  [[nodiscard]] static inline std::string
+  combine_strings(const string_vec_t & strings, std::string spacer=" ") {
+    // If there are no input strings, return an empty string.
+    if (strings.size() == 0) { return ""; }
+
+    // If there is one string provided, return it by itself.
+    if (strings.size() == 1) { return strings[0]; }
+
+    // If there is more than one, separate with spaces.
+    std::string out_string = strings[0];
+    for (size_t i = 1; i < strings.size(); ++i) {
+      out_string += spacer;
+      out_string += strings[i];
+    }
+    return out_string;
+  }
+
+ /// Convert a vector of strings to an English list, such as "one, two, three, and four."
+  [[nodiscard]] static inline std::string to_english_list(const string_vec_t & strings) {
     // If there are no input strings, return an empty string.
     if (strings.size() == 0) { return ""; }
 
@@ -904,8 +720,9 @@ namespace emp {
 
 
   /// Transform all strings in a vector.
-  static inline string_vec_t transform_strings(const string_vec_t & in_strings,
-                                               std::function<std::string(const std::string &)> fun) {
+  [[nodiscard]] static inline string_vec_t
+  transform_strings(const string_vec_t & in_strings,
+                    std::function<std::string(const std::string &)> fun) {
     string_vec_t out_strings(in_strings.size());
     for (size_t i = 0; i < in_strings.size(); i++) {
       out_strings[i] = fun(in_strings[i]);
@@ -915,31 +732,33 @@ namespace emp {
 
   /// Put all strings provided in quotes (Like 'this'), pre- and post-fixing another string if
   /// provided.
-  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
-                                           const std::string quote="'") {
+  [[nodiscard]] static inline string_vec_t
+  quote_strings(const string_vec_t & in_strings, const std::string quote="'") {
     return transform_strings(in_strings, [quote](const std::string & str) {
       return quote + str + quote;
     });
   }
 
   /// Pre-pend and post-pend specified sequences to all strings provided.
-  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
-                                           const std::string open_quote,
-                                           const std::string close_quote) {
+  [[nodiscard]] static inline string_vec_t 
+  quote_strings(const string_vec_t & in_strings,
+                const std::string open_quote,
+                const std::string close_quote) {
     return transform_strings(in_strings, [open_quote, close_quote](const std::string & str) {
       return open_quote + str + close_quote;
     });
   }
 
   /// Take a vector of strings, put them in quotes, and then transform it into an English list.
-  static inline std::string to_quoted_list(const string_vec_t & in_strings,
-                                           const std::string quote="'") {
+  [[nodiscard]] static inline std::string to_quoted_list(const string_vec_t & in_strings,
+                                                         const std::string quote="'") {
     return to_english_list(quote_strings(in_strings, quote));
   }
 
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
-  static inline std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
+  static inline std::string
+  string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
   {
     if (end_pos == 0) return "";                   // Not popping anything!
 
@@ -957,8 +776,8 @@ namespace emp {
   }
 
   /// Get a segment from the beginning of a string as another string, leaving original untouched.
-  static inline std::string string_get_range(const std::string & in_string, std::size_t start_pos,
-                                             std::size_t end_pos) {
+  [[nodiscard]] static inline std::string
+  string_get_range(const std::string & in_string, std::size_t start_pos, std::size_t end_pos) {
     emp_assert(start_pos <= in_string.size());
     if (end_pos == std::string::npos) end_pos = in_string.size();
     emp_assert(end_pos <= in_string.size());
@@ -973,7 +792,8 @@ namespace emp {
 
   /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
   /// If the delimeter is not found, return the entire input string.
-  inline std::string string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0) {
+  [[nodiscard]] inline std::string
+  string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
@@ -985,7 +805,8 @@ namespace emp {
 
   /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
   /// modify it. If the delimeter is not found, return the entire input string.
-  inline std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
+  [[nodiscard]] inline std::string
+  string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
     emp_assert(start_pos <= in_string.size());
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
@@ -997,7 +818,8 @@ namespace emp {
   }
 
   /// Return a prefix of a string, up to the first whitespace (do not modify the original string)
-  inline std::string string_get_word(const std::string & in_string, size_t start_pos=0) {
+  [[nodiscard]] inline std::string
+  string_get_word(const std::string & in_string, size_t start_pos=0) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_get(in_string, " \n\r\t", start_pos);
   }
@@ -1008,7 +830,8 @@ namespace emp {
   }
 
   /// Return a prefix of a string, up to the first newline (do not modify the original string)
-  inline std::string string_get_line(const std::string & in_string, size_t start_pos=0) {
+  [[nodiscard]] inline std::string
+  string_get_line(const std::string & in_string, size_t start_pos=0) {
     return string_get(in_string, '\n', start_pos);
   }
 
@@ -1039,7 +862,7 @@ namespace emp {
   /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
   /// Adapted from https://stackoverflow.com/a/26221725.
   template<typename... Args>
-  std::string format_string( const std::string& format, Args... args ) {
+  [[nodiscard]] std::string format_string( const std::string& format, Args... args ) {
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wformat-security"
@@ -1057,6 +880,9 @@ namespace emp {
 
   }
 
+  /// Find any instances of ${X} and replace with dictionary lookup of X.
+  template <typename MAP_T>
+  [[nodiscard]] std::string replace_vars( const std::string& in_string, const MAP_T & var_map );
 
   /// Provide a string_view on a given string
   static inline std::string_view view_string(const std::string_view & str) {
@@ -1143,41 +969,7 @@ namespace emp {
     const char delim='\n',
     const size_t max_split=std::numeric_limits<size_t>::max(),
     const bool preserve_quotes=false
-  ) {
-    const size_t test_size = in_string.size();
-
-    // Count produced strings
-    size_t out_count = 0;
-    size_t pos = 0;
-    while (pos < test_size && out_count <= max_split) {
-      while (pos < test_size && in_string[pos] != delim) {
-        if (preserve_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
-          pos = find_quote_match(in_string, pos, in_string[pos]);
-        }
-        pos++;
-      }
-      pos++; // Skip deliminator
-      out_count++;  // Increment for each delim plus once at the end (so once if no delims).
-    }
-
-    // And copy over the strings
-    out_set.resize(out_count);
-    pos = 0;
-    size_t string_id = 0;
-    while (pos < test_size) {
-      out_set[string_id] = "";
-      while (
-        pos < test_size
-        && (in_string[pos] != delim || string_id == out_count - 1)
-      ) {
-        out_set[string_id] += in_string[pos];
-        pos++;
-      }
-      pos++;        // Skip over any final deliminator
-      string_id++;  // Move to the next sub-string.
-    }
-
-  }
+  );
 
   /// Slice a string without passing in result vector (may be less efficient).
   /// @param in_string string to be sliced
@@ -1509,6 +1301,327 @@ namespace emp {
   /// Make a string appear reverse when printed to the command line.
   inline std::string to_ansi_reverse(const std::string & _in) {
     return ANSI_Reverse() + _in + ANSI_NoReverse();
+  }
+
+
+  //////////////////////////////////////////////////////
+  //  Implementations of larger functions (>25 lines)
+  //////////////////////////////////////////////////////
+
+  /// Test if an input string is properly formated as a literal character.
+  static inline bool is_literal_char(const std::string & value) {
+    // A literal char must beging with a single quote, contain a representation of a single
+    // character, and end with a single quote.
+    if (value.size() < 3) return false;
+    if (value[0] != '\'' || value.back() != '\'') return false;
+
+    // If there's only a single character in the quotes, it's USUALLY legal.
+    if (value.size() == 3) {
+      switch (value[1]) {
+        case '\'':         // Can't be a single quote (must be escaped!)
+        case '\\':         // Can't be a backslash (must be followed by something!)
+          return false;
+        default:
+          return true;
+      }
+    }
+
+    // If there are more characters, must be an escape sequence.
+    if (value.size() == 4) {
+      if (value[1] != '\\') return false;
+
+      // Identify legal escape sequences.
+      // @CAO Need more here!
+      switch (value[2]) {
+        case 'n':   // Newline
+        case 'r':   // Return
+        case 't':   // Tab
+        case '0':   // Empty (character 0)
+        case '\\':  // Backslash
+        case '\'':  // Single quote
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+
+    // If we made it here without a problem, it must be correct!
+    return true;
+  }
+
+
+  /// Test if an input string is properly formated as a literal string.
+  static inline bool is_literal_string(const std::string & value,
+                                       const std::string & quote_marks) {
+    if (value.size() < 2) return false;               // Two short to contain even quote marks!
+    char quote = value[0];
+    if (!is_one_of(quote, quote_marks)) return false; // Must be working with allowed quote mark.
+    if (value.back() != quote) return false;          // Must use same quote at front and back.
+
+    // Are all of the characters valid?
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      if (value[pos] == quote) return false;          // Cannot have a raw quote in the middle.
+      if (value[pos] == '\\') {                       // Allow escaped characters...
+        if (pos == value.size()-2) return false;      // Backslash must have char to escape.
+
+        // Move to the next char and make sure it is legal to be escaped.
+        // @CAO Expand on options!
+        pos++;
+        switch (value[pos]) {
+          case 'b':   // Backspace
+          case 'f':   // Form feed
+          case 'n':   // Newline
+          case 'r':   // Return
+          case 't':   // Tab
+          case 'v':   // Vertical tab.
+          case '0':   // Empty (character 0)
+          case '\\':  // Backslash
+          case '"':   // Double quote
+          case '\'':  // Single quote
+          case '`':   // Back quote
+            continue;
+          default:
+            return false;
+        }
+      }
+    }
+
+    // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
+
+    // If we made it here without a problem, it must be correct!
+    return true;
+  }
+
+
+  /// Test if an input string is properly formated as a literal string.
+  static inline std::string diagnose_literal_string(const std::string & value,
+                                                    const std::string & quote_marks) {
+    // A literal string must begin and end with a double quote and contain only valid characters.
+    if (value.size() < 2) return "Too short!";
+    char quote = value[0];
+    if (!is_one_of(quote, quote_marks)) return "Must begin an end in quotes.";
+    if (value.back() != quote) return "Begin and end quotes must match.";
+
+    // Are all of the characters valid?
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      if (value[pos] == quote) return "Has a floating quote.";
+      if (value[pos] == '\\') {
+        if (pos == value.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
+
+        // Move to the next char and make sure it's legal to be escaped.
+        // @CAO Expand on options!
+        pos++;
+        switch (value[pos]) {
+          case 'b':   // Backspace
+          case 'f':   // Form feed
+          case 'n':   // Newline
+          case 'r':   // Return
+          case 't':   // Tab
+          case 'v':   // Vertical tab.
+          case '0':   // Empty (character 0)
+          case '\\':  // Backslash
+          case '"':   // Double quote
+          case '\'':  // Single quote
+          case '`':   // Back quote
+            continue;
+          default:
+            return "Unknown escape charater.";
+        }
+      }
+    }
+
+    // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
+
+    // If we made it here without a problem, it must be correct!
+    return "Good!";
+  }
+
+
+  /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
+  static inline std::string to_escaped_string(char value) {
+    // Start by quickly returning a string if it's easy.
+    std::stringstream ss;
+    if ( (value >= 40 && value < 91) || (value > 96 && value < 127)) {
+      ss << value;
+      return ss.str();
+    }
+    switch (value) {
+    case '\0': return "\\0";
+    case 1: return "\\001";
+    case 2: return "\\002";
+    case 3: return "\\003";
+    case 4: return "\\004";
+    case 5: return "\\005";
+    case 6: return "\\006";
+    case '\a': return "\\a";  // case  7 (audible bell)
+    case '\b': return "\\b";  // case  8 (backspace)
+    case '\t': return "\\t";  // case  9 (tab)
+    case '\n': return "\\n";  // case 10 (newline)
+    case '\v': return "\\v";  // case 11 (vertical tab)
+    case '\f': return "\\f";  // case 12 (form feed - new page)
+    case '\r': return "\\r";  // case 13 (carriage return)
+    case 14: return "\\016";
+    case 15: return "\\017";
+    case 16: return "\\020";
+    case 17: return "\\021";
+    case 18: return "\\022";
+    case 19: return "\\023";
+    case 20: return "\\024";
+    case 21: return "\\025";
+    case 22: return "\\026";
+    case 23: return "\\027";
+    case 24: return "\\030";
+    case 25: return "\\031";
+    case 26: return "\\032";
+    case 27: return "\\033";  // case 27 (ESC), sometimes \e
+    case 28: return "\\034";
+    case 29: return "\\035";
+    case 30: return "\\036";
+    case 31: return "\\037";
+
+    case '\"': return "\\\"";  // case 34
+    case '\'': return "\\\'";  // case 39
+    case '\\': return "\\\\";  // case 92
+    case 127: return "\\177";  // (delete)
+
+    // case '\?': return "\\\?";
+    default:
+      ss << value;
+      return ss.str();
+    };
+  }
+
+
+  /// Convert a literal string representation to an actual string.
+  static inline std::string from_literal_string(
+    const std::string & value,
+    [[maybe_unused]] const std::string & quote_marks)
+  {
+    emp_assert(is_literal_string(value, quote_marks),
+               value, diagnose_literal_string(value, quote_marks));
+    // Given the assert, assume string DOES contain a literal string representation.
+
+    std::string out_string;
+    out_string.reserve(value.size()-2);  // Make a guess on final size.
+
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      // If we don't have an escaped character, just move it over.
+      if (value[pos] != '\\') {
+        out_string.push_back(value[pos]);
+        continue;
+      }
+
+      // If we do have an escape character, convert it.
+      pos++;
+
+      switch (value[pos]) {
+        case 'b': out_string.push_back('\b'); break;   // Backspace
+        case 'f': out_string.push_back('\f'); break;   // Form feed
+        case 'n': out_string.push_back('\n'); break;   // Newline
+        case 'r': out_string.push_back('\r'); break;   // Return
+        case 't': out_string.push_back('\t'); break;   // Tab
+        case 'v': out_string.push_back('\v'); break;   // Vertical tab
+        case '0': out_string.push_back('\0'); break;   // Empty (character 0)
+        case '\\': out_string.push_back('\\'); break;  // Backslash
+        case '"': out_string.push_back('"'); break;    // Double quote
+        case '\'': out_string.push_back('\''); break;  // Single quote
+        default:
+          emp_assert(false, "unknown escape char used; probably need to update converter!");
+      }
+    }
+
+    return out_string;
+  }
+
+
+  /// Find any instances of ${X} and replace with dictionary lookup of X.
+  template <typename MAP_T>
+  [[nodiscard]] std::string replace_vars( const std::string& in_string, const MAP_T & var_map ) {
+    std::string result = in_string;
+
+    // Seek out instances of "${" to indicate the start of pre-processing.
+    for (size_t i = 0; i < result.size(); ++i) {
+      if (result[i] != '$') continue;   // Replacement tag must start with a '$'.
+      if (result.size() <= i+2) break;  // Not enough room for a replacement tag.
+      if (result[i+1] == '$') {         // Compress two $$ into one $
+        result.erase(i,1);
+        continue;
+      }
+      if (result[i+1] != '{') continue; // Eval must be surrounded by braces.
+
+      // If we made it this far, we have a starting match!
+      size_t end_pos = emp::find_paren_match(result, i+1, '{', '}', false);
+      if (end_pos == i+1) {
+        emp::notify::Exception("emp::string_utils::replace_vars::missing_close",
+                               "No close brace found in string_utils::replace_vars()",
+                               result);
+        return result; // Stop where we are... No end brace found!
+      }
+      
+      std::string key = result.substr(i+2, end_pos-i-2);
+      auto replacement_it = var_map.find(key);
+      if (replacement_it == var_map.end()) {
+        emp::notify::Exception("emp::string_utils::replace_vars::missing_var",
+                               emp::to_string("Lookup variable not found in var_map (key=", key, ")"),
+                               key);
+        return result; // Stop here; variable could not be replaced.
+      }
+      result.replace(i, end_pos-i+1, replacement_it->second);   // Put into place.
+      i += replacement_it->second.size();                       // Continue at the next position...
+    }
+
+    return result;
+  }
+
+
+  /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
+  /// @param in_string string to be sliced
+  /// @param out_set destination
+  /// @param delim delimiter to split on
+  /// @param max_split defines the maximum number of splits
+  /// @param preserve_quotes Should quoted text be kept together?
+  static inline void slice (
+    const std::string_view & in_string,
+    emp::vector<std::string> & out_set,
+    const char delim,
+    const size_t max_split,
+    const bool preserve_quotes
+  ) {
+    const size_t test_size = in_string.size();
+
+    // Count produced strings
+    size_t out_count = 0;
+    size_t pos = 0;
+    while (pos < test_size && out_count <= max_split) {
+      while (pos < test_size && in_string[pos] != delim) {
+        if (preserve_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
+          pos = find_quote_match(in_string, pos, in_string[pos]);
+        }
+        pos++;
+      }
+      pos++; // Skip deliminator
+      out_count++;  // Increment for each delim plus once at the end (so once if no delims).
+    }
+
+    // And copy over the strings
+    out_set.resize(out_count);
+    pos = 0;
+    size_t string_id = 0;
+    while (pos < test_size) {
+      out_set[string_id] = "";
+      while (
+        pos < test_size
+        && (in_string[pos] != delim || string_id == out_count - 1)
+      ) {
+        out_set[string_id] += in_string[pos];
+        pos++;
+      }
+      pos++;        // Skip over any final deliminator
+      string_id++;  // Move to the next sub-string.
+    }
+
   }
 
 }
