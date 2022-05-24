@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2021.
+ *  @date 2018-2022.
  *
  *  @file CombinedBinomialDistribution.hpp
  *  @brief A means of quickly generating binomial random variables while only storing a small number of distributions.
@@ -23,12 +23,16 @@
 #include "./Distribution.hpp"
 
 namespace emp{
+  /// \brief A collection of distributions that allows for pulls from a binomial distribution with arbitrary N while only storing log_2(N) distributions 
   class CombinedBinomialDistribution{
     protected:
-      emp::vector<Binomial> distribution_vec;
-      double p;
-      size_t cur_max_power;
+      emp::vector<Binomial> distribution_vec; /**< The collection of binomial distributions 
+                                                   used to construct any N */
+      double p;             ///< The success probability of a single Bernoulli trial
+      size_t cur_max_power; /**< The maximum power of two currently supported by our 
+                                 distributions */
 
+      /// Fetch the smallest power of two that is larger than N
       size_t GetMaxPower(size_t n) const {
         size_t power = 0;
         for(size_t val = 1; val < n; val <<= 1, ++power){ ; }
@@ -41,7 +45,7 @@ namespace emp{
         Expand(_starting_n);
       }
 
-      /// Pick an item from a distribution using a value between 0.0 and 1.0.
+      /// Sample a binomial distribution with n events 
       size_t PickRandom(size_t n, Random & random){
         size_t local_max_power = GetMaxPower(n);
         size_t result = 0;
@@ -54,6 +58,7 @@ namespace emp{
         return result;
       }
 
+      /// Reset the distribution with a new probability, p, and a starting n value
       void Setup(double _p, size_t _n){
         distribution_vec.clear();
         cur_max_power = 0;
@@ -61,6 +66,7 @@ namespace emp{
         if(_n > (1ull << cur_max_power)) Expand(_n);
       }
 
+      /// Create more distributions to handle the given value of n
       void Expand(size_t max_n){
         cur_max_power = GetMaxPower(max_n);
         for(size_t power = distribution_vec.size(); power <= cur_max_power; ++power){
@@ -68,6 +74,7 @@ namespace emp{
         }
       }
 
+      /// Fetch the current maximum power handled by this combined distribution
       size_t GetCurMaxPower(){ return cur_max_power; }
   };
 }
