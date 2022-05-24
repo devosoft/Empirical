@@ -438,13 +438,19 @@ namespace emp {
 
     /// Generate a random variable drawn from an exponential distribution.
     inline double GetExponential(double p) {
-      emp_assert(p > 0.0 && p < 1.0, p);
+      emp_assert(p >= 0.0 && p <= 1.0, p);
+      if (p == 0) {
+        return std::numeric_limits<uint32_t>::infinity();
+      }
       return std::log(GetDouble()) / std::log(1.0 - p);
     }
 
     /// Generate a random variable drawn from a geometric distribution.
     inline uint32_t GetGeometric(double p) {
-      emp_assert(p > 0.0 && p < 1.0, p);
+      emp_assert(p >= 0.0 && p <= 1.0, p);
+      if (p == 0) {
+        return std::numeric_limits<uint32_t>::infinity();
+      }
       return static_cast<uint32_t>( GetExponential(p) ) + 1;
     }
 
