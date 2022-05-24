@@ -175,7 +175,7 @@ namespace emp {
       ResolveRefresh();
 
       // Make sure we don't try to index beyond end of map.
-      emp_assert(index <= weights[cur_id], index, cur_id, weights.size(), weights[cur_id]);
+      emp_assert(index < weights[cur_id], index, cur_id, weights.size(), weights[cur_id]);
 
       // If we are on a leaf, we have our answer!
       if (cur_id >= num_nodes) return cur_id - num_nodes;
