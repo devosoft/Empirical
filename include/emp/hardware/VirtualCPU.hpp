@@ -121,7 +121,9 @@ namespace emp{
       size_t write_head;                       ///< Write head, signals where to copy next
                                                ///< instruction
       //////// HELPER CONSTRUCTS
-      std::set<size_t> nop_id_set;       ///< Identifiers of all NOP instructions in library
+      emp::unordered_map<size_t, size_t> nop_id_map;/**< NOP inst id -> Nop index 
+                                                         (e.g., NopA -> 0, NopB -> 1, 
+                                                           NopE -> 5) */ 
       emp::vector<size_t> label_idx_vec; ///< Vector of LABEL instructions indices in genome
       //////// GENOME
       genome_t genome;         ///< Preserved copy of genome from organism creation/birth
@@ -417,11 +419,11 @@ namespace emp{
         label_idx_vec.clear();
         // Start by filling the nop vector of the last instruction
         for(size_t inst_idx = 0; inst_idx < genome_working.GetSize() - 1; ++inst_idx){
-          if(emp::Has(nop_id_set, genome_working[inst_idx].id))
+          if(emp::Has(nop_id_map, genome_working[inst_idx].id)){
             genome_working[genome_working.size() - 1].nop_vec.push_back(
-                genome_working[inst_idx].id);
-          else
-            break;
+                nop_id_map[genome_working[inst_idx].id]);
+          }
+          else break;
         }
         // If the last index is a label, record it!
         if(label_inst_present &&
@@ -434,9 +436,9 @@ namespace emp{
         // Then we copy THAT instruction's nop vector, too: [a,b,c]
         // By going in reverse order, all following instructions already have a nop vec
         for(auto it = genome_working.rbegin() + 1; it != genome_working.rend(); ++it){
-          if(emp::Has(nop_id_set, (it - 1)->id)){
+          if(emp::Has(nop_id_map, (it - 1)->id)){
             it->nop_vec.resize( (it - 1)->nop_vec.size() + 1 );
-            it->nop_vec[0] = (it - 1)->id;
+            it->nop_vec[0] = nop_id_map[(it - 1)->id];
             std::copy(
                 (it - 1)->nop_vec.begin(),
                 (it - 1)->nop_vec.end(),
@@ -455,14 +457,14 @@ namespace emp{
       /// stop. Last possible NOP instruction is NopW, as NopX is a special case in Avida.
       void CountNops(){
         num_nops = 0;
-        nop_id_set.clear();
+        nop_id_map.clear();
         are_nops_counted = true;
         for(size_t idx = 0; idx < 23 ; ++idx){ // Stop before X!
           std::string nop_name = (std::string)"Nop" + (char)('A' + idx);
           if(GetInstLib()->IsInst(nop_name)){
             num_nops++;
             size_t id = GetInstLib()->GetID(nop_name);
-            nop_id_set.insert(id);
+            nop_id_map[id] = idx;
           }
           else return;
         }

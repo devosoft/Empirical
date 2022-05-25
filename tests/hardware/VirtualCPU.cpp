@@ -50,8 +50,6 @@ Derived CreateSeedCPU(){
   CHECK(7 == (cpu_init.inst_ptr = 7));
   CHECK(3 == (cpu_init.read_head = 3));
   CHECK(4 == (cpu_init.write_head = 4));
-  cpu_init.nop_id_set.insert(4);
-  CHECK(cpu_init.nop_id_set.size() == 4);
   cpu_init.label_idx_vec.push_back(3);
   CHECK(2 == (cpu_init.regs[0] = 2));
   CHECK(38 == (cpu_init.regs[0] = 38));
@@ -73,10 +71,10 @@ TEST_CASE("VirtualCPU_Variables", "[Hardware]") {
   }
   CHECK(cpu.active_stack_idx == 0);   // Default to first stack
   CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-  CHECK(cpu.nop_id_set.size() == 3);  // All three default nops present in set
-  CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
-  CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
-  CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
+  CHECK(cpu.nop_id_map.size() == 3);  // All three default nops present in set
+  CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
+  CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
+  CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
   CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
   // All registers start at their index value
   for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
@@ -132,10 +130,10 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       }
       CHECK(cpu.active_stack_idx == 0);   // Default to first stack
       CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-      CHECK(cpu.nop_id_set.size() == 3);  // All three default nops present in set
-      CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
-      CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
-      CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
+      CHECK(cpu.nop_id_map.size() == 3);  // All three default nops present in set
+      CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
+      CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
+      CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
       CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
       // All registers start at their index value
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
@@ -182,10 +180,10 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       }
       CHECK(cpu.active_stack_idx == 0);   // Default to first stack
       CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-      CHECK(cpu.nop_id_set.size() == 3);  // All three default nops present in set
-      CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
-      CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
-      CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
+      CHECK(cpu.nop_id_map.size() == 3);  // All three default nops present in set
+      CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
+      CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
+      CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
       CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
       // All registers start at their index value
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
@@ -224,7 +222,7 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       }
       CHECK(cpu.active_stack_idx == cpu_init.active_stack_idx);
       CHECK(cpu.GetNumNops() == cpu_init.GetNumNops());
-      CHECK(cpu.nop_id_set.size() == cpu_init.nop_id_set.size());
+      CHECK(cpu.nop_id_map.size() == cpu_init.nop_id_map.size());
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
         CHECK(cpu.regs[idx] == cpu_init.regs[idx]);
       }
@@ -265,7 +263,7 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       }
       CHECK(cpu.active_stack_idx == cpu_init.active_stack_idx);
       CHECK(cpu.GetNumNops() == cpu_init.GetNumNops());
-      CHECK(cpu.nop_id_set.size() == cpu_init.nop_id_set.size());
+      CHECK(cpu.nop_id_map.size() == cpu_init.nop_id_map.size());
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
         CHECK(cpu.regs[idx] == cpu_init.regs[idx]);
       }
@@ -733,9 +731,9 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     { // VARIABLES -- should default
         CHECK(cpu.active_stack_idx == 0);   // Default to first stack
         CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-        CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
-        CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
-        CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
+        CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
+        CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
+        CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
         CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
         // All registers start at their index value
         for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
@@ -768,9 +766,9 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     { // VARIABLES -- should default
         CHECK(cpu.active_stack_idx == 0);   // Default to first stack
         CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-        CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
-        CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
-        CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
+        CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
+        CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
+        CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
         CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
         // All registers start at their index value
         for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
