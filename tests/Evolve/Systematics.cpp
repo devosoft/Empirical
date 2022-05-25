@@ -22,123 +22,120 @@
 #include "emp/Evolve/World_output.hpp"
 #include "emp/hardware/AvidaGP.hpp"
 
+TEST_CASE("Test Systematics", "[Evolve]") {
+  // Taxon
+  emp::Taxon<std::string> tx(0, "a");
+  CHECK(tx.GetID() == 0);
+  CHECK(tx.GetParent() == nullptr);
+  CHECK(tx.GetInfo() == "a");
+  CHECK(tx.GetNumOrgs() == 0);
+  CHECK(tx.GetTotOrgs() == 0);
+  tx.AddOrg();
+  CHECK(tx.GetNumOrgs() == 1);
+  tx.RemoveOrg();
+  CHECK(tx.GetNumOrgs() == 0);
+  CHECK(tx.GetTotOrgs() == 1);
+  CHECK(tx.GetTotalOffspring() == 0);
 
-TEST_CASE("Test Systematics", "[Evolve]")
-{
+  emp::Ptr< emp::Taxon<std::string, emp::datastruct::no_data> > parentPtr(&tx);
+  emp::Taxon<std::string> tx_1(1, "b", parentPtr);
+  CHECK(tx_1.GetParent() == parentPtr);
+  tx_1.AddTotalOffspring();
+  CHECK(tx_1.GetTotalOffspring() == 1);
+  CHECK(tx.GetTotalOffspring() == 1);
 
-	// Taxon
-	emp::Taxon<std::string> tx(0, "a");
-	CHECK(tx.GetID() == 0);
-	CHECK(tx.GetParent() == nullptr);
-	CHECK(tx.GetInfo() == "a");
-	CHECK(tx.GetNumOrgs() == 0);
-	CHECK(tx.GetTotOrgs() == 0);
-	tx.AddOrg();
-	CHECK(tx.GetNumOrgs() == 1);
-	tx.RemoveOrg();
-	CHECK(tx.GetNumOrgs() == 0);
-	CHECK(tx.GetTotOrgs() == 1);
-	CHECK(tx.GetTotalOffspring() == 0);
+  // Systematics
+  std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
+  emp::Systematics<double, std::string> sys1(calc_taxon);
+  CHECK(sys1.GetTrackSynchronous() == false);
+  CHECK(sys1.GetNumAncestors() == 0);
+  CHECK(sys1.GetNumActive() == 0);
+  CHECK(sys1.GetNumOutside() == 0);
+  CHECK(sys1.GetTreeSize() == 0);
+  CHECK(sys1.GetNumTaxa() == 0);
 
-	emp::Ptr< emp::Taxon<std::string, emp::datastruct::no_data> > parentPtr(&tx);
-	emp::Taxon<std::string> tx_1(1, "b", parentPtr);
-	CHECK(tx_1.GetParent() == parentPtr);
-	tx_1.AddTotalOffspring();
-	CHECK(tx_1.GetTotalOffspring() == 1);
-	CHECK(tx.GetTotalOffspring() == 1);
-
-	// Systematics
-	std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
-	emp::Systematics<double, std::string> sys1(calc_taxon);
-	CHECK(sys1.GetTrackSynchronous() == false);
-	CHECK(sys1.GetNumAncestors() == 0);
-	CHECK(sys1.GetNumActive() == 0);
-	CHECK(sys1.GetNumOutside() == 0);
-	CHECK(sys1.GetTreeSize() == 0);
-	CHECK(sys1.GetNumTaxa() == 0);
-
-	sys1.SetTrackSynchronous(true);
-	CHECK(sys1.GetTrackSynchronous() == true);
-	sys1.AddOrg(15.0, {0,0});
-	CHECK(sys1.GetNumActive() == 1);
-	CHECK(sys1.GetTaxonAt({0,0})->GetInfo() == "small");
+  sys1.SetTrackSynchronous(true);
+  CHECK(sys1.GetTrackSynchronous() == true);
+  sys1.AddOrg(15.0, {0,0});
+  CHECK(sys1.GetNumActive() == 1);
+  CHECK(sys1.GetTaxonAt({0,0})->GetInfo() == "small");
   CHECK(sys1.IsTaxonAt({0,0}));
-	sys1.AddOrg(56.0, {1,1});
-	CHECK(sys1.GetNumActive() == 2);
-	CHECK(sys1.GetTaxonAt({1,1})->GetInfo() == "large");
+  sys1.AddOrg(56.0, {1,1});
+  CHECK(sys1.GetNumActive() == 2);
+  CHECK(sys1.GetTaxonAt({1,1})->GetInfo() == "large");
   CHECK(sys1.IsTaxonAt({1,1}));
-	sys1.RemoveOrg({1,1});
+  sys1.RemoveOrg({1,1});
   CHECK(!sys1.IsTaxonAt({1,1}));
-	CHECK(sys1.GetNumActive() == 1);
-	sys1.AddOrg(56.0, {1,0});
+  CHECK(sys1.GetNumActive() == 1);
+  sys1.AddOrg(56.0, {1,0});
   CHECK(sys1.IsTaxonAt({1,0}));
-	CHECK(!sys1.RemoveOrg({1,0}));
+  CHECK(!sys1.RemoveOrg({1,0}));
   CHECK(!sys1.IsTaxonAt({1,0}));
 
-	// Base setters and getters
-	CHECK(sys1.GetStoreActive() == true);
-	CHECK(sys1.GetStoreAncestors() == true);
-	CHECK(sys1.GetStoreOutside() == false);
-	CHECK(sys1.GetArchive() == true);
-	CHECK(sys1.GetStorePosition() == true);
-	sys1.SetStoreActive(false);
-	CHECK(sys1.GetStoreActive() == false);
-	sys1.SetStoreAncestors(false);
-	CHECK(sys1.GetStoreAncestors() == false);
-	sys1.SetStoreOutside(true);
-	CHECK(sys1.GetStoreOutside() == true);
-	sys1.SetArchive(false);
-	CHECK(sys1.GetArchive() == false);
-	sys1.SetStorePosition(false);
-	CHECK(sys1.GetStorePosition() == false);
+  // Base setters and getters
+  CHECK(sys1.GetStoreActive() == true);
+  CHECK(sys1.GetStoreAncestors() == true);
+  CHECK(sys1.GetStoreOutside() == false);
+  CHECK(sys1.GetArchive() == true);
+  CHECK(sys1.GetStorePosition() == true);
+  sys1.SetStoreActive(false);
+  CHECK(sys1.GetStoreActive() == false);
+  sys1.SetStoreAncestors(false);
+  CHECK(sys1.GetStoreAncestors() == false);
+  sys1.SetStoreOutside(true);
+  CHECK(sys1.GetStoreOutside() == true);
+  sys1.SetArchive(false);
+  CHECK(sys1.GetArchive() == false);
+  sys1.SetStorePosition(false);
+  CHECK(sys1.GetStorePosition() == false);
 
-	#ifndef NDEBUG
-	sys1.AddDeleteriousStepDataNode();
-	CHECK(emp::assert_last_fail);
-	emp::assert_clear();
+  #ifndef NDEBUG
+  sys1.AddDeleteriousStepDataNode();
+  CHECK(emp::assert_last_fail);
+  emp::assert_clear();
 
-	sys1.AddVolatilityDataNode();
-	CHECK(emp::assert_last_fail);
-	emp::assert_clear();
+  sys1.AddVolatilityDataNode();
+  CHECK(emp::assert_last_fail);
+  emp::assert_clear();
 
-	sys1.AddUniqueTaxaDataNode();
-	CHECK(emp::assert_last_fail);
-	emp::assert_clear();
+  sys1.AddUniqueTaxaDataNode();
+  CHECK(emp::assert_last_fail);
+  emp::assert_clear();
 
-	sys1.AddMutationCountDataNode();
-	CHECK(emp::assert_last_fail);
-	emp::assert_clear();
-	#endif
+  sys1.AddMutationCountDataNode();
+  CHECK(emp::assert_last_fail);
+  emp::assert_clear();
+  #endif
 
-	// Analysis
-	using my_taxon = emp::Taxon<std::string, emp::datastruct::mut_landscape_info<double>>;
-	//emp::Systematics<double, std::string, emp::datastruct::mut_landscape_info> sys2(calc_taxon)
-	my_taxon taxon1(1, "medium");
-	emp::Ptr<my_taxon> ptr1 = &taxon1;
-	CHECK(emp::LineageLength(ptr1) == 1);
-	my_taxon taxon2(1, "medium", ptr1);
-	emp::Ptr<my_taxon> ptr2 = &taxon2;
-	CHECK(emp::LineageLength(ptr1) == 1);
-	CHECK(emp::LineageLength(ptr2) == 2);
-	std::unordered_map<std::string, int> muts;
-	muts["short"] = 12;
-	muts["tall"] = 3;
-	taxon2.GetData().RecordMutation(muts);
-	CHECK(taxon2.GetData().mut_counts.size() == 2);
-	CHECK(taxon2.GetData().mut_counts["tall"] == 3);
+  // Analysis
+  using my_taxon = emp::Taxon<std::string, emp::datastruct::mut_landscape_info<double>>;
+  //emp::Systematics<double, std::string, emp::datastruct::mut_landscape_info> sys2(calc_taxon)
+  my_taxon taxon1(1, "medium");
+  emp::Ptr<my_taxon> ptr1 = &taxon1;
+  CHECK(emp::LineageLength(ptr1) == 1);
+  my_taxon taxon2(1, "medium", ptr1);
+  emp::Ptr<my_taxon> ptr2 = &taxon2;
+  CHECK(emp::LineageLength(ptr1) == 1);
+  CHECK(emp::LineageLength(ptr2) == 2);
+  std::unordered_map<std::string, int> muts;
+  muts["short"] = 12;
+  muts["tall"] = 3;
+  taxon2.GetData().RecordMutation(muts);
+  CHECK(taxon2.GetData().mut_counts.size() == 2);
+  CHECK(taxon2.GetData().mut_counts["tall"] == 3);
 
-	emp::vector<std::string> types;
-	types.push_back("tall");
-	types.push_back("short");
-	CHECK(emp::CountMuts(ptr2, types) == 15);
-	CHECK(emp::CountMutSteps(ptr2, types) == 2);
-	CHECK(emp::CountMutSteps(ptr2, "short") == 1);
-	muts["short"] = 4;
-	taxon1.GetData().RecordMutation(muts);
-	CHECK(emp::CountMuts(ptr1, "short") == 4);
-	CHECK(emp::CountMuts(ptr2, "short") == 16);
-	CHECK(emp::CountMutSteps(ptr1, "short") == 1);
-	CHECK(emp::CountMutSteps(ptr2, "short") == 2);
+  emp::vector<std::string> types;
+  types.push_back("tall");
+  types.push_back("short");
+  CHECK(emp::CountMuts(ptr2, types) == 15);
+  CHECK(emp::CountMutSteps(ptr2, types) == 2);
+  CHECK(emp::CountMutSteps(ptr2, "short") == 1);
+  muts["short"] = 4;
+  taxon1.GetData().RecordMutation(muts);
+  CHECK(emp::CountMuts(ptr1, "short") == 4);
+  CHECK(emp::CountMuts(ptr2, "short") == 16);
+  CHECK(emp::CountMutSteps(ptr1, "short") == 1);
+  CHECK(emp::CountMutSteps(ptr2, "short") == 2);
 
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
@@ -398,11 +395,9 @@ TEST_CASE("Test Systematics", "[Evolve]")
   CHECK(active_vec[10]->GetNumOrgs() == 1);
   CHECK(active_vec[10]->GetNumOff() == 0);
   CHECK(active_vec[10]->GetParent()->GetID() == 17);
-
 }
 
-TEST_CASE("Test not tracking ancestors", "[Evolve]")
-{
+TEST_CASE("Test not tracking ancestors", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
@@ -575,8 +570,7 @@ TEST_CASE("Pointer to systematics", "[evo]") {
   sys.Delete();
 }
 
-TEST_CASE("Test Data Struct", "[evo]")
-{
+TEST_CASE("Test Data Struct", "[evo]") {
 
   emp::Ptr<emp::Systematics<int, int, emp::datastruct::mut_landscape_info<int> >> sys;
   sys.New([](const int & i){return i;}, true, true, true, false);
@@ -672,7 +666,6 @@ TEST_CASE("Test Data Struct", "[evo]")
 
 
 }
-
 
 TEST_CASE("World systematics integration", "[evo]") {
 
@@ -941,9 +934,7 @@ TEST_CASE("Run world", "[evo]") {
   }
 }
 
-
-TEST_CASE("Test GetCanopy", "[evo]")
-{
+TEST_CASE("Test GetCanopy", "[evo]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   sys.SetUpdate(0);
@@ -1256,8 +1247,7 @@ TEST_CASE("Dieing MRCA", "[evo]") {
   CHECK(tree.GetMRCA() == id6);
 }
 
-TEST_CASE("Test RemoveBefore", "[Evolve]")
-{
+TEST_CASE("Test RemoveBefore", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
@@ -1317,8 +1307,7 @@ TEST_CASE("Test RemoveBefore", "[Evolve]")
 
 }
 
-TEST_CASE("Test Snapshot", "[Evolve]")
-{
+TEST_CASE("Test Snapshot", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   sys.SetUpdate(0);
@@ -1357,8 +1346,7 @@ TEST_CASE("Test Snapshot", "[Evolve]")
   // TODO: Would be nice to compare this to existing snapshot file, but lines could be in any order
 }
 
-TEST_CASE("Test Prune", "[Evolve]")
-{
+TEST_CASE("Test Prune", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
   int prunes = 0;
@@ -1412,8 +1400,7 @@ TEST_CASE("Test Prune", "[Evolve]")
   CHECK(sys.GetMRCA() == id2);
 }
 
-TEST_CASE("Test tracking position", "[Evolve]")
-{
+TEST_CASE("Test tracking position", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
 
   sys.SetUpdate(0);
