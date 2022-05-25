@@ -22,16 +22,16 @@
 
 #include "../base/array.hpp"
 #include "../base/Ptr.hpp"
-#include "../base/vector.hpp"
 #include "../base/unordered_map.hpp"
+#include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "../io/File.hpp"
 #include "../math/Random.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "VirtualCPU_InstLib.hpp"
 #include "Genome.hpp"
+#include "VirtualCPU_InstLib.hpp"
 
 namespace emp{
   /// \brief A simple virtual CPU styled after those seen in Avida

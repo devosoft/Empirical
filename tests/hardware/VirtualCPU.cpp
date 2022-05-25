@@ -2,10 +2,10 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/hardware/VirtualCPU.hpp"
-
-#include <sstream>
 #include <iostream>
+#include <sstream>
+
+#include "emp/hardware/VirtualCPU.hpp"
 
 /* TODO
   [ ] *INSTRUCTIONS struct

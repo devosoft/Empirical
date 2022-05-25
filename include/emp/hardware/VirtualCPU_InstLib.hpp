@@ -10,8 +10,9 @@
 #ifndef EMP_VIRTUAL_CPU_INST_LIB_H
 #define EMP_VIRTUAL_CPU_INST_LIB_H
 
-#include "../math/math.hpp"
 #include "../base/error.hpp"
+#include "../math/math.hpp"
+
 #include "InstLib.hpp"
 
 namespace emp {

@@ -1,5 +1,5 @@
-#include <iostream>
 #include <ctime>
+#include <iostream>
 
 #include "../../include/emp/math/Distribution.hpp"
 #include "../../include/emp/math/Random.hpp"
