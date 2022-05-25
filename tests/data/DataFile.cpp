@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020-2022
+ *
+ *  @file DataFile.cpp
+ */
+
 #define CATCH_CONFIG_MAIN
 
 #ifndef EMP_TRACK_MEM

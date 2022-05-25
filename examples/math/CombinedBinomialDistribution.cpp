@@ -1,10 +1,10 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2020
+ *  @date 2022-2022
  *
- *  @file Distribution.cpp
- *  @brief Some examples code for using emp::Distribution and derived classes.
+ *  @file CombinedBinomialDistribution.cpp
+ *  @brief Some examples code for using emp::CombinedBinomialDistribution
  */
 
 
