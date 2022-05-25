@@ -184,8 +184,8 @@ namespace emp{
       bool Load(std::istream & input) {
         Reset();
         File file(input);
-        file.RemoveComments("//"); // Remove all C++ style comments 
-        file.RemoveComments("#");  // Remove all bash/Python/R style comments 
+        file.RemoveComments("//"); // Remove all C++ style comments
+        file.RemoveComments("#");  // Remove all bash/Python/R style comments
         file.CompressWhitespace();  // Trim down remaining whitespace.
         file.Apply( [this](std::string & info){ PushInst(info); } );
         nops_need_curated = true;
