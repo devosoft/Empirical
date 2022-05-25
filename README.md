@@ -7,6 +7,8 @@ namespace, so it is simple to incorporate into existing projects.
 [![CI](https://github.com/devosoft/Empirical/workflows/CI/badge.svg)](https://github.com/devosoft/Empirical/actions?query=workflow%3ACI+branch%3Amaster) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563) [![codecov](https://codecov.io/gh/devosoft/Empirical/branch/master/graph/badge.svg)](https://codecov.io/gh/devosoft/Empirical)
 [![DockerHub](https://img.shields.io/badge/DockerHub-Hosted-blue)](https://hub.docker.com/r/devosoft/empirical)
 ![Documentation Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdevosoft%2FEmpirical%2Fgh-storage%2Fstats%2Fdoc-coverage.json)
+[![GitHub contributors](https://img.shields.io/github/contributors/devosoft/Empirical.svg?style=flat-square)](https://github.com/devosoft/Empirical/graphs/contributors)
+
 
 See our [Built With Empirical Gallery](https://empirical.readthedocs.io/en/latest/BuiltWithEmpiricalGallery) for examples of web tools built with Empirical.
 
