@@ -20,6 +20,9 @@
  *    - We should come up with a more informative name for the file/class
  */
 
+#ifndef EMP_MATH_COMBINEDBINOMIALDISTRIBUTION_HPP_INCLUDE
+#define EMP_MATH_COMBINEDBINOMIALDISTRIBUTION_HPP_INCLUDE
+
 #include "./Distribution.hpp"
 
 namespace emp{
@@ -78,3 +81,5 @@ namespace emp{
       size_t GetCurMaxPower(){ return cur_max_power; }
   };
 }
+
+#endif // #ifndef EMP_MATH_COMBINEDBINOMIALDISTRIBUTION_HPP_INCLUDE

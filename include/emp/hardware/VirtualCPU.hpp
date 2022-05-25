@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021-2022.
  *
- *  @file  VirtualCPU.hpp
+ *  @file VirtualCPU.hpp
  *  @brief A simple virtual CPU styled after the original and extended Avidian architectures. 
  *
  *  @TODO
@@ -13,8 +13,8 @@
  *
  */
 
-#ifndef EMP_VIRTUAL_CPU_H
-#define EMP_VIRTUAL_CPU_H
+#ifndef EMP_HARDWARE_VIRTUALCPU_HPP_INCLUDE
+#define EMP_HARDWARE_VIRTUALCPU_HPP_INCLUDE
 
 #include <fstream>
 #include <iostream>
@@ -741,4 +741,4 @@ namespace emp{
 
 
 
-#endif
+#endif // #ifndef EMP_HARDWARE_VIRTUALCPU_HPP_INCLUDE

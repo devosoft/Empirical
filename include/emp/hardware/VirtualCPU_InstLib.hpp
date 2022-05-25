@@ -3,12 +3,12 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021-2022
  *
- *  @file  VirtualCPU_InstLib.hpp
+ *  @file VirtualCPU_InstLib.hpp
  *  @brief A specialized version of InstLib to handle VirtualCPU instructions.
  */
 
-#ifndef EMP_VIRTUAL_CPU_INST_LIB_H
-#define EMP_VIRTUAL_CPU_INST_LIB_H
+#ifndef EMP_HARDWARE_VIRTUALCPU_INSTLIB_HPP_INCLUDE
+#define EMP_HARDWARE_VIRTUALCPU_INSTLIB_HPP_INCLUDE
 
 #include "../base/error.hpp"
 #include "../math/math.hpp"
@@ -292,4 +292,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_HARDWARE_VIRTUALCPU_INSTLIB_HPP_INCLUDE
