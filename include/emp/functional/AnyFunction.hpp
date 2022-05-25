@@ -50,7 +50,7 @@ namespace emp {
 
     /// Determine if this BaseFunction can be converted into a derived emp::Function
     template <typename T> bool ConvertOK();
-    
+
     virtual emp::Ptr<BaseFunction> Clone() = 0;
   };
 
@@ -85,7 +85,7 @@ namespace emp {
 
     emp::Ptr<BaseFunction> Clone() override{
       return emp::NewPtr<DerivedFunction<RETURN(PARAMS...)>>(fun);
-    } 
+    }
   };
 
 
@@ -107,7 +107,7 @@ namespace emp {
   public:
     // By default, build an empty function.
     AnyFunction() { ; }
-    
+
     AnyFunction(const AnyFunction& other){ // copy constructor
       fun = other.CloneFunc();
     }

@@ -9,12 +9,12 @@
  *
  *  Quick check for theory: https://math.stackexchange.com/questions/1176385/sum-of-two-independent-binomial-variables
  *
- *  If we want to generate binomial random variables of various trial counts (n's) using the 
- *  Distribution class, we'd have to create a new Distribution for each unique trial count. 
+ *  If we want to generate binomial random variables of various trial counts (n's) using the
+ *  Distribution class, we'd have to create a new Distribution for each unique trial count.
  *
  *  This class leverages the fact that B(n, p) + B(m, p) = B(n + m, p) to calculate binomial
- *  draws with arbitrary trail counts without storing N distributions. 
- *  By storing distributions for powers of 2, we only store log_2(N) distributions. 
+ *  draws with arbitrary trail counts without storing N distributions.
+ *  By storing distributions for powers of 2, we only store log_2(N) distributions.
  *
  *  Developor Notes:
  *    - We should come up with a more informative name for the file/class
@@ -26,13 +26,13 @@
 #include "./Distribution.hpp"
 
 namespace emp{
-  /// \brief A collection of distributions that allows for pulls from a binomial distribution with arbitrary N while only storing log_2(N) distributions 
+  /// \brief A collection of distributions that allows for pulls from a binomial distribution with arbitrary N while only storing log_2(N) distributions
   class CombinedBinomialDistribution{
     protected:
-      emp::vector<Binomial> distribution_vec; /**< The collection of binomial distributions 
+      emp::vector<Binomial> distribution_vec; /**< The collection of binomial distributions
                                                    used to construct any N */
       double p;             ///< The success probability of a single Bernoulli trial
-      size_t cur_max_power; /**< The maximum power of two currently supported by our 
+      size_t cur_max_power; /**< The maximum power of two currently supported by our
                                  distributions */
 
       /// Fetch the smallest power of two that is larger than N
@@ -41,14 +41,14 @@ namespace emp{
         for(size_t val = 1; val < n; val <<= 1, ++power){ ; }
         return power;
       }
-    
+
     public:
       CombinedBinomialDistribution() : p(0), cur_max_power(0){ ; }
       CombinedBinomialDistribution(double _p, size_t _starting_n) : p(_p), cur_max_power(0){
         Expand(_starting_n);
       }
 
-      /// Sample a binomial distribution with n events 
+      /// Sample a binomial distribution with n events
       size_t PickRandom(size_t n, Random & random){
         size_t local_max_power = GetMaxPower(n);
         size_t result = 0;
@@ -65,7 +65,7 @@ namespace emp{
       void Setup(double _p, size_t _n){
         distribution_vec.clear();
         cur_max_power = 0;
-        p = _p; 
+        p = _p;
         if(_n > (1ull << cur_max_power)) Expand(_n);
       }
 

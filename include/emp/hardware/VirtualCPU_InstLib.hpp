@@ -31,58 +31,58 @@ namespace emp {
     static void Inst_NopA(hardware_t & hw, const inst_t & inst) { ; }
     static void Inst_NopB(hardware_t & hw, const inst_t & inst) { ; }
     static void Inst_NopC(hardware_t & hw, const inst_t & inst) { ; }
-    static void Inst_Inc(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_Inc(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       ++hw.regs[idx];
     }
-    static void Inst_Dec(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_Dec(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       --hw.regs[idx];
     }
-    static void Inst_If_Not_Equal(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_If_Not_Equal(hardware_t & hw, const inst_t & inst) {
       if(hw.expanded_nop_args){
         size_t idx_op_1 = inst.nop_vec.size() < 1 ? 1 : inst.nop_vec[0];
         size_t idx_op_2 = inst.nop_vec.size() < 2 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[1];
         if(hw.regs[idx_op_1] == hw.regs[idx_op_2])
           hw.AdvanceIP(1);
-        hw.AdvanceIP(inst.nop_vec.size()); 
+        hw.AdvanceIP(inst.nop_vec.size());
        }
       else{
         size_t idx_1 = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
         size_t idx_2 = hw.GetComplementNop(idx_1);
         if(hw.regs[idx_1] == hw.regs[idx_2])
           hw.AdvanceIP(1);
-        if(inst.nop_vec.size()) hw.AdvanceIP(1); 
+        if(inst.nop_vec.size()) hw.AdvanceIP(1);
       }
     }
-    static void Inst_If_Less(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_If_Less(hardware_t & hw, const inst_t & inst) {
       if(hw.expanded_nop_args){
         size_t idx_op_1 = inst.nop_vec.size() < 1 ? 1 : inst.nop_vec[0];
         size_t idx_op_2 = inst.nop_vec.size() < 2 ? hw.GetComplementNop(idx_op_1) : inst.nop_vec[1];
         if(hw.regs[idx_op_1] >= hw.regs[idx_op_2])
           hw.AdvanceIP(1);
-        hw.AdvanceIP(inst.nop_vec.size()); 
+        hw.AdvanceIP(inst.nop_vec.size());
       }
       else{
         size_t idx_1 = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
         size_t idx_2 = hw.GetComplementNop(idx_1);
         if(hw.regs[idx_1] >= hw.regs[idx_2])
           hw.AdvanceIP(1);
-        if(inst.nop_vec.size()) hw.AdvanceIP(1); 
+        if(inst.nop_vec.size()) hw.AdvanceIP(1);
       }
     }
-    static void Inst_Pop(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_Pop(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       hw.StackPop(idx);
     }
-    static void Inst_Push(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_Push(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       hw.StackPush(idx);
     }
-    static void Inst_Swap_Stack(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_Swap_Stack(hardware_t & hw, const inst_t & inst) {
       hw.StackSwap();
     }
-    static void Inst_Shift_Right(hardware_t & hw, const inst_t & inst) { 
+    static void Inst_Shift_Right(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       hw.regs[idx] >>= 1;
     }
@@ -224,9 +224,9 @@ namespace emp {
         inst_lib.AddInst("NopA", Inst_NopA, 0, "No-operation A");
         inst_lib.AddInst("NopB", Inst_NopB, 0, "No-operation B");
         inst_lib.AddInst("NopC", Inst_NopC, 0, "No-operation C");
-        inst_lib.AddInst("IfNEq", Inst_If_Not_Equal, 1, 
+        inst_lib.AddInst("IfNEq", Inst_If_Not_Equal, 1,
             "Skip next inst unless register values match");
-        inst_lib.AddInst("IfLess", Inst_If_Less, 1, 
+        inst_lib.AddInst("IfLess", Inst_If_Less, 1,
             "Skip next inst unless focal register is less than its complement");
         inst_lib.AddInst("Inc", Inst_Inc, 1, "Increment value in reg Arg1");
         inst_lib.AddInst("Dec", Inst_Dec, 1, "Decrement value in reg Arg1");
@@ -235,13 +235,13 @@ namespace emp {
         inst_lib.AddInst("Swap-Stk", Inst_Swap_Stack, 1, "Swap which stack is active");
         inst_lib.AddInst("ShiftR", Inst_Shift_Right, 1, "Shift register value right by one bit");
         inst_lib.AddInst("ShiftL", Inst_Shift_Left, 1, "Shift register value left by one bit");
-        inst_lib.AddInst("Add", Inst_Add, 1, 
+        inst_lib.AddInst("Add", Inst_Add, 1,
             "Add values in registers B and C, then store result in given register");
-        inst_lib.AddInst("Sub", Inst_Sub, 1, 
+        inst_lib.AddInst("Sub", Inst_Sub, 1,
             "Sub values in registers B and C, then store result in given register");
-        inst_lib.AddInst("Nand", Inst_Nand, 1, 
+        inst_lib.AddInst("Nand", Inst_Nand, 1,
             "NAND values in registers B and C, then store result in given register");
-        inst_lib.AddInst("IO", Inst_IO, 1, 
+        inst_lib.AddInst("IO", Inst_IO, 1,
             "Output value in given register and then place new input in that register");
         inst_lib.AddInst("HAlloc", Inst_H_Alloc, 1, "Allocate memory for offspring");
         inst_lib.AddInst("HDivide", Inst_H_Divide, 1, "Attempt to split offspring");
@@ -250,7 +250,7 @@ namespace emp {
         inst_lib.AddInst("MovHead", Inst_Mov_Head, 1, "Move a given head to a postiion");
         inst_lib.AddInst("JmpHead", Inst_Jmp_Head, 1, "Move a given head by a relative amount");
         inst_lib.AddInst("GetHead", Inst_Get_Head, 1, "Get location of head");
-        inst_lib.AddInst("IfLabel", Inst_If_Label, 1, 
+        inst_lib.AddInst("IfLabel", Inst_If_Label, 1,
             "Execute next instruction if label was the last thing copied");
         inst_lib.AddInst("SetFlow", Inst_Set_Flow, 1, "Set flow head to register value");
       /*

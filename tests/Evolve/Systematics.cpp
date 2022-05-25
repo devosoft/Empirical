@@ -421,7 +421,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
   // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   sys.SetUpdate(6);
   auto id7 = sys.AddOrg(30, id1);
-  
+
 
   // std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
@@ -657,7 +657,7 @@ TEST_CASE("Test Data Struct", "[evo]") {
 
   auto tax2 = sys2->AddOrg(2, new_tax);
   tax2->GetData().RecordFitness(1);
-  
+
   sys->GetDataNode("deleterious_steps")->PullData();
   CHECK(sys->GetDataNode("deleterious_steps")->GetMean() == Approx(.5));
 

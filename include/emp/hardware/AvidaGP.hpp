@@ -78,7 +78,7 @@ namespace emp {
 
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
         { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
-      
+
       size_t GetIndex() const override{
         return id;
       }

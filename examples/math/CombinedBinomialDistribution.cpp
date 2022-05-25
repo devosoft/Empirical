@@ -14,14 +14,14 @@
 int main(int argc, char* argv[])
 {
   if(argc != 4){
-    std::cout << "Error! Expecting exactly three command line arguments: " 
+    std::cout << "Error! Expecting exactly three command line arguments: "
               << "p n num_trials" << std::endl;
     emp_assert(false);
   }
   double p = std::stod(argv[1]);
   size_t n = std::stoi(argv[2]);
   size_t num_trials = std::stoi(argv[3]);
-  
+
   emp::Random random;
   emp::CombinedBinomialDistribution distribution(p, 1);
 

@@ -56,11 +56,11 @@ namespace emp {
   /// occurred along \c taxon 's lineage. (Different from CountMuts in
   /// that CountMuts sums them whereas CountMutSteps would count two
   /// simultaneous mutations of the same type as one event)
-  /// @param type string corresponding to a type of mutation. 
+  /// @param type string corresponding to a type of mutation.
   /// Must be in the mut_counts dictionary (i.e. the dictionary
   /// passed in when \ref mut_landscape_info::RecordMutation was called)
   /// @param taxon a pointer to a taxon to count mutation steps for.
-  /// Must have a DATA_TYPE that supports mutation tracking 
+  /// Must have a DATA_TYPE that supports mutation tracking
   /// (e.g. mut_landscape_info)
   template <typename taxon_t>
   int CountMutSteps(Ptr<taxon_t> taxon, std::string type="substitution") {

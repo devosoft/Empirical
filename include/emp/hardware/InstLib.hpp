@@ -40,7 +40,7 @@ namespace emp {
     using arg_t = ARG_T;
     using fun_t = std::function<void(hardware_t &, const inst_t &)>;
     using inst_properties_t = std::unordered_set<std::string>;
-  
+
     struct InstructionBase{
       virtual ~InstructionBase() {;}
       virtual size_t GetIndex() const = 0;
@@ -58,7 +58,7 @@ namespace emp {
       inst_properties_t properties; ///< Are there any generic properties associated with this inst def?
       char symbol;                  ///< Unique symbol for this instruction.
 
-      InstDef(size_t _idx, size_t _id, const std::string & _n, fun_t _fun, size_t _args, 
+      InstDef(size_t _idx, size_t _id, const std::string & _n, fun_t _fun, size_t _args,
               const std::string & _d, ScopeType _s_type, size_t _s_arg,
               const inst_properties_t & _properties = inst_properties_t(),
               char _sym='?')
@@ -107,15 +107,15 @@ namespace emp {
     size_t GetScopeArg(size_t idx) const { return inst_lib[idx].scope_arg; }
 
     /// Return the set of properties for the providxed instruction ID.
-    const inst_properties_t & GetProperties(size_t idx) const { 
-      return inst_lib[idx].properties; 
+    const inst_properties_t & GetProperties(size_t idx) const {
+      return inst_lib[idx].properties;
     }
 
     char GetSymbol(size_t idx) const { return inst_lib[idx].symbol; }
 
     /// Does the given instruction ID have the given property value?
-    bool HasProperty(size_t idx, std::string property) const { 
-      return inst_lib[idx].properties.count(property); 
+    bool HasProperty(size_t idx, std::string property) const {
+      return inst_lib[idx].properties.count(property);
     }
 
     /// Get the number of instructions in this set.
@@ -126,7 +126,7 @@ namespace emp {
     }
 
     size_t GetID(const size_t idx) const {
-     return inst_lib[idx].id; 
+     return inst_lib[idx].id;
     }
     /// Return the ID of the instruction that has the specified name.
     size_t GetID(const std::string & name) const {
@@ -139,7 +139,7 @@ namespace emp {
       emp_assert(symbol > 0);
       return symbol_map[(size_t) symbol];
     }
-    
+
     /// Return the ID of the instruction that has the specified name.
     size_t GetIndex(const std::string & name) const {
       emp_assert(Has(name_map, name), name);
@@ -178,7 +178,7 @@ namespace emp {
       const size_t id = (_id >= 0) ? _id : inst_lib.size();
       emp_assert(!Has(id_map, id), "ID is already in use!", id);
       const char symbol = (id < symbol_defaults.size()) ? symbol_defaults[id] : '+';
-      inst_lib.emplace_back(idx, id, name, fun_call, num_args, desc, scope_type, scope_arg, 
+      inst_lib.emplace_back(idx, id, name, fun_call, num_args, desc, scope_type, scope_arg,
           inst_properties, symbol);
       inst_funs.emplace_back(fun_call);
       name_map[name] = idx;

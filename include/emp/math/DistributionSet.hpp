@@ -32,7 +32,7 @@ namespace emp {
   class DistributionSet {
   private:
     /// Map parameters to pre-calculated distributions.
-    unordered_map< std::tuple<Ts...>, DIST_T, emp::TupleHash<Ts...>> dist_map;  
+    unordered_map< std::tuple<Ts...>, DIST_T, emp::TupleHash<Ts...>> dist_map;
 
   public:
     size_t PickRandom(Random & random, Ts... args) {
@@ -42,8 +42,8 @@ namespace emp {
     }
   };
 
-  using BinomialSet = emp::DistributionSet<emp::Binomial, double, size_t>; 
-  using NegativeBinomialSet = emp::DistributionSet<emp::NegativeBinomial, double, size_t>; 
+  using BinomialSet = emp::DistributionSet<emp::Binomial, double, size_t>;
+  using NegativeBinomialSet = emp::DistributionSet<emp::NegativeBinomial, double, size_t>;
 
 }
 

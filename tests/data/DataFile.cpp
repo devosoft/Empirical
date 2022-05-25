@@ -207,7 +207,7 @@ TEST_CASE("Test Floating Point DataFile", "[data]") {
     // We're not going to bother checking output because
     // floating point precision is messy, but this
     // should at least not have any run-time errors
-    
+
     double test_double = .2;
 
     emp::DataFile dfile("new_fp_test_file.dat");

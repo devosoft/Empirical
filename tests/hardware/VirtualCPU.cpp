@@ -36,7 +36,7 @@ class Derived : public emp::VirtualCPU<Derived> {
     Derived(const Derived& other) : base_t(other) { ; }
     Derived(const Derived&& other) : base_t(other) { ; }
 };
-    
+
 Derived CreateSeedCPU(){
   Derived cpu_init;
   emp::Random random(56);
@@ -59,7 +59,7 @@ Derived CreateSeedCPU(){
   CHECK(5 == (cpu_init.inputs[0] = 5));
   CHECK(2 == (cpu_init.outputs[0] = 2));
   CHECK(1 == (cpu_init.active_stack_idx = 1));
-  cpu_init.stacks[cpu_init.active_stack_idx].push_back(1); 
+  cpu_init.stacks[cpu_init.active_stack_idx].push_back(1);
   CHECK(cpu_init.stacks[cpu_init.active_stack_idx].size() == 1);
   return cpu_init;
 }
@@ -77,8 +77,8 @@ TEST_CASE("VirtualCPU_Variables", "[Hardware]") {
   CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
   CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
   CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
-  CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers 
-  // All registers start at their index value 
+  CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
+  // All registers start at their index value
   for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
     CHECK(cpu.regs[idx] == idx);
   }
@@ -90,22 +90,22 @@ TEST_CASE("VirtualCPU_Variables", "[Hardware]") {
   CHECK(cpu.flow_head == 0);  // All heads default to 0
   CHECK(cpu.copied_inst_id_vec.size() == 0); // No instructions copied
   CHECK(cpu.label_idx_vec.size() == 0); // No labels in empty genome
-  CHECK(cpu.nops_need_curated == true); // Nops are NOT curated at initialization 
-  CHECK(cpu.expanded_nop_args == false);// Nop arguments are NOT expanded by default 
+  CHECK(cpu.nops_need_curated == true); // Nops are NOT curated at initialization
+  CHECK(cpu.expanded_nop_args == false);// Nop arguments are NOT expanded by default
   CHECK(cpu.are_nops_counted == true);  // Defaults to false but flipped during initialization
   CHECK(cpu.are_regs_expanded == true); // Defaults to false but flipped during initialization
   /*
     [X] NUM_STACKS is actually used
-    [X] Stacks are initially empty 
+    [X] Stacks are initially empty
     [X] We store all the nops in the nop set
-    [X] Correct number of registers is initialized 
+    [X] Correct number of registers is initialized
     [X] Correct number of inputs are initialized
     [X] Correct number of outputs are initialized
     [X] Correct number of stacks are initialized
     [X] We default to the first stack
     [X] Heads are initialized to the start of the genome:
       [X] IP
-      [X] Read 
+      [X] Read
       [X] Write
       [X] Flow
       [ ] Expanded heads
@@ -120,7 +120,7 @@ TEST_CASE("VirtualCPU_Variables", "[Hardware]") {
 TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
   { // Default constructor
     Derived cpu;
-    CHECK(cpu.GetInstLib().Raw() == &Derived::inst_lib_t::DefaultInstLib()); 
+    CHECK(cpu.GetInstLib().Raw() == &Derived::inst_lib_t::DefaultInstLib());
     CHECK(cpu.GetGenomeSize() == 0);
     CHECK(cpu.GetWorkingGenomeSize() == 0);
     // VARIABLES -- should default
@@ -136,8 +136,8 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
       CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
       CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
-      CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers 
-      // All registers start at their index value 
+      CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
+      // All registers start at their index value
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
         CHECK(cpu.regs[idx] == idx);
       }
@@ -149,8 +149,8 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       CHECK(cpu.flow_head == 0);  // All heads default to 0
       CHECK(cpu.copied_inst_id_vec.size() == 0); // No instructions copied
       CHECK(cpu.label_idx_vec.size() == 0); // No labels in empty genome
-      CHECK(cpu.nops_need_curated == true); // Nops are NOT curated at initialization 
-      CHECK(cpu.expanded_nop_args == false);// Nop arguments are NOT expanded by default 
+      CHECK(cpu.nops_need_curated == true); // Nops are NOT curated at initialization
+      CHECK(cpu.expanded_nop_args == false);// Nop arguments are NOT expanded by default
       CHECK(cpu.are_nops_counted == true);  // Defaults to false but flipped during initialization
       CHECK(cpu.are_regs_expanded == true); // Defaults to false but flipped during initialization
     }
@@ -186,8 +186,8 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
       CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
       CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
-      CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers 
-      // All registers start at their index value 
+      CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
+      // All registers start at their index value
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
         CHECK(cpu.regs[idx] == idx);
       }
@@ -199,14 +199,14 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
       CHECK(cpu.flow_head == 0);  // All heads default to 0
       CHECK(cpu.copied_inst_id_vec.size() == 0); // No instructions copied
       CHECK(cpu.label_idx_vec.size() == 0); // No labels in empty genome
-      CHECK(cpu.nops_need_curated == true); // Nops are NOT curated at initialization 
-      CHECK(cpu.expanded_nop_args == false);// Nop arguments are NOT expanded by default 
+      CHECK(cpu.nops_need_curated == true); // Nops are NOT curated at initialization
+      CHECK(cpu.expanded_nop_args == false);// Nop arguments are NOT expanded by default
       CHECK(cpu.are_nops_counted == true);  // Defaults to false but flipped during initialization
       CHECK(cpu.are_regs_expanded == true); // Defaults to false but flipped during initialization
     }
   }
   { // Copy constructor
-    // Create a CPU and change all possible variables 
+    // Create a CPU and change all possible variables
     Derived cpu_init = CreateSeedCPU();
     // Create VirtualCPU using copy constructor
     Derived cpu(cpu_init);
@@ -217,22 +217,22 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
     CHECK(cpu.GetWorkingGenomeSize() == cpu_init.GetWorkingGenomeSize());
     for(size_t idx = 0; idx < cpu.genome_working.size(); ++idx)
       CHECK(cpu.genome_working[idx] == cpu.genome_working[idx]);
-    // VARIABLES -- should 100% match those of the seed cpu 
+    // VARIABLES -- should 100% match those of the seed cpu
     {
       for(size_t idx = 0; idx < cpu.stacks.size(); ++idx){
         CHECK(cpu.stacks[idx] == cpu_init.stacks[idx]);
       }
-      CHECK(cpu.active_stack_idx == cpu_init.active_stack_idx);   
-      CHECK(cpu.GetNumNops() == cpu_init.GetNumNops());       
-      CHECK(cpu.nop_id_set.size() == cpu_init.nop_id_set.size());  
+      CHECK(cpu.active_stack_idx == cpu_init.active_stack_idx);
+      CHECK(cpu.GetNumNops() == cpu_init.GetNumNops());
+      CHECK(cpu.nop_id_set.size() == cpu_init.nop_id_set.size());
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
         CHECK(cpu.regs[idx] == cpu_init.regs[idx]);
       }
       CHECK(cpu.inputs.size() == cpu_init.inputs.size());
       CHECK(cpu.inputs[0] == cpu_init.inputs[0]);
-      CHECK(cpu.outputs.size() == cpu_init.outputs.size()); 
+      CHECK(cpu.outputs.size() == cpu_init.outputs.size());
       CHECK(cpu.outputs[0] == cpu_init.outputs[0]);
-      CHECK(cpu.inst_ptr == cpu_init.inst_ptr);   
+      CHECK(cpu.inst_ptr == cpu_init.inst_ptr);
       CHECK(cpu.read_head == cpu_init.read_head);
       CHECK(cpu.write_head == cpu_init.write_head);
       CHECK(cpu.flow_head == cpu_init.flow_head);
@@ -247,8 +247,8 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
     }
   }
   { // Move constructor
-    // Create a CPU and change all possible variables then repeat the process to invoke 
-    // move constructor instead of copy constructor 
+    // Create a CPU and change all possible variables then repeat the process to invoke
+    // move constructor instead of copy constructor
     Derived cpu_init = CreateSeedCPU();
     Derived cpu(CreateSeedCPU());
     // Ensure genome and working genome were copied over
@@ -258,22 +258,22 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
     CHECK(cpu.GetWorkingGenomeSize() == cpu_init.GetWorkingGenomeSize());
     for(size_t idx = 0; idx < cpu.genome_working.size(); ++idx)
       CHECK(cpu.genome_working[idx] == cpu.genome_working[idx]);
-    // VARIABLES -- should 100% match those of the seed cpu 
+    // VARIABLES -- should 100% match those of the seed cpu
     {
       for(size_t idx = 0; idx < cpu.stacks.size(); ++idx){
         CHECK(cpu.stacks[idx] == cpu_init.stacks[idx]);
       }
-      CHECK(cpu.active_stack_idx == cpu_init.active_stack_idx);   
-      CHECK(cpu.GetNumNops() == cpu_init.GetNumNops());       
-      CHECK(cpu.nop_id_set.size() == cpu_init.nop_id_set.size());  
+      CHECK(cpu.active_stack_idx == cpu_init.active_stack_idx);
+      CHECK(cpu.GetNumNops() == cpu_init.GetNumNops());
+      CHECK(cpu.nop_id_set.size() == cpu_init.nop_id_set.size());
       for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
         CHECK(cpu.regs[idx] == cpu_init.regs[idx]);
       }
       CHECK(cpu.inputs.size() == cpu_init.inputs.size());
       CHECK(cpu.inputs[0] == cpu_init.inputs[0]);
-      CHECK(cpu.outputs.size() == cpu_init.outputs.size()); 
+      CHECK(cpu.outputs.size() == cpu_init.outputs.size());
       CHECK(cpu.outputs[0] == cpu_init.outputs[0]);
-      CHECK(cpu.inst_ptr == cpu_init.inst_ptr);   
+      CHECK(cpu.inst_ptr == cpu_init.inst_ptr);
       CHECK(cpu.read_head == cpu_init.read_head);
       CHECK(cpu.write_head == cpu_init.write_head);
       CHECK(cpu.flow_head == cpu_init.flow_head);
@@ -290,8 +290,8 @@ TEST_CASE("VirtualCPU_Constructors", "[Hardware]") {
   /*
    Constructors:
     [X] Default constructor gives us a default genome (empty)
-    [X] Genome constructor sets genome/working genome 
-    [X] Copy constructor functions as expected 
+    [X] Genome constructor sets genome/working genome
+    [X] Copy constructor functions as expected
     [X] Move constructor functions as expected
     [X] Working genome is based on the actual genome
     [X] Variables are initialized as expected for each constructor (see above)
@@ -306,7 +306,7 @@ TEST_CASE("VirtualCPU_Getters", "[Hardware]") {
     Derived cpu;
     // Basic getters
     CHECK(cpu.GetNumRegs() == 3);
-    CHECK(cpu.GetNumRegs() == cpu.regs.size()); 
+    CHECK(cpu.GetNumRegs() == cpu.regs.size());
     CHECK(cpu.GetNumNops() == 3);
     // Genome getters
     CHECK(cpu.GetGenomeSize() == 0);
@@ -323,8 +323,8 @@ TEST_CASE("VirtualCPU_Getters", "[Hardware]") {
     for(size_t idx = 0; idx < 5; ++idx) cpu.outputs[idx] = idx * idx;
     CHECK(cpu.GetOutputs().size() == 5);
     for(size_t idx = 0; idx < 5; ++idx) CHECK(cpu.outputs[idx] == idx * idx);
-    // Instruction library 
-    CHECK(cpu.GetInstLib().Raw() == &Derived::inst_lib_t::DefaultInstLib()); 
+    // Instruction library
+    CHECK(cpu.GetInstLib().Raw() == &Derived::inst_lib_t::DefaultInstLib());
   }
   {
     Derived::inst_lib_t inst_lib;
@@ -337,19 +337,19 @@ TEST_CASE("VirtualCPU_Getters", "[Hardware]") {
     Derived cpu(genome);
     // Basic getters
     CHECK(cpu.GetNumRegs() == 5);
-    CHECK(cpu.GetNumRegs() == cpu.regs.size()); 
+    CHECK(cpu.GetNumRegs() == cpu.regs.size());
     CHECK(cpu.GetNumNops() == 5);
   }
   /*
-    [X] GetNumNops returns 
+    [X] GetNumNops returns
       [X] 3 by default
        [X] Something else if we stuff more nops in the instruction set
-    [X] GetNumRegs returns 
+    [X] GetNumRegs returns
       [X] 3 by default
       [X] Something else if we stuff more nops in the instruction set
     [X] GetGenomeSize returns original genome size
     [X] GetWorkingGenomeSize returns working genome size
-    [X] GetOutputs returns ALL outputs 
+    [X] GetOutputs returns ALL outputs
     [X] GetInstLib returns correct pointer to instruction library
   */
 }
@@ -358,7 +358,7 @@ TEST_CASE("VirtualCPU_Setters", "[Hardware]") {
   CHECK(cpu.inputs.size() == 0);
   emp::vector<Derived::data_t> input_vec;
   input_vec.push_back(10);
-  input_vec.push_back(22); 
+  input_vec.push_back(22);
   input_vec.push_back(50);
   cpu.SetInputs(input_vec);
   CHECK(cpu.inputs.size() == 3);
@@ -374,7 +374,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     Derived cpu;
     auto inst_lib_ptr = cpu.GetInstLib();
     emp::Random random(100);
-    // GetDefaultInst 
+    // GetDefaultInst
     Derived::inst_t default_inst = cpu.GetDefaultInst();
     CHECK(default_inst.idx == 0);
     // GetRandomInst
@@ -395,7 +395,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     CHECK(cpu.nops_need_curated);
     // PushInst(name)
     cpu.CurateNops();
-    cpu.PushInst("NopB"); // NopB -> Index 1 
+    cpu.PushInst("NopB"); // NopB -> Index 1
     CHECK(cpu.GetGenomeSize() == 2);
     CHECK(cpu.GetWorkingGenomeSize() == 2);
     CHECK(cpu.genome[1].idx == 1);
@@ -403,7 +403,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     CHECK(cpu.nops_need_curated);
     // PushInst(inst)
     cpu.CurateNops();
-    cpu.PushInst(default_inst); // NopA -> Index 0 
+    cpu.PushInst(default_inst); // NopA -> Index 0
     CHECK(cpu.GetGenomeSize() == 3);
     CHECK(cpu.GetWorkingGenomeSize() == 3);
     CHECK(cpu.genome[2].idx == 0);
@@ -411,7 +411,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     CHECK(cpu.nops_need_curated);
     // PushInst(inst, count)
     cpu.CurateNops();
-    cpu.PushInst(default_inst, 5); // NopA -> Index 0 
+    cpu.PushInst(default_inst, 5); // NopA -> Index 0
     CHECK(cpu.GetGenomeSize() == 8);
     CHECK(cpu.GetWorkingGenomeSize() == 8);
     for(size_t i = 3; i < 8; ++i){
@@ -421,14 +421,14 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     CHECK(cpu.nops_need_curated);
     // PushDefaultInst()
     cpu.CurateNops();
-    cpu.PushDefaultInst(); // NopA -> Index 0 
+    cpu.PushDefaultInst(); // NopA -> Index 0
     CHECK(cpu.GetGenomeSize() == 9);
     CHECK(cpu.GetWorkingGenomeSize() == 9);
     CHECK(cpu.genome[8].idx == 0);
     CHECK(cpu.nops_need_curated);
     // PushDefaultInst(count)
     cpu.CurateNops();
-    cpu.PushDefaultInst(11); // NopA -> Index 0 
+    cpu.PushDefaultInst(11); // NopA -> Index 0
     CHECK(cpu.GetGenomeSize() == 20);
     CHECK(cpu.GetWorkingGenomeSize() == 20);
     for(size_t i = 9; i < 19; ++i){
@@ -473,7 +473,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     cpu.CurateNops();
     CHECK(!cpu.nops_need_curated);
     std::stringstream sstr;
-    sstr << "NopA\nAdd\nSub\nNopB\n"; 
+    sstr << "NopA\nAdd\nSub\nNopB\n";
     cpu.Load(sstr);
     CHECK(cpu.GetGenomeSize() == 4);
     CHECK(cpu.GetWorkingGenomeSize() == 4);
@@ -492,7 +492,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
   /*
     [X] PushInst adds the instruction to the end of the genome AND working genome
       [X] Update labels?
-      [X] By index 
+      [X] By index
       [X] By name
       [X] By copy
       [X] By copy (multiple times)
@@ -502,13 +502,13 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
     [X] SetInst overwrites an instruction in the genome/working genome
       [X] Recalcuates labels/nops?
     [X] RandomizeInst calls SetInst on the genome position, but with a random instruction
-    [X] Load 
+    [X] Load
       [X] Loads genome from a stream
       [X] That stream can be a file
   */
 }
 TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
-  { // Instruction pointer 
+  { // Instruction pointer
     Derived cpu;
     emp::Random random(10);
     cpu.PushRandomInst(random, 10);
@@ -526,9 +526,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetIP(18);
     CHECK(cpu.inst_ptr == 8);
     size_t idx = 0;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.inst_ptr == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.inst_ptr == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.inst_ptr == 4);
@@ -541,9 +541,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.inst_ptr == 8);
     idx = 16;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.inst_ptr == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.inst_ptr == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.inst_ptr == 4);
@@ -556,7 +556,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.inst_ptr == 8);
   }
-  { // Read head 
+  { // Read head
     Derived cpu;
     emp::Random random(10);
     cpu.PushRandomInst(random, 10);
@@ -574,9 +574,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetRH(18);
     CHECK(cpu.read_head == 8);
     size_t idx = 1;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.read_head == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.read_head == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.read_head == 4);
@@ -589,9 +589,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.read_head == 8);
     idx = 17;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.read_head == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.read_head == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.read_head == 4);
@@ -604,7 +604,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.read_head == 8);
   }
-  { // Write head 
+  { // Write head
     Derived cpu;
     emp::Random random(10);
     cpu.PushRandomInst(random, 10);
@@ -622,9 +622,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetWH(18);
     CHECK(cpu.write_head == 8);
     size_t idx = 2;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.write_head == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.write_head == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.write_head == 4);
@@ -637,9 +637,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.write_head == 8);
     idx = 18;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.write_head == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.write_head == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.write_head == 4);
@@ -652,7 +652,7 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.write_head == 8);
   }
-  { // Flow head 
+  { // Flow head
     Derived cpu;
     emp::Random random(10);
     cpu.PushRandomInst(random, 10);
@@ -670,9 +670,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetFH(18);
     CHECK(cpu.flow_head == 8);
     size_t idx = 3;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.flow_head == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.flow_head == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.flow_head == 4);
@@ -685,9 +685,9 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
     cpu.SetModdedHead(idx, 18);
     CHECK(cpu.flow_head == 8);
     idx = 19;
-    cpu.ResetModdedHead(idx); 
+    cpu.ResetModdedHead(idx);
     CHECK(cpu.flow_head == 0);
-    cpu.AdvanceModdedHead(idx); 
+    cpu.AdvanceModdedHead(idx);
     CHECK(cpu.flow_head == 1);
     cpu.AdvanceModdedHead(idx, 3);
     CHECK(cpu.flow_head == 4);
@@ -736,12 +736,12 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
         CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
         CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
         CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
-        CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers 
-        // All registers start at their index value 
+        CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
+        // All registers start at their index value
         for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
           CHECK(cpu.regs[idx] == idx);
         }
-        // All stacks are empty 
+        // All stacks are empty
         for(size_t idx = 0; idx < cpu.stacks.size(); ++idx){
           CHECK(cpu.stacks[idx].empty());
         }
@@ -771,12 +771,12 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
         CHECK(emp::Has(cpu.nop_id_set, 0)); // NopA in set
         CHECK(emp::Has(cpu.nop_id_set, 1)); // NopB in set
         CHECK(emp::Has(cpu.nop_id_set, 2)); // NopC in set
-        CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers 
-        // All registers start at their index value 
+        CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
+        // All registers start at their index value
         for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
           CHECK(cpu.regs[idx] == idx);
         }
-        // All stacks are empty 
+        // All stacks are empty
         for(size_t idx = 0; idx < cpu.stacks.size(); ++idx){
           CHECK(cpu.stacks[idx].empty());
         }
@@ -796,7 +796,7 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     CHECK(cpu_default.GetNumNops() == 3);
     CHECK(cpu_default.regs.size() == 3);
     CHECK(cpu_default.GetNumRegs() == 3);
-    
+
     // Add NopD and NopE, which bumps us to 5 nops and registers
     Derived::inst_lib_t inst_lib;
     inst_lib.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
@@ -809,7 +809,7 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     CHECK(cpu_more_nops.GetNumNops() == 5);
     CHECK(cpu_more_nops.regs.size() == 5);
     CHECK(cpu_more_nops.GetNumRegs() == 5);
-    
+
     // Add NopE but not NopD. Since they are disjoint we have still 3 nops and registers
     Derived::inst_lib_t inst_lib_2;
     inst_lib_2.AddInst("NopA", Derived::inst_lib_t::Inst_NopA, 0, "No-operation A");
@@ -832,14 +832,14 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     inst_lib.AddInst("Add", Derived::inst_lib_t::Inst_NopC, 0, "Fake add");
     Derived::genome_t genome = Derived::genome_t(inst_lib);
     Derived cpu(genome);
-    cpu.PushInst("NopA");  // 0 
+    cpu.PushInst("NopA");  // 0
     cpu.PushInst("NopB");  // 1
     cpu.PushInst("NopC");  // 2
     cpu.PushInst("NopD");  // 3
     cpu.PushInst("Label"); // 4
     cpu.PushInst("NopD");  // 5
     cpu.PushInst("NopB");  // 6
-    cpu.PushInst("Add");   // 7 
+    cpu.PushInst("Add");   // 7
     cpu.PushInst("NopC");  // 8
     cpu.PushInst("Label"); // 9
     cpu.PushInst("NopD");  // 10
@@ -849,7 +849,7 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     CHECK(cpu.label_idx_vec.size() == 2);
     CHECK(cpu.label_idx_vec[0] == 4);
     CHECK(cpu.label_idx_vec[1] == 9);
-    { // Nop vec checks 
+    { // Nop vec checks
       { // 0
         CHECK(cpu.genome_working[0].nop_vec.size() == 3);
         CHECK(cpu.genome_working[0].nop_vec[0] == 1);
@@ -895,7 +895,7 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
         CHECK(cpu.genome_working[9].nop_vec[3] == 2);
         CHECK(cpu.genome_working[9].nop_vec[4] == 3);
       }
-      { // 10 
+      { // 10
         CHECK(cpu.genome_working[10].nop_vec.size() == 4);
         CHECK(cpu.genome_working[10].nop_vec[0] == 0);
         CHECK(cpu.genome_working[10].nop_vec[1] == 1);
@@ -1042,7 +1042,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     CHECK(!cpu.CheckIfLastCopied({1})); // Mismatch
     CHECK(!cpu.CheckIfLastCopied({0, 2, 2})); // Mismatch with correct size
     CHECK(!cpu.CheckIfLastCopied({0, 1, 2, 0})); // Too long
-    CHECK(!cpu.CheckIfLastCopied({})); // Empty 
+    CHECK(!cpu.CheckIfLastCopied({})); // Empty
   }
   { // FindLabel_Reverse(start_local)
     Derived::inst_lib_t inst_lib;
@@ -1074,7 +1074,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     cpu.inst_ptr = 5;
     CHECK(cpu.FindLabel_Reverse(true) == 5);
     CHECK(cpu.FindLabel_Reverse(false) == 5);
-    // If instruction pointer is on a label and another match exists, 
+    // If instruction pointer is on a label and another match exists,
     // Return it if start_local = true
     // Return depending on position if start_local = false
     cpu.inst_ptr = 15;
@@ -1116,7 +1116,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
       cpu.inst_ptr = 5;
       CHECK(cpu.FindLabel(true, true) == 5);
       CHECK(cpu.FindLabel(false, true) == 5);
-      // If instruction pointer is on a label and another match exists, 
+      // If instruction pointer is on a label and another match exists,
       // Return it if start_local = true
       // Return depending on position if start_local = false
       cpu.inst_ptr = 15;
@@ -1141,7 +1141,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
       cpu.inst_ptr = 5;
       CHECK(cpu.FindLabel(true) == 5);
       CHECK(cpu.FindLabel(false) == 5);
-      // If instruction pointer is on a label and another match exists, 
+      // If instruction pointer is on a label and another match exists,
       // Return it if start_local = true
       // Return depending on position if start_local = false
       cpu.inst_ptr = 15;
@@ -1171,7 +1171,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     cpu.Load(sstr);
     cpu.CurateNops();
     // Keep instruction pointer at beginning of genome and use start_idx instead
-    cpu.inst_ptr = 2; 
+    cpu.inst_ptr = 2;
     // Ensure start_idx is used and search does not include the current instruction pointer
     CHECK(cpu.FindNopSequence_Reverse({0, 1}, (size_t)0) == 16);
     CHECK(cpu.FindNopSequence_Reverse({0, 1}, (size_t)6) == 0);
@@ -1182,11 +1182,11 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)13) == 13);
     CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)14) == 13);
     CHECK(cpu.FindNopSequence_Reverse({3, 3}, (size_t)18) == 13);
-    // Found sequence can have extra nops 
+    // Found sequence can have extra nops
     CHECK(cpu.FindNopSequence_Reverse({1}, (size_t)0) == 17);
     CHECK(cpu.FindNopSequence_Reverse({1}, (size_t)9) == 7);
     CHECK(cpu.FindNopSequence_Reverse({1}, (size_t)17) == 9);
-    // If pattern not found, return instruction pointer 
+    // If pattern not found, return instruction pointer
     CHECK(cpu.FindNopSequence_Reverse({1,1,1}, (size_t)0) == 2);
     CHECK(cpu.FindNopSequence_Reverse({1,1,1}, (size_t)9) == 2);
     CHECK(cpu.FindNopSequence_Reverse({1,1,1}, (size_t)17) == 2);
@@ -1208,7 +1208,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
             "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
     cpu.Load(sstr);
     cpu.CurateNops();
-    // Ensure result always matches the already-tested overload that uses start_idx 
+    // Ensure result always matches the already-tested overload that uses start_idx
     emp::vector<emp::vector<size_t>> test_vectors;
     test_vectors.push_back(emp::vector<size_t>({0,1}));
     test_vectors.push_back(emp::vector<size_t>({3,3}));
@@ -1217,9 +1217,9 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     for(emp::vector<size_t> v : test_vectors){
       for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
         cpu.inst_ptr = idx;
-        CHECK(cpu.FindNopSequence_Reverse(v, true) == 
+        CHECK(cpu.FindNopSequence_Reverse(v, true) ==
             cpu.FindNopSequence_Reverse(v, (size_t)cpu.inst_ptr));
-        CHECK(cpu.FindNopSequence_Reverse(v, false) == 
+        CHECK(cpu.FindNopSequence_Reverse(v, false) ==
             cpu.FindNopSequence_Reverse(v, (size_t)0));
       }
     }
@@ -1241,7 +1241,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
             "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
     cpu.Load(sstr);
     cpu.CurateNops();
-    // Ensure result always matches the already-tested overload that uses start_idx 
+    // Ensure result always matches the already-tested overload that uses start_idx
     emp::vector<emp::vector<size_t>> test_vectors;
     test_vectors.push_back(emp::vector<size_t>({0,1}));
     test_vectors.push_back(emp::vector<size_t>({3,3}));
@@ -1250,12 +1250,12 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     for(emp::vector<size_t> v : test_vectors){
       for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
         cpu.inst_ptr = idx;
-        CHECK(cpu.FindNopSequence_Reverse(true) == 
+        CHECK(cpu.FindNopSequence_Reverse(true) ==
             cpu.FindNopSequence_Reverse(
                 cpu.genome_working[cpu.inst_ptr].nop_vec, (size_t)cpu.inst_ptr
             )
         );
-        CHECK(cpu.FindNopSequence_Reverse(false) == 
+        CHECK(cpu.FindNopSequence_Reverse(false) ==
             cpu.FindNopSequence_Reverse(cpu.genome_working[cpu.inst_ptr].nop_vec, (size_t)0));
       }
     }
@@ -1278,7 +1278,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     cpu.Load(sstr);
     cpu.CurateNops();
     // Keep instruction pointer at beginning of genome and use start_idx instead
-    cpu.inst_ptr = 15; 
+    cpu.inst_ptr = 15;
     // Ensure start_idx is used and search does not include the current instruction pointer
     CHECK(cpu.FindNopSequence({0, 1}, (size_t)0) == 6);
     CHECK(cpu.FindNopSequence({0, 1}, (size_t)6) == 16);
@@ -1289,11 +1289,11 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     CHECK(cpu.FindNopSequence({3, 3}, (size_t)13) == 13);
     CHECK(cpu.FindNopSequence({3, 3}, (size_t)14) == 13);
     CHECK(cpu.FindNopSequence({3, 3}, (size_t)18) == 13);
-    // Found sequence can have extra nops 
+    // Found sequence can have extra nops
     CHECK(cpu.FindNopSequence(emp::vector<size_t>({1}), (size_t)0) == 1);
     CHECK(cpu.FindNopSequence(emp::vector<size_t>({1}), (size_t)9) == 17);
     CHECK(cpu.FindNopSequence(emp::vector<size_t>({1}), (size_t)17) == 1);
-    // If pattern not found, return instruction pointer 
+    // If pattern not found, return instruction pointer
     CHECK(cpu.FindNopSequence({1,1,1}, (size_t)0) == cpu.inst_ptr);
     CHECK(cpu.FindNopSequence({1,1,1}, (size_t)9) == cpu.inst_ptr);
     CHECK(cpu.FindNopSequence({1,1,1}, (size_t)17) == cpu.inst_ptr);
@@ -1327,7 +1327,7 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
             "Add\nNopD\nNopD\nLabel\nNopA\nNopB";
     cpu.Load(sstr);
     cpu.CurateNops();
-    cpu.inst_ptr = 15; 
+    cpu.inst_ptr = 15;
     emp::vector<emp::vector<size_t>> test_vectors;
     test_vectors.push_back(emp::vector<size_t>({0,1}));
     test_vectors.push_back(emp::vector<size_t>({3,3}));
@@ -1339,9 +1339,9 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
         cpu.inst_ptr = idx;
         CHECK(cpu.FindNopSequence(v, true, false) == cpu.FindNopSequence(v, cpu.inst_ptr));
         CHECK(cpu.FindNopSequence(v, true, true) == cpu.FindNopSequence(v,cpu.inst_ptr,true));
-        CHECK(cpu.FindNopSequence(v, false, false) == 
+        CHECK(cpu.FindNopSequence(v, false, false) ==
             cpu.FindNopSequence(v,cpu.GetWorkingGenomeSize() - 1));
-        CHECK(cpu.FindNopSequence(v, false, true) == 
+        CHECK(cpu.FindNopSequence(v, false, true) ==
             cpu.FindNopSequence(v,cpu.GetWorkingGenomeSize() - 1,true));
       }
     }
@@ -1366,76 +1366,76 @@ TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
     // Verify output matches previously tested overload
     for(size_t idx = 0; idx < cpu.GetGenomeSize(); ++idx){
       cpu.inst_ptr = idx;
-      CHECK(cpu.FindNopSequence(true, false) == 
+      CHECK(cpu.FindNopSequence(true, false) ==
           cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec, cpu.inst_ptr));
-      CHECK(cpu.FindNopSequence(true, true) == 
+      CHECK(cpu.FindNopSequence(true, true) ==
           cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec, cpu.inst_ptr, true));
-      CHECK(cpu.FindNopSequence(false, false) == 
+      CHECK(cpu.FindNopSequence(false, false) ==
           cpu.FindNopSequence(
               cpu.genome_working[cpu.inst_ptr].nop_vec, cpu.GetWorkingGenomeSize() - 1
           )
       );
-      CHECK(cpu.FindNopSequence(false, true) == 
-          cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec, 
+      CHECK(cpu.FindNopSequence(false, true) ==
+          cpu.FindNopSequence(cpu.genome_working[cpu.inst_ptr].nop_vec,
               cpu.GetWorkingGenomeSize() - 1,true
           )
      );
     }
   }
   /*
-    [X] GetComplementIdx returns the complement of a single nop 
+    [X] GetComplementIdx returns the complement of a single nop
       [X] Standard nops
       [X] Expanded nops
-    [X] GetComplementLabel returns the complemented sequences of nops (rename) 
+    [X] GetComplementLabel returns the complemented sequences of nops (rename)
       [X] Standard nops
       [X] Expanded nops
     [X] CompareSequences determines if two nop vectors are identical
       [X] Check length too!
     [X] CheckIfLastCopied only returns true if the nop vector was the last thing copied
     [X] FindLabel_Reverse(start_local){
-    [X] FindLabel(start_local, reverse = false) 
-    [X] FindNopSequence_Reverse(search_vec, start_idx) 
-    [X] FindNopSequence_Reverse(search_vec, start_local) 
-    [X] FindNopSequence_Reverse(start_local) 
-    [X] FindNopSequence(search_vec, start_idx, reverse = false) 
-    [X] FindNopSequence(search_vec, start_local, reverse = false) 
-    [X] FindNopSequence(start_local, reverse = false) 
+    [X] FindLabel(start_local, reverse = false)
+    [X] FindNopSequence_Reverse(search_vec, start_idx)
+    [X] FindNopSequence_Reverse(search_vec, start_local)
+    [X] FindNopSequence_Reverse(start_local)
+    [X] FindNopSequence(search_vec, start_idx, reverse = false)
+    [X] FindNopSequence(search_vec, start_local, reverse = false)
+    [X] FindNopSequence(start_local, reverse = false)
   */
 }
 TEST_CASE("VirtualCPU_Stack_Methods", "[Hardware]") {
   Derived cpu;
   // Default stack
-  CHECK(cpu.active_stack_idx == 0); 
+  CHECK(cpu.active_stack_idx == 0);
   cpu.regs[0] = 1;
   cpu.regs[1] = 2;
   cpu.regs[2] = 3;
   cpu.StackPush(0);
-  CHECK(cpu.stacks[0].size() == 1); 
-  CHECK(cpu.stacks[0][0] == 1); 
+  CHECK(cpu.stacks[0].size() == 1);
+  CHECK(cpu.stacks[0][0] == 1);
   cpu.StackPush(2);
-  CHECK(cpu.stacks[0].size() == 2); 
-  CHECK(cpu.stacks[0][1] == 3); 
+  CHECK(cpu.stacks[0].size() == 2);
+  CHECK(cpu.stacks[0][1] == 3);
   cpu.StackPop(0);
-  CHECK(cpu.stacks[0].size() == 1); 
-  CHECK(cpu.regs[0] == 3); 
+  CHECK(cpu.stacks[0].size() == 1);
+  CHECK(cpu.regs[0] == 3);
   // Swap stacks
   cpu.StackSwap();
-  CHECK(cpu.active_stack_idx == 1); 
+  CHECK(cpu.active_stack_idx == 1);
   cpu.regs[0] = 1;
   cpu.regs[1] = 2;
   cpu.regs[2] = 3;
   cpu.StackPush(0);
-  CHECK(cpu.stacks[1].size() == 1); 
-  CHECK(cpu.stacks[1][0] == 1); 
+  CHECK(cpu.stacks[1].size() == 1);
+  CHECK(cpu.stacks[1][0] == 1);
   cpu.StackPush(2);
-  CHECK(cpu.stacks[1].size() == 2); 
-  CHECK(cpu.stacks[1][1] == 3); 
+  CHECK(cpu.stacks[1].size() == 2);
+  CHECK(cpu.stacks[1][1] == 3);
   cpu.StackPop(0);
-  CHECK(cpu.stacks[1].size() == 1); 
-  CHECK(cpu.regs[0] == 3); 
+  CHECK(cpu.stacks[1].size() == 1);
+  CHECK(cpu.regs[0] == 3);
   // Swap back
   cpu.StackSwap();
-  CHECK(cpu.active_stack_idx == 0); 
+  CHECK(cpu.active_stack_idx == 0);
   /*
     [X] StackPush pushes the register value onto the active stack
     [X] StackPop pops the top value of the active stack and stores it in a register

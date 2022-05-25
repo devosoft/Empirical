@@ -1488,7 +1488,7 @@ namespace emp {
       std::swap(pops[0], pops[1]);            // Move next pop into place.
 
       // Tell systematics manager to swap next population and population
-      // Needs to happen here so that you can refer to systematics in 
+      // Needs to happen here so that you can refer to systematics in
       // OnPlacement functions
       for (Ptr<SystematicsBase<ORG>> s : systematics) {
         s->Update();
