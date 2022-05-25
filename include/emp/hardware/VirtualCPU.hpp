@@ -45,6 +45,7 @@ namespace emp{
   class VirtualCPU{
     public:
       static constexpr size_t NUM_STACKS = 2; ///< Number of stacks in this CPU (currently 2)
+      static constexpr size_t MAX_NOPS = 23; ///< Maximum number of nop instructions supported 
       struct Instruction;
 
       using derived_t = DERIVED;
@@ -459,7 +460,7 @@ namespace emp{
         num_nops = 0;
         nop_id_map.clear();
         are_nops_counted = true;
-        for(size_t idx = 0; idx < 23 ; ++idx){ // Stop before X!
+        for(size_t idx = 0; idx < MAX_NOPS ; ++idx){ // Stop before X!
           std::string nop_name = (std::string)"Nop" + (char)('A' + idx);
           if(GetInstLib()->IsInst(nop_name)){
             num_nops++;
