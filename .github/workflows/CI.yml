@@ -74,7 +74,7 @@ jobs:
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
-          version: 11          
+          version: 11
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: make install-test-dependencies
