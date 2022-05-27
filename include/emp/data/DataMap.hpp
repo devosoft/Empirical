@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2021.
+ *  @date 2018-2022.
  *
  *  @file DataMap.hpp
  *  @brief A DataMap links names to arbitrary object types.
@@ -50,10 +50,10 @@
  *
  *  - We should be able to keep a series of values, not just a single one.  This can be done with
  *    a series of new functions:
- *      AddLog() instead of AddVar() when new veriable is created.
- *      Get() should still work for latest value.  Ideally keep lates in first position.
+ *      AddLog() instead of AddVar() when new variable is created.
+ *      Get() should still work for latest value.  Ideally keep latest in first position.
  *      Change non-const Get() to GetRef() which cannot be used for a log.
- *      Add GetAve() function for logs as well as GetLog() for the full vector.
+ *      Add GetAve() function for logs as well as GetLog() for the full series (as std::span?).
  *
  *  - Settings for all entries should have more information on how they are dealt with, such as if
  *    they should be included in output an how.  Perhaps a system of tags for dynamic use?
@@ -67,7 +67,7 @@
  *
  *  - A user should be able to override copy constructors (though probably not move constructors
  *    or destructors?).  Then the copy process can be more customizable, for example having some
- *    settings retrun to the default value or be further processed.  It's also possible to have
+ *    settings return to the default value or be further processed.  It's also possible to have
  *    multiple types of copies, so if we indicate a "Copy birth" we get the above, but if we
  *    indicate a "Copy clone" or "Copy inject" we do something different.  We also probably need
  *    to allow for multiple parents...
@@ -78,10 +78,10 @@
  *    images repeatedly.
  *
  *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
- *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can
+ *    of its instances consecutive in memory?  This seems really tricky to pull off, but if we can
  *    do it, the improvement in cache performance could be dramatic.
  *
- *  - Rename DataLayout and MemoryImage to DataMapLayout and DataMapMemory
+ *  - Rename DataLayout and MemoryImage to DataMap_Layout and DataMap_Memory?
  */
 
 #ifndef EMP_DATA_DATAMAP_HPP_INCLUDE
