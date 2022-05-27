@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2022.
  *
  *  @file MemoryImage.hpp
  *  @brief A managed set of Bytes to store any kind of data.
@@ -14,6 +14,7 @@
 
 #include <cstring>        // For std::memcpy
 #include <new>            // For placement new
+#include <span>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -74,6 +75,16 @@ namespace emp {
     template <typename T> const T & Get(size_t pos) const {
       emp_assert(pos < GetInitSize(), "Only get a reference for initialized memory.");
       return *GetPtr<T>(pos);
+    }
+
+    /// Get proper spans to sets of same-type objects represented in this image.
+    template <typename T> std::span<T> & Get(size_t pos, size_t count) {
+      emp_assert(pos < GetInitSize(), "Only get a span from initialized memory.");
+      return std::span<T>( GetPtr<T>(pos), count );
+    }
+    template <typename T> std::span<const T> Get(size_t pos, size_t count) const {
+      emp_assert(pos < GetInitSize(), "Only get a span from initialized memory.");
+      return std::span<const T>( GetPtr<T>(pos), count );
     }
 
     /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
