@@ -88,6 +88,7 @@
 #define EMP_DATA_DATAMAP_HPP_INCLUDE
 
 #include <cstring>        // For std::memcpy
+#include <span>
 #include <string>
 
 #include "../base/assert.hpp"
@@ -121,6 +122,7 @@ namespace emp {
         layout_ptr.New(*layout_ptr);
       }
     }
+
   public:
     DataMap() : layout_ptr(nullptr) { ; }
     DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) {
@@ -135,40 +137,13 @@ namespace emp {
     }
 
     // Copy Operator...
-    DataMap & operator=(const DataMap & in_map) {
-      // If we have a layout pointer, use it to clear our memory image and update it if needed.
-      if (layout_ptr) {
-        layout_ptr->ClearImage(memory);
-
-        // If layout pointer doesn't match the new one, shift over.
-        if (layout_ptr != in_map.layout_ptr) {
-          layout_ptr->DecMaps();                                   // Remove self from counter.
-          if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();  // Delete layout if now unused.
-          layout_ptr = in_map.layout_ptr;                          // Shift to new layout.
-          if (layout_ptr) layout_ptr->IncMaps();                   // Add self to new counter.
-        }
-      }
-
-      // Otherwise we DON'T have a layout pointer, so setup the new one.
-      else {
-        layout_ptr = in_map.layout_ptr;                            // Shift to new layout.
-        if (layout_ptr) layout_ptr->IncMaps();                     // Add self to new counter.
-      }
-
-      // Now that we know we have a good layout, copy over the image.
-      layout_ptr->CopyImage(in_map.memory, memory);
-
-      return *this;
-    }
+    DataMap & operator=(const DataMap & in_map);
 
     ~DataMap() {
       /// If we have a layout pointer, clean up!
       if (!layout_ptr.IsNull()) {
-        // Clean up the current MemoryImage.
-        layout_ptr->ClearImage(memory);
-
-        // Clean up the DataLayout
-        layout_ptr->DecMaps();
+        layout_ptr->ClearImage(memory);    // Clean up the current MemoryImage.
+        layout_ptr->DecMaps();             // Clean up the DataLayout
         if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();
       }
     }
@@ -200,19 +175,25 @@ namespace emp {
       return layout_ptr->IsType<T>(GetID(name));
     }
 
+    /// Verify ID and type
+    template <typename T>
+    bool Has(size_t id) const { emp_assert(layout_ptr); return layout_ptr->Has<T>(id); }
+
+    /// Verify name and type
+    template <typename T>
+    bool Has(const std::string & name) const { emp_assert(layout_ptr); return layout_ptr->Has<T>(name); }
+
     /// Retrieve a variable by its type and position.
     template <typename T>
     T & Get(size_t id) {
-      emp_assert(HasID(id), "Can only get IDs the are available in DataMap.", id, GetSize());
-      emp_assert(IsType<T>(id));
+      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap.", id, GetSize());
       return memory.Get<T>(id);
     }
 
     /// Retrieve a const variable by its type and position.
     template <typename T>
     const T & Get(size_t id) const {
-      emp_assert(HasID(id), id, GetSize());
-      emp_assert(IsType<T>(id));
+      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap.", id, GetSize());
       return memory.Get<T>(id);
     }
 
@@ -220,18 +201,41 @@ namespace emp {
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(HasName(name), name);
-      emp_assert(IsType<T>(name), "DataMap::Get() must be provided the correct type.",
-                 name, GetType(name), emp::GetTypeID<T>());
+      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", id, GetSize());
       return memory.Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable by its type and name. (Slower!)
     template <typename T>
     const T & Get(const std::string & name) const {
-      emp_assert(HasName(name));
-      emp_assert(IsType<T>(name), name, GetType(name), emp::GetTypeID<T>());
+      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", id, GetSize());
       return memory.Get<T>(GetID(name));
+    }
+
+    // Retrieve a set of variables by id (as an std::span)
+    template <typename T>
+    std::span<T> Get(size_t id, size_t count) {
+      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.", id, GetSize());
+      return memory.Get<T>(id, count);
+    }
+
+    // Retrieve a const set of variables by id (as an std::span)
+    template <typename T>
+    std::span<const T> Get(size_t id, size_t count) const {
+      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.", id, GetSize());
+      return memory.Get<T>(id, count);
+    }
+
+    // Retrieve a set of variables by name (as an std::span)
+    template <typename T>
+    std::span<T> Get(const std::string & name, size_t count) {
+      return Get<T>(GetID(name), count);
+    }
+
+    // Retrieve a const set of variables by name (as an std::span)
+    template <typename T>
+    std::span<const T> Get(const std::string & name, size_t count) const {
+      return Get<T>(GetID(name), count);
     }
 
     /// Set a variable by ID.
@@ -326,6 +330,35 @@ namespace emp {
       layout_ptr->Lock();
     }
   };
+
+
+  // Copy Operator...
+  DataMap & DataMap::operator=(const DataMap & in_map) {
+    // If we have a layout pointer, use it to clear our memory image and update it if needed.
+    if (layout_ptr) {
+      layout_ptr->ClearImage(memory);
+
+      // If layout pointer doesn't match the new one, shift over.
+      if (layout_ptr != in_map.layout_ptr) {
+        layout_ptr->DecMaps();                                   // Remove self from counter.
+        if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();  // Delete layout if now unused.
+        layout_ptr = in_map.layout_ptr;                          // Shift to new layout.
+        if (layout_ptr) layout_ptr->IncMaps();                   // Add self to new counter.
+      }
+    }
+
+    // Otherwise we DON'T have a layout pointer, so setup the new one.
+    else {
+      layout_ptr = in_map.layout_ptr;                            // Shift to new layout.
+      if (layout_ptr) layout_ptr->IncMaps();                     // Add self to new counter.
+    }
+
+    // Now that we know we have a good layout, copy over the image.
+    layout_ptr->CopyImage(in_map.memory, memory);
+
+    return *this;
+  }
+
 
 }
 
