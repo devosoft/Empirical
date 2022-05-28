@@ -317,3 +317,35 @@ TEST_CASE("Test IsPowerOf2", "[math]") {
   REQUIRE( emp::IsPowerOf2( 10 ) == false );
 
 }
+
+TEST_CASE("Test exp2_overflow_unsafe", "[math]") {
+
+  for (int i = -1022; i <= 1024; ++i) {
+    REQUIRE( emp::exp2( i ) == std::exp2( i ) );
+  }
+
+}
+
+TEST_CASE("Test exp2f_overflow_unsafe", "[math]") {
+
+  for (int i = -126; i <= 128; ++i) {
+    REQUIRE( emp::exp2f( i ) == std::exp2f( i ) );
+  }
+
+}
+
+TEST_CASE("Test exp2", "[math]") {
+
+  for (int i = -2000; i <= 2000; ++i) {
+    REQUIRE( emp::exp2( i ) == std::exp2( i ) );
+  }
+
+}
+
+TEST_CASE("Test exp2f", "[math]") {
+
+  for (int i = -2000; i <= 2000; ++i) {
+    REQUIRE( emp::exp2f( i ) == std::exp2f( i ) );
+  }
+
+}

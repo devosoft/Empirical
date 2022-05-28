@@ -359,6 +359,58 @@ namespace emp {
     return result || AnyTrue(OTHER...);
   }
 
+  /// Calculate 2**exp fast by manually setting double exponent field.
+  /// Gives incorrect answer for exp outside of representable range of double
+  /// exponent field.
+  inline constexpr double exp2_overflow_unsafe(const int64_t exp) {
+    // benchmarking result https://quick-bench.com/q/8Q7UMP35zo3t2C70HvEz4AzyWVE
+    // ieee double has 11-bit exponent field
+    emp_assert(exp > -1023);
+    emp_assert(exp <= 1024);
+    static_assert(sizeof(double) == sizeof(uint64_t));
+    static_assert(std::numeric_limits<double>::is_iec559);
+
+    union {
+      uint64_t i;
+      double d;
+    } result{};
+    result.i = (exp + 1023) << 52;
+    emp_assert(result.d > 0.0, exp);
+    return result.d;
+  }
+
+  /// Calculate 2**exp fast by manually setting float exponent field.
+  /// Gives incorrect answer for exp outside of representable range of float
+  /// exponent field.
+  inline constexpr float exp2f_overflow_unsafe(const int32_t exp) {
+    // ieee float has 8-bit exponent field
+    emp_assert(exp > -127);
+    emp_assert(exp <= 128);
+    static_assert(sizeof(float) == sizeof(uint32_t));
+    static_assert(std::numeric_limits<float>::is_iec559);
+
+    union {
+      uint32_t i;
+      float f;
+    } result{};
+    result.i = (exp + 127) << 23;
+    emp_assert(result.f > 0.0f);
+    return result.f;
+  }
+
+  /// Calculate 2**exp fast for small exp, but handle large exp correctly.
+  inline constexpr double exp2(const int64_t exp) {
+    // benchmarking result https://quick-bench.com/q/8Q7UMP35zo3t2C70HvEz4AzyWVE
+    if (exp <= -1023l || exp > 1024l) return std::exp2(exp);
+    else return exp2_overflow_unsafe(exp);
+  }
+
+  /// Calculate 2**exp fast for small exp, but handle large exp correctly.
+  inline constexpr float exp2f(const int32_t exp) {
+    if (exp <= -127 || exp > 128) return std::exp2f(exp);
+    else return exp2f_overflow_unsafe(exp);
+  }
+
 }
 
 #endif
