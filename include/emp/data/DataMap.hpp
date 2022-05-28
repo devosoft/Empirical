@@ -175,13 +175,12 @@ namespace emp {
       return layout_ptr->IsType<T>(GetID(name));
     }
 
-    /// Verify ID and type
-    template <typename T>
-    bool Has(size_t id) const { emp_assert(layout_ptr); return layout_ptr->Has<T>(id); }
-
-    /// Verify name and type
-    template <typename T>
-    bool Has(const std::string & name) const { emp_assert(layout_ptr); return layout_ptr->Has<T>(name); }
+    /// Verify settings
+    template <typename T, typename... ARGS>
+    bool Has(ARGS &&... args) const {
+      emp_assert(layout_ptr);
+      return layout_ptr->Has<T>(std::forward<ARGS>(args)...);
+    }
 
     /// Retrieve a variable by its type and position.
     template <typename T>
@@ -201,14 +200,14 @@ namespace emp {
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", id, GetSize());
+      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", name, GetSize());
       return memory.Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable by its type and name. (Slower!)
     template <typename T>
     const T & Get(const std::string & name) const {
-      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", id, GetSize());
+      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", name, GetSize());
       return memory.Get<T>(GetID(name));
     }
 
@@ -296,9 +295,10 @@ namespace emp {
     size_t AddVar(const std::string & name,
                const T & default_value,
                const std::string & desc="",
-               const std::string & notes="") {
+               const std::string & notes="",
+               size_t count=1) {
       MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
-      return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
+      return layout_ptr->Add<T>(memory, name, default_value, desc, notes, count);
     }
 
     /// Test if this DataMap uses the specified layout.
