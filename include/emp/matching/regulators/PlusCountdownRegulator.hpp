@@ -85,41 +85,45 @@ struct PlusCountdownRegulator {
   /// A positive value downregulates the item,
   /// a value of zero is neutral,
   /// and a negative value upregulates the item.
-  bool Set(const float& set) {
-    if ( std::isnan( set ) ) return false;
+  float Set(const float& set) {
+    float set_;
+    if ( std::isnan( set ) ) return set_ = 0;
+    else set_ = std::max(max_up, set);
 
     timer = CountdownStart;
 
     // return whether regulator value changed
     // (i.e., we need to purge the cache)
-    return std::exchange(state, set) != set;
+    return set_ - std::exchange(state, set_);
   }
 
   /// A negative value upregulates the item,
   /// a value of exactly zero is neutral
   /// and a postive value downregulates the item.
-  bool Adj(const float& amt) {
-    if ( std::isnan( amt ) ) return false;
+  float Adj(const float& amt) {
+    float amt_;
+    if ( std::isnan( amt ) ) amt_ = 0;
+    else amt_ = std::max(max_up, state + amt) - state;
 
     timer = CountdownStart;
 
-    state += amt;
+    state += amt_;
 
     // return whether regulator value changed
     // (i.e., we need to purge the cache)
-    return amt != 0.0f;
+    return amt_;
   }
 
   /// Timer decay.
   /// Return whether MatchBin should be updated
-  bool Decay(const int32_t steps) {
+  float Decay(const int32_t steps) {
 
     const int64_t res = static_cast<int64_t>(timer) - steps;
     constexpr int64_t floor = std::numeric_limits<decltype(timer)>::lowest();
     constexpr int64_t ceil = std::numeric_limits<decltype(timer)>::max();
     timer = std::clamp( res, floor, ceil );
 
-    if ( timer == 0 ) return std::exchange(state, 0.0f) != 0.0f;
+    if ( timer == 0 ) return 0.0f - std::exchange(state, 0.0f);
     else return false;
 
   }

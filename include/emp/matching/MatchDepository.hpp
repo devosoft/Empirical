@@ -51,7 +51,9 @@ private:
   robin_hood::unordered_flat_map< query_t, res_t > cache_raw;
 
   // Cache of match results with regulation.
-  emp::SmallFifoMap< query_t, res_t, RegulatedCacheSize > cache_regulated;
+  robin_hood::unordered_flat_map< query_t, res_t> cache_regulated;
+
+  robin_hood::unordered_flat_set<uid_t> has_been_upregulated;
 
   /// Perform matching with regulation.
   res_t DoRegulatedMatch( const query_t& query ) noexcept {
@@ -71,7 +73,7 @@ private:
 
     const auto res = Selector::select( scores );
 
-    if constexpr (RegulatedCacheSize > 0) cache_regulated.set( query, res );
+    if constexpr (RegulatedCacheSize > 0) cache_regulated[query] = res;
 
     return res;
 
@@ -79,7 +81,9 @@ private:
 
   /// Return ptr to cached regulated result on success, nullptr on failure.
   res_t* DoRegulatedLookup( const query_t& query ) noexcept {
-    return cache_regulated.get( query );
+    const auto res = cache_regulated.find( query );
+    if (res == std::end(cache_regulated)) return nullptr;
+    else return &(res->second);
   }
 
   /// Perform matching without regulation.
@@ -116,6 +120,29 @@ private:
     if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
   }
 
+  void UpdateCacheDiffUid(const float diff, const uid_t uid) {
+    if ( diff < 0.0 ) { // was upregulated
+      // need to register self as possibly better
+      // so needs to be checked
+      has_been_upregulated.insert(uid);
+    } else if ( diff > 0.0 ) { // was downregulated
+      // need to register self as bad-to-return
+      // or remove all results where this is returned from res_t cache
+      // https://github.com/martinus/robin-hood-hashing/issues/18#issuecomment-461340159
+      // adapted from https://en.cppreference.com/w/cpp/container/unordered_map/erase
+      for (
+        auto it = std::begin(cache_regulated);
+        it != std::end(cache_regulated);
+      ) {
+          if (
+            const auto& res = it->second;
+            std::find(std::begin(res), std::end(res), uid) != std::end(res)
+          ) it = cache_regulated.erase(it);
+          else ++it;
+      }
+    }
+  }
+
 public:
 
   /// Compare a query tag to all stored tags using the distance metric
@@ -124,10 +151,20 @@ public:
   __attribute__ ((hot))
   res_t MatchRegulated( const query_t& query ) noexcept {
 
-    if constexpr ( RegulatedCacheSize > 0 ) {
+    if constexpr ( RegulatedCacheSize ) {
       if (const auto res = DoRegulatedLookup( query ); res != nullptr) {
-        return *res;
+        const auto raw_res = MatchRaw(query);
+        if (
+          *res == raw_res
+          || std::all_of(
+            std::begin(raw_res), std::end(raw_res),
+            [this](const auto& v){ return !has_been_upregulated.count(v); }
+          )
+        ) {
+          return *res;
+        }
       }
+
     }
 
     return DoRegulatedMatch( query );
@@ -166,23 +203,21 @@ public:
 
   using adj_t = typename Regulator::adj_t;
   void AdjRegulator( const uid_t uid, const adj_t amt ) noexcept {
-    if ( data.at(uid).reg.Adj(amt) ) {
-      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
-    }
+    const auto diff = data.at(uid).reg.Adj(amt);
+    if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
   }
 
   using set_t = typename Regulator::set_t;
   void SetRegulator( const uid_t uid, const set_t set ) noexcept {
-    if ( data.at(uid).reg.Set(set) ) {
-      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
-    }
+    const auto diff = data.at(uid).reg.Set(set);
+    if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
   }
 
-  void SetRegulator( const uid_t uid, const Regulator& set ) noexcept {
-    if (set != std::exchange( data.at(uid).reg, set )) {
-      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
-    }
-  }
+  // void SetRegulator( const uid_t uid, const Regulator& set ) noexcept {
+  //   if (set != std::exchange( data.at(uid).reg, set )) {
+  //     if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+  //   }
+  // }
 
   const Regulator& GetRegulator( const uid_t uid ) noexcept {
     return data.at(uid).reg;
