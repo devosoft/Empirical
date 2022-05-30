@@ -53,7 +53,7 @@ private:
 
   // Cache of match results with regulation.
   robin_hood::unordered_flat_map< query_t, res_t> cache_regulated;
-  std::unordered_multimap< uid_t, query_t> cache_regulated_bwd;
+  std::multimap< uid_t, query_t> cache_regulated_bwd;
 
   robin_hood::unordered_flat_set<query_t> has_shifted;
 
@@ -149,7 +149,6 @@ private:
 
       for (const auto& query : has_shifted) {
 
-        if (cache_regulated.count(query) == 0) continue;
         auto& existing_response = cache_regulated.at(query);
         // for now, assume this only iterates zero times or one time
         for (const auto& uid_ : existing_response) {
@@ -173,6 +172,8 @@ private:
             }
             existing_response[0] = uid;
             cache_regulated_bwd.insert({uid, query});
+
+            // TODO cache_regulated_bwd
           }
 
           if (cache_regulated[query] == cache_raw[query]) has_shifted.erase(
