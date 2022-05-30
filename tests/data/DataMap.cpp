@@ -57,4 +57,16 @@ TEST_CASE("Test DataMap", "[data]")
   dm.LockLayout();
   CHECK( dm.IsLocked() == true );
   CHECK( dm2.IsLocked() == false );
+
+
+  // Test putting multiple entries in a DataMap at once.
+  dm2.AddVar<double>("array", 0.0, "Test Array of doubles", "some notes.", 20);
+  std::span<double> test_span = dm2.Get<double>("array", 20);
+  test_span[10] = 3.14;
+  test_span[17] = 3.14;
+  std::span<double> test_span2 = dm2.Get<double>("array", 20);
+
+  double total = 0.0;
+  for (double x : test_span2) { total += x; }
+  CHECK( total == 3.14 + 3.14);
 }
