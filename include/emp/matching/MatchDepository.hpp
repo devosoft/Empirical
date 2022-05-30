@@ -13,6 +13,7 @@
 #define EMP_MATCH_DEPOSITORY_HPP
 
 #include <algorithm>
+#include <unordered_map>
 #include <limits>
 
 #include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
@@ -52,6 +53,7 @@ private:
 
   // Cache of match results with regulation.
   robin_hood::unordered_flat_map< query_t, res_t> cache_regulated;
+  std::multimap< uid_t, query_t> cache_regulated_bwd;
 
   robin_hood::unordered_flat_set<query_t> has_shifted;
 
@@ -73,7 +75,11 @@ private:
 
     const auto res = Selector::select( scores );
 
-    if constexpr (RegulatedCacheSize > 0) cache_regulated[query] = res;
+    if constexpr (RegulatedCacheSize > 0) {
+      cache_regulated[query] = res;
+      // assume res is length one
+      if (res.size()) cache_regulated_bwd.insert({res[0], query});
+    }
 
     return res;
 
@@ -117,7 +123,10 @@ private:
   void ClearCache() noexcept {
     // clear is an expensive operation on robin_hood::unordered_flat_map
     if constexpr ( UseRawCache ) if ( cache_raw.size() ) cache_raw.clear();
-    if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+    if constexpr ( RegulatedCacheSize > 0 ) {
+      cache_regulated.clear();
+      cache_regulated_bwd.clear();
+    }
   }
 
   void UpdateCacheDiffUid(const float diff, const uid_t uid) {
@@ -153,7 +162,18 @@ private:
           );
 
           if (competing_dist <  existing_dist) {
+            const auto [qb, qe] = cache_regulated_bwd.equal_range(uid_);
+            const auto ti = std::find_if(qb, qe, [query](const auto& p){
+              const auto& [f, s] = p;
+              return s == query;
+            });
+            if (ti != std::end(cache_regulated_bwd)) {
+              cache_regulated_bwd.erase(ti);
+            }
             existing_response[0] = uid;
+            cache_regulated_bwd.insert({uid, query});
+
+            // TODO cache_regulated_bwd
           }
 
           if (cache_regulated[query] == cache_raw[query]) has_shifted.erase(
@@ -166,18 +186,12 @@ private:
 
     } else if ( diff > 0.0 ) { // was downregulated
       // remove all results where this is returned from res_t cache
-      // https://github.com/martinus/robin-hood-hashing/issues/18#issuecomment-461340159
-      // adapted from https://en.cppreference.com/w/cpp/container/unordered_map/erase
-      for (
-        auto it = std::begin(cache_regulated);
-        it != std::end(cache_regulated);
-      ) {
-          if (
-            const auto& res = it->second;
-            std::find(std::begin(res), std::end(res), uid) != std::end(res)
-          ) it = cache_regulated.erase(it);
-          else ++it;
-      }
+      const auto [qb, qe] = cache_regulated_bwd.equal_range(uid);
+      std::for_each(qb, qe, [this](const auto& p){
+        const auto& [f, s] = p;
+        cache_regulated.erase(s);
+      });
+      cache_regulated_bwd.erase(qb, qe);
     }
   }
 
@@ -266,7 +280,10 @@ public:
   /// Apply decay to a regulator.
   void DecayRegulator(const uid_t uid, const int32_t steps=1) noexcept {
     if ( data.at(uid).reg.Decay(steps) ) {
-      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+      if constexpr ( RegulatedCacheSize > 0 ) {
+        cache_regulated.clear();
+        cache_regulated_bwd.clear();
+      }
     }
   }
 
@@ -274,7 +291,10 @@ public:
   void DecayRegulators(const int steps=1) noexcept {
     for (auto & pack : data ) {
       if ( pack.reg.Decay(steps) ) {
-        if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+        if constexpr ( RegulatedCacheSize > 0 ) {
+          cache_regulated.clear();
+          cache_regulated_bwd.clear();
+        }
       }
     }
   }
