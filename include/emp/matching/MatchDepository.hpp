@@ -140,6 +140,7 @@ private:
 
       for (const auto& query : has_shifted) {
 
+        if (cache_regulated.count(query) == 0) continue;
         auto& existing_response = cache_regulated.at(query);
         // for now, assume this only iterates zero times or one time
         for (const auto& uid_ : existing_response) {
