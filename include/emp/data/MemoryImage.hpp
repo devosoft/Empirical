@@ -78,13 +78,13 @@ namespace emp {
     }
 
     /// Get proper spans to sets of same-type objects represented in this image.
-    template <typename T> std::span<T> & Get(size_t pos, size_t count) {
+    template <typename T> std::span<T> Get(size_t pos, size_t count) {
       emp_assert(pos < GetInitSize(), "Only get a span from initialized memory.");
-      return std::span<T>( GetPtr<T>(pos), count );
+      return std::span<T>( GetPtr<T>(pos).Raw(), count );
     }
     template <typename T> std::span<const T> Get(size_t pos, size_t count) const {
       emp_assert(pos < GetInitSize(), "Only get a span from initialized memory.");
-      return std::span<const T>( GetPtr<T>(pos), count );
+      return std::span<const T>( GetPtr<T>(pos).Raw(), count );
     }
 
     /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
