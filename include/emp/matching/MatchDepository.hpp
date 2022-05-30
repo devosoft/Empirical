@@ -266,17 +266,15 @@ public:
 
   /// Apply decay to a regulator.
   void DecayRegulator(const uid_t uid, const int32_t steps=1) noexcept {
-    if ( data.at(uid).reg.Decay(steps) ) {
-      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
-    }
+    const auto diff = data.at(uid).reg.Decay(steps);
+    if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
   }
 
   /// Apply decay to all regulators.
   void DecayRegulators(const int steps=1) noexcept {
-    for (auto & pack : data ) {
-      if ( pack.reg.Decay(steps) ) {
-        if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
-      }
+    for (size_t uid{}; uid < data.size(); ++uid) {
+      const auto diff = data[uid].reg.Decay(steps);
+      if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
     }
   }
 
