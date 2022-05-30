@@ -30,7 +30,7 @@ template<
   typename Selector,
   typename Regulator,
   bool UseRawCache=1,
-  size_t RegulatedCacheSize=0
+  bool UseRegulatedCache=1
 > class MatchDepository {
 
 public:
@@ -73,7 +73,7 @@ private:
 
     const auto res = Selector::select( scores );
 
-    if constexpr (RegulatedCacheSize > 0) cache_regulated[query] = res;
+    if constexpr (UseRegulatedCache) cache_regulated[query] = res;
 
     return res;
 
@@ -117,7 +117,7 @@ private:
   void ClearCache() noexcept {
     // clear is an expensive operation on robin_hood::unordered_flat_map
     if constexpr ( UseRawCache ) if ( cache_raw.size() ) cache_raw.clear();
-    if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+    if constexpr ( UseRegulatedCache ) cache_regulated.clear();
   }
 
   void UpdateCacheDiffUid(const float diff, const uid_t uid) {
@@ -190,7 +190,7 @@ public:
   __attribute__ ((hot))
   res_t MatchRegulated( const query_t& query ) noexcept {
 
-    if constexpr ( RegulatedCacheSize ) {
+    if constexpr ( UseRegulatedCache ) {
       if (const auto res = DoRegulatedLookup( query ); res != nullptr) {
         return *res;
       }
@@ -198,7 +198,7 @@ public:
 
     const auto reg_res = DoRegulatedMatch( query );
 
-    if constexpr ( RegulatedCacheSize ) {
+    if constexpr ( UseRegulatedCache ) {
       const auto raw_res = MatchRaw(query);
       if (raw_res != reg_res) has_shifted.insert(query);
     }
@@ -240,18 +240,18 @@ public:
   using adj_t = typename Regulator::adj_t;
   void AdjRegulator( const uid_t uid, const adj_t amt ) noexcept {
     const auto diff = data.at(uid).reg.Adj(amt);
-    if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
+    if constexpr ( UseRegulatedCache ) UpdateCacheDiffUid(diff, uid);
   }
 
   using set_t = typename Regulator::set_t;
   void SetRegulator( const uid_t uid, const set_t set ) noexcept {
     const auto diff = data.at(uid).reg.Set(set);
-    if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
+    if constexpr ( UseRegulatedCache ) UpdateCacheDiffUid(diff, uid);
   }
 
   // void SetRegulator( const uid_t uid, const Regulator& set ) noexcept {
   //   if (set != std::exchange( data.at(uid).reg, set )) {
-  //     if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+  //     if constexpr ( UseRegulatedCache ) cache_regulated.clear();
   //   }
   // }
 
@@ -267,14 +267,14 @@ public:
   /// Apply decay to a regulator.
   void DecayRegulator(const uid_t uid, const int32_t steps=1) noexcept {
     const auto diff = data.at(uid).reg.Decay(steps);
-    if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
+    if constexpr ( UseRegulatedCache ) UpdateCacheDiffUid(diff, uid);
   }
 
   /// Apply decay to all regulators.
   void DecayRegulators(const int steps=1) noexcept {
     for (size_t uid{}; uid < data.size(); ++uid) {
       const auto diff = data[uid].reg.Decay(steps);
-      if constexpr ( RegulatedCacheSize ) UpdateCacheDiffUid(diff, uid);
+      if constexpr ( UseRegulatedCache ) UpdateCacheDiffUid(diff, uid);
     }
   }
 
