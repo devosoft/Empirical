@@ -53,7 +53,7 @@ private:
   // Cache of match results with regulation.
   robin_hood::unordered_flat_map< query_t, res_t> cache_regulated;
 
-  robin_hood::unordered_flat_set<uid_t> has_been_upregulated;
+  robin_hood::unordered_flat_set<query_t> has_shifted;
 
   /// Perform matching with regulation.
   res_t DoRegulatedMatch( const query_t& query ) noexcept {
@@ -124,10 +124,48 @@ private:
     if ( diff < 0.0 ) { // was upregulated
       // need to register self as possibly better
       // so needs to be checked
-      has_been_upregulated.insert(uid);
+      // for (const auto& query : has_shifted) {
+      //   cache_regulated.erase(query);
+      // }
+      // faster than has_shifted.clear() ?
+      // for (
+      //   auto it = std::begin(has_shifted);
+      //   it != std::end(has_shifted);
+      //   it = has_shifted.erase(it)
+      // );
+      // has_shifted.clear();
+      // TODO just check and update cache directly
+
+      const auto& competing_entry = data[uid];
+
+      for (const auto& query : has_shifted) {
+
+        auto& existing_response = cache_regulated.at(query);
+        // for now, assume this only iterates zero times or one time
+        for (const auto& uid_ : existing_response) {
+          const auto& existing_entry = data[uid_];
+          const auto existing_dist = existing_entry.reg(
+            Metric::calculate(query, existing_entry.tag)
+          );
+
+          const auto competing_dist = competing_entry.reg(
+            Metric::calculate(query, competing_entry.tag)
+          );
+
+          if (competing_dist <  existing_dist) {
+            existing_response[0] = uid;
+          }
+
+          if (cache_regulated[query] == cache_raw[query]) has_shifted.erase(
+            query
+          );
+
+        }
+
+      }
+
     } else if ( diff > 0.0 ) { // was downregulated
-      // need to register self as bad-to-return
-      // or remove all results where this is returned from res_t cache
+      // remove all results where this is returned from res_t cache
       // https://github.com/martinus/robin-hood-hashing/issues/18#issuecomment-461340159
       // adapted from https://en.cppreference.com/w/cpp/container/unordered_map/erase
       for (
@@ -153,21 +191,18 @@ public:
 
     if constexpr ( RegulatedCacheSize ) {
       if (const auto res = DoRegulatedLookup( query ); res != nullptr) {
-        const auto raw_res = MatchRaw(query);
-        if (
-          *res == raw_res
-          || std::all_of(
-            std::begin(raw_res), std::end(raw_res),
-            [this](const auto& v){ return !has_been_upregulated.count(v); }
-          )
-        ) {
-          return *res;
-        }
+        return *res;
       }
-
     }
 
-    return DoRegulatedMatch( query );
+    const auto reg_res = DoRegulatedMatch( query );
+
+    if constexpr ( RegulatedCacheSize ) {
+      const auto raw_res = MatchRaw(query);
+      if (raw_res != reg_res) has_shifted.insert(query);
+    }
+
+    return reg_res;
 
   }
 
