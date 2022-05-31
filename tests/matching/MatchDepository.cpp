@@ -9,9 +9,10 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/matching/MatchDepository.hpp"
-#include "emp/matching/selectors_static/RankedSelector.hpp"
 #include "emp/matching/matchbin_regulators.hpp"
 #include "emp/matching/matchbin_metrics.hpp"
+#include "emp/matching/regulators/PlusCountdownRegulator.hpp"
+#include "emp/matching/selectors_static/RankedSelector.hpp"
 
 TEST_CASE("MatchDepository Put, Get, GetSize, Clear", "[tools]") {
 
@@ -51,7 +52,7 @@ TEST_CASE("MatchDepository MatchRaw", "[tools]") {
     emp::statics::RankedSelector<>,
     emp::AdditiveCountdownRegulator<>,
     true,
-    2
+    true
   > depo;
 
   REQUIRE( depo.GetSize() == 0 );
@@ -112,9 +113,14 @@ TEST_CASE("MatchDepository MatchRegulated", "[tools]") {
     std::string,
     emp::AbsDiffMetric,
     emp::statics::RankedSelector<>,
-    emp::AdditiveCountdownRegulator<>,
+    emp::PlusCountdownRegulator<
+      std::deci, // Slope
+      std::ratio<0>, // MaxUpreg
+      std::deci, // ClampLeeway
+      2 // countdown
+    >,
     true,
-    2
+    true
   > depo;
 
   REQUIRE( depo.GetSize() == 0 );
