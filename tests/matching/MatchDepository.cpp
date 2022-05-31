@@ -171,4 +171,34 @@ TEST_CASE("MatchDepository MatchRegulated", "[tools]") {
   REQUIRE( depo.GetVal( res.front() ) == "two" );
   }
 
+  // upregulate back to baseline
+  depo.SetRegulator(2, 0.0);
+
+  {
+  const auto res = depo.MatchRegulated( 0 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "zero" );
+  }
+
+  {
+  const auto res = depo.MatchRegulated( 90 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "hundred" );
+  }
+
+
+  // do it again to check caching
+  {
+  const auto res = depo.MatchRegulated( 0 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "zero" );
+  }
+
+  {
+  const auto res = depo.MatchRegulated( 90 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "hundred" );
+  }
+
+
 }
