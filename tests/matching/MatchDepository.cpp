@@ -202,3 +202,75 @@ TEST_CASE("MatchDepository MatchRegulated", "[tools]") {
 
 
 }
+
+TEST_CASE("MatchDepository MatchRegulated pathological case", "[tools]") {
+
+  emp::MatchDepository<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::statics::RankedSelector<>,
+    emp::PlusCountdownRegulator<
+      std::deci, // Slope
+      std::ratio<0>, // MaxUpreg
+      std::deci, // ClampLeeway
+      2 // countdown
+    >,
+    true,
+    true
+  > depo;
+
+  REQUIRE( depo.GetSize() == 0 );
+
+  depo.Put( "zero", 0 );
+
+  depo.Put( "one", 1 );
+
+  depo.Put( "two", 2 );
+
+  {
+  const auto res = depo.MatchRegulated( 0 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "zero" );
+  }
+
+  {
+  const auto res = depo.MatchRegulated( 1 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "one" );
+  }
+
+  {
+  const auto res = depo.MatchRegulated( 2 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "two" );
+  }
+
+  // downregulate one
+  depo.SetRegulator(1, 400000000.0);
+
+  {
+  const auto res = depo.MatchRegulated( 0 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "zero" );
+  }
+
+  // downregulate zero
+  depo.SetRegulator(0, 400000000.0);
+
+  {
+  const auto res = depo.MatchRegulated( 0 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "two" );
+  }
+
+  // upregulate one
+  depo.SetRegulator(1, 0.0);
+
+  {
+  const auto res = depo.MatchRegulated( 0 );
+  REQUIRE( res.size() == 1 );
+  REQUIRE( depo.GetVal( res.front() ) == "one" );
+  }
+
+
+}
