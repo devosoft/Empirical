@@ -43,17 +43,25 @@ namespace emp {
 
     size_t GetTraitID(const std::string & name) const { return data_map.GetID(name); }
 
-    template <typename T>
-    T & GetTrait(size_t id) { return data_map.Get<T>(id); }
+    template <typename T, typename KEY_T>
+    auto & GetTrait(KEY_T && key) {
+      return data_map.Get<T>(std::forward<KEY_T>(key));
+    }
 
-    template <typename T>
-    const T & GetTrait(size_t id) const { return data_map.Get<T>(id); }
+    template <typename T, typename KEY_T>
+    auto GetTrait(KEY_T && key, size_t count) {
+      return data_map.Get<T>(std::forward<KEY_T>(key), count);
+    }
 
-    template <typename T>
-    T & GetTrait(const std::string & name) { return data_map.Get<T>(name); }
+    template <typename T, typename KEY_T>
+    const auto & GetTrait(KEY_T && key) const {
+      return data_map.Get<T>(std::forward<KEY_T>(key));
+    }
 
-    template <typename T>
-    const T & GetTrait(const std::string & name) const { return data_map.Get<T>(name); }
+    template <typename T, typename KEY_T>
+    auto GetTrait(KEY_T && key, size_t count) const {
+      return data_map.Get<T>(std::forward<KEY_T>(key), count);
+    }
 
     template <typename T>
     T & SetTrait(size_t id, const T & val) { return data_map.Set<T>(id, val); }
