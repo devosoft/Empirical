@@ -226,7 +226,7 @@ namespace emp {
     /// How many distinct values could be held in this BitVector?
     [[nodiscard]] double GetNumStates() const { return emp::Pow2(num_bits); }
 
-    /// Retrive the bit value from the specified index.
+    /// Retrieve the bit value from the specified index.
     [[nodiscard]] bool Get(size_t index) const;
 
     /// A safe version of Get() for indexing out of range. Useful for representing collections.
@@ -343,7 +343,7 @@ namespace emp {
 
     // =========  Access Groups of bits  ========= //
 
-    /// Retrive the byte at the specified byte index.
+    /// Retrieve the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
 
     /// Get a read-only view into the internal array used by BitVector.
@@ -1280,7 +1280,7 @@ namespace emp {
 
   // --------------------  Implementations of common accessors -------------------
 
-  /// Retrive the bit value from the specified index.
+  /// Retrieve the bit value from the specified index.
   bool BitVector::Get(size_t index) const {
     emp_assert(index < num_bits, index, num_bits);
     const size_t field_id = FieldID(index);
@@ -1570,7 +1570,7 @@ namespace emp {
 
   // -------------------------  Access Groups of bits -------------------------
 
-  /// Retrive the byte at the specified byte index.
+  /// Retrieve the byte at the specified byte index.
   uint8_t BitVector::GetByte(size_t index) const {
     emp_assert(index < NumBytes(), index, NumBytes());
     const size_t field_id = Byte2Field(index);
@@ -1582,7 +1582,7 @@ namespace emp {
   /// @return Read-only span of BitVector's bytes.
   std::span<const std::byte> BitVector::GetBytes() const {
     return std::span<const std::byte>(
-      bits.ReinterpretCast<const std::byte>(),
+      bits.ReinterpretCast<const std::byte>().Raw(),
       NumBytes()
     );
   }
