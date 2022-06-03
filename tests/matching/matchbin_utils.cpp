@@ -972,3 +972,28 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
 
 }
+
+TEST_CASE("Test codon metric", "[matchbin]")
+{
+
+    emp::Random rand(1);
+
+    emp::MatchBin<
+      size_t,
+      emp::CodonMetric<64>,
+      emp::RankedSelector<>,
+      emp::NopRegulator
+    >bin(rand);
+
+    for (size_t i{}; i < 100; ++i) {
+      bin.Put(i, emp::BitSet<64>(rand));
+    }
+
+    REQUIRE( bin.Size() == 100 );
+
+    for (size_t rep{}; rep < 100; ++rep) {
+      const auto res = bin.Match(emp::BitSet<64>(rand));
+      REQUIRE(res.size() == 1);
+    }
+
+}

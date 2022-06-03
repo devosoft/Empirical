@@ -688,6 +688,75 @@ namespace emp {
 
   };
 
+  template<size_t Width>
+  struct CodonMetric : public BaseMetric<
+    emp::BitSet<Width>,
+    emp::BitSet<Width>
+  > {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Codon Metric"; }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
+
+      // codon code
+      emp::Random rand_(1);
+      const emp::BitSet<Width> codon_code(rand_);
+
+      emp::vector<size_t> query_codon_idxs;
+      emp::vector<size_t> tag_codon_idxs;
+      emp::BitSet<Width> mask;
+      mask.SetUInt(0, 15);
+      for (size_t i{}; i < Width; i += 4) {
+        if ((mask & a) == (mask & codon_code)) query_codon_idxs.push_back(i);
+        if ((mask & b) == (mask & codon_code)) tag_codon_idxs.push_back(i);
+        const auto temp = mask;
+        for (size_t j{}; j < 15; ++j) {
+          mask += temp;
+        }
+      }
+
+      emp::vector<emp::BitSet<Width>> query_genes;
+      for (const size_t i : query_codon_idxs) {
+        query_genes.push_back(a.ROTATE(i + 4));
+      }
+
+      emp::vector<emp::BitSet<Width>> tag_genes;
+      for (const size_t i : tag_codon_idxs) {
+        tag_genes.push_back(b.ROTATE(i + 4));
+      }
+
+      emp::vector<size_t> overlaps;
+      for (const auto& query_gene : query_genes) {
+        for (const auto& tag_gene : tag_genes) {
+          overlaps.push_back(
+            (query_gene ^ tag_gene).FindBit()
+          );
+        }
+      }
+
+      if (overlaps.size()) return 1.0 / static_cast<double>(
+        *std::max_element(std::begin(overlaps), std::end(overlaps))
+      );
+      else return 1.0;
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+  };
+
   /// Matches based on longest streaks of equal and unequal bits in two bitsets.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
