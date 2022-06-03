@@ -419,7 +419,7 @@ namespace emp {
       return emp::to_string(Width) + "-bit " + base();
     }
 
-    std::string base() const override { return "Approx Dual Streak Metric"; }
+    std::string base() const override { return "Approx Single Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       return calculate(a, b);
