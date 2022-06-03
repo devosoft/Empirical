@@ -49,9 +49,9 @@ This directory contains a set of tools for managing more or less genetic data.
 
 ## To add?
 
-DataSheet - rows are entries, columns are types, stored by column for fast calculation.
-DataColumn = vector from DataSheet with type information.
-DataRow - Same interface as DataMap; refers to associated DataSheet.
+DataFrame - rows are entries, columns are types, stored by column for fast calculation.
+DataColumn = vector from DataFrame with type information.
+DataRow - Same interface as DataMap; refers to associated DataFrame.
 
 DataTracker - Handles all of the functionality of DataNode, DataLog, etc., but more dynamic
   using lambdas to deal with values as needed.
