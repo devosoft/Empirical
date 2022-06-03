@@ -746,7 +746,7 @@ namespace emp {
       }
 
       if (overlaps.size()) return 1.0 / static_cast<double>(
-        *std::max_element(std::begin(overlaps), std::end(overlaps))
+        *std::max_element(std::begin(overlaps), std::end(overlaps)) + 2
       );
       else return 1.0;
     }
