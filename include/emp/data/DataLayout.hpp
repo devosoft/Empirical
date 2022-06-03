@@ -82,25 +82,9 @@ namespace emp {
       return setting_map.find(id)->second.type == emp::GetTypeID<T>();
     }
 
-    // Verify type AND position.
-    template <typename T>
-    bool Has(size_t id) const {
-      auto it = setting_map.find(id);
-      return it != setting_map.end() &&
-             it->second.type == emp::GetTypeID<T>();
-    }
-
-    // Verify name AND position.
-    template <typename T>
-    bool Has(const std::string & name) const {
-      auto it = id_map.find(name);
-      return it != id_map.end() &&
-             setting_map.find(it->second)->second.type == emp::GetTypeID<T>();
-    }
-
     // Verify type, position, AND count.
     template <typename T>
-    bool Has(size_t id, size_t count) const {
+    bool Has(size_t id, size_t count=1) const {
       auto it = setting_map.find(id);
       return it != setting_map.end() &&
              it->second.type == emp::GetTypeID<T>() &&
@@ -109,9 +93,33 @@ namespace emp {
 
     // Verify name, position, AND count.
     template <typename T>
-    bool Has(const std::string & name, size_t count) const {
+    bool Has(const std::string & name, size_t count=1) const {
       auto it = id_map.find(name);
       return (it != id_map.end()) && Has<T>(it->second, count);
+    }
+
+    template <typename T, typename KEY_T>
+    std::string DiagnoseHas(KEY_T key, size_t count=1) const {
+      size_t id = 0;
+      if constexpr (std::is_arithmetic<KEY_T>()) {
+        id = key;
+      } else { // key is name.
+        auto it = id_map.find(key);
+        if (it == id_map.end()) return emp::to_string("Unknown trait name '", key, "'");
+        id = it->second;
+      }
+
+      auto setting_it = setting_map.find(id);
+      if (setting_it == setting_map.end()) return emp::to_string("Unknown ID ", id);
+      if (setting_it->second.type != emp::GetTypeID<T>()) {
+        return emp::to_string("Checking for type as ", emp::GetTypeID<T>(),
+                              ", but recorded as ", setting_it->second.type);
+      }
+      if (setting_it->second.count != count) {
+        return emp::to_string("Checking for count of ", count,
+                              ", but recorded as ", setting_it->second.count);
+      }
+      return emp::to_string("Has<", emp::GetTypeID<T>(), ">(", key, ",", count, ") should be true.");
     }
 
     /// Return the number of bytes in the default image.
@@ -127,6 +135,12 @@ namespace emp {
     emp::TypeID GetType(size_t id) const {
       emp_assert(HasID(id), id);
       return setting_map.find(id)->second.type;
+    }
+
+    // What is the count associated with a given entry.
+    size_t GetCount(size_t id) const {
+      emp_assert(HasID(id), id);
+      return setting_map.find(id)->second.count;
     }
 
     /// Determine is entry is some form of numeric type.
