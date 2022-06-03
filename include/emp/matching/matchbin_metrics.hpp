@@ -727,11 +727,13 @@ namespace emp {
       }
 
       emp::vector<emp::BitSet<Width>> query_genes;
+      query_genes.push_back(a);
       for (const size_t i : query_codon_idxs) {
         query_genes.push_back(a.ROTATE(i + 4));
       }
 
       emp::vector<emp::BitSet<Width>> tag_genes;
+      tag_genes.push_back(b);
       for (const size_t i : tag_codon_idxs) {
         tag_genes.push_back(b.ROTATE(i + 4));
       }
