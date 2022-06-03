@@ -185,14 +185,16 @@ namespace emp {
     /// Retrieve a variable by its type and position.
     template <typename T>
     T & Get(size_t id) {
-      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap.", id, GetSize());
+      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap in type and count.",
+                 id, GetSize(), layout_ptr->DiagnoseHas<T>(id));
       return memory.Get<T>(id);
     }
 
     /// Retrieve a const variable by its type and position.
     template <typename T>
     const T & Get(size_t id) const {
-      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap.", id, GetSize());
+      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap in type and count.",
+                 id, GetSize(), layout_ptr->DiagnoseHas<T>(id));
       return memory.Get<T>(id);
     }
 
@@ -200,40 +202,48 @@ namespace emp {
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", name, GetSize());
+      emp_assert(Has<T>(name), "Can only get name/types that match DataMap in type and count.",
+                 name, GetSize(), layout_ptr->DiagnoseHas<T>(name));
       return memory.Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable by its type and name. (Slower!)
     template <typename T>
     const T & Get(const std::string & name) const {
-      emp_assert(Has<T>(name), "Can only get name/types that match DataMap.", name, GetSize());
+      emp_assert(Has<T>(name), "Can only get name/types that match DataMap in type and count.",
+                 name, GetSize(), layout_ptr->DiagnoseHas<T>(name));
       return memory.Get<T>(GetID(name));
     }
 
     // Retrieve a set of variables by id (as an std::span)
     template <typename T>
     std::span<T> Get(size_t id, size_t count) {
-      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.", id, GetSize());
+      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.",
+                 id, count, GetSize(), layout_ptr->DiagnoseHas<T>(id,count));
       return memory.Get<T>(id, count);
     }
 
     // Retrieve a const set of variables by id (as an std::span)
     template <typename T>
     std::span<const T> Get(size_t id, size_t count) const {
-      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.", id, GetSize());
+      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.",
+                 id, GetSize(), layout_ptr->DiagnoseHas<T>(id,count));
       return memory.Get<T>(id, count);
     }
 
     // Retrieve a set of variables by name (as an std::span)
     template <typename T>
     std::span<T> Get(const std::string & name, size_t count) {
+      emp_assert(HasName(name), "Cannot get names not stored in DataMap.",
+                 name, layout_ptr->DiagnoseHas<T>(name, count));
       return Get<T>(GetID(name), count);
     }
 
     // Retrieve a const set of variables by name (as an std::span)
     template <typename T>
     std::span<const T> Get(const std::string & name, size_t count) const {
+      emp_assert(HasName(name), "Cannot get names not stored in DataMap.",
+                 name, layout_ptr->DiagnoseHas<T>(name, count));
       return Get<T>(GetID(name), count);
     }
 
