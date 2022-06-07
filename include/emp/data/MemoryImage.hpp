@@ -28,7 +28,7 @@ namespace emp {
   private:
     emp::Ptr<std::byte> image = nullptr;   ///< Current memory image.
     size_t size = 0;                       ///< Size of current image.
-    size_t init_to = 0;                    ///< How far if the current image initialized?
+    size_t init_to = 0;                    ///< How far of the current image is initialized?
 
     // Setup all of the uninitialized memory to be non-zero.
     void Fuzz() {
@@ -102,7 +102,7 @@ namespace emp {
     }
 
     /// Copy all of the bytes directly from another memory image.  Size manipulation must be
-    /// done beforehand to ensure sufficient space is availabe.
+    /// done beforehand to ensure sufficient space is available.
     void RawCopy(const MemoryImage & from_memory) {
       emp_assert(GetSize() >= from_memory.GetSize());
       if (from_memory.GetSize() == 0) return; // Nothing to copy!
