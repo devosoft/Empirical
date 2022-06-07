@@ -17,6 +17,7 @@
 #include "../base/error.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../polyfill/span.hpp"
 
 namespace emp {
 
@@ -26,16 +27,17 @@ namespace emp {
       // Config
       static constexpr const size_t mem_count = MEM_COUNT;
       static constexpr const size_t pool_count = POOL_COUNT;
+      static constexpr const size_t total_count = MEM_COUNT * POOL_COUNT;
       static constexpr const size_t chunk_size = sizeof(T) * MEM_COUNT;
       static constexpr const size_t pool_size = chunk_size * POOL_COUNT;
 
       // Data
-      emp::array<chunk_t, POOL_COUNT> pool;
+      emp::array<T, total_count> pool;
       emp::array<size_t, POOL_COUNT> free_ids;
 
       // Interface
       emp::Ptr<T> PoolPtr() const { return &pool; }
-      Initialize(size_t _mem_count, size_t _pool_count) {
+      void Initialize(size_t _mem_count, size_t _pool_count) {
         emp_error("Cannot re-initialize a static MemoryFactory.");
       }
       auto FreeBegin() const { return free_ids.begin(); }
@@ -55,7 +57,8 @@ namespace emp {
 
       // Interface
       emp::Ptr<T> PoolPtr() const { return pool; }
-      Initialize(size_t _mem_count, size_t _pool_count) {
+      void Initialize(size_t _mem_count, size_t _pool_count) {
+        emp_assert(mem_count == 0, "Cannot (currently) re-initialize a memory factory.");
         mem_count = _mem_count;
         pool_count = _pool_count;
         chunk_size = sizeof(T) * mem_count;
@@ -71,25 +74,33 @@ namespace emp {
     class MemFactory_impl {
     protected:
       DATA_T data;
-      size_t free_count = data.pool_count;
+      size_t free_count = data.pool_count;  // Start all positions free.
 
       size_t ToID(emp::Ptr<T> in) {
         return (in.Raw() - data.PoolPtr().Raw()) / data.chunk_size;
       }
     public:
-      MemoryFactory_impl() {
+      MemFactory_impl() {
         for (size_t i = 0; i < data.pool_size; ++i) data.pool[i] = i;
       }
+      MemFactory_impl(size_t _mem_count, size_t _pool_count=100) {
+        Initialize(_mem_count, _pool_count);
+      }
       // Do not copy memory factories.
-      MemoryFactory_impl(MemoryFactory_impl &) = delete;
+      MemFactory_impl(MemFactory_impl &) = delete;
 
       size_t GetChunkSize() const { return data.chunk_size; }
       size_t GetPoolSize() const { return data.pool_size; }
 
       bool IsFreeID(size_t id) const { return std::any_of(data.FreeBegin(), data.FreeBegin()+free_count, id); }
       bool IsValidID(size_t id) const { return id < data.pool_count; }
-      emp::Ptr<T> GetAtID(size_t id) { return &pool[id]; }
-      std::span<T> GetSpanAtID(size_t id) { return std::span(GetAtID(), data.mem_count); }
+      emp::Ptr<T> GetAtID(size_t id) { return &data.pool[id]; }
+      std::span<T> GetSpanAtID(size_t id) { return std::span<T>(GetAtID(), data.mem_count); }
+
+      void Initialize(size_t  _mem_count, size_t _pool_count=100) {
+        data.Initialize(_mem_count, _pool_count);
+        free_count = data.pool_count;
+      }
 
       emp::Ptr<T> Reserve() {
         emp_assert(free_count > 0);
@@ -97,7 +108,8 @@ namespace emp {
         return &data.pool[id];
       }
       emp::Ptr<T> Reserve(size_t id) {
-        auto it = find(data.free_ids.begin(), free_ids.begin()+free_count, id); // Find ID in free list.
+        // Find ID in free list.
+        auto it = find(data.free_ids.begin(), data.free_ids.begin()+free_count, id);
         emp_assert(it != data.free_ids.begin()+free_count);   // Make sure it's there!
         *it = data.free_ids.back();                           // Move last ID into its position.
         free_count--;                                         // Eliminate old final ID (now moved).
@@ -108,14 +120,14 @@ namespace emp {
         const size_t id = ToID(in);
         emp_assert(!IsFreeID(id), "Trying to release ID that is already free.", id);
         emp_assert(IsValidID(id), "Trying to release invalid ID", id);
-        free_ids[free_count] = id;
+        data.free_ids[free_count] = id;
         ++free_count;
       }
     };
   }
 
   template <typename T, size_t MEM_COUNT, size_t POOL_COUNT>
-  using MemoryFactory =
+  using StaticMemoryFactory =
     internal::MemFactory_impl<T, internal::MemFactory_StaticData<T, MEM_COUNT, POOL_COUNT>>;
   template <typename T>
   using MemoryFactory =
