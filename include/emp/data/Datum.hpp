@@ -78,6 +78,7 @@ namespace emp {
       //return std::to_string(num);
     }
 
+//    operator bool() const { return AsDouble() != 0.0; }
     operator double() const { return AsDouble(); }
     operator std::string() const { return AsString(); }
 
@@ -109,6 +110,11 @@ namespace emp {
     Datum & operator=(const char * in) { return SetString(in); }
     Datum & operator=(const Datum & in) { return Set(in); }
 
+    // Unary operators
+    Datum operator-() const { return -AsDouble(); }
+    Datum operator!() const { return AsDouble() == 0.0; }
+
+    // Binary operators
     int CompareNumber(double rhs) const {
       const double val = AsDouble();
       return (val == rhs) ? 0 : ((val < rhs) ? -1 : 1);
