@@ -377,18 +377,8 @@ namespace emp {
 
       // This must be a DataLayout entry name.
       if (!layout.HasName(name)) ParseError("Unknown data map entry '", name, "'.");
-      size_t id = layout.GetID(name);
-      TypeID type = layout.GetType(id);
       dm_names.insert(name);    // Store this name in the list of those used.
-
-      // Return an appropriate accessor for this value.
-      if (type.IsType<std::string>()) {
-        return (value_fun_t) [id](const emp::DataMap & dm){ return dm.Get<std::string>(id); };
-      }
-      if (type.IsType<double>()) {
-        return (value_fun_t) [id](const emp::DataMap & dm){ return dm.Get<double>(id); };
-      }
-      return (value_fun_t) [id](const emp::DataMap & dm){ return dm.GetAsDouble(id); };
+      return emp::DataMap::MakeDatumAccessor(layout, name);
     }
 
     ValueType ParseMath(const DataLayout & layout, pos_t & pos, size_t prec_limit=0) {
