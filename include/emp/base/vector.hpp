@@ -29,7 +29,7 @@
 
 #ifdef EMP_NDEBUG
 
-// Seemlessly translate emp::vector to std::vector
+// Seamlessly translate emp::vector to std::vector
 namespace emp {
   template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
 }
@@ -80,7 +80,7 @@ namespace emp {
       bool OK(bool begin_ok=true, bool end_ok=true) const {
         if (v_ptr == nullptr) { ErrorCode() = "Invalid Vector! (set to nullptr)"; return false; }
         if (v_ptr->revision == 0) { ErrorCode() = "Vector deleted! (revision==0)"; return false; }
-        if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memeory!"; return false; }
+        if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memory!"; return false; }
         int64_t pos = 0;
         if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
                       std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
