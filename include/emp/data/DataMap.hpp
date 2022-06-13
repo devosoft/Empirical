@@ -339,6 +339,50 @@ namespace emp {
       MakeLayoutUnique();
       layout_ptr->Lock();
     }
+
+
+    /////////////////////////////////////////////////////////////////
+    //  Tools for working with DataMaps....
+
+
+    /// Return a function that takes in a data map and (efficiently) returns a Datum using the
+    /// specified entry.
+    static std::function<emp::Datum(const emp::DataMap &)>
+    MakeDatumAccessor(const emp::DataLayout & layout, size_t id) {
+      // This must be a DataLayout entry name.
+      emp_assert(layout.HasID(id));
+      TypeID type_id = layout.GetType(id);
+
+      // Return an appropriate accessor for this value.
+      if (type_id.IsType<std::string>()) {                  // Explicit STRING
+        return [id](const emp::DataMap & dm){
+          return emp::Datum(dm.Get<std::string>(id));
+        };
+      }
+      else if (type_id.IsType<double>()) {                  // Explicit DOUBLE
+        return [id](const emp::DataMap & dm){
+          return emp::Datum(dm.Get<double>(id));
+        };
+      }
+      else if (type_id.IsArithmetic()) {                    // Other NUMERIC type
+        return [id,type_id](const emp::DataMap & dm){
+          return emp::Datum(type_id.ToDouble(dm.memory.GetPtr(id)));
+        };
+      }
+      else {                                                // Resort to STRING
+        return [id,type_id](const emp::DataMap & dm){
+          return emp::Datum(type_id.ToString(dm.memory.GetPtr(id)));
+        };
+      }
+    }
+
+    /// Return a function that takes in a data map and (efficiently) returns a Datum using the
+    /// specified name.
+    static auto MakeDatumAccessor(const emp::DataLayout & layout, const std::string & name) { 
+      // This must be a DataLayout entry name.
+      emp_assert(layout.HasName(name));
+      return MakeDatumAccessor(layout, layout.GetID(name));
+    }
   };
 
 
