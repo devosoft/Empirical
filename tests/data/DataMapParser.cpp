@@ -154,28 +154,28 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( fun(dmB) == 60.25 );
 
   fun = parser.BuildMathFunction(dmA, "CBRT(val1)");
-  CHECK( fun(dmA) == Approx(1.1447142426) );
-  CHECK( fun(dmB) == Approx(0.5) );
+  CHECK( fun(dmA).AsDouble() == Approx(1.1447142426) );
+  CHECK( fun(dmB).AsDouble() == Approx(0.5) );
 
   fun = parser.BuildMathFunction(dmA, "SQRT(val2)");
-  CHECK( fun(dmA) == Approx(1.4142135624) );
-  CHECK( fun(dmB) == Approx(8.0156097709) );
+  CHECK( fun(dmA).AsDouble() == Approx(1.4142135624) );
+  CHECK( fun(dmB).AsDouble() == Approx(8.0156097709) );
 
   fun = parser.BuildMathFunction(dmA, "SQRT(val3)");
-  CHECK( fun(dmA) == Approx(1.7320508076) );
+  CHECK( fun(dmA).AsDouble() == Approx(1.7320508076) );
   CHECK( fun(dmB) == 2.0 );
 
   fun = parser.BuildMathFunction(dmA, "CBRT(val4)");
-  CHECK( fun(dmA) == Approx(6.3496042079) );
-  CHECK( fun(dmB) == Approx(10.0793683992) );
+  CHECK( fun(dmA).AsDouble() == Approx(6.3496042079) );
+  CHECK( fun(dmB).AsDouble() == Approx(10.0793683992) );
 
   fun = parser.BuildMathFunction(dmA, "SQRT(val3) * SQRT(val2) + CBRT(val1) + CBRT(val4)");
-  CHECK( fun(dmA) == Approx(9.9438081932) );
-  CHECK( fun(dmB) == Approx(26.610587941) );
+  CHECK( fun(dmA).AsDouble() == Approx(9.9438081932) );
+  CHECK( fun(dmB).AsDouble() == Approx(26.610587941) );
 
   fun = parser.BuildMathFunction(dmA, "LOG(val1) + LOG(val2,9) + LOG2(val3) + LOG10(val4)");
-  CHECK( fun(dmA) == Approx(4.7141324511) );
-  CHECK( fun(dmB) == Approx(4.8254220245) );
+  CHECK( fun(dmA).AsDouble() == Approx(4.7141324511) );
+  CHECK( fun(dmB).AsDouble() == Approx(4.8254220245) );
 
   names_used = parser.GetNamesUsed();
   CHECK( names_used.size() == 4 );
@@ -188,20 +188,20 @@ TEST_CASE("Test DataMap", "[data]")
   CHECK( !emp::Has(names_used, "LOG10") );
 
   fun = parser.BuildMathFunction(dmA, "SIN(val1)");
-  CHECK( fun(dmA) == Approx(0.9974949866) );
-  CHECK( fun(dmB) == Approx(0.1246747334) );
+  CHECK( fun(dmA).AsDouble() == Approx(0.9974949866) );
+  CHECK( fun(dmB).AsDouble() == Approx(0.1246747334) );
 
   fun = parser.BuildMathFunction(dmA, "COS(val2)");
-  CHECK( fun(dmA) == Approx(-0.4161468365) );
-  CHECK( fun(dmB) == Approx(0.1520572536) );
+  CHECK( fun(dmA).AsDouble() == Approx(-0.4161468365) );
+  CHECK( fun(dmB).AsDouble() == Approx(0.1520572536) );
 
   fun = parser.BuildMathFunction(dmA, "TAN(val4 - val3)");
-  CHECK( fun(dmA) == Approx(-9.7900600635) );
-  CHECK( fun(dmB) == Approx(-1.6194475388) );
+  CHECK( fun(dmA).AsDouble() == Approx(-9.7900600635) );
+  CHECK( fun(dmB).AsDouble() == Approx(-1.6194475388) );
 
   fun = parser.BuildMathFunction(dmA, "SIN(val1) + COS(val2) + TAN(val4 - val3)");
-  CHECK( fun(dmA) == Approx(-9.2087119135) );
-  CHECK( fun(dmB) == Approx(-1.3427155518) );
+  CHECK( fun(dmA).AsDouble() == Approx(-9.2087119135) );
+  CHECK( fun(dmB).AsDouble() == Approx(-1.3427155518) );
 
   fun = parser.BuildMathFunction(dmA, "CEIL(SIN(val1))");
   CHECK( fun(dmA) == 1.0 );
@@ -226,7 +226,7 @@ TEST_CASE("Test DataMap", "[data]")
 
   fun = parser.BuildMathFunction(dmA, "HYPOT(2*val1, val3+1)");
   CHECK( fun(dmA) == 5.0 );
-  CHECK( fun(dmB) == Approx(5.0062460986) );
+  CHECK( fun(dmB).AsDouble() == Approx(5.0062460986) );
 
   fun = parser.BuildMathFunction(dmA, "MIN(val2, val3)");
   CHECK( fun(dmA) == 2.0 );
