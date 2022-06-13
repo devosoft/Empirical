@@ -24,6 +24,7 @@
 #include "../base/notify.hpp"
 #include "../compiler/Lexer.hpp"
 #include "../compiler/regex_utils.hpp"
+#include "../data/Datum.hpp"
 #include "../math/Random.hpp"
 
 #include "AnnotatedType.hpp"
@@ -32,7 +33,7 @@
 namespace emp {
   class DataMapParser {
 
-    using value_fun_t = std::function<double(const emp::DataMap &)>;
+    using value_fun_t = std::function<emp::Datum(const emp::DataMap &)>;
     using pos_t = emp::TokenStream::Iterator;
 
     static constexpr const bool verbose = false;
@@ -91,16 +92,20 @@ namespace emp {
       enum type_t { ERROR=0, VALUE, FUNCTION };
 
       type_t type;
-      double value;
+      emp::Datum value;
       value_fun_t fun;
 
       ValueType() : type(ERROR) {}
       ValueType(const ValueType &) = default;
       ValueType(double in_val) : type(VALUE), value(in_val) { }
+      ValueType(std::string in_val) : type(VALUE), value(in_val) { }
+      ValueType(emp::Datum in_val) : type(VALUE), value(in_val) { }
       ValueType(value_fun_t in_fun) : type(FUNCTION), fun(in_fun) { }
 
       ValueType & operator=(const ValueType &) = default;
+      ValueType & operator=(emp::Datum in_val) { type = VALUE; value = in_val; return *this; }
       ValueType & operator=(double in_val) { type = VALUE; value = in_val; return *this; }
+      ValueType & operator=(const std::string & in_val) { type = VALUE; value = in_val; return *this; }
       ValueType & operator=(value_fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
 
       value_fun_t AsFun() {
@@ -109,17 +114,17 @@ namespace emp {
     };
 
     struct BinaryOperator {
-      using fun_t = std::function<double(double,double)>;
+      using fun_t = std::function<emp::Datum(emp::Datum,emp::Datum)>;
       size_t prec;
       fun_t fun;
       void Set(size_t in_prec, fun_t in_fun) { prec = in_prec; fun = in_fun; }
     };
 
     struct Function {
-      using fun0_t = std::function<double()>;
-      using fun1_t = std::function<double(double)>;
-      using fun2_t = std::function<double(double,double)>;
-      using fun3_t = std::function<double(double,double,double)>;
+      using fun0_t = std::function<emp::Datum()>;
+      using fun1_t = std::function<emp::Datum(emp::Datum)>;
+      using fun2_t = std::function<emp::Datum(emp::Datum,emp::Datum)>;
+      using fun3_t = std::function<emp::Datum(emp::Datum,emp::Datum,emp::Datum)>;
 
       size_t num_args = 0;
       fun0_t fun0; fun1_t fun1; fun2_t fun2; fun3_t fun3;
@@ -134,10 +139,10 @@ namespace emp {
     DataMapLexer lexer;
 
     // Operators and functions that should be used when parsing.
-    std::unordered_map<std::string, std::function<double(double)>> unary_ops;
+    std::unordered_map<std::string, std::function<emp::Datum(emp::Datum)>> unary_ops;
     std::unordered_map<std::string, BinaryOperator> binary_ops;
     std::unordered_map<std::string, Function> functions;
-    emp::vector<double> external_vals;
+    emp::vector<emp::Datum> external_vals;
 
     // The set of data map entries accessed when the last function was parsed.
     std::set<std::string> dm_names;
@@ -177,7 +182,7 @@ namespace emp {
 
 
     /// Add a unary operator
-    void AddOp(const std::string & op, std::function<double(double)> fun) {
+    void AddOp(const std::string & op, std::function<emp::Datum(emp::Datum)> fun) {
       unary_ops[op] = fun;
     }
 
@@ -191,84 +196,92 @@ namespace emp {
 
     void AddDefaultOperators() {
             // Setup the unary operators for the parser.
-      AddOp("+", [](double x) { return x; });
-      AddOp("-", [](double x) { return -x; });
-      AddOp("!", [](double x) { return (double) (x==0.0); });
+      AddOp("+", [](emp::Datum x) { return x; });
+      AddOp("-", [](emp::Datum x) { return -x; });
+      AddOp("!", [](emp::Datum x) { return !x; });
 
 
       // Setup the default binary operators for the parser.
       size_t prec = 0;  // Precedence level of each operator...
-      binary_ops["||"].Set( ++prec, [](double x, double y){ return (x!=0.0)||(y!=0.0); } );
-      binary_ops["&&"].Set( ++prec, [](double x, double y){ return (x!=0.0)&&(y!=0.0); } );
-      binary_ops["=="].Set( ++prec, [](double x, double y){ return x == y; } );
-      binary_ops["!="].Set(   prec, [](double x, double y){ return x != y; } );
-      binary_ops["~=="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) == 0; } );
-      binary_ops["~!="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) != 0; } );
-      binary_ops["<"] .Set( ++prec, [](double x, double y){ return x < y; } );
-      binary_ops["<="].Set(   prec, [](double x, double y){ return x <= y; } );
-      binary_ops[">"] .Set(   prec, [](double x, double y){ return x > y; } );
-      binary_ops[">="].Set(   prec, [](double x, double y){ return x >= y; } );
-      binary_ops["~<"].Set(   prec, [](double x, double y){ return ApproxCompare(x,y) == -1; } );
-      binary_ops["~<="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) != 1; } );
-      binary_ops["~>"].Set(   prec, [](double x, double y){ return ApproxCompare(x,y) == 1; } );
-      binary_ops["~>="].Set(  prec, [](double x, double y){ return ApproxCompare(x,y) != -1; } );
-      binary_ops["+"] .Set( ++prec, [](double x, double y){ return x + y; } );
-      binary_ops["-"] .Set(   prec, [](double x, double y){ return x - y; } );
-      binary_ops["*"] .Set( ++prec, [](double x, double y){ return x * y; } );
-      binary_ops["/"] .Set(   prec, [](double x, double y){ return x / y; } );
-      binary_ops["%"] .Set(   prec, [](double x, double y){ return emp::Mod(x, y); } );
-      binary_ops["**"].Set( ++prec, [](double x, double y){ return emp::Pow(x, y); } );
-      binary_ops["%%"].Set(   prec, [](double x, double y){ return emp::Log(x, y); } );
+      binary_ops["||"].Set( ++prec, [](emp::Datum x, emp::Datum y){ return (x!=0.0)||(y!=0.0); } );
+      binary_ops["&&"].Set( ++prec, [](emp::Datum x, emp::Datum y){ return (x!=0.0)&&(y!=0.0); } );
+      binary_ops["=="].Set( ++prec, [](emp::Datum x, emp::Datum y){ return x == y; } );
+      binary_ops["!="].Set(   prec, [](emp::Datum x, emp::Datum y){ return x != y; } );
+      binary_ops["~=="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == 0; } );
+      binary_ops["~!="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != 0; } );
+      binary_ops["<"] .Set( ++prec, [](emp::Datum x, emp::Datum y){ return x < y; } );
+      binary_ops["<="].Set(   prec, [](emp::Datum x, emp::Datum y){ return x <= y; } );
+      binary_ops[">"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return x > y; } );
+      binary_ops[">="].Set(   prec, [](emp::Datum x, emp::Datum y){ return x >= y; } );
+      binary_ops["~<"].Set(   prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == -1; } );
+      binary_ops["~<="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != 1; } );
+      binary_ops["~>"].Set(   prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == 1; } );
+      binary_ops["~>="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != -1; } );
+      binary_ops["+"] .Set( ++prec, [](emp::Datum x, emp::Datum y){ return x + y; } );
+      binary_ops["-"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return x - y; } );
+      binary_ops["*"] .Set( ++prec, [](emp::Datum x, emp::Datum y){ return x * y; } );
+      binary_ops["/"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return x / y; } );
+      binary_ops["%"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return emp::Mod(x, y); } );
+      binary_ops["**"].Set( ++prec, [](emp::Datum x, emp::Datum y){ return emp::Pow(x, y); } );
+      binary_ops["%%"].Set(   prec, [](emp::Datum x, emp::Datum y){ return emp::Log(x, y); } );
     }
 
     void AddDefaultFunctions() {
       // Setup the default functions.
-      functions["ABS"].Set1( [](double x){ return std::abs(x); } );
-      functions["EXP"].Set1( [](double x){ return emp::Pow(emp::E, x); } );
-      functions["LOG"].Set1( [](double x){ return std::log(x); } );
-      functions["LOG2"].Set1( [](double x){ return std::log2(x); } );
-      functions["LOG10"].Set1( [](double x){ return std::log10(x); } );
+      functions["ABS"].Set1( [](emp::Datum x){ return std::abs(x); } );
+      functions["EXP"].Set1( [](emp::Datum x){ return emp::Pow(emp::E, x); } );
+      functions["LOG"].Set1( [](emp::Datum x){ return std::log(x); } );
+      functions["LOG2"].Set1( [](emp::Datum x){ return std::log2(x); } );
+      functions["LOG10"].Set1( [](emp::Datum x){ return std::log10(x); } );
 
-      functions["SQRT"].Set1( [](double x){ return std::sqrt(x); } );
-      functions["CBRT"].Set1( [](double x){ return std::cbrt(x); } );
+      functions["SQRT"].Set1( [](emp::Datum x){ return std::sqrt(x); } );
+      functions["CBRT"].Set1( [](emp::Datum x){ return std::cbrt(x); } );
 
-      functions["SIN"].Set1( [](double x){ return std::sin(x); } );
-      functions["COS"].Set1( [](double x){ return std::cos(x); } );
-      functions["TAN"].Set1( [](double x){ return std::tan(x); } );
-      functions["ASIN"].Set1( [](double x){ return std::asin(x); } );
-      functions["ACOS"].Set1( [](double x){ return std::acos(x); } );
-      functions["ATAN"].Set1( [](double x){ return std::atan(x); } );
-      functions["SINH"].Set1( [](double x){ return std::sinh(x); } );
-      functions["COSH"].Set1( [](double x){ return std::cosh(x); } );
-      functions["TANH"].Set1( [](double x){ return std::tanh(x); } );
-      functions["ASINH"].Set1( [](double x){ return std::asinh(x); } );
-      functions["ACOSH"].Set1( [](double x){ return std::acosh(x); } );
-      functions["ATANH"].Set1( [](double x){ return std::atanh(x); } );
+      functions["SIN"].Set1( [](emp::Datum x){ return std::sin(x); } );
+      functions["COS"].Set1( [](emp::Datum x){ return std::cos(x); } );
+      functions["TAN"].Set1( [](emp::Datum x){ return std::tan(x); } );
+      functions["ASIN"].Set1( [](emp::Datum x){ return std::asin(x); } );
+      functions["ACOS"].Set1( [](emp::Datum x){ return std::acos(x); } );
+      functions["ATAN"].Set1( [](emp::Datum x){ return std::atan(x); } );
+      functions["SINH"].Set1( [](emp::Datum x){ return std::sinh(x); } );
+      functions["COSH"].Set1( [](emp::Datum x){ return std::cosh(x); } );
+      functions["TANH"].Set1( [](emp::Datum x){ return std::tanh(x); } );
+      functions["ASINH"].Set1( [](emp::Datum x){ return std::asinh(x); } );
+      functions["ACOSH"].Set1( [](emp::Datum x){ return std::acosh(x); } );
+      functions["ATANH"].Set1( [](emp::Datum x){ return std::atanh(x); } );
 
-      functions["CEIL"].Set1( [](double x){ return std::ceil(x); } );
-      functions["FLOOR"].Set1( [](double x){ return std::floor(x); } );
-      functions["ROUND"].Set1( [](double x){ return std::round(x); } );
+      functions["CEIL"].Set1( [](emp::Datum x){ return std::ceil(x); } );
+      functions["FLOOR"].Set1( [](emp::Datum x){ return std::floor(x); } );
+      functions["ROUND"].Set1( [](emp::Datum x){ return std::round(x); } );
 
-      functions["ISINF"].Set1( [](double x){ return std::isinf(x); } );
-      functions["ISNAN"].Set1( [](double x){ return std::isnan(x); } );
+      functions["ISINF"].Set1( [](emp::Datum x){ return std::isinf(x); } );
+      functions["ISNAN"].Set1( [](emp::Datum x){ return std::isnan(x); } );
 
       // Default 2-input functions
-      functions["HYPOT"].Set2( [](double x, double y){ return std::hypot(x,y); } );
-      functions["EXP"].Set2( [](double x, double y){ return emp::Pow(x,y); } );
-      functions["LOG"].Set2( [](double x, double y){ return emp::Log(x,y); } );
-      functions["MIN"].Set2( [](double x, double y){ return (x<y) ? x : y; } );
-      functions["MAX"].Set2( [](double x, double y){ return (x>y) ? x : y; } );
-      functions["POW"].Set2( [](double x, double y){ return emp::Pow(x,y); } );
+      functions["HYPOT"].Set2( [](emp::Datum x, emp::Datum y){ return std::hypot(x,y); } );
+      functions["EXP"].Set2( [](emp::Datum x, emp::Datum y){ return emp::Pow(x,y); } );
+      functions["LOG"].Set2( [](emp::Datum x, emp::Datum y){ return emp::Log(x,y); } );
+      functions["MIN"].Set2( [](emp::Datum x, emp::Datum y){ return (x<y) ? x : y; } );
+      functions["MAX"].Set2( [](emp::Datum x, emp::Datum y){ return (x>y) ? x : y; } );
+      functions["POW"].Set2( [](emp::Datum x, emp::Datum y){ return emp::Pow(x,y); } );
 
       // Default 3-input functions.
-      functions["IF"].Set3( [](double x, double y, double z){ return (x!=0.0) ? y : z; } );
-      functions["CLAMP"].Set3( [](double x, double y, double z){ return (x<y) ? y : (x>z) ? z : x; } );
-      functions["TO_SCALE"].Set3( [](double x, double y, double z){ return (z-y)*x+y; } );
-      functions["FROM_SCALE"].Set3( [](double x, double y, double z){ return (x-y) / (z-y); } );
+      functions["IF"].Set3( [](emp::Datum x, emp::Datum y, emp::Datum z){
+        return (x!=0.0) ? y : z;
+      } );
+      functions["CLAMP"].Set3( [](emp::Datum x, emp::Datum y, emp::Datum z){
+        return (x<y) ? y : (x>z) ? z : x;
+      } );
+      functions["TO_SCALE"].Set3( [](emp::Datum x, emp::Datum y, emp::Datum z){
+        return (z-y)*x+y;
+      } );
+      functions["FROM_SCALE"].Set3( [](emp::Datum x, emp::Datum y, emp::Datum z){
+        return (x-y) / (z-y);
+      } );
     }
 
     void AddRandomFunctions(Random & random) {
-      functions["RAND"].Set2( [&random](double x, double y){ return random.GetDouble(x,y); } );
+      functions["RAND"].Set2( [&random](emp::Datum x, emp::Datum y){ return random.GetDouble(x,y); } );
     }
 
     /// Helpers for parsing.
@@ -417,7 +430,7 @@ namespace emp {
 
     /// Parse a function description that will take a DataMap and return the results.
     /// For example, if the string "foo * 2 + bar" is passed in, a function will be returned
-    /// that takes a datamap (of the example type) loads in the values of "foo" and "bar", and
+    /// that takes a DataMap (of the example type) loads in the values of "foo" and "bar", and
     /// returns the result of the above equation.
 
     template <typename... EXTRA_Ts>
@@ -440,7 +453,7 @@ namespace emp {
       #ifdef NDEBUG
         return val.fun;
       #else
-        // If we are in debug mode, save the original datamap and double-check compatability.
+        // If we are in debug mode, save the original DataMap and double-check compatability.
         return [fun=val.fun,&orig_layout=layout](const emp::DataMap & dm){
           emp_assert(dm.HasLayout(orig_layout));
           return fun(dm);
@@ -449,37 +462,49 @@ namespace emp {
     }
 
     /// BuildMathFunction can have extra, external values provided, to be accesses as $0, $1, etc.
-    template <typename... EXTRA_Ts>
+    /// These should be either a set of individual values that can each be stored in emp::Datum
+    /// OR a single vector of emp::Datum.
+    template <typename EXTRA1_T, typename... EXTRA_Ts>
     value_fun_t BuildMathFunction(
       const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
       const std::string & expression,   ///< The primary expression to convert.
-      double extra1,                    ///< Extra numerical argument, accessed as $0
-      EXTRA_Ts... extras                ///< Extra numerical arguments (accessed as $1, $2, etc.)
+      const EXTRA1_T & extra1,          ///< Extra value argument, accessed as $0
+      EXTRA_Ts... extras                ///< Extra value arguments (accessed as $1, $2, etc.)
     ) {
-      external_vals = emp::vector<double>{extra1, static_cast<double>(extras)...};
+      // If we have a vector, make sure it is valid and then just pass it along.
+      if constexpr (emp::is_emp_vector<EXTRA1_T>()) {
+        static_assert(!emp::is_emp_vector<EXTRA1_T>() || sizeof...(EXTRA_Ts) == 0,
+          "If an emp::vector is provided to BuildMathFunction, cannot have additional args.");
+        using value_t = typename EXTRA1_T::value_type;
+        static_assert(std::is_same<value_t, emp::Datum>(),
+          "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
+        external_vals = extra1;
+      }
+      // Otherwise convert all args to emp::Datum.
+      else {
+        external_vals = emp::vector<emp::Datum>{extra1, static_cast<emp::Datum>(extras)...};
+      }
       return BuildMathFunction(layout, expression);
     }
 
-    /// External values can also be provided in the form of a vector.
-    /// BuildMathFunction can have extra, external values provided, to be accesses as $0, $1, etc.
-    template <typename... EXTRA_Ts>
-    value_fun_t BuildMathFunction(
-      const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
-      const std::string & expression,   ///< The primary expression to convert.
-      const emp::vector<double> & extra_values
-    ) {
-      external_vals = extra_values;
-      return BuildMathFunction(layout, expression);
+
+    /// Convert a DataMap into its layout if needed before generating a lambda based on a
+    /// provided expression.
+    /// @param dm The DataMap containing the required variables.
+    /// @param expression The mathematical expression to be run on the data map.
+    /// @param extras Any extra values to fill in a $0, $1, etc.
+    template <typename... ARG_Ts>
+    value_fun_t BuildMathFunction(const DataMap & dm, ARG_Ts &&... args) {
+      return BuildMathFunction(dm.GetLayout(), std::forward<ARG_Ts>(args)...);
     }
 
-    template <typename... EXTRA_Ts>
-    value_fun_t BuildMathFunction(const DataMap & dm, const std::string & expression, EXTRA_Ts... extras) {
-      return BuildMathFunction(dm.GetLayout(), expression, extras...);
-    }
-
-    template <typename... EXTRA_Ts>
-    double RunMathFunction(const DataMap & dm, const std::string & expression, EXTRA_Ts... extras) {
-      auto fun = BuildMathFunction(dm.GetLayout(), expression, extras...);
+    /// Generate a temporary math function and immediately run it on the provided arguments.
+    /// @param dm The DataMap containing the required variables.
+    /// @param expression The mathematical expression to be run on the data map.
+    /// @param extras Any extra values to fill in a $0, $1, etc.
+    template <typename... ARG_Ts>
+    emp::Datum RunMathFunction(const DataMap & dm, ARG_Ts... args) {
+      auto fun = BuildMathFunction(dm.GetLayout(), std::forward<ARG_Ts>(args)...);
       return fun(dm);
     }
 
