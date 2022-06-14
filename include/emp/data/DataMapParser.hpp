@@ -8,11 +8,9 @@
  *  @note Status: ALPHA
  *
  *  Developer TODO:
- *  - Make ${ ... } actually work
  *  - Setup operator RegEx to be built dynamically
- *  - Allow new operators to be added externally
  *  - Setup LVALUES as a type, and allow assignment
- *  - Add in a type system (String, double, vectors, etc.)
+ *  - Allow types other than Datum (string and double)?
  */
 
 #ifndef EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
@@ -195,7 +193,7 @@ namespace emp {
     }
 
     void AddDefaultOperators() {
-            // Setup the unary operators for the parser.
+      // Setup the unary operators for the parser.
       AddOp("+", [](emp::Datum x) { return x; });
       AddOp("-", [](emp::Datum x) { return -x; });
       AddOp("!", [](emp::Datum x) { return !x; });
@@ -281,6 +279,8 @@ namespace emp {
     }
 
     void AddRandomFunctions(Random & random) {
+      functions["RAND"].Set0( [&random](){ return random.GetDouble(); } );
+      functions["RAND"].Set1( [&random](emp::Datum x){ return random.GetDouble(x); } );
       functions["RAND"].Set2( [&random](emp::Datum x, emp::Datum y){ return random.GetDouble(x,y); } );
     }
 
