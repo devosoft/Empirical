@@ -36,14 +36,34 @@ namespace emp {
     char SizeByte() const { return string[SIZE_POS]; }
   public:
     ShortString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
-    ShortString(const ShortString & in) {
-      memcpy(string.data(), in.string.data(), NUM_BYTES);
+    ShortString(const ShortString &) = default;
+
+    ShortString & operator=(const ShortString &) = default;
+    ShortString & operator=(const std::string & in) {
+      resize(in.size());
+      memcpy(string.data(), in.data(), in.size());
+    }
+    ShortString & operator=(char * in) {
+      resize(strlen(in));
+      memcpy(string.data(), in, size());
     }
 
-    size_t size() const { return NUM_BYTES - SizeByte(); }
+    size_t size() const { return MAX_CHARS - SizeByte(); }
 
-    char & operator[](size_t id) { return string[id]; }
-    char operator[](size_t id) const { return string[id]; }
+    void resize(size_t new_size) {
+      emp_assert(new_size <= MAX_CHARS);
+      SizeByte() = MAX_CHARS - new_size;
+      string[new_size] = '\0';
+    }
+
+    char & operator[](size_t id) {
+      emp_assert(id < size());
+      return string[id];
+    }
+    char operator[](size_t id) const {
+      emp_assert(id < size());
+      return string[id];
+    }
 
     operator char *() { return string.data(); }
   };
