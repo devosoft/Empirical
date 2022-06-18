@@ -34,19 +34,23 @@ namespace emp {
 
     char & SizeByte() { return string[SIZE_POS]; }
     char SizeByte() const { return string[SIZE_POS]; }
+
+    ShortString & CopyFrom(const char * in, size_t len) {
+      resize(len);
+      memcpy(string.data(), in, len);
+      return *this;
+    }
   public:
     ShortString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
     ShortString(const ShortString &) = default;
+    ShortString(const std::string & in) { CopyFrom(in.data(), in.size()); }
+    ShortString(char const * in) { CopyFrom(in, strlen(in)); }
+    template <size_t SIZE> ShortString(char in[SIZE]) { CopyFrom(in, SIZE-1); }
 
     ShortString & operator=(const ShortString &) = default;
-    ShortString & operator=(const std::string & in) {
-      resize(in.size());
-      memcpy(string.data(), in.data(), in.size());
-    }
-    ShortString & operator=(char * in) {
-      resize(strlen(in));
-      memcpy(string.data(), in, size());
-    }
+    ShortString & operator=(const std::string & in) { return CopyFrom(in.data(), in.size()); }
+    ShortString & operator=(char const * in) { return CopyFrom(in, strlen(in)); }
+    template <size_t SIZE> ShortString & operator=(char in[SIZE]) { return CopyFrom(in, SIZE-1); }
 
     size_t size() const { return MAX_CHARS - SizeByte(); }
 
