@@ -269,4 +269,12 @@ TEST_CASE("Test DataMap", "[data]")
   fun = parser.BuildMathFunction(dmA, expression, multiple);
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
+
+
+  // Test with string concatenation for '+'
+  emp::DataMap dmC;
+  dmC.AddVar<std::string>("val1", "abc");
+  dmC.AddVar<std::string>("val2", "def");
+  fun = parser.BuildMathFunction(dmC, "val1 + val2");
+  CHECK(fun(dmC).AsString() == "abcdef");
 }
