@@ -16,6 +16,7 @@
 #ifndef EMP_TOOLS_SHORT_STRING_HPP_INCLUDE
 #define EMP_TOOLS_SHORT_STRING_HPP_INCLUDE
 
+#include <algorithm>
 #include <string>
 
 #include "../base/array.hpp"
@@ -40,6 +41,23 @@ namespace emp {
       memcpy(string.data(), in, len);
       return *this;
     }
+
+    // Compare this string to another.
+    // -1 means this is less, 0 means they are the same, +1 means this is greater.
+    int Compare(const char * in, size_t len) const {
+      size_t min_len = std::min(len, size());
+      for (size_t i = 0; i < min_len; ++i) {
+        if (string[i] != in[i]) {
+          if (string[i] < in[i]) return -1;
+          return 1;
+        }
+      }
+      if (size() != len) {
+        if (size() < len) return -1;
+        return 1;
+      }
+      return 0;
+    }
   public:
     ShortString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
     ShortString(const ShortString &) = default;
@@ -51,6 +69,9 @@ namespace emp {
     ShortString & operator=(const std::string & in) { return CopyFrom(in.data(), in.size()); }
     ShortString & operator=(char const * in) { return CopyFrom(in, strlen(in)); }
     template <size_t SIZE> ShortString & operator=(char in[SIZE]) { return CopyFrom(in, SIZE-1); }
+
+    char * data() { return string.data(); }
+    const char * data() const { return string.data(); }
 
     size_t size() const { return MAX_CHARS - SizeByte(); }
 
@@ -68,6 +89,21 @@ namespace emp {
       emp_assert(id < size());
       return string[id];
     }
+
+
+    template <typename T> bool operator==(const T & in) const { return Compare(in.data(), in.size()) == 0; }
+    template <typename T> bool operator!=(const T & in) const { return Compare(in.data(), in.size()) != 0; }
+    template <typename T> bool operator< (const T & in) const { return Compare(in.data(), in.size()) < 0; }
+    template <typename T> bool operator<=(const T & in) const { return Compare(in.data(), in.size()) <= 0; }
+    template <typename T> bool operator> (const T & in) const { return Compare(in.data(), in.size()) > 0; }
+    template <typename T> bool operator>=(const T & in) const { return Compare(in.data(), in.size()) >= 0; }
+
+    bool operator==(char const * in) const { return Compare(in, strlen(in)) == 0; }
+    bool operator!=(char const * in) const { return Compare(in, strlen(in)) != 0; }
+    bool operator< (char const * in) const { return Compare(in, strlen(in)) < 0; }
+    bool operator<=(char const * in) const { return Compare(in, strlen(in)) <= 0; }
+    bool operator> (char const * in) const { return Compare(in, strlen(in)) > 0; }
+    bool operator>=(char const * in) const { return Compare(in, strlen(in)) >= 0; }
 
     operator char *() { return string.data(); }
   };
