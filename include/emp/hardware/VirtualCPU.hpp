@@ -10,6 +10,8 @@
  *    - Expanded heads?
  *    - expanded_nop_args useful?
  *    - Consider changing default return value for search functions
+ *    - Consider switching to (or adding an optional mode) where nops are only curated 
+ *          as-needed instead of all at once
  *
  */
 
@@ -404,6 +406,7 @@ namespace emp{
         genome.resize(0,0);         // Clear out genome
         genome_working.resize(0,0); // Clear out working genome
         label_idx_vec.clear();      // No labels if genome is empty
+        nops_need_curated = true;
         ResetHardware();            // Reset the full hardware
       }
       /// Compile NOP instructions in genome into useful nop vectors for each instruction,
@@ -685,11 +688,6 @@ namespace emp{
         GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
         AdvanceIP();
         num_insts_executed++;
-        //std::cout << "[";
-        //for(size_t idx = 0; idx < stacks[0].size(); ++idx){
-        //  std::cout << stacks[0] << ", ";
-        //}
-        //std::cout << std::endl;
       }
       /// Process the next SERIES of instructions, directed by the instruction pointer.
       void Process(size_t num_inst = 1, bool verbose = true) {
