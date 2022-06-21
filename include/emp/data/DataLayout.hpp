@@ -239,7 +239,7 @@ namespace emp {
       image.init_to = 0;
     }
 
-    /// Destruct and delete all memomry assocated with this DataMap.
+    /// Destruct and delete all memory associated in the provided image.
     void ClearImage(MemoryImage & image) const {
       // If this memory image is already clear, stop.
       if (image.GetSize() == 0) return;
