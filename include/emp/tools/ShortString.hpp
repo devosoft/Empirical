@@ -25,19 +25,19 @@
 
 namespace emp {
 
-  template <size_t NUM_BYTES>
+  template <size_t NUM_BYTES, typename CHAR_T=char>
   class StaticString {
   private:
     static_assert(NUM_BYTES <= 256, "Static String currently limited to 256 bytes.");
     static constexpr const size_t MAX_CHARS = NUM_BYTES - 1;
     static constexpr const size_t SIZE_POS = NUM_BYTES - 1;  // Size info stored in the last byte.
 
-    emp::array<char, NUM_BYTES> string;
+    emp::array<CHAR_T, NUM_BYTES> string;
 
-    char & SizeByte() { return string[SIZE_POS]; }
-    char SizeByte() const { return string[SIZE_POS]; }
+    CHAR_T & SizeByte() { return string[SIZE_POS]; }
+    CHAR_T SizeByte() const { return string[SIZE_POS]; }
 
-    StaticString & CopyFrom(const char * in, size_t len) {
+    StaticString & CopyFrom(const CHAR_T * in, size_t len) {
       resize(len);
       memcpy(string.data(), in, len);
       return *this;
@@ -45,7 +45,7 @@ namespace emp {
 
     // Compare this string to another.
     // -1 means this is less, 0 means they are the same, +1 means this is greater.
-    int Compare(const char * in, size_t len) const {
+    int Compare(const CHAR_T * in, size_t len) const {
       size_t min_len = std::min(len, size());
       for (size_t i = 0; i < min_len; ++i) {
         if (string[i] != in[i]) {
@@ -63,16 +63,16 @@ namespace emp {
     StaticString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
     StaticString(const StaticString &) = default;
     StaticString(const std::string & in) { CopyFrom(in.data(), in.size()); }
-    StaticString(char const * in) { CopyFrom(in, strlen(in)); }
-    template <size_t SIZE> StaticString(char in[SIZE]) { CopyFrom(in, SIZE-1); }
+    StaticString(CHAR_T const * in) { CopyFrom(in, strlen(in)); }
+    template <size_t SIZE> StaticString(CHAR_T in[SIZE]) { CopyFrom(in, SIZE-1); }
 
     StaticString & operator=(const StaticString &) = default;
     StaticString & operator=(const std::string & in) { return CopyFrom(in.data(), in.size()); }
-    StaticString & operator=(char const * in) { return CopyFrom(in, strlen(in)); }
-    template <size_t SIZE> StaticString & operator=(char in[SIZE]) { return CopyFrom(in, SIZE-1); }
+    StaticString & operator=(CHAR_T const * in) { return CopyFrom(in, strlen(in)); }
+    template <size_t SIZE> StaticString & operator=(CHAR_T in[SIZE]) { return CopyFrom(in, SIZE-1); }
 
-    char * data() { return string.data(); }
-    const char * data() const { return string.data(); }
+    CHAR_T * data() { return string.data(); }
+    const CHAR_T * data() const { return string.data(); }
 
     size_t size() const { return MAX_CHARS - SizeByte(); }
 
@@ -82,11 +82,11 @@ namespace emp {
       string[new_size] = '\0';
     }
 
-    char & operator[](size_t id) {
+    CHAR_T & operator[](size_t id) {
       emp_assert(id < size());
       return string[id];
     }
-    char operator[](size_t id) const {
+    CHAR_T operator[](size_t id) const {
       emp_assert(id < size());
       return string[id];
     }
@@ -99,14 +99,14 @@ namespace emp {
     template <typename T> bool operator> (const T & in) const { return Compare(in.data(), in.size()) > 0; }
     template <typename T> bool operator>=(const T & in) const { return Compare(in.data(), in.size()) >= 0; }
 
-    bool operator==(char const * in) const { return Compare(in, strlen(in)) == 0; }
-    bool operator!=(char const * in) const { return Compare(in, strlen(in)) != 0; }
-    bool operator< (char const * in) const { return Compare(in, strlen(in)) < 0; }
-    bool operator<=(char const * in) const { return Compare(in, strlen(in)) <= 0; }
-    bool operator> (char const * in) const { return Compare(in, strlen(in)) > 0; }
-    bool operator>=(char const * in) const { return Compare(in, strlen(in)) >= 0; }
+    bool operator==(CHAR_T const * in) const { return Compare(in, strlen(in)) == 0; }
+    bool operator!=(CHAR_T const * in) const { return Compare(in, strlen(in)) != 0; }
+    bool operator< (CHAR_T const * in) const { return Compare(in, strlen(in)) < 0; }
+    bool operator<=(CHAR_T const * in) const { return Compare(in, strlen(in)) <= 0; }
+    bool operator> (CHAR_T const * in) const { return Compare(in, strlen(in)) > 0; }
+    bool operator>=(CHAR_T const * in) const { return Compare(in, strlen(in)) >= 0; }
 
-    operator char *() { return string.data(); }
+    operator CHAR_T *() { return string.data(); }
   };
 
   using ShortString = StaticString<32>;
