@@ -1,4 +1,4 @@
-TEST_NAMES = attrs char_utils hash_namify keyname_utils SolveState string_utils timing TypeTracker unique value_utils
+TEST_NAMES = attrs char_utils hash_namify keyname_utils MemoryFactory ShortString SolveState string_utils timing TypeTracker unique value_utils
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DCATCH_CONFIG_MAIN
