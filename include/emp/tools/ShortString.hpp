@@ -25,18 +25,19 @@
 
 namespace emp {
 
-  class ShortString {
+  template <size_t NUM_BYTES>
+  class StaticString {
   private:
-    static constexpr const size_t NUM_BYTES = 32;
+    static_assert(NUM_BYTES <= 256, "Static String currently limited to 256 bytes.");
     static constexpr const size_t MAX_CHARS = NUM_BYTES - 1;
-    static constexpr const size_t SIZE_POS = NUM_BYTES - 1;
+    static constexpr const size_t SIZE_POS = NUM_BYTES - 1;  // Size info stored in the last byte.
 
     emp::array<char, NUM_BYTES> string;
 
     char & SizeByte() { return string[SIZE_POS]; }
     char SizeByte() const { return string[SIZE_POS]; }
 
-    ShortString & CopyFrom(const char * in, size_t len) {
+    StaticString & CopyFrom(const char * in, size_t len) {
       resize(len);
       memcpy(string.data(), in, len);
       return *this;
@@ -59,16 +60,16 @@ namespace emp {
       return 0;
     }
   public:
-    ShortString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
-    ShortString(const ShortString &) = default;
-    ShortString(const std::string & in) { CopyFrom(in.data(), in.size()); }
-    ShortString(char const * in) { CopyFrom(in, strlen(in)); }
-    template <size_t SIZE> ShortString(char in[SIZE]) { CopyFrom(in, SIZE-1); }
+    StaticString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
+    StaticString(const StaticString &) = default;
+    StaticString(const std::string & in) { CopyFrom(in.data(), in.size()); }
+    StaticString(char const * in) { CopyFrom(in, strlen(in)); }
+    template <size_t SIZE> StaticString(char in[SIZE]) { CopyFrom(in, SIZE-1); }
 
-    ShortString & operator=(const ShortString &) = default;
-    ShortString & operator=(const std::string & in) { return CopyFrom(in.data(), in.size()); }
-    ShortString & operator=(char const * in) { return CopyFrom(in, strlen(in)); }
-    template <size_t SIZE> ShortString & operator=(char in[SIZE]) { return CopyFrom(in, SIZE-1); }
+    StaticString & operator=(const StaticString &) = default;
+    StaticString & operator=(const std::string & in) { return CopyFrom(in.data(), in.size()); }
+    StaticString & operator=(char const * in) { return CopyFrom(in, strlen(in)); }
+    template <size_t SIZE> StaticString & operator=(char in[SIZE]) { return CopyFrom(in, SIZE-1); }
 
     char * data() { return string.data(); }
     const char * data() const { return string.data(); }
@@ -108,6 +109,7 @@ namespace emp {
     operator char *() { return string.data(); }
   };
 
+  using ShortString = StaticString<32>;
 }
 
 #endif
