@@ -18,6 +18,24 @@ TEST_CASE("Test ShortString", "[tools]")
   CHECK( str1[1] == 'B' );
   CHECK( str1[2] == 'C' );
 
-  CHECK( str1 = "ABC" );
+  CHECK( str1 == "ABC" );
 
+  std::string std_str = "DEFGH";
+
+  CHECK( str1 != std_str );
+  CHECK( str1 < std_str );
+
+  emp::ShortString str2(std_str);
+
+  CHECK( str1 != str2 );
+  CHECK( str1 < str2 );
+  CHECK( str2 > str1 );
+  CHECK( str1 <= str2 );
+  CHECK( str2 >= str1 );
+
+  str1 = str2;
+
+  CHECK( str1 == str2 );
+  CHECK( str1 <= str2);
+  CHECK( str1 >= str2);
 }
