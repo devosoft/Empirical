@@ -14,11 +14,50 @@
 #ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
 #define EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
 
+#include "../base/notify.hpp"
 #include "../base/vector.hpp"
+#include "../tools/string_utils.hpp"
 
 #include "math.hpp"
 
 namespace emp {
+
+  /// Generate a sequence from a string.
+  /// Format: "entry1,entry2,entry3" etc.
+  /// Entries can be single values (Eg: "72") or ranges using start[:step]:stop format
+  /// (Eg: "0:100" or "3:5:33").
+
+  template <typename T=size_t>
+  emp::vector<T> ToSequence(std::string sequence_str) {
+    // Clean up input sequence and slice by commas.
+    emp::remove_whitespace(sequence_str);
+    emp::vector<std::string> seq_slices = emp::slice(sequence_str, ',');
+    emp::vector<T> out;
+
+    // Convert each slice into a value or range of values.
+    emp::vector<std::string> range_slices;
+    for (const std::string & slice : seq_slices) {
+      emp::slice(slice, range_slices, ':');
+      T start = emp::from_string<T>(range_slices[0]);
+      T step = static_cast<T>(1);
+      T stop = start + static_cast<T>(1);
+
+      if (range_slices.size() == 2) stop = emp::from_string<T>(range_slices[1]);
+      else if (range_slices.size() == 3) {
+        step = emp::from_string<T>(range_slices[1]);
+        stop = emp::from_string<T>(range_slices[2]);
+      }
+      else if (range_slices.size() > 3) {
+        emp::notify::Exception("math::sequence_utils::ToSequence::invalid_range",
+                               "emp::ToSequnce() provided with range with too many ':'",
+                               slice);
+      }
+
+      for (T i = start; i < stop; i += step) out.push_back(i);
+    }
+
+    return out;
+  }
 
   // --- Distance functions for any array-type objects ---
 
