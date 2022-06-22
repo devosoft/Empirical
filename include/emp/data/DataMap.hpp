@@ -96,6 +96,7 @@
 #include "../polyfill/span.hpp"
 #include "../tools/string_utils.hpp"
 
+#include "Datum.hpp"
 #include "DataLayout.hpp"
 #include "MemoryImage.hpp"
 
