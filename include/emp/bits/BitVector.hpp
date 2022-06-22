@@ -190,20 +190,20 @@ namespace emp {
     ~BitVector();
 
     /// Assignment operator.
-    BitVector & operator=(const BitVector & in);
+    BitVector & operator=(const BitVector & in) &;
 
     /// Move operator.
-    BitVector & operator=(BitVector && in);
+    BitVector & operator=(BitVector && in) &;
 
     /// Assignment operator from a std::bitset.
     template <size_t NUM_BITS>
-    BitVector & operator=(const std::bitset<NUM_BITS> & bitset);
+    BitVector & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
     /// Assignment operator from a string of '0's and '1's.
-    BitVector & operator=(const std::string & bitstring);
+    BitVector & operator=(const std::string & bitstring) &;
 
     /// Assignment operator from a literal string of '0's and '1's.
-    BitVector & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
+    BitVector & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitVector without changing size.
     BitVector & Import( const BitVector & from_bv, const size_t from_bit=0 );
@@ -1155,7 +1155,7 @@ namespace emp {
   }
 
   /// Assignment operator.
-  BitVector & BitVector::operator=(const BitVector & in) {
+  BitVector & BitVector::operator=(const BitVector & in) & {
     emp_assert(in.OK());
 
     if (&in == this) return *this;
@@ -1175,7 +1175,7 @@ namespace emp {
   }
 
   /// Move operator.
-  BitVector & BitVector::operator=(BitVector && in) {
+  BitVector & BitVector::operator=(BitVector && in) & {
     emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
     if (bits) bits.DeleteArray();   // If we already have bits, get rid of them.
     num_bits = in.num_bits;         // Update the number of bits...
@@ -1188,7 +1188,7 @@ namespace emp {
 
   /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS>
-  BitVector & BitVector::operator=(const std::bitset<NUM_BITS> & bitset) {
+  BitVector & BitVector::operator=(const std::bitset<NUM_BITS> & bitset) & {
     const size_t start_fields = NumFields();
     num_bits = NUM_BITS;
     const size_t new_fields = NumFields();
@@ -1207,7 +1207,7 @@ namespace emp {
   }
 
   /// Assignment operator from a string of '0's and '1's.
-  BitVector & BitVector::operator=(const std::string & bitstring) {
+  BitVector & BitVector::operator=(const std::string & bitstring) & {
     const size_t start_fields = NumFields();
     num_bits = bitstring.size();
     const size_t new_fields = NumFields();

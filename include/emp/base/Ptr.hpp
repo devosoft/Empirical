@@ -85,8 +85,8 @@ namespace emp {
     }
     PtrInfo(const PtrInfo &) = default;
     PtrInfo(PtrInfo &&) = default;
-    PtrInfo & operator=(const PtrInfo &) = default;
-    PtrInfo & operator=(PtrInfo &&) = default;
+    PtrInfo & operator=(const PtrInfo &) & = default;
+    PtrInfo & operator=(PtrInfo &&) & = default;
 
     ~PtrInfo() {
       if (internal::ptr_debug) std::cout << "Deleted info for pointer " << ptr << std::endl;
@@ -624,7 +624,7 @@ namespace emp {
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     /// Copy assignment
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
       if (internal::ptr_debug) {
         std::cout << "copy assignment from id " << _in.id << " to id " << id
                   << std::endl;
@@ -645,7 +645,7 @@ namespace emp {
     /// Assign to a raw pointer of the correct type; if this is already tracked, hooked in
     /// correctly, otherwise don't track.
     template <typename T2>
-    Ptr<TYPE> & operator=(T2 * _in) {
+    Ptr<TYPE> & operator=(T2 * _in) & {
       if (internal::ptr_debug) std::cout << "raw assignment" << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_in)) );
 
@@ -667,7 +667,7 @@ namespace emp {
 
     /// Assign to a convertable Ptr
     template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> _in) {
+    Ptr<TYPE> & operator=(Ptr<T2> _in) & {
       if (internal::ptr_debug) std::cout << "convert-copy assignment" << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())), _in.id );
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
@@ -887,11 +887,11 @@ namespace emp {
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); } };
 
     // Copy assignments
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & { ptr = _in.ptr; return *this; }
 
     // Assign to compatible Ptr or raw (non-managed) pointer.
-    template <typename T2> Ptr<TYPE> & operator=(T2 * _in) { ptr = _in; return *this; }
-    template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) { ptr = _in.Raw(); return *this; }
+    template <typename T2> Ptr<TYPE> & operator=(T2 * _in) & { ptr = _in; return *this; }
+    template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) & { ptr = _in.Raw(); return *this; }
 
     // Auto-cast to raw pointer type.
     operator TYPE *() { return ptr; }

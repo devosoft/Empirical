@@ -168,16 +168,16 @@ namespace emp {
     ~BitArray() = default;
 
     /// Assignment operator (no separate move opperator since no resources to move...)
-    BitArray & operator=(const this_t & in_bits) noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
+    BitArray & operator=(const this_t & in_bits) & noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
-    BitArray & operator=(const std::bitset<NUM_BITS> & bitset);
+    BitArray & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
     /// Assignment operator from a string of '0's and '1's.
-    BitArray & operator=(const std::string & bitstring);
+    BitArray & operator=(const std::string & bitstring) &;
 
     /// Assignment operator from a literal string of '0's and '1's.
-    BitArray & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
+    BitArray & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitArray of a different size.
     template <size_t FROM_BITS, bool FROM_LEFT>
@@ -997,7 +997,7 @@ namespace emp {
     /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> &
-  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) & {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
   }
@@ -1005,7 +1005,7 @@ namespace emp {
   /// Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> &
-  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) & {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
     if constexpr (ZERO_LEFT) {

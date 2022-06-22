@@ -104,8 +104,8 @@ namespace emp {
         return true;
       }
 
-      this_t & operator=(const this_t &) = default;
-      this_t & operator=(this_t &&) = default;
+      this_t & operator=(const this_t &) & = default;
+      this_t & operator=(this_t &&) & = default;
 
       operator ITERATOR_T() { return *this; }
       operator const ITERATOR_T() const { return *this; }
@@ -214,7 +214,7 @@ namespace emp {
       stdv_t::resize(new_size, val);
       revision++;
     }
-    this_t & operator=(const this_t &) = default;
+    this_t & operator=(const this_t &) & = default;
 
     T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
@@ -304,7 +304,7 @@ namespace emp {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size, val);
     }
-    this_t & operator=(const this_t &) = default;
+    this_t & operator=(const this_t &) & = default;
 
     auto operator[](size_t pos) -> decltype(stdv_t::operator[](pos)) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
