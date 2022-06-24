@@ -29,6 +29,8 @@ namespace emp {
 
   constexpr const int32_t MIN_INT = -2147483648;      ///< (- 2^31)
 
+  constexpr const size_t MAX_SIZE_T = static_cast<size_t>(-1);
+
   /// Determine the maximum value for any type.
   // @CAO: Prevent inf to get more realistic numbers for double/float?
   template <typename T>
