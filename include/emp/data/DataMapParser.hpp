@@ -3,21 +3,29 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021-2022.
  *
- *  @file DataMapParser.hpp
- *  @brief Useful functions for working with DataMaps and AnnotatedTypes.
+ *  @file SimpleParser.hpp
+ *  @brief Parser to convert function descriptions to lambdas using maps for variable lookup.
  *  @note Status: ALPHA
  *
+ *  A fully functional parser that will convert a string-description of a function to a C++
+ *  lambda.  A map-typed object should be passed in to provide values associated with variables.
+ *  Allowed map types include std::map<std::string,T>, std::unordered_map<std::string,T>,
+ *  emp::DataMap, and (soon) derivations from emp::AnnotatedType.  For standard maps, T must be
+ *  convertable to emp::Datum.
+ * 
  *  Developer TODO:
  *  - Setup operator RegEx to be built dynamically
  *  - Setup LVALUES as a type, and allow assignment
  *  - Allow types other than Datum (string and double)?
  */
 
-#ifndef EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
-#define EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
+#ifndef EMP_DATA_SIMPLE_PARSER_HPP_INCLUDE
+#define EMP_DATA_SIMPLE_PARSER_HPP_INCLUDE
 
 #include <cmath>
 #include <string>
+#include <map>
+#include <unordered_map>
 
 #include "../base/notify.hpp"
 #include "../compiler/Lexer.hpp"
@@ -28,15 +36,104 @@
 #include "AnnotatedType.hpp"
 #include "DataMap.hpp"
 
-namespace emp {
-  class DataMapParser {
+/*
+    static_assert( std::is_same<typename MAP_T::key_type, std::string>(),
+                   "Any map type used by the parser must have a key type of std::string");
+*/
 
-    using value_fun_t = std::function<emp::Datum(const emp::DataMap &)>;
+namespace emp {
+
+  class SimpleParser {
+  private:
+
+    template <typename ARG_T>
+    struct ValueType {
+      using fun_t = std::function<emp::Datum(ARG_T)>;
+      enum type_t { ERROR=0, VALUE, FUNCTION };
+
+      type_t type;
+      emp::Datum value;
+      fun_t fun;
+
+      ValueType() : type(ERROR) {}
+      ValueType(const ValueType &) = default;
+      ValueType(double in_val) : type(VALUE), value(in_val) { }
+      ValueType(std::string in_val) : type(VALUE), value(in_val) { }
+      ValueType(emp::Datum in_val) : type(VALUE), value(in_val) { }
+      ValueType(fun_t in_fun) : type(FUNCTION), fun(in_fun) { }
+
+      ValueType & operator=(const ValueType &) = default;
+      ValueType & operator=(emp::Datum in_val) { type = VALUE; value = in_val; return *this; }
+      ValueType & operator=(double in_val) { type = VALUE; value = in_val; return *this; }
+      ValueType & operator=(const std::string & in_val) { type = VALUE; value = in_val; return *this; }
+      ValueType & operator=(fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
+
+      fun_t AsFunction() {
+        if (type==FUNCTION) return fun;
+        else return [v=value](ARG_T){ return v; };
+      }
+    };
+
+    template <typename MAP_T>
+    struct SymbolTable {
+      using arg_t = const MAP_T &;
+      using fun_t = std::function<emp::Datum(arg_t)>;
+      using value_t = ValueType<arg_t>;
+
+      SymbolTable() { }
+      SymbolTable(arg_t) { }
+
+      static auto MakeDatumAccessor(const std::string & name) {
+        return [](arg_t symbol_vals){
+          return emp::Datum(symbol_vals[id]);
+        };
+      }
+
+      /// By default, let the value handle its own converstion to a function.
+      auto AsFunction(ValueType<arg_t> & val) const { return val.AsFunction(); }
+    };
+
+    /// Specialty implementation for DataLayouts.
+    template <>
+    struct SymbolTable<emp::DataLayout> {
+      using arg_t = const emp::DataMap &;
+      using fun_t = std::function<emp::Datum(arg_t)>;
+      using value_t = ValueType<arg_t>;
+
+      const emp::DataLayout & layout;
+
+      SymbolTable(const emp::DataLayout & in_layout) : layout(in_layout) { }
+
+      static auto MakeDatumAccessor(const std::string & name) {
+        return emp::DataMap::MakeDatumAccessor(layout, name);
+      }
+
+      auto AsFunction(ValueType<arg_t> & val) const {
+        #ifdef NDEBUG
+          return val.AsFunction();
+        #else
+          // If we are in debug mode, add wrapper to ensure DataMap with has correct layout.
+          return [fun=val.fun,this](arg_t dm) {
+            emp_assert(dm.HasLayout(layout));
+            return fun(dm);
+          };
+        #endif
+      }
+
+    };
+
+    /// Special DataMap implementation that just converts to underlying layout.
+    template <>
+    struct SymbolTable<emp::DataMap> : public SymbolTable<emp::DataLayout> {
+      SymbolTable(const emp::DataMap & in_map) : SymbolTable<emp::DataLayout>(in_map.GetLayout()) { }
+    };
+
+
     using pos_t = emp::TokenStream::Iterator;
 
     static constexpr const bool verbose = false;
 
-    class DataMapLexer : public emp::Lexer {
+    class MapLexer : public emp::Lexer {
     private:
       int token_identifier;   ///< Token id for identifiers
       int token_number;       ///< Token id for literal numbers
@@ -46,7 +143,7 @@ namespace emp {
       int token_symbol;       ///< Token id for other symbols
 
     public:
-      DataMapLexer() {
+      MapLexer() {
         // Whitespace and comments should always be dismissed (top priority)
         IgnoreToken("Whitespace", "[ \t\n\r]+");
         IgnoreToken("//-Comments", "//.*");
@@ -86,31 +183,6 @@ namespace emp {
       bool IsSymbol(const emp::Token & token) const noexcept { return token.token_id == token_symbol; }
     };
 
-    struct ValueType {
-      enum type_t { ERROR=0, VALUE, FUNCTION };
-
-      type_t type;
-      emp::Datum value;
-      value_fun_t fun;
-
-      ValueType() : type(ERROR) {}
-      ValueType(const ValueType &) = default;
-      ValueType(double in_val) : type(VALUE), value(in_val) { }
-      ValueType(std::string in_val) : type(VALUE), value(in_val) { }
-      ValueType(emp::Datum in_val) : type(VALUE), value(in_val) { }
-      ValueType(value_fun_t in_fun) : type(FUNCTION), fun(in_fun) { }
-
-      ValueType & operator=(const ValueType &) = default;
-      ValueType & operator=(emp::Datum in_val) { type = VALUE; value = in_val; return *this; }
-      ValueType & operator=(double in_val) { type = VALUE; value = in_val; return *this; }
-      ValueType & operator=(const std::string & in_val) { type = VALUE; value = in_val; return *this; }
-      ValueType & operator=(value_fun_t in_fun) { type = FUNCTION; fun = in_fun; return *this; }
-
-      value_fun_t AsFun() {
-        if (type==FUNCTION) return fun; else return [v=value](const emp::DataMap &){ return v; };
-      }
-    };
-
     struct BinaryOperator {
       using fun_t = std::function<emp::Datum(emp::Datum,emp::Datum)>;
       size_t prec;
@@ -134,7 +206,7 @@ namespace emp {
     };
 
     // --------- MEMBER VARIABLES -----------
-    DataMapLexer lexer;
+    MapLexer lexer;
 
     // Operators and functions that should be used when parsing.
     std::unordered_map<std::string, std::function<emp::Datum(emp::Datum)>> unary_ops;
@@ -143,39 +215,40 @@ namespace emp {
     emp::vector<emp::Datum> external_vals;
 
     // The set of data map entries accessed when the last function was parsed.
-    std::set<std::string> dm_names;
+    std::set<std::string> var_names;
 
     // Track the number of errors and the function to call when errors occur.
     template<typename... Ts>
-    ValueType ParseError(Ts &&... args) {
-      emp::notify::Exception("DataMapParser::PARSE_ERROR", emp::to_string(args...), this);
-      return ValueType{};
+    size_t ParseError(Ts &&... args) {
+      emp::notify::Exception("SimpleParser::PARSE_ERROR", emp::to_string(args...), this);
+      return 1;
     }
 
   public:
-    DataMapParser(bool use_defaults=true) {
+    SimpleParser(bool use_defaults=true) {
       if (use_defaults) {
         AddDefaultOperators();
         AddDefaultFunctions();
       }
     }
 
-    DataMapParser(bool use_defaults, emp::Random & random) : DataMapParser(use_defaults)
+    /// Construct with a random number generator to automatically include random functions.
+    SimpleParser(bool use_defaults, emp::Random & random) : SimpleParser(use_defaults)
     { AddRandomFunctions(random); }
 
-    /// Get the set of names that the most recently generated function accesses in DataMap.
-    const std::set<std::string> & GetNamesUsed() const { return dm_names; }
+    /// Get the set of variable names that the most recently generated function used.
+    const std::set<std::string> & GetNamesUsed() const { return var_names; }
 
     /// Get the set of names used in the provided equation.
     const std::set<std::string> & GetNamesUsed(const std::string & expression) {
-      dm_names.clear();
+      var_names.clear();
       emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
       for (emp::Token token : tokens) {
         if (lexer.IsID(token) && !emp::Has(functions, token.lexeme)) {
-          dm_names.insert(token.lexeme);
+          var_names.insert(token.lexeme);
         }
       }
-      return dm_names;
+      return var_names;
     }
 
 
@@ -183,6 +256,13 @@ namespace emp {
     void AddOp(const std::string & op, std::function<emp::Datum(emp::Datum)> fun) {
       unary_ops[op] = fun;
     }
+
+    /// Add a binary operator
+    void AddOp(const std::string & op, size_t prec,
+               std::function<emp::Datum(emp::Datum,emp::Datum)> fun) {
+      binary_ops[op].Set(prec, fun);
+    }
+
 
     static int ApproxCompare(double x, double y) {
       static constexpr double APPROX_FRACTION = 8192.0;
@@ -201,27 +281,27 @@ namespace emp {
 
       // Setup the default binary operators for the parser.
       size_t prec = 0;  // Precedence level of each operator...
-      binary_ops["||"].Set( ++prec, [](emp::Datum x, emp::Datum y){ return (x!=0.0)||(y!=0.0); } );
-      binary_ops["&&"].Set( ++prec, [](emp::Datum x, emp::Datum y){ return (x!=0.0)&&(y!=0.0); } );
-      binary_ops["=="].Set( ++prec, [](emp::Datum x, emp::Datum y){ return x == y; } );
-      binary_ops["!="].Set(   prec, [](emp::Datum x, emp::Datum y){ return x != y; } );
-      binary_ops["~=="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == 0; } );
-      binary_ops["~!="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != 0; } );
-      binary_ops["<"] .Set( ++prec, [](emp::Datum x, emp::Datum y){ return x < y; } );
-      binary_ops["<="].Set(   prec, [](emp::Datum x, emp::Datum y){ return x <= y; } );
-      binary_ops[">"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return x > y; } );
-      binary_ops[">="].Set(   prec, [](emp::Datum x, emp::Datum y){ return x >= y; } );
-      binary_ops["~<"].Set(   prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == -1; } );
-      binary_ops["~<="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != 1; } );
-      binary_ops["~>"].Set(   prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == 1; } );
-      binary_ops["~>="].Set(  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != -1; } );
-      binary_ops["+"] .Set( ++prec, [](emp::Datum x, emp::Datum y){ return x + y; } );
-      binary_ops["-"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return x - y; } );
-      binary_ops["*"] .Set( ++prec, [](emp::Datum x, emp::Datum y){ return x * y; } );
-      binary_ops["/"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return x / y; } );
-      binary_ops["%"] .Set(   prec, [](emp::Datum x, emp::Datum y){ return emp::Mod(x, y); } );
-      binary_ops["**"].Set( ++prec, [](emp::Datum x, emp::Datum y){ return emp::Pow(x, y); } );
-      binary_ops["%%"].Set(   prec, [](emp::Datum x, emp::Datum y){ return emp::Log(x, y); } );
+      AddOp("||", ++prec, [](emp::Datum x, emp::Datum y){ return (x!=0.0)||(y!=0.0); } );
+      AddOp("&&", ++prec, [](emp::Datum x, emp::Datum y){ return (x!=0.0)&&(y!=0.0); } );
+      AddOp("==", ++prec, [](emp::Datum x, emp::Datum y){ return x == y; } );
+      AddOp("!=",   prec, [](emp::Datum x, emp::Datum y){ return x != y; } );
+      AddOp("~==",  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == 0; } );
+      AddOp("~!=",  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != 0; } );
+      AddOp("<",  ++prec, [](emp::Datum x, emp::Datum y){ return x < y; } );
+      AddOp("<=",   prec, [](emp::Datum x, emp::Datum y){ return x <= y; } );
+      AddOp(">",    prec, [](emp::Datum x, emp::Datum y){ return x > y; } );
+      AddOp(">=",   prec, [](emp::Datum x, emp::Datum y){ return x >= y; } );
+      AddOp("~<",   prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == -1; } );
+      AddOp("~<=",  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != 1; } );
+      AddOp("~>",   prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) == 1; } );
+      AddOp("~>=",  prec, [](emp::Datum x, emp::Datum y){ return ApproxCompare(x,y) != -1; } );
+      AddOp("+",  ++prec, [](emp::Datum x, emp::Datum y){ return x + y; } );
+      AddOp("-",    prec, [](emp::Datum x, emp::Datum y){ return x - y; } );
+      AddOp("*",  ++prec, [](emp::Datum x, emp::Datum y){ return x * y; } );
+      AddOp("/",    prec, [](emp::Datum x, emp::Datum y){ return x / y; } );
+      AddOp("%",    prec, [](emp::Datum x, emp::Datum y){ return emp::Mod(x, y); } );
+      AddOp("**", ++prec, [](emp::Datum x, emp::Datum y){ return emp::Pow(x, y); } );
+      AddOp("%%",   prec, [](emp::Datum x, emp::Datum y){ return emp::Log(x, y); } );
     }
 
     void AddDefaultFunctions() {
@@ -285,26 +365,31 @@ namespace emp {
     }
 
     /// Helpers for parsing.
-    ValueType ParseValue(const DataLayout & layout, pos_t & pos) {
+    template <typename SYMBOLS_T>
+    SYMBOLS_T::value_t ParseValue(const SYMBOLS_T & symbols, pos_t & pos) {
       if constexpr (verbose) {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
+
+      using value_t = SYMBOLS_T::value_t;
 
       // Deal with any unary operators...
       if (emp::Has(unary_ops, pos->lexeme)) {
         if constexpr (verbose) std::cout << "Found UNARY OP: " << pos->lexeme << std::endl;
         auto op = unary_ops[pos->lexeme];
         ++pos;
-        ValueType val = ParseValue(layout, pos);
-        if (val.type == ValueType::VALUE) { return op(val.value); }
-        else { return (value_fun_t) [fun=val.fun,op](const emp::DataMap & dm){ return op(fun(dm)); }; }
+        value_t val = ParseValue(symbols, pos);
+        if (val.type == value_t::VALUE) { return op(val.value); }
+        else {
+          return (value_fun_t) [fun=val.fun,op](SYMBOLS_T::arg_t arg){ return op(fun(arg)); };
+        }
       }
 
       // If we have parentheses, process the contents
       if (pos->lexeme == "(") {
         if constexpr (verbose) std::cout << "Found: OPEN PAREN" << std::endl;
         ++pos;
-        ValueType val = ParseMath(layout, pos);
+        value_t val = ParseMath(symbols, pos);
         if (pos->lexeme != ")") return ParseError("Expected ')', but found '", pos->lexeme, "'.");
         ++pos;
         return val;
@@ -337,7 +422,7 @@ namespace emp {
       if (is_fun) {
         if (!emp::Has(functions, name)) return ParseError("Call to unknown function '", name,"'.");
         ++pos;
-        emp::vector<ValueType> args;
+        emp::vector<value_t> args;
         while(pos->lexeme != ")") {
           args.push_back(ParseMath(layout, pos));
           if (pos->lexeme == ",") ++pos;
@@ -349,24 +434,24 @@ namespace emp {
         switch (args.size()) {
         case 0:
           if (!functions[name].fun0) ParseError("Function '", name, "' requires arguments.");
-          out_fun = [fun=functions[name].fun0](const emp::DataMap & /*dm*/) { return fun(); };
+          out_fun = [fun=functions[name].fun0](SYMBOLS_T::arg_t /*are*/) { return fun(); };
           break;
         case 1:
           if (!functions[name].fun1) ParseError("Function '", name, "' cannot have 1 arguments.");
-          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](const emp::DataMap & dm) {
-            return fun(arg0(dm));
+          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](SYMBOLS_T::arg_t sym_arg) {
+            return fun(arg0(sym_arg));
           };
           break;
         case 2:
           if (!functions[name].fun2) ParseError("Function '", name, "' cannot have 2 arguments.");
-          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](const emp::DataMap & dm) {
-            return fun(arg0(dm), arg1(dm));
+          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](SYMBOLS_T::arg_t sym_arg) {
+            return fun(arg0(sym_arg), arg1(sym_arg));
           };
           break;
         case 3:
           if (!functions[name].fun3) ParseError("Function '", name, "' cannot have 3 arguments.");
-          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](const emp::DataMap & dm) {
-            return fun(arg0(dm), arg1(dm), arg2(dm));
+          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](SYMBOLS_T::arg_t sym_arg) {
+            return fun(arg0(sym_arg), arg1(sym_arg), arg2(sym_arg));
           };
           break;
         default:
@@ -377,12 +462,14 @@ namespace emp {
 
       // This must be a DataLayout entry name.
       if (!layout.HasName(name)) ParseError("Unknown data map entry '", name, "'.");
-      dm_names.insert(name);    // Store this name in the list of those used.
-      return emp::DataMap::MakeDatumAccessor(layout, name);
+      var_names.insert(name);    // Store this name in the list of those used.
+      return symbols.MakeDatumAccessor(name);
     }
 
-    ValueType ParseMath(const DataLayout & layout, pos_t & pos, size_t prec_limit=0) {
-      ValueType val1 = ParseValue(layout, pos);
+    template <typename SYMBOLS_T>
+    SYMBOLS_T::value_t ParseMath(const SYMBOLS_T & symbols, pos_t & pos, size_t prec_limit=0) {
+      using value_t = SYMBOLS_T::value_t;
+      value_t val1 = ParseValue(symbols, pos);
 
       if constexpr (verbose) {
         if (pos.IsValid()) {
@@ -398,22 +485,22 @@ namespace emp {
           const BinaryOperator & op = binary_ops[pos->lexeme];
           if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
           ++pos;
-          ValueType val2 = ParseMath(layout, pos, op.prec);
-          if (val1.type == ValueType::VALUE) {
-            if (val2.type == ValueType::VALUE) { val1 = op.fun(val1.value, val2.value); }
+          value_t val2 = ParseMath(symbols, pos, op.prec);
+          if (val1.type == value_t::VALUE) {
+            if (val2.type == value_t::VALUE) { val1 = op.fun(val1.value, val2.value); }
             else {
-              val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](const emp::DataMap & dm){
-                return op_fun(val1_num, val2_fun(dm));
+              val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](SYMBOLS_T::arg_t symbol_vals){
+                return op_fun(val1_num, val2_fun(symbol_vals));
               };
             }
           } else {
-            if (val2.type == ValueType::VALUE) {
-              val1 = (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](const emp::DataMap & dm){
-                return op_fun(val1_fun(dm), val2_num);
+            if (val2.type == value_t::VALUE) {
+              val1 = (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](SYMBOLS_T::arg_t symbol_vals){
+                return op_fun(val1_fun(symbol_vals), val2_num);
               };
             } else {
-              val1 = (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](const emp::DataMap & dm){
-                return op_fun(val1_fun(dm), val2_fun(dm));
+              val1 = (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](SYMBOLS_T::arg_t symbol_vals){
+                return op_fun(val1_fun(symbol_vals), val2_fun(symbol_vals));
               };
             }
           }
@@ -427,87 +514,66 @@ namespace emp {
       return val1;
     }
 
-    /// Parse a function description that will take a DataMap and return the results.
-    /// For example, if the string "foo * 2 + bar" is passed in, a function will be returned
-    /// that takes a DataMap (of the example type) loads in the values of "foo" and "bar", and
-    /// returns the result of the above equation.
-
-    template <typename... EXTRA_Ts>
-    value_fun_t BuildMathFunction(
-      const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
-      const std::string & expression    ///< The primary expression to convert.
-    ) {
-      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
-      if constexpr (verbose) tokens.Print();
-      dm_names.clear();    // Reset the names used from data map.
-      pos_t pos = tokens.begin();
-      ValueType val = ParseMath(layout, pos);
-
-      // If this value is fixed, turn it into a function.
-      if (val.type == ValueType::VALUE) {
-        return [out=val.value](const emp::DataMap &){ return out; };
-      }
-
-      // Otherwise return the function produced.
-      #ifdef NDEBUG
-        return val.fun;
-      #else
-        // If we are in debug mode, save the original DataMap and double-check compatability.
-        return [fun=val.fun,&orig_layout=layout](const emp::DataMap & dm){
-          emp_assert(dm.HasLayout(orig_layout));
-          return fun(dm);
-      };
-      #endif
-    }
-
-    /// BuildMathFunction can have extra, external values provided, to be accesses as $0, $1, etc.
-    /// These should be either a set of individual values that can each be stored in emp::Datum
-    /// OR a single vector of emp::Datum.
-    template <typename EXTRA1_T, typename... EXTRA_Ts>
-    value_fun_t BuildMathFunction(
-      const DataLayout & layout,        ///< The layout to use, indicating positions of traits.
-      const std::string & expression,   ///< The primary expression to convert.
-      const EXTRA1_T & extra1,          ///< Extra value argument, accessed as $0
-      EXTRA_Ts... extras                ///< Extra value arguments (accessed as $1, $2, etc.)
-    ) {
-      // If we have a vector, make sure it is valid and then just pass it along.
-      if constexpr (emp::is_emp_vector<EXTRA1_T>()) {
-        static_assert(!emp::is_emp_vector<EXTRA1_T>() || sizeof...(EXTRA_Ts) == 0,
-          "If an emp::vector is provided to BuildMathFunction, cannot have additional args.");
-        using value_t = typename EXTRA1_T::value_type;
-        static_assert(std::is_same<value_t, emp::Datum>(),
-          "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
-        external_vals = extra1;
+    /// Take a set of variables and use them to replace $0, $1, etc. in any function.
+    template <typename... Ts>
+    void SetupStaticValues(Ts... args) {
+      // If we have a vector of incoming values, make sure it is valid and then just pass it along.
+      if constexpr (sizeof...(Ts) == 1) {
+        if (emp::is_emp_vector<Ts...>()) {
+          using value_t = typename emp::first_type<Ts::value_type...>;
+          static_assert(std::is_same<value_t, emp::Datum>(),
+            "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
+          external_vals = args...;
+          return;
+        }
       }
       // Otherwise convert all args to emp::Datum.
-      else {
-        external_vals = emp::vector<emp::Datum>{extra1, static_cast<emp::Datum>(extras)...};
-      }
-      return BuildMathFunction(layout, expression);
+      external_vals = emp::vector<emp::Datum>{static_cast<emp::Datum>(args)...};
     }
 
 
-    /// Convert a DataMap into its layout if needed before generating a lambda based on a
-    /// provided expression.
-    /// @param dm The DataMap containing the required variables.
-    /// @param expression The mathematical expression to be run on the data map.
-    /// @param extras Any extra values to fill in a $0, $1, etc.
-    template <typename... ARG_Ts>
-    value_fun_t BuildMathFunction(const DataMap & dm, ARG_Ts &&... args) {
-      return BuildMathFunction(dm.GetLayout(), std::forward<ARG_Ts>(args)...);
+    /// Parse a function description that will take a map and return the results.
+    /// For example, if the string "foo * 2 + bar" is passed in, a function will be returned
+    /// that takes a map (of the proper type) loads in the values of "foo" and "bar", and
+    /// returns the result of the above equation.
+
+    template <typename MAP_T, typename... EXTRA_Ts>
+    value_fun_t BuildMathFunction(
+      const MAP_T & symbols,            ///< The map or layout to use, specifying variables.
+      const std::string & expression,   ///< The primary expression to convert.
+      EXTRA_Ts... extra_args            ///< Extra value arguments (accessed as $1, $2, etc.)
+    ) {
+      // If we have incoming values, store them appropriately.
+      SetupStaticValues(extra_args...);
+
+      using symbol_table_t = SymbolTable<MAP_T>;
+      using value_t = symbol_table_t::value_t;
+      symbols_table_t symbol_table(symbols);
+
+      // Tokenize the expression.
+      emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
+      if constexpr (verbose) tokens.Print();
+      var_names.clear();    // Reset the names used from data map.
+      pos_t pos = tokens.begin();
+      value_t val = ParseMath(symbol_table, pos);
+
+      // Return the value as a function.
+      return symbol_table.AsFunction(val);
     }
+
 
     /// Generate a temporary math function and immediately run it on the provided arguments.
-    /// @param dm The DataMap containing the required variables.
+    /// @param dm The map containing the required variables.
     /// @param expression The mathematical expression to be run on the data map.
     /// @param extras Any extra values to fill in a $0, $1, etc.
     template <typename... ARG_Ts>
-    emp::Datum RunMathFunction(const DataMap & dm, ARG_Ts... args) {
-      auto fun = BuildMathFunction(dm.GetLayout(), std::forward<ARG_Ts>(args)...);
+    emp::Datum RunMathFunction(const MAP_T & dm, ARG_Ts... args) {
+      auto fun = BuildMathFunction(dm, std::forward<ARG_Ts>(args)...);
       return fun(dm);
     }
 
   };
+
 }
 
 #endif // #ifndef EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
