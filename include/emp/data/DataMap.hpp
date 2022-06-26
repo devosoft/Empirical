@@ -149,6 +149,9 @@ namespace emp {
       }
     }
 
+    // Built-in types.
+    using key_type = std::string;
+
     /// Determine how many Bytes large this image is.
     size_t GetSize() const { return memory.GetSize(); }
 
@@ -310,6 +313,13 @@ namespace emp {
                size_t count=1) {
       MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes, count);
+    }
+
+    /// Add a new variable with just a specified type and name; must be able to default.
+    template <typename T>
+    size_t AddVar(const std::string & name) {
+      MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
+      return layout_ptr->Add<T>(memory, name, T{}, "", "", 1);
     }
 
     /// Test if this DataMap uses the specified layout.
