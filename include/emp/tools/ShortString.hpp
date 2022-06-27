@@ -28,7 +28,7 @@ namespace emp {
   template <size_t NUM_BYTES, typename CHAR_T=char>
   class StaticString {
   private:
-    static_assert(NUM_BYTES <= 256, "Static String currently limited to 256 bytes.");
+    static_assert(NUM_BYTES <= 256, "Static String currently limited to 256 bytes (255 chars).");
     static constexpr const size_t MAX_CHARS = NUM_BYTES - 1;
     static constexpr const size_t SIZE_POS = NUM_BYTES - 1;  // Size info stored in the last byte.
 
@@ -107,9 +107,14 @@ namespace emp {
     bool operator>=(CHAR_T const * in) const { return Compare(in, strlen(in)) >= 0; }
 
     operator CHAR_T *() { return string.data(); }
+    operator const CHAR_T *() const { return string.data(); }
+    operator std::string() const { return std::string(string.data()); }
+
+    std::string AsString() const { return string.data(); }
   };
 
-  using ShortString = StaticString<32>;
+  using ShortString = emp::StaticString<32>;
 }
+
 
 #endif
