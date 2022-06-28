@@ -5,6 +5,15 @@
  *
  *  @file VirtualCPU.cpp
  *
+ *  TODO
+ *  [ ] *INSTRUCTIONS struct
+ *    [ ] Constructors assign values correctly
+ *    [ ] Comparison operators work correctly
+ *    [ ] Set functions as expected
+ *    [ ] Defaults?
+ *    [ ] Args?
+ *  [ ] Expanded heads?
+ *  [ ] Initialize (all internal method calls _should_ already be tested, just need combined)
  */
 
 #define CATCH_CONFIG_MAIN
@@ -16,15 +25,6 @@
 
 #include "emp/hardware/VirtualCPU.hpp"
 
-/* TODO
-  [ ] *INSTRUCTIONS struct
-    [ ] Constructors assign values correctly
-    [ ] Comparison operators work correctly
-    [ ] Set functions as expected
-    [ ] Defaults???
-    [ ] Args???
-  [ ] Expanded heads???
-*/
 
 // VirtualCPU is currently constructed to always be derived from.
 // Here we create an empty derived class
@@ -52,8 +52,8 @@ Derived CreateSeedCPU(){
   CHECK(4 == (cpu_init.write_head = 4));
   cpu_init.label_idx_vec.push_back(3);
   CHECK(2 == (cpu_init.regs[0] = 2));
-  CHECK(38 == (cpu_init.regs[0] = 38));
-  CHECK(2309 == (cpu_init.regs[0] = 2309));
+  CHECK(38 == (cpu_init.regs[1] = 38));
+  CHECK(2309 == (cpu_init.regs[2] = 2309));
   CHECK(5 == (cpu_init.inputs[0] = 5));
   CHECK(2 == (cpu_init.outputs[0] = 2));
   CHECK(1 == (cpu_init.active_stack_idx = 1));
@@ -717,76 +717,188 @@ TEST_CASE("VirtualCPU_Head_Manipulation", "[Hardware]") {
   */
 }
 TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
+  /*
+    [ ] Initialize
+    [X] ResetHeads
+    [X] ResetIO
+    [X] ResetMemory
+      [X] Reset registers
+      [X] Reset stacks
+      [X] Reset active stack index to 0
+    [X] ResetBookkeeping
+    [X] ResetHardware
+    [ ] ResetWorkingGenome
+    [ ] ClearGenome
+      [ ] Clears main genome
+      [ ] Clears working genome
+      [ ] Resets hardware
+    [X] CurateNops
+      [X] Counts nops if needed
+      [X] Finds all labels
+      [X] Add nops to preceeding instructions nop_vec
+      [X] Wraps?
+      [X] Sets boolean flag to false
+    [X] CountNops
+      [X] Calculates the number of nops
+      [X] Maps nop ids to indices
+      [X] Maps nop indices to ids
+    [X] ExpandRegisters
+      [X] Sets num_regs variable
+      [X] Resizes register vector
+  */
+  { // ResetHeads
+    Derived cpu = CreateSeedCPU();
+    cpu.ResetHeads();
+    CHECK(cpu.inst_ptr == 0);
+    CHECK(cpu.read_head == 0);
+    CHECK(cpu.write_head == 0);
+    CHECK(cpu.flow_head == 0);
+  }
+  { // ResetIO
+    Derived cpu = CreateSeedCPU();
+    cpu.inputs[0] = 10;
+    cpu.inputs[1] = 11;
+    cpu.inputs[2] = 12;
+    cpu.outputs[0] = 5;
+    cpu.outputs[1] = 6;
+    cpu.outputs[2] = 7;
+    cpu.outputs[3] = 8;
+    CHECK(cpu.inputs.size() == 3);
+    CHECK(cpu.outputs.size() == 4);
+    cpu.ResetIO();
+    CHECK(cpu.inputs.size() == 0);
+    CHECK(cpu.outputs.size() == 0);
+  }
+  { // ResetMemory
+    Derived cpu = CreateSeedCPU();
+    CHECK(cpu.regs[0] == 2);
+    CHECK(cpu.regs[1] == 38);
+    CHECK(cpu.regs[2] == 2309);
+    CHECK(cpu.active_stack_idx == 1);
+    CHECK(cpu.stacks[1].size() == 1);
+    cpu.ResetMemory();
+    CHECK(cpu.regs[0] == 0);
+    CHECK(cpu.regs[1] == 1);
+    CHECK(cpu.regs[2] == 2);
+    CHECK(cpu.active_stack_idx == 0);
+    CHECK(cpu.stacks[0].size() == 0);
+    CHECK(cpu.stacks[1].size() == 0);
+  }
+  { // ResetBookkeeping
+    Derived cpu = CreateSeedCPU();
+    cpu.copied_inst_id_vec.push_back(3);
+    cpu.num_insts_executed = 4;
+    CHECK(cpu.copied_inst_id_vec.size() == 1);
+    CHECK(cpu.num_insts_executed == 4);
+    cpu.ResetBookkeeping();
+    CHECK(cpu.copied_inst_id_vec.size() == 0);
+    CHECK(cpu.num_insts_executed == 0);
+  }
   { // ResetHardware
     // Create cpu with some variables set ...
     Derived cpu = CreateSeedCPU();
-    cpu.copied_inst_id_vec.push_back(10);
-    cpu.stacks[0].push_back(5);
-    cpu.genome_working.push_back(Derived::inst_t(1));
-    CHECK(cpu.GetGenomeSize() == 10);
-    CHECK(cpu.GetWorkingGenomeSize() == 11);
+    // IO
+    cpu.inputs[0] = 10;
+    cpu.inputs[1] = 11;
+    cpu.inputs[2] = 12;
+    cpu.outputs[0] = 5;
+    cpu.outputs[1] = 6;
+    cpu.outputs[2] = 7;
+    cpu.outputs[3] = 8;
+    CHECK(cpu.inputs.size() == 3);
+    CHECK(cpu.outputs.size() == 4);
+    // Memory
+    CHECK(cpu.regs[0] == 2);
+    CHECK(cpu.regs[1] == 38);
+    CHECK(cpu.regs[2] == 2309);
+    CHECK(cpu.active_stack_idx == 1);
+    CHECK(cpu.stacks[1].size() == 1);
+    // Bookkeeping
+    cpu.copied_inst_id_vec.push_back(3);
+    cpu.num_insts_executed = 4;
+    CHECK(cpu.copied_inst_id_vec.size() == 1);
+    CHECK(cpu.num_insts_executed == 4);
+
     cpu.ResetHardware();
-    CHECK(cpu.GetGenomeSize() == 10);
-    CHECK(cpu.GetWorkingGenomeSize() == 11);
-    { // VARIABLES -- should default
-        CHECK(cpu.active_stack_idx == 0);   // Default to first stack
-        CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-        CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
-        CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
-        CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
-        CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
-        // All registers start at their index value
-        for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
-          CHECK(cpu.regs[idx] == idx);
-        }
-        // All stacks are empty
-        for(size_t idx = 0; idx < cpu.stacks.size(); ++idx){
-          CHECK(cpu.stacks[idx].empty());
-        }
-        CHECK(cpu.inputs.size() == 0);  // Start with no inputs
-        CHECK(cpu.outputs.size() == 0); // Start with no outputs
-        CHECK(cpu.inst_ptr == 0);   // All heads default to 0
-        CHECK(cpu.read_head == 0);  // All heads default to 0
-        CHECK(cpu.write_head == 0); // All heads default to 0
-        CHECK(cpu.flow_head == 0);  // All heads default to 0
-        CHECK(cpu.copied_inst_id_vec.size() == 0); // No instructions copied
-    }
+
+    // Heads
+    CHECK(cpu.inst_ptr == 0);
+    CHECK(cpu.read_head == 0);
+    CHECK(cpu.write_head == 0);
+    CHECK(cpu.flow_head == 0);
+    // IO
+    CHECK(cpu.inputs.size() == 0);
+    CHECK(cpu.outputs.size() == 0);
+    // Memory
+    CHECK(cpu.regs[0] == 0);
+    CHECK(cpu.regs[1] == 1);
+    CHECK(cpu.regs[2] == 2);
+    CHECK(cpu.active_stack_idx == 0);
+    CHECK(cpu.stacks[0].size() == 0);
+    CHECK(cpu.stacks[1].size() == 0);
+    // Bookkeeping
+    CHECK(cpu.copied_inst_id_vec.size() == 0);
+    CHECK(cpu.num_insts_executed == 0);
   }
-  { // Reset
+  { // ResetWorkingGenome
+    Derived cpu = CreateSeedCPU();
+    CHECK(cpu.genome[0] != cpu.genome_working[0]); 
+    cpu.ResetWorkingGenome();
+    // Genome
+    CHECK(cpu.genome[0] == cpu.genome_working[0]); 
+    CHECK(cpu.label_idx_vec.size() == 0);
+    CHECK(cpu.nops_need_curated == true);
+  }
+  { // ClearGenome 
     // Create cpu with some variables set ...
     Derived cpu = CreateSeedCPU();
-    cpu.copied_inst_id_vec.push_back(10);
-    cpu.stacks[0].push_back(5);
-    cpu.genome_working.push_back(Derived::inst_t(1));
-    CHECK(cpu.GetGenomeSize() == 10);
-    CHECK(cpu.GetWorkingGenomeSize() == 11);
-    cpu.Reset();
-    CHECK(cpu.GetGenomeSize() == 0);
-    CHECK(cpu.GetWorkingGenomeSize() == 0);
-    { // VARIABLES -- should default
-        CHECK(cpu.active_stack_idx == 0);   // Default to first stack
-        CHECK(cpu.GetNumNops() == 3);       // Default instruction set has 3 nops
-        CHECK(emp::Has(cpu.nop_id_map, 0)); // NopA in set
-        CHECK(emp::Has(cpu.nop_id_map, 1)); // NopB in set
-        CHECK(emp::Has(cpu.nop_id_map, 2)); // NopC in set
-        CHECK(cpu.GetNumRegs() == 3); // 3 nops in instruction set forces cpu to have 3 registers
-        // All registers start at their index value
-        for(size_t idx = 0; idx < cpu.GetNumRegs(); ++idx){
-          CHECK(cpu.regs[idx] == idx);
-        }
-        // All stacks are empty
-        for(size_t idx = 0; idx < cpu.stacks.size(); ++idx){
-          CHECK(cpu.stacks[idx].empty());
-        }
-        CHECK(cpu.inputs.size() == 0);  // Start with no inputs
-        CHECK(cpu.outputs.size() == 0); // Start with no outputs
-        CHECK(cpu.inst_ptr == 0);   // All heads default to 0
-        CHECK(cpu.read_head == 0);  // All heads default to 0
-        CHECK(cpu.write_head == 0); // All heads default to 0
-        CHECK(cpu.flow_head == 0);  // All heads default to 0
-        CHECK(cpu.copied_inst_id_vec.size() == 0); // No instructions copied
-        CHECK(cpu.label_idx_vec.size() == 0); // No labels in empty genome
-    }
+    // IO
+    cpu.inputs[0] = 10;
+    cpu.inputs[1] = 11;
+    cpu.inputs[2] = 12;
+    cpu.outputs[0] = 5;
+    cpu.outputs[1] = 6;
+    cpu.outputs[2] = 7;
+    cpu.outputs[3] = 8;
+    CHECK(cpu.inputs.size() == 3);
+    CHECK(cpu.outputs.size() == 4);
+    // Memory
+    CHECK(cpu.regs[0] == 2);
+    CHECK(cpu.regs[1] == 38);
+    CHECK(cpu.regs[2] == 2309);
+    CHECK(cpu.active_stack_idx == 1);
+    CHECK(cpu.stacks[1].size() == 1);
+    // Bookkeeping
+    cpu.copied_inst_id_vec.push_back(3);
+    cpu.num_insts_executed = 4;
+    CHECK(cpu.copied_inst_id_vec.size() == 1);
+    CHECK(cpu.num_insts_executed == 4);
+
+    cpu.ClearGenome();
+
+    // Heads
+    CHECK(cpu.inst_ptr == 0);
+    CHECK(cpu.read_head == 0);
+    CHECK(cpu.write_head == 0);
+    CHECK(cpu.flow_head == 0);
+    // IO
+    CHECK(cpu.inputs.size() == 0);
+    CHECK(cpu.outputs.size() == 0);
+    // Memory
+    CHECK(cpu.regs[0] == 0);
+    CHECK(cpu.regs[1] == 1);
+    CHECK(cpu.regs[2] == 2);
+    CHECK(cpu.active_stack_idx == 0);
+    CHECK(cpu.stacks[0].size() == 0);
+    CHECK(cpu.stacks[1].size() == 0);
+    // Bookkeeping
+    CHECK(cpu.copied_inst_id_vec.size() == 0);
+    CHECK(cpu.num_insts_executed == 0);
+    // Genome
+    CHECK(cpu.genome.size() == 0);
+    CHECK(cpu.genome_working.size() == 0);
+    CHECK(cpu.label_idx_vec.size() == 0);
+    CHECK(cpu.nops_need_curated == true);
   }
   { // CountNops and ExpandRegisters
     // Everything defaults to 3
@@ -902,34 +1014,6 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
       }
     }
   }
-  /*
-    [X] ResetHardware resets:
-      [X] Registers
-      [X] Heads
-      [X] Stacks
-      [X] Inputs
-      [X] Outputs
-      [X] Working genome ???
-      [X] Copied instructions
-    [X] Reset
-      [X] ResetHardware
-      [X] Reset genome
-      [X] Reset working genome
-      [X] Labels
-    [X] CurateNops
-      [X] Counts nops if needed
-      [X] Finds all labels
-      [X] Add nops to preceeding instructions nop_vec
-      [X] Wraps?
-      [X] Sets boolean flag to false
-    [X] CountNops
-      [X] Calculates the number of nops
-      [X] Maps nop ids to indices
-      [X] Maps nop indices to ids
-    [X] ExpandRegisters
-      [X] Sets num_regs variable
-      [X] Resizes register vector
-  */
 }
 TEST_CASE("VirtualCPU_Nop_Methods", "[Hardware]") {
   { // GetComplementIdx

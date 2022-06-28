@@ -187,7 +187,7 @@ namespace emp{
       //////// GENOME & INSTRUCTION MANIPULATION
       /// Load instructions from input stream
       bool Load(std::istream & input) {
-        Reset();
+        ClearGenome();
         File file(input);
         file.RemoveComments("//"); // Remove all C++ style comments
         file.RemoveComments("#");  // Remove all bash/Python/R style comments
@@ -299,22 +299,22 @@ namespace emp{
       /// Advance the instruction pointer so many steps and wrap around the end of the genome
       void AdvanceIP(size_t steps=1){
         inst_ptr += steps;
-        inst_ptr %= genome_working.size();
+        inst_ptr = (genome_working.size() > 0 ? inst_ptr % genome_working.size() : 0);
       }
       /// Advance the read head so many steps and wrap around the end of the genome
       void AdvanceRH(size_t steps=1){
         read_head += steps;
-        read_head %= genome_working.size();
+        read_head = (genome_working.size() > 0 ? read_head % genome_working.size() : 0);
       }
       /// Advance the write head so many steps and wrap around the end of the genome
       void AdvanceWH(size_t steps=1){
         write_head += steps;
-        write_head %= genome_working.size();
+        write_head = (genome_working.size() > 0 ? write_head % genome_working.size() : 0);
       }
       /// Advance the flow head so many steps and wrap around the end of the genome
       void AdvanceFH(size_t steps=1){
         flow_head += steps;
-        flow_head %= genome_working.size();
+        flow_head = (genome_working.size() > 0 ? flow_head % genome_working.size() : 0);
       }
       /// Set the instruction pointer to the genome index, wrap around the end of the genome
       void SetIP(size_t pos){
@@ -381,34 +381,63 @@ namespace emp{
         ExpandRegisters();
         ResetHardware();
       }
-      /// Reset just the CPU hardware, but keep the original genome
-      virtual void ResetHardware() {
+      
+      /// Reset all heads
+      void ResetHeads(){
+        ResetIP();
+        ResetRH();
+        ResetWH();
+        ResetFH();
+      }
+
+      /// Reset all inputs and outputs
+      void ResetIO(){
+        inputs.clear();
+        outputs.clear();
+      }
+
+      /// Reset all memory/data
+      void ResetMemory(){
         // Initialize registers to their position.  So Reg0 = 0 and Reg11 = 11.
         for (size_t i = 0; i < num_regs; i++) {
           regs[i] = (data_t) i;
         }
-        inputs.clear();
-        outputs.clear();
         for(size_t i = 0; i < NUM_STACKS; ++i){
           stacks[i].resize(0);
         }
-        inst_ptr = 0;           // Move heads back to beginning
-        flow_head = 0;
-        read_head = 0;
-        write_head = 0;
         active_stack_idx = 0;
+      }
+
+      /// Reset all bookkeeping variables
+      void ResetBookkeeping(){
         copied_inst_id_vec.clear();
         num_insts_executed = 0;
-        //genome_working = genome;
-       }
-      /// Reset the entire CPU to a starting state, clearing the genome
-      void Reset() {
+      }
+
+      /// Reset the working genome back to the original genome
+      void ResetWorkingGenome(){
+        genome_working = genome;
+        label_idx_vec.clear();
+        nops_need_curated = true;
+      }
+
+      /// Reset just the CPU hardware, but keep the original genome
+      virtual void ResetHardware() {
+        ResetHeads();
+        ResetMemory();
+        ResetIO();
+        ResetBookkeeping();
+      }
+
+      /// Clear the main genome of the organism and reset all hardware
+      void ClearGenome() {
         genome.resize(0,0);         // Clear out genome
         genome_working.resize(0,0); // Clear out working genome
         label_idx_vec.clear();      // No labels if genome is empty
         nops_need_curated = true;
         ResetHardware();            // Reset the full hardware
       }
+
       /// Compile NOP instructions in genome into useful nop vectors for each instruction,
       /// and records the position of all LABEL instructions
       void CurateNops(){
