@@ -107,8 +107,9 @@ namespace emp{
       bool are_regs_expanded = false;  ///< Flag signaling if the number of registers have
                                        ///< been expanded to accomodate the number of NOP
                                        ///< instructions in the library
-      bool nops_need_curated = true;  ///< Flag signaling that NOP instructions need curated
+      bool nops_need_curated = true;   ///< Flag signaling that NOP instructions need curated
       bool expanded_nop_args = false;  ///< Flag signaling that CPU is used the expanded
+
       //////// CPU COMPONENTS
       emp::vector<data_t> regs;                ///< Vector of registers
       std::unordered_map<int, data_t> inputs;  ///< Map of all available inputs
@@ -381,7 +382,6 @@ namespace emp{
         ExpandRegisters();
         ResetHardware();
       }
-
       /// Reset all heads
       void ResetHeads(){
         ResetIP();
@@ -389,13 +389,11 @@ namespace emp{
         ResetWH();
         ResetFH();
       }
-
       /// Reset all inputs and outputs
       void ResetIO(){
         inputs.clear();
         outputs.clear();
       }
-
       /// Reset all memory/data
       void ResetMemory(){
         // Initialize registers to their position.  So Reg0 = 0 and Reg11 = 11.
@@ -407,20 +405,17 @@ namespace emp{
         }
         active_stack_idx = 0;
       }
-
       /// Reset all bookkeeping variables
       void ResetBookkeeping(){
         copied_inst_id_vec.clear();
         num_insts_executed = 0;
       }
-
       /// Reset the working genome back to the original genome
       void ResetWorkingGenome(){
         genome_working = genome;
         label_idx_vec.clear();
         nops_need_curated = true;
       }
-
       /// Reset just the CPU hardware, but keep the original genome
       virtual void ResetHardware() {
         ResetHeads();
@@ -428,7 +423,6 @@ namespace emp{
         ResetIO();
         ResetBookkeeping();
       }
-
       /// Clear the main genome of the organism and reset all hardware
       void ClearGenome() {
         genome.resize(0,0);         // Clear out genome
@@ -437,7 +431,6 @@ namespace emp{
         nops_need_curated = true;
         ResetHardware();            // Reset the full hardware
       }
-
       /// Compile NOP instructions in genome into useful nop vectors for each instruction,
       /// and records the position of all LABEL instructions
       void CurateNops(){
@@ -510,8 +503,6 @@ namespace emp{
         num_regs = num_nops;
         regs.resize(num_regs);
       }
-
-
 
       //////// NOP SEQUENCE METHODS
       /// For a given NOP instruction (as an index), return its complement index
