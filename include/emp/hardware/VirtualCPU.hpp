@@ -10,7 +10,7 @@
  *    - Expanded heads?
  *    - expanded_nop_args useful?
  *    - Consider changing default return value for search functions
- *    - Consider switching to (or adding an optional mode) where nops are only curated 
+ *    - Consider switching to (or adding an optional mode) where nops are only curated
  *          as-needed instead of all at once
  *
  */
@@ -47,7 +47,7 @@ namespace emp{
   class VirtualCPU{
     public:
       static constexpr size_t NUM_STACKS = 2; ///< Number of stacks in this CPU (currently 2)
-      static constexpr size_t MAX_NOPS = 23; ///< Maximum number of nop instructions supported 
+      static constexpr size_t MAX_NOPS = 23; ///< Maximum number of nop instructions supported
       struct Instruction;
 
       using derived_t = DERIVED;
@@ -124,9 +124,9 @@ namespace emp{
       size_t write_head;                       ///< Write head, signals where to copy next
                                                ///< instruction
       //////// HELPER CONSTRUCTS
-      emp::unordered_map<size_t, size_t> nop_id_map;/**< NOP inst id -> Nop index 
-                                                         (e.g., NopA -> 0, NopB -> 1, 
-                                                           NopE -> 5) */ 
+      emp::unordered_map<size_t, size_t> nop_id_map;/**< NOP inst id -> Nop index
+                                                         (e.g., NopA -> 0, NopB -> 1,
+                                                           NopE -> 5) */
       emp::vector<size_t> label_idx_vec; ///< Vector of LABEL instructions indices in genome
       //////// GENOME
       genome_t genome;         ///< Preserved copy of genome from organism creation/birth
@@ -381,7 +381,7 @@ namespace emp{
         ExpandRegisters();
         ResetHardware();
       }
-      
+
       /// Reset all heads
       void ResetHeads(){
         ResetIP();

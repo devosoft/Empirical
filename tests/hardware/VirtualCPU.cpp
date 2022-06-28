@@ -842,14 +842,14 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
   }
   { // ResetWorkingGenome
     Derived cpu = CreateSeedCPU();
-    CHECK(cpu.genome[0] != cpu.genome_working[0]); 
+    CHECK(cpu.genome[0] != cpu.genome_working[0]);
     cpu.ResetWorkingGenome();
     // Genome
-    CHECK(cpu.genome[0] == cpu.genome_working[0]); 
+    CHECK(cpu.genome[0] == cpu.genome_working[0]);
     CHECK(cpu.label_idx_vec.size() == 0);
     CHECK(cpu.nops_need_curated == true);
   }
-  { // ClearGenome 
+  { // ClearGenome
     // Create cpu with some variables set ...
     Derived cpu = CreateSeedCPU();
     // IO
