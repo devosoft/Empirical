@@ -417,7 +417,7 @@ namespace emp{
         nops_need_curated = true;
       }
       /// Reset just the CPU hardware, but keep the original genome
-      virtual void ResetHardware() {
+      void ResetHardware() {
         ResetHeads();
         ResetMemory();
         ResetIO();
