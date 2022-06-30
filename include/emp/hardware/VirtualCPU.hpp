@@ -135,9 +135,9 @@ namespace emp{
       genome_t genome_working; ///< Working copy of genome that can mutate, resize, and change
       //////// BOOKKEEPING
       size_t active_stack_idx = 0;             ///< Index of CPU's active stack
-      emp::vector<size_t> copied_inst_id_vec;  ///< Vector of instructions that have been
-                                               ///< copied
-      size_t num_insts_executed = 0;
+      emp::vector<size_t> copied_inst_id_vec;  /**< Vector of instructions that have been
+                                                    copied */
+      size_t num_insts_executed = 0;  ///< Number of instructions that have been executed
 
 
       //////// CONSTRUCTORS / DESTRUCTOR
@@ -276,6 +276,10 @@ namespace emp{
         genome.erase(genome.begin() + idx);
         genome_working.erase(genome_working.begin() + idx);
         nops_need_curated = true;
+      }
+      /// Return the number of instruction that have been copied
+      size_t GetNumInstsCopied() const{
+        return copied_inst_id_vec.size();
       }
 
 
