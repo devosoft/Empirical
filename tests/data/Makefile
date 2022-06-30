@@ -1,4 +1,4 @@
-TEST_NAMES = DataFile DataInterface DataLayout DataLog DataManager DataMap DataMapParser DataNode Datum MemoryImage Trait VarMap
+TEST_NAMES = DataFile DataInterface DataLayout DataLog DataManager DataMap DataNode Datum MemoryImage SimpleParser Trait VarMap
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DCATCH_CONFIG_MAIN
