@@ -24,6 +24,11 @@ TEST_CASE("Test ShortString", "[tools]")
 
   CHECK( str1 != std_str );
   CHECK( str1 < std_str );
+  CHECK( str1 <= std_str );
+
+  CHECK( std_str != str1.AsString() );
+  CHECK( std_str > str1.AsString() );
+  CHECK( std_str >= str1.AsString() );
 
   emp::ShortString str2(std_str);
 
