@@ -229,7 +229,7 @@ namespace emp{
         nops_need_curated = true;
       }
       /// Return the first instruction in the instruction library
-      inst_t GetDefaultInst(){
+      inst_t GetDefaultInst() const{
         return inst_t(0, GetInstLib()->GetID(0));
       }
       /// Add one or more default instructions to the end of the genome
@@ -720,7 +720,7 @@ namespace emp{
       ///
       /// Each instruction is represented by a single character, dictated by the
       /// instruction's ID.
-      std::string GetWorkingGenomeString(){
+      std::string GetWorkingGenomeString() const{
         std::stringstream sstr;
         sstr << "[" << genome_working.size() << "]";
         for(size_t idx = 0; idx < genome_working.size(); idx++){
@@ -734,7 +734,7 @@ namespace emp{
       ///
       /// Each instruction is represented by a single character, dictated by the
       /// instruction's ID.
-      std::string GetGenomeString(){
+      std::string GetGenomeString() const{
         std::stringstream sstr;
         sstr << "[" << genome.size() << "]";
         for(size_t idx = 0; idx < genome.size(); idx++){
