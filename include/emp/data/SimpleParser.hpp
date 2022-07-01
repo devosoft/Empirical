@@ -70,7 +70,7 @@ namespace emp {
       }
     };
 
-    template <typename MAP_T>
+    template <typename MAP_T, typename DUMMY_T=int>
     struct SymbolTable {
       using arg_t = const MAP_T &;
       using fun_t = std::function<emp::Datum(arg_t)>;
@@ -93,8 +93,8 @@ namespace emp {
     };
 
     /// Specialty implementation for DataLayouts.
-    template <>
-    struct SymbolTable<emp::DataLayout> {
+    template <typename DUMMY_T>
+    struct SymbolTable<emp::DataLayout, DUMMY_T> {
       using arg_t = const emp::DataMap &;
       using fun_t = std::function<emp::Datum(arg_t)>;
       using value_t = ValueType<arg_t>;
@@ -112,7 +112,7 @@ namespace emp {
           return val.AsFunction();
         #else
           // If we are in debug mode, add wrapper to ensure DataMap with has correct layout.
-          return [fun=val.fun,layout_ptr=&layout](arg_t dm) {
+          return [fun=val.AsFunction(),layout_ptr=&layout](arg_t dm) {
             emp_assert(dm.HasLayout(*layout_ptr));
             return fun(dm);
           };
@@ -122,8 +122,8 @@ namespace emp {
     };
 
     /// Special DataMap implementation that just converts to underlying layout.
-    template <>
-    struct SymbolTable<emp::DataMap> : public SymbolTable<emp::DataLayout> {
+    template <typename DUMMY_T>
+    struct SymbolTable<emp::DataMap, DUMMY_T> : public SymbolTable<emp::DataLayout> {
       SymbolTable(const emp::DataMap & dm) : SymbolTable<emp::DataLayout>(dm.GetLayout()) { }
     };
 
