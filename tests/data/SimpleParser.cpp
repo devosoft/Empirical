@@ -10,9 +10,12 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include <map>
+#include <unordered_map>
+
 #include "emp/data/SimpleParser.hpp"
 
-TEST_CASE("Test DataMap", "[data]")
+TEST_CASE("Test DataMap in SimpleParser", "[data]")
 {
   emp::DataMap dmA;
   dmA.AddVar<double>("val1", 1.5);
@@ -278,4 +281,21 @@ TEST_CASE("Test DataMap", "[data]")
   dmC.AddVar<std::string>("val2", "def");
   fun = parser.BuildMathFunction(dmC, "val1 + val2");
   CHECK(fun(dmC).AsString() == "abcdef");
+}
+
+TEST_CASE("Test std::map in SimpleParser", "[data]")
+{
+  std::map<std::string, double> var_map;
+  var_map["x"] = 5;
+  var_map["y"] = 10;
+
+  emp::SimpleParser parser;
+  auto fun = parser.BuildMathFunction(var_map, "11*x + y*y");
+
+  CHECK(fun(var_map) == 155.0);
+
+  var_map["x"] = 3.5;
+  var_map["y"] = 5;
+
+  CHECK(fun(var_map) == 63.5);
 }
