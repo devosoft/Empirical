@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2022
  *
- *  @file DataMapParser.cpp
+ *  @file SimpleParser.cpp
  */
 
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/data/DataMapParser.hpp"
+#include "emp/data/SimpleParser.hpp"
 
 TEST_CASE("Test DataMap", "[data]")
 {
@@ -33,7 +33,7 @@ TEST_CASE("Test DataMap", "[data]")
   // dmB    0.125 64.25     4  1024
 
 
-  emp::DataMapParser parser;
+  emp::SimpleParser parser;
 
   // Test a bunch of constant math.
   CHECK( parser.RunMathFunction(dmA, "(0 || 0)") == 0.0 );
@@ -68,7 +68,8 @@ TEST_CASE("Test DataMap", "[data]")
 
   // Now, try to use these with DataMap variables!
 
-  auto fun = parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
+  std::function<emp::Datum(const emp::DataMap &)> fun =
+    parser.BuildMathFunction(dmA, "val1 + val2 + 2*val3");
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
