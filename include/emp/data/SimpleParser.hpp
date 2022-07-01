@@ -32,14 +32,10 @@
 #include "../compiler/regex_utils.hpp"
 #include "../data/Datum.hpp"
 #include "../math/Random.hpp"
+#include "../meta/meta.hpp"
 
 #include "AnnotatedType.hpp"
 #include "DataMap.hpp"
-
-/*
-    static_assert( std::is_same<typename MAP_T::key_type, std::string>(),
-                   "Any map type used by the parser must have a key type of std::string");
-*/
 
 namespace emp {
 
@@ -83,9 +79,12 @@ namespace emp {
       SymbolTable() { }
       SymbolTable(arg_t) { }
 
+      static_assert( std::is_same<typename MAP_T::key_type, std::string>(),
+                    "Any map type used by the parser must have a key type of std::string");
+
       static auto MakeDatumAccessor(const std::string & name) {
-        return [](arg_t symbol_vals){
-          return emp::Datum(symbol_vals[id]);
+        return [name](arg_t symbol_vals){
+          return emp::Datum(symbol_vals[name]);
         };
       }
 
@@ -104,7 +103,7 @@ namespace emp {
 
       SymbolTable(const emp::DataLayout & in_layout) : layout(in_layout) { }
 
-      static auto MakeDatumAccessor(const std::string & name) {
+      auto MakeDatumAccessor(const std::string & name) const {
         return emp::DataMap::MakeDatumAccessor(layout, name);
       }
 
@@ -113,8 +112,8 @@ namespace emp {
           return val.AsFunction();
         #else
           // If we are in debug mode, add wrapper to ensure DataMap with has correct layout.
-          return [fun=val.fun,this](arg_t dm) {
-            emp_assert(dm.HasLayout(layout));
+          return [fun=val.fun,layout_ptr=&layout](arg_t dm) {
+            emp_assert(dm.HasLayout(*layout_ptr));
             return fun(dm);
           };
         #endif
@@ -125,7 +124,7 @@ namespace emp {
     /// Special DataMap implementation that just converts to underlying layout.
     template <>
     struct SymbolTable<emp::DataMap> : public SymbolTable<emp::DataLayout> {
-      SymbolTable(const emp::DataMap & in_map) : SymbolTable<emp::DataLayout>(in_map.GetLayout()) { }
+      SymbolTable(const emp::DataMap & dm) : SymbolTable<emp::DataLayout>(dm.GetLayout()) { }
     };
 
 
@@ -366,12 +365,12 @@ namespace emp {
 
     /// Helpers for parsing.
     template <typename SYMBOLS_T>
-    SYMBOLS_T::value_t ParseValue(const SYMBOLS_T & symbols, pos_t & pos) {
+    typename SYMBOLS_T::value_t ParseValue(const SYMBOLS_T & symbols, pos_t & pos) {
       if constexpr (verbose) {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
 
-      using value_t = SYMBOLS_T::value_t;
+      using value_t = typename SYMBOLS_T::value_t;
 
       // Deal with any unary operators...
       if (emp::Has(unary_ops, pos->lexeme)) {
@@ -381,7 +380,9 @@ namespace emp {
         value_t val = ParseValue(symbols, pos);
         if (val.type == value_t::VALUE) { return op(val.value); }
         else {
-          return (value_fun_t) [fun=val.fun,op](SYMBOLS_T::arg_t arg){ return op(fun(arg)); };
+          return static_cast<typename value_t::fun_t>(
+            [fun=val.fun,op](typename SYMBOLS_T::arg_t arg){ return op(fun(arg)); }
+          );
         }
       }
 
@@ -424,33 +425,33 @@ namespace emp {
         ++pos;
         emp::vector<value_t> args;
         while(pos->lexeme != ")") {
-          args.push_back(ParseMath(layout, pos));
+          args.push_back(ParseMath(symbols, pos));
           if (pos->lexeme == ",") ++pos;
         }
         ++pos;
 
         // Now build the function based on its argument count.
-        value_fun_t out_fun;
+        typename SYMBOLS_T::fun_t out_fun;
         switch (args.size()) {
         case 0:
           if (!functions[name].fun0) ParseError("Function '", name, "' requires arguments.");
-          out_fun = [fun=functions[name].fun0](SYMBOLS_T::arg_t /*are*/) { return fun(); };
+          out_fun = [fun=functions[name].fun0](typename SYMBOLS_T::arg_t /*are*/) { return fun(); };
           break;
         case 1:
           if (!functions[name].fun1) ParseError("Function '", name, "' cannot have 1 arguments.");
-          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFun()](SYMBOLS_T::arg_t sym_arg) {
+          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFunction()](typename SYMBOLS_T::arg_t sym_arg) {
             return fun(arg0(sym_arg));
           };
           break;
         case 2:
           if (!functions[name].fun2) ParseError("Function '", name, "' cannot have 2 arguments.");
-          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFun(),arg1=args[1].AsFun()](SYMBOLS_T::arg_t sym_arg) {
+          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFunction(),arg1=args[1].AsFunction()](typename SYMBOLS_T::arg_t sym_arg) {
             return fun(arg0(sym_arg), arg1(sym_arg));
           };
           break;
         case 3:
           if (!functions[name].fun3) ParseError("Function '", name, "' cannot have 3 arguments.");
-          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFun(),arg1=args[1].AsFun(),arg2=args[2].AsFun()](SYMBOLS_T::arg_t sym_arg) {
+          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFunction(),arg1=args[1].AsFunction(),arg2=args[2].AsFunction()](typename SYMBOLS_T::arg_t sym_arg) {
             return fun(arg0(sym_arg), arg1(sym_arg), arg2(sym_arg));
           };
           break;
@@ -460,15 +461,13 @@ namespace emp {
         return out_fun;
       }
 
-      // This must be a DataLayout entry name.
-      if (!layout.HasName(name)) ParseError("Unknown data map entry '", name, "'.");
-      var_names.insert(name);    // Store this name in the list of those used.
-      return symbols.MakeDatumAccessor(name);
+      var_names.insert(name);                 // Store this name in the list of those used.
+      return symbols.MakeDatumAccessor(name); // Return an accessor for this name.
     }
 
     template <typename SYMBOLS_T>
-    SYMBOLS_T::value_t ParseMath(const SYMBOLS_T & symbols, pos_t & pos, size_t prec_limit=0) {
-      using value_t = SYMBOLS_T::value_t;
+    typename SYMBOLS_T::value_t ParseMath(const SYMBOLS_T & symbols, pos_t & pos, size_t prec_limit=0) {
+      using value_t = typename SYMBOLS_T::value_t;
       value_t val1 = ParseValue(symbols, pos);
 
       if constexpr (verbose) {
@@ -489,17 +488,17 @@ namespace emp {
           if (val1.type == value_t::VALUE) {
             if (val2.type == value_t::VALUE) { val1 = op.fun(val1.value, val2.value); }
             else {
-              val1 = (value_fun_t) [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](SYMBOLS_T::arg_t symbol_vals){
+              val1 = [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](typename SYMBOLS_T::arg_t symbol_vals){
                 return op_fun(val1_num, val2_fun(symbol_vals));
               };
             }
           } else {
             if (val2.type == value_t::VALUE) {
-              val1 = (value_fun_t) [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](SYMBOLS_T::arg_t symbol_vals){
+              val1 = [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](typename SYMBOLS_T::arg_t symbol_vals){
                 return op_fun(val1_fun(symbol_vals), val2_num);
               };
             } else {
-              val1 = (value_fun_t) [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](SYMBOLS_T::arg_t symbol_vals){
+              val1 = [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](typename SYMBOLS_T::arg_t symbol_vals){
                 return op_fun(val1_fun(symbol_vals), val2_fun(symbol_vals));
               };
             }
@@ -515,22 +514,27 @@ namespace emp {
     }
 
     /// Take a set of variables and use them to replace $0, $1, etc. in any function.
-    template <typename... Ts>
-    void SetupStaticValues(Ts... args) {
+    template <typename T1, typename... Ts>
+    void SetupStaticValues(T1 arg1, Ts... args) {
       // If we have a vector of incoming values, make sure it is valid and then just pass it along.
       if constexpr (sizeof...(Ts) == 1) {
-        if (emp::is_emp_vector<Ts...>()) {
-          using value_t = typename emp::first_type<Ts::value_type...>;
+        if constexpr (emp::is_emp_vector<Ts...>()) {
+          using value_t = typename emp::first_type<Ts...>::value_type;
           static_assert(std::is_same<value_t, emp::Datum>(),
             "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
-          external_vals = args...;
+          external_vals = arg1;
           return;
         }
       }
       // Otherwise convert all args to emp::Datum.
-      external_vals = emp::vector<emp::Datum>{static_cast<emp::Datum>(args)...};
+      external_vals = emp::vector<emp::Datum>{
+        static_cast<emp::Datum>(arg1),
+        static_cast<emp::Datum>(args)...
+      };
     }
 
+    /// If there are no input args, just clear external values.
+    void SetupStaticValues() { external_vals.resize(0); }
 
     /// Parse a function description that will take a map and return the results.
     /// For example, if the string "foo * 2 + bar" is passed in, a function will be returned
@@ -538,17 +542,16 @@ namespace emp {
     /// returns the result of the above equation.
 
     template <typename MAP_T, typename... EXTRA_Ts>
-    value_fun_t BuildMathFunction(
-      const MAP_T & symbols,            ///< The map or layout to use, specifying variables.
+    auto BuildMathFunction(
+      const MAP_T & symbol_map,            ///< The map or layout to use, specifying variables.
       const std::string & expression,   ///< The primary expression to convert.
       EXTRA_Ts... extra_args            ///< Extra value arguments (accessed as $1, $2, etc.)
     ) {
       // If we have incoming values, store them appropriately.
       SetupStaticValues(extra_args...);
 
-      using symbol_table_t = SymbolTable<MAP_T>;
-      using value_t = symbol_table_t::value_t;
-      symbols_table_t symbol_table(symbols);
+      using value_t = typename SymbolTable<MAP_T>::value_t;
+      SymbolTable<MAP_T> symbol_table(symbol_map);
 
       // Tokenize the expression.
       emp::TokenStream tokens = lexer.Tokenize(expression, std::string("Expression: ") + expression);
@@ -566,10 +569,10 @@ namespace emp {
     /// @param dm The map containing the required variables.
     /// @param expression The mathematical expression to be run on the data map.
     /// @param extras Any extra values to fill in a $0, $1, etc.
-    template <typename... ARG_Ts>
-    emp::Datum RunMathFunction(const MAP_T & dm, ARG_Ts... args) {
-      auto fun = BuildMathFunction(dm, std::forward<ARG_Ts>(args)...);
-      return fun(dm);
+    template <typename MAP_T, typename... ARG_Ts>
+    emp::Datum RunMathFunction(const MAP_T & symbol_map, ARG_Ts... args) {
+      auto fun = BuildMathFunction(symbol_map, std::forward<ARG_Ts>(args)...);
+      return fun(symbol_map);
     }
 
   };
