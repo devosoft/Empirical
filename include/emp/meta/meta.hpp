@@ -29,10 +29,35 @@ namespace emp {
   /// Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 
+  template <typename... Ts> struct type_index;
+
+  template <> struct type_index<> {
+    using t1 = void;  using t2 = void;  using t3 = void;  using t4 = void;
+  };
+
+  template <typename T1> struct type_index<T1> {
+    using t1 = T1;    using t2 = void;  using t3 = void;  using t4 = void;
+  };
+
+  template <typename T1, typename T2> struct type_index<T1, T2> {
+    using t1 = T1;    using t2 = T2;    using t3 = void;  using t4 = void;
+  };
+
+  template <typename T1, typename T2, typename T3> struct type_index<T1,T2,T3> {
+    using t1 = T1;    using t2 = T2;    using t3 = T3;    using t4 = void;
+  };
+
+  template <typename T1, typename T2, typename T3, typename T4, typename... Ts>
+  struct type_index<T1,T2,T3,T4,Ts...> {
+    using t1 = T1;    using t2 = T2;    using t3 = T3;    using t4 = T4;
+  };
+
+
   /// Trim off a specific type position from a pack.
-  template <typename T1, typename... Ts> using first_type = T1;
-  template <typename T1, typename T2, typename... Ts> using second_type = T2;
-  template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
+  template <typename... Ts> using first_type  = typename type_index<Ts...>::t1;
+  template <typename... Ts> using second_type = typename type_index<Ts...>::t2;
+  template <typename... Ts> using third_type  = typename type_index<Ts...>::t3;
+  template <typename... Ts> using fourth_type = typename type_index<Ts...>::t4;
 
   // Index into a template parameter pack to grab a specific type.
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
