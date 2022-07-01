@@ -82,9 +82,11 @@ namespace emp {
       static_assert( std::is_same<typename MAP_T::key_type, std::string>(),
                     "Any map type used by the parser must have a key type of std::string");
 
-      static auto MakeDatumAccessor(const std::string & name) {
+      static fun_t MakeDatumAccessor(const std::string & name) {
         return [name](arg_t symbol_vals){
-          return emp::Datum(symbol_vals[name]);
+          auto val_it = symbol_vals.find(name);
+          emp_assert(val_it != symbol_vals.end());
+          return emp::Datum(val_it->second);
         };
       }
 
