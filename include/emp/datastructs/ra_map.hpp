@@ -1,0 +1,138 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2022.
+ *
+ *  @file ra_map.hpp
+ *  @brief This file defines a Random Access Map template.
+ *  @note Status: ALPHA
+ * 
+ *  A random access map allows for simple traversal by index and a guarantee that a value at a
+ *  given index will always be at that index unless any map element is deleted.  This allows
+ *  storage of indices for maps with a fixed layout, resulting in easy access.
+ */
+
+#ifndef EMP_DATASTRUCTS_RA_MAP_HPP_INCLUDE
+#define EMP_DATASTRUCTS_RA_MAP_HPP_INCLUDE
+
+#include <map>
+
+#include "../base/unordered_map.hpp"
+#include "../base/vector.hpp"
+
+namespace emp {
+
+  /// This class uses a combination of a hashtable (std::unordered_map) and emp::vector to
+  /// lookup insert, lookup, and delete values in constant time, while still being able to
+  /// step through all values (albeit in an arbitrary order).
+  ///
+  /// @note The arbitrary order of values may change if any values are deleted.
+
+  template <typename KEY_T,
+            typename T,
+            typename Hash = std::hash<Key>,
+            typename KeyEqual = std::equal_to<Key>,
+            typename Allocator = std::allocator< std::pair<const Key, T> >
+  class ra_map {
+  public:
+    using key_type = KEY_T;
+    using mapped_type = T;
+    using value_type = std::pair<const Key, T>;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using hasher = Hash;
+    using key_equal = KeyEqual;
+    using allocator_type = Allocator;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = std::allocator_traits<Allocator>::pointer;
+    using const_pointer = std::allocator_traits<Allocator>::const_pointer;
+
+  private:
+    emp::unordered_map<KEY_T,size_t,Hash,KeyEqual> id_map;  ///< Map to find keys in vector.
+    emp::vector<value_type> vals;                           ///< Vector of all values.
+
+  public:
+    ra_map() = default;
+    ra_map(const ra_map &) = default;
+    ra_map(ra_map &&) = default;
+    ra_map<T> & operator=(const ra_map &) = default;
+    ra_map<T> & operator=(ra_map &&) = default;
+
+    // -- Iterators --
+    auto begin() { return vals.begin(); }
+    auto cbegin() const { return vals.cbegin(); }
+    auto end() { return vals.end(); }
+    auto cend() const { return vals.cend(); }
+
+    // -- Capacity --
+    size_t size() const { return vals.size(); }           ///< Number of entries in map.
+    bool empty() const { return size() == 0; }            ///< Are there NO values in map?
+    size_t max_size() const { return id_map.max_size(); } ///< Max system limit on size.
+
+    // -- Modifiers --
+    void clear() { id_map.clear(); vals.resize(0); }      ///< Remove all values from container.
+
+    /// Insert a new value into container by copy; return position.
+    size_t insert(const value_type & v) {
+      auto pos_it = id_map.find(v.first);
+      if (pos_it != id_map.end()) return pos_it->second; // Already in map.
+      const size_t pos = vals.size();
+      id_map[v.first] = pos;
+      vals.emplace_back(v);
+      return pos;
+    }
+
+    /// Insert a new value into container by move; return position.
+    size_t insert(value_type && v) {
+      auto pos_it = id_map.find(v.first);
+      if (pos_it != id_map.end()) return pos_it->second; // Already in map.
+      const size_t pos = vals.size();
+      id_map[v.first] = pos;
+      vals.emplace_back(std::move(v));
+      return pos;
+    }
+
+    /// Construct a new value in place in a container container; return position.
+    template <typename... Ts>
+    size_t emplace(Ts &&... args) {
+      const size_t new_pos = vals.size();
+      vals.emplace_back(std::forward<Ts>(args)...);
+      auto old_pos_it = id_map.find(vals.back().first);
+      if (old_pos_it != id_map.end()) {
+        vals.resize(vals.size()-1); // Destroy newly created instance.
+        return old_pos_it->second;  // Return old position in map.
+      }
+      id_map[v.first] = pos;        // Save new position for later lookup.
+      return new_pos;               // And return it.
+    }
+
+    /// Erase a specific value from the container.
+    bool erase(const T & v) {
+      if (!count(v)) return false;   // Not in map.
+
+      // Find out where v is in id_map and clear it.
+      const size_t pos = id_map[v];
+      id_map.erase(v);
+
+      // Move the former last value to the now-empty spot.
+      const size_t last_pos = vals.size() - 1;
+      if (pos != last_pos) {
+        vals[pos] = vals[last_pos];
+        id_map[vals[pos]] = pos;
+      }
+      vals.resize(last_pos);
+      return true;
+    }
+
+    
+    size_t count(const T & v) const { return id_map.count(v); } /// Is value included? (0 or 1).
+
+    /// Index into the ra_map, similar to a vector.
+    const T & operator[](size_t pos) const { return vals[pos]; }
+
+  };
+
+}
+
+#endif // #ifndef EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
