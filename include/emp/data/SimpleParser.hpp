@@ -372,6 +372,8 @@ namespace emp {
         std::cout << "ParseValue at position " << pos.GetIndex() << " : " << pos->lexeme << std::endl;
       }
 
+      using arg_t = typename SYMBOLS_T::arg_t;
+      using fun_t = typename SYMBOLS_T::fun_t;
       using value_t = typename SYMBOLS_T::value_t;
 
       // Deal with any unary operators...
@@ -383,7 +385,7 @@ namespace emp {
         if (val.type == value_t::VALUE) { return op(val.value); }
         else {
           return static_cast<typename value_t::fun_t>(
-            [fun=val.fun,op](typename SYMBOLS_T::arg_t arg){ return op(fun(arg)); }
+            [fun=val.fun,op](arg_t arg){ return op(fun(arg)); }
           );
         }
       }
@@ -433,32 +435,37 @@ namespace emp {
         ++pos;
 
         // Now build the function based on its argument count.
-        typename SYMBOLS_T::fun_t out_fun;
+        fun_t out_fun;
         switch (args.size()) {
         case 0:
           if (!functions[name].fun0) ParseError("Function '", name, "' requires arguments.");
-          out_fun = [fun=functions[name].fun0](typename SYMBOLS_T::arg_t /*are*/) { return fun(); };
+          out_fun = [fun=functions[name].fun0](arg_t /*sym_arg*/) { return fun(); };
           break;
         case 1:
           if (!functions[name].fun1) ParseError("Function '", name, "' cannot have 1 arguments.");
-          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFunction()](typename SYMBOLS_T::arg_t sym_arg) {
+          out_fun = [fun=functions[name].fun1,arg0=args[0].AsFunction()](arg_t sym_arg) {
             return fun(arg0(sym_arg));
           };
           break;
         case 2:
           if (!functions[name].fun2) ParseError("Function '", name, "' cannot have 2 arguments.");
-          out_fun = [fun=functions[name].fun2,arg0=args[0].AsFunction(),arg1=args[1].AsFunction()](typename SYMBOLS_T::arg_t sym_arg) {
+          out_fun = [fun=functions[name].fun2,
+                     arg0=args[0].AsFunction(),
+                     arg1=args[1].AsFunction()](arg_t sym_arg) {
             return fun(arg0(sym_arg), arg1(sym_arg));
           };
           break;
         case 3:
           if (!functions[name].fun3) ParseError("Function '", name, "' cannot have 3 arguments.");
-          out_fun = [fun=functions[name].fun3,arg0=args[0].AsFunction(),arg1=args[1].AsFunction(),arg2=args[2].AsFunction()](typename SYMBOLS_T::arg_t sym_arg) {
+          out_fun = [fun=functions[name].fun3,
+                     arg0=args[0].AsFunction(),
+                     arg1=args[1].AsFunction(),
+                     arg2=args[2].AsFunction()](arg_t sym_arg) {
             return fun(arg0(sym_arg), arg1(sym_arg), arg2(sym_arg));
           };
           break;
         default:
-          ParseError("Too many arguments for function '", name, "'.");
+          ParseError("Too many arguments (", args.size(), ") for function '", name, "'.");
         }
         return out_fun;
       }
@@ -470,6 +477,7 @@ namespace emp {
     template <typename SYMBOLS_T>
     typename SYMBOLS_T::value_t ParseMath(const SYMBOLS_T & symbols, pos_t & pos, size_t prec_limit=0) {
       using value_t = typename SYMBOLS_T::value_t;
+      using arg_t = typename SYMBOLS_T::arg_t;
       value_t val1 = ParseValue(symbols, pos);
 
       if constexpr (verbose) {
@@ -490,17 +498,17 @@ namespace emp {
           if (val1.type == value_t::VALUE) {
             if (val2.type == value_t::VALUE) { val1 = op.fun(val1.value, val2.value); }
             else {
-              val1 = [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](typename SYMBOLS_T::arg_t symbol_vals){
+              val1 = [val1_num=val1.value,val2_fun=val2.fun,op_fun=op.fun](arg_t symbol_vals){
                 return op_fun(val1_num, val2_fun(symbol_vals));
               };
             }
           } else {
             if (val2.type == value_t::VALUE) {
-              val1 = [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](typename SYMBOLS_T::arg_t symbol_vals){
+              val1 = [val1_fun=val1.fun,val2_num=val2.value,op_fun=op.fun](arg_t symbol_vals){
                 return op_fun(val1_fun(symbol_vals), val2_num);
               };
             } else {
-              val1 = [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](typename SYMBOLS_T::arg_t symbol_vals){
+              val1 = [val1_fun=val1.fun,val2_fun=val2.fun,op_fun=op.fun](arg_t symbol_vals){
                 return op_fun(val1_fun(symbol_vals), val2_fun(symbol_vals));
               };
             }
@@ -568,7 +576,7 @@ namespace emp {
 
 
     /// Generate a temporary math function and immediately run it on the provided arguments.
-    /// @param dm The map containing the required variables.
+    /// @param symbol_map The map containing the required variables.
     /// @param expression The mathematical expression to be run on the data map.
     /// @param extras Any extra values to fill in a $0, $1, etc.
     template <typename MAP_T, typename... ARG_Ts>
