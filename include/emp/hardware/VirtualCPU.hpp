@@ -230,17 +230,19 @@ namespace emp{
       }
       /// Return the first instruction in the instruction library
       inst_t GetDefaultInst() const{
-        return inst_t(0, GetInstLib()->GetID(0));
+        return inst_t(GetInstLib()->GetIndex(0), 0);
       }
       /// Add one or more default instructions to the end of the genome
       void PushDefaultInst(size_t count=1) {
-        PushInst( inst_t(0, GetInstLib()->GetID(0)), count );
+        PushInst( inst_t(GetInstLib()->GetIndex(0), 0), count );
         nops_need_curated = true;
       }
       /// Return a random instruction from the instruction library
       inst_t GetRandomInst(Random & rand) {
-        size_t idx = rand.GetUInt(GetInstLib()->GetSize());
-        size_t id = GetInstLib()->GetID(idx);
+        size_t id = rand.GetUInt(GetInstLib()->GetSize());
+        size_t idx = GetInstLib()->GetIndex(id);
+        //size_t idx = rand.GetUInt(GetInstLib()->GetSize());
+        //size_t id = GetInstLib()->GetID(idx);
         return inst_t(idx, id);
       }
       /// Overwrite the instruction at the given genome index with passed instruction
