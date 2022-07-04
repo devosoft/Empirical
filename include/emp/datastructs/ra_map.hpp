@@ -19,6 +19,7 @@
 
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
+#include "../math/constants.hpp"
 
 namespace emp {
 
@@ -128,9 +129,36 @@ namespace emp {
     
     size_t count(const T & v) const { return id_map.count(v); } /// Is value included? (0 or 1).
 
-    /// Index into the ra_map, similar to a vector.
-    const T & operator[](size_t pos) const { return vals[pos]; }
+    /// Index into the ra_map by key.
+    T & operator[](key_t key) {
+      size_t key_it = id_map.find(key);
+      if (key_it == id_map.end()) {
+        return NewEntry(key);
+      }
+      return vals[key_it->second];
+    }
 
+    // --- Empirical only commands ---
+
+    T & NewEntry(key_t key) {
+      emp_assert(id_map.find(key) != id_map.end(), "ra_map::NewEntry must be an unused key!", key);
+      const size_t pos = vals.size();
+      id_map[v.first] = pos;
+      vals.emplace_back();
+      return vals.back().second;
+    }
+
+    bool Has(key_t key) const { return id_map.find(key) != id_map.end(); }
+
+    size_t GetID(key_t key) {
+      auto key_it = id_map.find(key);
+      return (key_it == id_map.end()) ? emp::MAX_SIZE_T : key_it->second;
+    }
+
+    key_t & KeyAtID(size_t id) { return vals[id]->first; }
+
+    T & AtID(size_t id) { return vals[id]->second; }
+    const T & AtID(size_t id) const { return vals[id]->second; }
   };
 
 }
