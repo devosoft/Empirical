@@ -31,6 +31,7 @@
 #include "../compiler/Lexer.hpp"
 #include "../compiler/regex_utils.hpp"
 #include "../data/Datum.hpp"
+#include "../datastructs/ra_map.hpp"
 #include "../math/Random.hpp"
 #include "../meta/meta.hpp"
 
@@ -92,6 +93,38 @@ namespace emp {
 
       /// By default, let the value handle its own converstion to a function.
       auto AsFunction(ValueType<arg_t> & val) const { return val.AsFunction(); }
+    };
+
+    template <typename VALUE_T, typename DUMMY_T>
+    struct SymbolTable<emp::ra_map<std::string,VALUE_T>, DUMMY_T> {
+      using map_t = emp::ra_map<std::string,VALUE_T>;
+      using arg_t = const map_t &;
+      using fun_t = std::function<emp::Datum(arg_t)>;
+      using value_t = ValueType<arg_t>;
+
+      const typename map_t::layout_t & layout;
+
+      SymbolTable(const emp::ra_map<std::string,VALUE_T> & in_map)
+        : layout(in_map.GetLayout()) { }
+
+      fun_t MakeDatumAccessor(const std::string & name) const {
+        emp_assert(layout.find(name) != layout.end());
+        size_t id = layout.find(name)->second;
+        #ifdef NDEBUG
+        return [id](arg_t symbol_vals){
+        #else
+        return [id,name](arg_t symbol_vals){          // Keep name in debug mode to check id.
+          emp_assert(symbol_vals.GetID(name) == id);
+        #endif
+          return emp::Datum(symbol_vals.AtID(id));
+        };
+      }
+
+      /// By default, let the value handle its own converstion to a function.
+      auto AsFunction(ValueType<arg_t> & val) const {
+        // @CAO: Could check layout correctness in debug mode.
+        return val.AsFunction();
+      }
     };
 
     /// Specialty implementation for DataLayouts.
