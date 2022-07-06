@@ -50,8 +50,10 @@ namespace emp {
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
 
+    using layout_t = emp::unordered_map<KEY_T,size_t,Hash,KeyEqual>;
+
   private:
-    emp::unordered_map<KEY_T,size_t,Hash,KeyEqual> id_map;  ///< Map to find keys in vector.
+    layout_t id_map;  ///< Map to find keys in vector.
     emp::vector<value_type> vals;                           ///< Vector of all values.
 
     using this_t = ra_map<KEY_T,T,Hash,KeyEqual,Allocator>;
@@ -143,6 +145,8 @@ namespace emp {
 
     // --- Empirical only commands ---
 
+    const layout_t & GetLayout() const { return id_map; }
+
     T & NewEntry(key_type key) {
       emp_assert(id_map.find(key) == id_map.end(), "ra_map::NewEntry must be an unused key!", key);
       const size_t pos = vals.size();
@@ -153,7 +157,7 @@ namespace emp {
 
     bool Has(key_type key) const { return id_map.find(key) != id_map.end(); }
 
-    size_t GetID(key_type key) {
+    size_t GetID(key_type key) const {
       auto key_it = id_map.find(key);
       return (key_it == id_map.end()) ? emp::MAX_SIZE_T : key_it->second;
     }
@@ -161,7 +165,7 @@ namespace emp {
     key_type & KeyAtID(size_t id) { return vals[id]->first; }
 
     T & AtID(size_t id) { return vals[id]->second; }
-    const T & AtID(size_t id) const { return vals[id]->second; }
+    const T & AtID(size_t id) const { return vals[id].second; }
   };
 
 }
