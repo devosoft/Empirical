@@ -71,6 +71,8 @@ namespace emp{
                                      /// it should use in a string representation)
         emp::vector<size_t> nop_vec; /// Representation of the contiguous sequence of NOP
                                      /// instructions following this instruction in the genome
+        bool has_been_executed = false; /// Has this instruction been executed?
+        bool has_been_copied = false; // Has this instruction been copied to an offspring?
 
         Instruction() = delete;
         Instruction(size_t _idx, size_t _id=0, emp::vector<size_t> _nop_vec = {})
@@ -176,6 +178,23 @@ namespace emp{
       const std::unordered_map<int,data_t> & GetOutputs() const { return outputs; }
       /// Return a pointer to the CPU's instruction library
       Ptr<const inst_lib_t> GetInstLib() const { return genome.GetInstLib(); }
+      /// Return the number of instructions that have been executed
+      size_t GetNumInstsExecuted() const{
+        size_t count = 0;
+        for(auto inst : genome_working){
+          if(inst.has_been_executed) count++;
+        }
+        return count;
+      }
+      /// Return the number of instructions that have been copied
+      size_t GetNumInstsCopied() const{
+        size_t count = 0;
+        for(auto inst : genome_working){
+          if(inst.has_been_copied) count++;
+        }
+        return count;
+      }
+
 
 
       //////// SETTERS
@@ -278,10 +297,6 @@ namespace emp{
         genome.erase(genome.begin() + idx);
         genome_working.erase(genome_working.begin() + idx);
         nops_need_curated = true;
-      }
-      /// Return the number of instruction that have been copied
-      size_t GetNumInstsCopied() const{
-        return copied_inst_id_vec.size();
       }
 
 
@@ -711,6 +726,7 @@ namespace emp{
           GetInstLib()->GetName(genome_working[inst_ptr].idx);
           PrintDetails();
         }
+        genome_working[inst_ptr].has_been_executed = true;
         GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
         AdvanceIP();
         num_insts_executed++;
