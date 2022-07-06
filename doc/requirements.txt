@@ -38,7 +38,7 @@ imagesize==1.2.0
     # via sphinx
 jinja2==3.0.2
     # via sphinx
-lxml==4.6.3
+lxml==4.9.1
     # via exhale
 markdown-it-py==0.5.8
     # via myst-parser
@@ -66,8 +66,6 @@ snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.2.1
     # via beautifulsoup4
-sphinx-rtd-theme==0.5.0
-    # via -r requirements.in
 sphinx==3.2.1
     # via
     #   -r requirements.in
@@ -75,6 +73,8 @@ sphinx==3.2.1
     #   exhale
     #   myst-parser
     #   sphinx-rtd-theme
+sphinx-rtd-theme==0.5.0
+    # via -r requirements.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
