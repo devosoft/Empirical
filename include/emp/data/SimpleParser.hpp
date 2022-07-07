@@ -560,20 +560,21 @@ namespace emp {
     template <typename T1, typename... Ts>
     void SetupStaticValues(T1 arg1, Ts... args) {
       // If we have a vector of incoming values, make sure it is valid and then just pass it along.
-      if constexpr (sizeof...(Ts) == 1) {
-        if constexpr (emp::is_emp_vector<Ts...>()) {
-          using value_t = typename emp::first_type<Ts...>::value_type;
-          static_assert(std::is_same<value_t, emp::Datum>(),
-            "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
-          external_vals = arg1;
-          return;
-        }
+      if constexpr (sizeof...(Ts) == 0 && emp::is_emp_vector<T1>()) {
+        using value_t = typename T1::value_type;
+        static_assert(std::is_same<value_t, emp::Datum>(),
+          "If BuildMathFunction is provided a vector, it must contain only emp::Datum.");
+        external_vals = arg1;
+        return;
       }
-      // Otherwise convert all args to emp::Datum.
-      external_vals = emp::vector<emp::Datum>{
-        static_cast<emp::Datum>(arg1),
-        static_cast<emp::Datum>(args)...
-      };
+
+      else {
+        // Otherwise convert all args to emp::Datum.
+        external_vals = emp::vector<emp::Datum>{
+          static_cast<emp::Datum>(arg1),
+          static_cast<emp::Datum>(args)...
+        };
+      }
     }
 
     /// If there are no input args, just clear external values.
