@@ -299,3 +299,20 @@ TEST_CASE("Test std::map in SimpleParser", "[data]")
 
   CHECK(fun(var_map) == 63.5);
 }
+
+TEST_CASE("Test emp::ra_map in SimpleParser", "[data]")
+{
+  emp::ra_map<std::string, double> var_map;
+  var_map["x"] = 5;
+  var_map["y"] = 10;
+
+  emp::SimpleParser parser;
+  auto fun = parser.BuildMathFunction(var_map, "11*x + y*y");
+
+  CHECK(fun(var_map) == 155.0);
+
+  var_map["x"] = 3.5;
+  var_map["y"] = 5;
+
+  CHECK(fun(var_map) == 63.5);
+}
