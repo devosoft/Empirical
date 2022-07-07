@@ -292,16 +292,25 @@ namespace emp {
 
     /// Get the memory at the target position, assume it is the provided type, and convert the
     /// value found there to string.
-    std::string GetAsString(size_t id, TypeID type_id) const {
+    std::string GetAsString(size_t id, TypeID type_id, size_t count=1) const {
       emp_assert(HasID(id), "Can only Get IDs that are available in DataMap.", id, GetSize());
       emp_assert(type_id == layout_ptr->GetType(id));
-      return type_id.ToString(memory.GetPtr(id));
+      emp_assert(count = layout_ptr->GetCount(id));
+      if (count == 1) return type_id.ToString(memory.GetPtr(id));
+      else {
+        size_t obj_size = type_id.GetSize();
+        std::stringstream ss;
+        for (size_t i = 0; i < count; ++i) {
+          ss << '[' << type_id.ToString(memory.GetPtr(id+i*obj_size)) << ']';
+        }
+        return ss.str();
+      }
     }
 
     /// Get the memory at the target position, lookup it's type, and convert the value to string.
     std::string GetAsString(size_t id) const {
       emp_assert(HasID(id), "Can only get IDs the are available in DataMap.", id, GetSize());
-      return GetAsString(id, layout_ptr->GetType(id));
+      return GetAsString(id, layout_ptr->GetType(id), layout_ptr->GetCount(id));
     }
 
     /// Add a new variable with a specified type, name and value.
@@ -361,7 +370,10 @@ namespace emp {
     static std::function<emp::Datum(const emp::DataMap &)>
     MakeDatumAccessor(const emp::DataLayout & layout, size_t id) {
       // This must be a DataLayout entry name.
-      emp_assert(layout.HasID(id));
+      emp_assert(layout.HasID(id), "DatumAccessor pointing to invalid id", id);
+      emp_assert(layout.GetCount(id) == 1,
+                 "DatumAccessors must have a count of 1 for proper conversion.",
+                 layout.GetCount(id));
       TypeID type_id = layout.GetType(id);
 
       // Return an appropriate accessor for this value.
@@ -390,8 +402,7 @@ namespace emp {
     /// Return a function that takes in a data map and (efficiently) returns a Datum using the
     /// specified name.
     static auto MakeDatumAccessor(const emp::DataLayout & layout, const std::string & name) { 
-      // This must be a DataLayout entry name.
-      emp_assert(layout.HasName(name));
+      emp_assert(layout.HasName(name), "DatumAccessor not pointing to valid name", name);
       return MakeDatumAccessor(layout, layout.GetID(name));
     }
   };
