@@ -212,6 +212,10 @@ namespace emp{
         file.RemoveComments("//"); // Remove all C++ style comments
         file.RemoveComments("#");  // Remove all bash/Python/R style comments
         file.CompressWhitespace();  // Trim down remaining whitespace.
+        file.RemoveEmpty();
+        if(file.GetNumLines() == 0){
+          emp_error("Error! VirtualCPU trying to load a genome from an empty stream!");
+        }
         file.Apply( [this](std::string & info){ PushInst(info); } );
         nops_need_curated = true;
         return true;
@@ -219,7 +223,11 @@ namespace emp{
       /// Load instructions from file
       bool Load(const std::string & filename) {
         std::ifstream is(filename);
-        return Load(is);
+        if(is.is_open()){
+          return Load(is);
+        }
+        emp_error("Error! VirtualCPU genome file is either empty or missing: ", filename);
+        return false;
       }
       /// Add a new instruction to the end of the genome, by index in the instruction library
       void PushInst(size_t idx){
