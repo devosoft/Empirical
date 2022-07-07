@@ -80,8 +80,8 @@ namespace emp {
 
     std::string GetTraitAsString(size_t id) const { return data_map.GetAsString(id); }
 
-    std::string GetTraitAsString(size_t trait_id, emp::TypeID type_id) const {
-      return data_map.GetAsString(trait_id, type_id);
+    std::string GetTraitAsString(size_t trait_id, emp::TypeID type_id, size_t count=1) const {
+      return data_map.GetAsString(trait_id, type_id, count);
     }
   };
 
