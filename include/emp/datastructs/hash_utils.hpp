@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019-2021.
+ *  @date 2019-2022.
  *
  *  @file hash_utils.hpp
  *  @brief This file provides tools for hashing values and containers.
@@ -14,11 +14,11 @@
 #include <cstddef>
 #include <cstring>
 #include <numeric>
+#include <span>
 #include <stdint.h>
 #include <type_traits>
 
 #include "../base/Ptr.hpp"
-#include "../polyfill/span.hpp"
 
 namespace emp {
 

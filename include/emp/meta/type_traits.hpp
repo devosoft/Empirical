@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
+ *  @date 2016-2022.
  *
  *  @file type_traits.hpp
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -13,13 +13,13 @@
 
 #include <functional>
 #include <tuple>
+#include <span>
 #include <type_traits>
 #include <utility>
 
 #include "../base/_is_streamable.hpp"
 //^ provides is_streamable implementation,
 // located in base directory to preserve levelization
-#include "../polyfill/span.hpp"
 
 #include "meta.hpp"
 

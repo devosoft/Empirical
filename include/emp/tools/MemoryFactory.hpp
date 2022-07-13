@@ -12,6 +12,7 @@
 #ifndef EMP_TOOLS_MEMORY_FACTORY_HPP_INCLUDE
 #define EMP_TOOLS_MEMORY_FACTORY_HPP_INCLUDE
 
+#include <span>
 #include <type_traits>
 
 #include "../base/array.hpp"
@@ -20,7 +21,6 @@
 #include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../polyfill/span.hpp"
 
 namespace emp {
 

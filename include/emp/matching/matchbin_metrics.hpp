@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019-2021.
+ *  @date 2019-2022.
  *
  *  @file matchbin_metrics.hpp
  *  @brief Metric structs that can be plugged into MatchBin.
@@ -19,6 +19,7 @@
 #include <limits>
 #include <queue>
 #include <ratio>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -37,7 +38,6 @@
 #include "../datastructs/tuple_utils.hpp"
 #include "../math/Distribution.hpp"
 #include "../math/math.hpp"
-#include "../polyfill/span.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {

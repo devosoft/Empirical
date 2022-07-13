@@ -20,6 +20,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <iostream>
+#include <span>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -28,7 +29,6 @@
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../meta/type_traits.hpp"
-#include "../polyfill/span.hpp"
 
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"

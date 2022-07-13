@@ -88,12 +88,12 @@
 #define EMP_DATA_DATAMAP_HPP_INCLUDE
 
 #include <cstring>        // For std::memcpy
+#include <span>
 #include <string>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../meta/TypeID.hpp"
-#include "../polyfill/span.hpp"
 #include "../tools/string_utils.hpp"
 
 #include "Datum.hpp"
