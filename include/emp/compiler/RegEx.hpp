@@ -205,9 +205,11 @@ namespace emp {
           // If blocks are nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
             auto old_node = nodes[i]->AsBlock();    // Save the old node for merging.
-            nodes.erase(nodes.begin() + (int) i);  // Remove block from nodes.
-            nodes.insert(nodes.begin() + (int) i, old_node->nodes.begin(), old_node->nodes.end());
-            old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
+            nodes.erase(nodes.begin() + (int) i);   // Remove block from nodes.
+            if (old_node->nodes.size()) {
+              nodes.insert(nodes.begin() + (int) i, old_node->nodes.begin(), old_node->nodes.end());
+              old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
+            }
             old_node.Delete();
             i--;
             modify = true;
