@@ -92,8 +92,7 @@ TEST_CASE("Test Random", "[math]")
   REQUIRE(randomStd(4) == 1);
 
   REQUIRE(rnd.GetGeometric(1) == 1);
-  REQUIRE(rnd.GetGeometric(0) == std::numeric_limits<uint32_t>::infinity());
-  // REQUIRE(rnd.GetGeometric(.25) == 8);
+  // REQUIRE(rnd.GetGeometric(0) == std::numeric_limits<uint32_t>::infinity());
 }
 
 TEST_CASE("Another Test random", "[math]")
