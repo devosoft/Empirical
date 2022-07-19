@@ -49,7 +49,7 @@ TEST_CASE("Test Datum", "[data]")
 
   CHECK(d1 == "789");
   CHECK(d2 == "123.000000");
-  CHECK(d3 == "456.000000");
+  CHECK(d3 == "456");
   CHECK(d4 == "789.000000");
 
   // Check string comparisons (d1 and d3)
@@ -120,6 +120,6 @@ TEST_CASE("Test Datum", "[data]")
   y = d2.AsString();
 
   CHECK(x == 123.0);
-  CHECK(y == "123.000000");
+  CHECK(y == "123");
 
 }

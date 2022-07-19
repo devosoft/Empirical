@@ -16,9 +16,9 @@
  *
  *  If you trip an assert, you can re-do the run a track a specific pointer by defining
  *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.
- * 
+ *
  *  For example: -DEMP_ABORT_PTR_NEW=1691
- * 
+ *
  *  This will allow you to track the pointer more easily in a debugger.
  *
  *  @todo Track information about emp::vector and emp::array objects to make sure we don't
