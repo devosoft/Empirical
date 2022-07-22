@@ -133,12 +133,12 @@ namespace emp {
     int Compare(const char * rhs) const { return CompareString(rhs); }
     int Compare(const Datum & rhs) const { return (rhs.is_num) ? CompareNumber(rhs) : CompareString(rhs); }
 
-    template<typename T> bool operator==(T && rhs) const { return Compare(std::forward<T>(rhs)) == 0; }
-    template<typename T> bool operator!=(T && rhs) const { return Compare(std::forward<T>(rhs)) != 0; }
-    template<typename T> bool operator< (T && rhs) const { return Compare(std::forward<T>(rhs)) == -1; }
-    template<typename T> bool operator>=(T && rhs) const { return Compare(std::forward<T>(rhs)) != -1; }
-    template<typename T> bool operator> (T && rhs) const { return Compare(std::forward<T>(rhs)) == 1; }
-    template<typename T> bool operator<=(T && rhs) const { return Compare(std::forward<T>(rhs)) != 1; }
+    template<typename T> bool operator==(const T & rhs) const { return Compare(rhs) == 0; }
+    template<typename T> bool operator!=(const T & rhs) const { return Compare(rhs) != 0; }
+    template<typename T> bool operator< (const T & rhs) const { return Compare(rhs) == -1; }
+    template<typename T> bool operator>=(const T & rhs) const { return Compare(rhs) != -1; }
+    template<typename T> bool operator> (const T & rhs) const { return Compare(rhs) == 1; }
+    template<typename T> bool operator<=(const T & rhs) const { return Compare(rhs) != 1; }
 
     Datum operator+(const Datum & in) const {
       if (IsDouble()) return NativeDouble() + in.AsDouble();
