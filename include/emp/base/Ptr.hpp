@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2022.
  *
  *  @file Ptr.hpp
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
@@ -715,22 +715,22 @@ namespace emp {
 
 
     /// Does this Ptr point to the same memory position as a raw pointer?
-    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
+    bool operator==(const TYPE * const in_ptr) const { return ptr == in_ptr; }
 
     /// Does this Ptr point to different memory positions as a raw pointer?
-    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
+    bool operator!=(const TYPE * const in_ptr) const { return ptr != in_ptr; }
 
     /// Does this Ptr point to a memory position before a raw pointer?
-    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
+    bool operator<(const TYPE * const in_ptr)  const { return ptr < in_ptr; }
 
     /// Does this Ptr point to a memory position before or equal to a raw pointer?
-    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
+    bool operator<=(const TYPE * const in_ptr) const { return ptr <= in_ptr; }
 
     /// Does this Ptr point to a memory position after a raw pointer?
-    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
+    bool operator>(const TYPE * const in_ptr)  const { return ptr > in_ptr; }
 
     /// Does this Ptr point to a memory position after or equal to a raw pointer?
-    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+    bool operator>=(const TYPE * const in_ptr) const { return ptr >= in_ptr; }
 
     [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
     [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
@@ -899,21 +899,20 @@ namespace emp {
     operator bool() { return ptr != nullptr; }
     operator bool() const { return ptr != nullptr; }
 
-    // Comparisons to other Ptr objects
-    bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
-    bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
-    bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
-    bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
-    bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
-    bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
+    template <typename T> bool operator==(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr == in_ptr.ptr; }
+      else { return ptr == in_ptr; }
+    }
+    template <typename T> bool operator!=(const T & in_ptr) const { return !operator==(in_ptr); }
 
-    // Comparisons to raw pointers.
-    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
-    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
-    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
-    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
-    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
-    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+    template <typename T> bool operator<(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr < in_ptr.ptr; }
+      else { return ptr < in_ptr; }
+    }
+    template <typename T> bool operator>(const T & in_ptr)  const { return in_ptr < *this; }
+    template <typename T> bool operator<=(const T & in_ptr) const { return !operator>(in_ptr); }
+    template <typename T> bool operator>=(const T & in_ptr) const { return !operator<(in_ptr); }
+
 
     [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
     [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
