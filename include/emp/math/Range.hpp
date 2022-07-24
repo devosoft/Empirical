@@ -28,6 +28,7 @@ namespace emp {
   public:
     Range() = default;
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l < _u); }
+    Range(const Range &) = default;
 
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
