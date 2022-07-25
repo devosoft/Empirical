@@ -1,4 +1,5 @@
 *~
+*.csv
 *.debug
 *.dSYM
 *.gcov
@@ -17,6 +18,8 @@
 *.dat
 *.exe
 *tmp.*
+*-bak.*
+*-bak2.*
 
 */env/*
 */3nv/*
@@ -24,9 +27,6 @@
 .DS_Store
 a.out
 a.out.js
-fitness.csv
-population.csv
-systematics.csv
 
 incoming/
 tmp/
@@ -88,7 +88,6 @@ examples/*/*
 !examples/*/Makefile
 !examples/timing/BENCHMARKS
 
-tests/*.csv
 tests/StatsConfig.cfg
 tests/web/*.js
 tests/web/package.json
