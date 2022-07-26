@@ -707,9 +707,18 @@ namespace emp {
       if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr < in_ptr.ptr; }
       else { return ptr < in_ptr; }
     }
-    template <typename T> bool operator>(const T & in_ptr)  const { return in_ptr < *this; }
-    template <typename T> bool operator<=(const T & in_ptr) const { return !operator>(in_ptr); }
-    template <typename T> bool operator>=(const T & in_ptr) const { return !operator<(in_ptr); }
+    template <typename T> bool operator>(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr > in_ptr.ptr; }
+      else { return ptr > in_ptr; }
+    }
+    template <typename T> bool operator<=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr <= in_ptr.ptr; }
+      else { return ptr <= in_ptr; }
+    }
+    template <typename T> bool operator>=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr >= in_ptr.ptr; }
+      else { return ptr >= in_ptr; }
+    }
 
     [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
     [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
@@ -888,10 +897,18 @@ namespace emp {
       if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr < in_ptr.ptr; }
       else { return ptr < in_ptr; }
     }
-    template <typename T> bool operator>(const T & in_ptr)  const { return in_ptr < *this; }
-    template <typename T> bool operator<=(const T & in_ptr) const { return !operator>(in_ptr); }
-    template <typename T> bool operator>=(const T & in_ptr) const { return !operator<(in_ptr); }
-
+    template <typename T> bool operator>(const T & in_ptr)  const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr > in_ptr.ptr; }
+      else { return ptr > in_ptr; }
+    }
+    template <typename T> bool operator<=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr <= in_ptr.ptr; }
+      else { return ptr <= in_ptr; }
+    }
+    template <typename T> bool operator>=(const T & in_ptr) const {
+      if constexpr (std::is_same<T,Ptr<TYPE>>()) { return ptr >= in_ptr.ptr; }
+      else { return ptr >= in_ptr; }
+    }
 
     [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
     [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
