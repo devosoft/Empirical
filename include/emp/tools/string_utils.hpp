@@ -740,7 +740,7 @@ namespace emp {
   }
 
   /// Pre-pend and post-pend specified sequences to all strings provided.
-  [[nodiscard]] static inline string_vec_t 
+  [[nodiscard]] static inline string_vec_t
   quote_strings(const string_vec_t & in_strings,
                 const std::string open_quote,
                 const std::string close_quote) {
@@ -1559,7 +1559,7 @@ namespace emp {
                                result);
         return result; // Stop where we are... No end brace found!
       }
-      
+
       std::string key = result.substr(i+2, end_pos-i-2);
       auto replacement_it = var_map.find(key);
       if (replacement_it == var_map.end()) {

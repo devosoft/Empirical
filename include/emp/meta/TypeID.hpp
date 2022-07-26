@@ -119,6 +119,7 @@ namespace emp {
       virtual bool IsTrivial() const { return false; }
       virtual bool IsVoid() const { return false; }
       virtual bool IsVolatile() const { return false; }
+      virtual bool IsFunction() const { return false; }
 
       virtual bool IsTypePack() const { return false; }
 
@@ -170,6 +171,7 @@ namespace emp {
       bool IsTrivial() const override { return std::is_trivial<T>(); }
       bool IsVoid() const override { return std::is_same<T,void>(); }
       bool IsVolatile() const override { return std::is_volatile<T>(); }
+      bool IsFunction() const override { return std::is_function<T>(); }
 
       bool IsTypePack() const override { return emp::is_TypePack<T>(); }
 
@@ -221,6 +223,7 @@ namespace emp {
 
       size_t GetSize() const override {
         if constexpr (std::is_void<T>()) return 0;
+        else if constexpr (std::is_function<T>()) return 0;
         else return sizeof(T);
       }
 

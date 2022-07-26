@@ -10,7 +10,7 @@ on:
 jobs:
   tidy:
     name: Enforce Tidyness
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -31,7 +31,7 @@ jobs:
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -50,11 +50,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 11
       - run: sudo apt-get update -qq
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq g++-8 cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
-      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+      - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
       - run: ${CXX} --version
@@ -63,14 +66,17 @@ jobs:
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 11
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq g++-8 cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
-      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+      - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: make install-test-dependencies
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
@@ -78,31 +84,21 @@ jobs:
           run: make test-web
   test-coverage:
     name: Measure Test Coverage
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
-      - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-      - run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-      - run: sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
-      - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq g++-8
-      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-      - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
-      - run: sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-7 90
-      - run: sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-7 90
-      - run: sudo update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-7 90
-      - run: sudo update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-7 90
+      - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip clang llvm-dev libclang-dev
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
-      - run: export CXX=clang++-7 && make install-coverage-dependencies
-      - run: export CXX=clang++-7 && make coverage
+      - run: export CXX=clang++ && make install-coverage-dependencies
+      - run: export CXX=clang++ && make coverage
       - run: curl -s https://codecov.io/bash | bash
   test-documentation:
     name: Test Documentation Build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -119,7 +115,7 @@ jobs:
           dst: stats/doc-coverage.json
   deploy-dockerhub:
     name: Deploy to DockerHub
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     needs:
       - tidy
