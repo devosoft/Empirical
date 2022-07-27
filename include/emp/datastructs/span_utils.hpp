@@ -44,4 +44,4 @@ namespace std {
 
 }
 
-#endif
+#endif // #ifndef EMP_DATASTRUCTS_SPAN_UTILS_HPP_INCLUDE

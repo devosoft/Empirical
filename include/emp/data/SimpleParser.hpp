@@ -19,8 +19,8 @@
  *  - Allow types other than Datum (string and double)?
  */
 
-#ifndef EMP_DATA_SIMPLE_PARSER_HPP_INCLUDE
-#define EMP_DATA_SIMPLE_PARSER_HPP_INCLUDE
+#ifndef EMP_DATA_SIMPLEPARSER_HPP_INCLUDE
+#define EMP_DATA_SIMPLEPARSER_HPP_INCLUDE
 
 #include <cmath>
 #include <map>
@@ -623,4 +623,4 @@ namespace emp {
 
 }
 
-#endif // #ifndef EMP_DATA_DATAMAPPARSER_HPP_INCLUDE
+#endif // #ifndef EMP_DATA_SIMPLEPARSER_HPP_INCLUDE

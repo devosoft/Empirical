@@ -13,8 +13,8 @@
  * 
  */
 
-#ifndef EMP_TOOLS_SHORT_STRING_HPP_INCLUDE
-#define EMP_TOOLS_SHORT_STRING_HPP_INCLUDE
+#ifndef EMP_TOOLS_SHORTSTRING_HPP_INCLUDE
+#define EMP_TOOLS_SHORTSTRING_HPP_INCLUDE
 
 #include <algorithm>
 #include <string>
@@ -117,4 +117,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_TOOLS_SHORTSTRING_HPP_INCLUDE

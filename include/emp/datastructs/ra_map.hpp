@@ -170,4 +170,4 @@ namespace emp {
 
 }
 
-#endif // #ifndef EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
+#endif // #ifndef EMP_DATASTRUCTS_RA_MAP_HPP_INCLUDE

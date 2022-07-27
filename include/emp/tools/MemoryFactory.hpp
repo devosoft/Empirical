@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef EMP_TOOLS_MEMORY_FACTORY_HPP_INCLUDE
-#define EMP_TOOLS_MEMORY_FACTORY_HPP_INCLUDE
+#ifndef EMP_TOOLS_MEMORYFACTORY_HPP_INCLUDE
+#define EMP_TOOLS_MEMORYFACTORY_HPP_INCLUDE
 
 #include <span>
 #include <type_traits>
@@ -221,4 +221,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TOOLS_MEMORYFACTORY_HPP_INCLUDE
