@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022
+ *  @date 2022.
  *
  *  @file MemoryFactory.cpp
  */
@@ -23,6 +23,5 @@ TEST_CASE("Test MemoryFactory", "[tools]")
       data[i][j] = status;
       status *= 1.0001;
     }
-    std::cout << status << std::endl;
   }
 }
