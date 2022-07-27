@@ -27,7 +27,7 @@ namespace emp {
   namespace internal {
     template <typename T, size_t MEM_COUNT, size_t POOL_COUNT>
     struct MemFactory_StaticData {
-      static constexpr const bool is_resizable = false;
+      static constexpr const bool is_dynamic = false;
 
       // Config
       static constexpr const size_t mem_count = MEM_COUNT;                // # of element per reserve.
@@ -51,7 +51,7 @@ namespace emp {
 
     template <typename T>
     struct MemFactory_DynamicData {
-      static constexpr const bool is_resizable = true;
+      static constexpr const bool is_dynamic = true;
 
       // Config
       size_t mem_count = 0;
@@ -112,6 +112,16 @@ namespace emp {
       // Do not copy memory factories.
       MemFactory_impl(MemFactory_impl &) = delete;
 
+      ~MemFactory_impl() {
+        // Clean up all remaining memory.
+        if constexpr (DATA_T::is_dynamic) {
+          data.pool.DeleteArray();
+          for (auto & mem : retired_mem) {
+            mem.begin_ptr.DeleteArray();
+          }
+        }
+      }
+
       size_t GetChunkSize() const { return data.chunk_size; }
       size_t GetPoolSize() const { return data.pool_size; }
 
@@ -132,7 +142,7 @@ namespace emp {
 
       template <typename... ARGS>
       emp::Ptr<T> Reserve(ARGS &&... args) {
-        if constexpr (DATA_T::is_resizable) {
+        if constexpr (DATA_T::is_dynamic) {
           if (free_count == 0) { // If we are out of memory, retire current back and request more!
             // Backup the old memory and initialize (bigger) replacement.
             retired_mem.push_back(RetiredMem{data.PoolPtr(), data.EndPoolPtr(), data.pool_count});
@@ -176,7 +186,7 @@ namespace emp {
         }
 
         // If data is resizable, we need to worry about retired memory.
-        if constexpr (data.is_resizable) {
+        if constexpr (data.is_dynamic) {
           if (!IsCurrent(in)) {
             // Determine which retired pool we are in.
             size_t pool_id;
