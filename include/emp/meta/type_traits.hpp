@@ -12,8 +12,8 @@
 
 
 #include <functional>
-#include <tuple>
 #include <span>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 

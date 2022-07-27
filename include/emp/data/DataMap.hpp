@@ -96,8 +96,8 @@
 #include "../meta/TypeID.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "Datum.hpp"
 #include "DataLayout.hpp"
+#include "Datum.hpp"
 #include "MemoryImage.hpp"
 
 namespace emp {

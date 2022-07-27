@@ -23,8 +23,8 @@
 #define EMP_DATA_SIMPLE_PARSER_HPP_INCLUDE
 
 #include <cmath>
-#include <string>
 #include <map>
+#include <string>
 #include <unordered_map>
 
 #include "../base/notify.hpp"
