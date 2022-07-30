@@ -31,7 +31,7 @@ test-web-%: %.cpp
 test: $(addprefix test-native-, $(NATIVE_TEST_NAMES)) test-color_map
 
 test-native-%: %.cpp
-	$(CXX) $(CFLAGS_all) $< -lstdc++fs -o $@.out
+	$(CXX) $(CFLAGS_all) $< -o $@.out
 	# execute test; on fail, run again and backtrace
 	./$@.out \
 		|| { gdb ./$@.out --ex="catch throw" --ex="set confirm off" --ex="run" --ex="backtrace" --ex="quit"; exit 1; }
