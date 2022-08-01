@@ -141,7 +141,7 @@ namespace emp {
       emp_assert(false, "Invalid call for DataNode config.");
     }
 
-    void AddDatum(const VAL_TYPE & val) { val_count++; }
+    void AddDatum(const VAL_TYPE & /*val*/) { val_count++; }
 
     void Reset() { val_count = 0; }
 
