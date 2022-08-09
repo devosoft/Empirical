@@ -2,7 +2,7 @@ EMP_DIR := ../../../../include
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wextra -Wno-unused-function -I$(EMP_DIR)/
-CFLAGS_version := -std=c++17
+CFLAGS_version := -std=c++20
 
 # Emscripten compiler information
 CXX_web := emcc

@@ -3,7 +3,7 @@ PROJECT := NK
 EMP_DIR := ../../include
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++17 -I$(EMP_DIR)/
+CFLAGS_all := -Wall -Wno-unused-function -std=c++20 -I$(EMP_DIR)/
 
 # Native compiler information
 CXX_nat := g++
