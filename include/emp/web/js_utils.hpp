@@ -611,7 +611,7 @@ namespace emp {
       while ((int)arr.size() <= i) {
         arr.push_back(emp::vector<T>());
       }
-      pass_vector_to_cpp(arr[i], true);
+      pass_vector_to_cpp(arr[(size_t) i], true);
     }
 
     // Clear temp array

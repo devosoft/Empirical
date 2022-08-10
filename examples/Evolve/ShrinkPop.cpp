@@ -16,7 +16,7 @@
 int main()
 {
   constexpr size_t POP_SIZE = 3600;
-  constexpr size_t GENS = 10000;
+  // constexpr size_t GENS = 10000;
   const size_t POP_SIDE = (size_t) std::sqrt(POP_SIZE);
 
   emp::Random random;
