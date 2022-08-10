@@ -57,7 +57,7 @@ namespace notify {
   using id_arg_t = const id_t &;
   using message_arg_t = const message_t &;
   using response_t = bool(id_arg_t, message_arg_t, except_data_t);
-  using exit_fun_t = std::function<void(size_t)>;
+  using exit_fun_t = std::function<void(int)>;
 
   /// Information about an exception that has occurred.
   struct ExceptInfo {
@@ -217,7 +217,7 @@ namespace notify {
       GetHandler(Type::EXCEPTION).SetExitOnFail();
 
       // The initial exit handler should actually exit, using the appropriate exit code.
-      exit_funs.push_back( [](size_t code){ exit(code); } );
+      exit_funs.push_back( [](int code){ exit(code); } );
     }
   };
 
@@ -238,7 +238,7 @@ namespace notify {
   }
 
   /// Generic exit handler that calls all of the provided functions.
-  static void Exit(size_t exit_code) {
+  static void Exit(int exit_code) {
     NotifyData & data = GetData();
     for (auto it = data.exit_funs.rbegin(); it != data.exit_funs.rend(); ++it) {
       (*it)(exit_code);
