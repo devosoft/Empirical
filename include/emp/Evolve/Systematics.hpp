@@ -292,7 +292,7 @@ namespace emp {
     // Stats about active taxa... (totals are across orgs, not taxa)
     size_t org_count;         ///< How many organisms are currently active?
     size_t total_depth;       ///< Sum of taxa depths for calculating average.
-    size_t num_roots;         ///< How many distint injected ancestors are currently in population?
+    size_t num_roots;         ///< How many distinct injected ancestors are currently in population?
     int max_depth;            ///< Depth of deepest taxon. -1 means needs to be recalculated
 
     size_t next_id;           ///< What ID value should the next new taxon have?
@@ -439,9 +439,9 @@ namespace emp {
   /// The systematics class tracks the relationships among all organisms based on the INFO_TYPE
   /// provided.  If an offspring has the same value for INFO_TYPE as its parent, it is grouped into
   /// the same taxon.  Otherwise a new Taxon is created and the old one is used as its parent in
-  /// the phylogeny.  If the provided INFO_TYPE is the organsism's genome, a traditional phylogeny
+  /// the phylogeny.  If the provided INFO_TYPE is the organism's genome, a traditional phylogeny
   /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
-  /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
+  /// grouped by phenotypes.  If the organism's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Systematics : public SystematicsBase<ORG> {
@@ -537,7 +537,7 @@ namespace emp {
 
     mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
-    /// Called wheneven a taxon has no organisms AND no descendants.
+    /// Called whenever a taxon has no organisms AND no descendants.
     void Prune(Ptr<taxon_t> taxon);
 
     /// Called when an offspring taxa has been deleted.
@@ -727,17 +727,17 @@ namespace emp {
 
     // ===== Functions for adding actions to systematics manager signals ====
 
-    /// Privide a function for Systematics to call each time a new taxon is created.
+    /// Provide a function for Systematics to call each time a new taxon is created.
     /// Trigger:  New taxon is made
     /// Argument: Pointer to taxon, reference to org taxon was created from
     SignalKey OnNew(std::function<void(Ptr<taxon_t> t, ORG & org)> & fun) { return on_new_sig.AddAction(fun); }
 
-    /// Privide a function for Systematics to call each time a taxon goes extinct.
+    /// Provide a function for Systematics to call each time a taxon goes extinct.
     /// Trigger:  Taxon is going extinct
     /// Argument: Pointer to taxon
     SignalKey OnExtinct(std::function<void(Ptr<taxon_t> t)> & fun) { return on_extinct_sig.AddAction(fun); }
 
-    /// Privide a function for Systematics to call each time a taxon is about to be pruned (removed from ancestors).
+    /// Provide a function for Systematics to call each time a taxon is about to be pruned (removed from ancestors).
     /// Trigger:  Taxon is about to be killed
     /// Argument: Pointer to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
@@ -875,7 +875,7 @@ namespace emp {
     }
 
 
-    // ===== Functions for calculating phylogeny toplogy metrics ====
+    // ===== Functions for calculating phylogeny topology metrics ====
 
     /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is
      *  the sum of edges in the minimal spanning tree connected the taxa you're
@@ -917,7 +917,7 @@ namespace emp {
      *
      * To quantify length of evolutionary history, this method needs \c time: the current
      * time, in whatever units time is being measured in when taxa are added to the systematics
-     * manager. Note that passing a time in the past will produce inacurate results (since we
+     * manager. Note that passing a time in the past will produce inaccurate results (since we
      * don't know what the state of the tree was at that time).
      *
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
@@ -1898,7 +1898,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPhylogeneticDiversityNormalize(int generation, std::string filename) const {
     int gen_value = ((generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
-    bool percent_found = false;
+    // bool percent_found = false;
     int phylogenetic_diversity = ancestor_taxa.size() + active_taxa.size() - 1;
 
     if(filename == ""){
