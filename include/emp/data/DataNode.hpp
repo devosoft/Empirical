@@ -126,7 +126,10 @@ namespace emp {
     /// Calculate the median of observed values
     double GetMedian() const {emp_assert(false, "Calculating median requires a DataNode with the Log modifier"); return 0;}
     /// Calculate a percentile of observed values
-    double GetPercentile(const double pct) const {emp_assert(false, "Calculating percentile requires a DataNode with the Log modifier"); return 0;}
+    double GetPercentile(const double /*pct*/) const {
+      emp_assert(false, "Calculating percentile requires a DataNode with the Log modifier");
+      return 0;
+    }
 
     const std::string & GetName() const { return emp::empty_string(); }
     const std::string & GetDescription() const { return emp::empty_string(); }
