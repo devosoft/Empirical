@@ -43,20 +43,8 @@ RUN \
     && \
   apt-get install --no-install-recommends --allow-downgrades -y \
     dpkg-dev \
-    #libc6 \
-    #libc6-dev \
-    #libc6-dbg \
-    #build-essential \
-    #gcc \
-    #g++ \
-    #gcc-7 \
-    #g++-7 \
     g++-11 \
-    #libstdc++-7-dev \
-    #libgcc-7-dev \
-    #libmpx2 \
     libc6=2.27-3ubuntu1 \
-    #gcc-8-base=8-20180414-1ubuntu2 \
     xvfb \
     x11vnc \
     x11-xkb-utils \
@@ -70,11 +58,6 @@ RUN \
     libnss3 \
     lsb-release \
     xdg-utils \
-    #g++ \
-    #cpp-11 \
-    #gcc \
-    #libgcc-11-dev \
-    #libstdc++-11-dev \
     cmake \
     python-virtualenv \
     python-pip-whl \
