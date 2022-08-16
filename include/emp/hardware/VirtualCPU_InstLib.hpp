@@ -28,9 +28,9 @@ namespace emp {
     using nop_vec_t = typename hardware_t::nop_vec_t;
 
     // Instructions
-    static void Inst_NopA(hardware_t & hw, const inst_t & inst) { ; }
-    static void Inst_NopB(hardware_t & hw, const inst_t & inst) { ; }
-    static void Inst_NopC(hardware_t & hw, const inst_t & inst) { ; }
+    static void Inst_NopA(hardware_t & /*hw*/, const inst_t & /*inst*/) { ; }
+    static void Inst_NopB(hardware_t & /*hw*/, const inst_t & /*inst*/) { ; }
+    static void Inst_NopC(hardware_t & /*hw*/, const inst_t & /*inst*/) { ; }
     static void Inst_Inc(hardware_t & hw, const inst_t & inst) {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       ++hw.regs[idx];
@@ -79,7 +79,7 @@ namespace emp {
       size_t idx = inst.nop_vec.empty() ? 1 : inst.nop_vec[0];
       hw.StackPush(idx);
     }
-    static void Inst_Swap_Stack(hardware_t & hw, const inst_t & inst) {
+    static void Inst_Swap_Stack(hardware_t & hw, const inst_t & /*inst*/) {
       hw.StackSwap();
     }
     static void Inst_Shift_Right(hardware_t & hw, const inst_t & inst) {
@@ -135,11 +135,11 @@ namespace emp {
       std::cout << "Output: " << hw.regs[idx] << std::endl;
       // TODO: Handle input
     }
-    static void Inst_H_Alloc(hardware_t & hw, const inst_t & inst) {
+    static void Inst_H_Alloc(hardware_t & hw, const inst_t & /*inst*/) {
       hw.genome_working.resize(hw.genome.size() * 2, hw.GetDefaultInst());
       hw.regs[0] = hw.genome.size();
     }
-    static void Inst_H_Divide(hardware_t & hw, const inst_t & inst) {
+    static void Inst_H_Divide(hardware_t & hw, const inst_t & /*inst*/) {
       if(hw.read_head >= hw.genome.size()){
         hw.genome_working.resize(hw.read_head, 0);
         hw.ResetHardware();
@@ -147,7 +147,7 @@ namespace emp {
         std::cout << "Divide!" << std::endl;
       }
     }
-    static void Inst_H_Copy(hardware_t & hw, const inst_t & inst) {
+    static void Inst_H_Copy(hardware_t & hw, const inst_t & /*inst*/) {
       hw.genome_working[hw.write_head] = hw.genome_working[hw.read_head];
       hw.copied_inst_id_vec.push_back(hw.genome_working[hw.write_head].id);
       hw.read_head++;
