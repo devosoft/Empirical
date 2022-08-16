@@ -43,10 +43,20 @@ RUN \
     && \
   apt-get install --no-install-recommends --allow-downgrades -y \
     dpkg-dev \
+    #libc6 \
+    #libc6-dev \
+    #libc6-dbg \
+    #build-essential \
+    #gcc \
+    #g++ \
+    #gcc-7 \
+    #g++-7 \
+    g++-11 \
+    #libstdc++-7-dev \
+    #libgcc-7-dev \
+    #libmpx2 \
     libc6=2.27-3ubuntu1 \
-    libc6-dev \
-    libc6-dbg \
-    build-essential \
+    #gcc-8-base=8-20180414-1ubuntu2 \
     xvfb \
     x11vnc \
     x11-xkb-utils \
@@ -60,13 +70,11 @@ RUN \
     libnss3 \
     lsb-release \
     xdg-utils \
-    g++-8=8-20180414-1ubuntu2 \
-    gcc-8-base=8-20180414-1ubuntu2 \
-    cpp-8=8-20180414-1ubuntu2 \
-    gcc-8=8-20180414-1ubuntu2 \
-    gcc-8-base=8-20180414-1ubuntu2 \
-    libgcc-8-dev \
-    libstdc++-8-dev \
+    #g++ \
+    #cpp-11 \
+    #gcc \
+    #libgcc-11-dev \
+    #libstdc++-11-dev \
     cmake \
     python-virtualenv \
     python-pip-whl \
@@ -162,7 +170,7 @@ ENV DISPLAY :99
 RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
 
 RUN \
-  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90 \
+  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 90 \
   && \
   npm install -g n \
   && \
