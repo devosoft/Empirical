@@ -110,7 +110,10 @@ namespace emp {
       }
 
       auto setting_it = setting_map.find(id);
-      if (setting_it == setting_map.end()) return emp::to_string("Unknown ID ", id);
+      if (setting_it == setting_map.end()) {
+        if (id == emp::MAX_SIZE_T) return emp::to_string("Unknown ID ", id, " (aka -1)");
+        return emp::to_string("Unknown ID ", id);
+      }
       if (setting_it->second.type != emp::GetTypeID<T>()) {
         return emp::to_string("Checking for type as ", emp::GetTypeID<T>(),
                               ", but recorded as ", setting_it->second.type);
