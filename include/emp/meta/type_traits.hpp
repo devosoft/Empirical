@@ -119,8 +119,8 @@ namespace emp {
   template <typename T> struct is_ptr_type<T*> : public std::true_type { };
   template <typename T> struct is_ptr_type<T* const> : public std::true_type { };
   template <typename T> struct is_ptr_type<Ptr<T>> : public std::true_type { };
-  template <typename T>
-  constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
+  template <typename T> constexpr bool is_ptr_type_v() { return is_ptr_type<T>::value; }
+  template <typename T> constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
   template <typename T> using is_pointer = is_ptr_type<T>;
 
   template <typename T> struct remove_ptr_type         { using type = T; };
