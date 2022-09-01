@@ -81,6 +81,25 @@ namespace notify {
     }
   }
 
+  /// Convert a type to a human-readable string in COLOR.
+  static id_t ColorTypeID(Type type) {
+    const std::string green_text = "\033[32m";
+    const std::string magenta_text = "\033[35m";
+    const std::string red_text = "\033[31m";
+    const std::string yellow_text = "\033[33m";
+    const std::string normal_text = "\033[39m";
+    const std::string bold_text = "\033[1m";
+    const std::string no_bold_text = "\033[22m";
+    switch (type) {
+      case Type::MESSAGE: return green_text + "Message" + normal_text;
+      case Type::DEBUG: return green_text + bold_text + "Debug" + no_bold_text + normal_text;
+      case Type::WARNING: return yellow_text + bold_text + "WARNING" + no_bold_text + normal_text;
+      case Type::ERROR: return red_text + bold_text + "ERROR" + no_bold_text + normal_text;
+      case Type::EXCEPTION: return magenta_text + bold_text + "EXCEPTION" + no_bold_text + normal_text;
+      default: return "Unknown";
+    }
+  }
+
   // Maintain a specified collection of handlers.
   class HandlerSet {
   private:
@@ -152,7 +171,7 @@ namespace notify {
     /// Replace all handlers with nothing (i.e., clear them)
     void Replace() { Clear(); }
 
-    /// Replace all handelers with the generic ones provided.
+    /// Replace all handlers with the generic ones provided.
     template <typename... FUN_Ts>
     void Replace(fun_t in, FUN_Ts... extra) {
       Replace(extra...);
@@ -188,7 +207,8 @@ namespace notify {
         [](id_arg_t, message_arg_t){ return true; }
 #else
         [](id_arg_t,  message_arg_t msg) {
-          std::cout << "Debug: " << msg << std::endl;
+          const std::string tag = ColorTypeID(Type::DEBUG);
+          std::cout << tag << ": " << msg << std::endl;
           return true;
         }
 #endif
@@ -196,22 +216,25 @@ namespace notify {
 
       GetHandler(Type::WARNING).Add(
         [](id_arg_t,  message_arg_t msg) {
-          std::cerr << "WARNING: " << msg << std::endl;
-          return true;
+          const std::string tag = ColorTypeID(Type::WARNING);
+          std::cout << tag << ": " << msg << std::endl;
+          return true;  // Only warning, do not exit.
         }
       );
 
       GetHandler(Type::ERROR).Add(
         [](id_arg_t,  message_arg_t msg) {
-          std::cerr << "ERROR: " << msg << std::endl;
-          return true;
+          const std::string tag = ColorTypeID(Type::ERROR);
+          std::cout << tag << ": " << msg << std::endl;
+          return false;  // Does not correct the problem, so exit.
         }
       );
 
       GetHandler(Type::EXCEPTION).Add(
         [](id_arg_t id,  message_arg_t msg) {
-          std::cerr << "EXCEPTION (" << id << "): " << msg << std::endl;
-          return false;
+          const std::string tag = ColorTypeID(Type::EXCEPTION);
+          std::cerr << tag << " (" << id << "): " << msg << std::endl;
+          return false;  // Does not correct the problem, so exit.
         }
       );
       GetHandler(Type::EXCEPTION).SetExitOnFail();
@@ -240,9 +263,14 @@ namespace notify {
   /// Generic exit handler that calls all of the provided functions.
   static void Exit(int exit_code) {
     NotifyData & data = GetData();
+
+    // Run any cleanup functions.
     for (auto it = data.exit_funs.rbegin(); it != data.exit_funs.rend(); ++it) {
       (*it)(exit_code);
     }
+
+    // Exit for real.
+    exit(exit_code);
   }
 
   /// Generic Notification where type must be specified.
@@ -357,7 +385,7 @@ namespace notify {
     // Retrieve any specialized exception handlers for this type of exception.
     bool result = data.handler_map[id].Trigger(id, message, except_data);
 
-    // If unresolved, see if we should quit; else use a generic exceptionhandler.
+    // If unresolved, see if we should quit; else use a generic exception handler.
     if (!result) {
       if (data.handler_map[id].GetExitOnFail()) Exit(1);
       result = data.handler_map["EXCEPTION"].Trigger(id, message, except_data);
