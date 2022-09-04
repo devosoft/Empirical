@@ -212,14 +212,14 @@ namespace emp {
     return (size_t) std::count(str.begin(), str.end(), c);
   }
 
-  /// Test if an input string is properly formated as a literal character.
+  /// Test if an input string is properly formatted as a literal character.
   static inline bool is_literal_char(const std::string & value);
 
-  /// Test if an input string is properly formated as a literal string.
+  /// Test if an input string is properly formatted as a literal string.
   static inline bool is_literal_string(const std::string & value,
                                        const std::string & quote_marks="\"");
 
-  /// Test if an input string is properly formated as a literal string.
+  /// Test if an input string is properly formatted as a literal string.
   static inline std::string diagnose_literal_string(const std::string & value,
                                                     const std::string & quote_marks="\"");
 
@@ -384,7 +384,7 @@ namespace emp {
     return out;
   }
 
-  /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
+  /// Convert a single character to one that uses a proper escape sequence (in a string) if needed.
   [[nodiscard]] static inline std::string to_escaped_string(char value);
 
   /// Convert a full string to one that uses proper escape sequences, as needed.
@@ -1054,7 +1054,7 @@ namespace emp {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   // The next functions are not efficient, but they will take any number of inputs and
-  // dynamically convert them all into a single, concatanated string.
+  // dynamically convert them all into a single, concatenated string.
 
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
@@ -1107,7 +1107,7 @@ namespace emp {
 
   /// This function does its very best to convert anything it gets to a string. Takes any number
   /// of arguments and returns a single string containing all of them concatenated.  Any objects
-  /// that can go through a stringstream, have a ToString() memember function, or are defined to
+  /// that can go through a stringstream, have a ToString() member function, or are defined to
   /// be passed into emp::ToString(x) will work correctly.
   template <typename... Ts>
   inline std::string to_string(const Ts &... values) {
@@ -1173,7 +1173,7 @@ namespace emp {
     internal::_from_string(ss, args...);
   }
 
-  /// The from_strings() function takes a vector of strings and convets them into a vector
+  /// The from_strings() function takes a vector of strings and converts them into a vector
   /// of the appropriate type.
   template <typename T>
   inline emp::vector<T> from_strings(const emp::vector<std::string> & string_v) {
@@ -1308,9 +1308,9 @@ namespace emp {
   //  Implementations of larger functions (>25 lines)
   //////////////////////////////////////////////////////
 
-  /// Test if an input string is properly formated as a literal character.
+  /// Test if an input string is properly formatted as a literal character.
   static inline bool is_literal_char(const std::string & value) {
-    // A literal char must beging with a single quote, contain a representation of a single
+    // A literal char must begin with a single quote, contain a representation of a single
     // character, and end with a single quote.
     if (value.size() < 3) return false;
     if (value[0] != '\'' || value.back() != '\'') return false;
@@ -1352,7 +1352,7 @@ namespace emp {
   }
 
 
-  /// Test if an input string is properly formated as a literal string.
+  /// Test if an input string is properly formatted as a literal string.
   static inline bool is_literal_string(const std::string & value,
                                        const std::string & quote_marks) {
     if (value.size() < 2) return false;               // Two short to contain even quote marks!
@@ -1395,7 +1395,7 @@ namespace emp {
   }
 
 
-  /// Test if an input string is properly formated as a literal string.
+  /// Test if an input string is properly formatted as a literal string.
   static inline std::string diagnose_literal_string(const std::string & value,
                                                     const std::string & quote_marks) {
     // A literal string must begin and end with a double quote and contain only valid characters.
@@ -1439,7 +1439,7 @@ namespace emp {
   }
 
 
-  /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
+  /// Convert a single character to one that uses a proper escape sequence (in a string) if needed.
   static inline std::string to_escaped_string(char value) {
     // Start by quickly returning a string if it's easy.
     std::stringstream ss;
