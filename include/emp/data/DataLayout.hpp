@@ -17,6 +17,7 @@
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../math/constants.hpp"
 #include "../meta/TypeID.hpp"
 
 #include "MemoryImage.hpp"
