@@ -892,7 +892,7 @@ namespace emp {
   /// Provide a string_view on a string from a given starting point.
   static inline std::string_view view_string(const std::string_view & str, size_t start) {
     emp_assert(start <= str.size());
-    return str.substr(start, str.size() - start);
+    return std::string_view(str.data()+start);
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
@@ -900,21 +900,21 @@ namespace emp {
                                              size_t start,
                                              size_t npos) {
     emp_assert(start + npos <= str.size());
-    return str.substr(start, npos);
+    return std::string_view(str.data()+start, npos);
   }
 
   /// Provide a string_view on a string from the beginning to a given size.
   static inline std::string_view view_string_front(const std::string_view & str,
                                                    size_t npos) {
     emp_assert(npos <= str.size());
-    return str.substr(0, npos);
+    return std::string_view(str.data(), npos);
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
   static inline std::string_view view_string_back(const std::string_view & str,
                                                   size_t npos) {
     emp_assert(npos <= str.size());
-    return str.substr(str.size() - npos, npos);
+    return std::string_view(str.data()+(str.size()-npos), npos);
   }
 
   /// Provide a string_view on a string from a starting point to an ending point.
@@ -923,7 +923,7 @@ namespace emp {
                                                    size_t end) {
     emp_assert(start <= end);
     emp_assert(end <= str.size());
-    return str.substr(start, end - start);
+    return std::string_view(str.data()+start, end - start);
   }
 
   /// Return a view of the prefix of the input string up to a specified delimeter.
