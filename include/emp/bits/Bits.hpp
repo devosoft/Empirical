@@ -68,14 +68,26 @@
 
 namespace emp {
 
-  class BitVector {
-  private:
-    // Use size_t for field_t since size_t is normally the native size for a processor (and,
-    // correctly, 32 bits for Emscripten), this should work in almost all cases.
-    using field_t = size_t;
+  ///  A flexible base template to handle BitVector, BitArray, BitSet, and other combinations.
+  ///  @param CAPACITY The maximum number of bits allows (-1 for no limit)
+  ///  @param FIXED_SIZE Can the number of bits change once created?
+  ///  @param ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false)
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  class Bits {
+    using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
+
+    // Determine the size of the fields to use.  By default, size_t will be the natural size for
+    // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
+    using field_t = typename emp::uint_bit_count_t<CAPACITY, size_t>;
 
     // Compile-time constants
     static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
+
+    static constexpr size_t MAX_FIELDS = CAPACITY < 0 ? -1 : (1 + ((CAPACITY - 1) / FIELD_BITS));
+    static constexpr size_t NUM_FIELDS = FIXED_SIZE ? MAX_FIELDS : -1;
+
+    static constexpr size_t MAX_BYTES = CAPACITY < 0 ? -1 : 1 + ((CAPACITY - 1) >> 3);
+    static constexpr size_t NUM_BYTES = FIXED_SIZE ? MAX_BYTES : -1;
 
     static constexpr field_t FIELD_0 = (field_t) 0;         ///< All bits in a field set to 0
     static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
@@ -86,6 +98,16 @@ namespace emp {
     // Number of bits needed to specify position in a field + mask
     static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
     static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
+
+    // Track number of bits in the final field; use 0 if a perfect fit.
+    static constexpr size_t MAX_END_BITS = CAPACITY & (FIELD_BITS - 1);
+    static constexpr size_t NUM_END_BITS = FIXED_SIZE ? MAX_END_BITS : -1;
+
+    /// How many EXTRA bits are leftover in the gap at the end?
+    static constexpr size_t END_GAP = NUM_END_BITS ? (FIELD_BITS - NUM_END_BITS) : 0;
+
+    // Mask to use to clear out any end bits that should be zeroes.
+    static constexpr field_t END_MASK = MaskLow<field_t>(NUM_END_BITS);
 
     size_t num_bits;        ///< Total number of bits are we using
     Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
