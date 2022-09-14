@@ -60,6 +60,7 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/hash_utils.hpp"
+#include "../math/constants.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 
@@ -68,12 +69,47 @@
 
 namespace emp {
 
+  static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
+
+  namespace internal {
+    /// Internal data for the Bits class to separate static vs. dynamic.
+    template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+    struct Bits_Data {
+      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
+      field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
+    };
+
+    // Limited capacity, but NOT fixed size!
+    template <size_t CAPACITY, bool ZERO_LEFT>
+    struct Bits_Data<CAPACITY, false, ZERO_LEFT> {
+      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
+      field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
+      size_t num_bits;           ///< Total number of bits are we using
+    };
+
+    // Dynamic capacity; not fixed size.
+    template <bool ZERO_LEFT>
+    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT> {
+      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+      size_t num_bits;        ///< Total number of bits are we using
+    };
+
+    // Dynamic capacity; fixed size after construction.
+    template <bool ZERO_LEFT>
+    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT> {
+      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+      const size_t num_bits;  ///< Total number of bits are we using
+    };
+  };
+
   ///  A flexible base template to handle BitVector, BitArray, BitSet, and other combinations.
-  ///  @param CAPACITY The maximum number of bits allows (-1 for no limit)
+  ///  @param CAPACITY The maximum number of bits allows (DYNAMIC_BITS for no limit)
   ///  @param FIXED_SIZE Can the number of bits change once created?
   ///  @param ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false)
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   class Bits {
+    internal::Bits_Data<CAPACITY, FIXED_SIZE, ZERO_LEFT> data;
+
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
 
     // Determine the size of the fields to use.  By default, size_t will be the natural size for
@@ -83,17 +119,16 @@ namespace emp {
     // Compile-time constants
     static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
-    static constexpr size_t MAX_FIELDS = CAPACITY < 0 ? -1 : (1 + ((CAPACITY - 1) / FIELD_BITS));
-    static constexpr size_t NUM_FIELDS = FIXED_SIZE ? MAX_FIELDS : -1;
+    static constexpr size_t NUM_FIELDS = FIXED_SIZE ? MAX_FIELDS : DYNAMIC_BITS;
 
-    static constexpr size_t MAX_BYTES = CAPACITY < 0 ? -1 : 1 + ((CAPACITY - 1) >> 3);
-    static constexpr size_t NUM_BYTES = FIXED_SIZE ? MAX_BYTES : -1;
+    static constexpr size_t MAX_BYTES =
+      (CAPACITY == DYNAMIC_BITS) ? DYNAMIC_BITS : 1 + ((CAPACITY - 1) >> 3);
+    static constexpr size_t NUM_BYTES = FIXED_SIZE ? MAX_BYTES : DYNAMIC_BITS;
 
     static constexpr field_t FIELD_0 = (field_t) 0;         ///< All bits in a field set to 0
     static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
     static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
     static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
-    static constexpr size_t MAX_BITS = (size_t) -1;         ///< Value larger than any bit ID.
 
     // Number of bits needed to specify position in a field + mask
     static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
@@ -101,7 +136,7 @@ namespace emp {
 
     // Track number of bits in the final field; use 0 if a perfect fit.
     static constexpr size_t MAX_END_BITS = CAPACITY & (FIELD_BITS - 1);
-    static constexpr size_t NUM_END_BITS = FIXED_SIZE ? MAX_END_BITS : -1;
+    static constexpr size_t NUM_END_BITS = FIXED_SIZE ? MAX_END_BITS : DYNAMIC_BITS;
 
     /// How many EXTRA bits are leftover in the gap at the end?
     static constexpr size_t END_GAP = NUM_END_BITS ? (FIELD_BITS - NUM_END_BITS) : 0;
@@ -109,8 +144,6 @@ namespace emp {
     // Mask to use to clear out any end bits that should be zeroes.
     static constexpr field_t END_MASK = MaskLow<field_t>(NUM_END_BITS);
 
-    size_t num_bits;        ///< Total number of bits are we using
-    Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
     /// Num bits used in partial field at the end; 0 if perfect fit.
     [[nodiscard]] size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
