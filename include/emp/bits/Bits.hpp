@@ -72,33 +72,58 @@ namespace emp {
   static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
 
   namespace internal {
+    /// Data needed for all bits data.
+    struct Bits_Data_Base {
+      // Determine the size of the fields to use.  By default, size_t will be the natural size for
+      // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
+      using field_t = typename emp::uint_bit_count_t<CAPACITY, size_t>;
+      static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
+
+      // Number of bits needed to specify position in a field + mask
+      static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
+      static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
+
+      static constexpr field_t FIELD_0 = (field_t) 0;         ///< All bits in a field set to 0
+      static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
+      static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
+      static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
+    };
+
     /// Internal data for the Bits class to separate static vs. dynamic.
     template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
-    struct Bits_Data {
+    struct Bits_Data : public Bits_Data_Base {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
+
+      [[nodiscard]] constexpr size_t NumBits() const noexcept { return CAPACITY; }
     };
 
     // Limited capacity, but NOT fixed size!
     template <size_t CAPACITY, bool ZERO_LEFT>
-    struct Bits_Data<CAPACITY, false, ZERO_LEFT> {
+    struct Bits_Data<CAPACITY, false, ZERO_LEFT> : public Bits_Data_Base {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
       size_t num_bits;           ///< Total number of bits are we using
+
+      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
     };
 
     // Dynamic capacity; not fixed size.
     template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT> {
+    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT> : public Bits_Data_Base {
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
       size_t num_bits;        ///< Total number of bits are we using
+
+      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
     };
 
     // Dynamic capacity; fixed size after construction.
     template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT> {
+    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT> : public Bits_Data_Base {
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
       const size_t num_bits;  ///< Total number of bits are we using
+
+      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
     };
   };
 
@@ -112,27 +137,13 @@ namespace emp {
 
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
 
-    // Determine the size of the fields to use.  By default, size_t will be the natural size for
-    // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
-    using field_t = typename emp::uint_bit_count_t<CAPACITY, size_t>;
-
     // Compile-time constants
-    static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
     static constexpr size_t NUM_FIELDS = FIXED_SIZE ? MAX_FIELDS : DYNAMIC_BITS;
 
     static constexpr size_t MAX_BYTES =
       (CAPACITY == DYNAMIC_BITS) ? DYNAMIC_BITS : 1 + ((CAPACITY - 1) >> 3);
     static constexpr size_t NUM_BYTES = FIXED_SIZE ? MAX_BYTES : DYNAMIC_BITS;
-
-    static constexpr field_t FIELD_0 = (field_t) 0;         ///< All bits in a field set to 0
-    static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
-    static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
-    static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
-
-    // Number of bits needed to specify position in a field + mask
-    static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
-    static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
 
     // Track number of bits in the final field; use 0 if a perfect fit.
     static constexpr size_t MAX_END_BITS = CAPACITY & (FIELD_BITS - 1);
