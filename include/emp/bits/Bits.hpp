@@ -63,6 +63,7 @@
 #include "../math/constants.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
+#include "../meta/type_traits.hpp"
 
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
@@ -71,12 +72,16 @@ namespace emp {
 
   static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
 
+  template <size_t CAPACITY>
+  using bits_field_t = typename emp::uint_bit_count_t<CAPACITY, size_t>;
+
   namespace internal {
     /// Data needed for all bits data.
+    template <size_t CAPACITY>
     struct Bits_Data_Base {
       // Determine the size of the fields to use.  By default, size_t will be the natural size for
       // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
-      using field_t = typename emp::uint_bit_count_t<CAPACITY, size_t>;
+      using field_t = bits_field_t<CAPACITY>;
       static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
       // Number of bits needed to specify position in a field + mask
@@ -87,43 +92,98 @@ namespace emp {
       static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
       static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
       static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
+
+      // Identify the field that a specified bit is in.
+      [[nodiscard]] static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
+
+      // Identify the position within a field where a specified bit is.
+      [[nodiscard]] static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
+
+      // Identify which field a specified byte position would be in.
+      [[nodiscard]] static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
+
+      // Convert a byte position in BitVector to a byte position in the target field.
+      [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
     };
 
     /// Internal data for the Bits class to separate static vs. dynamic.
+    /// Generic assumes a specified capacity and a fixed size.
     template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
-    struct Bits_Data : public Bits_Data_Base {
+    struct Bits_Data : public Bits_Data_Base<CAPACITY> {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return CAPACITY; }
+
+      /// Number of bits used in partial field at the end; 0 if perfect fit.
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return CAPACITY & (FIELD_BITS - 1); }
+
+      /// How many EXTRA bits are leftover in the gap at the end?
+      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (FIELD_BITS - NumEndBits()) % FIELD_BITS; }
+
+      /// A mask to cut off all of the final bits.
+      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+
+      /// How many felids do we need for the current set of bits?
+      [[nodiscard]] constexpr size_t NumFields() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) / FIELD_BITS)) : 0; }
+
+      /// What is the ID of the last occupied field?
+      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
+
+      /// How many bytes are used for the current set of bits? (rounded up!)
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) >> 3)) : 0; }
+
+      /// How many bytes are allocated? (rounded up!)
+      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+    };
+
+    /// All other forms of BitsData assumes that we have a variable size.
+    /// Size is stored here to work with, but not the actual bits.
+    template <size_t CAPACITY>
+    struct Bits_Data_RunTimeSize : public Bits_Data_Base<CAPACITY> {
+      size_t num_bits;           ///< Total number of bits are we using
+
+      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
+
+      /// Number of bits used in partial field at the end; 0 if perfect fit.
+      [[nodiscard]] size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
+
+      /// How many EXTRA bits are leftover in the gap at the end?
+      [[nodiscard]] size_t EndGap() const { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
+
+      /// A mask to cut off all of the final bits.
+      [[nodiscard]] field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
+
+      /// How many felids do we need for the current set of bits?
+      [[nodiscard]] size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+
+      /// What is the ID of the last occupied field?
+      [[nodiscard]] size_t LastField() const { return NumFields() - 1; }
+
+      /// How many bytes are used for the current set of bits? (rounded up!)
+      [[nodiscard]] size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+
+      /// How many bytes are allocated? (rounded up!)
+      [[nodiscard]] size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
     };
 
     // Limited capacity, but NOT fixed size!
     template <size_t CAPACITY, bool ZERO_LEFT>
-    struct Bits_Data<CAPACITY, false, ZERO_LEFT> : public Bits_Data_Base {
+    struct Bits_Data<CAPACITY, false, ZERO_LEFT> : public Bits_Data_RunTimeSize<CAPACITY> {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
-      size_t num_bits;           ///< Total number of bits are we using
-
-      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
     };
 
     // Dynamic capacity; not fixed size.
     template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT> : public Bits_Data_Base {
+    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT> : public Bits_Data_RunTimeSize<DYNAMIC_BITS> {
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
-      size_t num_bits;        ///< Total number of bits are we using
-
-      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
     };
 
     // Dynamic capacity; fixed size after construction.
     template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT> : public Bits_Data_Base {
+    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT> : public Bits_Data_RunTimeSize<DYNAMIC_BITS> {
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
-      const size_t num_bits;  ///< Total number of bits are we using
-
-      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
     };
   };
 
@@ -133,65 +193,15 @@ namespace emp {
   ///  @param ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false)
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   class Bits {
+    // All internal data (and base-level manipulators) for Bits.
     internal::Bits_Data<CAPACITY, FIXED_SIZE, ZERO_LEFT> data;
 
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
-
-    // Compile-time constants
-
-    static constexpr size_t NUM_FIELDS = FIXED_SIZE ? MAX_FIELDS : DYNAMIC_BITS;
-
-    static constexpr size_t MAX_BYTES =
-      (CAPACITY == DYNAMIC_BITS) ? DYNAMIC_BITS : 1 + ((CAPACITY - 1) >> 3);
-    static constexpr size_t NUM_BYTES = FIXED_SIZE ? MAX_BYTES : DYNAMIC_BITS;
-
-    // Track number of bits in the final field; use 0 if a perfect fit.
-    static constexpr size_t MAX_END_BITS = CAPACITY & (FIELD_BITS - 1);
-    static constexpr size_t NUM_END_BITS = FIXED_SIZE ? MAX_END_BITS : DYNAMIC_BITS;
-
-    /// How many EXTRA bits are leftover in the gap at the end?
-    static constexpr size_t END_GAP = NUM_END_BITS ? (FIELD_BITS - NUM_END_BITS) : 0;
-
-    // Mask to use to clear out any end bits that should be zeroes.
-    static constexpr field_t END_MASK = MaskLow<field_t>(NUM_END_BITS);
-
-
-    /// Num bits used in partial field at the end; 0 if perfect fit.
-    [[nodiscard]] size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
-
-    /// How many EXTRA bits are leftover in the gap at the end?
-    [[nodiscard]] size_t EndGap() const { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
-
-    /// A mask to cut off all of the final bits.
-    [[nodiscard]] field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
-
-    /// How many felids do we need for the current set of bits?
-    [[nodiscard]] size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
-
-    /// What is the ID of the last occupied field?
-    [[nodiscard]] size_t LastField() const { return NumFields() - 1; }
-
-    /// How many bytes are used for the current set of bits? (rounded up!)
-    [[nodiscard]] size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
-
-    /// How many bytes are allocated? (rounded up!)
-    [[nodiscard]] size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
-
-    // Identify the field that a specified bit is in.
-    [[nodiscard]] static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
-
-    // Identify the position within a field where a specified bit is.
-    [[nodiscard]] static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
-
-    // Identify which field a specified byte position would be in.
-    [[nodiscard]] static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
-
-    // Convert a byte position in BitVector to a byte position in the target field.
-    [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
+    using field_t = bits_field_t<CAPACITY>;
 
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
-    void RawCopy(const Ptr<field_t> in);
+    void RawCopy(const Ptr<field_t> from);
 
     // Copy bits from one position in the genome to another; leave old positions unchanged.
     void RawCopy(const size_t from_start, const size_t from_stop, const size_t to);
@@ -820,7 +830,8 @@ namespace emp {
 
   // ------------------------ Implementations for Internal Functions ------------------------
 
-  void BitVector::RawCopy(const Ptr<BitVector::field_t> in) {
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::RawCopy(const Ptr<bits_field_t<CAPACITY>> from) {
     #ifdef EMP_TRACK_MEM
     emp_assert(in.IsNull() == false);
     emp_assert(bits.DebugIsArray() && in.DebugIsArray());
