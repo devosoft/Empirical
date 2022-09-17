@@ -56,6 +56,7 @@
 #include <iostream>
 #include <span>
 
+#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
@@ -72,16 +73,10 @@ namespace emp {
 
   static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
 
-  template <size_t CAPACITY>
-  using bits_field_t = typename emp::uint_bit_count_t<CAPACITY, size_t>;
-
   namespace internal {
-    /// Data needed for all bits data.
-    template <size_t CAPACITY>
+    /// Data and functions needed for all Bits types.
     struct Bits_Data_Base {
-      // Determine the size of the fields to use.  By default, size_t will be the natural size for
-      // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
-      using field_t = bits_field_t<CAPACITY>;
+      using field_t = size_t;       // size_t will be the natural field size for the machine
       static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
       // Number of bits needed to specify position in a field + mask
@@ -106,42 +101,32 @@ namespace emp {
       [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
     };
 
-    /// Internal data for the Bits class to separate static vs. dynamic.
-    /// Generic assumes a specified capacity and a fixed size.
-    template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
-    struct Bits_Data : public Bits_Data_Base<CAPACITY> {
+    // ------------------------------------------------------------------------------------
+    //  RAW MEMORY MANAGEMENT
+    // ------------------------------------------------------------------------------------
+
+    /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
+    template <size_t CAPACITY>
+    struct Bits_Data_StaticMem : public Bits_Data_Base {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
-      field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
-
-      [[nodiscard]] constexpr size_t NumBits() const noexcept { return CAPACITY; }
-
-      /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return CAPACITY & (FIELD_BITS - 1); }
-
-      /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (FIELD_BITS - NumEndBits()) % FIELD_BITS; }
-
-      /// A mask to cut off all of the final bits.
-      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
-
-      /// How many felids do we need for the current set of bits?
-      [[nodiscard]] constexpr size_t NumFields() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) / FIELD_BITS)) : 0; }
-
-      /// What is the ID of the last occupied field?
-      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
-
-      /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) >> 3)) : 0; }
-
-      /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+      emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
     };
 
-    /// All other forms of BitsData assumes that we have a variable size.
+    /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
+    struct Bits_Data_DynamicMem : public Bits_Data_Base {
+      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+    };
+
+    // ------------------------------------------------------------------------------------
+    //  CURRENT SIZE TRACKING
+    // ------------------------------------------------------------------------------------
+
     /// Size is stored here to work with, but not the actual bits.
-    template <size_t CAPACITY>
-    struct Bits_Data_RunTimeSize : public Bits_Data_Base<CAPACITY> {
+    struct Bits_Data_DynamicSize {
       size_t num_bits;           ///< Total number of bits are we using
+
+      using field_t = Bits_Data_Base::field_t;
+      static constexpr size_t FIELD_BITS = Bits_Data_Base::FIELD_BITS;
 
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
 
@@ -167,23 +152,52 @@ namespace emp {
       [[nodiscard]] size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
     };
 
+
+    /// Internal data for the Bits class to separate static vs. dynamic.
+    /// Generic assumes a specified capacity and a fixed size.
+    template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+    struct Bits_Data : public Bits_Data_StaticMem<CAPACITY> {
+      [[nodiscard]] constexpr size_t NumBits() const noexcept { return CAPACITY; }
+
+      /// Number of bits used in partial field at the end; 0 if perfect fit.
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return CAPACITY & (FIELD_BITS - 1); }
+
+      /// How many EXTRA bits are leftover in the gap at the end?
+      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (FIELD_BITS - NumEndBits()) % FIELD_BITS; }
+
+      /// A mask to cut off all of the final bits.
+      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+
+      /// How many felids do we need for the current set of bits?
+      [[nodiscard]] constexpr size_t NumFields() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) / FIELD_BITS)) : 0; }
+
+      /// What is the ID of the last occupied field?
+      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
+
+      /// How many bytes are used for the current set of bits? (rounded up!)
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) >> 3)) : 0; }
+
+      /// How many bytes are allocated? (rounded up!)
+      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+    };
+
+
     // Limited capacity, but NOT fixed size!
     template <size_t CAPACITY, bool ZERO_LEFT>
-    struct Bits_Data<CAPACITY, false, ZERO_LEFT> : public Bits_Data_RunTimeSize<CAPACITY> {
-      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
-      field_t bits[MAX_FIELDS];  ///< Fields to hold the actual bits for this BitArray.
+    struct Bits_Data<CAPACITY, false, ZERO_LEFT>
+    : public Bits_Data_DynamicSize, public Bits_Data_StaticMem<CAPACITY> {
     };
 
     // Dynamic capacity; not fixed size.
     template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT> : public Bits_Data_RunTimeSize<DYNAMIC_BITS> {
-      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT>
+    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem {
     };
 
     // Dynamic capacity; fixed size after construction.
     template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT> : public Bits_Data_RunTimeSize<DYNAMIC_BITS> {
-      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT>
+    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem {
     };
   };
 
@@ -833,14 +847,14 @@ namespace emp {
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::RawCopy(const Ptr<bits_field_t<CAPACITY>> from) {
     #ifdef EMP_TRACK_MEM
-    emp_assert(in.IsNull() == false);
-    emp_assert(bits.DebugIsArray() && in.DebugIsArray());
-    emp_assert(bits.DebugGetArrayBytes() == in.DebugGetArrayBytes(),
-                bits.DebugGetArrayBytes(), in.DebugGetArrayBytes());
+    emp_assert(from.IsNull() == false);
+    emp_assert(bits.DebugIsArray() && from.DebugIsArray());
+    emp_assert(bits.DebugGetArrayBytes() == from.DebugGetArrayBytes(),
+               bits.DebugGetArrayBytes(), from.DebugGetArrayBytes());
     #endif
 
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = from[i];
   }
 
   // Move bits from one position in the genome to another; leave old positions unchanged.
