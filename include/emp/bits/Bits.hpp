@@ -71,22 +71,23 @@
 
 namespace emp {
 
+  using bits_field_t = size_t;  // size_t will be the natural field size for the machine
   static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
 
   namespace internal {
     /// Data and functions needed for all Bits types.
     struct Bits_Data_Base {
-      using field_t = size_t;       // size_t will be the natural field size for the machine
+      using field_t = bits_field_t;
       static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
       // Number of bits needed to specify position in a field + mask
       static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
       static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
 
-      static constexpr field_t FIELD_0 = (field_t) 0;         ///< All bits in a field set to 0
-      static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
-      static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
-      static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
+      static constexpr field_t FIELD_0 = (field_t) 0;      ///< All bits in a field set to 0
+      static constexpr field_t FIELD_1 = (field_t) 1;      ///< Least significant bit set to 1
+      static constexpr field_t FIELD_255 = (field_t) 255;  ///< Least significant 8 bits set to 1
+      static constexpr field_t FIELD_ALL = ~FIELD_0;       ///< All bits in a field set to 1
 
       // Identify the field that a specified bit is in.
       [[nodiscard]] static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
@@ -125,7 +126,7 @@ namespace emp {
     struct Bits_Data_DynamicSize {
       size_t num_bits;           ///< Total number of bits are we using
 
-      using field_t = Bits_Data_Base::field_t;
+      using field_t = bits_field_t;
       static constexpr size_t FIELD_BITS = Bits_Data_Base::FIELD_BITS;
 
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
@@ -211,7 +212,7 @@ namespace emp {
     internal::Bits_Data<CAPACITY, FIXED_SIZE, ZERO_LEFT> data;
 
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
-    using field_t = bits_field_t<CAPACITY>;
+    using field_t = bits_field_t;
 
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
@@ -845,37 +846,38 @@ namespace emp {
   // ------------------------ Implementations for Internal Functions ------------------------
 
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
-  void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::RawCopy(const Ptr<bits_field_t<CAPACITY>> from) {
-    #ifdef EMP_TRACK_MEM
-    emp_assert(from.IsNull() == false);
-    emp_assert(bits.DebugIsArray() && from.DebugIsArray());
-    emp_assert(bits.DebugGetArrayBytes() == from.DebugGetArrayBytes(),
-               bits.DebugGetArrayBytes(), from.DebugGetArrayBytes());
-    #endif
-
-    const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = from[i];
+  void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::
+    RawCopy(const Ptr<bits_field_t> from)
+  {
+    const size_t num_fields = NumFields();
+    for (size_t i = 0; i < num_fields; i++) data.bits[i] = from[i];
   }
 
   // Move bits from one position in the genome to another; leave old positions unchanged.
+  // All positions are requires to exist and memory must be available for the move.
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
-  void BitVector::RawCopy(const size_t from_start, const size_t from_stop, const size_t to) {
-    emp_assert(from_start <= from_stop);  // Must move legal region.
-    emp_assert(from_stop <= num_bits);    // Cannot move from past end.
-    emp_assert(to <= num_bits);           // Must move to somewhere legal.
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::
+    RawCopy(const size_t from_start, const size_t from_stop, const size_t to)
+  {
+    emp_assert(from_start <= from_stop);             // Must move legal region.
+    emp_assert(from_stop <= data.NumBits());         // Cannot move from past end.
+    emp_assert(to <= data.NumBits());                // Must move to somewhere legal.
+
+    const size_t move_size = from_stop - from_start; // How big is the chunk to move?
+    emp_assert(to + move_size <= data.NumBits());    // Must fit in new position.
 
     // If nothing to copy OR already in place, stop right there.
-    if (from_start == from_stop || from_start == to) return;
+    if (move_size == 0 || from_start == to) return;
 
-    const size_t move_size = from_stop - from_start;    // How bit is the chunk to move?
-    const size_t to_stop = Min(to+move_size, num_bits); // Where is the end to move it to?
-    const int shift = (int) from_start - (int) to;      // How far will the moved piece shift?
-    BitVector move_bits(*this);                         // Vector to hold moved bits.
-    move_bits.SHIFT_SELF(shift);                        // Put the moved bits in place.
-    Clear(to, to_stop);                                 // Make room for the moved bits.
-    move_bits.Clear(0, to);                             // Clear everything BEFORE moved bits.
-    move_bits.Clear(to_stop, num_bits);                 // Clear everything AFTER moved bits.
-    OR_SELF(move_bits);                                 // Merge bitstrings together.
+    const size_t to_stop = to + move_size;           // Where is the end to move it to?
+    const int shift = (int) from_start - (int) to;   // How far will the moved piece shift?
+    BitVector move_bits(*this);                      // Vector to hold moved bits.
+    move_bits.SHIFT_SELF(shift);                     // Put the moved bits in place.
+    Clear(to, to_stop);                              // Make room for the moved bits.
+    move_bits.Clear(0, to);                          // Clear everything BEFORE moved bits.
+    move_bits.Clear(to_stop, num_bits);              // Clear everything AFTER moved bits.
+    OR_SELF(move_bits);                              // Merge bit strings together.
   }
 
   template <typename FUN_T>
