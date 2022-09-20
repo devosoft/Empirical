@@ -111,11 +111,25 @@ namespace emp {
     struct Bits_Data_StaticMem : public Bits_Data_Base {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
+
+      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
+        return reinterpret_cast<unsigned char>(bits);
+      }
+      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
+        return reinterpret_cast<const unsigned char>(bits);
+      }
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
     struct Bits_Data_DynamicMem : public Bits_Data_Base {
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+
+      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
+        return bits.ReinterpretCast<unsigned char>();
+      }
+      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
+        return bits.ReinterpretCast<const unsigned char>();
+      }
     };
 
     // ------------------------------------------------------------------------------------
@@ -214,6 +228,14 @@ namespace emp {
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
     using field_t = bits_field_t;
 
+    static constexpr size_t DEFAULT_SIZE =
+      (FIXED_SIZE && CAPACITY != DYNAMIC_BITS) ? CAPACITY : 0;
+
+    [[nodiscard]] field_t MaskField(size_t mask_size) const { return MaskLow<field_t>(mask_size); }
+    [[nodiscard]] field_t MaskField(size_t mask_size, size_t offset) const {
+      return MaskLow<field_t>(mask_size) << offset;
+    }
+
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> from);
@@ -222,19 +244,19 @@ namespace emp {
     void RawCopy(const size_t from_start, const size_t from_stop, const size_t to);
 
     // Convert the bits to bytes (note that bits are NOT in order at the byte level!)
-    [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
+    [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return data.BytePtr(); }
 
     // Convert the bits to const bytes array (note that bits are NOT in order at the byte level!)
-    [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-      return bits.ReinterpretCast<const unsigned char>();
-    }
+    [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const { return data.BytePtr(); }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
-    void ClearExcessBits() { if (NumEndBits()) bits[LastField()] &= EndMask(); }
+    void ClearExcessBits() {
+      if (data.NumEndBits()) data.bits[data.LastField()] &= data.EndMask();
+    }
 
     // Apply a transformation to each bit field in a specified range.
     template <typename FUN_T>
-    inline BitVector & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
+    Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
 
     // Helper: call SHIFT with positive number
     void ShiftLeft(const size_t shift_size);
@@ -249,19 +271,20 @@ namespace emp {
     void RotateRight(const size_t shift_size_raw);
 
   public:
-    /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
-    BitVector(size_t in_num_bits=0, bool init_val=false);
+    /// Build a new BitVector with specified bit count and initialization (default 0)
+    Bits(size_t in_num_bits=DEFAULT_SIZE, bool init_val=false);
 
     // Prevent ambiguous conversions...
     /// Anything not otherwise defined for first argument, convert to size_t.
     template <typename T, typename std::enable_if<std::is_arithmetic<T>::value, int>::type = 0>
-    BitVector(T in_num_bits) : BitVector((size_t) in_num_bits, 0) {}
+    Bits(T in_num_bits, bool init_val=false) : Bits(static_cast<size_t>(in_num_bits), init_val) {}
 
-    /// Copy constructor of existing bit field.
-    BitVector(const BitVector & in);
+    /// Copy constructor of existing bits object.
+    template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+    Bits(const Bits<CAPACITY2, FIXED_SIZE2, ZERO_LEFT2> & in);
 
     /// Move constructor of existing bit field.
-    BitVector(BitVector && in);
+    Bits(this_t && in);
 
     /// Constructor to generate a BitVector from a std::bitset.
     template <size_t NUM_BITS>
@@ -880,45 +903,49 @@ namespace emp {
     OR_SELF(move_bits);                              // Merge bit strings together.
   }
 
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   template <typename FUN_T>
-  BitVector & BitVector::ApplyRange(const FUN_T & fun, size_t start, size_t stop) {
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> & Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::
+    ApplyRange(const FUN_T & fun, size_t start, size_t stop)
+  {
+    emp_assert(start <= stop, start, stop, num_bits); // Start cannot be after stop.
+    emp_assert(stop <= num_bits, stop, num_bits);     // Stop cannot be past the end of the bits
+
     if (start == stop) return *this;  // Empty range.
 
-    emp_assert(start <= stop, start, stop, num_bits);  // Start cannot be after stop.
-    emp_assert(stop <= num_bits, stop, num_bits);      // Stop cannot be past the end of the bits
-    const size_t start_pos = FieldPos(start);          // Identify the start position WITHIN a bit field.
-    const size_t stop_pos = FieldPos(stop);            // Identify the stop position WITHIN a bit field.
-    size_t start_field = FieldID(start);               // Identify WHICH bit field we're starting in.
-    const size_t stop_field = FieldID(stop-1);         // Identify the last field where we actually make a change.
+    const size_t start_pos = data.FieldPos(start);  // Start position WITHIN a bit field.
+    const size_t stop_pos = data.FieldPos(stop);    // Stop position WITHIN a bit field.
+    size_t start_field = data.FieldID(start);       // ID of bit field we're starting in.
+    const size_t stop_field = data.FieldID(stop-1); // ID of last field to actively scan.
 
     // If the start field and stop field are the same, mask off the middle.
     if (start_field == stop_field) {
-      const size_t apply_bits = stop - start;                          // How many bits to change?
-      const field_t mask = MaskLow<field_t>(apply_bits) << start_pos;  // Target change bits with a mask.
-      field_t & target = bits[start_field];                            // Isolate the field to change.
-      target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+      const size_t apply_bits = stop - start;                  // How many bits to change?
+      const field_t mask = MaskField(apply_bits, start_pos);   // Target change bits with a mask.
+      field_t & target = bits[start_field];                    // Isolate the field to change.
+      target = (target & ~mask) | (fun(target) & mask);        // Update targeted bits!
     }
 
     // Otherwise mask the ends and fully modify the chunks in between.
     else {
       // If we're only using a portions of start field, mask it and setup.
       if (start_pos != 0) {
-        const size_t start_bits = FIELD_BITS - start_pos;                // How many bits in start field?
-        const field_t mask = MaskLow<field_t>(start_bits) << start_pos;  // Target start bits with a mask.
-        field_t & target = bits[start_field];                            // Isolate the field to change.
-        target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
-        start_field++;                                                   // Done with this field; move to the next.
+        const size_t start_bits = data.FIELD_BITS - start_pos;  // How many bits in start field?
+        const field_t mask = MaskField(start_bits, start_pos);  // Target start bits with a mask.
+        field_t & target = data.bits[start_field];              // Isolate the field to change.
+        target = (target & ~mask) | (fun(target) & mask);       // Update targeted bits!
+        start_field++;                                          // Done with this field; move to the next.
       }
 
       // Middle fields
       for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = fun(bits[cur_field]);
+        bits[cur_field] = fun(data.bits[cur_field]);
       }
 
       // Set portions of stop field
-      const field_t mask = MaskLow<field_t>(stop_pos);
-      field_t & target = bits[stop_field];                             // Isolate the field to change.
-      target = (target & ~mask) | (fun(target) & mask);                // Update targeted bits!
+      const field_t mask = MaskField(stop_pos);           // Target end bits with a mask.
+      field_t & target = data.bits[stop_field];           // Isolate the field to change.
+      target = (target & ~mask) | (fun(target) & mask);   // Update targeted bits!
     }
 
     return *this;
@@ -1373,7 +1400,7 @@ namespace emp {
       // If there are end bits, make sure that everything past the last one is clear.
       if (NumEndBits()) {
         // Make sure final bits are zeroed out.
-        [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskLow<field_t>(NumEndBits());
+        [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskField(NumEndBits());
         emp_assert(!excess_bits);
       }
     }
@@ -1888,8 +1915,8 @@ namespace emp {
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
 
     // If there's a hit in a partial first field, return it.
-    if (field_pos && (bits[field_id] & ~(MaskLow<field_t>(field_pos)))) {
-      return (int) (find_bit(bits[field_id] & ~(MaskLow<field_t>(field_pos))) +
+    if (field_pos && (bits[field_id] & ~(MaskField(field_pos)))) {
+      return (int) (find_bit(bits[field_id] & ~(MaskField(field_pos))) +
                     field_id * FIELD_BITS);
     }
 
