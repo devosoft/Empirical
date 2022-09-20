@@ -492,7 +492,7 @@ namespace emp {
     [[nodiscard]] double GetValue() const;
 
     /// Return a span with all fields in order.
-    std::span<field_t> FieldSpan() { return std::span<field_t>(bits.Raw(), NumFields()); }
+    std::span<field_t> FieldSpan() { return std::span<field_t>(bits.Raw(), data.NumFields()); }
 
     /// Get specified type at a given index (in steps of that type size)
     template <typename T>
@@ -872,7 +872,7 @@ namespace emp {
   void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::
     RawCopy(const Ptr<bits_field_t> from)
   {
-    const size_t num_fields = NumFields();
+    const size_t num_fields = data.NumFields();
     for (size_t i = 0; i < num_fields; i++) data.bits[i] = from[i];
   }
 
@@ -895,7 +895,7 @@ namespace emp {
 
     const size_t to_stop = to + move_size;           // Where is the end to move it to?
     const int shift = (int) from_start - (int) to;   // How far will the moved piece shift?
-    BitVector move_bits(*this);                      // Vector to hold moved bits.
+    this_t move_bits(*this);                      // Vector to hold moved bits.
     move_bits.SHIFT_SELF(shift);                     // Put the moved bits in place.
     Clear(to, to_stop);                              // Make room for the moved bits.
     move_bits.Clear(0, to);                          // Clear everything BEFORE moved bits.
@@ -951,109 +951,112 @@ namespace emp {
     return *this;
   }
 
-  void BitVector::ShiftLeft(const size_t shift_size) {
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  void Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
     // If we are shifting out of range, clear the bits and stop.
-    if (shift_size >= num_bits) { Clear(); return; }
+    if (shift_size >= GetSize()) { Clear(); return; }
 
     // If we have only a single field, this operation can be quick.
-    if (NumFields() == 1) {
-      (bits[0] <<= shift_size) &= EndMask();
+    if (data.NumFields() == 1) {
+      (data.bits[0] <<= shift_size) &= data.EndMask();
       return;
     }
 
-    const size_t field_shift = shift_size / FIELD_BITS;
-    const size_t bit_shift = shift_size % FIELD_BITS;
-    const size_t bit_overflow = FIELD_BITS - bit_shift;
+    const size_t field_shift = shift_size / data.FIELD_BITS;
+    const size_t bit_shift = shift_size % data.FIELD_BITS;
+    const size_t bit_overflow = data.FIELD_BITS - bit_shift;
 
     // Loop through each field, from L to R, and update it.
     if (field_shift) {
-      for (size_t i = LastField(); i >= field_shift; --i) {
-        bits[i] = bits[i - field_shift];
+      for (size_t i = data.LastField(); i >= field_shift; --i) {
+        data.bits[i] = data.bits[i - field_shift];
       }
-      for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
+      for (size_t i = field_shift; i > 0; --i) data.bits[i-1] = 0;
     }
 
     // account for bit_shift
     if (bit_shift) {
-      for (size_t i = LastField() ; i > field_shift; --i) {
-        bits[i] <<= bit_shift;
-        bits[i] |= (bits[i-1] >> bit_overflow);
+      for (size_t i = data.LastField() ; i > field_shift; --i) {
+        data.bits[i] <<= bit_shift;
+        data.bits[i] |= (data.bits[i-1] >> bit_overflow);
       }
       // Handle final field (field_shift position)
-      bits[field_shift] <<= bit_shift;
+      data.bits[field_shift] <<= bit_shift;
     }
 
     // Mask out any bits that have left-shifted away
     ClearExcessBits();
   }
 
-  void BitVector::ShiftRight(const size_t shift_size) {
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  void Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
     // If we are shifting out of range, clear the bits and stop.
-    if (shift_size >= num_bits) { Clear(); return; }
+    if (shift_size >= GetSize()) { Clear(); return; }
 
     // If we have only a single field, this operation can be quick.
-    if (NumFields() == 1) {
-      bits[0] >>= shift_size;
+    if (data.NumFields() == 1) {
+      data.bits[0] >>= shift_size;
       return;
     }
 
-    const size_t field_shift = shift_size / FIELD_BITS;
-    const size_t bit_shift = shift_size % FIELD_BITS;
-    const size_t bit_overflow = FIELD_BITS - bit_shift;
-    const size_t NUM_FIELDS = NumFields();
+    const size_t field_shift = shift_size / data.FIELD_BITS;
+    const size_t bit_shift = shift_size % data.FIELD_BITS;
+    const size_t bit_overflow = data.FIELD_BITS - bit_shift;
+    const size_t NUM_FIELDS = data.NumFields();
     const size_t field_shift2 = NUM_FIELDS - field_shift;
 
     // account for field_shift
     if (field_shift) {
       for (size_t i = 0; i < field_shift2; ++i) {
-        bits[i] = bits[i + field_shift];
+        data.bits[i] = data.bits[i + field_shift];
       }
-      for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
+      for (size_t i = field_shift2; i < NUM_FIELDS; i++) data.bits[i] = data.FIELD_0;
     }
 
     // account for bit_shift
     if (bit_shift) {
       for (size_t i = 0; i < (field_shift2 - 1); ++i) {
-        bits[i] >>= bit_shift;
-        bits[i] |= (bits[i+1] << bit_overflow);
+        data.bits[i] >>= bit_shift;
+        data.bits[i] |= (data.bits[i+1] << bit_overflow);
       }
-      bits[field_shift2 - 1] >>= bit_shift;
+      data.bits[field_shift2 - 1] >>= bit_shift;
     }
   }
 
   /// Helper: call ROTATE with negative number
-  void BitVector::RotateLeft(const size_t shift_size_raw) {
-    if (num_bits == 0) return;   // Nothing to rotate in an empty BitVector.
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  void Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
+    if (GetSize() == 0) return;   // Nothing to rotate if there are not bits.
 
-    const field_t shift_size = shift_size_raw % num_bits;
-    const size_t NUM_FIELDS = NumFields();
+    const field_t shift_size = shift_size_raw % GetSize();
+    const size_t NUM_FIELDS = data.NumFields();
 
-    // Use different approaches based on BitVector size
+    // Use different approaches based on number of bits.
     if (NUM_FIELDS == 1) {
       // Special case: for exactly one field_T, try to go low level.
       // Adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      field_t & n = bits[0];
+      field_t & n = data.bits[0];
       size_t c = shift_size;
 
       // Mask necessary to surpress shift count overflow warnings.
       c &= FIELD_LOG2_MASK;
-      n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
+      n = (n<<c) | (n>>( (-(c+data.FIELD_BITS-GetSize())) & FIELD_LOG2_MASK ));
     }
-    else if (NUM_FIELDS < 32) {  // For small BitVectors, shifting L/R and ORing is faster.
-      emp::BitVector dup(*this);
+    else if (NUM_FIELDS < 32) {  // For few bits, shifting L/R and OR-ing is faster.
+      this_t dup(*this);
       dup.ShiftLeft(shift_size);
-      ShiftRight(num_bits - shift_size);
+      ShiftRight(GetSize() - shift_size);
       OR_SELF(dup);
     }
-    else {  // For big BitVectors, manual rotating is faster
+    else {  // For more bits, manual rotating is faster
       // Note: we already modded shift_size by num_bits, so no need to mod by FIELD_SIZE
-      const size_t field_shift = ( shift_size + EndGap() ) / FIELD_BITS;
+      const size_t field_shift = ( shift_size + EndGap() ) / data.FIELD_BITS;
 
       // If we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
       // to account for the filler that gets pulled out of the middle
       const size_t field_gap = field_shift ? EndGap() : 0;
-      const size_t bit_shift = NumEndBits() && (shift_size + field_gap) % FIELD_BITS;
-      const size_t bit_overflow = FIELD_BITS - bit_shift;
+      const size_t bit_shift = data.NumEndBits() && (shift_size + field_gap) % data.FIELD_BITS;
+      const size_t bit_overflow = data.FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
       auto field_span = FieldSpan();
@@ -1064,31 +1067,31 @@ namespace emp {
       );
 
       // if necessary, shift filler bits out of the middle
-      if (NumEndBits()) {
-        const size_t filler_idx = (LastField() + field_shift) % NUM_FIELDS;
+      if (data.NumEndBits()) {
+        const size_t filler_idx = (data.LastField() + field_shift) % NUM_FIELDS;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          bits[i-1] |= bits[i] << NumEndBits();
-          bits[i] >>= (FIELD_BITS - NumEndBits());
+          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
+          data.bits[i] >>= (data.FIELD_BITS - data.NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NumEndBits() ? (
-          (bits[LastField()] << (FIELD_BITS - NumEndBits()))
-          | (bits[NUM_FIELDS - 2] >> NumEndBits())
+        const field_t keystone = data.NumEndBits() ? (
+          (data.bits[data.LastField()] << (data.FIELD_BITS - data.NumEndBits()))
+          | (data.bits[NUM_FIELDS - 2] >> data.NumEndBits())
         ) : (
-          bits[LastField()]
+          data.bits[data.LastField()]
         );
 
-        for (size_t i = LastField(); i > 0; --i) {
-          bits[i] <<= bit_shift;
-          bits[i] |= (bits[i-1] >> bit_overflow);
+        for (size_t i = data.LastField(); i > 0; --i) {
+          data.bits[i] <<= bit_shift;
+          data.bits[i] |= (data.bits[i-1] >> bit_overflow);
         }
         // Handle final field
-        bits[0] <<= bit_shift;
-        bits[0] |= keystone >> bit_overflow;
+        data.bits[0] <<= bit_shift;
+        data.bits[0] |= keystone >> bit_overflow;
 
       }
 
@@ -1100,34 +1103,35 @@ namespace emp {
 
 
   /// Helper for calling ROTATE with positive number
-  void BitVector::RotateRight(const size_t shift_size_raw) {
-    const size_t shift_size = shift_size_raw % num_bits;
-    const size_t NUM_FIELDS = NumFields();
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  void Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
+    const size_t shift_size = shift_size_raw % GetSize();
+    const size_t NUM_FIELDS = data.NumFields();
 
-    // use different approaches based on BitVector size
+    // use different approaches based on number of bits
     if (NUM_FIELDS == 1) {
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
 
-      field_t & n = bits[0];
+      field_t & n = data.bits[0];
       size_t c = shift_size;
 
       // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
-      n = (n>>c) | (n<<( (num_bits-c) & FIELD_LOG2_MASK ));
+      n = (n>>c) | (n<<( (GetSize()-c) & FIELD_LOG2_MASK ));
 
     } else if (NUM_FIELDS < 32) {
-      // for small BitVectors, shifting L/R and ORing is faster
-      emp::BitVector dup(*this);
+      // for small few bits, shifting L/R and ORing is faster
+      this_t dup(*this);
       dup.ShiftRight(shift_size);
-      ShiftLeft(num_bits - shift_size);
+      ShiftLeft(GetSize() - shift_size);
       OR_SELF(dup);
     } else {
-      // for big BitVectors, manual rotating is faster
+      // for many bits, manual rotating is faster
 
-      const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-      const size_t bit_shift = shift_size % FIELD_BITS;
-      const field_t bit_overflow = FIELD_BITS - bit_shift;
+      const field_t field_shift = (shift_size / data.FIELD_BITS) % NUM_FIELDS;
+      const size_t bit_shift = shift_size % data.FIELD_BITS;
+      const field_t bit_overflow = data.FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
       auto field_span = FieldSpan();
@@ -1138,33 +1142,33 @@ namespace emp {
       );
 
       // if necessary, shift filler bits out of the middle
-      if (NumEndBits()) {
-        const size_t filler_idx = LastField() - field_shift;
+      if (data.NumEndBits()) {
+        const size_t filler_idx = data.LastField() - field_shift;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          bits[i-1] |= bits[i] << NumEndBits();
-          bits[i] >>= (FIELD_BITS - NumEndBits());
+          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
+          data.bits[i] >>= (data.FIELD_BITS - data.NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NumEndBits() ? (
-          bits[0] >> (FIELD_BITS - NumEndBits())
+        const field_t keystone = data.NumEndBits() ? (
+          data.bits[0] >> (data.FIELD_BITS - data.NumEndBits())
         ) : (
-          bits[0]
+          data.bits[0]
         );
 
-        if (NumEndBits()) {
-          bits[NUM_FIELDS-1] |= bits[0] << NumEndBits();
+        if (data.NumEndBits()) {
+          data.bits[NUM_FIELDS-1] |= data.bits[0] << data.NumEndBits();
         }
 
-        for (size_t i = 0; i < LastField(); ++i) {
-          bits[i] >>= bit_shift;
-          bits[i] |= (bits[i+1] << bit_overflow);
+        for (size_t i = 0; i < data.LastField(); ++i) {
+          data.bits[i] >>= bit_shift;
+          data.bits[i] |= (data.bits[i+1] << bit_overflow);
         }
-        bits[LastField()] >>= bit_shift;
-        bits[LastField()] |= keystone << bit_overflow;
+        data.bits[data.LastField()] >>= bit_shift;
+        data.bits[data.LastField()] |= keystone << bit_overflow;
       }
     }
 
