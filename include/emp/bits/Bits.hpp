@@ -33,7 +33,7 @@
  *  @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
  * 
- *  @todo Most of the operators don't check to make sure that both BitVectors are the same size.
+ *  @todo Most of the operators don't check to make sure that both Bit groups are the same size.
  *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
@@ -41,9 +41,9 @@
  *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
  *        just as efficient than a reserve, but without the need to store extra in-class info.
  *  @todo Implement append(), resize(), push_bit(), insert(), remove()
- *  @todo Think about how iterators should work for BitVector.  It should probably go bit-by-bit,
- *        but there are very few circumstances where that would be useful.  Going through the
- *        positions of all ones would be more useful, but perhaps less intuitive.
+ *  @todo Think about how iterators should work for Bit collections.  It should probably go
+ *        bit-by-bit, but there are very few circumstances where that would be useful.  Going
+ *        through the positions of all ones would be more useful, but perhaps less intuitive.
  */
 
 #ifndef EMP_BITS_BITS_HPP_INCLUDE
@@ -75,32 +75,6 @@ namespace emp {
   static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
 
   namespace internal {
-    /// Data and functions needed for all Bits types.
-    struct Bits_Data_Base {
-      using field_t = bits_field_t;
-      static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
-
-      // Number of bits needed to specify position in a field + mask
-      static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
-      static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
-
-      static constexpr field_t FIELD_0 = (field_t) 0;      ///< All bits in a field set to 0
-      static constexpr field_t FIELD_1 = (field_t) 1;      ///< Least significant bit set to 1
-      static constexpr field_t FIELD_255 = (field_t) 255;  ///< Least significant 8 bits set to 1
-      static constexpr field_t FIELD_ALL = ~FIELD_0;       ///< All bits in a field set to 1
-
-      // Identify the field that a specified bit is in.
-      [[nodiscard]] static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
-
-      // Identify the position within a field where a specified bit is.
-      [[nodiscard]] static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
-
-      // Identify which field a specified byte position would be in.
-      [[nodiscard]] static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
-
-      // Convert a byte position in BitVector to a byte position in the target field.
-      [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
-    };
 
     // ------------------------------------------------------------------------------------
     //  RAW MEMORY MANAGEMENT
@@ -108,7 +82,9 @@ namespace emp {
 
     /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
     template <size_t CAPACITY>
-    struct Bits_Data_StaticMem : public Bits_Data_Base {
+    struct Bits_Data_StaticMem {
+      using field_t = bits_field_t;
+      static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
 
@@ -121,7 +97,9 @@ namespace emp {
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    struct Bits_Data_DynamicMem : public Bits_Data_Base {
+    struct Bits_Data_DynamicMem {
+      using field_t = bits_field_t;
+
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
       [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
@@ -141,30 +119,30 @@ namespace emp {
       size_t num_bits;           ///< Total number of bits are we using
 
       using field_t = bits_field_t;
-      static constexpr size_t FIELD_BITS = Bits_Data_Base::FIELD_BITS;
+      static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
+      [[nodiscard]] size_t NumEndBits() const noexcept { return num_bits & (FIELD_BITS - 1); }
 
       /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] size_t EndGap() const { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
+      [[nodiscard]] size_t EndGap() const noexcept { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
 
       /// A mask to cut off all of the final bits.
-      [[nodiscard]] field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
+      [[nodiscard]] field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
 
       /// How many felids do we need for the current set of bits?
-      [[nodiscard]] size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+      [[nodiscard]] size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
 
       /// What is the ID of the last occupied field?
-      [[nodiscard]] size_t LastField() const { return NumFields() - 1; }
+      [[nodiscard]] size_t LastField() const noexcept { return NumFields() - 1; }
 
       /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+      [[nodiscard]] size_t NumBytes() const noexcept { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
 
       /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
+      [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
     };
 
 
@@ -216,6 +194,14 @@ namespace emp {
     };
   };
 
+  //****************************************************************************
+  //****************************************************************************
+  //
+  //   ----------------------  Bits class starts here!  ----------------------
+  //
+  //****************************************************************************
+  //****************************************************************************
+
   ///  A flexible base template to handle BitVector, BitArray, BitSet, and other combinations.
   ///  @param CAPACITY The maximum number of bits allows (DYNAMIC_BITS for no limit)
   ///  @param FIXED_SIZE Can the number of bits change once created?
@@ -228,8 +214,29 @@ namespace emp {
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
     using field_t = bits_field_t;
 
-    static constexpr size_t DEFAULT_SIZE =
-      (FIXED_SIZE && CAPACITY != DYNAMIC_BITS) ? CAPACITY : 0;
+    static constexpr size_t DEFAULT_SIZE = (FIXED_SIZE && CAPACITY != DYNAMIC_BITS) ? CAPACITY : 0;
+    static constexpr FIELD_BITS = data.FIELD_BITS;
+
+    // Number of bits needed to specify position in a field + mask
+    static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
+    static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
+
+    static constexpr field_t FIELD_0 = (field_t) 0;      ///< All bits in a field set to 0
+    static constexpr field_t FIELD_1 = (field_t) 1;      ///< Least significant bit set to 1
+    static constexpr field_t FIELD_255 = (field_t) 255;  ///< Least significant 8 bits set to 1
+    static constexpr field_t FIELD_ALL = ~FIELD_0;       ///< All bits in a field set to 1
+
+    // Identify the field that a specified bit is in.
+    [[nodiscard]] static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
+
+    // Identify the position within a field where a specified bit is.
+    [[nodiscard]] static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
+
+    // Identify which field a specified byte position would be in.
+    [[nodiscard]] static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
+
+    // Convert a byte position in Bits to a byte position in the target field.
+    [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
     [[nodiscard]] field_t MaskField(size_t mask_size) const { return MaskLow<field_t>(mask_size); }
     [[nodiscard]] field_t MaskField(size_t mask_size, size_t offset) const {
@@ -271,7 +278,7 @@ namespace emp {
     void RotateRight(const size_t shift_size_raw);
 
   public:
-    /// Build a new BitVector with specified bit count and initialization (default 0)
+    /// Build a new Bits with specified bit count and initialization (default 0)
     Bits(size_t in_num_bits=DEFAULT_SIZE, bool init_val=false);
 
     // Prevent ambiguous conversions...
@@ -286,59 +293,59 @@ namespace emp {
     /// Move constructor of existing bit field.
     Bits(this_t && in);
 
-    /// Constructor to generate a BitVector from a std::bitset.
+    /// Constructor to generate a Bits from a std::bitset.
     template <size_t NUM_BITS>
-    explicit BitVector(const std::bitset<NUM_BITS> & bitset);
+    explicit Bits(const std::bitset<NUM_BITS> & bitset);
 
-    /// Constructor to generate a BitVector from a string of '0's and '1's.
-    BitVector(const std::string & bitstring);
+    /// Constructor to generate a Bits from a string of '0's and '1's.
+    Bits(const std::string & bitstring);
 
-    /// Constructor to generate a BitVector from a literal string of '0's and '1's.
-    BitVector(const char * bitstring) : BitVector(std::string(bitstring)) {}
+    /// Constructor to generate a Bits from a literal string of '0's and '1's.
+    Bits(const char * bitstring) : Bits(std::string(bitstring)) {}
 
-    /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
-    BitVector(size_t in_num_bits, Random & random);
+    /// Constructor to generate a random Bits (with equal prob of 0 or 1).
+    Bits(size_t in_num_bits, Random & random);
 
-    /// Constructor to generate a random BitVector with provided prob of 1's.
-    BitVector(size_t in_num_bits, Random & random, const double p1);
+    /// Constructor to generate a random Bits with provided prob of 1's.
+    Bits(size_t in_num_bits, Random & random, const double p1);
 
-    /// Constructor to generate a random BitVector with provided number of 1's.
-    BitVector(size_t in_num_bits, Random & random, const size_t target_ones);
+    /// Constructor to generate a random Bits with provided number of 1's.
+    Bits(size_t in_num_bits, Random & random, const size_t target_ones);
 
-    /// Constructor to generate a random BitVector with provided number of 1's.
-    BitVector(size_t in_num_bits, Random & random, const int target_ones)
-      : BitVector(in_num_bits, random, (size_t) target_ones) { }
+    /// Constructor to generate a random Bits with provided number of 1's.
+    Bits(size_t in_num_bits, Random & random, const int target_ones)
+      : Bits(in_num_bits, random, (size_t) target_ones) { }
 
     /// Initializer list constructor.
-    template <typename T> BitVector(const std::initializer_list<T> l);
+    template <typename T> Bits(const std::initializer_list<T> l);
 
     /// Copy, but with a resize.
-    BitVector(const BitVector & in, size_t new_size);
+    Bits(const Bits & in, size_t new_size);
 
     /// Destructor
-    ~BitVector();
+    ~Bits();
 
     /// Assignment operator.
-    BitVector & operator=(const BitVector & in) &;
+    Bits & operator=(const Bits & in) &;
 
     /// Move operator.
-    BitVector & operator=(BitVector && in) &;
+    Bits & operator=(Bits && in) &;
 
     /// Assignment operator from a std::bitset.
     template <size_t NUM_BITS>
-    BitVector & operator=(const std::bitset<NUM_BITS> & bitset) &;
+    Bits & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
     /// Assignment operator from a string of '0's and '1's.
-    BitVector & operator=(const std::string & bitstring) &;
+    Bits & operator=(const std::string & bitstring) &;
 
     /// Assignment operator from a literal string of '0's and '1's.
-    BitVector & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
+    Bits & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
-    /// Assignment from another BitVector without changing size.
-    BitVector & Import( const BitVector & from_bv, const size_t from_bit=0 );
+    /// Assignment from another Bits without changing size.
+    Bits & Import( const Bits & from_bits, const size_t from_bit=0 );
 
-    /// Convert to a BitVector of a different size.
-    BitVector Export(size_t out_size, size_t start_bit=0) const;
+    /// Convert to a Bits of a different size.
+    Bits Export(size_t out_size, size_t start_bit=0) const;
 
     // Scan this bitvector to make sure that there are no internal problems.
     bool OK() const;
@@ -349,10 +356,10 @@ namespace emp {
     /// How many bits do we currently have?
     [[nodiscard]] size_t GetSize() const { return num_bits; }
 
-    /// How many bytes are in this BitVector? (includes empty field space)
+    /// How many bytes are in this Bits? (includes empty field space)
     [[nodiscard]] size_t GetNumBytes() const { return NumBytes(); }
 
-    /// How many distinct values could be held in this BitVector?
+    /// How many distinct values could be held in this Bits?
     [[nodiscard]] double GetNumStates() const { return emp::Pow2(num_bits); }
 
     /// Retrieve the bit value from the specified index.
@@ -362,23 +369,23 @@ namespace emp {
     [[nodiscard]] bool Has(size_t index) const { return (index < num_bits) ? Get(index) : false; }
 
     /// Update the bit value at the specified index.
-    BitVector & Set(size_t index, bool value=true);
+    Bits & Set(size_t index, bool value=true);
 
     /// Set all bits to 1.
-    BitVector & SetAll();
+    Bits & SetAll();
 
     /// Set a range of bits to one: [start, stop)
-    BitVector & SetRange(size_t start, size_t stop)
+    Bits & SetRange(size_t start, size_t stop)
       { return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop); }
 
     /// Set all bits to 0.
-    BitVector & Clear();
+    Bits & Clear();
 
     /// Set specific bit to 0.
-    BitVector & Clear(size_t index) { return Set(index, false); }
+    Bits & Clear(size_t index) { return Set(index, false); }
 
     /// Set bits to 0 in the range [start, stop)
-    BitVector & Clear(const size_t start, const size_t stop)
+    Bits & Clear(const size_t start, const size_t stop)
       { return ApplyRange([](field_t) -> size_t { return 0; }, start, stop); }
 
 
@@ -386,16 +393,16 @@ namespace emp {
     [[nodiscard]] bool operator[](size_t index) const { return Get(index); }
 
     /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
-    BitProxy<BitVector> operator[](size_t index) { return BitProxy<BitVector>(*this, index); }
+    BitProxy<Bits> operator[](size_t index) { return BitProxy<Bits>(*this, index); }
 
     /// Change every bit in the sequence.
-    BitVector & Toggle() { return NOT_SELF(); }
+    Bits & Toggle() { return NOT_SELF(); }
 
     /// Change a specified bit to the opposite value
-    BitVector & Toggle(size_t index);
+    Bits & Toggle(size_t index);
 
     /// Flips all the bits in a range [start, end)
-    BitVector & Toggle(size_t start, size_t stop)
+    Bits & Toggle(size_t start, size_t stop)
       { return ApplyRange([](field_t x){ return ~x; }, start, stop); }
 
     /// Return true if ANY bits are set to 1, otherwise return false.
@@ -405,65 +412,65 @@ namespace emp {
     [[nodiscard]] bool None() const { return !Any(); }
 
     /// Return true if ALL bits are set to 1, otherwise return false.
-    // @CAO: Can speed up by not duplicating the whole BitVector.
+    // @CAO: Can speed up by not duplicating the whole Bits.
     [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
-    /// Resize this BitVector to have the specified number of bits.
-    BitVector & Resize(size_t new_bits);
+    /// Resize this Bits to have the specified number of bits.
+    Bits & Resize(size_t new_bits);
 
 
     // =========  Randomization functions  ========= //
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
-    BitVector &  Randomize(Random & random);
+    Bits &  Randomize(Random & random);
 
     /// Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
-    BitVector & RandomizeP(Random & random, const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+    Bits & RandomizeP(Random & random, const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set all bits randomly, with a given probability of being a one.
-    BitVector & Randomize(Random & random, const double p,
+    Bits & Randomize(Random & random, const double p,
                        const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set all bits randomly, with a given number of ones.
-    BitVector & ChooseRandom(Random & random, const size_t target_ones,
+    Bits & ChooseRandom(Random & random, const size_t target_ones,
                              const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Flip random bits with a given probability.
-    BitVector & FlipRandom(Random & random, const double p,
+    Bits & FlipRandom(Random & random, const double p,
                            const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set random bits with a given probability (does not check if already set.)
-    BitVector & SetRandom(Random & random, const double p,
+    Bits & SetRandom(Random & random, const double p,
                           const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Unset random bits with a given probability (does not check if already zero.)
-    BitVector & ClearRandom(Random & random, const double p,
+    Bits & ClearRandom(Random & random, const double p,
                             const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Flip a specified number of random bits.
-    BitVector & FlipRandomCount(Random & random, const size_t target_bits);
+    Bits & FlipRandomCount(Random & random, const size_t target_bits);
 
     /// Set a specified number of random bits (does not check if already set.)
-    BitVector & SetRandomCount(Random & random, const size_t target_bits);
+    Bits & SetRandomCount(Random & random, const size_t target_bits);
 
     /// Unset  a specified number of random bits (does not check if already zero.)
-    BitVector & ClearRandomCount(Random & random, const size_t target_bits);
+    Bits & ClearRandomCount(Random & random, const size_t target_bits);
 
 
     // =========  Comparison Operators  ========= //
 
-    [[nodiscard]] bool operator==(const BitVector & in) const;
-    [[nodiscard]] bool operator!=(const BitVector & in) const { return !(*this == in); }
-    [[nodiscard]] bool operator< (const BitVector & in) const;
-    [[nodiscard]] bool operator> (const BitVector & in) const { return in < *this; }
-    [[nodiscard]] bool operator<=(const BitVector & in) const { return !(in < *this); }
-    [[nodiscard]] bool operator>=(const BitVector & in) const { return !(*this < in); }
+    [[nodiscard]] bool operator==(const Bits & in) const;
+    [[nodiscard]] bool operator!=(const Bits & in) const { return !(*this == in); }
+    [[nodiscard]] bool operator< (const Bits & in) const;
+    [[nodiscard]] bool operator> (const Bits & in) const { return in < *this; }
+    [[nodiscard]] bool operator<=(const Bits & in) const { return !(in < *this); }
+    [[nodiscard]] bool operator>=(const Bits & in) const { return !(*this < in); }
 
 
     // =========  Conversion Operators  ========= //
 
-    /// Automatically convert BitVector to other vector types.
+    /// Automatically convert Bits to other vector types.
     template <typename T> operator emp::vector<T>();
 
     /// Casting a bit array to bool identifies if ANY bits are set to 1.
@@ -475,19 +482,19 @@ namespace emp {
     /// Retrieve the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
 
-    /// Get a read-only view into the internal array used by BitVector.
-    /// @return Read-only span of BitVector's bytes.
+    /// Get a read-only view into the internal array used by Bits.
+    /// @return Read-only span of Bits's bytes.
     [[nodiscard]] std::span<const std::byte> GetBytes() const;
 
-    /// Get a read-only pointer to the internal array used by BitVector.
+    /// Get a read-only pointer to the internal array used by Bits.
     /// (note that bits are NOT in order at the byte level!)
-    /// @return Read-only pointer to BitVector's bytes.
+    /// @return Read-only pointer to Bits' bytes.
     emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
 
-    /// Get the overall value of this BitVector, using a uint encoding, but including all bits
+    /// Get the overall value of this Bits, using a uint encoding, but including all bits
     /// and returning the value as a double.
     [[nodiscard]] double GetValue() const;
 
@@ -576,13 +583,13 @@ namespace emp {
     /// A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash(size_t start_field=0) const;
 
-    /// Count the number of ones in the BitVector.
+    /// Count the number of ones in Bits.
     [[nodiscard]] size_t CountOnes() const;
 
     /// Faster counting of ones for very sparse bit vectors.
     [[nodiscard]] size_t CountOnes_Sparse() const;
 
-    /// Count the number of zeros in the BitVector.
+    /// Count the number of zeros in Bits.
     [[nodiscard]] size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Pop the last bit in the vector.
@@ -615,9 +622,9 @@ namespace emp {
     [[nodiscard]] int FindBit() const { return FindOne(); }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
-    /// You can loop through all 1-bit positions of a BitVector "bv" with:
+    /// You can loop through all 1-bit positions of Bits object "bits" with:
     ///
-    ///   for (int pos = bv.FindOne(); pos >= 0; pos = bv.FindOne(pos+1)) { ... }
+    ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
     ///
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
@@ -650,8 +657,8 @@ namespace emp {
     /// Find the length of the longest continuous series of ones.
     [[nodiscard]] size_t LongestSegmentOnes() const;
 
-    /// Return true if any ones are in common with another BitVector.
-    [[nodiscard]] bool HasOverlap(const BitVector & in) const;
+    /// Return true if any ones are in common with another Bits.
+    [[nodiscard]] bool HasOverlap(const Bits & in) const;
 
 
     // =========  Print/String Functions  ========= //
@@ -659,16 +666,16 @@ namespace emp {
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
-    /// Convert this BitVector to a vector string [index 0 on left]
+    /// Convert this Bits to a vector string [index 0 on left]
     [[nodiscard]] std::string ToString() const;
 
-    /// Convert this BitVector to a numerical string [index 0 on right]
+    /// Convert this Bits to a numerical string [index 0 on right]
     [[nodiscard]] std::string ToBinaryString() const;
 
-    /// Convert this BitVector to a series of IDs
+    /// Convert this Bits to a series of IDs
     [[nodiscard]] std::string ToIDString(const std::string & spacer=" ") const;
 
-    /// Convert this BitVector to a series of IDs with ranges condensed.
+    /// Convert this Bits to a series of IDs with ranges condensed.
     [[nodiscard]] std::string ToRangeString(const std::string & spacer=",",
                                             const std::string & ranger="-") const;
 
@@ -684,7 +691,7 @@ namespace emp {
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
-    /// Print out details about the internals of the BitVector.
+    /// Print out details about the internals of Bits.
     void PrintDebug(std::ostream & out=std::cout) const;
 
     /// Print the positions of all one bits, spaces are the default separator.
@@ -696,154 +703,154 @@ namespace emp {
                       const std::string & ranger="-") const;
 
     /// Overload ostream operator to return Print.
-    friend std::ostream& operator<<(std::ostream &out, const BitVector & bv) {
-      bv.Print(out);
+    friend std::ostream& operator<<(std::ostream &out, const Bits & bits) {
+      bits.Print(out);
       return out;
     }
 
 
     // =========  Boolean Logic and Shifting Operations  ========= //
 
-    /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
-    BitVector & NOT_SELF();
+    /// Perform a Boolean NOT with this Bits, store result here, and return this object.
+    Bits & NOT_SELF();
 
-    /// Perform a Boolean AND with this BitVector, store result here, and return this object.
-    BitVector & AND_SELF(const BitVector & bv2);
+    /// Perform a Boolean AND with this Bits, store result here, and return this object.
+    Bits & AND_SELF(const Bits & bits2);
 
-    /// Perform a Boolean OR with this BitVector, store result here, and return this object.
-    BitVector & OR_SELF(const BitVector & bv2);
+    /// Perform a Boolean OR with this Bits, store result here, and return this object.
+    Bits & OR_SELF(const Bits & bits2);
 
-    /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
-    BitVector & NAND_SELF(const BitVector & bv2);
+    /// Perform a Boolean NAND with this Bits, store result here, and return this object.
+    Bits & NAND_SELF(const Bits & bits2);
 
-    /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
-    BitVector & NOR_SELF(const BitVector & bv2);
+    /// Perform a Boolean NOR with this Bits, store result here, and return this object.
+    Bits & NOR_SELF(const Bits & bits2);
 
-    /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
-    BitVector & XOR_SELF(const BitVector & bv2);
+    /// Perform a Boolean XOR with this Bits, store result here, and return this object.
+    Bits & XOR_SELF(const Bits & bits2);
 
-    /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
-    BitVector & EQU_SELF(const BitVector & bv2);
+    /// Perform a Boolean EQU with this Bits, store result here, and return this object.
+    Bits & EQU_SELF(const Bits & bits2);
 
 
-    /// Perform a Boolean NOT on this BitVector and return the result.
-    [[nodiscard]] BitVector NOT() const { return BitVector(*this).NOT_SELF(); }
+    /// Perform a Boolean NOT on this Bits and return the result.
+    [[nodiscard]] Bits NOT() const { return Bits(*this).NOT_SELF(); }
 
-    /// Perform a Boolean AND on this BitVector and return the result.
-    [[nodiscard]] BitVector AND(const BitVector & bv2) const { return BitVector(*this).AND_SELF(bv2); }
+    /// Perform a Boolean AND on this Bits and return the result.
+    [[nodiscard]] Bits AND(const Bits & bits2) const { return Bits(*this).AND_SELF(bits2); }
 
-    /// Perform a Boolean OR on this BitVector and return the result.
-    [[nodiscard]] BitVector OR(const BitVector & bv2) const { return BitVector(*this).OR_SELF(bv2); }
+    /// Perform a Boolean OR on this Bits and return the result.
+    [[nodiscard]] Bits OR(const Bits & bits2) const { return Bits(*this).OR_SELF(bits2); }
 
-    /// Perform a Boolean NAND on this BitVector and return the result.
-    [[nodiscard]] BitVector NAND(const BitVector & bv2) const { return BitVector(*this).NAND_SELF(bv2); }
+    /// Perform a Boolean NAND on this Bits and return the result.
+    [[nodiscard]] Bits NAND(const Bits & bits2) const { return Bits(*this).NAND_SELF(bits2); }
 
-    /// Perform a Boolean NOR on this BitVector and return the result.
-    [[nodiscard]] BitVector NOR(const BitVector & bv2) const { return BitVector(*this).NOR_SELF(bv2); }
+    /// Perform a Boolean NOR on this Bits and return the result.
+    [[nodiscard]] Bits NOR(const Bits & bits2) const { return Bits(*this).NOR_SELF(bits2); }
 
-    /// Perform a Boolean XOR on this BitVector and return the result.
-    [[nodiscard]] BitVector XOR(const BitVector & bv2) const { return BitVector(*this).XOR_SELF(bv2); }
+    /// Perform a Boolean XOR on this Bits and return the result.
+    [[nodiscard]] Bits XOR(const Bits & bits2) const { return Bits(*this).XOR_SELF(bits2); }
 
-    /// Perform a Boolean EQU on this BitVector and return the result.
-    [[nodiscard]] BitVector EQU(const BitVector & bv2) const { return BitVector(*this).EQU_SELF(bv2); }
+    /// Perform a Boolean EQU on this Bits and return the result.
+    [[nodiscard]] Bits EQU(const Bits & bits2) const { return Bits(*this).EQU_SELF(bits2); }
 
 
     /// Positive shifts go left and negative go right (0 does nothing); return result.
-    [[nodiscard]] BitVector SHIFT(const int shift_size) const;
+    [[nodiscard]] Bits SHIFT(const int shift_size) const;
 
     /// Positive shifts go left and negative go right; store result here, and return this object.
-    BitVector & SHIFT_SELF(const int shift_size);
+    Bits & SHIFT_SELF(const int shift_size);
 
     /// Reverse the order of bits in the bitset
-    BitVector & REVERSE_SELF();
+    Bits & REVERSE_SELF();
 
     /// Reverse order of bits in the bitset.
-    [[nodiscard]] BitVector REVERSE() const;
+    [[nodiscard]] Bits REVERSE() const;
 
     /// Positive rotates go left and negative rotates go left (0 does nothing);
     /// return result.
-    [[nodiscard]] BitVector ROTATE(const int rotate_size) const;
+    [[nodiscard]] Bits ROTATE(const int rotate_size) const;
 
     /// Positive rotates go right and negative rotates go left (0 does nothing);
     /// store result here, and return this object.
-    BitVector & ROTATE_SELF(const int rotate_size);
+    Bits & ROTATE_SELF(const int rotate_size);
 
     /// Helper: call ROTATE with negative number instead
     template<size_t shift_size_raw>
-    BitVector & ROTL_SELF();
+    Bits & ROTL_SELF();
 
     /// Helper for calling ROTATE with positive number
     template<size_t shift_size_raw>
-    BitVector & ROTR_SELF();
+    Bits & ROTR_SELF();
 
-    /// Addition of two BitVectors.
+    /// Addition of two Bits.
     /// Wraps if it overflows.
     /// Returns result.
-    [[nodiscard]] BitVector ADD(const BitVector & set2) const;
+    [[nodiscard]] Bits ADD(const Bits & set2) const;
 
-    /// Addition of two BitVectors.
+    /// Addition of two Bits.
     /// Wraps if it overflows.
     /// Returns this object.
-    BitVector & ADD_SELF(const BitVector & set2);
+    Bits & ADD_SELF(const Bits & set2);
 
-    /// Subtraction of two BitVectors.
+    /// Subtraction of two Bits.
     /// Wraps around if it underflows.
     /// Returns result.
-    [[nodiscard]] BitVector SUB(const BitVector & set2) const;
+    [[nodiscard]] Bits SUB(const Bits & set2) const;
 
-    /// Subtraction of two BitVectors.
+    /// Subtraction of two Bits.
     /// Wraps if it underflows.
     /// Returns this object.
-    BitVector & SUB_SELF(const BitVector & set2);
+    Bits & SUB_SELF(const Bits & set2);
 
 
     /// Operator bitwise NOT...
-    [[nodiscard]] inline BitVector operator~() const { return NOT(); }
+    [[nodiscard]] inline Bits operator~() const { return NOT(); }
 
     /// Operator bitwise AND...
-    [[nodiscard]] inline BitVector operator&(const BitVector & ar2) const {
+    [[nodiscard]] inline Bits operator&(const Bits & ar2) const {
       emp_assert(size() == ar2.size(), size(), ar2.size());
       return AND(ar2);
     }
 
     /// Operator bitwise OR...
-    [[nodiscard]] inline BitVector operator|(const BitVector & ar2) const {
+    [[nodiscard]] inline Bits operator|(const Bits & ar2) const {
       emp_assert(size() == ar2.size(), size(), ar2.size());
       return OR(ar2);
     }
 
     /// Operator bitwise XOR...
-    [[nodiscard]] inline BitVector operator^(const BitVector & ar2) const {
+    [[nodiscard]] inline Bits operator^(const Bits & ar2) const {
       emp_assert(size() == ar2.size(), size(), ar2.size());
       return XOR(ar2);
     }
 
     /// Operator shift left...
-    [[nodiscard]] inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    [[nodiscard]] inline Bits operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
 
     /// Operator shift right...
-    [[nodiscard]] inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+    [[nodiscard]] inline Bits operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
     /// Compound operator bitwise AND...
-    BitVector & operator&=(const BitVector & ar2) {
+    Bits & operator&=(const Bits & ar2) {
       emp_assert(size() == ar2.size()); return AND_SELF(ar2);
     }
 
     /// Compound operator bitwise OR...
-    BitVector & operator|=(const BitVector & ar2) {
+    Bits & operator|=(const Bits & ar2) {
       emp_assert(size() == ar2.size()); return OR_SELF(ar2);
     }
 
     /// Compound operator bitwise XOR...
-    BitVector & operator^=(const BitVector & ar2) {
+    Bits & operator^=(const Bits & ar2) {
       emp_assert(size() == ar2.size()); return XOR_SELF(ar2);
     }
 
     /// Compound operator for shift left...
-    BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    Bits & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
 
     /// Compound operator for shift right...
-    BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
+    Bits & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     // =========  Standard Library Compatability  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
@@ -854,9 +861,9 @@ namespace emp {
     [[nodiscard]] bool any() const { return Any(); }
     [[nodiscard]] bool none() const { return !Any(); }
     size_t count() const { return CountOnes(); }
-    BitVector & flip() { return Toggle(); }
-    BitVector & flip(size_t pos) { return Toggle(pos); }
-    BitVector & flip(size_t start, size_t end) { return Toggle(start, end); }
+    Bits & flip() { return Toggle(); }
+    Bits & flip(size_t pos) { return Toggle(pos); }
+    Bits & flip(size_t start, size_t end) { return Toggle(start, end); }
     void reset() { Clear(); }
     void reset(size_t id) { Set(id, false); }
     void set() { SetAll(); }
@@ -930,7 +937,7 @@ namespace emp {
     else {
       // If we're only using a portions of start field, mask it and setup.
       if (start_pos != 0) {
-        const size_t start_bits = data.FIELD_BITS - start_pos;  // How many bits in start field?
+        const size_t start_bits = FIELD_BITS - start_pos;       // How many bits in start field?
         const field_t mask = MaskField(start_bits, start_pos);  // Target start bits with a mask.
         field_t & target = data.bits[start_field];              // Isolate the field to change.
         target = (target & ~mask) | (fun(target) & mask);       // Update targeted bits!
@@ -962,9 +969,9 @@ namespace emp {
       return;
     }
 
-    const size_t field_shift = shift_size / data.FIELD_BITS;
-    const size_t bit_shift = shift_size % data.FIELD_BITS;
-    const size_t bit_overflow = data.FIELD_BITS - bit_shift;
+    const size_t field_shift = shift_size / FIELD_BITS;
+    const size_t bit_shift = shift_size % FIELD_BITS;
+    const size_t bit_overflow = FIELD_BITS - bit_shift;
 
     // Loop through each field, from L to R, and update it.
     if (field_shift) {
@@ -999,9 +1006,9 @@ namespace emp {
       return;
     }
 
-    const size_t field_shift = shift_size / data.FIELD_BITS;
-    const size_t bit_shift = shift_size % data.FIELD_BITS;
-    const size_t bit_overflow = data.FIELD_BITS - bit_shift;
+    const size_t field_shift = shift_size / FIELD_BITS;
+    const size_t bit_shift = shift_size % FIELD_BITS;
+    const size_t bit_overflow = FIELD_BITS - bit_shift;
     const size_t NUM_FIELDS = data.NumFields();
     const size_t field_shift2 = NUM_FIELDS - field_shift;
 
@@ -1010,7 +1017,7 @@ namespace emp {
       for (size_t i = 0; i < field_shift2; ++i) {
         data.bits[i] = data.bits[i + field_shift];
       }
-      for (size_t i = field_shift2; i < NUM_FIELDS; i++) data.bits[i] = data.FIELD_0;
+      for (size_t i = field_shift2; i < NUM_FIELDS; i++) data.bits[i] = FIELD_0;
     }
 
     // account for bit_shift
@@ -1040,7 +1047,7 @@ namespace emp {
 
       // Mask necessary to surpress shift count overflow warnings.
       c &= FIELD_LOG2_MASK;
-      n = (n<<c) | (n>>( (-(c+data.FIELD_BITS-GetSize())) & FIELD_LOG2_MASK ));
+      n = (n<<c) | (n>>( (-(c+FIELD_BITS-GetSize())) & FIELD_LOG2_MASK ));
     }
     else if (NUM_FIELDS < 32) {  // For few bits, shifting L/R and OR-ing is faster.
       this_t dup(*this);
@@ -1050,13 +1057,13 @@ namespace emp {
     }
     else {  // For more bits, manual rotating is faster
       // Note: we already modded shift_size by num_bits, so no need to mod by FIELD_SIZE
-      const size_t field_shift = ( shift_size + EndGap() ) / data.FIELD_BITS;
+      const size_t field_shift = ( shift_size + EndGap() ) / FIELD_BITS;
 
       // If we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
       // to account for the filler that gets pulled out of the middle
       const size_t field_gap = field_shift ? EndGap() : 0;
-      const size_t bit_shift = data.NumEndBits() && (shift_size + field_gap) % data.FIELD_BITS;
-      const size_t bit_overflow = data.FIELD_BITS - bit_shift;
+      const size_t bit_shift = data.NumEndBits() && (shift_size + field_gap) % FIELD_BITS;
+      const size_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
       auto field_span = FieldSpan();
@@ -1071,7 +1078,7 @@ namespace emp {
         const size_t filler_idx = (data.LastField() + field_shift) % NUM_FIELDS;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
           data.bits[i-1] |= data.bits[i] << data.NumEndBits();
-          data.bits[i] >>= (data.FIELD_BITS - data.NumEndBits());
+          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
         }
       }
 
@@ -1079,7 +1086,7 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = data.NumEndBits() ? (
-          (data.bits[data.LastField()] << (data.FIELD_BITS - data.NumEndBits()))
+          (data.bits[data.LastField()] << (FIELD_BITS - data.NumEndBits()))
           | (data.bits[NUM_FIELDS - 2] >> data.NumEndBits())
         ) : (
           data.bits[data.LastField()]
@@ -1129,9 +1136,9 @@ namespace emp {
     } else {
       // for many bits, manual rotating is faster
 
-      const field_t field_shift = (shift_size / data.FIELD_BITS) % NUM_FIELDS;
-      const size_t bit_shift = shift_size % data.FIELD_BITS;
-      const field_t bit_overflow = data.FIELD_BITS - bit_shift;
+      const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+      const size_t bit_shift = shift_size % FIELD_BITS;
+      const field_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
       auto field_span = FieldSpan();
@@ -1146,7 +1153,7 @@ namespace emp {
         const size_t filler_idx = data.LastField() - field_shift;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
           data.bits[i-1] |= data.bits[i] << data.NumEndBits();
-          data.bits[i] >>= (data.FIELD_BITS - data.NumEndBits());
+          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
         }
       }
 
@@ -1154,7 +1161,7 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = data.NumEndBits() ? (
-          data.bits[0] >> (data.FIELD_BITS - data.NumEndBits())
+          data.bits[0] >> (FIELD_BITS - data.NumEndBits())
         ) : (
           data.bits[0]
         );
@@ -1372,12 +1379,12 @@ namespace emp {
 
   /// Assign from a BitVector of a different size.
   // @CAO: Can manually copy to skip unused fields for a speedup.
-  BitVector & BitVector::Import(const BitVector & from_bv, const size_t from_bit) {
-    emp_assert(&from_bv != this);
-    emp_assert(from_bit < from_bv.GetSize());
+  BitVector & BitVector::Import(const BitVector & from_bits, const size_t from_bit) {
+    emp_assert(&from_bits != this);
+    emp_assert(from_bit < from_bits.GetSize());
 
     const size_t init_size = GetSize();
-    *this = from_bv;
+    *this = from_bits;
     *this >>= from_bit;
     Resize(init_size);
 
@@ -1830,7 +1837,7 @@ namespace emp {
   }
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
-  /// Count the number of ones in the BitVector.
+  /// Count the number of ones in Bits.
   size_t BitVector::CountOnes() const {
     if (num_bits == 0) return 0;
     const field_t NUM_FIELDS = NumFields();
@@ -1909,9 +1916,9 @@ namespace emp {
   }
 
   /// Return the position of the first one after start_pos; return -1 if no ones in vector.
-  /// You can loop through all 1-bit positions of a BitVector "bv" with:
+  /// You can loop through all 1-bit positions in "bits" with:
   ///
-  ///   for (int pos = bv.FindOne(); pos >= 0; pos = bv.FindOne(pos+1)) { ... }
+  ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
 
   int BitVector::FindOne(const size_t start_pos) const {
     if (start_pos >= num_bits) return -1;            // If we're past the end, return fail.
@@ -2106,56 +2113,56 @@ namespace emp {
   }
 
   /// Perform a Boolean AND with this BitVector, store result here, and return this object.
-  BitVector & BitVector::AND_SELF(const BitVector & bv2) {
+  BitVector & BitVector::AND_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & bv2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & bits2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean OR with this BitVector, store result here, and return this object.
-  BitVector & BitVector::OR_SELF(const BitVector & bv2) {
+  BitVector & BitVector::OR_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | bv2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | bits2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
-  BitVector & BitVector::NAND_SELF(const BitVector & bv2) {
+  BitVector & BitVector::NAND_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bv2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bits2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
-  BitVector & BitVector::NOR_SELF(const BitVector & bv2) {
+  BitVector & BitVector::NOR_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bv2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bits2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
-  BitVector & BitVector::XOR_SELF(const BitVector & bv2) {
+  BitVector & BitVector::XOR_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ bv2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ bits2.bits[i];
     return *this;
   }
 
   /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
-  BitVector & BitVector::EQU_SELF(const BitVector & bv2) {
+  BitVector & BitVector::EQU_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bv2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bits2.bits[i]);
     ClearExcessBits();
     return *this;
   }
 
   /// Positive shifts go left and negative go right (0 does nothing); return result.
   BitVector BitVector::SHIFT(const int shift_size) const {
-    BitVector out_bv(*this);
-    if (shift_size > 0) out_bv.ShiftRight((size_t) shift_size);
-    else if (shift_size < 0) out_bv.ShiftLeft((size_t) -shift_size);
-    return out_bv;
+    BitVector out_bits(*this);
+    if (shift_size > 0) out_bits.ShiftRight((size_t) shift_size);
+    else if (shift_size < 0) out_bits.ShiftLeft((size_t) -shift_size);
+    return out_bits;
   }
 
   /// Positive shifts go left and negative go right; store result here, and return this object.
@@ -2434,6 +2441,15 @@ namespace emp {
     return *this;
   }
 
+
+  // Setup all of the more specific Bits class types.
+  using BitVector = Bits<DYNAMIC_BITS, false, true>;
+  using BitString = Bits<DYNAMIC_BITS, false, false>;
+
+  template <size_t NUM_BITS> using BitArray        = Bits<NUM_BITS, true, true>;
+  template <size_t NUM_BITS> using BitSet          = Bits<NUM_BITS, true, false>;
+  template <size_t NUM_BITS> using StaticBitVector = Bits<NUM_BITS, false, true>;
+  template <size_t NUM_BITS> using StaticBitString = Bits<NUM_BITS, false, false>;
 }
 
 
@@ -2443,8 +2459,8 @@ namespace std {
   /// Hash function to allow BitVector to be used with maps and sets (must be in std).
   template <>
   struct hash<emp::BitVector> {
-    std::size_t operator()(const emp::BitVector & bv) const {
-      return bv.Hash();
+    std::size_t operator()(const emp::BitVector & bits) const {
+      return bits.Hash();
     }
   };
 }
