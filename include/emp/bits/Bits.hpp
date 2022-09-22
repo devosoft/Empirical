@@ -88,11 +88,12 @@ namespace emp {
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
 
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
       [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return reinterpret_cast<unsigned char>(bits);
+        return reinterpret_cast<unsigned char*>(bits);
       }
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return reinterpret_cast<const unsigned char>(bits);
+        return reinterpret_cast<const unsigned char*>(bits);
       }
     };
 
@@ -102,11 +103,12 @@ namespace emp {
 
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
       [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return bits.ReinterpretCast<unsigned char>();
+        return bits.ReinterpretCast<unsigned char*>();
       }
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return bits.ReinterpretCast<const unsigned char>();
+        return bits.ReinterpretCast<const unsigned char*>();
       }
     };
 
@@ -150,6 +152,10 @@ namespace emp {
     /// Generic assumes a specified capacity and a fixed size.
     template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
     struct Bits_Data : public Bits_Data_StaticMem<CAPACITY> {
+      using base_t = Bits_Data_StaticMem<CAPACITY>;
+      using field_t = bits_field_t;
+      using base_t::FIELD_BITS;      
+
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return CAPACITY; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
@@ -208,14 +214,15 @@ namespace emp {
   ///  @param ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false)
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   class Bits {
-    // All internal data (and base-level manipulators) for Bits.
-    internal::Bits_Data<CAPACITY, FIXED_SIZE, ZERO_LEFT> data;
-
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
     using field_t = bits_field_t;
+    using data_t = internal::Bits_Data<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
+
+    // All internal data (and base-level manipulators) for Bits.
+    data_t data;
 
     static constexpr size_t DEFAULT_SIZE = (FIXED_SIZE && CAPACITY != DYNAMIC_BITS) ? CAPACITY : 0;
-    static constexpr FIELD_BITS = data.FIELD_BITS;
+    static constexpr size_t FIELD_BITS = data_t::FIELD_BITS;
 
     // Number of bits needed to specify position in a field + mask
     static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
@@ -354,19 +361,21 @@ namespace emp {
     // =========  Accessors  ========= //
 
     /// How many bits do we currently have?
-    [[nodiscard]] size_t GetSize() const { return num_bits; }
+    [[nodiscard]] auto GetSize() const { return data.NumBits(); }
 
     /// How many bytes are in this Bits? (includes empty field space)
-    [[nodiscard]] size_t GetNumBytes() const { return NumBytes(); }
+    [[nodiscard]] auto GetNumBytes() const { return data.NumBytes(); }
 
     /// How many distinct values could be held in this Bits?
-    [[nodiscard]] double GetNumStates() const { return emp::Pow2(num_bits); }
+    [[nodiscard]] double GetNumStates() const { return emp::Pow2(data.NumBits()); }
 
     /// Retrieve the bit value from the specified index.
     [[nodiscard]] bool Get(size_t index) const;
 
     /// A safe version of Get() for indexing out of range. Useful for representing collections.
-    [[nodiscard]] bool Has(size_t index) const { return (index < num_bits) ? Get(index) : false; }
+    [[nodiscard]] bool Has(size_t index) const {
+      return (index < data.NumBits()) ? Get(index) : false;
+    }
 
     /// Update the bit value at the specified index.
     Bits & Set(size_t index, bool value=true);
@@ -426,27 +435,27 @@ namespace emp {
 
     /// Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
-    Bits & RandomizeP(Random & random, const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+    Bits & RandomizeP(Random & random, const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Set all bits randomly, with a given probability of being a one.
     Bits & Randomize(Random & random, const double p,
-                       const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+                       const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Set all bits randomly, with a given number of ones.
     Bits & ChooseRandom(Random & random, const size_t target_ones,
-                             const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+                             const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Flip random bits with a given probability.
     Bits & FlipRandom(Random & random, const double p,
-                           const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+                           const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Set random bits with a given probability (does not check if already set.)
     Bits & SetRandom(Random & random, const double p,
-                          const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+                          const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Unset random bits with a given probability (does not check if already zero.)
     Bits & ClearRandom(Random & random, const double p,
-                            const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+                            const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Flip a specified number of random bits.
     Bits & FlipRandomCount(Random & random, const size_t target_bits);
@@ -499,7 +508,9 @@ namespace emp {
     [[nodiscard]] double GetValue() const;
 
     /// Return a span with all fields in order.
-    std::span<field_t> FieldSpan() { return std::span<field_t>(bits.Raw(), data.NumFields()); }
+    std::span<field_t> FieldSpan() {
+      return std::span<field_t>(data.FieldPtr().Raw(), data.NumFields());
+    }
 
     /// Get specified type at a given index (in steps of that type size)
     template <typename T>
@@ -855,7 +866,7 @@ namespace emp {
     // =========  Standard Library Compatability  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
-    [[nodiscard]] size_t size() const { return num_bits; }
+    [[nodiscard]] size_t size() const { return data.NumBits(); }
     void resize(std::size_t new_size) { Resize(new_size); }
     [[nodiscard]] bool all() const { return All(); }
     [[nodiscard]] bool any() const { return Any(); }
@@ -906,7 +917,7 @@ namespace emp {
     move_bits.SHIFT_SELF(shift);                     // Put the moved bits in place.
     Clear(to, to_stop);                              // Make room for the moved bits.
     move_bits.Clear(0, to);                          // Clear everything BEFORE moved bits.
-    move_bits.Clear(to_stop, num_bits);              // Clear everything AFTER moved bits.
+    move_bits.Clear(to_stop, data.NumBits());        // Clear everything AFTER moved bits.
     OR_SELF(move_bits);                              // Merge bit strings together.
   }
 
@@ -915,8 +926,8 @@ namespace emp {
   Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> & Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::
     ApplyRange(const FUN_T & fun, size_t start, size_t stop)
   {
-    emp_assert(start <= stop, start, stop, num_bits); // Start cannot be after stop.
-    emp_assert(stop <= num_bits, stop, num_bits);     // Stop cannot be past the end of the bits
+    emp_assert(start <= stop, start, stop, data.NumBits());   // Start cannot be after stop.
+    emp_assert(stop <= data.NumBits(), stop, data.NumBits()); // Stop cannot be past the end of bits
 
     if (start == stop) return *this;  // Empty range.
 
@@ -929,7 +940,7 @@ namespace emp {
     if (start_field == stop_field) {
       const size_t apply_bits = stop - start;                  // How many bits to change?
       const field_t mask = MaskField(apply_bits, start_pos);   // Target change bits with a mask.
-      field_t & target = bits[start_field];                    // Isolate the field to change.
+      field_t & target = data.bits[start_field];               // Isolate the field to change.
       target = (target & ~mask) | (fun(target) & mask);        // Update targeted bits!
     }
 
@@ -946,7 +957,7 @@ namespace emp {
 
       // Middle fields
       for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-        bits[cur_field] = fun(data.bits[cur_field]);
+        data.bits[cur_field] = fun(data.bits[cur_field]);
       }
 
       // Set portions of stop field
@@ -1057,11 +1068,11 @@ namespace emp {
     }
     else {  // For more bits, manual rotating is faster
       // Note: we already modded shift_size by num_bits, so no need to mod by FIELD_SIZE
-      const size_t field_shift = ( shift_size + EndGap() ) / FIELD_BITS;
+      const size_t field_shift = ( shift_size + data.EndGap() ) / FIELD_BITS;
 
       // If we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
       // to account for the filler that gets pulled out of the middle
-      const size_t field_gap = field_shift ? EndGap() : 0;
+      const size_t field_gap = field_shift ? data.EndGap() : 0;
       const size_t bit_shift = data.NumEndBits() && (shift_size + field_gap) % FIELD_BITS;
       const size_t bit_overflow = FIELD_BITS - bit_shift;
 
@@ -1520,7 +1531,7 @@ namespace emp {
   template <Random::Prob P>
   BitVector & BitVector::RandomizeP(Random & random,
                                     const size_t start_pos, size_t stop_pos) {
-    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
@@ -1532,7 +1543,7 @@ namespace emp {
   /// Set all bits randomly, with a given probability of being on.
   BitVector & BitVector::Randomize(Random & random, const double p,
                                    const size_t start_pos, size_t stop_pos) {
-    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos, start_pos, stop_pos);
     emp_assert(stop_pos <= num_bits, stop_pos, num_bits);
@@ -1544,7 +1555,7 @@ namespace emp {
   /// Set all bits randomly, with a given number of them being on.
   BitVector & BitVector::ChooseRandom(Random & random, const size_t target_ones,
                                       const size_t start_pos, size_t stop_pos) {
-    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
@@ -1607,7 +1618,7 @@ namespace emp {
                                                   const size_t start_pos,
                                                   size_t stop_pos)
   {
-    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
@@ -1624,7 +1635,7 @@ namespace emp {
                       const size_t start_pos,
                       size_t stop_pos)
   {
-    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
@@ -1641,7 +1652,7 @@ namespace emp {
                       const size_t start_pos,
                       size_t stop_pos)
   {
-    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
