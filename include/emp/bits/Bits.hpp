@@ -58,6 +58,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
+#include "../base/error.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/hash_utils.hpp"
@@ -72,7 +73,13 @@
 namespace emp {
 
   using bits_field_t = size_t;  // size_t will be the natural field size for the machine
+
+  static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
   static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
+
+  size_t NumBitFields(size_t num_bits) noexcept {
+    return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
+  }
 
   namespace internal {
 
@@ -84,8 +91,8 @@ namespace emp {
     template <size_t CAPACITY>
     struct Bits_Data_StaticMem {
       using field_t = bits_field_t;
-      static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
-      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / FIELD_BITS));
+      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
+
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
 
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
@@ -95,6 +102,8 @@ namespace emp {
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
         return reinterpret_cast<const unsigned char*>(bits);
       }
+
+      Bits_Data_StaticMem() { }
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
@@ -110,6 +119,10 @@ namespace emp {
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
         return bits.ReinterpretCast<const unsigned char*>();
       }
+
+      Bits_Data_DynamicMem(size_t num_bits) {
+        if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
+      }
     };
 
     // ------------------------------------------------------------------------------------
@@ -121,21 +134,19 @@ namespace emp {
       size_t num_bits;           ///< Total number of bits are we using
 
       using field_t = bits_field_t;
-      static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
-
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] size_t NumEndBits() const noexcept { return num_bits & (FIELD_BITS - 1); }
+      [[nodiscard]] size_t NumEndBits() const noexcept { return num_bits & (NUM_FIELD_BITS - 1); }
 
       /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] size_t EndGap() const noexcept { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
+      [[nodiscard]] size_t EndGap() const noexcept { return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0; }
 
       /// A mask to cut off all of the final bits.
       [[nodiscard]] field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
 
       /// How many felids do we need for the current set of bits?
-      [[nodiscard]] size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+      [[nodiscard]] size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0; }
 
       /// What is the ID of the last occupied field?
       [[nodiscard]] size_t LastField() const noexcept { return NumFields() - 1; }
@@ -145,58 +156,88 @@ namespace emp {
 
       /// How many bytes are allocated? (rounded up!)
       [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+
+      Bits_Data_DynamicSize() : num_bits(0) { }
+      Bits_Data_DynamicSize(size_t in_size) : num_bits(in_size) { }
     };
 
-
-    /// Internal data for the Bits class to separate static vs. dynamic.
-    /// Generic assumes a specified capacity and a fixed size.
-    template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
-    struct Bits_Data : public Bits_Data_StaticMem<CAPACITY> {
-      using base_t = Bits_Data_StaticMem<CAPACITY>;
+    /// Size is stored here to work with, but not the actual bits.
+    template <size_t NUM_BITS>
+    struct Bits_Data_FixedSize {
       using field_t = bits_field_t;
-      using base_t::FIELD_BITS;      
 
-      [[nodiscard]] constexpr size_t NumBits() const noexcept { return CAPACITY; }
+      [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return CAPACITY & (FIELD_BITS - 1); }
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return NUM_BITS & (NUM_FIELD_BITS - 1); }
 
       /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (FIELD_BITS - NumEndBits()) % FIELD_BITS; }
+      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (NUM_FIELD_BITS - NumEndBits()) % NUM_FIELD_BITS; }
 
       /// A mask to cut off all of the final bits.
       [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
 
       /// How many felids do we need for the current set of bits?
-      [[nodiscard]] constexpr size_t NumFields() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) / FIELD_BITS)) : 0; }
+      [[nodiscard]] constexpr size_t NumFields() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) / NUM_FIELD_BITS)) : 0; }
 
       /// What is the ID of the last occupied field?
       [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
 
       /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return CAPACITY ? (1 + ((CAPACITY - 1) >> 3)) : 0; }
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) >> 3)) : 0; }
 
       /// How many bytes are allocated? (rounded up!)
       [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+
+      Bits_Data_FixedSize() { }
+      Bits_Data_FixedSize(size_t in_size) { emp_assert(in_size == NUM_BITS); }
+    };
+
+
+    /// Internal data for the Bits class to separate static vs. dynamic.
+    /// Generic assumes a specified capacity and a fixed size.
+    template <size_t CAPACITY, bool FIXED_SIZE>
+    struct Bits_Data : public Bits_Data_FixedSize<CAPACITY>, public Bits_Data_StaticMem<CAPACITY> {
+      using base_size_t = Bits_Data_FixedSize<CAPACITY>;
+      using base_mem_t = Bits_Data_StaticMem<CAPACITY>;
+
+      Bits_Data() : base_size_t(0), base_mem_t() { }
     };
 
 
     // Limited capacity, but NOT fixed size!
-    template <size_t CAPACITY, bool ZERO_LEFT>
-    struct Bits_Data<CAPACITY, false, ZERO_LEFT>
-    : public Bits_Data_DynamicSize, public Bits_Data_StaticMem<CAPACITY> {
+    template <size_t CAPACITY>
+    struct Bits_Data<CAPACITY, false>
+    : public Bits_Data_DynamicSize, public Bits_Data_StaticMem<CAPACITY>
+    {
+      using base_size_t = Bits_Data_DynamicSize;
+      using base_mem_t = Bits_Data_StaticMem<CAPACITY>;
+
+      Bits_Data() : base_size_t(0), base_mem_t() { }
     };
 
     // Dynamic capacity; not fixed size.
-    template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, false, ZERO_LEFT>
-    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem {
+    template <>
+    struct Bits_Data<DYNAMIC_BITS, false>
+    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem
+    {
+      using base_size_t = Bits_Data_DynamicSize;
+      using base_mem_t = Bits_Data_DynamicMem;
+
+      Bits_Data() : base_size_t(0), base_mem_t(0) { }
     };
 
     // Dynamic capacity; fixed size after construction.
-    template <bool ZERO_LEFT>
-    struct Bits_Data<DYNAMIC_BITS, true, ZERO_LEFT>
-    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem {
+    template <>
+    struct Bits_Data<DYNAMIC_BITS, true>
+    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem
+    {
+      using base_size_t = Bits_Data_DynamicSize;
+      using base_mem_t = Bits_Data_DynamicMem;
+
+      Bits_Data() : base_size_t(0), base_mem_t(0) {
+        emp_error("Building a constant-size bits object, but not initializing size.");
+      }
     };
   };
 
@@ -216,12 +257,11 @@ namespace emp {
   class Bits {
     using this_t = Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
     using field_t = bits_field_t;
-    using data_t = internal::Bits_Data<CAPACITY, FIXED_SIZE, ZERO_LEFT>;
+    using data_t = internal::Bits_Data<CAPACITY, FIXED_SIZE>;
 
     // All internal data (and base-level manipulators) for Bits.
     data_t data;
 
-    static constexpr size_t DEFAULT_SIZE = (FIXED_SIZE && CAPACITY != DYNAMIC_BITS) ? CAPACITY : 0;
     static constexpr size_t FIELD_BITS = data_t::FIELD_BITS;
 
     // Number of bits needed to specify position in a field + mask
@@ -285,8 +325,10 @@ namespace emp {
     void RotateRight(const size_t shift_size_raw);
 
   public:
+    Bits() { }
+
     /// Build a new Bits with specified bit count and initialization (default 0)
-    Bits(size_t in_num_bits=DEFAULT_SIZE, bool init_val=false);
+    Bits(size_t in_num_bits, bool init_val=false);
 
     // Prevent ambiguous conversions...
     /// Anything not otherwise defined for first argument, convert to size_t.
@@ -424,14 +466,14 @@ namespace emp {
     // @CAO: Can speed up by not duplicating the whole Bits.
     [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
-    /// Resize this Bits to have the specified number of bits.
+    /// Resize this Bits object to have the specified number of bits (if allowed)
     Bits & Resize(size_t new_bits);
 
 
     // =========  Randomization functions  ========= //
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
-    Bits &  Randomize(Random & random);
+    Bits & Randomize(Random & random);
 
     /// Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
@@ -439,23 +481,23 @@ namespace emp {
 
     /// Set all bits randomly, with a given probability of being a one.
     Bits & Randomize(Random & random, const double p,
-                       const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
+                     const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Set all bits randomly, with a given number of ones.
     Bits & ChooseRandom(Random & random, const size_t target_ones,
-                             const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
+                        const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Flip random bits with a given probability.
     Bits & FlipRandom(Random & random, const double p,
-                           const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
+                      const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Set random bits with a given probability (does not check if already set.)
     Bits & SetRandom(Random & random, const double p,
-                          const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
+                     const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Unset random bits with a given probability (does not check if already zero.)
     Bits & ClearRandom(Random & random, const double p,
-                            const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
+                       const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
     /// Flip a specified number of random bits.
     Bits & FlipRandomCount(Random & random, const size_t target_bits);
@@ -1206,14 +1248,13 @@ namespace emp {
 
   // ------------------- Implementations of Constructors and Assignments --------------------
 
-  /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
-  BitVector::BitVector(size_t in_num_bits, bool init_val) : num_bits(in_num_bits), bits(nullptr) {
-    if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
+  /// Build a new Bits with specified bit count (default 0) and initialization (default 0)
+  Bits::Bits(size_t in_num_bits, bool init_val) : data(in_num_bits) {
     if (init_val) SetAll(); else Clear();
   }
 
   /// Copy constructor of existing bit field.
-  BitVector::BitVector(const BitVector & in) : num_bits(in.num_bits), bits(nullptr) {
+  Bits::Bits(const Bits & in) : num_bits(in.num_bits), bits(nullptr) {
     emp_assert(in.OK());
 
     // There is only something to copy if there are a non-zero number of bits!
@@ -1227,16 +1268,16 @@ namespace emp {
   }
 
   /// Move constructor of existing bit field.
-  BitVector::BitVector(BitVector && in) : num_bits(in.num_bits), bits(in.bits) {
+  Bits::Bits(Bits && in) : num_bits(in.num_bits), bits(in.bits) {
     emp_assert(in.OK());
 
     in.bits = nullptr;
     in.num_bits = 0;
   }
 
-  /// Constructor to generate a BitVector from a std::bitset.
+  /// Constructor to generate a Bits from a std::bitset.
   template <size_t NUM_BITS>
-  BitVector::BitVector(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
+  Bits::Bits(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       Clear();
@@ -1244,8 +1285,8 @@ namespace emp {
     }
   }
 
-  /// Constructor to generate a BitVector from a string of '0's and '1's.
-  BitVector::BitVector(const std::string & bitstring) : num_bits(bitstring.size()), bits(nullptr) {
+  /// Constructor to generate a Bits from a string of '0's and '1's.
+  Bits::Bits(const std::string & bitstring) : num_bits(bitstring.size()), bits(nullptr) {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       Clear();
@@ -1255,8 +1296,8 @@ namespace emp {
     }
   }
 
-  /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
-  BitVector::BitVector(size_t in_num_bits, Random & random)
+  /// Constructor to generate a random Bits (with equal prob of 0 or 1).
+  Bits::Bits(size_t in_num_bits, Random & random)
   : num_bits(in_num_bits), bits(nullptr)
   {
     if (num_bits) {
@@ -1266,8 +1307,8 @@ namespace emp {
     }
   }
 
-  /// Constructor to generate a random BitVector with provided prob of 1's.
-  BitVector::BitVector(size_t in_num_bits, Random & random, const double p1)
+  /// Constructor to generate a random Bits with provided prob of 1's.
+  Bits::Bits(size_t in_num_bits, Random & random, const double p1)
   : num_bits(in_num_bits), bits(nullptr)
   {
     if (num_bits) {
@@ -1277,8 +1318,8 @@ namespace emp {
     }
   }
 
-  /// Constructor to generate a random BitVector with provided number of 1's.
-  BitVector::BitVector(size_t in_num_bits, Random & random, const size_t target_ones)
+  /// Constructor to generate a random Bits with provided number of 1's.
+  Bits::Bits(size_t in_num_bits, Random & random, const size_t target_ones)
   : num_bits(in_num_bits), bits(nullptr)
   {
     if (num_bits) {
@@ -1290,7 +1331,7 @@ namespace emp {
 
   /// Initializer list constructor.
   template <typename T>
-  BitVector::BitVector(const std::initializer_list<T> l) : num_bits(l.size()), bits(nullptr) {
+  Bits::Bits(const std::initializer_list<T> l) : num_bits(l.size()), bits(nullptr) {
     if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
 
     size_t idx = 0;
@@ -1299,12 +1340,12 @@ namespace emp {
   }
 
   /// Copy, but with a resize.
-  BitVector::BitVector(const BitVector & in, size_t new_size) : BitVector(in) {
+  Bits::Bits(const Bits & in, size_t new_size) : Bits(in) {
     if (num_bits != new_size) Resize(new_size);
   }
 
   /// Destructor
-  BitVector::~BitVector() {
+  Bits::~Bits() {
     if (bits) {        // A move constructor can make bits == nullptr
       bits.DeleteArray();
       bits = nullptr;
@@ -1312,7 +1353,7 @@ namespace emp {
   }
 
   /// Assignment operator.
-  BitVector & BitVector::operator=(const BitVector & in) & {
+  Bits & Bits::operator=(const Bits & in) & {
     emp_assert(in.OK());
 
     if (&in == this) return *this;
@@ -1332,7 +1373,7 @@ namespace emp {
   }
 
   /// Move operator.
-  BitVector & BitVector::operator=(BitVector && in) & {
+  Bits & Bits::operator=(Bits && in) & {
     emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
     if (bits) bits.DeleteArray();   // If we already have bits, get rid of them.
     num_bits = in.num_bits;         // Update the number of bits...
@@ -1345,7 +1386,7 @@ namespace emp {
 
   /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS>
-  BitVector & BitVector::operator=(const std::bitset<NUM_BITS> & bitset) & {
+  Bits & Bits::operator=(const std::bitset<NUM_BITS> & bitset) & {
     const size_t start_fields = NumFields();
     num_bits = NUM_BITS;
     const size_t new_fields = NumFields();
@@ -1364,7 +1405,7 @@ namespace emp {
   }
 
   /// Assignment operator from a string of '0's and '1's.
-  BitVector & BitVector::operator=(const std::string & bitstring) & {
+  Bits & Bits::operator=(const std::string & bitstring) & {
     const size_t start_fields = NumFields();
     num_bits = bitstring.size();
     const size_t new_fields = NumFields();
