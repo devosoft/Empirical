@@ -202,6 +202,7 @@ namespace emp {
       using base_mem_t = Bits_Data_StaticMem<CAPACITY>;
 
       Bits_Data() : base_size_t(0), base_mem_t() { }
+      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t() { }
     };
 
 
@@ -214,6 +215,7 @@ namespace emp {
       using base_mem_t = Bits_Data_StaticMem<CAPACITY>;
 
       Bits_Data() : base_size_t(0), base_mem_t() { }
+      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t() { }
     };
 
     // Dynamic capacity; not fixed size.
@@ -225,6 +227,7 @@ namespace emp {
       using base_mem_t = Bits_Data_DynamicMem;
 
       Bits_Data() : base_size_t(0), base_mem_t(0) { }
+      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
     };
 
     // Dynamic capacity; fixed size after construction.
@@ -238,6 +241,7 @@ namespace emp {
       Bits_Data() : base_size_t(0), base_mem_t(0) {
         emp_error("Building a constant-size bits object, but not initializing size.");
       }
+      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
     };
   };
 
@@ -292,10 +296,16 @@ namespace emp {
 
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
-    void RawCopy(const Ptr<field_t> from);
+    void RawCopy(const Ptr<field_t> from, size_t copy_fields=emp::MAX_SIZE_T);
+
+    // Shortcut for RawCopy if we are copying a whole other Bits object.
+    template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+    void RawCopy(const Bits<CAPACITY2, FIXED_SIZE2, ZERO_LEFT2> & in_bits) {
+      RawCopy(in_bits.data.FieldPtr(), in_bits.data.NumFields());
+    }
 
     // Copy bits from one position in the genome to another; leave old positions unchanged.
-    void RawCopy(const size_t from_start, const size_t from_stop, const size_t to);
+    void RawMove(const size_t from_start, const size_t from_stop, const size_t to);
 
     // Convert the bits to bytes (note that bits are NOT in order at the byte level!)
     [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return data.BytePtr(); }
@@ -340,7 +350,7 @@ namespace emp {
     Bits(const Bits<CAPACITY2, FIXED_SIZE2, ZERO_LEFT2> & in);
 
     /// Move constructor of existing bit field.
-    Bits(this_t && in);
+    Bits(this_t && in) = default;
 
     /// Constructor to generate a Bits from a std::bitset.
     template <size_t NUM_BITS>
@@ -369,13 +379,15 @@ namespace emp {
     template <typename T> Bits(const std::initializer_list<T> l);
 
     /// Copy, but with a resize.
-    Bits(const Bits & in, size_t new_size);
+    template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+    Bits(const Bits<CAPACITY2, FIXED_SIZE2, ZERO_LEFT2> & in, size_t new_size);
 
     /// Destructor
-    ~Bits();
+    ~Bits() = default;
 
     /// Assignment operator.
-    Bits & operator=(const Bits & in) &;
+    template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+    Bits & operator=(const Bits<CAPACITY2, FIXED_SIZE2, ZERO_LEFT2> & in) &;
 
     /// Move operator.
     Bits & operator=(Bits && in) &;
@@ -930,9 +942,13 @@ namespace emp {
 
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::
-    RawCopy(const Ptr<bits_field_t> from)
+    RawCopy(const Ptr<bits_field_t> from, size_t num_fields)
   {
-    const size_t num_fields = data.NumFields();
+    // If num_fields was not specified, set it to the max number of fields.
+    if (num_fields == emp::SIZE_T_MAX) num_fields = data.NumFields();
+
+    emp_assert(num_fields <= data.NumFields(), "Trying to RawCopy() more fields than can fit.");
+
     for (size_t i = 0; i < num_fields; i++) data.bits[i] = from[i];
   }
 
@@ -941,7 +957,7 @@ namespace emp {
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   void Bits<CAPACITY, FIXED_SIZE, ZERO_LEFT>::
-    RawCopy(const size_t from_start, const size_t from_stop, const size_t to)
+    RawMove(const size_t from_start, const size_t from_stop, const size_t to)
   {
     emp_assert(from_start <= from_stop);             // Must move legal region.
     emp_assert(from_stop <= data.NumBits());         // Cannot move from past end.
@@ -1249,144 +1265,137 @@ namespace emp {
   // ------------------- Implementations of Constructors and Assignments --------------------
 
   /// Build a new Bits with specified bit count (default 0) and initialization (default 0)
-  Bits::Bits(size_t in_num_bits, bool init_val) : data(in_num_bits) {
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, bool init_val) : data(in_num_bits) {
     if (init_val) SetAll(); else Clear();
   }
 
   /// Copy constructor of existing bit field.
-  Bits::Bits(const Bits & in) : num_bits(in.num_bits), bits(nullptr) {
+  template <size_t CAPACITY,  bool FIXED_SIZE,  bool ZERO_LEFT>
+  template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(const Bits<CAPACITY2,FIXED_SIZE2,ZERO_LEFT2> & in)
+    : data(in.GetSize())
+  {
     emp_assert(in.OK());
-
-    // There is only something to copy if there are a non-zero number of bits!
-    if (num_bits) {
-      #ifdef EMP_TRACK_MEM
-      emp_assert(!in.bits.IsNull() && in.bits.DebugIsArray(), in.bits.IsNull(), in.bits.DebugIsArray());
-      #endif
-      bits = NewArrayPtr<field_t>(NumFields());
-      RawCopy(in.bits);
-    }
+    RawCopy(in);
   }
 
-  /// Move constructor of existing bit field.
-  Bits::Bits(Bits && in) : num_bits(in.num_bits), bits(in.bits) {
-    emp_assert(in.OK());
-
-    in.bits = nullptr;
-    in.num_bits = 0;
-  }
+  // -- Move constructor in class; set to default --
 
   /// Constructor to generate a Bits from a std::bitset.
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   template <size_t NUM_BITS>
-  Bits::Bits(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
-    if (num_bits) {
-      bits = NewArrayPtr<field_t>(NumFields());
-      Clear();
-      for (size_t i = 0; i < NUM_BITS; i++) if (bitset[i]) Set(i);
-    }
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(const std::bitset<NUM_BITS> & bitset)
+    : data(NUM_BITS)
+  {
+    // Copy over the values.
+    for (size_t i = 0; i < NUM_BITS; ++i) Set(i, bitset[i]);
   }
 
   /// Constructor to generate a Bits from a string of '0's and '1's.
-  Bits::Bits(const std::string & bitstring) : num_bits(bitstring.size()), bits(nullptr) {
-    if (num_bits) {
-      bits = NewArrayPtr<field_t>(NumFields());
-      Clear();
-      for (size_t i = 0; i < num_bits; i++) {
-        if (bitstring[i] != '0') Set(i);
-      }
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(const std::string & bitstring)
+    : data(bitstring.size())
+  {
+    Clear();
+    for (size_t i = 0; i < num_bits; i++) {
+      if (bitstring[i] != '0') Set(i);
     }
-  }
+}
 
   /// Constructor to generate a random Bits (with equal prob of 0 or 1).
-  Bits::Bits(size_t in_num_bits, Random & random)
-  : num_bits(in_num_bits), bits(nullptr)
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random)
+    : data(in_num_bits)
   {
-    if (num_bits) {
-      bits = NewArrayPtr<field_t>(NumFields());
-      Clear();
-      Randomize(random);
-    }
+    Clear();
+    Randomize(random);
   }
 
   /// Constructor to generate a random Bits with provided prob of 1's.
-  Bits::Bits(size_t in_num_bits, Random & random, const double p1)
-  : num_bits(in_num_bits), bits(nullptr)
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const double p1)
+    : data(in_num_bits)
   {
-    if (num_bits) {
-      bits = NewArrayPtr<field_t>(NumFields());
-      Clear();
-      Randomize(random, p1);
-    }
+    Clear();
+    Randomize(random, p1);
   }
 
   /// Constructor to generate a random Bits with provided number of 1's.
-  Bits::Bits(size_t in_num_bits, Random & random, const size_t target_ones)
-  : num_bits(in_num_bits), bits(nullptr)
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const size_t target_ones)
+    : data(in_num_bits)
   {
-    if (num_bits) {
-      bits = NewArrayPtr<field_t>(NumFields());
-      Clear();
-      ChooseRandom(random, target_ones);
-    }
+    Clear();
+    ChooseRandom(random, target_ones);
   }
 
   /// Initializer list constructor.
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   template <typename T>
-  Bits::Bits(const std::initializer_list<T> l) : num_bits(l.size()), bits(nullptr) {
-    if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
-
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(const std::initializer_list<T> l)
+    : data(l.size())
+  {
     size_t idx = 0;
     for (auto i = std::begin(l); i != std::end(l); ++i) Set(idx++, *i);
     ClearExcessBits();
   }
 
   /// Copy, but with a resize.
-  Bits::Bits(const Bits & in, size_t new_size) : Bits(in) {
-    if (num_bits != new_size) Resize(new_size);
-  }
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::
+  Bits(const Bits<CAPACITY2,FIXED_SIZE2,ZERO_LEFT2> & in, size_t new_size)
+    : Bits(new_size)
+  {
+    emp_assert(in.OK());
 
-  /// Destructor
-  Bits::~Bits() {
-    if (bits) {        // A move constructor can make bits == nullptr
-      bits.DeleteArray();
-      bits = nullptr;
-    }
+    // How many fields do we need to copy?
+    size_t copy_fields = std::min(data.NumFields(), in.data.NumFields());
+
+    RawCopy(in.data.FieldPtr(), copy_fields);
   }
 
   /// Assignment operator.
-  Bits & Bits::operator=(const Bits & in) & {
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  template <size_t CAPACITY2, bool FIXED_SIZE2, bool ZERO_LEFT2>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> &
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::operator=(const Bits<CAPACITY2,FIXED_SIZE2,ZERO_LEFT2> & in) &
+  {
     emp_assert(in.OK());
 
-    if (&in == this) return *this;
-    const size_t in_num_fields = in.NumFields();
-    const size_t prev_num_fields = NumFields();
-    num_bits = in.num_bits;
+    if (&in == this) return *this; // Trying to set this object to itself.
 
-    if (in_num_fields != prev_num_fields) {
-      if (bits) bits.DeleteArray();
-      if (num_bits) bits = NewArrayPtr<field_t>(in_num_fields);
-      else bits = nullptr;
-    }
-
-    if (num_bits) RawCopy(in.bits);
+    Resize(in.GetSize());
+    RawCopy(in);
 
     return *this;
   }
 
   /// Move operator.
-  Bits & Bits::operator=(Bits && in) & {
-    emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
-    if (bits) bits.DeleteArray();   // If we already have bits, get rid of them.
-    num_bits = in.num_bits;         // Update the number of bits...
-    bits = in.bits;                 // And steal the old memory for what those bits are.
-    in.bits = nullptr;              // Prepare in for deletion without deallocating.
-    in.num_bits = 0;
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> &
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::operator=(Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> && in) &
+  {
+    emp_assert(&in != this);        // Shouldn't be possible in an r-value
+    data = std::move(in.data);      // Shift move into data objects.
+    // if (bits) bits.DeleteArray();   // If we already have bits, get rid of them.
+    // num_bits = in.num_bits;         // Update the number of bits...
+    // bits = in.bits;                 // And steal the old memory for what those bits are.
+    // in.bits = nullptr;              // Prepare in for deletion without deallocating.
+    // in.num_bits = 0;
 
     return *this;
   }
 
+  ///////////// @CAO CONTINUE HERE
+
   /// Assignment operator from a std::bitset.
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
   template <size_t NUM_BITS>
-  Bits & Bits::operator=(const std::bitset<NUM_BITS> & bitset) & {
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> &
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) &
+  {
     const size_t start_fields = NumFields();
     num_bits = NUM_BITS;
     const size_t new_fields = NumFields();
@@ -1405,7 +1414,10 @@ namespace emp {
   }
 
   /// Assignment operator from a string of '0's and '1's.
-  Bits & Bits::operator=(const std::string & bitstring) & {
+  template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT> &
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::operator=(const std::string & bitstring) &
+  {
     const size_t start_fields = NumFields();
     num_bits = bitstring.size();
     const size_t new_fields = NumFields();
@@ -1954,7 +1966,7 @@ namespace emp {
   /// @param num number of bits to delete, default 1.
   void BitVector::Delete(const size_t index, const size_t num) {
     emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
-    RawCopy(index+num, num_bits, index);  // Shift positions AFTER delete into place.
+    RawMove(index+num, num_bits, index);  // Shift positions AFTER delete into place.
     Resize(num_bits - num);               // Crop off end bits.
   }
 
