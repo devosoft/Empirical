@@ -89,8 +89,9 @@ namespace emp {
 
     /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
     template <size_t CAPACITY>
-    struct Bits_Data_StaticMem {
+    struct Bits_Data_Mem {
       using field_t = bits_field_t;
+      static constexpr bool movable = false;
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
 
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
@@ -103,12 +104,14 @@ namespace emp {
         return reinterpret_cast<const unsigned char*>(bits);
       }
 
-      Bits_Data_StaticMem() { }
+      Bits_Data_Mem([[maybe_unused]] size_t num_bits) { emp_assert(num_bits <= CAPACITY); }
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    struct Bits_Data_DynamicMem {
+    template <>
+    struct Bits_Data_Mem<DYNAMIC_BITS> {
       using field_t = bits_field_t;
+      static constexpr bool movable = true;
 
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
@@ -120,18 +123,54 @@ namespace emp {
         return bits.ReinterpretCast<const unsigned char*>();
       }
 
-      Bits_Data_DynamicMem(size_t num_bits) {
+      Bits_Data_Mem(size_t num_bits) : bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
+      ~Bits_Data_Mem() { bits.DeleteArray(); }
     };
 
     // ------------------------------------------------------------------------------------
     //  CURRENT SIZE TRACKING
     // ------------------------------------------------------------------------------------
 
-    /// Size is stored here to work with, but not the actual bits.
-    struct Bits_Data_DynamicSize {
+    /// Track the size.  If a non-dynamic value is provided, lock in that size.
+    template <size_t NUM_BITS>
+    struct Bits_Data_Size {
+      using field_t = bits_field_t;
+      static constexpr size_t DEFAULT_SIZE = NUM_BITS;
+
+      [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
+
+      /// Number of bits used in partial field at the end; 0 if perfect fit.
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return NUM_BITS & (NUM_FIELD_BITS - 1); }
+
+      /// How many EXTRA bits are leftover in the gap at the end?
+      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (NUM_FIELD_BITS - NumEndBits()) % NUM_FIELD_BITS; }
+
+      /// A mask to cut off all of the final bits.
+      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+
+      /// How many felids do we need for the current set of bits?
+      [[nodiscard]] constexpr size_t NumFields() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) / NUM_FIELD_BITS)) : 0; }
+
+      /// What is the ID of the last occupied field?
+      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
+
+      /// How many bytes are used for the current set of bits? (rounded up!)
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) >> 3)) : 0; }
+
+      /// How many bytes are allocated? (rounded up!)
+      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+
+      Bits_Data_Size(size_t in_size) { emp_assert(in_size == NUM_BITS); }
+    };
+
+
+    /// Dynamic size is stored here to work with, but not the actual bits.
+    template <>
+    struct Bits_Data_Size<DYNAMIC_BITS> {
       size_t num_bits;           ///< Total number of bits are we using
+      static constexpr size_t DEFAULT_SIZE = 0;
 
       using field_t = bits_field_t;
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
@@ -157,93 +196,28 @@ namespace emp {
       /// How many bytes are allocated? (rounded up!)
       [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
-      Bits_Data_DynamicSize() : num_bits(0) { }
-      Bits_Data_DynamicSize(size_t in_size) : num_bits(in_size) { }
-    };
-
-    /// Size is stored here to work with, but not the actual bits.
-    template <size_t NUM_BITS>
-    struct Bits_Data_FixedSize {
-      using field_t = bits_field_t;
-
-      [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
-
-      /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return NUM_BITS & (NUM_FIELD_BITS - 1); }
-
-      /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (NUM_FIELD_BITS - NumEndBits()) % NUM_FIELD_BITS; }
-
-      /// A mask to cut off all of the final bits.
-      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
-
-      /// How many felids do we need for the current set of bits?
-      [[nodiscard]] constexpr size_t NumFields() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) / NUM_FIELD_BITS)) : 0; }
-
-      /// What is the ID of the last occupied field?
-      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
-
-      /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) >> 3)) : 0; }
-
-      /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
-
-      Bits_Data_FixedSize() { }
-      Bits_Data_FixedSize(size_t in_size) { emp_assert(in_size == NUM_BITS); }
+      Bits_Data_Size(size_t in_size) : num_bits(in_size) { }
     };
 
 
     /// Internal data for the Bits class to separate static vs. dynamic.
     /// Generic assumes a specified capacity and a fixed size.
     template <size_t CAPACITY, bool FIXED_SIZE>
-    struct Bits_Data : public Bits_Data_FixedSize<CAPACITY>, public Bits_Data_StaticMem<CAPACITY> {
-      using base_size_t = Bits_Data_FixedSize<CAPACITY>;
-      using base_mem_t = Bits_Data_StaticMem<CAPACITY>;
-
-      Bits_Data() : base_size_t(0), base_mem_t() { }
-      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t() { }
-    };
-
-
-    // Limited capacity, but NOT fixed size!
-    template <size_t CAPACITY>
-    struct Bits_Data<CAPACITY, false>
-    : public Bits_Data_DynamicSize, public Bits_Data_StaticMem<CAPACITY>
+    struct Bits_Data
+      : public Bits_Data_Size<FIXED_SIZE ? CAPACITY : DYNAMIC_BITS>,
+        public Bits_Data_Mem<CAPACITY>
     {
-      using base_size_t = Bits_Data_DynamicSize;
-      using base_mem_t = Bits_Data_StaticMem<CAPACITY>;
+      static constexpr size_t CT_SIZE = FIXED_SIZE ? CAPACITY : DYNAMIC_BITS;
+      using base_size_t = Bits_Data_Size<CT_SIZE>;
+      using base_mem_t = Bits_Data_Mem<CAPACITY>;
 
-      Bits_Data() : base_size_t(0), base_mem_t() { }
-      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t() { }
-    };
-
-    // Dynamic capacity; not fixed size.
-    template <>
-    struct Bits_Data<DYNAMIC_BITS, false>
-    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem
-    {
-      using base_size_t = Bits_Data_DynamicSize;
-      using base_mem_t = Bits_Data_DynamicMem;
-
-      Bits_Data() : base_size_t(0), base_mem_t(0) { }
-      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
-    };
-
-    // Dynamic capacity; fixed size after construction.
-    template <>
-    struct Bits_Data<DYNAMIC_BITS, true>
-    : public Bits_Data_DynamicSize, public Bits_Data_DynamicMem
-    {
-      using base_size_t = Bits_Data_DynamicSize;
-      using base_mem_t = Bits_Data_DynamicMem;
-
-      Bits_Data() : base_size_t(0), base_mem_t(0) {
-        emp_error("Building a constant-size bits object, but not initializing size.");
+      Bits_Data() : base_size_t(base_size_t::DEFAULT_SIZE), base_mem_t(base_size_t::DEFAULT_SIZE) {
+        // Default constructor not viable if fixed size AND size must be user specified.
+        emp_assert(FIXED_SIZE == false || CAPACITY != DYNAMIC_BITS);
       }
       Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
     };
-  };
+
 
   //****************************************************************************
   //****************************************************************************
@@ -945,7 +919,7 @@ namespace emp {
     RawCopy(const Ptr<bits_field_t> from, size_t num_fields)
   {
     // If num_fields was not specified, set it to the max number of fields.
-    if (num_fields == emp::SIZE_T_MAX) num_fields = data.NumFields();
+    if (num_fields == emp::MAX_SIZE_T) num_fields = data.NumFields();
 
     emp_assert(num_fields <= data.NumFields(), "Trying to RawCopy() more fields than can fit.");
 
