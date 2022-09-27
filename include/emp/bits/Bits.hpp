@@ -91,7 +91,7 @@ namespace emp {
     template <size_t CAPACITY>
     struct Bits_Data_Mem {
       using field_t = bits_field_t;
-      static constexpr bool movable = false;
+      static constexpr bool dynamic_mem = false;
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
 
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
@@ -105,13 +105,15 @@ namespace emp {
       }
 
       Bits_Data_Mem([[maybe_unused]] size_t num_bits) { emp_assert(num_bits <= CAPACITY); }
+      Bits_Data_Mem(const Bits_Data_Mem &) = default;
+      Bits_Data_Mem(Bits_Data_Mem &&) = default;
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
     template <>
     struct Bits_Data_Mem<DYNAMIC_BITS> {
       using field_t = bits_field_t;
-      static constexpr bool movable = true;
+      static constexpr bool dynamic_mem = true;
 
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
@@ -126,6 +128,8 @@ namespace emp {
       Bits_Data_Mem(size_t num_bits) : bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
+      Bits_Data_Mem(const Bits_Data_Mem &) { /* don't know size; handle in base class */ };
+      Bits_Data_Mem(Bits_Data_Mem && in) { bits = in.bits; in.bits = nullptr; }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
     };
 
@@ -163,6 +167,7 @@ namespace emp {
       [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
       Bits_Data_Size(size_t in_size) { emp_assert(in_size == NUM_BITS); }
+      Bits_Data_Size(const Bits_Data_Size &) = default;
     };
 
 
@@ -197,6 +202,7 @@ namespace emp {
       [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
       Bits_Data_Size(size_t in_size) : num_bits(in_size) { }
+      Bits_Data_Size(const Bits_Data_Size &) = default;
     };
 
 
@@ -208,14 +214,30 @@ namespace emp {
         public Bits_Data_Mem<CAPACITY>
     {
       static constexpr size_t CT_SIZE = FIXED_SIZE ? CAPACITY : DYNAMIC_BITS;
+      using field_t = bits_field_t;
       using base_size_t = Bits_Data_Size<CT_SIZE>;
+      using base_size_t::NumBits;
+
       using base_mem_t = Bits_Data_Mem<CAPACITY>;
+      using base_mem_t::bits;
+      using base_mem_t::dynamic_mem;
 
       Bits_Data() : base_size_t(base_size_t::DEFAULT_SIZE), base_mem_t(base_size_t::DEFAULT_SIZE) {
         // Default constructor not viable if fixed size AND size must be user specified.
         emp_assert(FIXED_SIZE == false || CAPACITY != DYNAMIC_BITS);
       }
       Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
+      Bits_Data(const Bits_Data & in) : base_size_t(in.NumBits()), base_mem_t(in) {
+        if constexpr (dynamic_mem) {
+          if (NumBits()) {
+            size_t num_fields = NumBitFields(NumBits());
+            bits = NewArrayPtr<field_t>(num_fields);
+            for (size_t i = 0; i < num_fields; ++i) bits[i] = in.bits[i];
+          }
+          else bits = nullptr;
+        }
+      }
+      Bits_Data(Bits_Data && in) : base_size_t(in), base_mem_t(in) { }
     };
 
 
@@ -1272,7 +1294,7 @@ namespace emp {
     : data(bitstring.size())
   {
     Clear();
-    for (size_t i = 0; i < num_bits; i++) {
+    for (size_t i = 0; i < bitstring.size(); i++) {
       if (bitstring[i] != '0') Set(i);
     }
 }
