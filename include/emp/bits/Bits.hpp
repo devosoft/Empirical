@@ -75,11 +75,16 @@ namespace emp {
   using bits_field_t = size_t;  // size_t will be the natural field size for the machine
 
   static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
-  static constexpr size_t DYNAMIC_BITS = MAX_SIZE_T;
 
   size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
+
+  // BitSize specifies how a Bits object can change the number of bits in itself.
+  //  FIXED is locked at the base size an cannot change and is stored in static memory.
+  //  CAPPED must be the base size or lower, but requires size tracking.
+  //  DYNAMIC defaults to base size, but can be changed; requires indirect memory and allocation.
+  enum class BitSize { FIXED, CAPPED, DYNAMIC };
 
   namespace internal {
 
@@ -88,7 +93,7 @@ namespace emp {
     // ------------------------------------------------------------------------------------
 
     /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
-    template <size_t CAPACITY>
+    template <size_t CAPACITY, BitSize SIZE_MODE>
     struct Bits_Data_Mem {
       using field_t = bits_field_t;
       static constexpr bool dynamic_mem = false;
@@ -104,14 +109,15 @@ namespace emp {
         return reinterpret_cast<const unsigned char*>(bits);
       }
 
+      Bits_Data_Mem() = default;
       Bits_Data_Mem([[maybe_unused]] size_t num_bits) { emp_assert(num_bits <= CAPACITY); }
       Bits_Data_Mem(const Bits_Data_Mem &) = default;
       Bits_Data_Mem(Bits_Data_Mem &&) = default;
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    template <>
-    struct Bits_Data_Mem<DYNAMIC_BITS> {
+    template <size_t DEFAULT_SIZE>
+    struct Bits_Data_Mem<DEFAULT_SIZE, BitSize::DYNAMIC> {
       using field_t = bits_field_t;
       static constexpr bool dynamic_mem = true;
 
@@ -125,7 +131,7 @@ namespace emp {
         return bits.ReinterpretCast<const unsigned char*>();
       }
 
-      Bits_Data_Mem(size_t num_bits) : bits(nullptr) {
+      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
       Bits_Data_Mem(const Bits_Data_Mem &) { /* don't know size; handle in base class */ };
@@ -967,7 +973,7 @@ namespace emp {
 
     const size_t to_stop = to + move_size;           // Where is the end to move it to?
     const int shift = (int) from_start - (int) to;   // How far will the moved piece shift?
-    this_t move_bits(*this);                      // Vector to hold moved bits.
+    this_t move_bits(*this);                         // Place to hold moved bits.
     move_bits.SHIFT_SELF(shift);                     // Put the moved bits in place.
     Clear(to, to_stop);                              // Make room for the moved bits.
     move_bits.Clear(0, to);                          // Clear everything BEFORE moved bits.
@@ -1260,9 +1266,9 @@ namespace emp {
 
   // ------------------- Implementations of Constructors and Assignments --------------------
 
-  /// Build a new Bits with specified bit count (default 0) and initialization (default 0)
+  /// Build a new Bits object with specified bit count and initialization (default 0)
   template <size_t CAPACITY, bool FIXED_SIZE, bool ZERO_LEFT>
-  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, bool init_val) : data(in_num_bits) {
+  Bits<CAPACITY,FIXED_SIZE,ZERO_LEFT>::Bits(size_t _num_bits, bool init_val) : data(_num_bits) {
     if (init_val) SetAll(); else Clear();
   }
 
