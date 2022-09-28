@@ -143,9 +143,42 @@ namespace emp {
     //  CURRENT SIZE TRACKING
     // ------------------------------------------------------------------------------------
 
-    /// Track the size.  If a non-dynamic value is provided, lock in that size.
-    template <size_t NUM_BITS>
+    /// Dynamic size is stored here to work with, but not the actual bits.
+    template <size_t DEFAULT_SIZE, BitSize SIZE_MODE>
     struct Bits_Data_Size {
+      size_t num_bits;           ///< Total number of bits are we using
+
+      using field_t = bits_field_t;
+      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
+
+      /// Number of bits used in partial field at the end; 0 if perfect fit.
+      [[nodiscard]] size_t NumEndBits() const noexcept { return num_bits & (NUM_FIELD_BITS - 1); }
+
+      /// How many EXTRA bits are leftover in the gap at the end?
+      [[nodiscard]] size_t EndGap() const noexcept { return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0; }
+
+      /// A mask to cut off all of the final bits.
+      [[nodiscard]] field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+
+      /// How many felids do we need for the current set of bits?
+      [[nodiscard]] size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0; }
+
+      /// What is the ID of the last occupied field?
+      [[nodiscard]] size_t LastField() const noexcept { return NumFields() - 1; }
+
+      /// How many bytes are used for the current set of bits? (rounded up!)
+      [[nodiscard]] size_t NumBytes() const noexcept { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+
+      /// How many bytes are allocated? (rounded up!)
+      [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+
+      Bits_Data_Size(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
+      Bits_Data_Size(const Bits_Data_Size &) = default;
+    };
+
+    /// If we have a fixed number of bits, we know size at compile time.
+    template <size_t NUM_BITS>
+    struct Bits_Data_Size<NUM_BITS, BitSize::FIXED> {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
@@ -172,42 +205,7 @@ namespace emp {
       /// How many bytes are allocated? (rounded up!)
       [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
-      Bits_Data_Size(size_t in_size) { emp_assert(in_size == NUM_BITS); }
-      Bits_Data_Size(const Bits_Data_Size &) = default;
-    };
-
-
-    /// Dynamic size is stored here to work with, but not the actual bits.
-    template <>
-    struct Bits_Data_Size<DYNAMIC_BITS> {
-      size_t num_bits;           ///< Total number of bits are we using
-      static constexpr size_t DEFAULT_SIZE = 0;
-
-      using field_t = bits_field_t;
-      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
-
-      /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] size_t NumEndBits() const noexcept { return num_bits & (NUM_FIELD_BITS - 1); }
-
-      /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] size_t EndGap() const noexcept { return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0; }
-
-      /// A mask to cut off all of the final bits.
-      [[nodiscard]] field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
-
-      /// How many felids do we need for the current set of bits?
-      [[nodiscard]] size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0; }
-
-      /// What is the ID of the last occupied field?
-      [[nodiscard]] size_t LastField() const noexcept { return NumFields() - 1; }
-
-      /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] size_t NumBytes() const noexcept { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
-
-      /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
-
-      Bits_Data_Size(size_t in_size) : num_bits(in_size) { }
+      Bits_Data_Size(size_t in_size=NUM_BITS) { emp_assert(in_size == NUM_BITS); }
       Bits_Data_Size(const Bits_Data_Size &) = default;
     };
 
