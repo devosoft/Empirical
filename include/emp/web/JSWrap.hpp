@@ -454,11 +454,7 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
-      #ifdef __EMSCRIPTEN_PTHREADS__
-      thread_local emp::vector<JSWrap_Callback_Base *> callback_array{nullptr};
-      #else
-      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
-      #endif
+      static emp::vector<JSWrap_Callback_Base *> callback_array{nullptr};
       return callback_array;
     }
 
