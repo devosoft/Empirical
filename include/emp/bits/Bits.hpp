@@ -112,6 +112,7 @@ namespace emp {
       Bits_Data_Mem() = default;
       Bits_Data_Mem([[maybe_unused]] size_t num_bits) { emp_assert(num_bits <= CAPACITY); }
       Bits_Data_Mem(const Bits_Data_Mem &) = default;
+      Bits_Data_Mem(const Bits_Data_Mem & in, num_fields) : Bits_Data_Mem(in) { } // Ignore fields
       Bits_Data_Mem(Bits_Data_Mem &&) = default;
     };
 
@@ -134,7 +135,13 @@ namespace emp {
       Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
-      Bits_Data_Mem(const Bits_Data_Mem &) { /* don't know size; handle in base class */ };
+      Bits_Data_Mem(const Bits_Data_Mem & in, size_t num_fields) { 
+        if (num_fields) {
+          bits = NewArrayPtr<field_t>(num_fields);
+          for (size_t i = 0; i < num_fields; ++i) bits[i] = in.bits[i];
+        }
+        else bits = nullptr;
+      };
       Bits_Data_Mem(Bits_Data_Mem && in) { bits = in.bits; in.bits = nullptr; }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
     };
@@ -144,9 +151,13 @@ namespace emp {
     // ------------------------------------------------------------------------------------
 
     /// Dynamic size is stored here to work with, but not the actual bits.
-    template <size_t DEFAULT_SIZE, BitSize SIZE_MODE>
+    template <size_t BASE_SIZE, BitSize SIZE_MODE>
     struct Bits_Data_Size {
       size_t num_bits;           ///< Total number of bits are we using
+
+      // If BASE_SIZE indicates max capacity, default size to zero.
+      // Otherwise, for dynamic SIZE_MODE use BASE_SIZE as the default.
+      static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitSize::CAPPED) ? 0 : BASE_SIZE;
 
       using field_t = bits_field_t;
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
@@ -212,35 +223,19 @@ namespace emp {
 
     /// Internal data for the Bits class to separate static vs. dynamic.
     /// Generic assumes a specified capacity and a fixed size.
-    template <size_t CAPACITY, bool FIXED_SIZE>
+    template <size_t BASE_SIZE, BitSize SIZE_MODE>
     struct Bits_Data
-      : public Bits_Data_Size<FIXED_SIZE ? CAPACITY : DYNAMIC_BITS>,
-        public Bits_Data_Mem<CAPACITY>
+      : public Bits_Data_Size<BASE_SIZE, SIZE_MODE>,
+        public Bits_Data_Mem<BASE_SIZE, SIZE_MODE>
     {
-      static constexpr size_t CT_SIZE = FIXED_SIZE ? CAPACITY : DYNAMIC_BITS;
       using field_t = bits_field_t;
-      using base_size_t = Bits_Data_Size<CT_SIZE>;
-      using base_size_t::NumBits;
+      using base_mem_t = Bits_Data_Mem<BASE_SIZE, SIZE_MODE>;
+      using base_size_t = Bits_Data_Size<BASE_SIZE, SIZE_MODE>;
+      using base_size_t::NumBits;      // Activate NumBits() function.
 
-      using base_mem_t = Bits_Data_Mem<CAPACITY>;
-      using base_mem_t::bits;
-      using base_mem_t::dynamic_mem;
-
-      Bits_Data() : base_size_t(base_size_t::DEFAULT_SIZE), base_mem_t(base_size_t::DEFAULT_SIZE) {
-        // Default constructor not viable if fixed size AND size must be user specified.
-        emp_assert(FIXED_SIZE == false || CAPACITY != DYNAMIC_BITS);
-      }
+      Bits_Data() : base_size_t(), base_mem_t(base_size_t::DEFAULT_SIZE) { }
       Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
-      Bits_Data(const Bits_Data & in) : base_size_t(in.NumBits()), base_mem_t(in) {
-        if constexpr (dynamic_mem) {
-          if (NumBits()) {
-            size_t num_fields = NumBitFields(NumBits());
-            bits = NewArrayPtr<field_t>(num_fields);
-            for (size_t i = 0; i < num_fields; ++i) bits[i] = in.bits[i];
-          }
-          else bits = nullptr;
-        }
-      }
+      Bits_Data(const Bits_Data & in) : base_size_t(in.NumBits()), base_mem_t(in, NumBitFields(NumBits())) { }
       Bits_Data(Bits_Data && in) : base_size_t(in), base_mem_t(in) { }
     };
 
