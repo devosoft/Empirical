@@ -1267,9 +1267,9 @@ namespace emp {
   }
 
   /// Copy constructor of existing bit field.
-  template <size_t BASE_SIZE,  BitsMode SIZE_MODE,  bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in)
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & in)
     : data(in.GetSize())
   {
     emp_assert(in.OK());
@@ -1341,7 +1341,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::
-  Bits(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in, size_t new_size)
+  Bits(const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & in, size_t new_size)
     : Bits(new_size)
   {
     emp_assert(in.OK());
@@ -1356,7 +1356,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in) &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & in) &
   {
     emp_assert(in.OK());
 
