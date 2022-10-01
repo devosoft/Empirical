@@ -81,11 +81,11 @@ namespace emp {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
 
-  // BitSize specifies how a Bits object can change the number of bits in itself.
+  // BitsMode specifies how a Bits object can change the number of bits in itself.
   //  FIXED is locked at the base size an cannot change and is stored in static memory.
   //  CAPPED must be the base size or lower, but requires size tracking.
   //  DYNAMIC defaults to base size, but can be changed; requires indirect memory and allocation.
-  enum class BitSize { FIXED, CAPPED, DYNAMIC };
+  enum class BitsMode { FIXED, CAPPED, DYNAMIC };
 
   namespace internal {
 
@@ -94,7 +94,7 @@ namespace emp {
     // ------------------------------------------------------------------------------------
 
     /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
-    template <size_t CAPACITY, BitSize SIZE_MODE>
+    template <BitsMode SIZE_MODE, size_t CAPACITY>
     struct Bits_Data_Mem {
       using field_t = bits_field_t;
       static constexpr bool dynamic_mem = false;
@@ -119,7 +119,7 @@ namespace emp {
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
     template <size_t DEFAULT_SIZE>
-    struct Bits_Data_Mem<DEFAULT_SIZE, BitSize::DYNAMIC> {
+    struct Bits_Data_Mem<BitsMode::DYNAMIC, DEFAULT_SIZE> {
       using field_t = bits_field_t;
       static constexpr bool dynamic_mem = true;
 
@@ -152,13 +152,13 @@ namespace emp {
     // ------------------------------------------------------------------------------------
 
     /// Dynamic size is stored here to work with, but not the actual bits.
-    template <size_t BASE_SIZE, BitSize SIZE_MODE>
+    template <BitsMode SIZE_MODE, size_t BASE_SIZE>
     struct Bits_Data_Size {
       size_t num_bits;           ///< Total number of bits are we using
 
       // If BASE_SIZE indicates max capacity, default size to zero.
       // Otherwise, for dynamic SIZE_MODE use BASE_SIZE as the default.
-      static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitSize::CAPPED) ? 0 : BASE_SIZE;
+      static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitsMode::CAPPED) ? 0 : BASE_SIZE;
 
       using field_t = bits_field_t;
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
@@ -190,7 +190,7 @@ namespace emp {
 
     /// If we have a fixed number of bits, we know size at compile time.
     template <size_t NUM_BITS>
-    struct Bits_Data_Size<NUM_BITS, BitSize::FIXED> {
+    struct Bits_Data_Size<BitsMode::FIXED, NUM_BITS> {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
@@ -224,14 +224,14 @@ namespace emp {
 
     /// Internal data for the Bits class to separate static vs. dynamic.
     /// Generic assumes a specified capacity and a fixed size.
-    template <size_t BASE_SIZE, BitSize SIZE_MODE>
+    template <BitsMode SIZE_MODE, size_t BASE_SIZE>
     struct Bits_Data
-      : public Bits_Data_Size<BASE_SIZE, SIZE_MODE>,
-        public Bits_Data_Mem<BASE_SIZE, SIZE_MODE>
+      : public Bits_Data_Size<SIZE_MODE, BASE_SIZE>,
+        public Bits_Data_Mem<SIZE_MODE, BASE_SIZE>
     {
       using field_t = bits_field_t;
-      using base_mem_t = Bits_Data_Mem<BASE_SIZE, SIZE_MODE>;
-      using base_size_t = Bits_Data_Size<BASE_SIZE, SIZE_MODE>;
+      using base_mem_t = Bits_Data_Mem<SIZE_MODE, BASE_SIZE>;
+      using base_size_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
       using base_size_t::NumBits;      // Activate NumBits() function.
 
       Bits_Data() : base_size_t(), base_mem_t(base_size_t::DEFAULT_SIZE) { }
@@ -250,14 +250,14 @@ namespace emp {
   //****************************************************************************
 
   /// @brief A flexible base template to handle BitVector, BitArray, BitSet, & other combinations.
-  /// @tparam BASE_SIZE The maximum number of bits allowed (or default size for DYNAMIC bits) 
   /// @tparam SIZE_MODE How is this Bits object allowed to change size? (FIXED, CAPPED, or DYNAMIC)
+  /// @tparam BASE_SIZE The maximum number of bits allowed (or default size for DYNAMIC bits) 
   /// @tparam ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false) 
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   class Bits {
-    using this_t = Bits<BASE_SIZE, SIZE_MODE, ZERO_LEFT>;
+    using this_t = Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT>;
     using field_t = bits_field_t;
-    using data_t = internal::Bits_Data<BASE_SIZE, SIZE_MODE>;
+    using data_t = internal::Bits_Data<SIZE_MODE, BASE_SIZE>;
 
     // All internal data (and base-level manipulators) for Bits.
     data_t data;
@@ -295,8 +295,8 @@ namespace emp {
     void RawCopy(const Ptr<field_t> from, size_t copy_fields=emp::MAX_SIZE_T);
 
     // Shortcut for RawCopy if we are copying a whole other Bits object.
-    template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-    void RawCopy(const Bits<BASE_SIZE2, SIZE_MODE2, ZERO_LEFT2> & in_bits) {
+    template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+    void RawCopy(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in_bits) {
       RawCopy(in_bits.data.FieldPtr(), in_bits.data.NumFields());
     }
 
@@ -316,7 +316,7 @@ namespace emp {
 
     // Apply a transformation to each bit field in a specified range.
     template <typename FUN_T>
-    Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
+    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
 
     // Helper: call SHIFT with positive number
     void ShiftLeft(const size_t shift_size);
@@ -342,8 +342,8 @@ namespace emp {
     Bits(T in_num_bits, bool init_val=false) : Bits(static_cast<size_t>(in_num_bits), init_val) {}
 
     /// Copy constructor of existing bits object.
-    template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-    Bits(const Bits<BASE_SIZE2, SIZE_MODE2, ZERO_LEFT2> & in);
+    template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+    Bits(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in);
 
     /// Move constructor of existing bit field.
     Bits(this_t && in) = default;
@@ -375,15 +375,15 @@ namespace emp {
     template <typename T> Bits(const std::initializer_list<T> l);
 
     /// Copy, but with a resize.
-    template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-    Bits(const Bits<BASE_SIZE2, SIZE_MODE2, ZERO_LEFT2> & in, size_t new_size);
+    template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+    Bits(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in, size_t new_size);
 
     /// Destructor
     ~Bits() = default;
 
     /// Assignment operator.
-    template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-    Bits & operator=(const Bits<BASE_SIZE2, SIZE_MODE2, ZERO_LEFT2> & in) &;
+    template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+    Bits & operator=(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in) &;
 
     /// Move operator.
     Bits & operator=(Bits && in) &;
@@ -936,8 +936,8 @@ namespace emp {
 
   // ------------------------ Implementations for Internal Functions ------------------------
 
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  void Bits<BASE_SIZE, SIZE_MODE, ZERO_LEFT>::
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  void Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT>::
     RawCopy(const Ptr<bits_field_t> from, size_t num_fields)
   {
     // If num_fields was not specified, set it to the max number of fields.
@@ -951,8 +951,8 @@ namespace emp {
   // Move bits from one position in the genome to another; leave old positions unchanged.
   // All positions are requires to exist and memory must be available for the move.
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  void Bits<BASE_SIZE, SIZE_MODE, ZERO_LEFT>::
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  void Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT>::
     RawMove(const size_t from_start, const size_t from_stop, const size_t to)
   {
     emp_assert(from_start <= from_stop);             // Must move legal region.
@@ -975,9 +975,9 @@ namespace emp {
     OR_SELF(move_bits);                              // Merge bit strings together.
   }
 
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename FUN_T>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> & Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::
     ApplyRange(const FUN_T & fun, size_t start, size_t stop)
   {
     emp_assert(start <= stop, start, stop, data.NumBits());   // Start cannot be after stop.
@@ -1023,8 +1023,8 @@ namespace emp {
     return *this;
   }
 
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  void Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= GetSize()) { Clear(); return; }
 
@@ -1060,8 +1060,8 @@ namespace emp {
     ClearExcessBits();
   }
 
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  void Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= GetSize()) { Clear(); return; }
 
@@ -1096,8 +1096,8 @@ namespace emp {
   }
 
   /// Helper: call ROTATE with negative number
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  void Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
     if (GetSize() == 0) return;   // Nothing to rotate if there are not bits.
 
     const field_t shift_size = shift_size_raw % GetSize();
@@ -1175,8 +1175,8 @@ namespace emp {
 
 
   /// Helper for calling ROTATE with positive number
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  void Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
     const size_t shift_size = shift_size_raw % GetSize();
     const size_t NUM_FIELDS = data.NumFields();
 
@@ -1261,15 +1261,15 @@ namespace emp {
   // ------------------- Implementations of Constructors and Assignments --------------------
 
   /// Build a new Bits object with specified bit count and initialization (default 0)
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(size_t _num_bits, bool init_val) : data(_num_bits) {
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(size_t _num_bits, bool init_val) : data(_num_bits) {
     if (init_val) SetAll(); else Clear();
   }
 
   /// Copy constructor of existing bit field.
-  template <size_t BASE_SIZE,  BitSize SIZE_MODE,  bool ZERO_LEFT>
-  template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in)
+  template <size_t BASE_SIZE,  BitsMode SIZE_MODE,  bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in)
     : data(in.GetSize())
   {
     emp_assert(in.OK());
@@ -1279,9 +1279,9 @@ namespace emp {
   // -- Move constructor in class; set to default --
 
   /// Constructor to generate a Bits from a std::bitset.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <size_t NUM_BITS>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(const std::bitset<NUM_BITS> & bitset)
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const std::bitset<NUM_BITS> & bitset)
     : data(NUM_BITS)
   {
     // Copy over the values.
@@ -1289,8 +1289,8 @@ namespace emp {
   }
 
   /// Constructor to generate a Bits from a string of '0's and '1's.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(const std::string & bitstring)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const std::string & bitstring)
     : data(bitstring.size())
   {
     Clear();
@@ -1300,8 +1300,8 @@ namespace emp {
 }
 
   /// Constructor to generate a random Bits (with equal prob of 0 or 1).
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random)
     : data(in_num_bits)
   {
     Clear();
@@ -1309,8 +1309,8 @@ namespace emp {
   }
 
   /// Constructor to generate a random Bits with provided prob of 1's.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const double p1)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const double p1)
     : data(in_num_bits)
   {
     Clear();
@@ -1318,8 +1318,8 @@ namespace emp {
   }
 
   /// Constructor to generate a random Bits with provided number of 1's.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const size_t target_ones)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const size_t target_ones)
     : data(in_num_bits)
   {
     Clear();
@@ -1327,9 +1327,9 @@ namespace emp {
   }
 
   /// Initializer list constructor.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::Bits(const std::initializer_list<T> l)
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const std::initializer_list<T> l)
     : data(l.size())
   {
     size_t idx = 0;
@@ -1338,9 +1338,9 @@ namespace emp {
   }
 
   /// Copy, but with a resize.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::
   Bits(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in, size_t new_size)
     : Bits(new_size)
   {
@@ -1353,10 +1353,10 @@ namespace emp {
   }
 
   /// Assignment operator.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  template <size_t BASE_SIZE2, BitSize SIZE_MODE2, bool ZERO_LEFT2>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> &
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::operator=(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in) &
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const Bits<BASE_SIZE2,SIZE_MODE2,ZERO_LEFT2> & in) &
   {
     emp_assert(in.OK());
 
@@ -1369,9 +1369,9 @@ namespace emp {
   }
 
   /// Move operator.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> &
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::operator=(Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> && in) &
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> && in) &
   {
     emp_assert(&in != this);        // Shouldn't be possible in an r-value
     data = std::move(in.data);      // Shift move into data objects.
@@ -1387,10 +1387,10 @@ namespace emp {
   ///////////// @CAO CONTINUE HERE
 
   /// Assignment operator from a std::bitset.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <size_t NUM_BITS>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> &
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) &
   {
     const size_t start_fields = NumFields();
     num_bits = NUM_BITS;
@@ -1410,9 +1410,9 @@ namespace emp {
   }
 
   /// Assignment operator from a string of '0's and '1's.
-  template <size_t BASE_SIZE, BitSize SIZE_MODE, bool ZERO_LEFT>
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT> &
-  Bits<BASE_SIZE,SIZE_MODE,ZERO_LEFT>::operator=(const std::string & bitstring) &
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const std::string & bitstring) &
   {
     const size_t start_fields = NumFields();
     num_bits = bitstring.size();
