@@ -90,65 +90,7 @@ namespace emp {
   namespace internal {
 
     // ------------------------------------------------------------------------------------
-    //  RAW MEMORY MANAGEMENT
-    // ------------------------------------------------------------------------------------
-
-    /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
-    template <BitsMode SIZE_MODE, size_t CAPACITY>
-    struct Bits_Data_Mem {
-      using field_t = bits_field_t;
-      static constexpr bool dynamic_mem = false;
-      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
-
-      emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
-
-      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return reinterpret_cast<unsigned char*>(bits);
-      }
-      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return reinterpret_cast<const unsigned char*>(bits);
-      }
-
-      Bits_Data_Mem() = default;
-      Bits_Data_Mem([[maybe_unused]] size_t num_bits) { emp_assert(num_bits <= CAPACITY); }
-      Bits_Data_Mem(const Bits_Data_Mem &) = default;
-      Bits_Data_Mem(const Bits_Data_Mem & in, size_t) : Bits_Data_Mem(in) { } // Ignore fields
-      Bits_Data_Mem(Bits_Data_Mem &&) = default;
-    };
-
-    /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    template <size_t DEFAULT_SIZE>
-    struct Bits_Data_Mem<BitsMode::DYNAMIC, DEFAULT_SIZE> {
-      using field_t = bits_field_t;
-      static constexpr bool dynamic_mem = true;
-
-      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
-
-      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return bits.ReinterpretCast<unsigned char*>();
-      }
-      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return bits.ReinterpretCast<const unsigned char*>();
-      }
-
-      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : bits(nullptr) {
-        if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
-      }
-      Bits_Data_Mem(const Bits_Data_Mem & in, size_t num_fields) { 
-        if (num_fields) {
-          bits = NewArrayPtr<field_t>(num_fields);
-          for (size_t i = 0; i < num_fields; ++i) bits[i] = in.bits[i];
-        }
-        else bits = nullptr;
-      };
-      Bits_Data_Mem(Bits_Data_Mem && in) { bits = in.bits; in.bits = nullptr; }
-      ~Bits_Data_Mem() { bits.DeleteArray(); }
-    };
-
-    // ------------------------------------------------------------------------------------
-    //  CURRENT SIZE TRACKING
+    //  SIZE TRACKING
     // ------------------------------------------------------------------------------------
 
     /// Dynamic size is stored here to work with, but not the actual bits.
@@ -159,6 +101,8 @@ namespace emp {
       // If BASE_SIZE indicates max capacity, default size to zero.
       // Otherwise, for dynamic SIZE_MODE use BASE_SIZE as the default.
       static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitsMode::CAPPED) ? 0 : BASE_SIZE;
+
+      void RawResize(size_t new_size) { num_bits = new_size; }
 
       using field_t = bits_field_t;
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
@@ -194,6 +138,8 @@ namespace emp {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
+      void RawResize(size_t new_size) { emp_assert(new_size == NUM_BITS, "Cannot change to new_size"); }
+
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
@@ -221,13 +167,84 @@ namespace emp {
       Bits_Data_Size(const Bits_Data_Size &) = default;
     };
 
+    // ------------------------------------------------------------------------------------
+    //  RAW MEMORY MANAGEMENT
+    // ------------------------------------------------------------------------------------
+
+    /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
+    template <BitsMode SIZE_MODE, size_t CAPACITY>
+    struct Bits_Data_Mem : public Bits_Data_Size<SIZE_MODE, CAPACITY> {
+      using base_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
+      using field_t = bits_field_t;
+      static constexpr bool dynamic_mem = false;
+      static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
+
+      emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
+
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
+        return reinterpret_cast<unsigned char*>(bits);
+      }
+      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
+        return reinterpret_cast<const unsigned char*>(bits);
+      }
+
+      Bits_Data_Mem() = default;
+      Bits_Data_Mem(size_t num_bits) : base_t(num_bits) { emp_assert(num_bits <= CAPACITY); }
+      Bits_Data_Mem(const Bits_Data_Mem &) = default;
+      Bits_Data_Mem(Bits_Data_Mem &&) = default;
+    };
+
+    /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
+    template <size_t DEFAULT_SIZE>
+    struct Bits_Data_Mem<BitsMode::DYNAMIC, DEFAULT_SIZE> 
+      : public Bits_Data_Size<BitsMode::DYNAMIC, DEFAULT_SIZE>
+    {
+      using base_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
+
+      using field_t = bits_field_t;
+      static constexpr bool dynamic_mem = true;
+
+      Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
+
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
+        return bits.ReinterpretCast<unsigned char*>();
+      }
+      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
+        return bits.ReinterpretCast<const unsigned char*>();
+      }
+
+      void RawResize(size_t new_fields) {
+        if (bits) bits.DeleteArray();
+        if (new_size) bits = NewArrayPtr<field_t>(new_fields);
+        else bits = nullptr;
+      }
+
+      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
+        if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
+      }
+      Bits_Data_Mem(const Bits_Data_Mem & in) : base_t(in) { 
+        const auto size_t num_fields = base_t::NumFields();
+        if (num_fields) {
+          bits = NewArrayPtr<field_t>(num_fields);
+          for (size_t i = 0; i < num_fields; ++i) bits[i] = in.bits[i];
+        }
+        else bits = nullptr;
+      };
+      Bits_Data_Mem(Bits_Data_Mem && in) : base_t(in.NumBits()) {
+        // Move over the bits.
+        bits = in.bits; in.bits = nullptr;
+      }
+      ~Bits_Data_Mem() { bits.DeleteArray(); }
+    };
+
+
 
     /// Internal data for the Bits class to separate static vs. dynamic.
     /// Generic assumes a specified capacity and a fixed size.
     template <BitsMode SIZE_MODE, size_t BASE_SIZE>
-    struct Bits_Data
-      : public Bits_Data_Size<SIZE_MODE, BASE_SIZE>,
-        public Bits_Data_Mem<SIZE_MODE, BASE_SIZE>
+    struct Bits_Data : public Bits_Data_Mem<SIZE_MODE, BASE_SIZE>
     {
       using field_t = bits_field_t;
       using base_mem_t = Bits_Data_Mem<SIZE_MODE, BASE_SIZE>;
@@ -238,6 +255,15 @@ namespace emp {
       Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
       Bits_Data(const Bits_Data & in) : base_size_t(in.NumBits()), base_mem_t(in, NumBitFields(NumBits())) { }
       Bits_Data(Bits_Data && in) : base_size_t(in), base_mem_t(in) { }
+
+      void RawResize(size_t new_size) {
+        // If we have dynamic memory, see if number of bit fields needs to change.
+        if constexpr (dynamic_mem) {
+          const new_fields = NumBitFields(new_size);
+          if (NumFields() != new_fields) base_mem_t::RawResize(new_fields);
+        } 
+        base_size_t::RawResize(new_size);
+      }
     };
 
 
@@ -1375,12 +1401,6 @@ namespace emp {
   {
     emp_assert(&in != this);        // Shouldn't be possible in an r-value
     data = std::move(in.data);      // Shift move into data objects.
-    // if (bits) bits.DeleteArray();   // If we already have bits, get rid of them.
-    // num_bits = in.num_bits;         // Update the number of bits...
-    // bits = in.bits;                 // And steal the old memory for what those bits are.
-    // in.bits = nullptr;              // Prepare in for deletion without deallocating.
-    // in.num_bits = 0;
-
     return *this;
   }
 
