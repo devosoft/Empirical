@@ -85,7 +85,8 @@ namespace emp {
   //  FIXED is locked at the base size an cannot change and is stored in static memory.
   //  CAPPED must be the base size or lower, but requires size tracking.
   //  DYNAMIC defaults to base size, but can be changed; requires indirect memory and allocation.
-  enum class BitsMode { FIXED, CAPPED, DYNAMIC };
+  //  WATERMARK is like DYNAMIC, but never reallocates memory when shrinking active size.
+  enum class BitsMode { FIXED, CAPPED, DYNAMIC, WATERMARK };
 
   namespace internal {
 
@@ -176,23 +177,18 @@ namespace emp {
     struct Bits_Data_Mem : public Bits_Data_Size<SIZE_MODE, CAPACITY> {
       using base_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
       using field_t = bits_field_t;
-      static constexpr bool dynamic_mem = false;
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
 
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
-
-      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return reinterpret_cast<unsigned char*>(bits);
-      }
-      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return reinterpret_cast<const unsigned char*>(bits);
-      }
 
       Bits_Data_Mem() = default;
       Bits_Data_Mem(size_t num_bits) : base_t(num_bits) { emp_assert(num_bits <= CAPACITY); }
       Bits_Data_Mem(const Bits_Data_Mem &) = default;
       Bits_Data_Mem(Bits_Data_Mem &&) = default;
+
+      // --- Helper functions --
+      
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
@@ -200,26 +196,10 @@ namespace emp {
     struct Bits_Data_Mem<BitsMode::DYNAMIC, DEFAULT_SIZE> 
       : public Bits_Data_Size<BitsMode::DYNAMIC, DEFAULT_SIZE>
     {
-      using base_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
-
+      using base_t = Bits_Data_Size<BitsMode::DYNAMIC, BASE_SIZE>;
       using field_t = bits_field_t;
-      static constexpr bool dynamic_mem = true;
 
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
-
-      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return bits.ReinterpretCast<unsigned char*>();
-      }
-      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return bits.ReinterpretCast<const unsigned char*>();
-      }
-
-      void RawResize(size_t new_fields) {
-        if (bits) bits.DeleteArray();
-        if (new_size) bits = NewArrayPtr<field_t>(new_fields);
-        else bits = nullptr;
-      }
 
       Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
@@ -237,6 +217,61 @@ namespace emp {
         bits = in.bits; in.bits = nullptr;
       }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
+
+      // --- Helper functions --
+
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+
+      void RawResize(size_t new_fields) {
+        if (base_t::NumFields() != new_fields) {
+          if (bits) bits.DeleteArray();
+          if (new_fields) bits = NewArrayPtr<field_t>(new_fields);
+          else bits = nullptr;
+        }
+      }
+    };
+
+    /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
+    template <size_t DEFAULT_SIZE>
+    struct Bits_Data_Mem<BitsMode::WATERMARK, DEFAULT_SIZE> 
+      : public Bits_Data_Size<BitsMode::WATERMARK, DEFAULT_SIZE>
+    {
+      using base_t = Bits_Data_Size<BitsMode::WATERMARK, BASE_SIZE>;
+      using field_t = bits_field_t;
+
+      Ptr<field_t> bits;          ///< Pointer to array with the status of each bit
+      size_t field_capacity = 0;  ///< How many fields is the watermark up to?
+
+      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
+        if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
+      }
+      Bits_Data_Mem(const Bits_Data_Mem & in) : base_t(in) { 
+        field_capacity = base_t::NumFields();
+        if (field_capacity) {
+          bits = NewArrayPtr<field_t>(field_capacity);
+          for (size_t i = 0; i < field_capacity; ++i) bits[i] = in.bits[i];
+        }
+        else bits = nullptr;
+      };
+      Bits_Data_Mem(Bits_Data_Mem && in) : base_t(in.NumBits()), field_capacity(in.field_capacity) {
+        bits = in.bits;     // Move over the bits.
+        in.bits = nullptr;  // Clear them out of the original.
+      }
+      ~Bits_Data_Mem() { bits.DeleteArray(); }
+
+      // --- Helper functions --
+
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+
+      // Resize to have at least the specified number of fields.
+      void RawResize(size_t new_fields) {
+        if (new_fields > field_capacity) {
+          if (bits) bits.DeleteArray();
+          bits = NewArrayPtr<field_t>(new_fields);
+          field_capacity = new_fields;
+        }
+      }
+
     };
 
 
@@ -247,14 +282,21 @@ namespace emp {
     struct Bits_Data : public Bits_Data_Mem<SIZE_MODE, BASE_SIZE>
     {
       using field_t = bits_field_t;
-      using base_mem_t = Bits_Data_Mem<SIZE_MODE, BASE_SIZE>;
+      using base_t = Bits_Data_Mem<SIZE_MODE, BASE_SIZE>;
       using base_size_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
       using base_size_t::NumBits;      // Activate NumBits() function.
 
-      Bits_Data() : base_size_t(), base_mem_t(base_size_t::DEFAULT_SIZE) { }
-      Bits_Data(size_t num_bits) : base_size_t(num_bits), base_mem_t(num_bits) { }
-      Bits_Data(const Bits_Data & in) : base_size_t(in.NumBits()), base_mem_t(in, NumBitFields(NumBits())) { }
-      Bits_Data(Bits_Data && in) : base_size_t(in), base_mem_t(in) { }
+      Bits_Data() : base_t(base_size_t::DEFAULT_SIZE) { }
+      Bits_Data(size_t num_bits) : base_t(num_bits) { }
+      Bits_Data(const Bits_Data & in) : base_t(in) { }
+      Bits_Data(Bits_Data && in) : base_t(in) { }
+
+      [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
+        return base_t::FieldPtr().ReinterpretCast<unsigned char*>();
+      }
+      [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
+        return base_t::FieldPtr().ReinterpretCast<const unsigned char*>();
+      }
 
       void RawResize(size_t new_size) {
         // If we have dynamic memory, see if number of bit fields needs to change.
