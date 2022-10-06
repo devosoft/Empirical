@@ -466,11 +466,17 @@ namespace emp {
     /// Assignment operator from a literal string of '0's and '1's.
     Bits & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
-    /// Assignment from another Bits without changing size.
-    Bits & Import( const Bits & from_bits, const size_t from_bit=0 );
+    /// Assignment from another Bits object without changing size.
+    template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+    Bits & Import(
+      const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & from_bits,
+      const size_t from_start_pos=0,
+      size_t max_copy_bits=emp::MAX_SIZE_T
+    );
 
     /// Convert to a Bits of a different size.
-    Bits Export(size_t out_size, size_t start_bit=0) const;
+    template <typename OUT_T=Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>>
+    OUT_T Export(size_t out_size, size_t start_bit=0) const;
 
     // Scan this bitvector to make sure that there are no internal problems.
     bool OK() const;
@@ -1452,7 +1458,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) &
   {
-    data.RawResize(NUM_BITS)
+    data.RawResize(NUM_BITS);
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);  // Copy bits in.
     ClearExcessBits();                                        // Set excess bits to zeros.
 
@@ -1464,7 +1470,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const std::string & bitstring) &
   {
-    data.RawResize(bitstring.size())
+    data.RawResize(bitstring.size());
     Clear();
 
     for (size_t i = 0; i < GetSize(); i++) {
@@ -1475,30 +1481,39 @@ namespace emp {
   }
 
 
-  ///////////// @CAO CONTINUE HERE
-
   /// Assign from a BitVector of a different size.
-  // @CAO: Can manually copy to skip unused fields for a speedup.
-  BitVector & BitVector::Import(const BitVector & from_bits, const size_t from_bit) {
-    emp_assert(&from_bits != this);
-    emp_assert(from_bit < from_bits.GetSize());
+  // @CAO: Can copy fields for a speedup.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Import(
+    const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & from_bits,
+    const size_t from_start_pos,
+    size_t max_copy_bits)
+  {
+    emp_assert(from_start_pos < from_bits.GetSize());
+    size_t bits_available = from_bits.GetSize() - from_start_pos;
 
-    const size_t init_size = GetSize();
-    *this = from_bits;
-    *this >>= from_bit;
-    Resize(init_size);
+    // Actual max_copy bits is limited by bits available to copy and bits in this object.
+    max_copy_bits = emp::Min(bits_available, GetSize(), max_copy_bits);
+
+    for (size_t i = 0; i < max_copy_bits; ++i) {
+      Set(i, from_bits[i+from_start_pos]);
+    }
 
     return *this;
   }
 
   /// Convert to a Bitset of a different size.
-  BitVector BitVector::Export(size_t out_size, size_t start_bit) const {
-
-    BitVector out_bits(out_size);
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  template <typename OUT_T>
+  OUT_T Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Export(size_t out_size, size_t start_bit) const {
+    OUT_T out_bits(out_size);
     out_bits.Import(*this, start_bit);
-
     return out_bits;
   }
+
+  // ------  @CAO CONTINUE HERE!!! ------
 
   bool BitVector::OK() const {
     // Do some checking on the bits array ptr to make sure it's value.
