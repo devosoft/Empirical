@@ -1446,25 +1446,13 @@ namespace emp {
     return *this;
   }
 
-  ///////////// @CAO CONTINUE HERE
-
   /// Assignment operator from a std::bitset.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <size_t NUM_BITS>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) &
   {
-    const size_t start_fields = NumFields();
-    num_bits = NUM_BITS;
-    const size_t new_fields = NumFields();
-
-    // Update the size of internal fields if needed.
-    if (start_fields != new_fields) {
-      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
-      if constexpr (NUM_BITS > 0) bits = NewArrayPtr<field_t>(new_fields);
-      else bits = nullptr;
-    }
-
+    data.RawResize(NUM_BITS)
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);  // Copy bits in.
     ClearExcessBits();                                        // Set excess bits to zeros.
 
@@ -1476,28 +1464,18 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const std::string & bitstring) &
   {
-    const size_t start_fields = NumFields();
-    num_bits = bitstring.size();
-    const size_t new_fields = NumFields();
+    data.RawResize(bitstring.size())
+    Clear();
 
-    // Update the size of internal fields if needed.
-    if (start_fields != new_fields) {
-      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
-      if (num_bits) bits = NewArrayPtr<field_t>(new_fields);
-      else bits = nullptr;
-      Clear();
-    }
-
-    // If we have bits, copy them in.
-    if (num_bits) {
-      for (size_t i = 0; i < num_bits; i++) {
-        if (bitstring[i] != '0') Set(i);
-      }
+    for (size_t i = 0; i < GetSize(); i++) {
+      if (bitstring[i] != '0') Set(i);
     }
 
     return *this;
   }
 
+
+  ///////////// @CAO CONTINUE HERE
 
   /// Assign from a BitVector of a different size.
   // @CAO: Can manually copy to skip unused fields for a speedup.
