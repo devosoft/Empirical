@@ -131,6 +131,8 @@ namespace emp {
 
       Bits_Data_Size(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
       Bits_Data_Size(const Bits_Data_Size &) = default;
+
+      bool OK() const { return true; } // Nothing to check yet.
     };
 
     /// If we have a fixed number of bits, we know size at compile time.
@@ -166,6 +168,8 @@ namespace emp {
 
       Bits_Data_Size(size_t in_size=NUM_BITS) { emp_assert(in_size == NUM_BITS); }
       Bits_Data_Size(const Bits_Data_Size &) = default;
+
+      bool OK() const { return true; } // Nothing to check yet.
     };
 
     // ------------------------------------------------------------------------------------
@@ -189,8 +193,10 @@ namespace emp {
       // --- Helper functions --
       
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-    };
 
+      bool OK() const { return true; } // Nothing to check yet.
+    };
+    
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
     template <size_t DEFAULT_SIZE>
     struct Bits_Data_Mem<BitsMode::DYNAMIC, DEFAULT_SIZE> 
@@ -232,6 +238,18 @@ namespace emp {
           if (new_fields) bits = NewArrayPtr<field_t>(new_fields);
           else bits = nullptr;
         }
+      }
+
+      bool OK() const {
+        // Do some checking on the bits array ptr to make sure it's value.
+        if (bits) {
+          #ifdef EMP_TRACK_MEM
+          emp_assert(bits.DebugIsArray()); // Must be marked as an array.
+          emp_assert(bits.OK());           // Pointer must be okay.
+          #endif
+        }
+        else { emp_assert(base_t::num_bits == 0); }  // If bits is null, num_bits should be zero.
+        return true;
       }
     };
 
@@ -280,6 +298,17 @@ namespace emp {
         }
       }
 
+      bool OK() const {
+        // Do some checking on the bits array ptr to make sure it's value.
+        if (bits) {
+          #ifdef EMP_TRACK_MEM
+          emp_assert(bits.DebugIsArray()); // Must be marked as an array.
+          emp_assert(bits.OK());           // Pointer must be okay.
+          #endif
+        }
+        else { emp_assert(base_t::num_bits == 0); }  // If bits is null, num_bits should be zero.
+        return true;
+      }
     };
 
 
@@ -293,6 +322,7 @@ namespace emp {
       using base_t = Bits_Data_Mem<SIZE_MODE, BASE_SIZE>;
       using base_size_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
       using base_size_t::NumBits;      // Activate NumBits() function.
+      using base_t::bits;
 
       Bits_Data() : base_t(base_size_t::DEFAULT_SIZE) { }
       Bits_Data(size_t num_bits) : base_t(num_bits) { }
@@ -304,6 +334,21 @@ namespace emp {
       }
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
         return base_t::FieldPtr().template ReinterpretCast<const unsigned char*>();
+      }
+
+      bool OK() const {
+        bool result = base_t::OK();
+        result &= base_size_t::OK();
+
+        // If there are end bits, make sure that everything past the last one is clear.
+        if (base_t::NumEndBits()) {
+          // Make sure final bits are zeroed out.
+          const field_t excess_bits =
+            bits[base_t::LastField()] & ~MaskLow<field_t>(base_t::NumEndBits());
+          result &= !excess_bits;
+        }
+
+        return result;
       }
 
     };
@@ -479,7 +524,7 @@ namespace emp {
     OUT_T Export(size_t out_size, size_t start_bit=0) const;
 
     // Scan this bitvector to make sure that there are no internal problems.
-    bool OK() const;
+    bool OK() const { return data.OK(); }
 
 
     // =========  Accessors  ========= //
@@ -1514,29 +1559,6 @@ namespace emp {
   }
 
   // ------  @CAO CONTINUE HERE!!! ------
-
-  bool BitVector::OK() const {
-    // Do some checking on the bits array ptr to make sure it's value.
-    if (bits) {
-#ifdef EMP_TRACK_MEM
-      emp_assert(bits.DebugIsArray()); // Must be marked as an array.
-      emp_assert(bits.OK());           // Pointer must be okay.
-#endif
-
-      // If there are end bits, make sure that everything past the last one is clear.
-      if (NumEndBits()) {
-        // Make sure final bits are zeroed out.
-        [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskField(NumEndBits());
-        emp_assert(!excess_bits);
-      }
-    }
-
-    // Otherwise bits is null; num_bits should be zero.
-    else { emp_assert(num_bits == 0); }
-
-    return true;
-  }
-
 
 
   // --------------------  Implementations of common accessors -------------------
