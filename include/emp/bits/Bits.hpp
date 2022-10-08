@@ -1104,10 +1104,10 @@ namespace emp {
 
     if (start == stop) return *this;  // Empty range.
 
-    const size_t start_pos = data.FieldPos(start);  // Start position WITHIN a bit field.
-    const size_t stop_pos = data.FieldPos(stop);    // Stop position WITHIN a bit field.
-    size_t start_field = data.FieldID(start);       // ID of bit field we're starting in.
-    const size_t stop_field = data.FieldID(stop-1); // ID of last field to actively scan.
+    const size_t start_pos = FieldPos(start);    // Start position WITHIN a bit field.
+    const size_t stop_pos = FieldPos(stop);      // Stop position WITHIN a bit field.
+    size_t start_field = FieldID(start);         // ID of bit field we're starting in.
+    const size_t stop_field = FieldID(stop-1);   // ID of last field to actively scan.
 
     // If the start field and stop field are the same, mask off the middle.
     if (start_field == stop_field) {
@@ -1558,58 +1558,63 @@ namespace emp {
     return out_bits;
   }
 
-  // ------  @CAO CONTINUE HERE!!! ------
-
 
   // --------------------  Implementations of common accessors -------------------
 
   /// Retrieve the bit value from the specified index.
-  bool BitVector::Get(size_t index) const {
-    emp_assert(index < num_bits, index, num_bits);
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Get(size_t index) const {
+    emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
-    return (bits[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
+    return data.bits[field_id] & (FIELD_1 << pos_id);
   }
 
   /// Update the bit value at the specified index.
-  BitVector & BitVector::Set(size_t index, bool value) {
-    emp_assert(index < num_bits, index, num_bits);
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Set(size_t index, bool value) {
+    emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
 
-    if (value) bits[field_id] |= pos_mask;
-    else       bits[field_id] &= ~pos_mask;
+    if (value) data.bits[field_id] |= pos_mask;
+    else       data.bits[field_id] &= ~pos_mask;
 
     return *this;
   }
 
   /// Set all bits to 1.
-  BitVector & BitVector::SetAll() {
-    const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_ALL;
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetAll() {
+    const size_t NUM_FIELDS = data.NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = FIELD_ALL;
     ClearExcessBits();
     return *this;
   }
 
   /// Set all bits to 0.
-  BitVector & BitVector::Clear() {
-    const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Clear() {
+    const size_t NUM_FIELDS = data.NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = FIELD_0;
     return *this;
   }
 
   /// Change a specified bit to the opposite value
-  BitVector & BitVector::Toggle(size_t index) {
-    emp_assert(index < num_bits, index, num_bits);
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Toggle(size_t index) {
+    emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
 
-    bits[field_id] ^= pos_mask;
+    data.bits[field_id] ^= pos_mask;
 
     return *this;
   }
+
+  // ------  @CAO CONTINUE HERE!!! ------
 
   bool BitVector::Any() const {
     const size_t NUM_FIELDS = NumFields();
