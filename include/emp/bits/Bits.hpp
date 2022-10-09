@@ -1614,8 +1614,11 @@ namespace emp {
     return *this;
   }
 
+
   // ------  @CAO CONTINUE HERE!!! ------
 
+
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool BitVector::Any() const {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) {
@@ -1625,6 +1628,7 @@ namespace emp {
   }
 
   /// Resize this BitVector to have the specified number of bits.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::Resize(size_t new_bits) {
     const size_t old_num_fields = NumFields();
     num_bits = new_bits;
@@ -1652,6 +1656,7 @@ namespace emp {
   // -------------------------  Implementations Randomization functions -------------------------
 
   /// Set all bits randomly, with a 50% probability of being a 0 or 1.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::Randomize(Random & random) {
     random.RandFill(BytePtr(), NumBytes());
     ClearExcessBits();
@@ -1659,6 +1664,7 @@ namespace emp {
   }
 
   /// Set all bits randomly, with probability specified at compile time.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <Random::Prob P>
   BitVector & BitVector::RandomizeP(Random & random,
                                     const size_t start_pos, size_t stop_pos) {
@@ -1672,6 +1678,7 @@ namespace emp {
 
 
   /// Set all bits randomly, with a given probability of being on.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::Randomize(Random & random, const double p,
                                    const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
@@ -1684,6 +1691,7 @@ namespace emp {
   }
 
   /// Set all bits randomly, with a given number of them being on.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::ChooseRandom(Random & random, const size_t target_ones,
                                       const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
@@ -1744,6 +1752,7 @@ namespace emp {
 
   /// Flip random bits with a given probability.
   // @CAO: Possibly faster to generate a sequence of bits and XORing with them.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::FlipRandom(Random & random,
                                                   const double p,
                                                   const size_t start_pos,
@@ -1761,6 +1770,7 @@ namespace emp {
   }
 
   /// Set random bits with a given probability (does not check if already set.)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::SetRandom(Random & random,
                       const double p,
                       const size_t start_pos,
@@ -1778,6 +1788,7 @@ namespace emp {
   }
 
   /// Unset random bits with a given probability (does not check if already zero.)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::ClearRandom(Random & random,
                       const double p,
                       const size_t start_pos,
@@ -1795,6 +1806,7 @@ namespace emp {
   }
 
   /// Flip a specified number of random bits.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::FlipRandomCount(Random & random, const size_t target_bits)
   {
     emp_assert(num_bits <= num_bits);
@@ -1803,6 +1815,7 @@ namespace emp {
   }
 
   /// Set a specified number of random bits (does not check if already set.)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::SetRandomCount(Random & random, const size_t target_bits)
   {
     emp_assert(num_bits <= num_bits);
@@ -1822,6 +1835,7 @@ namespace emp {
   // -------------------------  Implementations of Comparison Operators -------------------------
 
   /// Test if two bit vectors are identical.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool BitVector::operator==(const BitVector & in) const {
     if (num_bits != in.num_bits) return false;
 
@@ -1833,6 +1847,7 @@ namespace emp {
   }
 
   /// Compare the would-be numerical values of two bit vectors.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool BitVector::operator<(const BitVector & in) const {
     if (num_bits != in.num_bits) return num_bits < in.num_bits;
 
@@ -1846,6 +1861,7 @@ namespace emp {
   }
 
   /// Automatically convert BitVector to other vector types.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
   BitVector::operator emp::vector<T>() {
     emp::vector<T> out(GetSize());
@@ -1859,6 +1875,7 @@ namespace emp {
   // -------------------------  Access Groups of bits -------------------------
 
   /// Retrieve the byte at the specified byte index.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   uint8_t BitVector::GetByte(size_t index) const {
     emp_assert(index < NumBytes(), index, NumBytes());
     const size_t field_id = Byte2Field(index);
@@ -1868,6 +1885,7 @@ namespace emp {
 
   /// Get a read-only view into the internal array used by BitVector.
   /// @return Read-only span of BitVector's bytes.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::span<const std::byte> BitVector::GetBytes() const {
     return std::span<const std::byte>(
       bits.ReinterpretCast<const std::byte>().Raw(),
@@ -1876,6 +1894,7 @@ namespace emp {
   }
 
   /// Update the byte at the specified byte index.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::SetByte(size_t index, uint8_t value) {
     emp_assert(index < NumBytes(), index, NumBytes());
     const size_t field_id = Byte2Field(index);
@@ -1886,6 +1905,7 @@ namespace emp {
 
   /// Get the overall value of this BitSet, using a uint encoding, but including all bits
   /// and returning the value as a double.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   double BitVector::GetValue() const {
     const int max_one = FindMaxOne();
 
@@ -1905,6 +1925,7 @@ namespace emp {
   }
 
   /// Get specified type at a given index (in steps of that type size)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
   T BitVector::GetValueAtIndex(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
@@ -1917,6 +1938,7 @@ namespace emp {
 
 
   /// Set specified type at a given index (in steps of that type size)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
   void BitVector::SetValueAtIndex(const size_t index, T in_value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
@@ -1929,6 +1951,7 @@ namespace emp {
 
 
   /// Get the specified type starting from a given BIT position.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
   T BitVector::GetValueAtBit(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
@@ -1943,6 +1966,7 @@ namespace emp {
 
   /// Set the specified type starting from a given BIT position.
   // @CAO: Can be optimized substantially, especially for long BitVectors.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
   void BitVector::SetValueAtBit(const size_t index, T value) {
     // For the moment, must fit inside bounds; eventually should (?) pad with zeros.
@@ -1963,6 +1987,7 @@ namespace emp {
   // -------------------------  Other Analyses -------------------------
 
   /// A simple hash function for bit vectors.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::size_t BitVector::Hash(size_t start_field) const {
     static_assert(std::is_same_v<field_t, size_t>, "Hash() requires fields to be size_t");
 
@@ -1980,6 +2005,7 @@ namespace emp {
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in Bits.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   size_t BitVector::CountOnes() const {
     if (num_bits == 0) return 0;
     const field_t NUM_FIELDS = NumFields();
@@ -1994,6 +2020,7 @@ namespace emp {
   }
 
   /// Faster counting of ones for very sparse bit vectors.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   size_t BitVector::CountOnes_Sparse() const {
     size_t bit_count = 0;
     const size_t NUM_FIELDS = NumFields();
@@ -2009,6 +2036,7 @@ namespace emp {
 
   /// Pop the last bit in the vector.
   /// @return value of the popped bit.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool BitVector::PopBack() {
     const bool val = Get(num_bits-1);
     Resize(num_bits - 1);
@@ -2018,6 +2046,7 @@ namespace emp {
   /// Push given bit(s) onto the back of a vector.
   /// @param bit value of bit to be pushed.
   /// @param num number of bits to be pushed.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::PushBack(const bool bit, const size_t num) {
     Resize(num_bits + num);
     if (bit) SetRange(num_bits-num, num_bits);
@@ -2028,6 +2057,7 @@ namespace emp {
   /// @param index location to insert bit(s).
   /// @param val value of bit(s) to insert (default true)
   /// @param num number of bits to insert, default 1.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::Insert(const size_t index, const bool val, const size_t num) {
     Resize(num_bits + num);                 // Adjust to new number of bits.
     BitVector low_bits(*this);              // Copy current bits
@@ -2042,6 +2072,7 @@ namespace emp {
   /// Delete bits from any index in a vector.
   /// @param index location to delete bit(s).
   /// @param num number of bits to delete, default 1.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::Delete(const size_t index, const size_t num) {
     emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
     RawMove(index+num, num_bits, index);  // Shift positions AFTER delete into place.
@@ -2049,6 +2080,7 @@ namespace emp {
   }
 
   /// Return the position of the first one; return -1 if no ones in vector.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int BitVector::FindOne() const {
     const size_t NUM_FIELDS = NumFields();
     size_t field_id = 0;
@@ -2062,6 +2094,7 @@ namespace emp {
   ///
   ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
 
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int BitVector::FindOne(const size_t start_pos) const {
     if (start_pos >= num_bits) return -1;            // If we're past the end, return fail.
     size_t field_id  = FieldID(start_pos);           // What field do we start in?
@@ -2082,6 +2115,7 @@ namespace emp {
   }
 
   /// Find the most-significant set-bit.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int BitVector::FindMaxOne() const {
     // Find the max field with a one.
     size_t max_field = NumFields() - 1;
@@ -2108,6 +2142,7 @@ namespace emp {
   }
 
   /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int BitVector::PopOne() {
     const int out_bit = FindOne();
     if (out_bit >= 0) Clear((size_t) out_bit);
@@ -2115,6 +2150,7 @@ namespace emp {
   }
 
   /// Return positions of all ones.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   emp::vector<size_t> BitVector::GetOnes() const {
     emp::vector<size_t> out_vals;
     GetOnes(out_vals);
@@ -2123,6 +2159,7 @@ namespace emp {
 
   /// Return positions of all ones using a specified type.
   template <typename T>
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   emp::vector<T> & BitVector::GetOnes(emp::vector<T> & out_vals) const {
     // @CAO -- There are better ways to do this with bit tricks.
     out_vals.resize(CountOnes());
@@ -2134,6 +2171,7 @@ namespace emp {
   }
 
   /// Find the length of the longest continuous series of ones.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   size_t BitVector::LongestSegmentOnes() const {
     size_t length = 0;
     BitVector test_bits(*this);
@@ -2145,6 +2183,7 @@ namespace emp {
   }
 
   /// Return true if any ones are in common with another BitVector.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool BitVector::HasOverlap(const BitVector & in) const {
     const size_t num_fields = std::min(NumFields(), in.NumFields());
     for (size_t i = 0; i < num_fields; ++i) {
@@ -2158,6 +2197,7 @@ namespace emp {
   // -------------------------  Printing and string conversion -------------------------
 
   /// Convert this BitVector to a vector string [0 index on left]
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::string BitVector::ToString() const {
     std::string out_string;
     out_string.reserve(num_bits);
@@ -2166,6 +2206,7 @@ namespace emp {
   }
 
   /// Convert this BitVector to a numerical string [0 index on right]
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::string BitVector::ToBinaryString() const {
     std::string out_string;
     out_string.reserve(num_bits);
@@ -2174,6 +2215,7 @@ namespace emp {
   }
 
   /// Convert this BitVector to a series of IDs
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::string BitVector::ToIDString(const std::string & spacer) const {
     std::stringstream ss;
     PrintOneIDs(ss, spacer);
@@ -2181,6 +2223,7 @@ namespace emp {
   }
 
   /// Convert this BitVector to a series of IDs with ranges condensed.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::string BitVector::ToRangeString(const std::string & spacer,
                                        const std::string & ranger) const
   {
@@ -2190,6 +2233,7 @@ namespace emp {
   }
 
   /// Print a space between each field (or other provided spacer)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::PrintFields(std::ostream & out, const std::string & spacer) const {
     for (size_t i = num_bits-1; i < num_bits; i--) {
       out << Get(i);
@@ -2198,6 +2242,7 @@ namespace emp {
   }
 
   /// Print a space between each field (or other provided spacer)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::PrintDebug(std::ostream & out) const {
     for (size_t field = 0; field < NumFields(); field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
@@ -2213,6 +2258,7 @@ namespace emp {
   }
 
   /// Print the positions of all one bits, spaces are the default separator.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
     bool started = false;
     for (size_t i = 0; i < num_bits; i++) {
@@ -2225,6 +2271,7 @@ namespace emp {
   }
 
   /// Print the ones in a range format.  E.g., 2-5,7,10-15
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void BitVector::PrintAsRange(std::ostream & out,
                     const std::string & spacer,
                     const std::string & ranger) const
@@ -2247,6 +2294,7 @@ namespace emp {
   // -------------------------  Base Boolean-logic operations -------------------------
 
   /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::NOT_SELF() {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
@@ -2255,6 +2303,7 @@ namespace emp {
   }
 
   /// Perform a Boolean AND with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::AND_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & bits2.bits[i];
@@ -2262,6 +2311,7 @@ namespace emp {
   }
 
   /// Perform a Boolean OR with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::OR_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | bits2.bits[i];
@@ -2269,6 +2319,7 @@ namespace emp {
   }
 
   /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::NAND_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bits2.bits[i]);
@@ -2277,6 +2328,7 @@ namespace emp {
   }
 
   /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::NOR_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bits2.bits[i]);
@@ -2285,6 +2337,7 @@ namespace emp {
   }
 
   /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::XOR_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ bits2.bits[i];
@@ -2292,6 +2345,7 @@ namespace emp {
   }
 
   /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::EQU_SELF(const BitVector & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bits2.bits[i]);
@@ -2300,6 +2354,7 @@ namespace emp {
   }
 
   /// Positive shifts go left and negative go right (0 does nothing); return result.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector BitVector::SHIFT(const int shift_size) const {
     BitVector out_bits(*this);
     if (shift_size > 0) out_bits.ShiftRight((size_t) shift_size);
@@ -2308,6 +2363,7 @@ namespace emp {
   }
 
   /// Positive shifts go left and negative go right; store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::SHIFT_SELF(const int shift_size) {
     if (shift_size > 0) ShiftRight((size_t) shift_size);
     else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
@@ -2315,6 +2371,7 @@ namespace emp {
   }
 
   /// Reverse the order of bits in the bitset
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::REVERSE_SELF() {
     // reverse bytes
     std::reverse( BytePtr().Raw(), BytePtr().Raw() + NumBytes() );
@@ -2339,6 +2396,7 @@ namespace emp {
   }
 
   /// Reverse order of bits in the bitset.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector BitVector::REVERSE() const {
     BitVector out_set(*this);
     return out_set.REVERSE_SELF();
@@ -2347,6 +2405,7 @@ namespace emp {
 
   /// Positive rotates go left and negative rotates go left (0 does nothing);
   /// return result.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector BitVector::ROTATE(const int rotate_size) const {
     BitVector out_set(*this);
     if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
@@ -2356,6 +2415,7 @@ namespace emp {
 
   /// Positive rotates go right and negative rotates go left (0 does nothing);
   /// store result here, and return this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::ROTATE_SELF(const int rotate_size) {
     if (rotate_size > 0) RotateRight((field_t) rotate_size);
     else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
@@ -2363,6 +2423,7 @@ namespace emp {
   }
 
   /// Helper: call ROTATE with negative number instead
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template<size_t shift_size_raw>
   BitVector & BitVector::ROTL_SELF() {
     constexpr size_t shift_size = shift_size_raw % num_bits;
@@ -2446,6 +2507,7 @@ namespace emp {
 
 
   /// Helper for calling ROTATE with positive number
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template<size_t shift_size_raw>
   BitVector & BitVector::ROTR_SELF() {
     const size_t shift_size = shift_size_raw % num_bits;
@@ -2518,6 +2580,7 @@ namespace emp {
   /// Addition of two Bitsets.
   /// Wraps if it overflows.
   /// Returns result.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector BitVector::ADD(const BitVector & set2) const{
     BitVector out_set(*this);
     return out_set.ADD_SELF(set2);
@@ -2526,6 +2589,7 @@ namespace emp {
   /// Addition of two Bitsets.
   /// Wraps if it overflows.
   /// Returns this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::ADD_SELF(const BitVector & set2) {
     bool carry = false;
 
@@ -2553,6 +2617,7 @@ namespace emp {
   /// Subtraction of two Bitsets.
   /// Wraps around if it underflows.
   /// Returns result.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector BitVector::SUB(const BitVector & set2) const{
     BitVector out_set(*this);
     return out_set.SUB_SELF(set2);
@@ -2561,6 +2626,7 @@ namespace emp {
   /// Subtraction of two Bitsets.
   /// Wraps if it underflows.
   /// Returns this object.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   BitVector & BitVector::SUB_SELF(const BitVector & set2){
 
     bool carry = false;
