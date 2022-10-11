@@ -1058,6 +1058,19 @@ namespace emp {
     }
   }
 
+  /// Copy an array from the provided memory.
+  template <typename T>
+  void CopyMemory(
+    emp::Ptr<T> from_ptr,
+    emp::Ptr<T> to_ptr,
+    const size_t num_items)
+  {
+    constexpr size_t FILL_CHUNK = sizeof(T);
+    const size_t num_bytes = num_items * FILL_CHUNK;
+
+    std::memcpy(to_ptr.Raw(), from_ptr.Raw(), num_bytes);
+  }
+
 } // namespace emp
 
 #endif // #ifndef EMP_BASE_PTR_HPP_INCLUDE
