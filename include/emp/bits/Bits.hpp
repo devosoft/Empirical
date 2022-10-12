@@ -103,7 +103,7 @@ namespace emp {
       // Otherwise, for dynamic SIZE_MODE use BASE_SIZE as the default.
       static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitsMode::CAPPED) ? 0 : BASE_SIZE;
 
-      void RawResize(size_t new_size) { num_bits = new_size; }
+      void SetSize(size_t new_size) { num_bits = new_size; }
 
       using field_t = bits_field_t;
       [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
@@ -141,7 +141,7 @@ namespace emp {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
-      void RawResize(size_t new_size) { emp_assert(new_size == NUM_BITS, "Cannot change to new_size"); }
+      void SetSize(size_t new_size) { emp_assert(new_size == NUM_BITS, "Cannot change to new_size"); }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
 
@@ -194,6 +194,10 @@ namespace emp {
       
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
 
+      void RawResize(const size_t new_size, const bool /* preserve data */) {
+        base_t::SetSize(new_size);
+      }
+
       bool OK() const { return true; } // Nothing to check yet.
     };
     
@@ -228,16 +232,30 @@ namespace emp {
 
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
 
-      void RawResize(size_t new_size) {
-        base_t::RawResize(new_size);
+      void MakeEmpty() {
+        base_t::SetSize(0);
+        if (bits) bits.DeleteArray();
+        bits = nullptr;
+      }
+
+      void RawResize(const size_t new_size, const bool preserve_data=false) {
+        if (new_size == 0) { return MakeEmpty(); }
 
         // If we have dynamic memory, see if number of bit fields needs to change.
         const size_t new_fields = NumBitFields(new_size);
         if (base_t::NumFields() != new_fields) {
-          if (bits) bits.DeleteArray();
-          if (new_fields) bits = NewArrayPtr<field_t>(new_fields);
-          else bits = nullptr;
+          auto new_bits = NewArrayPtr<field_t>(new_fields);
+          if (base_t::num_bits) {
+            if (preserve_data) {
+              static size_t copy_count = std::min(base_t::NumFields(), new_fields);
+              emp::CopyMemory(bits, new_bits, copy_count);
+            }
+            bits.DeleteArray();  // Delete old memory
+          }
+          bits = new_bits;     // Use new memory
         }
+
+        base_t::SetSize(new_size);
       }
 
       bool OK() const {
@@ -286,16 +304,24 @@ namespace emp {
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
 
       // Resize to have at least the specified number of fields.
-      void RawResize(size_t new_size) {
-        base_t::RawResize(new_size);
-
+      void RawResize(const size_t new_size, const bool preserve_data=false) {
         // If we have dynamic memory, see if number of bit fields needs to change.
         const size_t new_fields = NumBitFields(new_size);
+
+        // If we need more fields than currently available, reallocate memory.
         if (new_fields > field_capacity) {
-          if (bits) bits.DeleteArray();
-          bits = NewArrayPtr<field_t>(new_fields);
-          field_capacity = new_fields;
+          auto new_bits = NewArrayPtr<field_t>(new_fields);
+          if (base_t::num_bits) {
+            if (preserve_data) {
+              // Copy over all old fields (new memory must be larger)
+              emp::CopyMemory(bits, new_bits, base_t::NumFields());
+            }
+            bits.DeleteArray();  // Delete old memory
+          }
+          bits = new_bits;     // Use new memory
         }
+
+        base_t::SetSize(new_size);
       }
 
       bool OK() const {
@@ -1622,7 +1648,7 @@ namespace emp {
   bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Any() const {
     const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) {
-      if (bits[i]) return true;
+      if (data.bits[i]) return true;
     }
     return false;
   }
@@ -1630,7 +1656,7 @@ namespace emp {
   /// Resize this Bits object to have the specified number of bits.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Resize(size_t new_bits) {
-    const size_t old_num_fields = NumFields();
+    const size_t old_num_fields = data.NumFields();
     num_bits = new_bits;
     const size_t NUM_FIELDS = NumFields();
 
@@ -1643,8 +1669,8 @@ namespace emp {
       if (num_bits > 0) bits = NewArrayPtr<field_t>(NUM_FIELDS);          // Allocate new mem.
       else bits = nullptr;                                                // (or null if no bits)
       const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);     // Calc num fields to copy
-      for (size_t i = 0; i < min_fields; i++) bits[i] = old_bits[i];      // Copy fields
-      for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = FIELD_0; // Zero any excess fields
+      for (size_t i = 0; i < min_fields; i++) data.bits[i] = old_bits[i];      // Copy fields
+      for (size_t i = min_fields; i < NUM_FIELDS; i++) data.bits[i] = FIELD_0; // Zero any excess fields
       if (old_bits) old_bits.DeleteArray();                               // Cleanup old memory
     }
 
@@ -1841,7 +1867,7 @@ namespace emp {
 
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
-      if (bits[i] != in.bits[i]) return false;
+      if (data.bits[i] != in.bits[i]) return false;
     }
     return true;
   }
@@ -1854,8 +1880,8 @@ namespace emp {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
       const size_t pos = i-1;
-      if (bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
-      return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
+      if (data.bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
+      return (data.bits[pos] < in.bits[pos]);        // Otherwise, do comparison
     }
     return false; // Bit vectors are identical.
   }
@@ -1880,7 +1906,7 @@ namespace emp {
     emp_assert(index < NumBytes(), index, NumBytes());
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
-    return (bits[field_id] >> pos_id) & 255U;
+    return (data.bits[field_id] >> pos_id) & 255U;
   }
 
   /// Get a read-only view into the internal array used by Bits object.
@@ -1900,7 +1926,7 @@ namespace emp {
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     const field_t val_uint = value;
-    bits[field_id] = (bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
+    data.bits[field_id] = (data.bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
   }
 
   /// Get the overall value of this BitSet, using a uint encoding, but including all bits
@@ -1995,10 +2021,10 @@ namespace emp {
     if (start_field == NumFields()) return num_bits;
 
     // If we have only one field left, combine it with size.
-    if (start_field == NumFields()-1) return hash_combine(bits[start_field], num_bits);
+    if (start_field == NumFields()-1) return hash_combine(data.bits[start_field], num_bits);
 
     // Otherwise we have more than one field.  Combine and recurse.
-    size_t partial_hash = hash_combine(bits[start_field], bits[start_field+1]);
+    size_t partial_hash = hash_combine(data.bits[start_field], data.bits[start_field+1]);
 
     return hash_combine(partial_hash, Hash(start_field+2));
   }
@@ -2012,7 +2038,7 @@ namespace emp {
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; i++) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.
-        std::bitset<FIELD_BITS> std_bs(bits[i]);
+        std::bitset<FIELD_BITS> std_bs(data.bits[i]);
         bit_count += std_bs.count();
       }
 
@@ -2025,7 +2051,7 @@ namespace emp {
     size_t bit_count = 0;
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
-      field_t cur_field = bits[i];
+      field_t cur_field = data.bits[i];
       while (cur_field) {
         cur_field &= (cur_field-1);       // Peel off a single 1.
         bit_count++;                      // Increment the counter
@@ -2084,9 +2110,9 @@ namespace emp {
   int Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FindOne() const {
     const size_t NUM_FIELDS = NumFields();
     size_t field_id = 0;
-    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
+    while (field_id < NUM_FIELDS && data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
+      (int) (find_bit(data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
   }
 
   /// Return the position of the first one after start_pos; return -1 if no ones in vector.
@@ -2101,17 +2127,17 @@ namespace emp {
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
 
     // If there's a hit in a partial first field, return it.
-    if (field_pos && (bits[field_id] & ~(MaskField(field_pos)))) {
-      return (int) (find_bit(bits[field_id] & ~(MaskField(field_pos))) +
+    if (field_pos && (data.bits[field_id] & ~(MaskField(field_pos)))) {
+      return (int) (find_bit(data.bits[field_id] & ~(MaskField(field_pos))) +
                     field_id * FIELD_BITS);
     }
 
     // Search other fields...
     const size_t NUM_FIELDS = NumFields();
     if (field_pos) field_id++;
-    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
+    while (field_id < NUM_FIELDS && data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
-      (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+      (int) (find_bit(data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
   }
 
   /// Find the most-significant set-bit.
@@ -2119,12 +2145,12 @@ namespace emp {
   int Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FindMaxOne() const {
     // Find the max field with a one.
     size_t max_field = NumFields() - 1;
-    while (max_field > 0 && bits[max_field] == 0) max_field--;
+    while (max_field > 0 && data.bits[max_field] == 0) max_field--;
 
     // If there are no ones, return -1.
-    if (bits[max_field] == 0) return -1;
+    if (data.bits[max_field] == 0) return -1;
 
-    const field_t field = bits[max_field]; // Save a local copy of this field.
+    const field_t field = data.bits[max_field]; // Save a local copy of this field.
     field_t mask = (field_t) -1;           // Mask off the bits still under consideration.
     size_t offset = 0;                     // Indicate where the mask should be applied.
     size_t range = FIELD_BITS;             // Indicate how many bits are in the mask.
@@ -2188,7 +2214,7 @@ namespace emp {
     const size_t num_fields = std::min(NumFields(), in.NumFields());
     for (size_t i = 0; i < num_fields; ++i) {
       // Short-circuit if we find any overlap.
-      if (bits[i] & in.bits[i]) return true;
+      if (data.bits[i] & in.bits[i]) return true;
     }
     return false;
   }
@@ -2246,7 +2272,7 @@ namespace emp {
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PrintDebug(std::ostream & out) const {
     for (size_t field = 0; field < NumFields(); field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
-        bool bit = (FIELD_1 << bit_id) & bits[field];
+        bool bit = (FIELD_1 << bit_id) & data.bits[field];
         out << ( bit ? 1 : 0 );
       }
       out << " : " << field << std::endl;
@@ -2297,7 +2323,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOT_SELF() {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~bits[i];
     ClearExcessBits();
     return *this;
   }
@@ -2306,7 +2332,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::AND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & bits2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] & bits2.bits[i];
     return *this;
   }
 
@@ -2314,7 +2340,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::OR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | bits2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] | bits2.bits[i];
     return *this;
   }
 
@@ -2322,7 +2348,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NAND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bits2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] & bits2.bits[i]);
     ClearExcessBits();
     return *this;
   }
@@ -2331,7 +2357,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bits2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] | bits2.bits[i]);
     ClearExcessBits();
     return *this;
   }
@@ -2340,7 +2366,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::XOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ bits2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] ^ bits2.bits[i];
     return *this;
   }
 
@@ -2348,7 +2374,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::EQU_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bits2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] ^ bits2.bits[i]);
     ClearExcessBits();
     return *this;
   }
@@ -2433,7 +2459,7 @@ namespace emp {
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
     if (NUM_FIELDS == 1) {
-      field_t & n = bits[0];
+      field_t & n = data.bits[0];
       size_t c = shift_size;
 
       // mask necessary to surpress shift count overflow warnings
@@ -2472,8 +2498,8 @@ namespace emp {
       if (NumEndBits()) {
         const size_t filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          bits[i-1] |= bits[i] << NumEndBits();
-          bits[i] >>= (FIELD_BITS - NumEndBits());
+          data.bits[i-1] |= data.bits[i] << NumEndBits();
+          data.bits[i] >>= (FIELD_BITS - NumEndBits());
         }
       }
 
@@ -2481,19 +2507,19 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = NumEndBits() ? (
-          (bits[LAST_FIELD] << (FIELD_BITS - NumEndBits()))
-          | (bits[NUM_FIELDS - 2] >> NumEndBits())
+          (data.bits[LAST_FIELD] << (FIELD_BITS - NumEndBits()))
+          | (data.bits[NUM_FIELDS - 2] >> NumEndBits())
         ) : (
-          bits[LAST_FIELD]
+          data.bits[LAST_FIELD]
         );
 
         for (size_t i = LAST_FIELD; i > 0; --i) {
-          bits[i] <<= bit_shift;
-          bits[i] |= (bits[i-1] >> bit_overflow);
+          data.bits[i] <<= bit_shift;
+          data.bits[i] |= (data.bits[i-1] >> bit_overflow);
         }
         // Handle final field
-        bits[0] <<= bit_shift;
-        bits[0] |= keystone >> bit_overflow;
+        data.bits[0] <<= bit_shift;
+        data.bits[0] |= keystone >> bit_overflow;
 
       }
 
@@ -2517,7 +2543,7 @@ namespace emp {
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
     if (NUM_FIELDS == 1) {
-      field_t & n = bits[0];
+      field_t & n = data.bits[0];
       size_t c = shift_size;
 
       // mask necessary to surpress shift count overflow warnings
@@ -2544,8 +2570,8 @@ namespace emp {
       if (NumEndBits()) {
         size_t filler_idx = LAST_FIELD - field_shift;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          bits[i-1] |= bits[i] << NumEndBits();
-          bits[i] >>= (FIELD_BITS - NumEndBits());
+          data.bits[i-1] |= data.bits[i] << NumEndBits();
+          data.bits[i] >>= (FIELD_BITS - NumEndBits());
         }
       }
 
@@ -2553,21 +2579,21 @@ namespace emp {
       if (bit_shift) {
 
         const field_t keystone = NumEndBits() ? (
-          bits[0] >> (FIELD_BITS - NumEndBits())
+          data.bits[0] >> (FIELD_BITS - NumEndBits())
         ) : (
-          bits[0]
+          data.bits[0]
         );
 
         if (NumEndBits()) {
-          bits[LastField()] |= bits[0] << NumEndBits();
+          data.bits[LastField()] |= data.bits[0] << NumEndBits();
         }
 
         for (size_t i = 0; i < LAST_FIELD; ++i) {
-          bits[i] >>= bit_shift;
-          bits[i] |= (bits[i+1] << bit_overflow);
+          data.bits[i] >>= bit_shift;
+          data.bits[i] |= (data.bits[i+1] << bit_overflow);
         }
-        bits[LAST_FIELD] >>= bit_shift;
-        bits[LAST_FIELD] |= keystone << bit_overflow;
+        data.bits[LAST_FIELD] >>= bit_shift;
+        data.bits[LAST_FIELD] |= keystone << bit_overflow;
       }
     }
 
@@ -2597,15 +2623,15 @@ namespace emp {
       field_t addend = set2.bits[i] + static_cast<field_t>(carry);
       carry = set2.bits[i] > addend;
 
-      field_t sum = bits[i] + addend;
-      carry |= bits[i] > sum;
+      field_t sum = data.bits[i] + addend;
+      carry |= data.bits[i] > sum;
 
-      bits[i] = sum;
+      data.bits[i] = sum;
     }
 
     if (NumEndBits()) {
-      bits[num_bits/FIELD_BITS] = (
-        bits[num_bits/FIELD_BITS]
+      data.bits[num_bits/FIELD_BITS] = (
+        data.bits[num_bits/FIELD_BITS]
         + set2.bits[num_bits/FIELD_BITS]
         + static_cast<field_t>(carry)
       ) & EndMask();
@@ -2634,13 +2660,13 @@ namespace emp {
     for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
       field_t subtrahend = set2.bits[i] + static_cast<field_t>(carry);
       carry = set2.bits[i] > subtrahend;
-      carry |= bits[i] < subtrahend;
-      bits[i] -= subtrahend;
+      carry |= data.bits[i] < subtrahend;
+      data.bits[i] -= subtrahend;
     }
 
     if (NumEndBits()) {
-      bits[num_bits/FIELD_BITS] = (
-        bits[num_bits/FIELD_BITS]
+      data.bits[num_bits/FIELD_BITS] = (
+        data.bits[num_bits/FIELD_BITS]
         - set2.bits[num_bits/FIELD_BITS]
         - static_cast<field_t>(carry)
       ) & EndMask();
