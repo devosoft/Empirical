@@ -249,6 +249,8 @@ namespace emp {
             if (preserve_data) {
               static size_t copy_count = std::min(base_t::NumFields(), new_fields);
               emp::CopyMemory(bits, new_bits, copy_count);
+              // Clear out any newly added fields.
+              for (size_t i = base_t::NumFields(); i < new_fields; ++i) bits[i] = 0;
             }
             bits.DeleteArray();  // Delete old memory
           }
@@ -315,6 +317,8 @@ namespace emp {
             if (preserve_data) {
               // Copy over all old fields (new memory must be larger)
               emp::CopyMemory(bits, new_bits, base_t::NumFields());
+              // Clear out new fields, if any.
+              for (size_t i = base_t::NumFields(); i < new_fields; ++i) bits[i] = 0;
             }
             bits.DeleteArray();  // Delete old memory
           }
@@ -449,8 +453,9 @@ namespace emp {
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const { return data.BytePtr(); }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
-    void ClearExcessBits() {
+    this_t & ClearExcessBits() {
       if (data.NumEndBits()) data.bits[data.LastField()] &= data.EndMask();
+      return *this;
     }
 
     // Apply a transformation to each bit field in a specified range.
@@ -620,7 +625,7 @@ namespace emp {
     [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
     /// Resize this Bits object to have the specified number of bits (if allowed)
-    Bits & Resize(size_t new_bits);
+    Bits & Resize(size_t new_bits) { data.RawResize(new_bits, true); return *this; }
 
 
     // =========  Randomization functions  ========= //
@@ -1531,9 +1536,7 @@ namespace emp {
   {
     data.RawResize(NUM_BITS);
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);  // Copy bits in.
-    ClearExcessBits();                                        // Set excess bits to zeros.
-
-    return *this;
+    return ClearExcessBits();                                 // Set excess bits to zeros.
   }
 
   /// Assignment operator from a string of '0's and '1's.
@@ -1615,8 +1618,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetAll() {
     const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = FIELD_ALL;
-    ClearExcessBits();
-    return *this;
+    return ClearExcessBits();
   }
 
   /// Set all bits to 0.
@@ -1653,40 +1655,13 @@ namespace emp {
     return false;
   }
 
-  /// Resize this Bits object to have the specified number of bits.
-  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Resize(size_t new_bits) {
-    const size_t old_num_fields = data.NumFields();
-    num_bits = new_bits;
-    const size_t NUM_FIELDS = NumFields();
-
-    if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
-      num_bits = new_bits;
-    }
-
-    else {  // We must change the number of bitfields.  Resize & copy old info.
-      Ptr<field_t> old_bits = bits;                                       // Backup old ptr.
-      if (num_bits > 0) bits = NewArrayPtr<field_t>(NUM_FIELDS);          // Allocate new mem.
-      else bits = nullptr;                                                // (or null if no bits)
-      const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);     // Calc num fields to copy
-      for (size_t i = 0; i < min_fields; i++) data.bits[i] = old_bits[i];      // Copy fields
-      for (size_t i = min_fields; i < NUM_FIELDS; i++) data.bits[i] = FIELD_0; // Zero any excess fields
-      if (old_bits) old_bits.DeleteArray();                               // Cleanup old memory
-    }
-
-    ClearExcessBits();     // If there are ones past the end, zero them out.
-
-    return *this;
-  }
-
   // -------------------------  Implementations Randomization functions -------------------------
 
   /// Set all bits randomly, with a 50% probability of being a 0 or 1.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Randomize(Random & random) {
-    random.RandFill(BytePtr(), NumBytes());
-    ClearExcessBits();
-    return *this;
+    random.RandFill(BytePtr(), data.NumBytes());
+    return ClearExcessBits();
   }
 
   /// Set all bits randomly, with probability specified at compile time.
@@ -1698,7 +1673,7 @@ namespace emp {
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
-    random.RandFillP<P>(BytePtr(), NumBytes(), start_pos, stop_pos);
+    random.RandFillP<P>(BytePtr(), data.NumBytes(), start_pos, stop_pos);
     return *this;
   }
 
@@ -1712,7 +1687,7 @@ namespace emp {
     emp_assert(start_pos <= stop_pos, start_pos, stop_pos);
     emp_assert(stop_pos <= num_bits, stop_pos, num_bits);
     emp_assert(p >= 0.0 && p <= 1.0, p);
-    random.RandFill(BytePtr(), NumBytes(), p, start_pos, stop_pos);
+    random.RandFill(BytePtr(), data.NumBytes(), p, start_pos, stop_pos);
     return *this;
   }
 
@@ -1903,7 +1878,7 @@ namespace emp {
   /// Retrieve the byte at the specified byte index.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   uint8_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetByte(size_t index) const {
-    emp_assert(index < NumBytes(), index, NumBytes());
+    emp_assert(index < data.NumBytes(), index, data.NumBytes());
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     return (data.bits[field_id] >> pos_id) & 255U;
@@ -1915,14 +1890,14 @@ namespace emp {
   std::span<const std::byte> Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetBytes() const {
     return std::span<const std::byte>(
       bits.ReinterpretCast<const std::byte>().Raw(),
-      NumBytes()
+      data.NumBytes()
     );
   }
 
   /// Update the byte at the specified byte index.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetByte(size_t index, uint8_t value) {
-    emp_assert(index < NumBytes(), index, NumBytes());
+    emp_assert(index < data.NumBytes(), index, data.NumBytes());
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     const field_t val_uint = value;
@@ -1966,13 +1941,11 @@ namespace emp {
   /// Set specified type at a given index (in steps of that type size)
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetValueAtIndex(const size_t index, T in_value) {
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetValueAtIndex(const size_t index, T in_value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= TotalBytes());
-
     std::memcpy( BytePtr().Raw() + index * sizeof(T), &in_value, sizeof(T) );
-
-    ClearExcessBits();
+    return ClearExcessBits();
   }
 
 
@@ -1994,7 +1967,7 @@ namespace emp {
   // @CAO: Can be optimized substantially, especially for long Bits objects.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <typename T>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetValueAtBit(const size_t index, T value) {
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetValueAtBit(const size_t index, T value) {
     // For the moment, must fit inside bounds; eventually should (?) pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
     constexpr size_t type_bits = sizeof(T) * 8;
@@ -2006,7 +1979,7 @@ namespace emp {
     in_bits <<= index;                   // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current Bits object.
 
-    ClearExcessBits();
+    return ClearExcessBits();
   }
 
 
@@ -2324,8 +2297,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOT_SELF() {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~bits[i];
-    ClearExcessBits();
-    return *this;
+    return ClearExcessBits();
   }
 
   /// Perform a Boolean AND with this Bits object, store result here, and return this object.
@@ -2349,8 +2321,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NAND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] & bits2.bits[i]);
-    ClearExcessBits();
-    return *this;
+    return ClearExcessBits();
   }
 
   /// Perform a Boolean NOR with this Bits object, store result here, and return this object.
@@ -2358,8 +2329,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] | bits2.bits[i]);
-    ClearExcessBits();
-    return *this;
+    return ClearExcessBits();
   }
 
   /// Perform a Boolean XOR with this Bits object, store result here, and return this object.
@@ -2375,8 +2345,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::EQU_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] ^ bits2.bits[i]);
-    ClearExcessBits();
-    return *this;
+    return ClearExcessBits();
   }
 
   /// Positive shifts go left and negative go right (0 does nothing); return result.
@@ -2400,11 +2369,11 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::REVERSE_SELF() {
     // reverse bytes
-    std::reverse( BytePtr().Raw(), BytePtr().Raw() + NumBytes() );
+    std::reverse( BytePtr().Raw(), BytePtr().Raw() + data.NumBytes() );
 
     // reverse each byte
     // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
-    for (size_t i = 0; i < NumBytes(); ++i) {
+    for (size_t i = 0; i < data.NumBytes(); ++i) {
       unsigned char & b = BytePtr()[i];
       b = static_cast<unsigned char>( (b & 0xF0) >> 4 | (b & 0x0F) << 4 );
       b = static_cast<unsigned char>( (b & 0xCC) >> 2 | (b & 0x33) << 2 );
@@ -2525,10 +2494,7 @@ namespace emp {
 
     }
 
-    ClearExcessBits();
-
-    return *this;
-
+    return ClearExcessBits();
   }
 
 
@@ -2597,10 +2563,7 @@ namespace emp {
       }
     }
 
-    ClearExcessBits();
-
-    return *this;
-
+    return ClearExcessBits();
   }
 
   /// Addition of two Bitsets.
