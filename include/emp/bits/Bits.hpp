@@ -733,7 +733,7 @@ namespace emp {
 
 
     /// Set specified type at a given index (in steps of that type size)
-    template <typename T> void SetValueAtIndex(const size_t index, T value);
+    template <typename T> Bits & SetValueAtIndex(const size_t index, T value);
 
     /// Update the 8-bit uint at the specified uint index.
     void SetUInt8(const size_t index, uint8_t value) { SetValueAtIndex(index, value); }
@@ -771,7 +771,7 @@ namespace emp {
     [[nodiscard]] uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
 
 
-    template <typename T> void SetValueAtBit(const size_t index, T value);
+    template <typename T> Bits & SetValueAtBit(const size_t index, T value);
 
     /// Update the 8-bit uint at the specified uint index.
     void SetUInt8AtBit(const size_t index, uint8_t value) { SetValueAtBit(index, value); }
@@ -1669,10 +1669,10 @@ namespace emp {
   template <Random::Prob P>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RandomizeP(Random & random,
                                     const size_t start_pos, size_t stop_pos) {
-    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= num_bits);
+    emp_assert(stop_pos <= GetSize());
     random.RandFillP<P>(BytePtr(), data.NumBytes(), start_pos, stop_pos);
     return *this;
   }
@@ -1682,10 +1682,10 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Randomize(Random & random, const double p,
                                    const size_t start_pos, size_t stop_pos) {
-    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos, start_pos, stop_pos);
-    emp_assert(stop_pos <= num_bits, stop_pos, num_bits);
+    emp_assert(stop_pos <= GetSize(), stop_pos, GetSize());
     emp_assert(p >= 0.0 && p <= 1.0, p);
     random.RandFill(BytePtr(), data.NumBytes(), p, start_pos, stop_pos);
     return *this;
@@ -1695,10 +1695,10 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ChooseRandom(Random & random, const size_t target_ones,
                                       const size_t start_pos, size_t stop_pos) {
-    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= num_bits);
+    emp_assert(stop_pos <= GetSize());
 
     const size_t target_size = stop_pos - start_pos;
     emp_assert(target_ones <= target_size);
@@ -1709,14 +1709,14 @@ namespace emp {
     // If we are not randomizing the whole sequence, we need to track the number of ones
     // in the NON-randomized region to subtract off later.
     size_t kept_ones = 0;
-    if (target_size != num_bits) {
+    if (target_size != GetSize()) {
       Clear(start_pos, stop_pos);
       kept_ones = CountOnes();
     }
 
     // Try to find a shortcut if p allows....
     // (These values are currently educated guesses)
-    if (p < 0.12) { if (target_size == num_bits) Clear(start_pos, stop_pos); }
+    if (p < 0.12) { if (target_size == GetSize()) Clear(start_pos, stop_pos); }
     else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random, start_pos, stop_pos);
     else if (p < 0.35) RandomizeP<Random::PROB_25>(random, start_pos, stop_pos);
     else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random, start_pos, stop_pos);
@@ -1759,10 +1759,10 @@ namespace emp {
                                                   const size_t start_pos,
                                                   size_t stop_pos)
   {
-    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= num_bits);
+    emp_assert(stop_pos <= GetSize());
     emp_assert(p >= 0.0 && p <= 1.0, p);
 
     for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
@@ -1777,10 +1777,10 @@ namespace emp {
                       const size_t start_pos,
                       size_t stop_pos)
   {
-    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= num_bits);
+    emp_assert(stop_pos <= GetSize());
     emp_assert(p >= 0.0 && p <= 1.0, p);
 
     for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Set(i);
@@ -1795,10 +1795,10 @@ namespace emp {
                       const size_t start_pos,
                       size_t stop_pos)
   {
-    if (stop_pos == MAX_SIZE_T) stop_pos = num_bits;
+    if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= num_bits);
+    emp_assert(stop_pos <= GetSize());
     emp_assert(p >= 0.0 && p <= 1.0, p);
 
     for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Clear(i);
@@ -1810,8 +1810,8 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FlipRandomCount(Random & random, const size_t target_bits)
   {
-    emp_assert(num_bits <= num_bits);
-    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> choice(num_bits, random, target_bits);
+    emp_assert(GetSize() <= GetSize());
+    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> choice(GetSize(), random, target_bits);
     return XOR_SELF(choice);
   }
 
@@ -1819,16 +1819,17 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetRandomCount(Random & random, const size_t target_bits)
   {
-    emp_assert(num_bits <= num_bits);
-    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> choice(num_bits, random, target_bits);
+    emp_assert(GetSize() <= GetSize());
+    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> choice(GetSize(), random, target_bits);
     return OR_SELF(choice);
   }
 
   /// Unset  a specified number of random bits (does not check if already zero.)
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ClearRandomCount(Random & random, const size_t target_bits)
   {
-    emp_assert(num_bits <= num_bits);
-    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> choice(num_bits, random, num_bits - target_bits);
+    emp_assert(GetSize() <= GetSize());
+    Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> choice(GetSize(), random, GetSize() - target_bits);
     return AND_SELF(choice);
   }
 
@@ -1838,9 +1839,9 @@ namespace emp {
   /// Test if two bit vectors are identical.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator==(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & in) const {
-    if (num_bits != in.num_bits) return false;
+    if (GetSize() != in.GetSize()) return false;
 
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
       if (data.bits[i] != in.bits[i]) return false;
     }
@@ -1850,9 +1851,9 @@ namespace emp {
   /// Compare the would-be numerical values of two bit vectors.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator<(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & in) const {
-    if (num_bits != in.num_bits) return num_bits < in.num_bits;
+    if (GetSize() != in.GetSize()) return GetSize() < in.GetSize();
 
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
       const size_t pos = i-1;
       if (data.bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
@@ -1889,7 +1890,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::span<const std::byte> Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetBytes() const {
     return std::span<const std::byte>(
-      bits.ReinterpretCast<const std::byte>().Raw(),
+      data.BytePtr().Raw(),
       data.NumBytes()
     );
   }
@@ -1930,7 +1931,7 @@ namespace emp {
   template <typename T>
   T Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetValueAtIndex(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 1) * sizeof(T) <= TotalBytes());
+    emp_assert((index + 1) * sizeof(T) <= data.TotalBytes());
 
     T out_value;
     std::memcpy( &out_value, BytePtr().Raw() + index * sizeof(T), sizeof(T) );
@@ -1943,7 +1944,7 @@ namespace emp {
   template <typename T>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetValueAtIndex(const size_t index, T in_value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 1) * sizeof(T) <= TotalBytes());
+    emp_assert((index + 1) * sizeof(T) <= data.TotalBytes());
     std::memcpy( BytePtr().Raw() + index * sizeof(T), &in_value, sizeof(T) );
     return ClearExcessBits();
   }
@@ -1954,7 +1955,7 @@ namespace emp {
   template <typename T>
   T Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetValueAtBit(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
+    emp_assert((index+7)/8 + sizeof(T) < data.TotalBytes());
 
     Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> out_bits(*this);
     out_bits >>= index;
@@ -1969,10 +1970,10 @@ namespace emp {
   template <typename T>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::SetValueAtBit(const size_t index, T value) {
     // For the moment, must fit inside bounds; eventually should (?) pad with zeros.
-    emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
+    emp_assert((index+7)/8 + sizeof(T) < data.TotalBytes());
     constexpr size_t type_bits = sizeof(T) * 8;
 
-    const size_t end_pos = Min(index+type_bits, num_bits);
+    const size_t end_pos = Min(index+type_bits, GetSize());
     Clear(index, end_pos);               // Clear out the bits where new value will go.
     Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> in_bits(GetSize());        // Setup a bitset for the new bits.
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
@@ -1991,10 +1992,10 @@ namespace emp {
     static_assert(std::is_same_v<field_t, size_t>, "Hash() requires fields to be size_t");
 
     // If there are no fields left, hash on size one.
-    if (start_field == NumFields()) return num_bits;
+    if (start_field == data.NumFields()) return GetSize();
 
     // If we have only one field left, combine it with size.
-    if (start_field == NumFields()-1) return hash_combine(data.bits[start_field], num_bits);
+    if (start_field == data.NumFields()-1) return hash_combine(data.bits[start_field], GetSize());
 
     // Otherwise we have more than one field.  Combine and recurse.
     size_t partial_hash = hash_combine(data.bits[start_field], data.bits[start_field+1]);
@@ -2006,8 +2007,8 @@ namespace emp {
   /// Count the number of ones in Bits.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes() const {
-    if (num_bits == 0) return 0;
-    const field_t NUM_FIELDS = NumFields();
+    if (GetSize() == 0) return 0;
+    const field_t NUM_FIELDS = data.NumFields();
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; i++) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.
@@ -2022,7 +2023,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes_Sparse() const {
     size_t bit_count = 0;
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
       field_t cur_field = data.bits[i];
       while (cur_field) {
@@ -2037,8 +2038,8 @@ namespace emp {
   /// @return value of the popped bit.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PopBack() {
-    const bool val = Get(num_bits-1);
-    Resize(num_bits - 1);
+    const bool val = Get(GetSize()-1);
+    Resize(GetSize() - 1);
     return val;
   }
 
@@ -2047,8 +2048,8 @@ namespace emp {
   /// @param num number of bits to be pushed.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PushBack(const bool bit, const size_t num) {
-    Resize(num_bits + num);
-    if (bit) SetRange(num_bits-num, num_bits);
+    Resize(GetSize() + num);
+    if (bit) SetRange(GetSize()-num, GetSize());
   }
 
   /// Insert bit(s) into any index of vector using bit magic.
@@ -2058,11 +2059,11 @@ namespace emp {
   /// @param num number of bits to insert, default 1.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Insert(const size_t index, const bool val, const size_t num) {
-    Resize(num_bits + num);                 // Adjust to new number of bits.
+    Resize(GetSize() + num);                 // Adjust to new number of bits.
     Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> low_bits(*this);              // Copy current bits
     SHIFT_SELF(-(int)num);                  // Shift the high bits into place.
     Clear(0, index+num);                    // Reduce current to just high bits.
-    low_bits.Clear(index, num_bits);        // Reduce copy to just low bits.
+    low_bits.Clear(index, GetSize());        // Reduce copy to just low bits.
     if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
     OR_SELF(low_bits);                      // Put the low bits back in place.
   }
@@ -2074,14 +2075,14 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Delete(const size_t index, const size_t num) {
     emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
-    RawMove(index+num, num_bits, index);  // Shift positions AFTER delete into place.
-    Resize(num_bits - num);               // Crop off end bits.
+    RawMove(index+num, GetSize(), index);  // Shift positions AFTER delete into place.
+    Resize(GetSize() - num);               // Crop off end bits.
   }
 
   /// Return the position of the first one; return -1 if no ones in vector.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FindOne() const {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     size_t field_id = 0;
     while (field_id < NUM_FIELDS && data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
@@ -2095,7 +2096,7 @@ namespace emp {
 
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FindOne(const size_t start_pos) const {
-    if (start_pos >= num_bits) return -1;            // If we're past the end, return fail.
+    if (start_pos >= GetSize()) return -1;            // If we're past the end, return fail.
     size_t field_id  = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
 
@@ -2106,7 +2107,7 @@ namespace emp {
     }
 
     // Search other fields...
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     if (field_pos) field_id++;
     while (field_id < NUM_FIELDS && data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
@@ -2117,7 +2118,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   int Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FindMaxOne() const {
     // Find the max field with a one.
-    size_t max_field = NumFields() - 1;
+    size_t max_field = data.NumFields() - 1;
     while (max_field > 0 && data.bits[max_field] == 0) max_field--;
 
     // If there are no ones, return -1.
@@ -2163,7 +2164,7 @@ namespace emp {
     // @CAO -- There are better ways to do this with bit tricks.
     out_vals.resize(CountOnes());
     T cur_pos = 0;
-    for (T i = 0; i < num_bits; i++) {
+    for (T i = 0; i < GetSize(); i++) {
       if (Get(i)) out_vals[cur_pos++] = i;
     }
     return out_vals;
@@ -2184,7 +2185,7 @@ namespace emp {
   /// Return true if any ones are in common with another Bits object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::HasOverlap(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & in) const {
-    const size_t num_fields = std::min(NumFields(), in.NumFields());
+    const size_t num_fields = std::min(data.NumFields(), in.data.NumFields());
     for (size_t i = 0; i < num_fields; ++i) {
       // Short-circuit if we find any overlap.
       if (data.bits[i] & in.bits[i]) return true;
@@ -2199,8 +2200,8 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::string Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ToString() const {
     std::string out_string;
-    out_string.reserve(num_bits);
-    for (size_t i = 0; i < num_bits; ++i) out_string.push_back(GetAsChar(i));
+    out_string.reserve(GetSize());
+    for (size_t i = 0; i < GetSize(); ++i) out_string.push_back(GetAsChar(i));
     return out_string;
   }
 
@@ -2208,8 +2209,8 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   std::string Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ToBinaryString() const {
     std::string out_string;
-    out_string.reserve(num_bits);
-    for (size_t i = num_bits; i > 0; --i) out_string.push_back(GetAsChar(i-1));
+    out_string.reserve(GetSize());
+    for (size_t i = GetSize(); i > 0; --i) out_string.push_back(GetAsChar(i-1));
     return out_string;
   }
 
@@ -2234,7 +2235,7 @@ namespace emp {
   /// Print a space between each field (or other provided spacer)
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PrintFields(std::ostream & out, const std::string & spacer) const {
-    for (size_t i = num_bits-1; i < num_bits; i--) {
+    for (size_t i = GetSize()-1; i < GetSize(); i--) {
       out << Get(i);
       if (i && (i % FIELD_BITS == 0)) out << spacer;
     }
@@ -2243,7 +2244,7 @@ namespace emp {
   /// Print a space between each field (or other provided spacer)
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PrintDebug(std::ostream & out) const {
-    for (size_t field = 0; field < NumFields(); field++) {
+    for (size_t field = 0; field < data.NumFields(); field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
         bool bit = (FIELD_1 << bit_id) & data.bits[field];
         out << ( bit ? 1 : 0 );
@@ -2260,7 +2261,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
     bool started = false;
-    for (size_t i = 0; i < num_bits; i++) {
+    for (size_t i = 0; i < GetSize(); i++) {
       if (Get(i)) {
         if (started) out << spacer;
         out << i;
@@ -2295,7 +2296,7 @@ namespace emp {
   /// Perform a Boolean NOT with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOT_SELF() {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~bits[i];
     return ClearExcessBits();
   }
@@ -2303,7 +2304,7 @@ namespace emp {
   /// Perform a Boolean AND with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::AND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] & bits2.bits[i];
     return *this;
   }
@@ -2311,7 +2312,7 @@ namespace emp {
   /// Perform a Boolean OR with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::OR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] | bits2.bits[i];
     return *this;
   }
@@ -2319,7 +2320,7 @@ namespace emp {
   /// Perform a Boolean NAND with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NAND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] & bits2.bits[i]);
     return ClearExcessBits();
   }
@@ -2327,7 +2328,7 @@ namespace emp {
   /// Perform a Boolean NOR with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] | bits2.bits[i]);
     return ClearExcessBits();
   }
@@ -2335,7 +2336,7 @@ namespace emp {
   /// Perform a Boolean XOR with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::XOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] ^ bits2.bits[i];
     return *this;
   }
@@ -2343,7 +2344,7 @@ namespace emp {
   /// Perform a Boolean EQU with this Bits object, store result here, and return this object.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::EQU_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
-    const size_t NUM_FIELDS = NumFields();
+    const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] ^ bits2.bits[i]);
     return ClearExcessBits();
   }
@@ -2381,7 +2382,7 @@ namespace emp {
     }
 
     // shift out filler bits
-    size_t filler_bits = num_bits % 8;
+    size_t filler_bits = GetSize() % 8;
     if (filler_bits) {
       this->ShiftRight(8-filler_bits);
     }
@@ -2421,8 +2422,8 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template<size_t shift_size_raw>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ROTL_SELF() {
-    constexpr size_t shift_size = shift_size_raw % num_bits;
-    const size_t NUM_FIELDS = NumFields();
+    constexpr size_t shift_size = shift_size_raw % GetSize();
+    const size_t NUM_FIELDS = data.NumFields();
     const size_t LAST_FIELD = LastField();
 
     // special case: for exactly one field_t, try to go low level
@@ -2433,11 +2434,11 @@ namespace emp {
 
       // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
-      n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
+      n = (n<<c) | (n>>( (-(c+FIELD_BITS-GetSize())) & FIELD_LOG2_MASK ));
 
     } else {
 
-      // note that we already modded shift_size by num_bits
+      // note that we already modded shift_size by GetSize()
       // so there's no need to mod by FIELD_SIZE here
       size_t field_shift = NumEndBits() ? (
         (shift_size + FIELD_BITS - NumEndBits()) / FIELD_BITS
@@ -2502,8 +2503,8 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template<size_t shift_size_raw>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ROTR_SELF() {
-    const size_t shift_size = shift_size_raw % num_bits;
-    const size_t NUM_FIELDS = NumFields();
+    const size_t shift_size = shift_size_raw % GetSize();
+    const size_t NUM_FIELDS = data.NumFields();
     const size_t LAST_FIELD = LastField();
 
     // special case: for exactly one field_t, try to go low level
@@ -2514,7 +2515,7 @@ namespace emp {
 
       // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
-      n = (n>>c) | (n<<( (num_bits-c) & FIELD_LOG2_MASK ));
+      n = (n>>c) | (n<<( (GetSize()-c) & FIELD_LOG2_MASK ));
 
     } else {
 
@@ -2582,7 +2583,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ADD_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & set2) {
     bool carry = false;
 
-    for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
+    for (size_t i = 0; i < GetSize()/FIELD_BITS; ++i) {
       field_t addend = set2.bits[i] + static_cast<field_t>(carry);
       carry = set2.bits[i] > addend;
 
@@ -2593,9 +2594,9 @@ namespace emp {
     }
 
     if (NumEndBits()) {
-      data.bits[num_bits/FIELD_BITS] = (
-        data.bits[num_bits/FIELD_BITS]
-        + set2.bits[num_bits/FIELD_BITS]
+      data.bits[GetSize()/FIELD_BITS] = (
+        data.bits[GetSize()/FIELD_BITS]
+        + set2.bits[GetSize()/FIELD_BITS]
         + static_cast<field_t>(carry)
       ) & EndMask();
     }
@@ -2620,7 +2621,7 @@ namespace emp {
 
     bool carry = false;
 
-    for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
+    for (size_t i = 0; i < GetSize()/FIELD_BITS; ++i) {
       field_t subtrahend = set2.bits[i] + static_cast<field_t>(carry);
       carry = set2.bits[i] > subtrahend;
       carry |= data.bits[i] < subtrahend;
@@ -2628,9 +2629,9 @@ namespace emp {
     }
 
     if (NumEndBits()) {
-      data.bits[num_bits/FIELD_BITS] = (
-        data.bits[num_bits/FIELD_BITS]
-        - set2.bits[num_bits/FIELD_BITS]
+      data.bits[GetSize()/FIELD_BITS] = (
+        data.bits[GetSize()/FIELD_BITS]
+        - set2.bits[GetSize()/FIELD_BITS]
         - static_cast<field_t>(carry)
       ) & EndMask();
     }
