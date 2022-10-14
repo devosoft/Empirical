@@ -11,6 +11,8 @@
 #ifndef EMP_BITSET_UTILS_H
 #define EMP_BITSET_UTILS_H
 
+#include <cstddef>
+
 namespace emp {
 
   /// Create a series of a specified number of ones (at compile time) in a uint.

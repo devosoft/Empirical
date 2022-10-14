@@ -12,6 +12,9 @@
 #ifndef EMP_IS_STREAMABLE_HPP
 #define EMP_IS_STREAMABLE_HPP
 
+#include <type_traits>
+#include <utility>
+
 namespace emp {
 
 // adapted from https://stackoverflow.com/a/22759544
