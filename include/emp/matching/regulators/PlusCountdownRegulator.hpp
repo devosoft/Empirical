@@ -19,6 +19,8 @@
 #include <tuple>
 #include <utility>
 
+#include "../../base/assert.hpp"
+
 namespace emp {
 
 template <
