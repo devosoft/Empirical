@@ -45,6 +45,7 @@
 #include <unordered_set>
 
 #include "../base/assert.hpp"
+#include "../base/EMP_NAMESPACE.hpp"
 #include "../base/errors.hpp"
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
@@ -807,7 +808,7 @@ namespace emp {
   TYPE NAME(const TYPE & _in) {                                                 \
     std::stringstream ss;                                                       \
     ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl;      \
-    emp::NotifyWarning(ss.str());                                               \
+    EMP_NAMESPACE()::NotifyWarning(ss.str());                                               \
     return VALUE;                                                               \
   }                                                                             \
   bool NAME ## _is_const() const { return true; }
@@ -816,7 +817,7 @@ namespace emp {
 #define EMP_CONFIG__ACCESS_ALIAS(NAME)
 #define EMP_CONFIG__ACCESS_
 
-#define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
+#define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, EMP_NAMESPACE()::Config, __VA_ARGS__)
 
 #define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)     \
   EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)     \
