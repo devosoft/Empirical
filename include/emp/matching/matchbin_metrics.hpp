@@ -441,7 +441,7 @@ namespace emp {
         emp_assert(k < 511);
         denominator = emp::exp2_overflow_unsafe(-static_cast<int>(k));
       } else {
-        denominator = emp::exp2(-k);
+        denominator = emp::exp2(-static_cast<int>(k));
       }
 
       // Bad Math
@@ -504,7 +504,7 @@ namespace emp {
         emp_assert(k < 511);
         denominator = emp::exp2_overflow_unsafe(-static_cast<int>(k));
       } else {
-        denominator = emp::exp2(-k);
+        denominator = emp::exp2(-static_cast<int>(k));
       }
 
       // Bad Math
