@@ -439,7 +439,7 @@ namespace emp {
       double denominator;
       if constexpr (Width < 511) {
         emp_assert(k < 511);
-        denominator = emp::exp2_overflow_unsafe(-k);
+        denominator = emp::exp2_overflow_unsafe(-static_cast<int>(k));
       } else {
         denominator = emp::exp2(-k);
       }
@@ -502,7 +502,7 @@ namespace emp {
       double denominator;
       if constexpr (Width < 511) {
         emp_assert(k < 511);
-        denominator = emp::exp2_overflow_unsafe(-k);
+        denominator = emp::exp2_overflow_unsafe(-static_cast<int>(k));
       } else {
         denominator = emp::exp2(-k);
       }

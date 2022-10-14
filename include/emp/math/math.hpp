@@ -365,8 +365,8 @@ namespace emp {
   inline constexpr double exp2_overflow_unsafe(const int64_t exp) {
     // benchmarking result https://quick-bench.com/q/8Q7UMP35zo3t2C70HvEz4AzyWVE
     // ieee double has 11-bit exponent field
-    emp_assert(exp > -1023);
-    emp_assert(exp <= 1024);
+    emp_assert(exp > -1023, exp);
+    emp_assert(exp <= 1024, exp);
     static_assert(sizeof(double) == sizeof(uint64_t));
     static_assert(std::numeric_limits<double>::is_iec559);
 
