@@ -3,6 +3,7 @@
 
 // use to allow for namespace substitions inside macros
 #ifndef EMP_NAMESPACE
+#define EMP_NAMESPACE_OBJLIKE emp
 #define EMP_NAMESPACE() emp
 #endif // #ifndef EMP_NAMESPACE
 
