@@ -30,6 +30,7 @@
 #include <cstdlib>
 
 #include "_assert_trigger.hpp"
+#include "EMP_NAMESPACE.hpp"
 #include "macros.hpp"
 
 /// Helper macro used throughout...
@@ -37,10 +38,10 @@
 
 #if defined( _MSC_VER )
 
-  #define emp_always_assert_warning_msvc_impl(TEST)                                    \
+  #define emp_always_assert_warning_msvc_impl(TEST)                            \
     do {                                                                       \
       !(TEST)                                                                  \
-      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0);                    \
+      && EMP_NAMESPACE()::assert_trigger(__FILE__, __LINE__, #TEST, 0);        \
     } while(0)
 
   #define emp_always_assert_warning_impl(TEST) \
@@ -51,7 +52,7 @@
   #define emp_always_assert_warning_impl(...)                                          \
     do {                                                                       \
       !(EMP_GET_ARG_1(__VA_ARGS__, ~))                                         \
-      && emp::assert_trigger(                                                  \
+      && EMP_NAMESPACE()::assert_trigger(                                      \
         __FILE__, __LINE__,                                                    \
         EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) ),                        \
         EMP_WRAP_ARGS(emp_assert_warning_TO_PAIR, __VA_ARGS__)                 \

@@ -15,6 +15,8 @@
 #include <iostream>
 #include <string>
 
+#include "EMP_NAMESPACE.hpp"
+
 namespace emp {
 
   template <typename... Ts>
@@ -32,7 +34,7 @@ namespace emp {
 /// Use in place of emp_assert(false, ...); no need to debug toggle.
 #define emp_error(...)                                                         \
   do {                                                                         \
-    emp::trigger_emp_error(__FILE__, __LINE__, __VA_ARGS__);                   \
+    EMP_NAMESPACE()::trigger_emp_error(__FILE__, __LINE__, __VA_ARGS__);       \
   } while(0)
 
 #endif // #ifndef EMP_ERROR_HPP
