@@ -382,7 +382,7 @@ namespace emp {
       }
 
     };
-
+  }
 
   //****************************************************************************
   //****************************************************************************
@@ -2158,8 +2158,8 @@ namespace emp {
   }
 
   /// Return positions of all ones using a specified type.
-  template <typename T>
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  template <typename T>
   emp::vector<T> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetOnes(emp::vector<T> & out_vals) const {
     // @CAO -- There are better ways to do this with bit tricks.
     out_vals.resize(CountOnes());
@@ -2251,7 +2251,7 @@ namespace emp {
       }
       out << " : " << field << std::endl;
     }
-    size_t end_pos = NumEndBits();
+    size_t end_pos = data.NumEndBits();
     if (end_pos == 0) end_pos = FIELD_BITS;
     for (size_t i = 0; i < end_pos; i++) out << " ";
     out << "^" << std::endl;
@@ -2297,7 +2297,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOT_SELF() {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~data.bits[i];
     return ClearExcessBits();
   }
 
@@ -2424,7 +2424,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ROTL_SELF() {
     constexpr size_t shift_size = shift_size_raw % GetSize();
     const size_t NUM_FIELDS = data.NumFields();
-    const size_t LAST_FIELD = LastField();
+    const size_t LAST_FIELD = data.LastField();
 
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
@@ -2440,15 +2440,15 @@ namespace emp {
 
       // note that we already modded shift_size by GetSize()
       // so there's no need to mod by FIELD_SIZE here
-      size_t field_shift = NumEndBits() ? (
-        (shift_size + FIELD_BITS - NumEndBits()) / FIELD_BITS
+      size_t field_shift = data.NumEndBits() ? (
+        (shift_size + FIELD_BITS - data.NumEndBits()) / FIELD_BITS
       ) : (
         shift_size / FIELD_BITS
       );
-      // if we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
+      // if we field shift, we need to shift bits by (FIELD_BITS - data.NumEndBits())
       // more to account for the filler that gets pulled out of the middle
-      size_t bit_shift = NumEndBits() && field_shift ? (
-        (shift_size + FIELD_BITS - NumEndBits()) % FIELD_BITS
+      size_t bit_shift = data.NumEndBits() && field_shift ? (
+        (shift_size + FIELD_BITS - data.NumEndBits()) % FIELD_BITS
       ) : (
         shift_size % FIELD_BITS
       );
@@ -2465,20 +2465,20 @@ namespace emp {
       }
 
       // if necessary, shift filler bits out of the middle
-      if (NumEndBits()) {
+      if (data.NumEndBits()) {
         const size_t filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          data.bits[i-1] |= data.bits[i] << NumEndBits();
-          data.bits[i] >>= (FIELD_BITS - NumEndBits());
+          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
+          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NumEndBits() ? (
-          (data.bits[LAST_FIELD] << (FIELD_BITS - NumEndBits()))
-          | (data.bits[NUM_FIELDS - 2] >> NumEndBits())
+        const field_t keystone = data.NumEndBits() ? (
+          (data.bits[LAST_FIELD] << (FIELD_BITS - data.NumEndBits()))
+          | (data.bits[NUM_FIELDS - 2] >> data.NumEndBits())
         ) : (
           data.bits[LAST_FIELD]
         );
@@ -2505,7 +2505,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ROTR_SELF() {
     const size_t shift_size = shift_size_raw % GetSize();
     const size_t NUM_FIELDS = data.NumFields();
-    const size_t LAST_FIELD = LastField();
+    const size_t LAST_FIELD = data.LastField();
 
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
@@ -2534,25 +2534,25 @@ namespace emp {
       }
 
       // if necessary, shift filler bits out of the middle
-      if (NumEndBits()) {
+      if (data.NumEndBits()) {
         size_t filler_idx = LAST_FIELD - field_shift;
         for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          data.bits[i-1] |= data.bits[i] << NumEndBits();
-          data.bits[i] >>= (FIELD_BITS - NumEndBits());
+          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
+          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NumEndBits() ? (
-          data.bits[0] >> (FIELD_BITS - NumEndBits())
+        const field_t keystone = data.NumEndBits() ? (
+          data.bits[0] >> (FIELD_BITS - data.NumEndBits())
         ) : (
           data.bits[0]
         );
 
-        if (NumEndBits()) {
-          data.bits[LastField()] |= data.bits[0] << NumEndBits();
+        if (data.NumEndBits()) {
+          data.bits[data.LastField()] |= data.bits[0] << data.NumEndBits();
         }
 
         for (size_t i = 0; i < LAST_FIELD; ++i) {
@@ -2593,12 +2593,12 @@ namespace emp {
       data.bits[i] = sum;
     }
 
-    if (NumEndBits()) {
+    if (data.NumEndBits()) {
       data.bits[GetSize()/FIELD_BITS] = (
         data.bits[GetSize()/FIELD_BITS]
         + set2.bits[GetSize()/FIELD_BITS]
         + static_cast<field_t>(carry)
-      ) & EndMask();
+      ) & data.EndMask();
     }
 
     return *this;
@@ -2628,26 +2628,27 @@ namespace emp {
       data.bits[i] -= subtrahend;
     }
 
-    if (NumEndBits()) {
+    if (data.NumEndBits()) {
       data.bits[GetSize()/FIELD_BITS] = (
         data.bits[GetSize()/FIELD_BITS]
         - set2.bits[GetSize()/FIELD_BITS]
         - static_cast<field_t>(carry)
-      ) & EndMask();
+      ) & data.EndMask();
     }
 
     return *this;
   }
 
-
   // Setup all of the more specific Bits class types.
-  using BitVector = Bits<DYNAMIC_BITS, false, true>;
-  using BitString = Bits<DYNAMIC_BITS, false, false>;
+  class BitVector : public Bits<BitsMode::WATERMARK, 0, true> { };
 
-  template <size_t NUM_BITS> using BitArray        = Bits<NUM_BITS, true, true>;
-  template <size_t NUM_BITS> using BitSet          = Bits<NUM_BITS, true, false>;
-  template <size_t NUM_BITS> using StaticBitVector = Bits<NUM_BITS, false, true>;
-  template <size_t NUM_BITS> using StaticBitString = Bits<NUM_BITS, false, false>;
+  // using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
+  using BitString = Bits<BitsMode::DYNAMIC, 0, false>;
+
+  template <size_t NUM_BITS> using BitArray        = Bits<BitsMode::FIXED,  NUM_BITS, true>;
+  template <size_t NUM_BITS> using BitSet          = Bits<BitsMode::FIXED,  NUM_BITS, false>;
+  template <size_t NUM_BITS> using StaticBitVector = Bits<BitsMode::CAPPED, NUM_BITS, true>;
+  template <size_t NUM_BITS> using StaticBitString = Bits<BitsMode::CAPPED, NUM_BITS, false>;
 }
 
 
