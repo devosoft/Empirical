@@ -193,6 +193,7 @@ namespace emp {
       // --- Helper functions --
       
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+      [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
 
       void RawResize(const size_t new_size, const bool /* preserve data */) {
         base_t::SetSize(new_size);
@@ -231,6 +232,7 @@ namespace emp {
       // --- Helper functions --
 
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+      [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
 
       void MakeEmpty() {
         base_t::SetSize(0);
@@ -304,6 +306,7 @@ namespace emp {
       // --- Helper functions --
 
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
+      [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
 
       // Resize to have at least the specified number of fields.
       void RawResize(const size_t new_size, const bool preserve_data=false) {
@@ -360,10 +363,10 @@ namespace emp {
       Bits_Data(Bits_Data && in) : base_t(in) { }
 
       [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return base_t::FieldPtr().template ReinterpretCast<unsigned char*>();
+        return base_t::FieldPtr().template ReinterpretCast<unsigned char>();
       }
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return base_t::FieldPtr().template ReinterpretCast<const unsigned char*>();
+        return base_t::FieldPtr().template ReinterpretCast<const unsigned char>();
       }
 
       bool OK() const {
@@ -405,7 +408,7 @@ namespace emp {
     // All internal data (and base-level manipulators) for Bits.
     data_t data;
 
-    static constexpr size_t FIELD_BITS = data_t::FIELD_BITS;
+    static constexpr size_t FIELD_BITS = NUM_FIELD_BITS;
 
     // Number of bits needed to specify position in a field + mask
     static constexpr size_t FIELD_LOG2 = static_cast<size_t>(emp::Log2(FIELD_BITS));
@@ -435,7 +438,7 @@ namespace emp {
 
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
-    void RawCopy(const Ptr<field_t> from, size_t copy_fields=emp::MAX_SIZE_T);
+    void RawCopy(const Ptr<const field_t> from, size_t copy_fields=emp::MAX_SIZE_T);
 
     // Shortcut for RawCopy if we are copying a whole other Bits object.
     template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
@@ -486,6 +489,9 @@ namespace emp {
     Bits(T in_num_bits, bool init_val=false) : Bits(static_cast<size_t>(in_num_bits), init_val) {}
 
     /// Copy constructor of existing bits object.
+    Bits(const Bits & in);
+
+    /// Constructor for other type of existing bits object.
     template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
     Bits(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in);
 
@@ -525,7 +531,10 @@ namespace emp {
     /// Destructor
     ~Bits() = default;
 
-    /// Assignment operator.
+    /// Copy assignment operator.
+    Bits & operator=(const Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT> & in) &;
+
+    /// Assignment operator for other Bits object
     template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
     Bits & operator=(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in) &;
 
@@ -1088,7 +1097,7 @@ namespace emp {
 
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT>::
-    RawCopy(const Ptr<bits_field_t> from, size_t num_fields)
+    RawCopy(const Ptr<const bits_field_t> from, size_t num_fields)
   {
     // If num_fields was not specified, set it to the max number of fields.
     if (num_fields == emp::MAX_SIZE_T) num_fields = data.NumFields();
@@ -1418,6 +1427,15 @@ namespace emp {
 
   /// Copy constructor of existing bit field.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & in)
+    : data(in.GetSize())
+  {
+    emp_assert(in.OK());
+    RawCopy(in);
+  }
+
+  /// Constructor for other type of Bits field.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & in)
     : data(in.GetSize())
@@ -1502,16 +1520,27 @@ namespace emp {
     RawCopy(in.data.FieldPtr(), copy_fields);
   }
 
-  /// Assignment operator.
+  /// Copy assignment operator.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & in) &
+  {
+    emp_assert(in.OK());
+    if (&in != this) {
+      data.RawResize(in.GetSize());
+      RawCopy(in);
+    }
+
+    return *this;
+  }
+
+  /// Other Bits assignment operator.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::operator=(const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & in) &
   {
     emp_assert(in.OK());
-
-    if (&in == this) return *this; // Trying to set this object to itself.
-
     Resize(in.GetSize());
     RawCopy(in);
 
@@ -1843,7 +1872,7 @@ namespace emp {
 
     const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
-      if (data.bits[i] != in.bits[i]) return false;
+      if (data.bits[i] != in.data.bits[i]) return false;
     }
     return true;
   }
@@ -1856,8 +1885,8 @@ namespace emp {
     const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
       const size_t pos = i-1;
-      if (data.bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
-      return (data.bits[pos] < in.bits[pos]);        // Otherwise, do comparison
+      if (data.bits[pos] == in.data.bits[pos]) continue;  // If same, keep looking!
+      return (data.bits[pos] < in.data.bits[pos]);        // Otherwise, do comparison
     }
     return false; // Bit vectors are identical.
   }
@@ -2188,7 +2217,7 @@ namespace emp {
     const size_t num_fields = std::min(data.NumFields(), in.data.NumFields());
     for (size_t i = 0; i < num_fields; ++i) {
       // Short-circuit if we find any overlap.
-      if (data.bits[i] & in.bits[i]) return true;
+      if (data.bits[i] & in.data.bits[i]) return true;
     }
     return false;
   }
@@ -2305,7 +2334,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::AND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] & bits2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] & bits2.data.bits[i];
     return *this;
   }
 
@@ -2313,7 +2342,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::OR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] | bits2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] | bits2.data.bits[i];
     return *this;
   }
 
@@ -2321,7 +2350,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NAND_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] & bits2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] & bits2.data.bits[i]);
     return ClearExcessBits();
   }
 
@@ -2329,7 +2358,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::NOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] | bits2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] | bits2.data.bits[i]);
     return ClearExcessBits();
   }
 
@@ -2337,7 +2366,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::XOR_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] ^ bits2.bits[i];
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = data.bits[i] ^ bits2.data.bits[i];
     return *this;
   }
 
@@ -2345,7 +2374,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::EQU_SELF(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & bits2) {
     const size_t NUM_FIELDS = data.NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] ^ bits2.bits[i]);
+    for (size_t i = 0; i < NUM_FIELDS; i++) data.bits[i] = ~(data.bits[i] ^ bits2.data.bits[i]);
     return ClearExcessBits();
   }
 
@@ -2639,10 +2668,7 @@ namespace emp {
     return *this;
   }
 
-  // Setup all of the more specific Bits class types.
-  class BitVector : public Bits<BitsMode::WATERMARK, 0, true> { };
-
-  // using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
+  using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
   using BitString = Bits<BitsMode::DYNAMIC, 0, false>;
 
   template <size_t NUM_BITS> using BitArray        = Bits<BitsMode::FIXED,  NUM_BITS, true>;
