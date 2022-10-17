@@ -215,19 +215,12 @@ namespace emp {
       Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
-      Bits_Data_Mem(const Bits_Data_Mem & in) : base_t(in) { 
-        const size_t num_fields = base_t::NumFields();
-        if (num_fields) {
-          bits = NewArrayPtr<field_t>(num_fields);
-          for (size_t i = 0; i < num_fields; ++i) bits[i] = in.bits[i];
-        }
-        else bits = nullptr;
-      };
-      Bits_Data_Mem(Bits_Data_Mem && in) : base_t(in.NumBits()) {
-        // Move over the bits.
-        bits = in.bits; in.bits = nullptr;
-      }
+      Bits_Data_Mem(const Bits_Data_Mem & in) : bits(nullptr) { Copy(in); }
+      Bits_Data_Mem(Bits_Data_Mem && in) : bits(nullptr) { Move(in); }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
+
+      Bits_Data_Mem & operator=(const Bits_Data_Mem & in) { Copy(in); return *this; }
+      Bits_Data_Mem & operator=(Bits_Data_Mem && in) { Move(std::move(in)); return *this; }
 
       // --- Helper functions --
 
@@ -262,6 +255,19 @@ namespace emp {
         base_t::SetSize(new_size);
       }
 
+      // Assume size is already correct.
+      void Copy(const Bits_Data_Mem & in) {
+        RawResize(in.NumBits());
+        for (size_t i = 0; i < base_t::NumFields(); ++i) bits[i] = in.bits[i];
+      }
+
+      void Move(Bits_Data_Mem && in) {
+        base_t::SetSize(in.NumBits());
+        if (bits) bits.DeleteArray();  // Clear out old bits.
+        bits = in.bits;     // Move over the bits.
+        in.bits = nullptr;  // Clear them out of the original.
+      }
+
       bool OK() const {
         // Do some checking on the bits array ptr to make sure it's value.
         if (bits) {
@@ -289,19 +295,12 @@ namespace emp {
       Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
-      Bits_Data_Mem(const Bits_Data_Mem & in) : base_t(in) { 
-        field_capacity = base_t::NumFields();
-        if (field_capacity) {
-          bits = NewArrayPtr<field_t>(field_capacity);
-          for (size_t i = 0; i < field_capacity; ++i) bits[i] = in.bits[i];
-        }
-        else bits = nullptr;
-      };
-      Bits_Data_Mem(Bits_Data_Mem && in) : base_t(in.NumBits()), field_capacity(in.field_capacity) {
-        bits = in.bits;     // Move over the bits.
-        in.bits = nullptr;  // Clear them out of the original.
-      }
+      Bits_Data_Mem(const Bits_Data_Mem & in) :  bits(nullptr) { Copy(in); }
+      Bits_Data_Mem(Bits_Data_Mem && in) :  bits(nullptr) { Move(in); }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
+
+      Bits_Data_Mem & operator=(const Bits_Data_Mem & in) { Copy(in); return *this; }
+      Bits_Data_Mem & operator=(Bits_Data_Mem && in) { Move(std::move(in)); return *this; }
 
       // --- Helper functions --
 
@@ -326,9 +325,23 @@ namespace emp {
             bits.DeleteArray();  // Delete old memory
           }
           bits = new_bits;     // Use new memory
+          field_capacity = new_fields;
         }
 
         base_t::SetSize(new_size);
+      }
+
+      void Copy(const Bits_Data_Mem & in) {
+        RawResize(in.NumBits());
+        for (size_t i = 0; i < base_t::NumFields(); ++i) bits[i] = in.bits[i];
+      }
+
+      void Move(Bits_Data_Mem && in) {
+        base_t::SetSize(in.NumBits());
+        field_capacity = in.field_capacity;
+        if (bits) bits.DeleteArray();  // Clear out old bits.
+        bits = in.bits;                // Move over the bits.
+        in.bits = nullptr;             // Clear them out of the original.
       }
 
       bool OK() const {
@@ -361,6 +374,9 @@ namespace emp {
       Bits_Data(size_t num_bits) : base_t(num_bits) { }
       Bits_Data(const Bits_Data & in) : base_t(in) { }
       Bits_Data(Bits_Data && in) : base_t(in) { }
+
+      Bits_Data & operator=(const Bits_Data &) = default;
+      Bits_Data & operator=(Bits_Data &&) = default;
 
       [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
         return base_t::FieldPtr().template ReinterpretCast<unsigned char>();
