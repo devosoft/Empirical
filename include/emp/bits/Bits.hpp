@@ -245,7 +245,7 @@ namespace emp {
               static size_t copy_count = std::min(base_t::NumFields(), new_fields);
               emp::CopyMemory(bits, new_bits, copy_count);
               // Clear out any newly added fields.
-              for (size_t i = base_t::NumFields(); i < new_fields; ++i) bits[i] = 0;
+              for (size_t i = base_t::NumFields(); i < new_fields; ++i) new_bits[i] = 0;
             }
             bits.DeleteArray();  // Delete old memory
           }
@@ -289,14 +289,17 @@ namespace emp {
       using base_t = Bits_Data_Size<BitsMode::WATERMARK, DEFAULT_SIZE>;
       using field_t = bits_field_t;
 
-      Ptr<field_t> bits;          ///< Pointer to array with the status of each bit
-      size_t field_capacity = 0;  ///< How many fields is the watermark up to?
+      Ptr<field_t> bits = nullptr;  ///< Pointer to array with the status of each bit
+      size_t field_capacity = 0;    ///< How many fields is the watermark up to?
 
       Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
-        if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
+        if (num_bits) {
+          field_capacity = base_t::NumFields();
+          bits = NewArrayPtr<field_t>(field_capacity);
+        }
       }
-      Bits_Data_Mem(const Bits_Data_Mem & in) :  bits(nullptr) { Copy(in); }
-      Bits_Data_Mem(Bits_Data_Mem && in) :  bits(nullptr) { Move(in); }
+      Bits_Data_Mem(const Bits_Data_Mem & in) { Copy(in); }
+      Bits_Data_Mem(Bits_Data_Mem && in) { Move(std::move(in)); }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
 
       Bits_Data_Mem & operator=(const Bits_Data_Mem & in) { Copy(in); return *this; }
@@ -310,22 +313,27 @@ namespace emp {
       // Resize to have at least the specified number of fields.
       void RawResize(const size_t new_size, const bool preserve_data=false) {
         // If we have dynamic memory, see if number of bit fields needs to change.
-        const size_t new_fields = NumBitFields(new_size);
+        const size_t num_new_fields = NumBitFields(new_size);
 
-        // If we need more fields than currently available, reallocate memory.
-        if (new_fields > field_capacity) {
-          auto new_bits = NewArrayPtr<field_t>(new_fields);
-          if (base_t::num_bits) {
-            if (preserve_data) {
-              // Copy over all old fields (new memory must be larger)
-              emp::CopyMemory(bits, new_bits, base_t::NumFields());
-              // Clear out new fields, if any.
-              for (size_t i = base_t::NumFields(); i < new_fields; ++i) bits[i] = 0;
+        // std::cout << "RawResize(" << new_size << "," << preserve_data << ");"
+        //           << "  base_t::NumFields()=" << base_t::NumFields()
+        //           << "  new_fields=" << num_new_fields
+        //           << "  field_cap=" << field_capacity
+        //           << std::endl;
+
+        // If we need more fields than are currently available, reallocate memory.
+        if (num_new_fields > field_capacity) {
+          auto new_bits = NewArrayPtr<field_t>(num_new_fields);
+          if (field_capacity) {    // If we already had some allocated fields...
+            if (preserve_data) {   // Check if we should copy them.
+              emp::CopyMemory(bits, new_bits, field_capacity); // Copy over old fields.
+              // Clear any new (or previously unused) fields.
+              for (size_t i = base_t::NumFields(); i < num_new_fields; ++i) new_bits[i] = 0;
             }
             bits.DeleteArray();  // Delete old memory
           }
+          field_capacity = num_new_fields;
           bits = new_bits;     // Use new memory
-          field_capacity = new_fields;
         }
 
         base_t::SetSize(new_size);
@@ -372,8 +380,8 @@ namespace emp {
 
       Bits_Data() : base_t(base_size_t::DEFAULT_SIZE) { }
       Bits_Data(size_t num_bits) : base_t(num_bits) { }
-      Bits_Data(const Bits_Data & in) : base_t(in) { }
-      Bits_Data(Bits_Data && in) : base_t(in) { }
+      Bits_Data(const Bits_Data & in) = default;
+      Bits_Data(Bits_Data && in) = default;
 
       Bits_Data & operator=(const Bits_Data &) = default;
       Bits_Data & operator=(Bits_Data &&) = default;
@@ -505,7 +513,7 @@ namespace emp {
     Bits(T in_num_bits, bool init_val=false) : Bits(static_cast<size_t>(in_num_bits), init_val) {}
 
     /// Copy constructor of existing bits object.
-    Bits(const Bits & in);
+    Bits(const Bits & in) = default;
 
     /// Constructor for other type of existing bits object.
     template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
@@ -1439,15 +1447,6 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(size_t _num_bits, bool init_val) : data(_num_bits) {
     if (init_val) SetAll(); else Clear();
-  }
-
-  /// Copy constructor of existing bit field.
-  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & in)
-    : data(in.GetSize())
-  {
-    emp_assert(in.OK());
-    RawCopy(in);
   }
 
   /// Constructor for other type of Bits field.
