@@ -310,7 +310,9 @@ namespace emp {
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
       [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
 
-      // Resize to have at least the specified number of fields.
+      /// Resize to have at least the specified number of fields.
+      /// @param new_size The number of bits the new data needs to hold.
+      /// @param preserve_data Should we keep existing bits (and zero out new bits)?
       void RawResize(const size_t new_size, const bool preserve_data=false) {
         // If we have dynamic memory, see if number of bit fields needs to change.
         const size_t num_new_fields = NumBitFields(new_size);
@@ -325,12 +327,12 @@ namespace emp {
         if (num_new_fields > field_capacity) {
           auto new_bits = NewArrayPtr<field_t>(num_new_fields);
           if (field_capacity) {    // If we already had some allocated fields...
-            if (preserve_data) {   // Check if we should copy them.
-              emp::CopyMemory(bits, new_bits, field_capacity); // Copy over old fields.
-              // Clear any new (or previously unused) fields.
-              for (size_t i = base_t::NumFields(); i < num_new_fields; ++i) new_bits[i] = 0;
-            }
+            // If needed, copy over previous memory.
+            if (preserve_data) emp::CopyMemory(bits, new_bits, field_capacity);
             bits.DeleteArray();  // Delete old memory
+          }
+          if (preserve_data) { // If needed, clear any new (or previously unused) fields.            
+            for (size_t i = base_t::NumFields(); i < num_new_fields; ++i) new_bits[i] = 0;
           }
           field_capacity = num_new_fields;
           bits = new_bits;     // Use new memory
@@ -2094,6 +2096,7 @@ namespace emp {
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PushBack(const bool bit, const size_t num) {
     Resize(GetSize() + num);
     if (bit) SetRange(GetSize()-num, GetSize());
+    // else Clear(GetSize()-num, GetSize());
   }
 
   /// Insert bit(s) into any index of vector using bit magic.
