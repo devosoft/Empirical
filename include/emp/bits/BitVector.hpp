@@ -1558,7 +1558,7 @@ namespace emp {
   /// @return Read-only span of BitVector's bytes.
   std::span<const std::byte> BitVector::GetBytes() const {
     return std::span<const std::byte>(
-      bits.ReinterpretCast<const std::byte>(),
+      bits.ReinterpretCast<const std::byte>().Raw(),
       NumBytes()
     );
   }
