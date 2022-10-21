@@ -195,8 +195,11 @@ namespace emp {
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
       [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
 
-      void RawResize(const size_t new_size, const bool /* preserve data */) {
-        base_t::SetSize(new_size);
+      void RawResize(const size_t new_size, const bool preserve_data=false) {
+        base_t::SetSize(new_size);        
+        if (preserve_data && base_t::NumEndBits()) {
+          bits[base_t::LastField()] &= base_t::EndMask();
+        }
       }
 
       bool OK() const { return true; } // Nothing to check yet.
@@ -216,7 +219,7 @@ namespace emp {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
       Bits_Data_Mem(const Bits_Data_Mem & in) : bits(nullptr) { Copy(in); }
-      Bits_Data_Mem(Bits_Data_Mem && in) : bits(nullptr) { Move(in); }
+      Bits_Data_Mem(Bits_Data_Mem && in) : bits(nullptr) { Move(std::move(in)); }
       ~Bits_Data_Mem() { bits.DeleteArray(); }
 
       Bits_Data_Mem & operator=(const Bits_Data_Mem & in) { Copy(in); return *this; }
@@ -253,6 +256,11 @@ namespace emp {
         }
 
         base_t::SetSize(new_size);
+
+        // Clear out any extra bits.
+        if (preserve_data && base_t::NumEndBits()) {
+          bits[base_t::LastField()] &= base_t::EndMask();
+        }
       }
 
       // Assume size is already correct.
@@ -329,11 +337,16 @@ namespace emp {
           field_capacity = num_new_fields;
           bits = new_bits;     // Use new memory
         }
-        if (preserve_data) { // If needed, clear any new (or previously unused) fields.            
-          for (size_t i = num_old_fields; i < num_new_fields; ++i) bits[i] = 0;
-        }
 
         base_t::SetSize(new_size);
+
+        if (preserve_data) {
+          // Clear any new (or previously unused) fields.            
+          for (size_t i = num_old_fields; i < num_new_fields; ++i) bits[i] = 0;
+
+          // Clear out any extra end bits.
+          if (base_t::NumEndBits()) bits[base_t::LastField()] &= base_t::EndMask();
+        }
       }
 
       void Copy(const Bits_Data_Mem & in) {
@@ -581,7 +594,7 @@ namespace emp {
     );
 
     /// Convert to a Bits of a different size.
-    template <typename OUT_T=Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>>
+    template <typename OUT_T=Bits<BitsMode::DYNAMIC,0,ZERO_LEFT>>
     OUT_T Export(size_t out_size, size_t start_bit=0) const;
 
     // Scan this bitvector to make sure that there are no internal problems.
@@ -826,6 +839,9 @@ namespace emp {
 
     /// Count the number of ones in Bits.
     [[nodiscard]] size_t CountOnes() const;
+
+    /// Count the number of ones in a range within Bits.  [start, end)
+    [[nodiscard]] size_t CountOnes(size_t start, size_t end) const;
 
     /// Faster counting of ones for very sparse bit vectors.
     [[nodiscard]] size_t CountOnes_Sparse() const;
@@ -2057,7 +2073,19 @@ namespace emp {
         bit_count += std_bs.count();
       }
 
+    emp_assert(bit_count <= GetSize());
     return bit_count;
+  }
+
+  // TODO: Speed this up so that we don't need to copy out all of the bits.
+  /// Count the number of ones in a specified range of Bits.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes(size_t start, size_t end) const {
+    emp_assert(start <= end);
+    emp_assert(end <= GetSize());
+    if (start == end) return 0;
+    const size_t range_size = end-start;
+    return Export(range_size, start).CountOnes();
   }
 
   /// Faster counting of ones for very sparse bit vectors.
@@ -2116,7 +2144,7 @@ namespace emp {
   /// @param num number of bits to delete, default 1.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Delete(const size_t index, const size_t num) {
-    emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
+    emp_assert(index+num <= GetSize());    // Make sure bits to delete actually exist!
     RawMove(index+num, GetSize(), index);  // Shift positions AFTER delete into place.
     Resize(GetSize() - num);               // Crop off end bits.
   }
