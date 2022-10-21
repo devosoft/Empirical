@@ -312,16 +312,11 @@ namespace emp {
 
       /// Resize to have at least the specified number of fields.
       /// @param new_size The number of bits the new data needs to hold.
-      /// @param preserve_data Should we keep existing bits (and zero out new bits)?
+      /// @param preserve_data Should we keep existing bits and zero out new bits?
       void RawResize(const size_t new_size, const bool preserve_data=false) {
         // If we have dynamic memory, see if number of bit fields needs to change.
+        const size_t num_old_fields = base_t::NumFields();
         const size_t num_new_fields = NumBitFields(new_size);
-
-        // std::cout << "RawResize(" << new_size << "," << preserve_data << ");"
-        //           << "  base_t::NumFields()=" << base_t::NumFields()
-        //           << "  new_fields=" << num_new_fields
-        //           << "  field_cap=" << field_capacity
-        //           << std::endl;
 
         // If we need more fields than are currently available, reallocate memory.
         if (num_new_fields > field_capacity) {
@@ -331,11 +326,11 @@ namespace emp {
             if (preserve_data) emp::CopyMemory(bits, new_bits, field_capacity);
             bits.DeleteArray();  // Delete old memory
           }
-          if (preserve_data) { // If needed, clear any new (or previously unused) fields.            
-            for (size_t i = base_t::NumFields(); i < num_new_fields; ++i) new_bits[i] = 0;
-          }
           field_capacity = num_new_fields;
           bits = new_bits;     // Use new memory
+        }
+        if (preserve_data) { // If needed, clear any new (or previously unused) fields.            
+          for (size_t i = num_old_fields; i < num_new_fields; ++i) bits[i] = 0;
         }
 
         base_t::SetSize(new_size);
