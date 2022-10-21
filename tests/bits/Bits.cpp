@@ -849,6 +849,19 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
   CHECK(bv.CountOnes() == 1000);
   CHECK(bv.CountZeros() == 0);
 
+  for (size_t i = 0; i < 100; i++) {
+    bv.Resize(1000+i+1);
+    CHECK(bv.GetSize() == 1000+i+1);
+    CHECK(bv.CountOnes() == 1000);
+    bv[1000+i] = 1;
+    CHECK(bv.CountOnes() == 1001);
+    bv[1000+i] = 0;
+    CHECK(bv.CountOnes() == 1000);
+  }
+  bv.Resize(1000);
+  CHECK(bv.GetSize() == 1000);
+  CHECK(bv.CountOnes() == 1000);
+
   emp::Random random(1);
   bv.Randomize(random);
   CHECK(bv.CountOnes() == bv.CountOnes_Sparse());
@@ -865,8 +878,32 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
 
   CHECK(num_ones == 0);
   CHECK(num_zeros == 0);
+  CHECK(bv.CountOnes() == 0);
+  CHECK(bv.CountZeros() == 0);
 
-  for (size_t i = 0; i < 500; i++) {
+  // Size is now zero.  Raise it back up to one and make sure it initializes to zero ones correctly.
+  bv.Resize(1);
+  CHECK(bv.GetSize() == 1);
+  CHECK(bv.CountOnes() == 0);
+  bv.SetRange(0,1);
+  CHECK(bv.GetSize() == 1);
+  CHECK(bv.CountOnes() == 1);
+
+  bv.Resize(0);
+  // Push (100*2=) 200 bits with intensive checking.
+  for (size_t i = 0; i < 100; i++) {
+    CHECK(bv.GetSize() == i*2);
+    CHECK(bv.CountOnes() == i);
+    bv.PushBack(0);
+    CHECK(bv.GetSize() == i*2+1);
+    CHECK(bv.CountOnes() == i);
+    bv.PushBack(1);
+    CHECK(bv.GetSize() == i*2+2);
+    CHECK(bv.CountOnes() == i+1);
+  }
+
+  // Push another (400*2=) 800 bits with checking afterward.
+  for (size_t i = 100; i < 500; i++) {
     bv.PushBack(0);
     bv.PushBack(1);
   }
