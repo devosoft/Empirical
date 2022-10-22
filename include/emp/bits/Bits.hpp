@@ -56,6 +56,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <span>
+#include <sstream>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -79,6 +80,21 @@ namespace emp {
 
   size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
+  }
+
+  std::string BitFieldToString(bits_field_t field) {
+    std::stringstream ss;
+    ss << '[' << std::hex << field << ']';
+    return ss.str();
+  }
+
+  std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
+    std::stringstream ss;
+    for (size_t i = 0; i < count; ++i) {
+      if (i) ss << ' ';            
+      ss << BitFieldToString(bits[i]);
+    }
+    return ss.str();
   }
 
   // BitsMode specifies how a Bits object can change the number of bits in itself.
@@ -239,25 +255,29 @@ namespace emp {
       void RawResize(const size_t new_size, const bool preserve_data=false) {
         if (new_size == 0) { return MakeEmpty(); }
 
-        // If we have dynamic memory, see if number of bit fields needs to change.
-        const size_t new_fields = NumBitFields(new_size);
-        if (base_t::NumFields() != new_fields) {
-          auto new_bits = NewArrayPtr<field_t>(new_fields);
-          if (base_t::num_bits) {
+        // See if number of bit fields needs to change.
+        const size_t num_old_fields = base_t::NumFields();
+        const size_t num_new_fields = NumBitFields(new_size);
+
+        if (num_old_fields != num_new_fields) {
+          auto new_bits = NewArrayPtr<field_t>(num_new_fields);
+          if (num_old_fields) {
             if (preserve_data) {
-              static size_t copy_count = std::min(base_t::NumFields(), new_fields);
+              size_t copy_count = std::min(num_old_fields, num_new_fields);
               emp::CopyMemory(bits, new_bits, copy_count);
-              // Clear out any newly added fields.
-              for (size_t i = base_t::NumFields(); i < new_fields; ++i) new_bits[i] = 0;
             }
             bits.DeleteArray();  // Delete old memory
           }
           bits = new_bits;     // Use new memory
+          if (preserve_data) {
+            // Zero out any newly added fields.
+            for (size_t i = num_old_fields; i < num_new_fields; ++i) bits[i] = 0;
+          }
         }
 
         base_t::SetSize(new_size);
 
-        // Clear out any extra bits.
+        // Clear out any extra bits in the last field.
         if (preserve_data && base_t::NumEndBits()) {
           bits[base_t::LastField()] &= base_t::EndMask();
         }
@@ -322,7 +342,7 @@ namespace emp {
       /// @param new_size The number of bits the new data needs to hold.
       /// @param preserve_data Should we keep existing bits and zero out new bits?
       void RawResize(const size_t new_size, const bool preserve_data=false) {
-        // If we have dynamic memory, see if number of bit fields needs to change.
+        // See if number of bit fields needs to change.
         const size_t num_old_fields = base_t::NumFields();
         const size_t num_new_fields = NumBitFields(new_size);
 
@@ -2709,7 +2729,8 @@ namespace emp {
     return *this;
   }
 
-  using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
+  using BitVector = Bits<BitsMode::DYNAMIC, 0, true>;
+//  using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
   using BitString = Bits<BitsMode::DYNAMIC, 0, false>;
 
   template <size_t NUM_BITS> using BitArray        = Bits<BitsMode::FIXED,  NUM_BITS, true>;
