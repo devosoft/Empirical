@@ -562,7 +562,26 @@ namespace emp {
     /// Constructor to generate a Bits from a literal string of '0's and '1's.
     Bits(const char * bitstring) : Bits(std::string(bitstring)) {}
 
-    /// Constructor to generate a random Bits (with equal prob of 0 or 1).
+    /// @brief Constructor to generate a random set of bits in the default size.
+    /// @param random Random number generator to use.
+    Bits(Random & random);
+
+    /// @brief Constructor to generate random Bits with provided prob of 1's, default size.
+    /// @param random Random number generator to use.
+    /// @param p1 Probability of a bit being a one.
+    Bits(Random & random, const double p1);
+
+    /// @brief Constructor to generate random Bits with specified # of ones, default size.
+    /// @param random Random number generator to use.
+    /// @param target_ones Number of ones to include in the Bits.
+    Bits(Random & random, const size_t target_ones);
+
+    /// @brief Constructor to generate random Bits with specified # of ones, default size.
+    /// @param random Random number generator to use.
+    /// @param target_ones Number of ones to include in the Bits.
+    Bits(Random & random, const int target_ones) : Bits(random, (size_t) target_ones) { }
+
+    /// Constructor to generate a specified number of random Bits (with equal prob of 0 or 1).
     Bits(size_t in_num_bits, Random & random);
 
     /// Constructor to generate a random Bits with provided prob of 1's.
@@ -616,6 +635,12 @@ namespace emp {
     /// Convert to a Bits of a different size.
     template <typename OUT_T=Bits<BitsMode::DYNAMIC,0,ZERO_LEFT>>
     OUT_T Export(size_t out_size, size_t start_bit=0) const;
+
+    /// Convert to a BitArray of a different size.
+    template <size_t NUM_BITS=BASE_SIZE>
+    Bits<BitsMode::FIXED, NUM_BITS, true> ExportArray(size_t start_bit=0) const {
+      return Export<Bits<BitsMode::FIXED, NUM_BITS, true>>(NUM_BITS, start_bit);
+    }
 
     // Scan this bitvector to make sure that there are no internal problems.
     bool OK() const { return data.OK(); }
@@ -1513,7 +1538,32 @@ namespace emp {
     for (size_t i = 0; i < bitstring.size(); i++) {
       if (bitstring[i] != '0') Set(i);
     }
-}
+  }
+
+  /// Constructor to generate a random set of bits in the default size.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(Random & random)
+  {
+    emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
+    Randomize(random);
+  }
+
+  /// Constructor to generate random Bits with provided prob of 1's, default size.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(Random & random, const double p1)
+  {
+    emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
+    emp_assert(p1 >= 0.0 && p1 <= 1.0, "Probability of ones out of range", p1);
+    Randomize(random, p1);
+  }
+
+  /// Constructor to generate random Bits with specified number of ones.
+  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(Random & random, const size_t target_ones)
+  {
+    emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
+    ChooseRandom(random, target_ones);
+  }
 
   /// Constructor to generate a random Bits (with equal prob of 0 or 1).
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
@@ -1529,6 +1579,7 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(size_t in_num_bits, Random & random, const double p1)
     : data(in_num_bits)
   {
+    emp_assert(p1 >= 0.0 && p1 <= 1.0, "Probability of ones out of range", p1);
     Clear();
     Randomize(random, p1);
   }
@@ -2729,8 +2780,8 @@ namespace emp {
     return *this;
   }
 
-  using BitVector = Bits<BitsMode::DYNAMIC, 0, true>;
-//  using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
+  // using BitVector = Bits<BitsMode::DYNAMIC, 0, true>;
+  using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
   using BitString = Bits<BitsMode::DYNAMIC, 0, false>;
 
   template <size_t NUM_BITS> using BitArray        = Bits<BitsMode::FIXED,  NUM_BITS, true>;
