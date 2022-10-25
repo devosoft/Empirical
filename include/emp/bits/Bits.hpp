@@ -2780,14 +2780,19 @@ namespace emp {
     return *this;
   }
 
+  // Set up some aliases from common types of Bit strings.
+  // BitVector and BitArray function like vectors and arrays, which is to say that the zero
+  // index is on the left-hand side.  BitSet and BitValue are treated like numerical
+  // representations, with the zero-position on the right-hand side.
+
   // using BitVector = Bits<BitsMode::DYNAMIC, 0, true>;
   using BitVector = Bits<BitsMode::WATERMARK, 0, true>;
-  using BitString = Bits<BitsMode::DYNAMIC, 0, false>;
+  using BitValue  = Bits<BitsMode::DYNAMIC, 0, false>;
 
   template <size_t NUM_BITS> using BitArray        = Bits<BitsMode::FIXED,  NUM_BITS, true>;
   template <size_t NUM_BITS> using BitSet          = Bits<BitsMode::FIXED,  NUM_BITS, false>;
   template <size_t NUM_BITS> using StaticBitVector = Bits<BitsMode::CAPPED, NUM_BITS, true>;
-  template <size_t NUM_BITS> using StaticBitString = Bits<BitsMode::CAPPED, NUM_BITS, false>;
+  template <size_t NUM_BITS> using StaticBitValue  = Bits<BitsMode::CAPPED, NUM_BITS, false>;
 }
 
 
