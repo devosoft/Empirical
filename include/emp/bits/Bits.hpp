@@ -1154,6 +1154,19 @@ namespace emp {
     /// Compound operator for shift right...
     Bits & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
+    /// Operator plus...
+    [[nodiscard]] Bits operator+(const Bits & ar2) const { return ADD(ar2); }
+
+    /// Operator minus...
+    [[nodiscard]] Bits operator-(const Bits & ar2) const { return SUB(ar2); }
+
+    /// Compound operator plus...
+    const Bits & operator+=(const Bits & ar2) { return ADD_SELF(ar2); }
+
+    /// Compound operator minus...
+    const Bits & operator-=(const Bits & ar2) { return SUB_SELF(ar2); }
+
+
     // =========  Standard Library Compatability  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
