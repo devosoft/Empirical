@@ -167,7 +167,7 @@ namespace emp {
     /// Destructor.
     ~BitArray() = default;
 
-    /// Assignment operator (no separate move opperator since no resources to move...)
+    /// Assignment operator (no separate move operator since no resources to move...)
     BitArray & operator=(const this_t & in_bits) & noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
@@ -187,7 +187,7 @@ namespace emp {
     template <size_t TO_BITS, bool TO_LEFT=ZERO_LEFT>
     BitArray<TO_BITS,TO_LEFT> Export(size_t start_bit=0) const;
 
-    /// For debugging: make sure that there are no obvous problems with a BitArray object.
+    /// For debugging: make sure that there are no obvious problems with a BitArray object.
     bool OK() const;
 
     /// How many bits are in this BitArray?
@@ -314,7 +314,7 @@ namespace emp {
 
     // =========  Access Groups of bits  ========= //
 
-    /// Retrive the byte at the specified byte index.
+    /// Retrieve the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
 
     /// Get a read-only view into the internal array used by BitArray.
@@ -428,7 +428,7 @@ namespace emp {
     [[nodiscard]] int FindOne() const;
 
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
-    [[deprecated("Renamed to more acurate FindOne()")]]
+    [[deprecated("Renamed to more accurate FindOne()")]]
     [[nodiscard]] int FindBit() const { return FindOne(); }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
@@ -439,7 +439,7 @@ namespace emp {
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
     /// Deprecated version of FindOne().
-    [[deprecated("Renamed to more acurate FindOne(start_pos)")]]
+    [[deprecated("Renamed to more accurate FindOne(start_pos)")]]
     [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// Find the most-significant set-bit.
@@ -449,7 +449,7 @@ namespace emp {
     int PopOne();
 
     /// Deprecated version of PopOne().
-    [[deprecated("Renamed to more acurate PopOne()")]]
+    [[deprecated("Renamed to more accurate PopOne()")]]
     int PopBit() { return PopOne(); }
 
     /// Return positions of all ones.
@@ -644,7 +644,7 @@ namespace emp {
     /// Compound operator plus...
     const BitArray & operator+=(const BitArray & ar2) { return ADD_SELF(ar2); }
 
-    /// Compoount operator minus...
+    /// Compound operator minus...
     const BitArray & operator-=(const BitArray & ar2) { return SUB_SELF(ar2); }
 
     /// STL COMPATABILITY
@@ -684,7 +684,7 @@ namespace emp {
 
     const size_t start_pos = FieldPos(start);          // Identify the start position WITHIN a bit field.
     const size_t stop_pos = FieldPos(stop);            // Identify the stop position WITHIN a bit field.
-    size_t start_field = FieldID(start);               // Ideftify WHICH bit field we're starting in.
+    size_t start_field = FieldID(start);               // Identify WHICH bit field we're starting in.
     const size_t stop_field = FieldID(stop-1);         // Identify the last field where we actually make a change.
 
     // If the start field and stop field are the same, mask off the middle.
@@ -812,7 +812,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
 
@@ -823,7 +823,7 @@ namespace emp {
       ShiftRight(NUM_BITS - shift_size);
       OR_SELF(dup);
     } else {
-      // for big BitArrays, manual rotating is fater
+      // for big BitArrays, manual rotating is faster
 
       // note that we already modded shift_size by NUM_BITS
       // so there's no need to mod by FIELD_SIZE here
@@ -898,7 +898,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
 
@@ -909,7 +909,7 @@ namespace emp {
       ShiftLeft(NUM_BITS - shift_size);
       OR_SELF(dup);
     } else {
-      // for big BitArrays, manual rotating is fater
+      // for big BitArrays, manual rotating is faster
 
       const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
       const int bit_shift = shift_size % FIELD_BITS;
@@ -1074,7 +1074,7 @@ namespace emp {
     return out_bits;
   }
 
-    /// For debugging: make sure that there are no obvous problems with a BitArray object.
+    /// For debugging: make sure that there are no obvious problems with a BitArray object.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   bool BitArray<NUM_BITS,ZERO_LEFT>::OK() const {
     // Make sure final bits are zeroed out.
@@ -1846,7 +1846,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
 
@@ -1928,7 +1928,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
 
