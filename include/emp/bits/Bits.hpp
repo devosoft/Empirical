@@ -15,18 +15,18 @@
  *  -or- bitwise logic (including more complex bit magic) can be used on the groups of bits.
  *
  *  The template parameters are:
+ *    SIZE_MODE : How can the number of bits change once created? (FIXED, CAPED, DYNAMIC, WATERMARK)
  *    BASE_SIZE  : For FIXED, How many bits are used?
  *                 For CAPPED, What is the maximum number of bits allowed?
  *                 For DYNAMIC, What is the default size?
  *                  note: adjustable capacity is 15-20% slower, but run-time configurable.
- *    SIZE_MODE : How can the number of bits change once created? (FIXED, CAPED, DYNAMIC)
  *    ZERO_LEFT : Should the index of zero be the left-most bit? (right-most if false)
  *
  *  Specializations are:
  *    BitVector : A replacement for std::vector<bool> (index 0 is on left)
  *    BitArray  : A replacement for std::array<bool> (index 0 is on left)
  *    BitSet    : A replacement for std::bitset (index 0 is on right)
- *    BitString : Like BitVector, but index 0 is on the right
+ *    BitValue  : Like BitVector, but index 0 is on the right
  * 
  *  In the case of replacements, the aim was for identical functionality, but many additional
  *  features, especially associated with bitwise logic operations.
@@ -206,10 +206,13 @@ namespace emp {
       Bits_Data_Mem(const Bits_Data_Mem &) = default;
       Bits_Data_Mem(Bits_Data_Mem &&) = default;
 
+      Bits_Data_Mem & operator=(const Bits_Data_Mem &) = default;
+      Bits_Data_Mem & operator=(Bits_Data_Mem &&) = default;
+
       // --- Helper functions --
       
-      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-      [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
+      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits.data(); }
+      [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits.data(); }
 
       void RawResize(const size_t new_size, const bool preserve_data=false) {
         base_t::SetSize(new_size);        
@@ -217,6 +220,9 @@ namespace emp {
           bits[base_t::LastField()] &= base_t::EndMask();
         }
       }
+
+      auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data()); }
+      auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data()); }
 
       bool OK() const { return true; } // Nothing to check yet.
     };
@@ -295,6 +301,8 @@ namespace emp {
         bits = in.bits;     // Move over the bits.
         in.bits = nullptr;  // Clear them out of the original.
       }
+
+      auto AsSpan() const { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
 
       bool OK() const {
         // Do some checking on the bits array ptr to make sure it's value.
@@ -382,6 +390,8 @@ namespace emp {
         in.bits = nullptr;             // Clear them out of the original.
       }
 
+      auto AsSpan() const { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+
       bool OK() const {
         // Do some checking on the bits array ptr to make sure it's value.
         if (bits) {
@@ -422,6 +432,8 @@ namespace emp {
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
         return base_t::FieldPtr().template ReinterpretCast<const unsigned char>();
       }
+
+      auto AsByteSpan() const { return std::as_bytes( base_t::AsSpan() ); }
 
       bool OK() const {
         bool result = base_t::OK();
@@ -781,7 +793,7 @@ namespace emp {
 
     /// Get a read-only view into the internal array used by Bits.
     /// @return Read-only span of Bits's bytes.
-    [[nodiscard]] std::span<const std::byte> GetBytes() const;
+    [[nodiscard]] auto GetBytes() const { return data.AsByteSpan(); }
 
     /// Get a read-only pointer to the internal array used by Bits.
     /// (note that bits are NOT in order at the byte level!)
@@ -2024,16 +2036,6 @@ namespace emp {
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     return (data.bits[field_id] >> pos_id) & 255U;
-  }
-
-  /// Get a read-only view into the internal array used by Bits object.
-  /// @return Read-only span of Bits object's bytes.
-  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  std::span<const std::byte> Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::GetBytes() const {
-    return std::span<const std::byte>(
-      data.BytePtr().Raw(),
-      data.NumBytes()
-    );
   }
 
   /// Update the byte at the specified byte index.
