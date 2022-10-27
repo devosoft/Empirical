@@ -15,11 +15,11 @@
  *  -or- bitwise logic (including more complex bit magic) can be used on the groups of bits.
  *
  *  The template parameters are:
- *    SIZE_MODE : How can the number of bits change once created? (FIXED, CAPED, DYNAMIC, WATERMARK)
- *    BASE_SIZE  : For FIXED, How many bits are used?
- *                 For CAPPED, What is the maximum number of bits allowed?
- *                 For DYNAMIC, What is the default size?
- *                  note: adjustable capacity is 15-20% slower, but run-time configurable.
+ *    SIZE_MODE : How is memory managed? (FIXED, CAPED, DYNAMIC, WATERMARK)
+ *    BASE_SIZE : For FIXED, How many bits are used?
+ *                For CAPPED, What is the maximum number of bits allowed?
+ *                For DYNAMIC or WATERMARK, What is the default size?
+ *             note: adjustable capacity is 15-20% slower, but run-time configurable.
  *    ZERO_LEFT : Should the index of zero be the left-most bit? (right-most if false)
  *
  *  Specializations are:
@@ -78,7 +78,7 @@ namespace emp {
 
   static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
 
-  size_t NumBitFields(size_t num_bits) noexcept {
+  constexpr size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
 
@@ -119,36 +119,41 @@ namespace emp {
       // Otherwise, for dynamic SIZE_MODE use BASE_SIZE as the default.
       static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitsMode::CAPPED) ? 0 : BASE_SIZE;
 
-      void SetSize(size_t new_size) { num_bits = new_size; }
+      constexpr void SetSize(size_t new_size) { num_bits = new_size; }
 
       using field_t = bits_field_t;
-      [[nodiscard]] size_t NumBits() const noexcept { return num_bits; }
+      [[nodiscard]] constexpr size_t NumBits() const noexcept { return num_bits; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] size_t NumEndBits() const noexcept { return num_bits & (NUM_FIELD_BITS - 1); }
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return num_bits & (NUM_FIELD_BITS - 1); }
 
       /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] size_t EndGap() const noexcept { return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0; }
+      [[nodiscard]] constexpr size_t EndGap() const noexcept { return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0; }
 
       /// A mask to cut off all of the final bits.
-      [[nodiscard]] field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
 
       /// How many felids do we need for the current set of bits?
-      [[nodiscard]] size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0; }
+      [[nodiscard]] constexpr size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0; }
 
       /// What is the ID of the last occupied field?
-      [[nodiscard]] size_t LastField() const noexcept { return NumFields() - 1; }
+      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
 
       /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] size_t NumBytes() const noexcept { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
 
       /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
       Bits_Data_Size(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
       Bits_Data_Size(const Bits_Data_Size &) = default;
 
-      bool OK() const { return true; } // Nothing to check yet.
+      template <class Archive>
+      void serialize(Archive & ar) {
+        ar(num_bits);
+      }
+
+      constexpr bool OK() const { return true; } // Nothing to check yet.
     };
 
     /// If we have a fixed number of bits, we know size at compile time.
@@ -157,7 +162,9 @@ namespace emp {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
-      void SetSize(size_t new_size) { emp_assert(new_size == NUM_BITS, "Cannot change to new_size"); }
+      constexpr void SetSize(size_t new_size) {
+        emp_assert(new_size == NUM_BITS, "Cannot change to new_size");
+      }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
 
@@ -184,6 +191,11 @@ namespace emp {
 
       Bits_Data_Size(size_t in_size=NUM_BITS) { emp_assert(in_size == NUM_BITS); }
       Bits_Data_Size(const Bits_Data_Size &) = default;
+
+      template <class Archive>
+      void serialize(Archive & ar) {
+        // Nothing to do here.
+      }
 
       bool OK() const { return true; } // Nothing to check yet.
     };
@@ -225,6 +237,15 @@ namespace emp {
       auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data()); }
 
       bool OK() const { return true; } // Nothing to check yet.
+
+      template <class Archive>
+      void serialize(Archive & ar) {
+        base_t::serialize(ar); // Save size info.
+        for (size_t i=0; i < base_t::NumFields(); ++i) {
+          ar(bits[i]);
+        }
+      }
+
     };
     
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
@@ -303,6 +324,24 @@ namespace emp {
       }
 
       auto AsSpan() const { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+
+      template <class Archive>
+      void save(Archive & ar) {
+        base_t::serialize(ar); // Save size info.
+        for (size_t i=0; i < base_t::NumFields(); ++i) {
+          ar(bits[i]);
+        }
+      }
+
+      template <class Archive>
+      void load(Archive & ar) {
+        base_t::serialize(ar);
+        if (bits) bits.DeleteArray();  // Delete old memory if needed
+        bits = NewArrayPtr<field_t>(base_t::NumFields());
+        for (size_t i=0; i < base_t::NumFields(); ++i) {
+          ar(bits[i]);
+        }
+      }
 
       bool OK() const {
         // Do some checking on the bits array ptr to make sure it's value.
@@ -391,6 +430,25 @@ namespace emp {
       }
 
       auto AsSpan() const { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+
+      template <class Archive>
+      void save(Archive & ar) {
+        base_t::serialize(ar); // Save size info.
+        for (size_t i=0; i < base_t::NumFields(); ++i) {
+          ar(bits[i]);
+        }
+      }
+
+      template <class Archive>
+      void load(Archive & ar) {
+        base_t::serialize(ar);
+        if (bits) bits.DeleteArray();  // Delete old memory if needed
+        bits = NewArrayPtr<field_t>(base_t::NumFields());
+        field_capacity = base_t::NumFields();
+        for (size_t i=0; i < base_t::NumFields(); ++i) {
+          ar(bits[i]);
+        }
+      }
 
       bool OK() const {
         // Do some checking on the bits array ptr to make sure it's value.
@@ -497,8 +555,10 @@ namespace emp {
     // Convert a byte position in Bits to a byte position in the target field.
     [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
-    [[nodiscard]] field_t MaskField(size_t mask_size) const { return MaskLow<field_t>(mask_size); }
-    [[nodiscard]] field_t MaskField(size_t mask_size, size_t offset) const {
+    [[nodiscard]] constexpr field_t MaskField(size_t mask_size) const {
+      return MaskLow<field_t>(mask_size);
+    }
+    [[nodiscard]] constexpr field_t MaskField(size_t mask_size, size_t offset) const {
       return MaskLow<field_t>(mask_size) << offset;
     }
 
@@ -513,7 +573,7 @@ namespace emp {
     }
 
     // Copy bits from one position in the genome to another; leave old positions unchanged.
-    void RawMove(const size_t from_start, const size_t from_stop, const size_t to);
+    constexpr void RawMove(const size_t from_start, const size_t from_stop, const size_t to);
 
     // Convert the bits to bytes (note that bits are NOT in order at the byte level!)
     [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return data.BytePtr(); }
@@ -522,7 +582,7 @@ namespace emp {
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const { return data.BytePtr(); }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
-    this_t & ClearExcessBits() {
+    constexpr this_t & ClearExcessBits() {
       if (data.NumEndBits()) data.bits[data.LastField()] &= data.EndMask();
       return *this;
     }
@@ -532,16 +592,16 @@ namespace emp {
     Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & ApplyRange(const FUN_T & fun, size_t start, size_t stop);
 
     // Helper: call SHIFT with positive number
-    void ShiftLeft(const size_t shift_size);
+    constexpr void ShiftLeft(const size_t shift_size);
 
     // Helper for calling SHIFT with negative number
-    void ShiftRight(const size_t shift_size);
+    constexpr void ShiftRight(const size_t shift_size);
 
     /// Helper: call ROTATE with negative number instead
-    void RotateLeft(const size_t shift_size_raw);
+    constexpr void RotateLeft(const size_t shift_size_raw);
 
     /// Helper for calling ROTATE with positive number
-    void RotateRight(const size_t shift_size_raw);
+    constexpr void RotateRight(const size_t shift_size_raw);
 
   public:
     Bits() { }
@@ -661,19 +721,19 @@ namespace emp {
     // =========  Accessors  ========= //
 
     /// How many bits do we currently have?
-    [[nodiscard]] auto GetSize() const { return data.NumBits(); }
+    [[nodiscard]] constexpr auto GetSize() const { return data.NumBits(); }
 
     /// How many bytes are in this Bits? (includes empty field space)
-    [[nodiscard]] auto GetNumBytes() const { return data.NumBytes(); }
+    [[nodiscard]] constexpr auto GetNumBytes() const { return data.NumBytes(); }
 
     /// How many distinct values could be held in this Bits?
-    [[nodiscard]] double GetNumStates() const { return emp::Pow2(data.NumBits()); }
+    [[nodiscard]] constexpr double GetNumStates() const { return emp::Pow2(data.NumBits()); }
 
     /// Retrieve the bit value from the specified index.
-    [[nodiscard]] bool Get(size_t index) const;
+    [[nodiscard]] constexpr bool Get(size_t index) const;
 
     /// A safe version of Get() for indexing out of range. Useful for representing collections.
-    [[nodiscard]] bool Has(size_t index) const {
+    [[nodiscard]] constexpr bool Has(size_t index) const {
       return (index < data.NumBits()) ? Get(index) : false;
     }
 
@@ -895,16 +955,16 @@ namespace emp {
     [[nodiscard]] std::size_t Hash(size_t start_field=0) const;
 
     /// Count the number of ones in Bits.
-    [[nodiscard]] size_t CountOnes() const;
+    [[nodiscard]] constexpr size_t CountOnes() const;
 
     /// Count the number of ones in a range within Bits.  [start, end)
-    [[nodiscard]] size_t CountOnes(size_t start, size_t end) const;
+    [[nodiscard]] constexpr size_t CountOnes(size_t start, size_t end) const;
 
     /// Faster counting of ones for very sparse bit vectors.
-    [[nodiscard]] size_t CountOnes_Sparse() const;
+    [[nodiscard]] constexpr size_t CountOnes_Sparse() const;
 
     /// Count the number of zeros in Bits.
-    [[nodiscard]] size_t CountZeros() const { return GetSize() - CountOnes(); }
+    [[nodiscard]] constexpr size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Pop the last bit in the vector.
     /// @return value of the popped bit.
@@ -1089,14 +1149,6 @@ namespace emp {
     /// store result here, and return this object.
     Bits & ROTATE_SELF(const int rotate_size);
 
-    /// Helper: call ROTATE with negative number instead
-    template<size_t shift_size_raw>
-    Bits & ROTL_SELF();
-
-    /// Helper for calling ROTATE with positive number
-    template<size_t shift_size_raw>
-    Bits & ROTR_SELF();
-
     /// Addition of two Bits.
     /// Wraps if it overflows.
     /// Returns result.
@@ -1179,15 +1231,21 @@ namespace emp {
     const Bits & operator-=(const Bits & ar2) { return SUB_SELF(ar2); }
 
 
+    // =========  Cereal Compatability  ========= //
+
+    template <class Archive>
+    void serialize(Archive & ar) { ar(data); }
+
+
     // =========  Standard Library Compatability  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
-    [[nodiscard]] size_t size() const { return data.NumBits(); }
+    [[nodiscard]] constexpr size_t size() const { return data.NumBits(); }
     void resize(std::size_t new_size) { Resize(new_size); }
-    [[nodiscard]] bool all() const { return All(); }
-    [[nodiscard]] bool any() const { return Any(); }
-    [[nodiscard]] bool none() const { return !Any(); }
-    size_t count() const { return CountOnes(); }
+    [[nodiscard]] constexpr bool all() const { return All(); }
+    [[nodiscard]] constexpr bool any() const { return Any(); }
+    [[nodiscard]] constexpr bool none() const { return !Any(); }
+    constexpr size_t count() const { return CountOnes(); }
     Bits & flip() { return Toggle(); }
     Bits & flip(size_t pos) { return Toggle(pos); }
     Bits & flip(size_t start, size_t end) { return Toggle(start, end); }
@@ -1218,7 +1276,7 @@ namespace emp {
   // All positions are requires to exist and memory must be available for the move.
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  void Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT>::
+  constexpr void Bits<SIZE_MODE, BASE_SIZE, ZERO_LEFT>::
     RawMove(const size_t from_start, const size_t from_stop, const size_t to)
   {
     emp_assert(from_start <= from_stop);             // Must move legal region.
@@ -1290,7 +1348,7 @@ namespace emp {
   }
 
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
+  constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftLeft(const size_t shift_size) {
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= GetSize()) { Clear(); return; }
 
@@ -1327,7 +1385,7 @@ namespace emp {
   }
 
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
+  constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= GetSize()) { Clear(); return; }
 
@@ -1363,7 +1421,7 @@ namespace emp {
 
   /// Helper: call ROTATE with negative number
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
+  constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
     if (GetSize() == 0) return;   // Nothing to rotate if there are not bits.
 
     const field_t shift_size = shift_size_raw % GetSize();
@@ -1442,7 +1500,7 @@ namespace emp {
 
   /// Helper for calling ROTATE with positive number
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
+  constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
     const size_t shift_size = shift_size_raw % GetSize();
     const size_t NUM_FIELDS = data.NumFields();
 
@@ -1745,7 +1803,7 @@ namespace emp {
 
   /// Retrieve the bit value from the specified index.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Get(size_t index) const {
+  constexpr bool Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Get(size_t index) const {
     emp_assert(index < GetSize(), index, GetSize());
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
@@ -2149,7 +2207,7 @@ namespace emp {
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in Bits.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes() const {
+  constexpr size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes() const {
     if (GetSize() == 0) return 0;
     const field_t NUM_FIELDS = data.NumFields();
     size_t bit_count = 0;
@@ -2166,7 +2224,7 @@ namespace emp {
   // TODO: Speed this up so that we don't need to copy out all of the bits.
   /// Count the number of ones in a specified range of Bits.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes(size_t start, size_t end) const {
+  constexpr size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes(size_t start, size_t end) const {
     emp_assert(start <= end);
     emp_assert(end <= GetSize());
     if (start == end) return 0;
@@ -2176,7 +2234,7 @@ namespace emp {
 
   /// Faster counting of ones for very sparse bit vectors.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes_Sparse() const {
+  constexpr size_t Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::CountOnes_Sparse() const {
     size_t bit_count = 0;
     const size_t NUM_FIELDS = data.NumFields();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
@@ -2574,154 +2632,6 @@ namespace emp {
     return *this;
   }
 
-  /// Helper: call ROTATE with negative number instead
-  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  template<size_t shift_size_raw>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ROTL_SELF() {
-    constexpr size_t shift_size = shift_size_raw % GetSize();
-    const size_t NUM_FIELDS = data.NumFields();
-    const size_t LAST_FIELD = data.LastField();
-
-    // special case: for exactly one field_t, try to go low level
-    // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-    if (NUM_FIELDS == 1) {
-      field_t & n = data.bits[0];
-      size_t c = shift_size;
-
-      // mask necessary to surpress shift count overflow warnings
-      c &= FIELD_LOG2_MASK;
-      n = (n<<c) | (n>>( (-(c+FIELD_BITS-GetSize())) & FIELD_LOG2_MASK ));
-
-    } else {
-
-      // note that we already modded shift_size by GetSize()
-      // so there's no need to mod by FIELD_SIZE here
-      size_t field_shift = data.NumEndBits() ? (
-        (shift_size + FIELD_BITS - data.NumEndBits()) / FIELD_BITS
-      ) : (
-        shift_size / FIELD_BITS
-      );
-      // if we field shift, we need to shift bits by (FIELD_BITS - data.NumEndBits())
-      // more to account for the filler that gets pulled out of the middle
-      size_t bit_shift = data.NumEndBits() && field_shift ? (
-        (shift_size + FIELD_BITS - data.NumEndBits()) % FIELD_BITS
-      ) : (
-        shift_size % FIELD_BITS
-      );
-      size_t bit_overflow = FIELD_BITS - bit_shift;
-
-      // if rotating more than field capacity, we need to rotate fields
-      if (field_shift) {
-        auto field_span = FieldSpan();
-        std::rotate(
-          field_span.rbegin(),
-          field_span.rbegin()+static_cast<int>(field_shift),
-          field_span.rend()
-        );
-      }
-
-      // if necessary, shift filler bits out of the middle
-      if (data.NumEndBits()) {
-        const size_t filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
-        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
-          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
-        }
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-
-        const field_t keystone = data.NumEndBits() ? (
-          (data.bits[LAST_FIELD] << (FIELD_BITS - data.NumEndBits()))
-          | (data.bits[NUM_FIELDS - 2] >> data.NumEndBits())
-        ) : (
-          data.bits[LAST_FIELD]
-        );
-
-        for (size_t i = LAST_FIELD; i > 0; --i) {
-          data.bits[i] <<= bit_shift;
-          data.bits[i] |= (data.bits[i-1] >> bit_overflow);
-        }
-        // Handle final field
-        data.bits[0] <<= bit_shift;
-        data.bits[0] |= keystone >> bit_overflow;
-
-      }
-
-    }
-
-    return ClearExcessBits();
-  }
-
-
-  /// Helper for calling ROTATE with positive number
-  template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  template<size_t shift_size_raw>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ROTR_SELF() {
-    const size_t shift_size = shift_size_raw % GetSize();
-    const size_t NUM_FIELDS = data.NumFields();
-    const size_t LAST_FIELD = data.LastField();
-
-    // special case: for exactly one field_t, try to go low level
-    // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-    if (NUM_FIELDS == 1) {
-      field_t & n = data.bits[0];
-      size_t c = shift_size;
-
-      // mask necessary to surpress shift count overflow warnings
-      c &= FIELD_LOG2_MASK;
-      n = (n>>c) | (n<<( (GetSize()-c) & FIELD_LOG2_MASK ));
-
-    } else {
-
-      field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-      size_t bit_shift = shift_size % FIELD_BITS;
-      field_t bit_overflow = FIELD_BITS - bit_shift;
-
-      // if rotating more than field capacity, we need to rotate fields
-      if (field_shift) {
-        auto field_span = FieldSpan();
-        std::rotate(
-          field_span.begin(),
-          field_span.begin()+field_shift,
-          field_span.end()
-        );
-      }
-
-      // if necessary, shift filler bits out of the middle
-      if (data.NumEndBits()) {
-        size_t filler_idx = LAST_FIELD - field_shift;
-        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
-          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
-        }
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-
-        const field_t keystone = data.NumEndBits() ? (
-          data.bits[0] >> (FIELD_BITS - data.NumEndBits())
-        ) : (
-          data.bits[0]
-        );
-
-        if (data.NumEndBits()) {
-          data.bits[data.LastField()] |= data.bits[0] << data.NumEndBits();
-        }
-
-        for (size_t i = 0; i < LAST_FIELD; ++i) {
-          data.bits[i] >>= bit_shift;
-          data.bits[i] |= (data.bits[i+1] << bit_overflow);
-        }
-        data.bits[LAST_FIELD] >>= bit_shift;
-        data.bits[LAST_FIELD] |= keystone << bit_overflow;
-      }
-    }
-
-    return ClearExcessBits();
-  }
 
   /// Addition of two Bitsets.
   /// Wraps if it overflows.
@@ -2740,8 +2650,8 @@ namespace emp {
     bool carry = false;
 
     for (size_t i = 0; i < GetSize()/FIELD_BITS; ++i) {
-      field_t addend = set2.bits[i] + static_cast<field_t>(carry);
-      carry = set2.bits[i] > addend;
+      field_t addend = set2.data.bits[i] + static_cast<field_t>(carry);
+      carry = set2.data.bits[i] > addend;
 
       field_t sum = data.bits[i] + addend;
       carry |= data.bits[i] > sum;
@@ -2752,7 +2662,7 @@ namespace emp {
     if (data.NumEndBits()) {
       data.bits[GetSize()/FIELD_BITS] = (
         data.bits[GetSize()/FIELD_BITS]
-        + set2.bits[GetSize()/FIELD_BITS]
+        + set2.data.bits[GetSize()/FIELD_BITS]
         + static_cast<field_t>(carry)
       ) & data.EndMask();
     }
@@ -2778,8 +2688,8 @@ namespace emp {
     bool carry = false;
 
     for (size_t i = 0; i < GetSize()/FIELD_BITS; ++i) {
-      field_t subtrahend = set2.bits[i] + static_cast<field_t>(carry);
-      carry = set2.bits[i] > subtrahend;
+      field_t subtrahend = set2.data.bits[i] + static_cast<field_t>(carry);
+      carry = set2.data.bits[i] > subtrahend;
       carry |= data.bits[i] < subtrahend;
       data.bits[i] -= subtrahend;
     }
@@ -2787,7 +2697,7 @@ namespace emp {
     if (data.NumEndBits()) {
       data.bits[GetSize()/FIELD_BITS] = (
         data.bits[GetSize()/FIELD_BITS]
-        - set2.bits[GetSize()/FIELD_BITS]
+        - set2.data.bits[GetSize()/FIELD_BITS]
         - static_cast<field_t>(carry)
       ) & data.EndMask();
     }
