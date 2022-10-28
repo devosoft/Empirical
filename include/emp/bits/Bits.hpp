@@ -145,7 +145,8 @@ namespace emp {
       /// How many bytes are allocated? (rounded up!)
       [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
-      Bits_Data_Size(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
+      Bits_Data_Size(size_t in_size=DEFAULT_SIZE, bool /*allow smaller*/=false)
+        : num_bits(in_size) { }
       Bits_Data_Size(const Bits_Data_Size &) = default;
 
       template <class Archive>
@@ -189,7 +190,10 @@ namespace emp {
       /// How many bytes are allocated? (rounded up!)
       [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
 
-      Bits_Data_Size(size_t in_size=NUM_BITS) { emp_assert(in_size == NUM_BITS); }
+      Bits_Data_Size(size_t in_size=NUM_BITS, bool allow_smaller=false) {
+        emp_assert(in_size <= NUM_BITS, in_size, NUM_BITS);
+        emp_assert(allow_smaller || in_size == NUM_BITS, allow_smaller, in_size, NUM_BITS);
+      }
       Bits_Data_Size(const Bits_Data_Size &) = default;
 
       template <class Archive>
@@ -214,7 +218,9 @@ namespace emp {
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
 
       Bits_Data_Mem() = default;
-      Bits_Data_Mem(size_t num_bits) : base_t(num_bits) { emp_assert(num_bits <= CAPACITY); }
+      Bits_Data_Mem(size_t num_bits, bool allow_smaller=false) : base_t(num_bits,allow_smaller) {
+        emp_assert(num_bits <= CAPACITY);
+      }
       Bits_Data_Mem(const Bits_Data_Mem &) = default;
       Bits_Data_Mem(Bits_Data_Mem &&) = default;
 
@@ -258,7 +264,9 @@ namespace emp {
 
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
-      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
+      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE, bool /*allow_smaller*/=true)
+        : base_t(num_bits,true), bits(nullptr)
+      {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
       Bits_Data_Mem(const Bits_Data_Mem & in) : bits(nullptr) { Copy(in); }
@@ -367,7 +375,9 @@ namespace emp {
       Ptr<field_t> bits = nullptr;  ///< Pointer to array with the status of each bit
       size_t field_capacity = 0;    ///< How many fields is the watermark up to?
 
-      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr) {
+      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE, bool allow_smaller=false)
+        : base_t(num_bits,allow_smaller), bits(nullptr)
+      {
         if (num_bits) {
           field_capacity = base_t::NumFields();
           bits = NewArrayPtr<field_t>(field_capacity);
@@ -466,7 +476,6 @@ namespace emp {
 
 
     /// Internal data for the Bits class to separate static vs. dynamic.
-    /// Generic assumes a specified capacity and a fixed size.
     template <BitsMode SIZE_MODE, size_t BASE_SIZE>
     struct Bits_Data : public Bits_Data_Mem<SIZE_MODE, BASE_SIZE>
     {
@@ -477,7 +486,7 @@ namespace emp {
       using base_t::bits;
 
       Bits_Data() : base_t(base_size_t::DEFAULT_SIZE) { }
-      Bits_Data(size_t num_bits) : base_t(num_bits) { }
+      Bits_Data(size_t num_bits, bool allow_smaller=false) : base_t(num_bits,allow_smaller) { }
       Bits_Data(const Bits_Data & in) = default;
       Bits_Data(Bits_Data && in) = default;
 
@@ -604,34 +613,36 @@ namespace emp {
     constexpr void RotateRight(const size_t shift_size_raw);
 
   public:
-    Bits() { }
+    /// @brief Default constructor; will build the default number of bits (often 0, but not always)
+    /// @param init_val Initial value of all default bits. 
+    Bits(bool init_val=0) { if (init_val) SetAll(); else Clear(); }
 
     /// Build a new Bits with specified bit count and initialization (default 0)
     Bits(size_t in_num_bits, bool init_val=false);
 
     // Prevent ambiguous conversions...
-    /// Anything not otherwise defined for first argument, convert to size_t.
+    /// @brief Anything not otherwise defined for first argument, convert to size_t.
     template <typename T, typename std::enable_if<std::is_arithmetic<T>::value, int>::type = 0>
     Bits(T in_num_bits, bool init_val=false) : Bits(static_cast<size_t>(in_num_bits), init_val) {}
 
-    /// Copy constructor of existing bits object.
+    /// @brief Copy constructor of existing bits object.
     Bits(const Bits & in) = default;
 
-    /// Constructor for other type of existing bits object.
+    /// @brief Constructor for other type of existing bits object.
     template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
     Bits(const Bits<SIZE_MODE2, BASE_SIZE2, ZERO_LEFT2> & in);
 
-    /// Move constructor of existing bit field.
+    /// @brief Move constructor of existing bit field.
     Bits(this_t && in) = default;
 
-    /// Constructor to generate a Bits from a std::bitset.
+    /// @brief Constructor to generate a Bits from a std::bitset.
     template <size_t NUM_BITS>
     explicit Bits(const std::bitset<NUM_BITS> & bitset);
 
-    /// Constructor to generate a Bits from a string of '0's and '1's.
+    /// @brief Constructor to generate a Bits from a string of '0's and '1's.
     Bits(const std::string & bitstring);
 
-    /// Constructor to generate a Bits from a literal string of '0's and '1's.
+    /// @brief Constructor to generate a Bits from a literal string of '0's and '1's.
     Bits(const char * bitstring) : Bits(std::string(bitstring)) {}
 
     /// @brief Constructor to generate a random set of bits in the default size.
@@ -1590,11 +1601,11 @@ namespace emp {
     if (init_val) SetAll(); else Clear();
   }
 
-  /// Constructor for other type of Bits field.
+  /// Constructor from other type of Bits field.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const Bits<SIZE_MODE2,BASE_SIZE2,ZERO_LEFT2> & in)
-    : data(in.GetSize())
+    : data(in.GetSize(), true)
   {
     emp_assert(in.OK());
     RawCopy(in);
@@ -1606,7 +1617,7 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <size_t NUM_BITS>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const std::bitset<NUM_BITS> & bitset)
-    : data(NUM_BITS)
+    : data(NUM_BITS, true)
   {
     // Copy over the values.
     for (size_t i = 0; i < NUM_BITS; ++i) Set(i, bitset[i]);
@@ -1615,7 +1626,7 @@ namespace emp {
   /// Constructor to generate a Bits from a string of '0's and '1's.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Bits(const std::string & bitstring)
-    : data(bitstring.size())
+    : data(bitstring.size(), true)
   {
     Clear();
     for (size_t i = 0; i < bitstring.size(); i++) {
