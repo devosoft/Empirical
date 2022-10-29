@@ -1640,6 +1640,7 @@ namespace emp {
   {
     emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
     Randomize(random);
+    ClearExcessBits();
   }
 
   /// Constructor to generate random Bits with provided prob of 1's, default size.
@@ -1649,6 +1650,7 @@ namespace emp {
     emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
     emp_assert(p1 >= 0.0 && p1 <= 1.0, "Probability of ones out of range", p1);
     Randomize(random, p1);
+    ClearExcessBits();
   }
 
   /// Constructor to generate random Bits with specified number of ones.
@@ -1657,6 +1659,7 @@ namespace emp {
   {
     emp_assert(GetSize() > 0, "Trying to construct a random series of bits, but with no bits!");
     ChooseRandom(random, target_ones);
+    ClearExcessBits();
   }
 
   /// Constructor to generate a random Bits (with equal prob of 0 or 1).
@@ -1902,7 +1905,8 @@ namespace emp {
 
   /// Set all bits randomly, with a given probability of being on.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Randomize(Random & random, const double p,
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::Randomize(Random & random, const double p,
                                    const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
@@ -1915,7 +1919,8 @@ namespace emp {
 
   /// Set all bits randomly, with a given number of them being on.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ChooseRandom(Random & random, const size_t target_ones,
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ChooseRandom(Random & random, const size_t target_ones,
                                       const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_SIZE_T) stop_pos = GetSize();
 
@@ -1976,7 +1981,8 @@ namespace emp {
   /// Flip random bits with a given probability.
   // @CAO: Possibly faster to generate a sequence of bits and XORing with them.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FlipRandom(Random & random,
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> &
+  Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::FlipRandom(Random & random,
                                                   const double p,
                                                   const size_t start_pos,
                                                   size_t stop_pos)
