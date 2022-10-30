@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2022.
  *
  *  @file bitset_utils.hpp
  *  @brief A set of simple functions to manipulate bitsets.
@@ -72,18 +72,18 @@ namespace emp {
   static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
 
   /// Quick bit-mask generator for low bits.
-  template <typename TYPE>
+  template <typename TYPE=size_t>
   static constexpr TYPE MaskLow(std::size_t num_bits) {
     return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
   /// Quick bit-mask generator for high bits.
-  template <typename TYPE>
+  template <typename TYPE=size_t>
   static constexpr TYPE MaskHigh(std::size_t num_bits) {
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
-  template <typename TYPE>
+  template <typename TYPE=size_t>
   static constexpr TYPE MaskUsed(TYPE val) {
     size_t shift = 1;
     TYPE last = 0;
@@ -95,6 +95,44 @@ namespace emp {
     }
     return val;
   }
+
+  template <typename T>
+  T ReverseBits(T in) {
+    constexpr size_t num_bytes = sizeof(T);
+
+    static_assert(num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8,
+                  "ReverseBits() currently requires 1, 2, 4, or 8-byte values.");
+
+    if constexpr (num_bytes == 1) {
+      in = static_cast<T>( (in & 0xF0) >> 4 | (in & 0x0F) << 4 );
+      in = static_cast<T>( (in & 0xCC) >> 2 | (in & 0x33) << 2 );
+      in = static_cast<T>( (in & 0xAA) >> 1 | (in & 0x55) << 1 );
+    }
+    else if constexpr (num_bytes == 2) {
+      in = static_cast<T>( (in & 0xFF00) >> 8 | (in & 0x00FF) << 8 );
+      in = static_cast<T>( (in & 0xF0F0) >> 4 | (in & 0x0F0F) << 4 );
+      in = static_cast<T>( (in & 0xCCCC) >> 2 | (in & 0x3333) << 2 );
+      in = static_cast<T>( (in & 0xAAAA) >> 1 | (in & 0x5555) << 1 );
+    }
+    else if constexpr (num_bytes == 4) {
+      in = static_cast<T>( (in & 0xFFFF0000) >> 16 | (in & 0x0000FFFF) << 16 );
+      in = static_cast<T>( (in & 0xFF00FF00) >> 8  | (in & 0x00FF00FF) << 8 );
+      in = static_cast<T>( (in & 0xF0F0F0F0) >> 4  | (in & 0x0F0F0F0F) << 4 );
+      in = static_cast<T>( (in & 0xCCCCCCCC) >> 2  | (in & 0x33333333) << 2 );
+      in = static_cast<T>( (in & 0xAAAAAAAA) >> 1  | (in & 0x55555555) << 1 );
+    }
+    else /* if constexpr (num_bytes == 8) */ {
+      in = static_cast<T>( (in & 0xFFFFFFFF00000000) >> 32 | (in & 0x00000000FFFFFFFF) << 32 );
+      in = static_cast<T>( (in & 0xFFFF0000FFFF0000) >> 16 | (in & 0x0000FFFF0000FFFF) << 16 );
+      in = static_cast<T>( (in & 0xFF00FF00FF00FF00) >> 8  | (in & 0x00FF00FF00FF00FF) << 8 );
+      in = static_cast<T>( (in & 0xF0F0F0F0F0F0F0F0) >> 4  | (in & 0x0F0F0F0F0F0F0F0F) << 4 );
+      in = static_cast<T>( (in & 0xCCCCCCCCCCCCCCCC) >> 2  | (in & 0x3333333333333333) << 2 );
+      in = static_cast<T>( (in & 0xAAAAAAAAAAAAAAAA) >> 1  | (in & 0x5555555555555555) << 1 );
+    }
+
+    return in;
+  }
+
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
