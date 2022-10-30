@@ -33,31 +33,33 @@ namespace emp {
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  /// Count the number of bits in a 64-bit unsigned integer.
-  inline constexpr size_t count_bits(uint64_t val) {
-    return
-      ByteCount[  val >> 56         ] +
-      ByteCount[ (val >> 48) & 0xFF ] +
-      ByteCount[ (val >> 40) & 0xFF ] +
-      ByteCount[ (val >> 32) & 0xFF ] +
-      ByteCount[ (val >> 24) & 0xFF ] +
-      ByteCount[ (val >> 16) & 0xFF ] +
-      ByteCount[ (val >>  8) & 0xFF ] +
-      ByteCount[  val        & 0xFF ];
+  /// Count the number of bits in an unsigned integer.
+  template <typename T>
+  [[nodiscard]] inline constexpr size_t count_bits(T val) {
+    constexpr size_t num_bytes = sizeof(T);
+    static_assert(num_bytes <= 8, "count_bits() requires 8 or fewer bytes.");
+
+    size_t out_ones = ByteCount[ val & 0xFF ];
+    if constexpr (num_bytes > 1) {
+      out_ones += ByteCount[ (val >>  8) & 0xFF ];
+    }
+    if constexpr (num_bytes > 2) {
+      out_ones += ByteCount[ (val >> 24) & 0xFF ] +
+                  ByteCount[ (val >> 16) & 0xFF ];
+    }
+    if constexpr (num_bytes > 4) {
+      out_ones += ByteCount[  val >> 56         ] +
+                  ByteCount[ (val >> 48) & 0xFF ] +
+                  ByteCount[ (val >> 40) & 0xFF ] +
+                  ByteCount[ (val >> 32) & 0xFF ];
+    }
+    return out_ones;
   }
 
-  // /// Count the number of bits in a 32-bit unsigned integer.
-  // inline constexpr size_t count_bits(uint32_t val) {
-  //   return
-  //     ByteCount[  val >> 24         ] +
-  //     ByteCount[ (val >> 16) & 0xFF ] +
-  //     ByteCount[ (val >>  8) & 0xFF ] +
-  //     ByteCount[  val        & 0xFF ];
-  // }
 
   /// Return the position of the first one bit
   template <typename T>
-  inline constexpr size_t find_bit(T val) { return count_bits( (~val) & (val-1) ); }
+  [[nodiscard]] inline constexpr size_t find_bit(T val) { return count_bits( (~val) & (val-1) ); }
 
   /// Return the position of the first one bit AND REMOVE IT.
   template <typename T>
@@ -69,22 +71,22 @@ namespace emp {
 
   /// A compile-time bit counter.
   template <typename TYPE>
-  static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
+  [[nodiscard]] static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
 
   /// Quick bit-mask generator for low bits.
   template <typename TYPE=size_t>
-  static constexpr TYPE MaskLow(std::size_t num_bits) {
+  [[nodiscard]] static constexpr TYPE MaskLow(std::size_t num_bits) {
     return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
   /// Quick bit-mask generator for high bits.
   template <typename TYPE=size_t>
-  static constexpr TYPE MaskHigh(std::size_t num_bits) {
+  [[nodiscard]] static constexpr TYPE MaskHigh(std::size_t num_bits) {
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
   template <typename TYPE=size_t>
-  static constexpr TYPE MaskUsed(TYPE val) {
+  [[nodiscard]] static constexpr TYPE MaskUsed(TYPE val) {
     size_t shift = 1;
     TYPE last = 0;
     while (val != last) {     // While the shift is making progress...
@@ -97,7 +99,7 @@ namespace emp {
   }
 
   template <typename T>
-  T ReverseBits(T in) {
+  [[nodiscard]] T ReverseBits(T in) {
     constexpr size_t num_bytes = sizeof(T);
 
     static_assert(num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8,
