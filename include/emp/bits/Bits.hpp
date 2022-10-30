@@ -1077,7 +1077,7 @@ namespace emp {
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
     /// Print out details about the internals of Bits.
-    void PrintDebug(std::ostream & out=std::cout) const;
+    void PrintDebug(std::ostream & out=std::cout, const std::string & label="") const;
 
     /// Print the positions of all one bits, spaces are the default separator.
     void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const;
@@ -2474,7 +2474,11 @@ namespace emp {
 
   /// Print a space between each field (or other provided spacer)
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PrintDebug(std::ostream & out) const {
+  void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PrintDebug(
+    std::ostream & out,
+    const std::string & label
+  ) const {
+    if (label.size()) out << label << ": ";
     for (size_t field = 0; field < data.NumFields(); field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
         bool bit = (FIELD_1 << bit_id) & data.bits[field];
@@ -2600,23 +2604,16 @@ namespace emp {
   /// Reverse the order of bits in the bitset
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::REVERSE_SELF() {
-    // reverse bytes
-    std::reverse( BytePtr().Raw(), BytePtr().Raw() + data.NumBytes() );
+    auto bit_span = data.AsSpan();
 
-    // reverse each byte
-    // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
-    for (size_t i = 0; i < data.NumBytes(); ++i) {
-      unsigned char & b = BytePtr()[i];
-      b = static_cast<unsigned char>( (b & 0xF0) >> 4 | (b & 0x0F) << 4 );
-      b = static_cast<unsigned char>( (b & 0xCC) >> 2 | (b & 0x33) << 2 );
-      b = static_cast<unsigned char>( (b & 0xAA) >> 1 | (b & 0x55) << 1 );
-    }
+    // Reverse order of all fields
+    std::reverse( bit_span.begin(), bit_span.end() );
 
-    // shift out filler bits
-    size_t filler_bits = GetSize() % 8;
-    if (filler_bits) {
-      this->ShiftRight(8-filler_bits);
-    }
+    // Reverse the bits in each field.
+    for (auto & cur_field : bit_span) emp::ReverseBits(cur_field);
+
+    // Move the gap to the other side.
+    if (data.NumEndBits()) ShiftRight(data.EndGap());
 
     return *this;
 
