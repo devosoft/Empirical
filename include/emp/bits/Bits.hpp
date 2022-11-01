@@ -78,17 +78,17 @@ namespace emp {
 
   static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
 
-  constexpr size_t NumBitFields(size_t num_bits) noexcept {
+  [[nodiscard]] constexpr size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
 
-  std::string BitFieldToString(bits_field_t field) {
+  [[nodiscard]] std::string BitFieldToString(bits_field_t field) {
     std::stringstream ss;
     ss << '[' << std::hex << field << ']';
     return ss.str();
   }
 
-  std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
+  [[nodiscard]] std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
     std::stringstream ss;
     for (size_t i = 0; i < count; ++i) {
       if (i) ss << ' ';            
@@ -154,7 +154,7 @@ namespace emp {
         ar(num_bits);
       }
 
-      constexpr bool OK() const { return true; } // Nothing to check yet.
+      [[nodiscard]] constexpr bool OK() const { return true; } // Nothing to check yet.
     };
 
     /// If we have a fixed number of bits, we know size at compile time.
@@ -201,7 +201,7 @@ namespace emp {
         // Nothing to do here.
       }
 
-      bool OK() const { return true; } // Nothing to check yet.
+      [[nodiscard]] constexpr bool OK() const { return true; } // Nothing to check yet.
     };
 
     // ------------------------------------------------------------------------------------
@@ -239,10 +239,10 @@ namespace emp {
         }
       }
 
-      auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data()); }
-      auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data()); }
+      [[nodiscard]] auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data()); }
+      [[nodiscard]] auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data()); }
 
-      bool OK() const { return true; } // Nothing to check yet.
+      [[nodiscard]] bool OK() const { return true; } // Nothing to check yet.
 
       template <class Archive>
       void serialize(Archive & ar) {
@@ -331,7 +331,8 @@ namespace emp {
         in.bits = nullptr;  // Clear them out of the original.
       }
 
-      auto AsSpan() const { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+      [[nodiscard]] auto AsSpan() { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+      [[nodiscard]] auto AsSpan() const { return std::span<const field_t>(bits.Raw(), base_t::NumFields()); }
 
       template <class Archive>
       void save(Archive & ar) {
@@ -439,7 +440,8 @@ namespace emp {
         in.bits = nullptr;             // Clear them out of the original.
       }
 
-      auto AsSpan() const { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+      [[nodiscard]] auto AsSpan() { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
+      [[nodiscard]] auto AsSpan() const { return std::span<const field_t>(bits.Raw(), base_t::NumFields()); }
 
       template <class Archive>
       void save(Archive & ar) {
@@ -500,9 +502,9 @@ namespace emp {
         return base_t::FieldPtr().template ReinterpretCast<const unsigned char>();
       }
 
-      auto AsByteSpan() const { return std::as_bytes( base_t::AsSpan() ); }
+      [[nodiscard]] auto AsByteSpan() const { return std::as_bytes( base_t::AsSpan() ); }
 
-      bool OK() const {
+      [[nodiscard]] bool OK() const {
         bool result = base_t::OK();
         result &= base_size_t::OK();
 
@@ -604,7 +606,9 @@ namespace emp {
     constexpr void ShiftLeft(const size_t shift_size);
 
     // Helper for calling SHIFT with negative number
-    constexpr void ShiftRight(const size_t shift_size);
+    // Raw indicates if we should keep bits that are technically out of range; may be needed if
+    // we are trying to shift bits back INTO range after another operation.
+    constexpr void ShiftRight(const size_t shift_size, bool raw=false);
 
     /// Helper: call ROTATE with negative number instead
     constexpr void RotateLeft(const size_t shift_size_raw);
@@ -717,16 +721,17 @@ namespace emp {
 
     /// Convert to a Bits of a different size.
     template <typename OUT_T=Bits<BitsMode::DYNAMIC,0,ZERO_LEFT>>
-    OUT_T Export(size_t out_size, size_t start_bit=0) const;
+    [[nodiscard]] OUT_T Export(size_t out_size, size_t start_bit=0) const;
 
     /// Convert to a BitArray of a different size.
     template <size_t NUM_BITS=BASE_SIZE>
-    Bits<BitsMode::FIXED, NUM_BITS, true> ExportArray(size_t start_bit=0) const {
+    [[nodiscard]] Bits<BitsMode::FIXED, NUM_BITS, true>
+    ExportArray(size_t start_bit=0) const {
       return Export<Bits<BitsMode::FIXED, NUM_BITS, true>>(NUM_BITS, start_bit);
     }
 
     // Scan this bitvector to make sure that there are no internal problems.
-    bool OK() const { return data.OK(); }
+    [[nodiscard]] bool OK() const { return data.OK(); }
 
 
     // =========  Accessors  ========= //
@@ -765,8 +770,9 @@ namespace emp {
     Bits & Clear(size_t index) { return Set(index, false); }
 
     /// Set bits to 0 in the range [start, stop)
-    Bits & Clear(const size_t start, const size_t stop)
-      { return ApplyRange([](field_t) -> size_t { return 0; }, start, stop); }
+    Bits & Clear(const size_t start, const size_t stop) {
+      return ApplyRange([](field_t) -> size_t { return 0; }, start, std::min(stop,GetSize()));
+    }
 
 
     /// Const index operator -- return the bit at the specified position.
@@ -869,7 +875,7 @@ namespace emp {
     /// Get a read-only pointer to the internal array used by Bits.
     /// (note that bits are NOT in order at the byte level!)
     /// @return Read-only pointer to Bits' bytes.
-    emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
+    [[nodiscard]] emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
@@ -1256,7 +1262,7 @@ namespace emp {
     [[nodiscard]] constexpr bool all() const { return All(); }
     [[nodiscard]] constexpr bool any() const { return Any(); }
     [[nodiscard]] constexpr bool none() const { return !Any(); }
-    constexpr size_t count() const { return CountOnes(); }
+    [[nodiscard]] constexpr size_t count() const { return CountOnes(); }
     Bits & flip() { return Toggle(); }
     Bits & flip(size_t pos) { return Toggle(pos); }
     Bits & flip(size_t start, size_t end) { return Toggle(start, end); }
@@ -1396,9 +1402,11 @@ namespace emp {
   }
 
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
-  constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftRight(const size_t shift_size) {
+  constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::ShiftRight(const size_t shift_size, bool raw) {
+    if (shift_size == 0) return;
+
     // If we are shifting out of range, clear the bits and stop.
-    if (shift_size >= GetSize()) { Clear(); return; }
+    if (!raw && shift_size >= GetSize()) { Clear(); return; }
 
     // If we have only a single field, this operation can be quick.
     if (data.NumFields() == 1) {
@@ -1417,6 +1425,7 @@ namespace emp {
       for (size_t i = 0; i < field_shift2; ++i) {
         data.bits[i] = data.bits[i + field_shift];
       }
+      // Clear fields where bits were fully shifted out.
       for (size_t i = field_shift2; i < NUM_FIELDS; i++) data.bits[i] = FIELD_0;
     }
 
@@ -1780,7 +1789,9 @@ namespace emp {
   }
 
 
-  /// Assign from a Bits object of a different size.
+  /// Assign from a Bits object of a different size, while keeping current size.
+  /// If there are too many bits being imported, extras are cut off.
+  /// If there are fewer bits, the remainder are zero'd out (up to max_copy_bits)
   // @CAO: Can copy fields for a speedup.
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   template <BitsMode SIZE_MODE2, size_t BASE_SIZE2, bool ZERO_LEFT2>
@@ -1793,12 +1804,15 @@ namespace emp {
     emp_assert(from_start_pos < from_bits.GetSize());
     size_t bits_available = from_bits.GetSize() - from_start_pos;
 
-    // Actual max_copy bits is limited by bits available to copy and bits in this object.
-    max_copy_bits = emp::Min(bits_available, GetSize(), max_copy_bits);
+    // Actual copied bits is limited by bits available to copy and bits in this object.
+    size_t copy_bits = emp::Min(bits_available, GetSize(), max_copy_bits);
 
-    for (size_t i = 0; i < max_copy_bits; ++i) {
+    for (size_t i = 0; i < copy_bits; ++i) {
       Set(i, from_bits[i+from_start_pos]);
     }
+
+    // Any bits AFTER the ones copied, but before the max copy, should be zeroed out.
+    Clear(copy_bits, max_copy_bits);
 
     return *this;
   }
@@ -2280,7 +2294,6 @@ namespace emp {
   void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::PushBack(const bool bit, const size_t num) {
     Resize(GetSize() + num);
     if (bit) SetRange(GetSize()-num, GetSize());
-    // else Clear(GetSize()-num, GetSize());
   }
 
   /// Insert bit(s) into any index of vector using bit magic.
@@ -2488,6 +2501,7 @@ namespace emp {
     }
     size_t end_pos = data.NumEndBits();
     if (end_pos == 0) end_pos = FIELD_BITS;
+    if (label.size()) end_pos += label.size() + 2;
     for (size_t i = 0; i < end_pos; i++) out << " ";
     out << "^" << std::endl;
   }
@@ -2606,17 +2620,16 @@ namespace emp {
   Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT> & Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::REVERSE_SELF() {
     auto bit_span = data.AsSpan();
 
-    // Reverse order of all fields
+    // Reverse order of whole fields
     std::reverse( bit_span.begin(), bit_span.end() );
 
     // Reverse the bits in each field.
-    for (auto & cur_field : bit_span) emp::ReverseBits(cur_field);
+    for (auto & cur_field : bit_span) cur_field = emp::ReverseBits(cur_field);
 
     // Move the gap to the other side.
-    if (data.NumEndBits()) ShiftRight(data.EndGap());
+    if (data.NumEndBits()) ShiftRight(data.EndGap(), true);
 
     return *this;
-
   }
 
   /// Reverse order of bits in the bitset.
