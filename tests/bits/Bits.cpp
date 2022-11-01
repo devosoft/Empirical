@@ -1676,34 +1676,34 @@ TEST_CASE("19: Test Simple BitArray Accessors", "[bits]"){
 TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   // Now try range-based accessors on a single bit.
   emp::BitArray<1> ba1(false);  REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.Set(0);                 REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Clear(0);               REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.Toggle(0);              REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Clear();                REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetAll();               REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Toggle();               REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetRange(0,1);          REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Clear(0,1);             REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.Toggle(0,1);            REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
-  ba1.Set(0, false);          REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetRange(0,0);          REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
-  ba1.SetRange(1,1);          REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.Set(0);           REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
+  ba1.Clear(0);         REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.Toggle(0);        REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
+  ba1.Clear();          REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.SetAll();         REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
+  ba1.Toggle();         REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.SetRange(0,1);    REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
+  ba1.Clear(0,1);       REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.Toggle(0,1);      REQUIRE( ba1[0] == true );    REQUIRE( ba1.CountOnes() == 1 );
+  ba1.Set(0, false);    REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.SetRange(0,0);    REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
+  ba1.SetRange(1,1);    REQUIRE( ba1[0] == false );   REQUIRE( ba1.CountOnes() == 0 );
 
   // Test when a full byte is used.
   emp::BitArray<8> ba8( "10001101" );   REQUIRE(ba8.GetValue() == 177.0);  // 10110001
-  ba8.Set(2);                         REQUIRE(ba8.GetValue() == 181.0);  // 10110101
-  ba8.Set(0, 0);                      REQUIRE(ba8.GetValue() == 180.0);  // 10110100
-  ba8.SetRange(1, 4);                 REQUIRE(ba8.GetValue() == 190.0);  // 10111110
-  ba8.SetAll();                       REQUIRE(ba8.GetValue() == 255.0);  // 11111111
-  ba8.Clear(3);                       REQUIRE(ba8.GetValue() == 247.0);  // 11110111
-  ba8.Clear(5,5);                     REQUIRE(ba8.GetValue() == 247.0);  // 11110111
-  ba8.Clear(5,7);                     REQUIRE(ba8.GetValue() == 151.0);  // 10010111
-  ba8.Clear();                        REQUIRE(ba8.GetValue() ==   0.0);  // 00000000
-  ba8.Toggle(4);                      REQUIRE(ba8.GetValue() ==  16.0);  // 00010000
-  ba8.Toggle(4,6);                    REQUIRE(ba8.GetValue() ==  32.0);  // 00100000
-  ba8.Toggle(0,3);                    REQUIRE(ba8.GetValue() ==  39.0);  // 00100111
-  ba8.Toggle(7,8);                    REQUIRE(ba8.GetValue() == 167.0);  // 10100111
-  ba8.Toggle();                       REQUIRE(ba8.GetValue() ==  88.0);  // 01011000
+  ba8.Set(2);           REQUIRE(ba8.GetValue() == 181.0);  // 10110101
+  ba8.Set(0, 0);        REQUIRE(ba8.GetValue() == 180.0);  // 10110100
+  ba8.SetRange(1, 4);   REQUIRE(ba8.GetValue() == 190.0);  // 10111110
+  ba8.SetAll();         REQUIRE(ba8.GetValue() == 255.0);  // 11111111
+  ba8.Clear(3);         REQUIRE(ba8.GetValue() == 247.0);  // 11110111
+  ba8.Clear(5,5);       REQUIRE(ba8.GetValue() == 247.0);  // 11110111
+  ba8.Clear(5,7);       REQUIRE(ba8.GetValue() == 151.0);  // 10010111
+  ba8.Clear();          REQUIRE(ba8.GetValue() ==   0.0);  // 00000000
+  ba8.Toggle(4);        REQUIRE(ba8.GetValue() ==  16.0);  // 00010000
+  ba8.Toggle(4,6);      REQUIRE(ba8.GetValue() ==  32.0);  // 00100000
+  ba8.Toggle(0,3);      REQUIRE(ba8.GetValue() ==  39.0);  // 00100111
+  ba8.Toggle(7,8);      REQUIRE(ba8.GetValue() == 167.0);  // 10100111
+  ba8.Toggle();         REQUIRE(ba8.GetValue() ==  88.0);  // 01011000
 
   // Test a full field.
   constexpr double ALL_64 = (double) ((uint64_t) -1);
@@ -1756,8 +1756,13 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
 
   // A larger BitArray with lots of random tests.
   emp::Random random;
+
+  emp::BitArray<40> ba40(random, 0.65);
+  size_t num_ones = ba40.CountOnes();  REQUIRE(num_ones > 20);
+  ba40.Toggle();                       REQUIRE(ba40.CountOnes() == 40 - num_ones);
+
   emp::BitArray<1000> ba1k(random, 0.65);
-  size_t num_ones = ba1k.CountOnes();  REQUIRE(num_ones > 550);
+  num_ones = ba1k.CountOnes();         REQUIRE(num_ones > 550);
   ba1k.Toggle();                       REQUIRE(ba1k.CountOnes() == 1000 - num_ones);
 
   for (size_t test_id = 0; test_id < 10000; ++test_id) {
