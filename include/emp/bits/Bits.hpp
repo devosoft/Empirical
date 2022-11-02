@@ -1326,13 +1326,13 @@ namespace emp {
 
     if (start == stop) return *this;  // Empty range.
 
-    const size_t start_pos = FieldPos(start);    // Start position WITHIN a bit field.
-    const size_t stop_pos = FieldPos(stop);      // Stop position WITHIN a bit field.
-    size_t start_field = FieldID(start);         // ID of bit field we're starting in.
-    const size_t stop_field = FieldID(stop-1);   // ID of last field to actively scan.
+    const size_t start_pos = FieldPos(start);  // Start position WITHIN a bit field.
+    const size_t stop_pos = FieldPos(stop);    // Stop position WITHIN a bit field.
+    size_t start_field = FieldID(start);       // ID of bit field we're starting in.
+    const size_t stop_field = FieldID(stop);   // ID of last field to actively scan.
 
-    // If the start field and stop field are the same, mask off the middle.
-    if (start_field == stop_field) {
+    // If all bits are in the same field, mask off the middle.
+    if (start_field == FieldID(stop-1)) {
       const size_t apply_bits = stop - start;                  // How many bits to change?
       const field_t mask = MaskField(apply_bits, start_pos);   // Target change bits with a mask.
       field_t & target = data.bits[start_field];               // Isolate the field to change.
@@ -1356,9 +1356,11 @@ namespace emp {
       }
 
       // Set portions of stop field
-      const field_t mask = MaskField(stop_pos);           // Target end bits with a mask.
-      field_t & target = data.bits[stop_field];           // Isolate the field to change.
-      target = (target & ~mask) | (fun(target) & mask);   // Update targeted bits!
+      if (stop_pos != 0) {
+        const field_t mask = MaskField(stop_pos);           // Target end bits with a mask.
+        field_t & target = data.bits[stop_field];           // Isolate the field to change.
+        target = (target & ~mask) | (fun(target) & mask);   // Update targeted bits!
+      }
     }
 
     return *this;
@@ -1805,14 +1807,14 @@ namespace emp {
     size_t bits_available = from_bits.GetSize() - from_start_pos;
 
     // Actual copied bits is limited by bits available to copy and bits in this object.
-    size_t copy_bits = emp::Min(bits_available, GetSize(), max_copy_bits);
+    size_t copy_size = emp::Min(bits_available, GetSize(), max_copy_bits);
 
-    for (size_t i = 0; i < copy_bits; ++i) {
+    for (size_t i = 0; i < copy_size; ++i) {
       Set(i, from_bits[i+from_start_pos]);
     }
 
     // Any bits AFTER the ones copied, but before the max copy, should be zeroed out.
-    Clear(copy_bits, max_copy_bits);
+    Clear(copy_size, max_copy_bits);
 
     return *this;
   }
@@ -2491,7 +2493,7 @@ namespace emp {
     std::ostream & out,
     const std::string & label
   ) const {
-    if (label.size()) out << label << ": ";
+    if (label.size()) out << label << ":\n";
     for (size_t field = 0; field < data.NumFields(); field++) {
       for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
         bool bit = (FIELD_1 << bit_id) & data.bits[field];
@@ -2501,7 +2503,6 @@ namespace emp {
     }
     size_t end_pos = data.NumEndBits();
     if (end_pos == 0) end_pos = FIELD_BITS;
-    if (label.size()) end_pos += label.size() + 2;
     for (size_t i = 0; i < end_pos; i++) out << " ";
     out << "^" << std::endl;
   }
