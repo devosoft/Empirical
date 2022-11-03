@@ -1473,9 +1473,6 @@ namespace emp {
       ShiftLeft(GetSize() - shift_size);
       OR_SELF(dup);
     }
-
-    // Mask out filler bits
-    ClearExcessBits();
   }
 
 
