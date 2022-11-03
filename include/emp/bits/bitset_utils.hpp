@@ -13,6 +13,36 @@
 
 namespace emp {
 
+  /// @brief Use size_t as the default bits field type.
+  using bits_field_t = size_t;
+
+  /// @brief Track the number of bits in a single bit field.
+  static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
+
+  /// @brief Convert a bit count to the number of fields needed to store them.
+  [[nodiscard]] constexpr size_t NumBitFields(size_t num_bits) noexcept {
+    return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
+  }
+
+  /// @brief Convert a single bit field to a string.
+  /// @param field A single bit field to convert to a string.
+  [[nodiscard]] std::string BitFieldToString(bits_field_t field) {
+    std::stringstream ss;
+    ss << '[' << std::hex << field << ']';
+    return ss.str();
+  }
+
+  /// @brief Convert a series of bit fields to a string.
+  /// @param field A single bit field to convert to a string.
+  [[nodiscard]] std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
+    std::stringstream ss;
+    for (size_t i = 0; i < count; ++i) {
+      if (i) ss << ' ';            
+      ss << BitFieldToString(bits[i]);
+    }
+    return ss.str();
+  }
+
   /// Create a series of a specified number of ones (at compile time) in a uint.
   template <int NUM_BITS>
   constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1>() << 1) | 1; }
