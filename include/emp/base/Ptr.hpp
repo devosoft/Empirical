@@ -1012,7 +1012,7 @@ namespace emp {
   /// Fill an array with the provided fill_value.
   /// If fill_value is a function, repeatedly call function.
   template <typename T>
-  void FillMemory(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_value) {
+  void FillMemory(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_value) {
     // If the fill value is a function, call that function for each memory position.
     if constexpr (std::is_invocable_v<T>) {
       FillMemoryFunction(mem_ptr, num_bytes, std::forward<T>(fill_value));
