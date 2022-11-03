@@ -36,6 +36,7 @@ namespace emp {
   /// Count the number of bits in an unsigned integer.
   template <typename T>
   [[nodiscard]] inline constexpr size_t count_bits(T val) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
     constexpr size_t num_bytes = sizeof(T);
     static_assert(num_bytes <= 8, "count_bits() requires 8 or fewer bytes.");
 
@@ -59,34 +60,37 @@ namespace emp {
 
   /// Return the position of the first one bit
   template <typename T>
-  [[nodiscard]] inline constexpr size_t find_bit(T val) { return count_bits( (~val) & (val-1) ); }
+  [[nodiscard]] inline constexpr size_t find_bit(T val) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    return count_bits( (~val) & (val-1) );
+  }
 
   /// Return the position of the first one bit AND REMOVE IT.
   template <typename T>
   inline size_t pop_bit(T & val) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
     const size_t pos = find_bit(val);
     val &= ~(1 << pos);
     return pos;
   }
 
-  /// A compile-time bit counter.
-  template <typename TYPE>
-  [[nodiscard]] static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
-
   /// Quick bit-mask generator for low bits.
   template <typename TYPE=size_t>
   [[nodiscard]] static constexpr TYPE MaskLow(std::size_t num_bits) {
+    static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
     return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
   /// Quick bit-mask generator for high bits.
   template <typename TYPE=size_t>
   [[nodiscard]] static constexpr TYPE MaskHigh(std::size_t num_bits) {
+    static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
   template <typename TYPE=size_t>
   [[nodiscard]] static constexpr TYPE MaskUsed(TYPE val) {
+    static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
     size_t shift = 1;
     TYPE last = 0;
     while (val != last) {     // While the shift is making progress...
@@ -99,11 +103,12 @@ namespace emp {
   }
 
   template <typename T>
-  [[nodiscard]] T ReverseBits(T in) {
+  [[nodiscard]] constexpr T ReverseBits(T in) {
     constexpr size_t num_bytes = sizeof(T);
 
-    static_assert(num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8,
-                  "ReverseBits() currently requires 1, 2, 4, or 8-byte values.");
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    static_assert( num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8,
+                   "ReverseBits() currently requires 1, 2, 4, or 8-byte values." );
 
     if constexpr (num_bytes == 1) {
       in = static_cast<T>( (in & 0xF0) >> 4 | (in & 0x0F) << 4 );
@@ -133,6 +138,62 @@ namespace emp {
     }
 
     return in;
+  }
+
+  // Rotate all bits to the left (looping around) in a provided field.
+  template <typename T>
+  [[nodiscard]] constexpr T RotateBitsLeft(
+    T in,
+    size_t rotate_size = 1
+  ) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    constexpr size_t FIELD_BITS = sizeof(T) * 8;
+    rotate_size %= FIELD_BITS;       // Make sure rotate is in range.
+    return (in << rotate_size) |
+           (in >> (FIELD_BITS - rotate_size));
+  }
+
+  // Rotate lowest "bit_count" bits to the left (looping around) in a provided field.
+  template <typename T>
+  [[nodiscard]] constexpr T RotateBitsLeft(
+    T in,
+    size_t rotate_size,
+    size_t bit_count
+  ) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    constexpr size_t FIELD_BITS = sizeof(T) * 8;
+    emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
+    rotate_size %= bit_count; // Make sure rotate is in range.
+    const T out = (in << rotate_size) | (in >> (bit_count - rotate_size));
+    return out & MaskLow<T>(bit_count);  // Zero out excess bits.
+  }
+
+  // Rotate all bits to the left (looping around) in a provided field.
+  template <typename T>
+  [[nodiscard]] constexpr T RotateBitsRight(
+    T in,
+    size_t rotate_size = 1
+  ) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    constexpr size_t FIELD_BITS = sizeof(T) * 8;
+    rotate_size %= FIELD_BITS;       // Make sure rotate is in range.
+    return (in >> rotate_size) |
+           (in << (FIELD_BITS - rotate_size));
+  }
+
+  // Rotate lowest "bit_count" bits to the left (looping around) in a provided field.
+  template <typename T>
+  [[nodiscard]] constexpr T RotateBitsRight(
+    T in,
+    size_t rotate_size,
+    size_t bit_count
+  ) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    constexpr size_t FIELD_BITS = sizeof(T) * 8;
+    emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
+    rotate_size %= bit_count; // Make sure rotate is in range.
+    const T out = (in >> rotate_size) | (in << (bit_count - rotate_size));
+    return out & MaskLow<T>(bit_count);  // Zero out excess bits.
   }
 
 
