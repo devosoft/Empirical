@@ -1445,78 +1445,17 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
     if (GetSize() == 0) return;   // Nothing to rotate if there are not bits.
-
     const field_t shift_size = shift_size_raw % GetSize();
-    const size_t NUM_FIELDS = data.NumFields();
 
     // Use different approaches based on number of bits.
-    if (NUM_FIELDS == 1) {
-      // Special case: for exactly one field_T, try to go low level.
-      // Adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      field_t & n = data.bits[0];
-      size_t c = shift_size;
-
-      // Mask necessary to surpress shift count overflow warnings.
-      c &= FIELD_LOG2_MASK;
-      n = (n<<c) | (n>>( (-(c+FIELD_BITS-GetSize())) & FIELD_LOG2_MASK ));
-    }
-    else if (NUM_FIELDS < 32) {  // For few bits, shifting L/R and OR-ing is faster.
+    if (data.NumFields() == 1) {
+      data.bits[0] = emp::RotateBitsLeft(data.bits[0], shift_size, GetSize());
+    } else {  // For few bits, shifting L/R and OR-ing is faster.
       this_t dup(*this);
       dup.ShiftLeft(shift_size);
       ShiftRight(GetSize() - shift_size);
       OR_SELF(dup);
     }
-    else {  // For more bits, manual rotating is faster
-      // Note: we already modded shift_size by num_bits, so no need to mod by FIELD_SIZE
-      const size_t field_shift = ( shift_size + data.EndGap() ) / FIELD_BITS;
-
-      // If we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
-      // to account for the filler that gets pulled out of the middle
-      const size_t field_gap = field_shift ? data.EndGap() : 0;
-      const size_t bit_shift = data.NumEndBits() && (shift_size + field_gap) % FIELD_BITS;
-      const size_t bit_overflow = FIELD_BITS - bit_shift;
-
-      // if rotating more than field capacity, we need to rotate fields
-      auto field_span = FieldSpan();
-      std::rotate(
-        field_span.rbegin(),
-        field_span.rbegin()+static_cast<int>(field_shift),
-        field_span.rend()
-      );
-
-      // if necessary, shift filler bits out of the middle
-      if (data.NumEndBits()) {
-        const size_t filler_idx = (data.LastField() + field_shift) % NUM_FIELDS;
-        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
-          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
-        }
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-
-        const field_t keystone = data.NumEndBits() ? (
-          (data.bits[data.LastField()] << (FIELD_BITS - data.NumEndBits()))
-          | (data.bits[NUM_FIELDS - 2] >> data.NumEndBits())
-        ) : (
-          data.bits[data.LastField()]
-        );
-
-        for (size_t i = data.LastField(); i > 0; --i) {
-          data.bits[i] <<= bit_shift;
-          data.bits[i] |= (data.bits[i-1] >> bit_overflow);
-        }
-        // Handle final field
-        data.bits[0] <<= bit_shift;
-        data.bits[0] |= keystone >> bit_overflow;
-
-      }
-
-    }
-
-    // Mask out filler bits
-    ClearExcessBits();
   }
 
 
@@ -1524,70 +1463,15 @@ namespace emp {
   template <BitsMode SIZE_MODE, size_t BASE_SIZE, bool ZERO_LEFT>
   constexpr void Bits<SIZE_MODE,BASE_SIZE,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
     const size_t shift_size = shift_size_raw % GetSize();
-    const size_t NUM_FIELDS = data.NumFields();
 
     // use different approaches based on number of bits
-    if (NUM_FIELDS == 1) {
-      // special case: for exactly one field_t, try to go low level
-      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-
-      field_t & n = data.bits[0];
-      size_t c = shift_size;
-
-      // mask necessary to surpress shift count overflow warnings
-      c &= FIELD_LOG2_MASK;
-      n = (n>>c) | (n<<( (GetSize()-c) & FIELD_LOG2_MASK ));
-
-    } else if (NUM_FIELDS < 32) {
-      // for small few bits, shifting L/R and ORing is faster
+    if (data.NumFields() == 1) {
+      data.bits[0] = emp::RotateBitsRight(data.bits[0], shift_size, GetSize());
+    } else {
       this_t dup(*this);
       dup.ShiftRight(shift_size);
       ShiftLeft(GetSize() - shift_size);
       OR_SELF(dup);
-    } else {
-      // for many bits, manual rotating is faster
-
-      const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-      const size_t bit_shift = shift_size % FIELD_BITS;
-      const field_t bit_overflow = FIELD_BITS - bit_shift;
-
-      // if rotating more than field capacity, we need to rotate fields
-      auto field_span = FieldSpan();
-      std::rotate(
-        field_span.begin(),
-        field_span.begin()+field_shift,
-        field_span.end()
-      );
-
-      // if necessary, shift filler bits out of the middle
-      if (data.NumEndBits()) {
-        const size_t filler_idx = data.LastField() - field_shift;
-        for (size_t i = filler_idx + 1; i < NUM_FIELDS; ++i) {
-          data.bits[i-1] |= data.bits[i] << data.NumEndBits();
-          data.bits[i] >>= (FIELD_BITS - data.NumEndBits());
-        }
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-
-        const field_t keystone = data.NumEndBits() ? (
-          data.bits[0] >> (FIELD_BITS - data.NumEndBits())
-        ) : (
-          data.bits[0]
-        );
-
-        if (data.NumEndBits()) {
-          data.bits[NUM_FIELDS-1] |= data.bits[0] << data.NumEndBits();
-        }
-
-        for (size_t i = 0; i < data.LastField(); ++i) {
-          data.bits[i] >>= bit_shift;
-          data.bits[i] |= (data.bits[i+1] << bit_overflow);
-        }
-        data.bits[data.LastField()] >>= bit_shift;
-        data.bits[data.LastField()] |= keystone << bit_overflow;
-      }
     }
 
     // Mask out filler bits
