@@ -41,55 +41,63 @@ namespace emp {
     // ------------------------------------------------------------------------------------
 
     /// Dynamic size is stored here to work with, but not the actual bits.
-    template <BitsMode SIZE_MODE, size_t BASE_SIZE>
-    struct Bits_Data_Size {
-      size_t num_bits;           ///< Total number of bits are we using
+    template <size_t DEFAULT_SIZE=0>
+    struct Bits_Data_Size_Var {
+      using field_t = bits_field_t;
 
-      // If BASE_SIZE indicates max capacity, default size to zero.
-      // Otherwise, for dynamic SIZE_MODE use BASE_SIZE as the default.
-      static constexpr size_t DEFAULT_SIZE = (SIZE_MODE == BitsMode::CAPPED) ? 0 : BASE_SIZE;
+      size_t num_bits;           ///< Total number of bits are we using
 
       constexpr void SetSize(size_t new_size) { num_bits = new_size; }
 
-      using field_t = bits_field_t;
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return num_bits; }
 
-      /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return num_bits & (NUM_FIELD_BITS - 1); }
+      /// Number of bits used in partial field at the end; 0 = perfect fit.
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
+        return num_bits & (NUM_FIELD_BITS - 1);
+      }
 
-      /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] constexpr size_t EndGap() const noexcept { return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0; }
+      /// EXTRA bits leftover in the gap at the end
+      [[nodiscard]] constexpr size_t EndGap() const noexcept {
+        return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0;
+      }
 
-      /// A mask to cut off all of the final bits.
-      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+      /// Mask to cut off all of the final bits.
+      [[nodiscard]] constexpr field_t EndMask() const noexcept {
+        return MaskLow<field_t>(NumEndBits());
+      }
 
-      /// How many felids do we need for the current set of bits?
-      [[nodiscard]] constexpr size_t NumFields() const noexcept { return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0; }
+      /// How many fields do we need for the current set of bits?
+      [[nodiscard]] constexpr size_t NumFields() const noexcept {
+        return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
+      }
 
-      /// What is the ID of the last occupied field?
-      [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
+      /// ID of the last occupied field
+      [[nodiscard]] constexpr size_t LastField() const noexcept {
+        return NumFields() - 1;
+      }
 
-      /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+      /// Number of bytes needed for the current set of bits
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept {
+        return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0;
+      }
 
-      /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
+      /// How many bytes are allocated?
+      [[nodiscard]] constexpr size_t TotalBytes() const noexcept {
+        return NumFields() * sizeof(field_t);
+      }
 
-      Bits_Data_Size(size_t in_size=DEFAULT_SIZE, bool /*allow smaller*/=false)
-        : num_bits(in_size) { }
-      Bits_Data_Size(const Bits_Data_Size &) = default;
+      Bits_Data_Size_Var(size_t in_size=DEFAULT_SIZE) : num_bits(in_size) { }
+      Bits_Data_Size_Var(const Bits_Data_Size_Var &) = default;
 
       template <class Archive>
-      void serialize(Archive & ar) {
-        ar(num_bits);
-      }
+      void serialize(Archive & ar) { ar(num_bits); }
 
       [[nodiscard]] constexpr bool OK() const { return true; } // Nothing to check yet.
     };
 
     /// If we have a fixed number of bits, we know size at compile time.
     template <size_t NUM_BITS>
-    struct Bits_Data_Size<BitsMode::FIXED, NUM_BITS> {
+    struct Bits_Data_Size_Fixed {
       using field_t = bits_field_t;
       static constexpr size_t DEFAULT_SIZE = NUM_BITS;
 
@@ -100,62 +108,73 @@ namespace emp {
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
-      [[nodiscard]] constexpr size_t NumEndBits() const noexcept { return NUM_BITS & (NUM_FIELD_BITS - 1); }
+      [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
+        return NUM_BITS & (NUM_FIELD_BITS - 1);
+      }
 
       /// How many EXTRA bits are leftover in the gap at the end?
-      [[nodiscard]] constexpr size_t EndGap() const noexcept { return (NUM_FIELD_BITS - NumEndBits()) % NUM_FIELD_BITS; }
+      [[nodiscard]] constexpr size_t EndGap() const noexcept {
+        return (NUM_FIELD_BITS - NumEndBits()) % NUM_FIELD_BITS;
+      }
 
       /// A mask to cut off all of the final bits.
-      [[nodiscard]] constexpr field_t EndMask() const noexcept { return MaskLow<field_t>(NumEndBits()); }
+      [[nodiscard]] constexpr field_t EndMask() const noexcept {
+        return MaskLow<field_t>(NumEndBits());
+      }
 
       /// How many felids do we need for the current set of bits?
-      [[nodiscard]] constexpr size_t NumFields() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) / NUM_FIELD_BITS)) : 0; }
+      [[nodiscard]] constexpr size_t NumFields() const noexcept {
+        return NUM_BITS ? (1 + ((NUM_BITS - 1) / NUM_FIELD_BITS)) : 0;
+      }
 
       /// What is the ID of the last occupied field?
       [[nodiscard]] constexpr size_t LastField() const noexcept { return NumFields() - 1; }
 
       /// How many bytes are used for the current set of bits? (rounded up!)
-      [[nodiscard]] constexpr size_t NumBytes() const noexcept { return NUM_BITS ? (1 + ((NUM_BITS - 1) >> 3)) : 0; }
+      [[nodiscard]] constexpr size_t NumBytes() const noexcept {
+        return NUM_BITS ? (1 + ((NUM_BITS - 1) >> 3)) : 0;
+      }
 
       /// How many bytes are allocated? (rounded up!)
-      [[nodiscard]] constexpr size_t TotalBytes() const noexcept { return NumFields() * sizeof(field_t); }
-
-      Bits_Data_Size(size_t in_size=NUM_BITS, bool allow_smaller=false) {
-        emp_assert(in_size <= NUM_BITS, in_size, NUM_BITS);
-        emp_assert(allow_smaller || in_size == NUM_BITS, allow_smaller, in_size, NUM_BITS);
+      [[nodiscard]] constexpr size_t TotalBytes() const noexcept {
+        return NumFields() * sizeof(field_t);
       }
-      Bits_Data_Size(const Bits_Data_Size &) = default;
+
+      Bits_Data_Size_Fixed(size_t in_size=NUM_BITS) {
+        emp_assert(in_size <= NUM_BITS, in_size, NUM_BITS);
+      }
+      Bits_Data_Size_Fixed(const Bits_Data_Size_Fixed &) = default;
 
       template <class Archive>
-      void serialize(Archive & ar) {
-        // Nothing to do here.
-      }
+      void serialize(Archive & ar) { /* Nothing to do here. */ }
 
       [[nodiscard]] constexpr bool OK() const { return true; } // Nothing to check yet.
     };
+
 
     // ------------------------------------------------------------------------------------
     //  RAW MEMORY MANAGEMENT
     // ------------------------------------------------------------------------------------
 
     /// Data & functions for Bits types with fixed memory (size may be dynamic, capped by CAPACITY)
-    template <BitsMode SIZE_MODE, size_t CAPACITY>
-    struct Bits_Data_Mem : public Bits_Data_Size<SIZE_MODE, CAPACITY> {
-      using base_t = Bits_Data_Size<SIZE_MODE, CAPACITY>;
+    template <typename BASE_T, size_t CAPACITY>
+    struct Bits_Data_Mem_Static_Base : public BASE_T {
+      using base_size_t = BASE_T;
       using field_t = bits_field_t;
       static constexpr size_t MAX_FIELDS = (1 + ((CAPACITY - 1) / NUM_FIELD_BITS));
 
       emp::array<field_t, MAX_FIELDS> bits;  ///< Fields to hold the actual bit values.
 
-      Bits_Data_Mem() = default;
-      Bits_Data_Mem(size_t num_bits, bool allow_smaller=false) : base_t(num_bits,allow_smaller) {
+      Bits_Data_Mem_Static_Base() = default;
+      Bits_Data_Mem_Static_Base(size_t num_bits) : BASE_T(num_bits)
+      {
         emp_assert(num_bits <= CAPACITY);
       }
-      Bits_Data_Mem(const Bits_Data_Mem &) = default;
-      Bits_Data_Mem(Bits_Data_Mem &&) = default;
+      Bits_Data_Mem_Static_Base(const Bits_Data_Mem_Static_Base &) = default;
+      Bits_Data_Mem_Static_Base(Bits_Data_Mem_Static_Base &&) = default;
 
-      Bits_Data_Mem & operator=(const Bits_Data_Mem &) = default;
-      Bits_Data_Mem & operator=(Bits_Data_Mem &&) = default;
+      Bits_Data_Mem_Static_Base & operator=(const Bits_Data_Mem_Static_Base &) = default;
+      Bits_Data_Mem_Static_Base & operator=(Bits_Data_Mem_Static_Base &&) = default;
 
       // --- Helper functions --
       
@@ -163,9 +182,11 @@ namespace emp {
       [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits.data(); }
 
       void RawResize(const size_t new_size, const bool preserve_data=false) {
-        base_t::SetSize(new_size);        
-        if (preserve_data && base_t::NumEndBits()) {
-          bits[base_t::LastField()] &= base_t::EndMask();
+        const size_t old_num_fields = BASE_T::NumFields();
+        BASE_T::SetSize(new_size);
+        if (preserve_data && BASE_T::NumEndBits()) {
+          bits[BASE_T::LastField()] &= BASE_T::EndMask();          
+          for (size_t id = BASE_T::NumFields(); id < old_num_fields; ++id) bits[id] = 0;
         }
       }
 
@@ -176,35 +197,38 @@ namespace emp {
 
       template <class Archive>
       void serialize(Archive & ar) {
-        base_t::serialize(ar); // Save size info.
-        for (size_t i=0; i < base_t::NumFields(); ++i) {
-          ar(bits[i]);
-        }
+        BASE_T::serialize(ar); // Save size info.
+        for (size_t i=0; i < BASE_T::NumFields(); ++i) { ar(bits[i]); }
       }
 
     };
     
+    template <size_t CAPACITY>
+    using Bits_Data_Mem_Static = Bits_Data_Mem_Static_Base< Bits_Data_Size_Var<CAPACITY>, CAPACITY >;
+
+    template <size_t CAPACITY>
+    using Bits_Data_Mem_Fixed = Bits_Data_Mem_Static_Base< Bits_Data_Size_Fixed<CAPACITY>, CAPACITY >;
+
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    template <size_t DEFAULT_SIZE>
-    struct Bits_Data_Mem<BitsMode::DYNAMIC, DEFAULT_SIZE> 
-      : public Bits_Data_Size<BitsMode::DYNAMIC, DEFAULT_SIZE>
+    template <size_t DEFAULT_SIZE=0>
+    struct Bits_Data_Mem_Dynamic : public Bits_Data_Size_Var<DEFAULT_SIZE>
     {
-      using base_t = Bits_Data_Size<BitsMode::DYNAMIC, DEFAULT_SIZE>;
+      using base_t = Bits_Data_Size_Var<DEFAULT_SIZE>;
+      using base_size_t = base_t;
       using field_t = bits_field_t;
 
       Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
-      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE, bool /*allow_smaller*/=true)
-        : base_t(num_bits,true), bits(nullptr)
+      Bits_Data_Mem_Dynamic(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits), bits(nullptr)
       {
         if (num_bits) bits = NewArrayPtr<field_t>(NumBitFields(num_bits));
       }
-      Bits_Data_Mem(const Bits_Data_Mem & in) : bits(nullptr) { Copy(in); }
-      Bits_Data_Mem(Bits_Data_Mem && in) : bits(nullptr) { Move(std::move(in)); }
-      ~Bits_Data_Mem() { bits.DeleteArray(); }
+      Bits_Data_Mem_Dynamic(const Bits_Data_Mem_Dynamic & in) : bits(nullptr) { Copy(in); }
+      Bits_Data_Mem_Dynamic(Bits_Data_Mem_Dynamic && in) : bits(nullptr) { Move(std::move(in)); }
+      ~Bits_Data_Mem_Dynamic() { bits.DeleteArray(); }
 
-      Bits_Data_Mem & operator=(const Bits_Data_Mem & in) { Copy(in); return *this; }
-      Bits_Data_Mem & operator=(Bits_Data_Mem && in) { Move(std::move(in)); return *this; }
+      Bits_Data_Mem_Dynamic & operator=(const Bits_Data_Mem_Dynamic & in) { Copy(in); return *this; }
+      Bits_Data_Mem_Dynamic & operator=(Bits_Data_Mem_Dynamic && in) { Move(std::move(in)); return *this; }
 
       // --- Helper functions --
 
@@ -249,12 +273,12 @@ namespace emp {
       }
 
       // Assume size is already correct.
-      void Copy(const Bits_Data_Mem & in) {
+      void Copy(const Bits_Data_Mem_Dynamic & in) {
         RawResize(in.NumBits());
         for (size_t i = 0; i < base_t::NumFields(); ++i) bits[i] = in.bits[i];
       }
 
-      void Move(Bits_Data_Mem && in) {
+      void Move(Bits_Data_Mem_Dynamic && in) {
         base_t::SetSize(in.NumBits());
         if (bits) bits.DeleteArray();  // Clear out old bits.
         bits = in.bits;     // Move over the bits.
@@ -296,35 +320,27 @@ namespace emp {
     };
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
-    template <size_t DEFAULT_SIZE>
-    struct Bits_Data_Mem<BitsMode::WATERMARK, DEFAULT_SIZE> 
-      : public Bits_Data_Size<BitsMode::WATERMARK, DEFAULT_SIZE>
+    template <size_t DEFAULT_SIZE=0>
+    struct Bits_Data_Mem_Watermark : public Bits_Data_Mem_Dynamic<DEFAULT_SIZE>
     {
-      using base_t = Bits_Data_Size<BitsMode::WATERMARK, DEFAULT_SIZE>;
+      using this_t = Bits_Data_Mem_Watermark<DEFAULT_SIZE>;
+      using base_t = Bits_Data_Mem_Dynamic<DEFAULT_SIZE>;
       using field_t = bits_field_t;
-
-      Ptr<field_t> bits = nullptr;  ///< Pointer to array with the status of each bit
+      using base_t::bits;           ///< Pointer to array with the status of each bit
       size_t field_capacity = 0;    ///< How many fields is the watermark up to?
 
-      Bits_Data_Mem(size_t num_bits=DEFAULT_SIZE, bool allow_smaller=false)
-        : base_t(num_bits,allow_smaller), bits(nullptr)
+      Bits_Data_Mem_Watermark(size_t num_bits=DEFAULT_SIZE) : base_t(num_bits)
       {
-        if (num_bits) {
-          field_capacity = base_t::NumFields();
-          bits = NewArrayPtr<field_t>(field_capacity);
-        }
+        field_capacity = base_t::NumFields();
       }
-      Bits_Data_Mem(const Bits_Data_Mem & in) { Copy(in); }
-      Bits_Data_Mem(Bits_Data_Mem && in) { Move(std::move(in)); }
-      ~Bits_Data_Mem() { bits.DeleteArray(); }
+      Bits_Data_Mem_Watermark(const this_t & in) { Copy(in); }
+      Bits_Data_Mem_Watermark(this_t && in) { Move(std::move(in)); }
+      ~Bits_Data_Mem_Watermark() { /* cleanup in base class */ }
 
-      Bits_Data_Mem & operator=(const Bits_Data_Mem & in) { Copy(in); return *this; }
-      Bits_Data_Mem & operator=(Bits_Data_Mem && in) { Move(std::move(in)); return *this; }
+      Bits_Data_Mem_Watermark & operator=(const this_t & in) { Copy(in); return *this; }
+      Bits_Data_Mem_Watermark & operator=(this_t && in) { Move(std::move(in)); return *this; }
 
       // --- Helper functions --
-
-      [[nodiscard]] Ptr<field_t> FieldPtr() { return bits; }
-      [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits; }
 
       /// Resize to have at least the specified number of fields.
       /// @param new_size The number of bits the new data needs to hold.
@@ -357,68 +373,41 @@ namespace emp {
         }
       }
 
-      void Copy(const Bits_Data_Mem & in) {
+      void Copy(const Bits_Data_Mem_Watermark & in) {  // Same as base class, but call THIS RawResize().
         RawResize(in.NumBits());
         for (size_t i = 0; i < base_t::NumFields(); ++i) bits[i] = in.bits[i];
       }
 
-      void Move(Bits_Data_Mem && in) {
-        base_t::SetSize(in.NumBits());
+      void Move(Bits_Data_Mem_Watermark && in) {
+        base_t::Move(std::move(in));
         field_capacity = in.field_capacity;
-        if (bits) bits.DeleteArray();  // Clear out old bits.
-        bits = in.bits;                // Move over the bits.
-        in.bits = nullptr;             // Clear them out of the original.
       }
-
-      [[nodiscard]] auto AsSpan() { return std::span<field_t>(bits.Raw(), base_t::NumFields()); }
-      [[nodiscard]] auto AsSpan() const { return std::span<const field_t>(bits.Raw(), base_t::NumFields()); }
 
       template <class Archive>
-      void save(Archive & ar) {
-        base_t::serialize(ar); // Save size info.
-        for (size_t i=0; i < base_t::NumFields(); ++i) {
-          ar(bits[i]);
-        }
-      }
+      void save(Archive & ar) { base_t::save(ar); } // Base class handles saving.
 
       template <class Archive>
       void load(Archive & ar) {
-        base_t::serialize(ar);
-        if (bits) bits.DeleteArray();  // Delete old memory if needed
-        bits = NewArrayPtr<field_t>(base_t::NumFields());
-        field_capacity = base_t::NumFields();
-        for (size_t i=0; i < base_t::NumFields(); ++i) {
-          ar(bits[i]);
-        }
+        base_t::load(ar);
+        field_capacity = base_t::NumFields(); // Use loaded size as capacity.
       }
 
       bool OK() const {
-        // Do some checking on the bits array ptr to make sure it's value.
-        if (bits) {
-          #ifdef EMP_TRACK_MEM
-          emp_assert(bits.DebugIsArray()); // Must be marked as an array.
-          emp_assert(bits.OK());           // Pointer must be okay.
-          #endif
-        }
-        else { emp_assert(base_t::num_bits == 0); }  // If bits is null, num_bits should be zero.
-        return true;
+        emp_assert(field_capacity >= base_t::NumFields());
+        return base_t::OK();
       }
     };
 
 
 
     /// Internal data for the Bits class to separate static vs. dynamic.
-    template <BitsMode SIZE_MODE, size_t BASE_SIZE>
-    struct Bits_Data : public Bits_Data_Mem<SIZE_MODE, BASE_SIZE>
+    template <typename BASE_T>
+    struct Bits_Data : public BASE_T
     {
       using field_t = bits_field_t;
-      using base_t = Bits_Data_Mem<SIZE_MODE, BASE_SIZE>;
-      using base_size_t = Bits_Data_Size<SIZE_MODE, BASE_SIZE>;
-      using base_size_t::NumBits;      // Activate NumBits() function.
-      using base_t::bits;
 
-      Bits_Data() : base_t(base_size_t::DEFAULT_SIZE) { }
-      Bits_Data(size_t num_bits, bool allow_smaller=false) : base_t(num_bits,allow_smaller) { }
+      Bits_Data() = default;
+      Bits_Data(size_t num_bits) : BASE_T(num_bits) { }
       Bits_Data(const Bits_Data & in) = default;
       Bits_Data(Bits_Data && in) = default;
 
@@ -426,23 +415,22 @@ namespace emp {
       Bits_Data & operator=(Bits_Data &&) = default;
 
       [[nodiscard]] emp::Ptr<unsigned char> BytePtr() {
-        return base_t::FieldPtr().template ReinterpretCast<unsigned char>();
+        return BASE_T::FieldPtr().template ReinterpretCast<unsigned char>();
       }
       [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
-        return base_t::FieldPtr().template ReinterpretCast<const unsigned char>();
+        return BASE_T::FieldPtr().template ReinterpretCast<const unsigned char>();
       }
 
-      [[nodiscard]] auto AsByteSpan() const { return std::as_bytes( base_t::AsSpan() ); }
+      [[nodiscard]] auto AsByteSpan() const { return std::as_bytes( BASE_T::AsSpan() ); }
 
       [[nodiscard]] bool OK() const {
-        bool result = base_t::OK();
-        result &= base_size_t::OK();
+        bool result = BASE_T::OK();
 
         // If there are end bits, make sure that everything past the last one is clear.
-        if (base_t::NumEndBits()) {
+        if (BASE_T::NumEndBits()) {
           // Make sure final bits are zeroed out.
           const field_t excess_bits =
-            bits[base_t::LastField()] & ~MaskLow<field_t>(base_t::NumEndBits());
+            BASE_T::bits[BASE_T::LastField()] & ~MaskLow<field_t>(BASE_T::NumEndBits());
           result &= !excess_bits;
         }
 
@@ -451,6 +439,13 @@ namespace emp {
 
     };
   }
+
+  using Bits_WatermarkData = internal::Bits_Data< internal::Bits_Data_Mem_Watermark<0> >;
+  using Bits_DynamicData   = internal::Bits_Data< internal::Bits_Data_Mem_Dynamic<0> >;
+  template <size_t NUM_BITS>
+  using Bits_FixedData     = internal::Bits_Data< internal::Bits_Data_Mem_Fixed<NUM_BITS> >;
+  template <size_t MAX_BITS>
+  using Bits_StaticData    = internal::Bits_Data< internal::Bits_Data_Mem_Static<MAX_BITS> >;
 }
 
 #endif
