@@ -338,7 +338,7 @@ namespace emp {
     [[nodiscard]] bool None() const { return !Any(); }
 
     /// Return true if ALL bits are set to 1, otherwise return false.
-    // @CAO: Can speed up by not duplicating the whole Bits.
+    // @CAO: Can speed up by not duplicating Bits; fields should be all 1, last should be mask.
     [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
     /// Resize this Bits object to have the specified number of bits (if allowed)
@@ -386,12 +386,18 @@ namespace emp {
 
     // =========  Comparison Operators  ========= //
 
-    [[nodiscard]] bool operator==(const Bits & in) const;
-    [[nodiscard]] bool operator!=(const Bits & in) const { return !(*this == in); }
-    [[nodiscard]] bool operator< (const Bits & in) const;
-    [[nodiscard]] bool operator> (const Bits & in) const { return in < *this; }
-    [[nodiscard]] bool operator<=(const Bits & in) const { return !(in < *this); }
-    [[nodiscard]] bool operator>=(const Bits & in) const { return !(*this < in); }
+    template <typename DATA2_T, bool ZL2>
+    [[nodiscard]] bool operator==(const Bits<DATA2_T,ZL2> & in) const;
+    template <typename DATA2_T, bool ZL2>
+    [[nodiscard]] bool operator!=(const Bits<DATA2_T,ZL2> & in) const { return !(*this == in); }
+    template <typename DATA2_T, bool ZL2>
+    [[nodiscard]] bool operator< (const Bits<DATA2_T,ZL2> & in) const;
+    template <typename DATA2_T, bool ZL2>
+    [[nodiscard]] bool operator> (const Bits<DATA2_T,ZL2> & in) const { return in < *this; }
+    template <typename DATA2_T, bool ZL2>
+    [[nodiscard]] bool operator<=(const Bits<DATA2_T,ZL2> & in) const { return !(in < *this); }
+    template <typename DATA2_T, bool ZL2>
+    [[nodiscard]] bool operator>=(const Bits<DATA2_T,ZL2> & in) const { return !(*this < in); }
 
 
     // =========  Conversion Operators  ========= //
@@ -412,6 +418,11 @@ namespace emp {
     /// @return Read-only span of Bits's bytes.
     [[nodiscard]] auto GetBytes() const { return data.AsByteSpan(); }
 
+    /// Return a span with all fields in order.
+    std::span<field_t> FieldSpan() {
+      return std::span<field_t>(data.FieldPtr().Raw(), data.NumFields());
+    }
+
     /// Get a read-only pointer to the internal array used by Bits.
     /// (note that bits are NOT in order at the byte level!)
     /// @return Read-only pointer to Bits' bytes.
@@ -423,11 +434,6 @@ namespace emp {
     /// Get the overall value of this Bits, using a uint encoding, but including all bits
     /// and returning the value as a double.
     [[nodiscard]] double GetValue() const;
-
-    /// Return a span with all fields in order.
-    std::span<field_t> FieldSpan() {
-      return std::span<field_t>(data.FieldPtr().Raw(), data.NumFields());
-    }
 
     /// Get specified type at a given index (in steps of that type size)
     template <typename T>
@@ -1503,7 +1509,8 @@ namespace emp {
 
   /// Test if two bit vectors are identical.
   template <typename DATA_T, bool ZERO_LEFT>
-  bool Bits<DATA_T,ZERO_LEFT>::operator==(const Bits<DATA_T,ZERO_LEFT> & in) const {
+  template <typename DATA2_T, bool ZL2>
+  bool Bits<DATA_T,ZERO_LEFT>::operator==(const Bits<DATA2_T,ZL2> & in) const {
     if (GetSize() != in.GetSize()) return false;
 
     const size_t NUM_FIELDS = data.NumFields();
@@ -1515,7 +1522,8 @@ namespace emp {
 
   /// Compare the would-be numerical values of two bit vectors.
   template <typename DATA_T, bool ZERO_LEFT>
-  bool Bits<DATA_T,ZERO_LEFT>::operator<(const Bits<DATA_T,ZERO_LEFT> & in) const {
+  template <typename DATA2_T, bool ZL2>
+  bool Bits<DATA_T,ZERO_LEFT>::operator<(const Bits<DATA2_T,ZL2> & in) const {
     if (GetSize() != in.GetSize()) return GetSize() < in.GetSize();
 
     const size_t NUM_FIELDS = data.NumFields();
