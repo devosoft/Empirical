@@ -151,10 +151,10 @@ namespace emp {
     constexpr void ShiftRight(const size_t shift_size, bool raw=false);
 
     /// Helper: call ROTATE with negative number instead
-    constexpr void RotateLeft(const size_t shift_size_raw);
+    constexpr void ROTL_SELF(const size_t shift_size_raw);
 
     /// Helper for calling ROTATE with positive number
-    constexpr void RotateRight(const size_t shift_size_raw);
+    constexpr void ROTR_SELF(const size_t shift_size_raw);
 
   public:
     /// @brief Default constructor; will build the default number of bits (often 0, but not always)
@@ -603,8 +603,11 @@ namespace emp {
     /// Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
-    /// Convert this Bits to a vector string [index 0 on left]
+    /// Convert this Bits to a vector string [index 0 based on ZERO_LEFT]
     [[nodiscard]] std::string ToString() const;
+
+    /// Convert this Bits to an array-based string [index 0 on left]
+    [[nodiscard]] std::string ToArrayString() const;
 
     /// Convert this Bits to a numerical string [index 0 on right]
     [[nodiscard]] std::string ToBinaryString() const;
@@ -623,7 +626,7 @@ namespace emp {
     void PrintBinary(std::ostream & out=std::cout) const { out << ToBinaryString(); }
 
     /// Print from smallest bit position to largest.
-    void PrintArray(std::ostream & out=std::cout) const { out << ToString(); }
+    void PrintArray(std::ostream & out=std::cout) const { out << ToArrayString(); }
 
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
@@ -989,7 +992,7 @@ namespace emp {
 
   /// Helper: call ROTATE with negative number
   template <typename DATA_T, bool ZERO_LEFT>
-  constexpr void Bits<DATA_T,ZERO_LEFT>::RotateLeft(const size_t shift_size_raw) {
+  constexpr void Bits<DATA_T,ZERO_LEFT>::ROTL_SELF(const size_t shift_size_raw) {
     if (GetSize() == 0) return;   // Nothing to rotate if there are not bits.
     const field_t shift_size = shift_size_raw % GetSize();
 
@@ -1007,7 +1010,7 @@ namespace emp {
 
   /// Helper for calling ROTATE with positive number
   template <typename DATA_T, bool ZERO_LEFT>
-  constexpr void Bits<DATA_T,ZERO_LEFT>::RotateRight(const size_t shift_size_raw) {
+  constexpr void Bits<DATA_T,ZERO_LEFT>::ROTR_SELF(const size_t shift_size_raw) {
     const size_t shift_size = shift_size_raw % GetSize();
 
     // use different approaches based on number of bits
@@ -1874,6 +1877,13 @@ namespace emp {
   /// Convert this Bits object to a vector string [0 index on left]
   template <typename DATA_T, bool ZERO_LEFT>
   std::string Bits<DATA_T,ZERO_LEFT>::ToString() const {
+    if constexpr (ZERO_LEFT) return ToArrayString();
+    else return ToBinaryString();
+  }
+
+  /// Convert this Bits object to a vector string [0 index on left]
+  template <typename DATA_T, bool ZERO_LEFT>
+  std::string Bits<DATA_T,ZERO_LEFT>::ToArrayString() const {
     std::string out_string;
     out_string.reserve(GetSize());
     for (size_t i = 0; i < GetSize(); ++i) out_string.push_back(GetAsChar(i));
@@ -2075,8 +2085,8 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> Bits<DATA_T,ZERO_LEFT>::ROTATE(const int rotate_size) const {
     Bits<DATA_T,ZERO_LEFT> out_set(*this);
-    if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
-    else if (rotate_size < 0) out_set.RotateLeft((field_t) (-rotate_size));
+    if (rotate_size > 0) out_set.ROTR_SELF((field_t) rotate_size);
+    else if (rotate_size < 0) out_set.ROTL_SELF((field_t) (-rotate_size));
     return out_set;
   }
 
@@ -2084,8 +2094,8 @@ namespace emp {
   /// store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::ROTATE_SELF(const int rotate_size) {
-    if (rotate_size > 0) RotateRight((field_t) rotate_size);
-    else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
+    if (rotate_size > 0) ROTR_SELF((field_t) rotate_size);
+    else if (rotate_size < 0) ROTL_SELF((field_t) -rotate_size);
     return *this;
   }
 
