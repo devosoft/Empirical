@@ -11,6 +11,11 @@
 #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
+#include <string>
+#include <sstream>
+
+#include "../base/Ptr.hpp"
+
 namespace emp {
 
   /// @brief Use size_t as the default bits field type.
