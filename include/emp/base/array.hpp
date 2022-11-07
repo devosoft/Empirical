@@ -158,7 +158,9 @@ namespace emp {
     T & front() { emp_assert(N > 0); return _data[0]; }
     const T & front() const { emp_assert(N > 0); return _data[0]; }
 
-    void fill(const T & val) { this->assign(N, val); }
+    void fill(const T & val) {
+      for (size_t i = 0; i < N; ++i) _data[i] = val;
+    }
 
     // Functions to make sure to throw an error on:
 
