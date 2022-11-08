@@ -1061,6 +1061,7 @@ namespace emp {
     : data(NUM_BITS)
   {
     // Copy over the values.
+    Clear();
     for (size_t i = 0; i < NUM_BITS; ++i) Set(i, bitset[i]);
   }
 
@@ -1070,8 +1071,12 @@ namespace emp {
     : data(bitstring.size())
   {
     Clear();
-    for (size_t i = 0; i < bitstring.size(); i++) {
-      if (bitstring[i] != '0') Set(i);
+    const size_t in_size = bitstring.size();
+    for (size_t i = 0; i < in_size; i++) {
+      if (bitstring[i] == '1') {
+        if constexpr (ZERO_LEFT) Set(i);
+        else Set(in_size - i - 1);
+      }
     }
   }
 
@@ -1137,9 +1142,13 @@ namespace emp {
   Bits<DATA_T,ZERO_LEFT>::Bits(const std::initializer_list<T> l)
     : data(l.size())
   {
+    Clear();
     size_t idx = 0;
-    for (auto i = std::begin(l); i != std::end(l); ++i) Set(idx++, *i);
-    ClearExcessBits();
+    if constexpr (ZERO_LEFT) {
+      for (auto i = std::begin(l); i != std::end(l); ++i) Set(idx++, *i);
+    } else {
+      for (auto i = std::rbegin(l); i != std::rend(l); ++i) Set(idx++, *i);
+    }
   }
 
   /// Copy, but with a resize.
@@ -1213,8 +1222,12 @@ namespace emp {
     data.RawResize(bitstring.size());
     Clear();
 
-    for (size_t i = 0; i < GetSize(); i++) {
-      if (bitstring[i] != '0') Set(i);
+    const size_t in_size = bitstring.size();
+    for (size_t i = 0; i < in_size; i++) {
+      if (bitstring[i] == '1') {
+        if constexpr (ZERO_LEFT) Set(i);
+        else Set(in_size - i - 1);
+      }
     }
 
     return *this;
