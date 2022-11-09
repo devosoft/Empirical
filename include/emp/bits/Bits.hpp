@@ -161,7 +161,7 @@ namespace emp {
     /// @param init_val Initial value of all default bits. 
     Bits(bool init_val=0) { if (init_val) SetAll(); else Clear(); }
 
-    /// Build a new Bits with specified bit count and initialization (default 0)
+    /// @brief Build a new Bits with specified bit count and initialization (default 0)
     Bits(size_t in_num_bits, bool init_val=false);
 
     // Prevent ambiguous conversions...
@@ -208,50 +208,50 @@ namespace emp {
     /// @param target_ones Number of ones to include in the Bits.
     Bits(Random & random, const int target_ones) : Bits(random, (size_t) target_ones) { }
 
-    /// Constructor to generate a specified number of random Bits (with equal prob of 0 or 1).
+    /// @brief Constructor to generate a specified number of random Bits (with equal prob of 0 or 1).
     Bits(size_t in_num_bits, Random & random);
 
-    /// Constructor to generate a random Bits with provided prob of 1's.
+    /// @brief Constructor to generate a random Bits with provided prob of 1's.
     Bits(size_t in_num_bits, Random & random, const double p1);
 
-    /// Constructor to generate a random Bits with provided number of 1's.
+    /// @brief Constructor to generate a random Bits with provided number of 1's.
     Bits(size_t in_num_bits, Random & random, const size_t target_ones);
 
-    /// Constructor to generate a random Bits with provided number of 1's.
+    /// @brief Constructor to generate a random Bits with provided number of 1's.
     Bits(size_t in_num_bits, Random & random, const int target_ones)
       : Bits(in_num_bits, random, (size_t) target_ones) { }
 
-    /// Initializer list constructor.
+    /// @brief Initializer list constructor.
     template <typename T> Bits(const std::initializer_list<T> l);
 
-    /// Copy, but with a resize.
+    /// @brief Copy, but with a resize.
     template <typename DATA2_T, bool ZERO_LEFT2>
     Bits(const Bits<DATA2_T, ZERO_LEFT2> & in, size_t new_size);
 
-    /// Destructor
+    /// @brief Destructor
     ~Bits() = default;
 
-    /// Copy assignment operator.
+    /// @brief Copy assignment operator.
     Bits & operator=(const Bits<DATA_T, ZERO_LEFT> & in) &;
 
-    /// Assignment operator for other Bits object
+    /// @brief Assignment operator for other Bits object
     template <typename DATA2_T, bool ZERO_LEFT2>
     Bits & operator=(const Bits<DATA2_T, ZERO_LEFT2> & in) &;
 
-    /// Move operator.
+    /// @brief Move operator.
     Bits & operator=(Bits && in) &;
 
-    /// Assignment operator from a std::bitset.
+    /// @brief Assignment operator from a std::bitset.
     template <size_t NUM_BITS>
     Bits & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
-    /// Assignment operator from a string of '0's and '1's.
+    /// @brief Assignment operator from a string of '0's and '1's.
     Bits & operator=(const std::string & bitstring) &;
 
-    /// Assignment operator from a literal string of '0's and '1's.
+    /// @brief Assignment operator from a literal string of '0's and '1's.
     Bits & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
-    /// Assignment from another Bits object without changing size.
+    /// @brief Assignment from another Bits object without changing size.
     template <typename DATA2_T, bool ZERO_LEFT2>
     Bits & Import(
       const Bits<DATA2_T, ZERO_LEFT2> & from_bits,
@@ -259,133 +259,134 @@ namespace emp {
       size_t max_copy_bits=emp::MAX_SIZE_T
     );
 
-    /// Convert to a Bits of a different size.
+    /// @brief Convert to a Bits of a different size.
     template <typename OUT_T = Bits<Bits_DynamicData,ZERO_LEFT> >
     [[nodiscard]] OUT_T Export(size_t out_size, size_t start_bit=0) const;
 
-    /// Convert to a BitArray of a different size.
+    /// @brief Convert to a BitArray of a different size.
     template <size_t NUM_BITS>
     [[nodiscard]] Bits<Bits_FixedData<NUM_BITS>,true>
     ExportArray(size_t start_bit=0) const {
       return Export< Bits<Bits_FixedData<NUM_BITS>,true> >(NUM_BITS, start_bit);
     }
 
-    // Scan this bitvector to make sure that there are no internal problems.
+    // @brief Scan this bitvector to make sure that there are no internal problems.
     [[nodiscard]] bool OK() const { return data.OK(); }
 
 
     // =========  Accessors  ========= //
 
-    /// How many bits do we currently have?
+    /// @brief How many bits do we currently have?
     [[nodiscard]] constexpr auto GetSize() const { return data.NumBits(); }
 
-    /// How many bytes are in this Bits? (includes empty field space)
+    /// @brief How many bytes are in this Bits? (includes empty field space)
     [[nodiscard]] constexpr auto GetNumBytes() const { return data.NumBytes(); }
 
-    /// How many distinct values could be held in this Bits?
+    /// @brief How many distinct values could be held in this Bits?
     [[nodiscard]] constexpr double GetNumStates() const { return emp::Pow2(data.NumBits()); }
 
-    /// Retrieve the bit value from the specified index.
+    /// @brief Retrieve the bit value from the specified index.
     [[nodiscard]] constexpr bool Get(size_t index) const;
 
-    /// A safe version of Get() for indexing out of range. Useful for representing collections.
+    /// @brief A safe version of Get() for indexing out of range. Useful for representing collections.
     [[nodiscard]] constexpr bool Has(size_t index) const {
       return (index < data.NumBits()) ? Get(index) : false;
     }
 
-    /// Update the bit value at the specified index.
+    /// @brief Update the bit value at the specified index.
     Bits & Set(size_t index, bool value=true);
 
-    /// Set all bits to 1.
+    /// @brief Set all bits to 1.
     Bits & SetAll();
 
-    /// Set a range of bits to one: [start, stop)
+    /// @brief Set a range of bits to one: [start, stop)
     Bits & SetRange(size_t start, size_t stop)
       { return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop); }
 
-    /// Set all bits to 0.
+    /// @brief Set all bits to 0.
     Bits & Clear();
 
-    /// Set specific bit to 0.
+    /// @brief Set specific bit to 0.
     Bits & Clear(size_t index) { return Set(index, false); }
 
-    /// Set bits to 0 in the range [start, stop)
+    /// @brief Set bits to 0 in the range [start, stop)
     Bits & Clear(const size_t start, const size_t stop) {
       return ApplyRange([](field_t) -> size_t { return 0; }, start, std::min(stop,GetSize()));
     }
 
 
-    /// Const index operator -- return the bit at the specified position.
+    /// @brief Const index operator -- return the bit at the specified position.
     [[nodiscard]] bool operator[](size_t index) const { return Get(index); }
 
-    /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
+    /// @brief Index operator; return proxy to bit at specified position usable as an lvalue.
     BitProxy<Bits> operator[](size_t index) { return BitProxy<Bits>(*this, index); }
 
-    /// Change every bit in the sequence.
+    /// @brief Change every bit in the sequence.
     Bits & Toggle() { return NOT_SELF(); }
 
-    /// Change a specified bit to the opposite value
+    /// @brief Change a specified bit to the opposite value
     Bits & Toggle(size_t index);
 
-    /// Flips all the bits in a range [start, end)
+    /// @brief Flips all the bits in a range [start, end)
     Bits & Toggle(size_t start, size_t stop)
       { return ApplyRange([](field_t x){ return ~x; }, start, stop); }
 
-    /// Return true if ANY bits are set to 1, otherwise return false.
+    /// @brief Return true if ANY bits are set to 1, otherwise return false.
     [[nodiscard]] bool Any() const;
 
-    /// Return true if NO bits are set to 1, otherwise return false.
+    /// @brief Return true if NO bits are set to 1, otherwise return false.
     [[nodiscard]] bool None() const { return !Any(); }
 
-    /// Return true if ALL bits are set to 1, otherwise return false.
+    /// @brief Return true if ALL bits are set to 1, otherwise return false.
     // @CAO: Can speed up by not duplicating Bits; fields should be all 1, last should be mask.
     [[nodiscard]] bool All() const { return (~(*this)).None(); }
 
-    /// Resize this Bits object to have the specified number of bits (if allowed)
+    /// @brief Resize this Bits object to have the specified number of bits (if allowed)
     Bits & Resize(size_t new_bits) { data.RawResize(new_bits, true); return *this; }
 
 
     // =========  Randomization functions  ========= //
 
-    /// Set all bits randomly, with a 50% probability of being a 0 or 1.
+    /// @brief Set all bits randomly, with a 50% probability of being a 0 or 1.
     Bits & Randomize(Random & random);
 
-    /// Set all bits randomly, with probability specified at compile time.
+    /// @brief Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
     Bits & RandomizeP(Random & random, const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
-    /// Set all bits randomly, with a given probability of being a one.
+    /// @brief Set all bits randomly, with a given probability of being a one.
     Bits & Randomize(Random & random, const double p,
                      const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
-    /// Set all bits randomly, with a given number of ones.
+    /// @brief Set all bits randomly, with a given number of ones.
     Bits & ChooseRandom(Random & random, const size_t target_ones,
                         const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
-    /// Flip random bits with a given probability.
+    /// @brief Flip random bits with a given probability.
     Bits & FlipRandom(Random & random, const double p,
                       const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
-    /// Set random bits with a given probability (does not check if already set.)
+    /// @brief Set random bits with a given probability (does not check if already set.)
     Bits & SetRandom(Random & random, const double p,
                      const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
-    /// Unset random bits with a given probability (does not check if already zero.)
+    /// @brief Unset random bits with a given probability (does not check if already zero.)
     Bits & ClearRandom(Random & random, const double p,
                        const size_t start_pos=0, size_t stop_pos=MAX_SIZE_T);
 
-    /// Flip a specified number of random bits.
+    /// @brief Flip a specified number of random bits.
     Bits & FlipRandomCount(Random & random, const size_t target_bits);
 
-    /// Set a specified number of random bits (does not check if already set.)
+    /// @brief Set a specified number of random bits (does not check if already set.)
     Bits & SetRandomCount(Random & random, const size_t target_bits);
 
-    /// Unset  a specified number of random bits (does not check if already zero.)
+    /// @brief Unset  a specified number of random bits (does not check if already zero.)
     Bits & ClearRandomCount(Random & random, const size_t target_bits);
 
 
     // =========  Comparison Operators  ========= //
 
+    /// @brief Compare two bits objects, even with different template arguments.
     template <typename DATA2_T, bool ZL2>
     [[nodiscard]] bool operator==(const Bits<DATA2_T,ZL2> & in) const;
     template <typename DATA2_T, bool ZL2>
@@ -402,170 +403,169 @@ namespace emp {
 
     // =========  Conversion Operators  ========= //
 
-    /// Automatically convert Bits to other vector types.
+    /// @brief Automatically convert Bits to other vector types.
     template <typename T> operator emp::vector<T>();
 
-    /// Casting a bit array to bool identifies if ANY bits are set to 1.
+    /// @brief Casting a bit array to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
 
 
     // =========  Access Groups of bits  ========= //
 
-    /// Retrieve the byte at the specified byte index.
+    /// @brief Retrieve the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
 
-    /// Get a read-only view into the internal array used by Bits.
+    /// @brief et a read-only view into the internal array used by Bits.
     /// @return Read-only span of Bits's bytes.
     [[nodiscard]] auto GetBytes() const { return data.AsByteSpan(); }
 
-    /// Return a span with all fields in order.
+    /// @brief Return a span with all fields in order.
     std::span<field_t> FieldSpan() {
       return std::span<field_t>(data.FieldPtr().Raw(), data.NumFields());
     }
 
-    /// Get a read-only pointer to the internal array used by Bits.
+    /// @brief Get a read-only pointer to the internal array used by Bits.
     /// (note that bits are NOT in order at the byte level!)
     /// @return Read-only pointer to Bits' bytes.
     [[nodiscard]] emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
-    /// Update the byte at the specified byte index.
+    /// @brief Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
 
-    /// Get the overall value of this Bits, using a uint encoding, but including all bits
-    /// and returning the value as a double.
+    /// @brief Get overall base-2 value of this Bits, returning as a double.
     [[nodiscard]] double GetValue() const;
 
-    /// Get specified type at a given index (in steps of that type size)
+    /// @brief Get specified type at a given index (in steps of that type size)
     template <typename T>
     [[nodiscard]] T GetValueAtIndex(const size_t index) const;
 
-    // Retrieve the 8-bit uint from the specified uint index.
+    /// @brief Retrieve the 8-bit uint from the specified uint index.
     [[nodiscard]] uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
 
-    // Retrieve the 16-bit uint from the specified uint index.
+    /// @brief Retrieve the 16-bit uint from the specified uint index.
     [[nodiscard]] uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
 
-    // Retrieve the 32-bit uint from the specified uint index.
+    /// @brief Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
 
-    // Retrieve the 64-bit uint from the specified uint index.
+    /// @brief Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
-    // By default, retrieve the 32-bit uint from the specified uint index.
+    /// @brief By default, retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
 
 
-    /// Set specified type at a given index (in steps of that type size)
+    /// @brief Set specified type at a given index (in steps of that type size)
     template <typename T> Bits & SetValueAtIndex(const size_t index, T value);
 
-    /// Update the 8-bit uint at the specified uint index.
+    /// @brief Update the 8-bit uint at the specified uint index.
     void SetUInt8(const size_t index, uint8_t value) { SetValueAtIndex(index, value); }
 
-    /// Update the 16-bit uint at the specified uint index.
+    /// @brief Update the 16-bit uint at the specified uint index.
     void SetUInt16(const size_t index, uint16_t value) { SetValueAtIndex(index, value); }
 
-    /// Update the 32-bit uint at the specified uint index.
+    /// @brief Update the 32-bit uint at the specified uint index.
     void SetUInt32(const size_t index, uint32_t value) { SetValueAtIndex(index, value); }
 
-    /// Update the 64-bit uint at the specified uint index.
+    /// @brief Update the 64-bit uint at the specified uint index.
     void SetUInt64(const size_t index, uint64_t value) { SetValueAtIndex(index, value); }
 
-    /// By default, update the 32-bit uint at the specified uint index.
+    /// @brief By default, update the 32-bit uint at the specified uint index.
     void SetUInt(const size_t index, uint32_t value) { SetUInt32(index, value); }
 
 
-    /// Get specified type starting at a given BIT position.
+    /// @briefGet specified type starting at a given BIT position.
     template <typename T>
     [[nodiscard]] T GetValueAtBit(const size_t index) const;
 
-    // Retrieve the 8-bit uint from the specified uint index.
+    /// @brief Retrieve the 8-bit uint from the specified uint index.
     [[nodiscard]] uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
 
-    // Retrieve the 16-bit uint from the specified uint index.
+    /// @brief Retrieve the 16-bit uint from the specified uint index.
     [[nodiscard]] uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
 
-    // Retrieve the 32-bit uint from the specified uint index.
+    /// @brief Retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
 
-    // Retrieve the 64-bit uint from the specified uint index.
+    /// @brief Retrieve the 64-bit uint from the specified uint index.
     [[nodiscard]] uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
-    // By default, retrieve the 32-bit uint from the specified uint index.
+    /// @brief By default, retrieve the 32-bit uint from the specified uint index.
     [[nodiscard]] uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
 
 
     template <typename T> Bits & SetValueAtBit(const size_t index, T value);
 
-    /// Update the 8-bit uint at the specified uint index.
+    /// @brief Update the 8-bit uint at the specified uint index.
     void SetUInt8AtBit(const size_t index, uint8_t value) { SetValueAtBit(index, value); }
 
-    /// Update the 16-bit uint at the specified uint index.
+    /// @brief Update the 16-bit uint at the specified uint index.
     void SetUInt16AtBit(const size_t index, uint16_t value) { SetValueAtBit(index, value); }
 
-    /// Update the 32-bit uint at the specified uint index.
+    /// @brief Update the 32-bit uint at the specified uint index.
     void SetUInt32AtBit(const size_t index, uint32_t value) { SetValueAtBit(index, value); }
 
-    /// Update the 64-bit uint at the specified uint index.
+    /// @brief Update the 64-bit uint at the specified uint index.
     void SetUInt64AtBit(const size_t index, uint64_t value) { SetValueAtBit(index, value); }
 
-    /// By default, update the 32-bit uint at the specified uint index.
+    /// @brief By default, update the 32-bit uint at the specified uint index.
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
     // =========  Other Analyses  ========= //
 
-    /// A simple hash function for bit vectors.
+    /// @brief A simple hash function for bit vectors.
     [[nodiscard]] std::size_t Hash(size_t start_field=0) const;
 
-    /// Count the number of ones in Bits.
+    /// @brief Count the number of ones in Bits.
     [[nodiscard]] constexpr size_t CountOnes() const;
 
-    /// Count the number of ones in a range within Bits.  [start, end)
+    /// @brief Count the number of ones in a range within Bits.  [start, end)
     [[nodiscard]] constexpr size_t CountOnes(size_t start, size_t end) const;
 
-    /// Faster counting of ones for very sparse bit vectors.
+    /// @brief Faster counting of ones for very sparse bit vectors.
     [[nodiscard]] constexpr size_t CountOnes_Sparse() const;
 
-    /// Count the number of zeros in Bits.
+    /// @brief Count the number of zeros in Bits.
     [[nodiscard]] constexpr size_t CountZeros() const { return GetSize() - CountOnes(); }
 
-    /// Pop the last bit in the vector.
+    /// @brief Pop the last bit in the vector.
     /// @return value of the popped bit.
     bool PopBack();
 
-    /// Push given bit(s) onto the back of a vector.
+    /// @brief Push given bit(s) onto the back of a vector.
     /// @param bit value of bit to be pushed.
     /// @param num number of bits to be pushed.
     void PushBack(const bool bit=true, const size_t num=1);
 
-    /// Insert bit(s) into any index of vector using bit magic.
+    /// @brief Insert bit(s) into any index of vector using bit magic.
     /// Blog post on implementation reasoning: https://devolab.org/?p=2249
     /// @param index location to insert bit(s).
     /// @param val value of bit(s) to insert.
     /// @param num number of bits to insert, default 1.
     void Insert(const size_t index, const bool val=true, const size_t num=1);
 
-    /// Delete bits from any index in a vector.
-    /// TODO: consider a bit magic approach here.
+    /// @brief Delete bits from any index in a vector.
+    // TODO: consider a bit magic approach here.
     /// @param index location to delete bit(s).
     /// @param num number of bits to delete, default 1.
     void Delete(const size_t index, const size_t num=1);
 
-    /// Return the position of the first one; return -1 if no ones in vector.
+    /// @brief Return the position of the first one; return -1 if no ones in vector.
     [[nodiscard]] int FindOne() const;
 
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
     [[deprecated("Renamed to more accurate FindOne()")]]
     [[nodiscard]] int FindBit() const { return FindOne(); }
 
-    /// Return the position of the first one after start_pos; return -1 if no ones in vector.
+    /// @brief Return the position of the first one after start_pos (or -1 if none)
     /// You can loop through all 1-bit positions of Bits object "bits" with:
     ///
     ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
     ///
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
-    /// Special version of FindOne takes int; most common way to call.
+    /// @brief Special version of FindOne takes int; most common way to call.
     [[nodiscard]] int FindOne(int start_pos) const {
       return FindOne(static_cast<size_t>(start_pos));
     }
@@ -574,75 +574,75 @@ namespace emp {
     [[deprecated("Renamed to more accurate FindOne(start_pos)")]]
     [[nodiscard]] int FindBit(const size_t start_pos) const;
 
-    /// Find the most-significant set-bit.
+    /// @brief Find the most-significant set-bit.
     [[nodiscard]] int FindMaxOne() const;
 
-    /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+    /// @brief Return the position of the first one and change it to a zero.  Return -1 if none.
     int PopOne();
 
     /// Deprecated version of PopOne().
     [[deprecated("Renamed to more accurate PopOne()")]]
     int PopBit() { return PopOne(); }
 
-    /// Return positions of all ones.
+    /// @brief Return vector of positions of all ones.
     [[nodiscard]] emp::vector<size_t> GetOnes() const;
 
-    /// Collect positions of ones in the provided vector (allows id type choice)
+    /// @brief Collect positions of ones in the provided vector (allows id type choice)
     template <typename T>
     emp::vector<T> & GetOnes(emp::vector<T> & out_vals) const;
 
-    /// Find the length of the longest continuous series of ones.
+    /// @brief Find the length of the longest continuous series of ones.
     [[nodiscard]] size_t LongestSegmentOnes() const;
 
-    /// Return true if any ones are in common with another Bits.
+    /// @brief Return true if any ones are in common with another Bits.
     [[nodiscard]] bool HasOverlap(const Bits & in) const;
 
 
     // =========  Print/String Functions  ========= //
 
-    /// Convert a specified bit to a character.
+    /// @brief Convert a specified bit to a character.
     [[nodiscard]] char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
 
-    /// Convert this Bits to a vector string [index 0 based on ZERO_LEFT]
+    /// @brief Convert this Bits to a vector string [index 0 based on ZERO_LEFT]
     [[nodiscard]] std::string ToString() const;
 
-    /// Convert this Bits to an array-based string [index 0 on left]
+    /// @brief Convert this Bits to an array-based string [index 0 on left]
     [[nodiscard]] std::string ToArrayString() const;
 
-    /// Convert this Bits to a numerical string [index 0 on right]
+    /// @brief Convert this Bits to a numerical string [index 0 on right]
     [[nodiscard]] std::string ToBinaryString() const;
 
-    /// Convert this Bits to a series of IDs
+    /// @brief Convert this Bits to a series of IDs
     [[nodiscard]] std::string ToIDString(const std::string & spacer=" ") const;
 
-    /// Convert this Bits to a series of IDs with ranges condensed.
+    /// @brief Convert this Bits to a series of IDs with ranges condensed.
     [[nodiscard]] std::string ToRangeString(const std::string & spacer=",",
                                             const std::string & ranger="-") const;
 
-    /// Regular print function (from least significant bit to most)
+    /// @brief Regular print function (from least significant bit to most)
     void Print(std::ostream & out=std::cout) const { out << ToString(); }
 
-    /// Numerical print function (from most significant bit to least)
+    /// @brief Numerical print function (from most significant bit to least)
     void PrintBinary(std::ostream & out=std::cout) const { out << ToBinaryString(); }
 
-    /// Print from smallest bit position to largest.
+    /// @brief Print from smallest bit position to largest.
     void PrintArray(std::ostream & out=std::cout) const { out << ToArrayString(); }
 
-    /// Print a space between each field (or other provided spacer)
+    /// @brief Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
-    /// Print out details about the internals of Bits.
+    /// @brief Print out details about the internals of Bits.
     void PrintDebug(std::ostream & out=std::cout, const std::string & label="") const;
 
-    /// Print the positions of all one bits, spaces are the default separator.
+    /// @brief Print the positions of all one bits, spaces are the default separator.
     void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
-    /// Print the ones in a range format.  E.g., 2-5,7,10-15
+    /// @brief Print the ones in a range format.  E.g., 2-5,7,10-15
     void PrintAsRange(std::ostream & out=std::cout,
                       const std::string & spacer=",",
                       const std::string & ranger="-") const;
 
-    /// Overload ostream operator to return Print.
+    /// @brief Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const Bits & bits) {
       bits.Print(out);
       return out;
@@ -651,154 +651,145 @@ namespace emp {
 
     // =========  Boolean Logic and Shifting Operations  ========= //
 
-    /// Perform a Boolean NOT with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean NOT with this Bits, store result here, and return this object.
     Bits & NOT_SELF();
 
-    /// Perform a Boolean AND with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean AND with this Bits, store result here, and return this object.
     Bits & AND_SELF(const Bits & bits2);
 
-    /// Perform a Boolean OR with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean OR with this Bits, store result here, and return this object.
     Bits & OR_SELF(const Bits & bits2);
 
-    /// Perform a Boolean NAND with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean NAND with this Bits, store result here, and return this object.
     Bits & NAND_SELF(const Bits & bits2);
 
-    /// Perform a Boolean NOR with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean NOR with this Bits, store result here, and return this object.
     Bits & NOR_SELF(const Bits & bits2);
 
-    /// Perform a Boolean XOR with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean XOR with this Bits, store result here, and return this object.
     Bits & XOR_SELF(const Bits & bits2);
 
-    /// Perform a Boolean EQU with this Bits, store result here, and return this object.
+    /// @brief Perform a Boolean EQU with this Bits, store result here, and return this object.
     Bits & EQU_SELF(const Bits & bits2);
 
 
-    /// Perform a Boolean NOT on this Bits and return the result.
+    /// @brief Perform a Boolean NOT on this Bits and return the result.
     [[nodiscard]] Bits NOT() const { return Bits(*this).NOT_SELF(); }
 
-    /// Perform a Boolean AND on this Bits and return the result.
+    /// @brief Perform a Boolean AND on this Bits and return the result.
     [[nodiscard]] Bits AND(const Bits & bits2) const { return Bits(*this).AND_SELF(bits2); }
 
-    /// Perform a Boolean OR on this Bits and return the result.
+    /// @brief Perform a Boolean OR on this Bits and return the result.
     [[nodiscard]] Bits OR(const Bits & bits2) const { return Bits(*this).OR_SELF(bits2); }
 
-    /// Perform a Boolean NAND on this Bits and return the result.
+    /// @brief Perform a Boolean NAND on this Bits and return the result.
     [[nodiscard]] Bits NAND(const Bits & bits2) const { return Bits(*this).NAND_SELF(bits2); }
 
-    /// Perform a Boolean NOR on this Bits and return the result.
+    /// @brief Perform a Boolean NOR on this Bits and return the result.
     [[nodiscard]] Bits NOR(const Bits & bits2) const { return Bits(*this).NOR_SELF(bits2); }
 
-    /// Perform a Boolean XOR on this Bits and return the result.
+    /// @brief Perform a Boolean XOR on this Bits and return the result.
     [[nodiscard]] Bits XOR(const Bits & bits2) const { return Bits(*this).XOR_SELF(bits2); }
 
-    /// Perform a Boolean EQU on this Bits and return the result.
+    /// @brief Perform a Boolean EQU on this Bits and return the result.
     [[nodiscard]] Bits EQU(const Bits & bits2) const { return Bits(*this).EQU_SELF(bits2); }
 
 
-    /// Positive shifts go left and negative go right (0 does nothing); return result.
+    /// @brief Positive shifts left and negative right (0 does nothing); return result.
     [[nodiscard]] Bits SHIFT(const int shift_size) const;
 
-    /// Positive shifts go left and negative go right; store result here, and return this object.
+    /// @brief Positive shifts left and negative right; store result here, and return *this.
     Bits & SHIFT_SELF(const int shift_size);
 
-    /// Reverse the order of bits in the bitset
+    /// @brief Reverse the order of bits in the bitset
     Bits & REVERSE_SELF();
 
-    /// Reverse order of bits in the bitset.
+    /// @brief Reverse order of bits in the bitset.
     [[nodiscard]] Bits REVERSE() const;
 
-    /// Positive rotates go left and negative rotates go left (0 does nothing);
-    /// return result.
+    /// @brief Positive rotates right and negative goes left; return result.
     [[nodiscard]] Bits ROTATE(const int rotate_size) const;
 
-    /// Positive rotates go right and negative rotates go left (0 does nothing);
-    /// store result here, and return this object.
+    /// @brief Positive rotates right and negative goes left; store here, and return *this.
     Bits & ROTATE_SELF(const int rotate_size);
 
-    /// Addition of two Bits.
-    /// Wraps if it overflows.
-    /// Returns result.
+    /// @brief Sums two Bits objects (following uint rules); returns result.
     [[nodiscard]] Bits ADD(const Bits & set2) const;
 
-    /// Addition of two Bits.
-    /// Wraps if it overflows.
-    /// Returns this object.
+    /// @brief Sums another Bits object onto this one (following uint rules); returns *this.
     Bits & ADD_SELF(const Bits & set2);
 
-    /// Subtraction of two Bits.
-    /// Wraps around if it underflows.
-    /// Returns result.
+    /// @brief Subtracts on Bits object from another (following uint rules); returns result.
     [[nodiscard]] Bits SUB(const Bits & set2) const;
 
-    /// Subtraction of two Bits.
-    /// Wraps if it underflows.
-    /// Returns this object.
+    /// @brief Subtracts another Bits object from this one (following uint rules); returns *this.
     Bits & SUB_SELF(const Bits & set2);
 
 
-    /// Operator bitwise NOT...
+    /// @brief Operator bitwise NOT...
     [[nodiscard]] inline Bits operator~() const { return NOT(); }
 
-    /// Operator bitwise AND...
+    /// @brief Operator bitwise AND...
     [[nodiscard]] inline Bits operator&(const Bits & ar2) const {
       emp_assert(size() == ar2.size(), size(), ar2.size());
       return AND(ar2);
     }
 
-    /// Operator bitwise OR...
+    /// @brief Operator bitwise OR...
     [[nodiscard]] inline Bits operator|(const Bits & ar2) const {
       emp_assert(size() == ar2.size(), size(), ar2.size());
       return OR(ar2);
     }
 
-    /// Operator bitwise XOR...
+    /// @brief Operator bitwise XOR...
     [[nodiscard]] inline Bits operator^(const Bits & ar2) const {
       emp_assert(size() == ar2.size(), size(), ar2.size());
       return XOR(ar2);
     }
 
-    /// Operator shift left...
+    /// @brief Operator shift left...
     [[nodiscard]] inline Bits operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
 
-    /// Operator shift right...
+    /// @brief Operator shift right...
     [[nodiscard]] inline Bits operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
-    /// Compound operator bitwise AND...
+    /// @brief Compound operator bitwise AND...
     Bits & operator&=(const Bits & ar2) {
       emp_assert(size() == ar2.size()); return AND_SELF(ar2);
     }
 
-    /// Compound operator bitwise OR...
+    /// @brief Compound operator bitwise OR...
     Bits & operator|=(const Bits & ar2) {
       emp_assert(size() == ar2.size()); return OR_SELF(ar2);
     }
 
-    /// Compound operator bitwise XOR...
+    /// @brief Compound operator bitwise XOR...
     Bits & operator^=(const Bits & ar2) {
       emp_assert(size() == ar2.size()); return XOR_SELF(ar2);
     }
 
-    /// Compound operator for shift left...
+    /// @brief Compound operator for shift left...
     Bits & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
 
-    /// Compound operator for shift right...
+    /// @brief Compound operator for shift right...
     Bits & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    /// Operator plus...
+    /// @brief Operator plus...
     [[nodiscard]] Bits operator+(const Bits & ar2) const { return ADD(ar2); }
 
-    /// Operator minus...
+    /// @brief Operator minus...
     [[nodiscard]] Bits operator-(const Bits & ar2) const { return SUB(ar2); }
 
-    /// Compound operator plus...
+    /// @brief Compound operator plus...
     const Bits & operator+=(const Bits & ar2) { return ADD_SELF(ar2); }
 
-    /// Compound operator minus...
+    /// @brief Compound operator minus...
     const Bits & operator-=(const Bits & ar2) { return SUB_SELF(ar2); }
 
 
     // =========  Cereal Compatability  ========= //
 
+    /// @brief Setup this bits object so that it can be stored in an archive and re-loaded.
     template <class Archive>
     void serialize(Archive & ar) { ar(data); }
 
