@@ -1758,11 +1758,11 @@ TEST_CASE("20: Test BitArray Set*, Clear* and Toggle* Accessors", "[bits]") {
   emp::Random random;
 
   emp::BitArray<40> ba40(random, 0.65);
-  size_t num_ones = ba40.CountOnes();  REQUIRE(num_ones > 20);
+  size_t num_ones = ba40.CountOnes();  REQUIRE(num_ones >= 14); REQUIRE(num_ones < 39);
   ba40.Toggle();                       REQUIRE(ba40.CountOnes() == 40 - num_ones);
 
   emp::BitArray<1000> ba1k(random, 0.65);
-  num_ones = ba1k.CountOnes();         REQUIRE(num_ones > 550);
+  num_ones = ba1k.CountOnes();         REQUIRE(num_ones > 560); REQUIRE(num_ones < 760);
   ba1k.Toggle();                       REQUIRE(ba1k.CountOnes() == 1000 - num_ones);
 
   for (size_t test_id = 0; test_id < 10000; ++test_id) {
