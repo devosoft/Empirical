@@ -862,7 +862,7 @@ namespace emp {
     ApplyRange(const FUN_T & fun, size_t start, size_t stop)
   {
     emp_assert(start <= stop, start, stop, data.NumBits());   // Start cannot be after stop.
-    emp_assert(stop <= data.NumBits(), stop, data.NumBits()); // Stop cannot be past the end of bits
+    emp_assert(stop <= data.NumBits(), stop, data.NumBits()); // Stop must be in range.
 
     if (start == stop) return *this;  // Empty range.
 
@@ -887,7 +887,7 @@ namespace emp {
         const field_t mask = MaskField(start_bits, start_pos);  // Target start bits with a mask.
         field_t & target = data.bits[start_field];              // Isolate the field to change.
         target = (target & ~mask) | (fun(target) & mask);       // Update targeted bits!
-        start_field++;                                          // Done with this field; move to the next.
+        start_field++;                                          // Move to the next field.
       }
 
       // Middle fields
@@ -1486,8 +1486,10 @@ namespace emp {
 
   /// Flip a specified number of random bits.
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::FlipRandomCount(Random & random, const size_t target_bits)
-  {
+  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::FlipRandomCount(
+    Random & random,
+    const size_t target_bits
+  ) {
     emp_assert(GetSize() <= GetSize());
     Bits<DATA_T,ZERO_LEFT> choice(GetSize(), random, target_bits);
     return XOR_SELF(choice);
@@ -1495,8 +1497,10 @@ namespace emp {
 
   /// Set a specified number of random bits (does not check if already set.)
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::SetRandomCount(Random & random, const size_t target_bits)
-  {
+  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::SetRandomCount(
+    Random & random,
+    const size_t target_bits
+  ) {
     emp_assert(GetSize() <= GetSize());
     Bits<DATA_T,ZERO_LEFT> choice(GetSize(), random, target_bits);
     return OR_SELF(choice);
@@ -1504,8 +1508,10 @@ namespace emp {
 
   /// Unset  a specified number of random bits (does not check if already zero.)
   template <typename DATA_T, bool ZERO_LEFT>
-  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::ClearRandomCount(Random & random, const size_t target_bits)
-  {
+  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::ClearRandomCount(
+    Random & random,
+    const size_t target_bits
+  ) {
     emp_assert(GetSize() <= GetSize());
     Bits<DATA_T,ZERO_LEFT> choice(GetSize(), random, GetSize() - target_bits);
     return AND_SELF(choice);
