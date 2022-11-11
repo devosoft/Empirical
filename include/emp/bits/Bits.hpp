@@ -37,7 +37,6 @@
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
  *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
  *        just as efficient than a reserve, but without the need to store extra in-class info.
- *  @todo Implement append(), resize(), push_bit(), insert(), remove()
  *  @todo Think about how iterators should work for Bit collections.  It should probably go
  *        bit-by-bit, but there are very few circumstances where that would be useful.  Going
  *        through the positions of all ones would be more useful, but perhaps less intuitive.
@@ -120,7 +119,7 @@ namespace emp {
     // Shortcut for RawCopy if we are copying a whole other Bits object.
     template <typename DATA2_T, bool ZERO_LEFT2>
     void RawCopy(const Bits<DATA2_T, ZERO_LEFT2> & in_bits) {
-      RawCopy(in_bits.data.FieldPtr(), in_bits.data.NumFields());
+      RawCopy(in_bits.FieldPtr(), in_bits.NumFields());
     }
 
     // Copy bits from one position in the genome to another; leave old positions unchanged.
@@ -269,6 +268,10 @@ namespace emp {
     ExportArray(size_t start_bit=0) const {
       return Export< Bits<Bits_FixedData<NUM_BITS>,true> >(NUM_BITS, start_bit);
     }
+
+    /// @brief concatenate another Bits object on to the end of this one.
+    template<typename DATA2_T, bool ZERO_LEFT2>
+    Bits & Append(const Bits<DATA2_T, ZERO_LEFT2> & in_bits);
 
     // @brief Scan this bitvector to make sure that there are no internal problems.
     [[nodiscard]] bool OK() const { return data.OK(); }
@@ -420,9 +423,22 @@ namespace emp {
     [[nodiscard]] auto GetBytes() const { return data.AsByteSpan(); }
 
     /// @brief Return a span with all fields in order.
-    std::span<field_t> FieldSpan() {
+    [[nodiscard]] std::span<field_t> FieldSpan() {
       return std::span<field_t>(data.FieldPtr().Raw(), data.NumFields());
     }
+
+    /// @brief Return a const span with all fields in order.
+    [[nodiscard]] std::span<const field_t> FieldSpan() const {
+      return std::span<const field_t>(data.FieldPtr().Raw(), data.NumFields());
+    }
+
+    [[nodiscard]] size_t NumFields() const { return data.NumFields(); }
+
+    /// @brief Return a pointer to the set of fields.
+    [[nodiscard]] auto FieldPtr() { return data.FieldPtr(); }
+
+    /// @brief Return a const pointer to the set of fields.
+    [[nodiscard]] auto FieldPtr() const { return data.FieldPtr(); }
 
     /// @brief Get a read-only pointer to the internal array used by Bits.
     /// (note that bits are NOT in order at the byte level!)
@@ -798,7 +814,15 @@ namespace emp {
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] constexpr size_t size() const { return data.NumBits(); }
+    auto at(size_t pos) { return operator[](pos); }
+    auto at(size_t pos) const { return operator[](pos); }
+    auto front() { return at(0); }
+    auto front() const { return at(0); }
+    auto back() { return at(GetSize()-1); }
+    auto back() const { return at(GetSize()-1); }
     void resize(std::size_t new_size) { Resize(new_size); }
+    void push_back(const bool bit=true, const size_t num=1) { PushBack(bit, num); }
+    void pop_back() { resize(GetSize() - 1); }
     [[nodiscard]] constexpr bool all() const { return All(); }
     [[nodiscard]] constexpr bool any() const { return Any(); }
     [[nodiscard]] constexpr bool none() const { return !Any(); }
@@ -1037,7 +1061,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename DATA2_T, bool ZERO_LEFT2>
   Bits<DATA_T,ZERO_LEFT>::Bits(const Bits<DATA2_T,ZERO_LEFT2> & in)
-    : data(in.GetSize(), true)
+    : data(in.GetSize())
   {
     emp_assert(in.OK());
     RawCopy(in);
@@ -1152,9 +1176,9 @@ namespace emp {
     emp_assert(in.OK());
 
     // How many fields do we need to copy?
-    size_t copy_fields = std::min(data.NumFields(), in.data.NumFields());
+    size_t copy_fields = std::min(data.NumFields(), in.NumFields());
 
-    RawCopy(in.data.FieldPtr(), copy_fields);
+    RawCopy(in.FieldPtr(), copy_fields);
   }
 
   /// Copy assignment operator.
@@ -1260,6 +1284,22 @@ namespace emp {
     OUT_T out_bits(out_size);
     out_bits.Import(*this, start_bit);
     return out_bits;
+  }
+
+  /// Concatenate another Bits object on to the end of this one.
+  template <typename DATA_T, bool ZERO_LEFT>
+  template <typename DATA2_T, bool ZERO_LEFT2>
+  Bits<DATA_T,ZERO_LEFT> & Bits<DATA_T,ZERO_LEFT>::Append(
+    const Bits<DATA2_T, ZERO_LEFT2> & in_bits
+  ) {
+    this_t shift_copy(in_bits);
+    const size_t old_size = GetSize();
+    const size_t new_size = old_size + in_bits.GetSize();
+    Resize(new_size);
+    shift_copy.Resize(new_size);
+    shift_copy <<= old_size;
+    OR_SELF(shift_copy);
+    return *this;
   }
 
 
@@ -1527,8 +1567,9 @@ namespace emp {
     if (GetSize() != in.GetSize()) return false;
 
     const size_t NUM_FIELDS = data.NumFields();
+    auto in_fields = in.FieldSpan();
     for (size_t i = 0; i < NUM_FIELDS; ++i) {
-      if (data.bits[i] != in.data.bits[i]) return false;
+      if (data.bits[i] != in_fields[i]) return false;
     }
     return true;
   }
@@ -1540,10 +1581,11 @@ namespace emp {
     if (GetSize() != in.GetSize()) return GetSize() < in.GetSize();
 
     const size_t NUM_FIELDS = data.NumFields();
+    auto in_fields = in.FieldSpan();
     for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
       const size_t pos = i-1;
-      if (data.bits[pos] == in.data.bits[pos]) continue;  // If same, keep looking!
-      return (data.bits[pos] < in.data.bits[pos]);        // Otherwise, do comparison
+      if (data.bits[pos] == in_fields[pos]) continue;  // If same, keep looking!
+      return (data.bits[pos] < in_fields[pos]);        // Otherwise, do comparison
     }
     return false; // Bit vectors are identical.
   }
@@ -1873,10 +1915,11 @@ namespace emp {
   /// Return true if any ones are in common with another Bits object.
   template <typename DATA_T, bool ZERO_LEFT>
   bool Bits<DATA_T,ZERO_LEFT>::HasOverlap(const Bits<DATA_T,ZERO_LEFT> & in) const {
-    const size_t num_fields = std::min(data.NumFields(), in.data.NumFields());
+    const size_t num_fields = std::min(data.NumFields(), in.NumFields());
+    auto in_fields = in.FieldSpan();
     for (size_t i = 0; i < num_fields; ++i) {
       // Short-circuit if we find any overlap.
-      if (data.bits[i] & in.data.bits[i]) return true;
+      if (data.bits[i] & in_fields[i]) return true;
     }
     return false;
   }
