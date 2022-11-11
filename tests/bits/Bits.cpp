@@ -3725,3 +3725,12 @@ TEST_CASE("28: Test BitArray string construction", "[tools]") {
   );
 
 }
+
+TEST_CASE("29: Test Append()", "[tools]") {
+  emp::BitVector bv1 = {0,1,1,1,0,0,0,1};
+  emp::BitArray<8> ba1 = {0,0,0,1,0,0,0,1};
+  bv1.Append(ba1);
+  emp::BitVector exp_result = {0,1,1,1,0,0,0,1,0,0,0,1,0,0,0,1};
+
+  REQUIRE( bv1 == exp_result );
+}
