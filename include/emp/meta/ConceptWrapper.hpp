@@ -29,7 +29,7 @@
  *
  *  REQUIRED_OVERLOAD_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS... )
  *    Setup a set of overloaded member functions called FUNCTION_NAME that varies the first
- *    parameter (and may have additional paramters with fixed types.  ARG1_TYPES must be an
+ *    parameter (and may have additional parameters with fixed types.  ARG1_TYPES must be an
  *    emp::TypePack that includes the full set of types to be used for the first parameter.
  *    Zero or more additional parameters may be included in OTHER_ARGS.  The wrapped class must
  *    already define the full set of overloaded functions by the correct name and with the correct
@@ -90,7 +90,7 @@
  *  OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
  *    Setup a member variable called VAR_NAME.  If it already exists in the wrapped class, use
  *    that version.  If it does not already exist, create it with the provided TYPE and set it to
- *    the DEFAULT_VALUE prodided.
+ *    the DEFAULT_VALUE provided.
  *
  */
 
@@ -107,7 +107,7 @@
 
 
 #define EMP_BUILD_CONCEPT( WRAPPER_NAME, BASE_NAME, ... )      \
-  /* Do error-checkig on the inputs! */                        \
+  /* Do error-checking on the inputs! */                       \
   EMP_WRAP_EACH(EMP_BUILD_CONCEPT__ERROR_CHECK, __VA_ARGS__)   \
   /* Build the interface class. */                             \
   class BASE_NAME {                                            \
@@ -138,8 +138,14 @@
 #define EMP_BUILD_CONCEPT__EC_PROTECTED(...)              /* PROTECTED okay */
 #define EMP_BUILD_CONCEPT__EC_PUBLIC(...)                 /* PUBLIC okay */
 
-#define EMP_BUILD_CONCEPT__CHECK_EMPTY(A, CMD)  EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A, \
-          static_assert(false, "\n\n  \033[1;31mInvalid EMP_BUILD_CONCEPT.\033[0m May be invalid command or missing comma in:\n    \033[1;32m" #CMD "\033[0m;\n\n"); )
+#define EMP_BUILD_CONCEPT__CHECK_EMPTY(A, CMD)               \
+  EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A,             \
+    static_assert(false,                                     \
+      "\n\n  \033[1;31mInvalid EMP_BUILD_CONCEPT.\033"       \
+      "[0m May be invalid command or missing comma in:\n"    \
+      "    \033[1;32m" #CMD "\033[0m;\n\n"                   \
+    );                                                       \
+  )
 #define EMP_BUILD_CONCEPT__SPACER ~, /* EMPTY! */
 #define EMP_BUILD_CONCEPT__ERROR
 
@@ -153,7 +159,7 @@
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 
-// Since you cannot have virtual tempalated functions, we need to do a bit of work in the bast class.
+// Since you cannot have virtual templated functions, we need to do a bit of work in the bast class.
 // ARGS are: FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS...
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_OVERLOAD_FUN(NAME, X, RETURN_TYPE, ...)         \
   static_assert(emp::is_TypePack<TYPE_OPTIONS>() == true,                                \
@@ -193,7 +199,7 @@
 #define EMP_BUILD_CONCEPT__REQUIRED_FUN_impl(FUN_NAME, ERROR, NUM_ARGS, RETURN_T, ...)            \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
-       It should be undefined if the member functon does not exist!                           */  \
+       It should be undefined if the member function does not exist!                           */  \
     template <typename T>                                                                         \
     using return_t_ ## FUN_NAME =                                                                 \
       EMP_IF( NUM_ARGS,                                                                           \
@@ -239,7 +245,7 @@
 #define EMP_BUILD_CONCEPT__OPTIONAL_impl(FUN_NAME, DEFAULT, NUM_ARGS, RETURN_T, ...)              \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
-       It should be undefined if the member functon does not exist!                           */  \
+       It should be undefined if the member function does not exist!                           */  \
     template <typename T>                                                                         \
     using return_t_ ## FUN_NAME =                                                                 \
       EMP_IF( NUM_ARGS,                                                                           \
@@ -276,7 +282,7 @@
 #define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_OVERLOAD_FUN(FUN_NAME, ERROR_MESSAGE, RETURN_T, ...)  \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
-       It should be undefined if the member functon does not exist!                           */  \
+       It should be undefined if the member function does not exist!                           */  \
     template <typename WRAPPED_T, typename ARG_T>                                                 \
     using return_t_ ## FUN_NAME =                                                                 \
       decltype( std::declval<WRAPPED_T>().FUN_NAME( std::declval<ARG_T>() ) );                    \
