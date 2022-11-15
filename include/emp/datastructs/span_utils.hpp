@@ -15,6 +15,9 @@
 #include <iostream>
 #include <span>
 
+#include "../base/array.hpp"
+#include "../base/vector.hpp"
+
 namespace emp {
 
   /// Print the contents of a span.
@@ -26,6 +29,13 @@ namespace emp {
     }
   }
 
+  /// Convert an emp::array to an equivalent span
+  template <typename T, size_t SIZE>
+  auto to_span(emp::array<T,SIZE> a) { return std::span<T,SIZE>(a); }
+
+  /// Convert an emp::vector to an equivalent span
+  template <typename T, typename... Ts>
+  auto to_span(emp::vector<T,Ts...> v) { return std::span<T>(v); }
 }
 
 namespace std {
