@@ -203,11 +203,13 @@ namespace emp {
 
     };
     
-    template <size_t CAPACITY>
-    using Bits_Data_Mem_Static = Bits_Data_Mem_Static_Base< Bits_Data_Size_Var<CAPACITY>, CAPACITY >;
+    template <size_t CAPACITY, size_t DEFAULT_SIZE=0>
+    using Bits_Data_Mem_Static =
+      Bits_Data_Mem_Static_Base< Bits_Data_Size_Var<DEFAULT_SIZE>, CAPACITY >;
 
-    template <size_t CAPACITY>
-    using Bits_Data_Mem_Fixed = Bits_Data_Mem_Static_Base< Bits_Data_Size_Fixed<CAPACITY>, CAPACITY >;
+    template <size_t CAPACITY, size_t DEFAULT_SIZE=CAPACITY>
+    using Bits_Data_Mem_Fixed =
+      Bits_Data_Mem_Static_Base< Bits_Data_Size_Fixed<DEFAULT_SIZE>, CAPACITY >;
 
     /// Data & functions for Bits types with dynamic memory (size is tracked elsewhere)
     template <size_t DEFAULT_SIZE=0>
