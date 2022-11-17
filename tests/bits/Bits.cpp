@@ -22,17 +22,39 @@
 #include "emp/bits/Bits.hpp"
 #include "emp/math/Random.hpp"
 
-TEST_CASE("1: Test BitVector Constructors", "[bits]"){
-  // Create a size 50 bit vector, default to all zeros.
-  emp::BitVector bv1(50);
-  CHECK( bv1.GetSize() == 50 );
-  CHECK( bv1.CountOnes() == 0 );
-  CHECK( (~bv1).CountOnes() == 50 );
+template<typename T>
+void TestBasics(const T & bits, size_t _size, std::string vals="Any") {
+  CHECK( bits.GetSize() == _size);
+  if (vals == "Zeros")      { CHECK(bits.CountOnes() == 0); }
+  else if (vals == "Ones")  { CHECK(bits.CountOnes() == _size); }
+  else if (vals == "Mixed") { CHECK(bits.CountOnes() > 0); CHECK(bits.CountOnes() < _size); }
+}
 
-  // Create a size 1000 BitVector, default to all ones.
-  emp::BitVector bv2(1000, true);
-  CHECK( bv2.GetSize() == 1000 );
-  CHECK( bv2.CountOnes() == 1000 );
+TEST_CASE("1: Test Bits Constructors", "[bits]"){
+  // Default constructors.
+  emp::BitVector           bv0;    TestBasics( bv0, 0, "Zeros" );
+  emp::BitValue            bvl0;   TestBasics( bvl0, 0, "Zeros" );
+  emp::StaticBitVector<50> sbv0;   TestBasics( sbv0, 0, "Zeros" );
+  emp::StaticBitValue<50>  sbvl0;  TestBasics( sbvl0, 0, "Zeros" );
+  emp::BitArray<50>        ba0;    TestBasics( ba0, 50, "Zeros" );
+  emp::BitSet<50>          bs0;    TestBasics( bs0, 50, "Zeros" );
+
+  // Create a size 50 bits objects, default to all zeros.
+  emp::BitVector           bv1(50);    TestBasics( bv1, 50, "Zeros" );
+  emp::BitValue            bvl1(50);   TestBasics( bvl1, 50, "Zeros" );
+  emp::StaticBitVector<50> sbv1(50);   TestBasics( sbv1, 50, "Zeros" );
+  emp::StaticBitValue<50>  sbvl1(50);  TestBasics( sbvl1, 50, "Zeros" );
+  emp::BitArray<50>        ba1;        TestBasics( ba1, 50, "Zeros" );
+  emp::BitSet<50>          bs1;        TestBasics( bs1, 50, "Zeros" );
+
+  // Create a size 5000 bits objects, default to all ones.
+  emp::BitVector             bv2(5000, true);   TestBasics( bv2, 5000, "Ones" );
+  emp::BitValue              bvl2(5000, true);  TestBasics( bvl2, 5000, "Ones" );
+  emp::StaticBitVector<5000> sbv2(5000, true);  TestBasics( sbv2, 5000, "Ones" );
+  emp::StaticBitValue<5000>  sbvl2(5000, true); TestBasics( sbvl2, 5000, "Ones" );
+  emp::BitArray<5000>        ba2(true);         TestBasics( ba2, 5000, "Ones" );
+  emp::BitSet<5000>          bs2(true);         TestBasics( bs2, 5000, "Ones" );
+
 
   // Try a range of BitVector sizes, from 0 to 200.
   for (size_t bv_size = 0; bv_size <= 200; bv_size++) {
