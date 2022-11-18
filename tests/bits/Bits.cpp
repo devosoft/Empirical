@@ -22,6 +22,16 @@
 #include "emp/bits/Bits.hpp"
 #include "emp/math/Random.hpp"
 
+#define BITS_TEST(TYPE, CONSTRUCT, ...) { TYPE CONSTRUCT; __VA_ARGS__ }
+
+#define BITS_TEST_ALL(BASE_SIZE, CONSTRUCT, ...)               \
+  BITS_TEST(emp::BitVector, CONSTRUCT, __VA_ARGS__)                       \
+  BITS_TEST(emp::BitValue, CONSTRUCT, __VA_ARGS__)                        \
+  BITS_TEST(emp::StaticBitVector<BASE_SIZE>, CONSTRUCT, __VA_ARGS__) \
+  BITS_TEST(emp::StaticBitValue<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)       \
+  BITS_TEST(emp::BitArray<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)             \
+  BITS_TEST(emp::BitSet<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)
+
 template<typename T>
 void TestBasics(const T & bits, size_t _size, std::string vals="Any") {
   CHECK( bits.GetSize() == _size);
@@ -40,20 +50,11 @@ TEST_CASE("1: Test Bits Constructors", "[bits]"){
   emp::BitSet<50>          bs0;    TestBasics( bs0, 50, "Zeros" );
 
   // Create a size 50 bits objects, default to all zeros.
-  emp::BitVector           bv1(50);    TestBasics( bv1, 50, "Zeros" );
-  emp::BitValue            bvl1(50);   TestBasics( bvl1, 50, "Zeros" );
-  emp::StaticBitVector<50> sbv1(50);   TestBasics( sbv1, 50, "Zeros" );
-  emp::StaticBitValue<50>  sbvl1(50);  TestBasics( sbvl1, 50, "Zeros" );
-  emp::BitArray<50>        ba1;        TestBasics( ba1, 50, "Zeros" );
-  emp::BitSet<50>          bs1;        TestBasics( bs1, 50, "Zeros" );
+  BITS_TEST_ALL(50,   bits(50),         TestBasics( bits, 50, "Zeros");)
 
   // Create a size 5000 bits objects, default to all ones.
-  emp::BitVector             bv2(5000, true);   TestBasics( bv2, 5000, "Ones" );
-  emp::BitValue              bvl2(5000, true);  TestBasics( bvl2, 5000, "Ones" );
-  emp::StaticBitVector<5000> sbv2(5000, true);  TestBasics( sbv2, 5000, "Ones" );
-  emp::StaticBitValue<5000>  sbvl2(5000, true); TestBasics( sbvl2, 5000, "Ones" );
-  emp::BitArray<5000>        ba2(true);         TestBasics( ba2, 5000, "Ones" );
-  emp::BitSet<5000>          bs2(true);         TestBasics( bs2, 5000, "Ones" );
+  BITS_TEST_ALL(5000, bits(5000, true), TestBasics( bits, 5000, "Ones");)
+
 
 
   // Try a range of BitVector sizes, from 0 to 200.
