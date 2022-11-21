@@ -10,6 +10,6 @@
 
 #include "emp/config/SettingConfig.hpp"
 
-TEST_CASE("Test SettingConfit", "[config]")
+TEST_CASE("Test SettingConfig", "[config]")
 {
 }
