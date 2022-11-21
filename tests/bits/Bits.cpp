@@ -22,15 +22,16 @@
 #include "emp/bits/Bits.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/meta/macros.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #define BITS_TEST(TYPE, CONSTRUCT, ...) { TYPE CONSTRUCT; __VA_ARGS__ }
 
-#define BITS_TEST_ALL(BASE_SIZE, CONSTRUCT, ...)               \
-  BITS_TEST(emp::BitVector, CONSTRUCT, __VA_ARGS__)                       \
-  BITS_TEST(emp::BitValue, CONSTRUCT, __VA_ARGS__)                        \
-  BITS_TEST(emp::StaticBitVector<BASE_SIZE>, CONSTRUCT, __VA_ARGS__) \
-  BITS_TEST(emp::StaticBitValue<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)       \
-  BITS_TEST(emp::BitArray<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)             \
+#define BITS_TEST_ALL(BASE_SIZE, CONSTRUCT, ...)                      \
+  BITS_TEST(emp::BitVector, CONSTRUCT, __VA_ARGS__)                   \
+  BITS_TEST(emp::BitValue, CONSTRUCT, __VA_ARGS__)                    \
+  BITS_TEST(emp::StaticBitVector<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)  \
+  BITS_TEST(emp::StaticBitValue<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)   \
+  BITS_TEST(emp::BitArray<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)         \
   BITS_TEST(emp::BitSet<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)
 
 #define BITS_TEST_ALL_ZEROS(SIZE) BITS_TEST_ALL(SIZE, bits(SIZE, false), TestBasics( bits, SIZE, "Zeros");)
@@ -40,8 +41,11 @@ template<typename T>
 void TestBasics(const T & bits, size_t _size, std::string vals="Any") {
   CHECK( bits.GetSize() == _size);
   if (vals == "Zeros")      { CHECK(bits.CountOnes() == 0); }
-  else if (vals == "Ones")  { CHECK(bits.CountOnes() == _size); }
+  else if (vals == "Ones")  { if (bits.CountOnes() != _size) abort(); CHECK(bits.CountOnes() == _size); }
   else if (vals == "Mixed") { CHECK(bits.CountOnes() > 0); CHECK(bits.CountOnes() < _size); }
+  else if (emp::is_digits(vals)) {
+    CHECK(bits.CountOnes() == emp::from_string<size_t>(vals));
+  }
 }
 
 TEST_CASE("1: Test Bits Constructors", "[bits]"){
@@ -60,7 +64,7 @@ TEST_CASE("1: Test Bits Constructors", "[bits]"){
   BITS_TEST_ALL(5000, bits(5000, true), TestBasics( bits, 5000, "Ones");)
 
   // Create huge (size 100,000) bits objects.
-  BITS_TEST_ALL(100000, bits(100000), TestBasics( bits, 100000, "Ones");)
+  BITS_TEST_ALL(100000, bits(100000), TestBasics( bits, 100000, "Zeros");)
 
   // Try a full range of BitVector sizes, from 1 to 200.
   EMP_LAYOUT( BITS_TEST_ALL_ZEROS, , 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50 )
@@ -74,21 +78,29 @@ TEST_CASE("1: Test Bits Constructors", "[bits]"){
   EMP_LAYOUT( BITS_TEST_ALL_ONES, , 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 100 )
 
 
-  // Build a relatively large BitVector.
-  emp::BitVector bv4(1000000);
-  for (size_t i = 0; i < bv4.GetSize(); i += 100) bv4[i].Toggle();
-  CHECK( bv4.CountOnes() == 10000 );
+  // Build a relatively large BitVector and populate it with scatters ones.
+  BITS_TEST_ALL(100000, bits(100000),
+    for (size_t i = 0; i < bits.GetSize(); i += 91) bits[i].Toggle();
+    TestBasics( bits, 100000, "1099");
+  )
 
-  // Try out the copy constructor.
-  emp::BitVector bv5(bv4);
-  CHECK( bv5.GetSize() == 1000000 );
-  CHECK( bv5.CountOnes() == 10000 );
+  // Try out all combinations of the copy constructor.
+  BITS_TEST_ALL(100, b1(100), b1.Set(50); emp::BitVector b2(b1); TestBasics(b2, 100, "1");)
+  BITS_TEST_ALL(100, b1(100), b1.Set(50); emp::BitValue  b2(b1); TestBasics(b2, 100, "1");)
+  BITS_TEST_ALL(100, b1(100), b1.Set(50); emp::BitArray<100> b2(b1); TestBasics(b2, 100, "1");)
+  BITS_TEST_ALL(100, b1(100), b1.Set(50); emp::BitSet<100> b2(b1); TestBasics(b2, 100, "1");)
+  BITS_TEST_ALL(100, b1(100), b1.Set(50); emp::StaticBitVector<105> b2(b1); TestBasics(b2, 100, "1");)
+  BITS_TEST_ALL(100, b1(100), b1.Set(50); emp::StaticBitValue<105> b2(b1); TestBasics(b2, 100, "1");)
 
-  // And the move constructor.
-  auto old_ptr = bv5.RawBytes();         // Grab a pointer to where bv5 currently has its bytes.
-  emp::BitVector bv6( std::move(bv5) );  // Move bv5 bytes into bv6.
-  CHECK( bv6.RawBytes() == old_ptr );
-  CHECK( bv5.RawBytes() == nullptr );
+
+  // And the move constructor (on BitVector only since it's movable.)
+  emp::BitVector bv1(1000);
+  bv1 = "0,0,0,1,1,1,1,1,1,0,0,1,1,0";
+  auto old_ptr = bv1.RawBytes();         // Grab a pointer to where bv5 currently has its bytes.
+  emp::BitVector bv2( std::move(bv1) );  // Move bv5 bytes into bv6.
+  CHECK( bv2.RawBytes() == old_ptr );
+  CHECK( bv1.RawBytes() == nullptr );
+
 
   // Construct from std::bitset.
   std::bitset<6> bit_set;
@@ -1481,10 +1493,10 @@ template <size_t VAL1, size_t... VALS>
 struct TestBitArrayConstruct<VAL1, VALS...> {
   static void Run() {
     emp::BitArray<VAL1> bit_array;
-    REQUIRE( bit_array.GetSize() == VAL1 );
-    REQUIRE( bit_array.CountOnes() == 0 );
+    CHECK( bit_array.GetSize() == VAL1 );
+    CHECK( bit_array.CountOnes() == 0 );
     for (size_t i = 0; i < VAL1; i++) bit_array[i] = true;
-    REQUIRE( bit_array.CountOnes() == VAL1 );
+    CHECK( bit_array.CountOnes() == VAL1 );
 
     TestBitArrayConstruct<VALS...>::Run();
   }
