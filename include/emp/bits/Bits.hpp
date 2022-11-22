@@ -19,10 +19,12 @@
  *    ZERO_LEFT : Should the index of zero be the left-most bit? (right-most if false)
  *
  *  Specializations are:
- *    BitVector : A replacement for std::vector<bool> (index 0 is on left)
- *    BitArray  : A replacement for std::array<bool> (index 0 is on left)
- *    BitSet    : A replacement for std::bitset (index 0 is on right)
- *    BitValue  : Like BitVector, but index 0 is on the right
+ *    BitVector       : A replacement for std::vector<bool> (index 0 is on left)
+ *    BitValue        : Like BitVector, but index 0 is on the right
+ *    StaticBitVector : Like Bitvector, but max size and fixed memory.
+ *    StaticBitValue  : Like BitValue, but max size and fixed memory.
+ *    BitArray        : A replacement for std::array<bool> (index 0 is on left)
+ *    BitSet          : A replacement for std::bitset (index 0 is on right)
  * 
  *  In the case of replacements, the aim was for identical functionality, but many additional
  *  features, especially associated with bitwise logic operations.
@@ -1236,15 +1238,23 @@ namespace emp {
   Bits<DATA_T,ZERO_LEFT> &
   Bits<DATA_T,ZERO_LEFT>::operator=(const std::string & bitstring) &
   {
-    _data.RawResize(bitstring.size());
+    size_t new_size = std::count_if(
+      bitstring.begin(),
+      bitstring.end(),
+      [](char i) { return i == '0' || i == '1'; }
+    );
+    _data.RawResize(new_size);
+
     Clear();
 
-    const size_t in_size = bitstring.size();
-    for (size_t i = 0; i < in_size; i++) {
-      if (bitstring[i] == '1') {
-        if constexpr (ZERO_LEFT) Set(i);
-        else Set(in_size - i - 1);
+    size_t pos = 0;
+    for (char c : bitstring) {
+      if (c == '1') {
+        if constexpr (ZERO_LEFT) Set(pos);
+        else Set(new_size - pos - 1);
+        pos++;
       }
+      if (c == '0') ++pos; // Leave position as zero and move to next pos.
     }
 
     return *this;
