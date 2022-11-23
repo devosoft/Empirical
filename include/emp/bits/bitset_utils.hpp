@@ -231,6 +231,14 @@ namespace emp {
     return out & MaskLow<T>(bit_count);  // Zero out excess bits.
   }
 
+  /// Count the number of bits ('0' or '1') found in a string.
+  size_t CountBits(const std::string & bitstring) {
+    return std::count_if(
+      bitstring.begin(),
+      bitstring.end(),
+      [](char i) { return i == '0' || i == '1'; }
+    );
+  }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
