@@ -1087,15 +1087,18 @@ namespace emp {
   /// Constructor to generate a Bits from a string of '0's and '1's.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T,ZERO_LEFT>::Bits(const std::string & bitstring)
-    : _data(bitstring.size())
+    : _data(CountBits(bitstring))
   {
     Clear();
-    const size_t in_size = bitstring.size();
-    for (size_t i = 0; i < in_size; i++) {
-      if (bitstring[i] == '1') {
-        if constexpr (ZERO_LEFT) Set(i);
-        else Set(in_size - i - 1);
+
+    size_t pos = 0;
+    for (char c : bitstring) {
+      if (c == '1') {
+        if constexpr (ZERO_LEFT) Set(pos);
+        else Set(GetSize() - pos - 1);
+        pos++;
       }
+      if (c == '0') ++pos; // Leave position as zero and move to next pos.
     }
   }
 
@@ -1238,11 +1241,7 @@ namespace emp {
   Bits<DATA_T,ZERO_LEFT> &
   Bits<DATA_T,ZERO_LEFT>::operator=(const std::string & bitstring) &
   {
-    size_t new_size = std::count_if(
-      bitstring.begin(),
-      bitstring.end(),
-      [](char i) { return i == '0' || i == '1'; }
-    );
+    const size_t new_size = CountBits(bitstring);
     _data.RawResize(new_size);
 
     Clear();
