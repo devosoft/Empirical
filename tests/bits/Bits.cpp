@@ -105,15 +105,16 @@ TEST_CASE("1: Test Bits Constructors", "[bits]"){
   // Construct from std::bitset.
   std::bitset<6> bit_set;
   bit_set[1] = 1;   bit_set[2] = 1;   bit_set[4] = 1;
-  emp::BitVector bv7(bit_set);
-  CHECK( bv7.GetSize() == 6 );
-  CHECK( bv7.CountOnes() == 3 );
+  BITS_TEST_ALL(6, bits(bit_set),
+    TestBasics( bits, 6, "3" );
+  )
 
   // Construct from string.
   std::string bit_string = "10011001010000011101";
-  emp::BitVector bv8(bit_string);
-  CHECK( bv8.GetSize() == 20 );
-  CHECK( bv8.CountOnes() == 9 );
+  BITS_TEST_ALL(20, bits(bit_string),
+    TestBasics( bits, 20, "9" );
+  )
+
 
   // Some random BitVectors
   emp::Random random(1);
