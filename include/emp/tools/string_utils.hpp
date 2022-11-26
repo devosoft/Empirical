@@ -67,6 +67,7 @@
  *
  *    -- EXTRACTIONS and CROPPING --
  *    void remove_chars(std::string & in_string, std::string chars)
+ *    bool string_pop_if_char(std::string & in_string, char c)
  *    std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
  *    std::string string_get_range(const std::string & in_string, std::size_t start_pos, std::size_t end_pos)
  *    std::string string_pop(std::string & in_string, const char delim=' ')
@@ -78,6 +79,8 @@
  *    std::string string_pop_line(std::string & in_string)
  *    std::string string_get_line(const std::string & in_string, size_t start_pos=0)
  *    std::string string_pop_quote(std::string & in_string)
+ *    size_t string_pop_uint(std::string & in_string)
+ *    size_t string_get_uint(const std::string & in_string)
  *    std::string left_justify(std::string & in_string)
  *    void right_justify(std::string & in_string)
  *    void justify(std::string & in_string)
@@ -755,6 +758,14 @@ namespace emp {
     return to_english_list(quote_strings(in_strings, quote));
   }
 
+  static inline bool string_pop_if_char(std::string & in_string, char c)
+  {
+    if (in_string.size() && in_string[0] == c) {
+      in_string.erase(0,1);
+      return true;
+    }
+    return false;
+  }
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
   static inline std::string
@@ -840,6 +851,25 @@ namespace emp {
     return end_pos ? string_pop_fixed(in_string, end_pos+1) : "";
   }
 
+  inline size_t string_pop_uint(std::string & in_string) {
+    size_t uint_size = 0;
+    for (char c : in_string) {
+      if (is_digit(c)) uint_size++;
+      else break;
+    }
+    std::string out_uint = string_pop_fixed(in_string, uint_size);
+    return std::stoull(out_uint);
+  }
+
+  inline size_t string_get_uint(const std::string & in_string) {
+    size_t uint_size = 0;
+    for (char c : in_string) {
+      if (is_digit(c)) uint_size++;
+      else break;
+    }
+    std::string out_uint = string_get_range(in_string, 0, uint_size);
+    return std::stoull(out_uint);
+  }
 
   /// Remove all whitespace at the beginning of a string.  Return the whitespace removed.
   inline std::string left_justify(std::string & in_string) {
