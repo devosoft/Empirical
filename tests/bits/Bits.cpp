@@ -38,13 +38,31 @@
 #define BITS_TEST_ALL_ONES(SIZE) BITS_TEST_ALL(SIZE, bits(SIZE, true), TestBasics( bits, SIZE, "Ones");)
 
 template<typename T>
-void TestBasics(const T & bits, size_t _size, std::string vals="Any") {
+void TestBasics(const T & bits, size_t _size, std::string vals="") {
+  
   CHECK( bits.GetSize() == _size);
-  if (vals == "Zeros")      { CHECK(bits.CountOnes() == 0); }
-  else if (vals == "Ones")  { if (bits.CountOnes() != _size) abort(); CHECK(bits.CountOnes() == _size); }
+  if (vals == "") { return; } // No values to check.
+  else if (vals == "Zeros") { CHECK(bits.CountOnes() == 0); }
+  else if (vals == "Ones")  { CHECK(bits.CountOnes() == _size); }
   else if (vals == "Mixed") { CHECK(bits.CountOnes() > 0); CHECK(bits.CountOnes() < _size); }
+
+  // If vals is a number, use that as the expected number of ones.
   else if (emp::is_digits(vals)) {
     CHECK(bits.CountOnes() == emp::from_string<size_t>(vals));
+  }
+
+  // If vals is a range in the format "[100,200]" then make sure in that range.
+  else if (vals[0] == '[') {
+    vals.erase(0,1); // erase open '['
+    size_t start = emp::string_pop_uint(vals);
+    emp_assert(vals.size() && vals[0] == ',');
+    vals.erase(0,1); // erase ','
+    size_t end = emp::string_pop_uint(vals);
+    emp_assert(vals.size() && vals[0] == ']');
+
+    size_t count = bits.CountOnes();
+    CHECK(count >= start);
+    CHECK(count <= end);
   }
 }
 
@@ -116,26 +134,27 @@ TEST_CASE("1: Test Bits Constructors", "[bits]"){
   )
 
 
-  // Some random BitVectors
+  // Some random Bits objects
   emp::Random random(1);
-  emp::BitVector bv9(1000, random);            // 50/50 chance for each bit.
-  const size_t bv9_ones = bv9.CountOnes();
-  CHECK( bv9_ones >= 400 );
-  CHECK( bv9_ones <= 600 );
+  BITS_TEST_ALL(1000, bits(1000, random),
+    TestBasics( bits, 1000, "[400,600]" );
+  )
 
-  emp::BitVector bv10(1000, random, 0.8);      // 80% chance of ones.
-  const size_t bv10_ones = bv10.CountOnes();
-  CHECK( bv10_ones >= 750 );
-  CHECK( bv10_ones <= 850 );
+  // Random Bits objects with 80% chance of ones.
+  BITS_TEST_ALL(1000, bits(1000, random, 0.8),
+    TestBasics( bits, 1000, "[750,850]" );
+  )
 
-  emp::BitVector bv11(1000, random, 117);      // Exactly 117 ones, randomly placed.
-  const size_t bv11_ones = bv11.CountOnes();
-  CHECK( bv11_ones == 117 );
+  // Random Bits objects with exactly 117 ones, randomly placed.
+  BITS_TEST_ALL(1000, bits(1000, random, 117),
+    TestBasics( bits, 1000, "117" );
+  )
 
-  emp::BitVector bv12(bv11, 500);              // Construct with just first half of bv11.
-  const size_t bv12_ones = bv12.CountOnes();
-  CHECK( bv12_ones >= 20 );
-  CHECK( bv12_ones <= 90 );
+  // Construct with just the first half of another Bits object.
+  emp::BitVector bits_base(1000, random);
+  BITS_TEST_ALL(500, bits(bits_base, 500),
+    TestBasics( bits, 500, "[180,320]" );
+  )
 
   emp::BitVector bv13({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
   CHECK( bv13.GetSize() == 13 );
