@@ -156,28 +156,36 @@ TEST_CASE("1: Test Bits Constructors", "[bits]"){
     TestBasics( bits, 500, "[180,320]" );
   )
 
-  emp::BitVector bv13({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
-  CHECK( bv13.GetSize() == 13 );
-  CHECK( bv13.CountOnes() == 7 );
+  BITS_TEST_ALL(13, bits({1,0,0,0,1,1,1,0,0,0,1,1,1}),
+    TestBasics( bits, 13, "7" );
+  )
 }
 
-TEST_CASE("2: Test BitVector Assignments", "[bits]"){
-  emp::vector< emp::BitVector > v;
+TEST_CASE("2: Test Bits Assignments", "[bits]"){
+  emp::vector< emp::BitVector > b_vec;
+  emp::vector< emp::BitValue > b_val;
+  emp::vector< emp::StaticBitVector<128> > b_svec;
+  emp::vector< emp::StaticBitValue<128> > b_sval;
+  emp::vector< emp::BitArray<128> > b_arr;
+  emp::vector< emp::BitSet<128> > b_set;
 
-  // Try all BitVector sizes from 0 to 128.
+  // For resizable Bits types, try all sizes from 0 to 128.
   // Lot's of move operators will trigger as vector grows.
   for (size_t i = 0; i <= 128; i++) {
-    v.emplace_back(i);
+    b_vec.emplace_back(i);
+    b_val.emplace_back(i);
+    b_svec.emplace_back(i);
+    b_sval.emplace_back(i);
   }
 
   // And a few larger BitVectors...
-  v.emplace_back(1023);
-  v.emplace_back(1024);
-  v.emplace_back(1025);
-  v.emplace_back(1000000);
+  b_vec.emplace_back(1023);
+  b_vec.emplace_back(1024);
+  b_vec.emplace_back(1025);
+  b_vec.emplace_back(1000000);
 
   // Copy each BitVector into bv2 and do some manipulations then copy back.
-  for (emp::BitVector & bv : v) {
+  for (emp::BitVector & bv : b_vec) {
     emp::BitVector bv2 = bv;
     for (size_t i = 1; i < bv2.GetSize(); i += 2) {
       bv2[i] = 1;
@@ -186,29 +194,29 @@ TEST_CASE("2: Test BitVector Assignments", "[bits]"){
   }
 
   // Now make sure the we constructed bits correctly!
-  for (const emp::BitVector & bv : v) {
+  for (const emp::BitVector & bv : b_vec) {
     CHECK( bv.CountOnes() == bv.GetSize()/2 );
   }
 
   emp::vector< emp::BitVector > v2;
   v2.push_back( emp::BitVector({0,1,0,1,0,1}) );
 
-  v2 = v; // Copy over all BitVectors.
+  v2 = b_vec; // Copy over all BitVectors.
 
   std::bitset<600> bit_set;
   bit_set[1] = 1;   bit_set[22] = 1;   bit_set[444] = 1;
 
-  v[10] = bit_set;  // Copy in an std::bitset.
+  b_vec[10] = bit_set;  // Copy in an std::bitset.
 
-  CHECK( v[10].GetSize() == 600 );
-  CHECK( v[10].CountOnes() == 3 );
+  CHECK( b_vec[10].GetSize() == 600 );
+  CHECK( b_vec[10].CountOnes() == 3 );
 
   std::string bit_string = "100110010100000111011001100101000001110110011001010000011101";
 
-  v[75] = bit_string;
+  b_vec[75] = bit_string;
 
-  CHECK( v[75].GetSize() == 60 );
-  CHECK( v[75].CountOnes() == 27 );
+  CHECK( b_vec[75].GetSize() == 60 );
+  CHECK( b_vec[75].CountOnes() == 27 );
 
 }
 
