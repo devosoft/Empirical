@@ -67,8 +67,41 @@ namespace emp {
       return text[pos];
     }
 
-    // Simple formatting.
+    // Simple formatting: set all characters to a specified format.
     FormattedText & Bold() { return SetBits( attr_map["bold"] ); }
+    FormattedText & Italic() { return SetBits( attr_map["italic"] ); }
+    FormattedText & Strikethrough() { return SetBits( attr_map["strikethrough"] ); }
+    FormattedText & Subscript() { return SetBits( attr_map["subscript"] ); }
+    FormattedText & Superscript() { return SetBits( attr_map["superscript"] ); }
+    FormattedText & Underline() { return SetBits( attr_map["underline"] ); }
+
+    // Simple formatting: set a single character to a specified format.
+    FormattedText & Bold(size_t pos) { return SetBit( attr_map["bold"], pos ); }
+    FormattedText & Italic(size_t pos) { return SetBit( attr_map["italic"], pos ); }
+    FormattedText & Strikethrough(size_t pos) { return SetBit( attr_map["strikethrough"], pos ); }
+    FormattedText & Subscript(size_t pos) { return SetBit( attr_map["subscript"], pos ); }
+    FormattedText & Superscript(size_t pos) { return SetBit( attr_map["superscript"], pos ); }
+    FormattedText & Underline(size_t pos) { return SetBit( attr_map["underline"], pos ); }
+
+    // Simple formatting: set a range of characters to a specified format.
+    FormattedText & Bold(size_t start, size_t end) {
+      return SetBits( attr_map["bold"], start, end );
+    }
+    FormattedText & Italic(size_t start, size_t end) {
+      return SetBits( attr_map["italic"], start, end );
+    }
+    FormattedText & Strikethrough(size_t start, size_t end) {
+      return SetBits( attr_map["strikethrough"], start, end );
+    }
+    FormattedText & Subscript(size_t start, size_t end) {
+      return SetBits( attr_map["subscript"], start, end );
+    }
+    FormattedText & Superscript(size_t start, size_t end) {
+      return SetBits( attr_map["superscript"], start, end );
+    }
+    FormattedText & Underline(size_t start, size_t end) {
+      return SetBits( attr_map["underline"], start, end );
+    }
 
     // Compatibility with std::string
     size_t size() const { return GetSize(); }
@@ -80,6 +113,20 @@ namespace emp {
     FormattedText & SetBits(BitVector & cur_bits) {
       cur_bits.Resize(text.size());
       cur_bits.SetAll();
+      return *this;
+    }
+
+    FormattedText & SetBit(BitVector & cur_bits, size_t pos) {
+      if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
+      cur_bits.Set(pos);
+      return *this;
+    }
+
+    FormattedText & SetBits(BitVector & cur_bits, size_t start, size_t end) {
+      emp_assert(end <= text.size());
+      emp_assert(start <= end);
+      if (cur_bits.size() <= end) cur_bits.Resize(end+1);
+      cur_bits.SetRange(start, end);
       return *this;
     }
   };
