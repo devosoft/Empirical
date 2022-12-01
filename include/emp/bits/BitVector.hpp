@@ -721,10 +721,16 @@ namespace emp {
 
     [[nodiscard]] size_t size() const { return num_bits; }
     void resize(std::size_t new_size) { Resize(new_size); }
+    [[nodiscard]] auto & at(size_t pos) { return operator[](pos); }
+    [[nodiscard]] auto at(size_t pos) const { return operator[](pos); }
+    [[nodiscard]] auto & front() { return at(0); }
+    [[nodiscard]] auto front() const { return at(0); }
+    [[nodiscard]] auto & back() { return at(GetSize()-1); }
+    [[nodiscard]] auto back() const { return at(GetSize()-1); }
     [[nodiscard]] bool all() const { return All(); }
     [[nodiscard]] bool any() const { return Any(); }
     [[nodiscard]] bool none() const { return !Any(); }
-    size_t count() const { return CountOnes(); }
+    [[nodiscard]] size_t count() const { return CountOnes(); }
     BitVector & flip() { return Toggle(); }
     BitVector & flip(size_t pos) { return Toggle(pos); }
     BitVector & flip(size_t start, size_t end) { return Toggle(start, end); }
