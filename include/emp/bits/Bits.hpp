@@ -816,12 +816,12 @@ namespace emp {
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] constexpr size_t size() const { return _data.NumBits(); }
-    auto at(size_t pos) { return operator[](pos); }
-    auto at(size_t pos) const { return operator[](pos); }
-    auto front() { return at(0); }
-    auto front() const { return at(0); }
-    auto back() { return at(GetSize()-1); }
-    auto back() const { return at(GetSize()-1); }
+    [[nodiscard]] auto & at(size_t pos) { return operator[](pos); }
+    [[nodiscard]] auto at(size_t pos) const { return operator[](pos); }
+    [[nodiscard]] auto & front() { return at(0); }
+    [[nodiscard]] auto front() const { return at(0); }
+    [[nodiscard]] auto & back() { return at(GetSize()-1); }
+    [[nodiscard]] auto back() const { return at(GetSize()-1); }
     void resize(std::size_t new_size) { Resize(new_size); }
     void push_back(const bool bit=true, const size_t num=1) { PushBack(bit, num); }
     void pop_back() { resize(GetSize() - 1); }
