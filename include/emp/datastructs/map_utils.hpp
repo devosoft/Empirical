@@ -100,6 +100,15 @@ namespace emp {
     return val_it->second;
   }
 
+  /// Take any map and element, run find() member function, and return a reference to
+  /// the result found; trip assert if the result is not present.
+  template <class MAP_T, class KEY_T>
+  inline const auto & GetConstRef( const MAP_T & in_map, const KEY_T & key) {
+    auto val_it = in_map.find(key);
+    emp_assert(val_it != in_map.end());
+    return val_it->second;
+  }
+
 
   // The following two functions are from:
   // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
