@@ -15,11 +15,13 @@
 #ifndef EMP_TOOLS_FORMATTED_TEXT_HPP_INCLUDE
 #define EMP_TOOLS_FORMATTED_TEXT_HPP_INCLUDE
 
+#include <map>
 #include <string>
 #include <unordered_map>
 
 #include "../base/assert.hpp"
 #include "../bits/BitVector.hpp"
+#include "../datastructs/map_utils.hpp"
 
 namespace emp {
 
@@ -103,10 +105,28 @@ namespace emp {
       return SetBits( attr_map["underline"], start, end );
     }
 
+    // Test if a particular attribute is present.
+    bool HasBold() const { return HasAttr("bold"); }
+    bool HasItalic() const { return HasAttr("italic"); }
+    bool HasStrikethrough() const { return HasAttr("strikethrough"); }
+    bool HasSubscript() const { return HasAttr("subscript"); }
+    bool HasSuperscript() const { return HasAttr("superscript"); }
+    bool HasUnderline() const { return HasAttr("underline"); }
+
     // Compatibility with std::string
     size_t size() const { return GetSize(); }
 
-
+    // Convert this to a string in HTML format.
+    std::string AsHTML() {
+      std::map<size_t, std::string> tag_map; // Where do tags go?
+      if (HasBold()) AddOutputTags(tag_map, "bold", "<b>", "</b>");
+      if (HasItalic()) AddOutputTags(tag_map, "italic", "<i>", "</i>");
+      if (HasStrikethrough()) AddOutputTags(tag_map, "strikethrough", "<del>", "</del>");
+      if (HasSubscript()) AddOutputTags(tag_map, "subscript", "<sub>", "</sub>");
+      if (HasSuperscript()) AddOutputTags(tag_map, "superscript", "<sup>", "</sup>");
+      if (HasUnderline()) AddOutputTags(tag_map, "underline", "<u>", "</u>");
+    }
+    
   private:
     // ----   Helper functions   ----
 
@@ -128,6 +148,29 @@ namespace emp {
       if (cur_bits.size() <= end) cur_bits.Resize(end+1);
       cur_bits.SetRange(start, end);
       return *this;
+    }
+
+    bool HasAttr(const std::string & attr) const {
+      if (!emp::Has(attr_map, attr)) return false;
+      return GetConstRef(attr_map, attr).Any();
+    }
+
+    void AddOutputTags(
+      std::map<size_t, std::string> & tag_map,
+      std::string attr,
+      std::string start_tag,
+      std::string end_tag)
+    {
+      const BitVector & sites = attr_map[attr];
+
+      if (sites.Has(0)) tag_map[0] += start_tag;
+      for (size_t i = 1; i < sites.size(); ++i) {
+        if (sites[i] != sites[i-1]) {
+          if (sites[i]) tag_map[i] += start_tag;
+          else tag_map[i] += end_tag;
+        }
+      }
+      if (sites.back()) tag_map[sites.size()] += end_tag;
     }
   };
 
