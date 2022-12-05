@@ -29,10 +29,9 @@ namespace emp {
   private:
     std::string text = "";
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
-    // "strike", "superscript", "subscript", and "code".
+    // "strike", "superscript", "subscript", and "code".  Fonts are described as font name,
+    // a colon, and the font size.  E.g.: "TimesNewRoman:12"
     std::unordered_map<std::string, BitVector> attr_map;
-    // Fonts are described as font name, a colon, and the font size.  E.g.: "TimesNewRoman:12"
-    std::unordered_map<std::string, BitVector> font_map;
 
   public:
     FormattedText() = default;
@@ -46,18 +45,28 @@ namespace emp {
     FormattedText & operator=(FormattedText &&) = default;
 
     FormattedText & operator=(const std::string & in) {
-      attr_map.clear(); font_map.clear(); // Clear out existing content.
+      attr_map.clear(); // Clear out existing content.
       text=in;
       return *this;
     };
     FormattedText & operator=(std::string && in) {
-      attr_map.clear(); font_map.clear(); // Clear out existing content.
+      attr_map.clear(); // Clear out existing content.
       text = std::move(in);
       return *this;
     }
 
     // GetSize() returns the number of characters IGNORING all formatting.
     size_t GetSize() const { return text.size(); }
+
+    // Return the current text as an unformatted string.
+    const std::string & GetString() { return text; }
+
+    void Resize(size_t new_size) {
+      text.resize(new_size);
+      for (auto & [tag, bits] : attr_map) {
+        if (bits.GetSize() > new_size) bits.Resize(new_size);
+      }
+    }
 
     char & operator[](size_t pos) {
       emp_assert(pos < GetSize(), pos, GetSize());
@@ -105,6 +114,34 @@ namespace emp {
     bool HasSuperscript() const { return HasAttr("superscript"); }
     bool HasUnderline() const { return HasAttr("underline"); }
 
+    // Clear ALL formatting
+    FormattedText & Clear() { attr_map.clear(); return *this; }
+    FormattedText & ClearBold() { attr_map.erase("bold"); return *this; }
+    FormattedText & ClearCode() { attr_map.erase("code"); return *this; }
+    FormattedText & ClearItalic() { attr_map.erase("italic"); return *this; }
+    FormattedText & ClearStrike() { attr_map.erase("strike"); return *this; }
+    FormattedText & ClearSubscript() { attr_map.erase("subscript"); return *this; }
+    FormattedText & ClearSuperscript() { attr_map.erase("superscript"); return *this; }
+    FormattedText & ClearUnderline() { attr_map.erase("underline"); return *this; }
+    
+    // Simple formatting: clear a single character from a specified format.
+    FormattedText & ClearBold(size_t pos) { return SetBit("bold", pos, false); }
+    FormattedText & ClearCode(size_t pos) { return SetBit("code", pos, false); }
+    FormattedText & ClearItalic(size_t pos) { return SetBit("italic", pos, false); }
+    FormattedText & ClearStrike(size_t pos) { return SetBit("strike", pos, false); }
+    FormattedText & ClearSubscript(size_t pos) { return SetBit("subscript", pos, false); }
+    FormattedText & ClearSuperscript(size_t pos) { return SetBit("superscript", pos, false); }
+    FormattedText & ClearUnderline(size_t pos) { return SetBit("underline", pos, false); }
+
+    // Simple formatting: clear a range of characters from a specified format.
+    FormattedText & ClearBold(size_t start, size_t end) { return SetBits("bold", start, end, false); }
+    FormattedText & ClearCode(size_t start, size_t end) { return SetBits("code", start, end, false); }
+    FormattedText & ClearItalic(size_t start, size_t end) { return SetBits("italic", start, end, false); }
+    FormattedText & ClearStrike(size_t start, size_t end) { return SetBits("strike", start, end, false); }
+    FormattedText & ClearSubscript(size_t start, size_t end) { return SetBits("subscript", start, end, false); }
+    FormattedText & ClearSuperscript(size_t start, size_t end) { return SetBits("superscript", start, end, false); }
+    FormattedText & ClearUnderline(size_t start, size_t end) { return SetBits("underline", start, end, false); }
+
     // Compatibility with std::string
     size_t size() const { return GetSize(); }
 
@@ -130,19 +167,19 @@ namespace emp {
       return *this;
     }
 
-    FormattedText & SetBit(const std::string & attr, size_t pos) {
+    FormattedText & SetBit(const std::string & attr, size_t pos, bool value=true) {
       BitVector & cur_bits = attr_map[attr];
       if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
-      cur_bits.Set(pos);
+      cur_bits.Set(pos, value);
       return *this;
     }
 
-    FormattedText & SetBits(const std::string & attr, size_t start, size_t end) {
+    FormattedText & SetBits(const std::string & attr, size_t start, size_t end, bool value=true) {
       BitVector & cur_bits = attr_map[attr];
       emp_assert(end <= text.size());
       emp_assert(start <= end);
       if (cur_bits.size() <= end) cur_bits.Resize(end+1);
-      cur_bits.SetRange(start, end);
+      cur_bits.SetRange(start, end, value);
       return *this;
     }
 
