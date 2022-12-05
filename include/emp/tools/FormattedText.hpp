@@ -29,7 +29,7 @@ namespace emp {
   private:
     std::string text = "";
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
-    // "strikethrough", "superscript", and "subscript".
+    // "strike", "superscript", "subscript", and "code".
     std::unordered_map<std::string, BitVector> attr_map;
     // Fonts are described as font name, a colon, and the font size.  E.g.: "TimesNewRoman:12"
     std::unordered_map<std::string, BitVector> font_map;
@@ -70,45 +70,37 @@ namespace emp {
     }
 
     // Simple formatting: set all characters to a specified format.
-    FormattedText & Bold() { return SetBits( attr_map["bold"] ); }
-    FormattedText & Italic() { return SetBits( attr_map["italic"] ); }
-    FormattedText & Strikethrough() { return SetBits( attr_map["strikethrough"] ); }
-    FormattedText & Subscript() { return SetBits( attr_map["subscript"] ); }
-    FormattedText & Superscript() { return SetBits( attr_map["superscript"] ); }
-    FormattedText & Underline() { return SetBits( attr_map["underline"] ); }
+    FormattedText & Bold() { return SetBits("bold"); }
+    FormattedText & Code() { return SetBits("code"); }
+    FormattedText & Italic() { return SetBits("italic"); }
+    FormattedText & Strike() { return SetBits("strike"); }
+    FormattedText & Subscript() { return SetBits("subscript"); }
+    FormattedText & Superscript() { return SetBits("superscript"); }
+    FormattedText & Underline() { return SetBits("underline"); }
 
     // Simple formatting: set a single character to a specified format.
-    FormattedText & Bold(size_t pos) { return SetBit( attr_map["bold"], pos ); }
-    FormattedText & Italic(size_t pos) { return SetBit( attr_map["italic"], pos ); }
-    FormattedText & Strikethrough(size_t pos) { return SetBit( attr_map["strikethrough"], pos ); }
-    FormattedText & Subscript(size_t pos) { return SetBit( attr_map["subscript"], pos ); }
-    FormattedText & Superscript(size_t pos) { return SetBit( attr_map["superscript"], pos ); }
-    FormattedText & Underline(size_t pos) { return SetBit( attr_map["underline"], pos ); }
+    FormattedText & Bold(size_t pos) { return SetBit("bold", pos); }
+    FormattedText & Code(size_t pos) { return SetBit("code", pos); }
+    FormattedText & Italic(size_t pos) { return SetBit("italic", pos); }
+    FormattedText & Strike(size_t pos) { return SetBit("strike", pos); }
+    FormattedText & Subscript(size_t pos) { return SetBit("subscript", pos); }
+    FormattedText & Superscript(size_t pos) { return SetBit("superscript", pos); }
+    FormattedText & Underline(size_t pos) { return SetBit("underline", pos); }
 
     // Simple formatting: set a range of characters to a specified format.
-    FormattedText & Bold(size_t start, size_t end) {
-      return SetBits( attr_map["bold"], start, end );
-    }
-    FormattedText & Italic(size_t start, size_t end) {
-      return SetBits( attr_map["italic"], start, end );
-    }
-    FormattedText & Strikethrough(size_t start, size_t end) {
-      return SetBits( attr_map["strikethrough"], start, end );
-    }
-    FormattedText & Subscript(size_t start, size_t end) {
-      return SetBits( attr_map["subscript"], start, end );
-    }
-    FormattedText & Superscript(size_t start, size_t end) {
-      return SetBits( attr_map["superscript"], start, end );
-    }
-    FormattedText & Underline(size_t start, size_t end) {
-      return SetBits( attr_map["underline"], start, end );
-    }
+    FormattedText & Bold(size_t start, size_t end) { return SetBits("bold", start, end ); }
+    FormattedText & Code(size_t start, size_t end) { return SetBits("code", start, end); }
+    FormattedText & Italic(size_t start, size_t end) { return SetBits("italic", start, end); }
+    FormattedText & Strike(size_t start, size_t end) { return SetBits("strike", start, end); }
+    FormattedText & Subscript(size_t start, size_t end) { return SetBits("subscript", start, end); }
+    FormattedText & Superscript(size_t start, size_t end) { return SetBits("superscript", start, end); }
+    FormattedText & Underline(size_t start, size_t end) { return SetBits("underline", start, end); }
 
     // Test if a particular attribute is present.
     bool HasBold() const { return HasAttr("bold"); }
+    bool HasCode() const { return HasAttr("code"); }
     bool HasItalic() const { return HasAttr("italic"); }
-    bool HasStrikethrough() const { return HasAttr("strikethrough"); }
+    bool HasStrike() const { return HasAttr("strike"); }
     bool HasSubscript() const { return HasAttr("subscript"); }
     bool HasSuperscript() const { return HasAttr("superscript"); }
     bool HasUnderline() const { return HasAttr("underline"); }
@@ -120,29 +112,33 @@ namespace emp {
     std::string AsHTML() {
       std::map<size_t, std::string> tag_map; // Where do tags go?
       if (HasBold()) AddOutputTags(tag_map, "bold", "<b>", "</b>");
+      if (HasCode()) AddOutputTags(tag_map, "code", "<b>", "</b>");
       if (HasItalic()) AddOutputTags(tag_map, "italic", "<i>", "</i>");
-      if (HasStrikethrough()) AddOutputTags(tag_map, "strikethrough", "<del>", "</del>");
+      if (HasStrike()) AddOutputTags(tag_map, "strike", "<del>", "</del>");
       if (HasSubscript()) AddOutputTags(tag_map, "subscript", "<sub>", "</sub>");
       if (HasSuperscript()) AddOutputTags(tag_map, "superscript", "<sup>", "</sup>");
       if (HasUnderline()) AddOutputTags(tag_map, "underline", "<u>", "</u>");
     }
-    
+
   private:
     // ----   Helper functions   ----
 
-    FormattedText & SetBits(BitVector & cur_bits) {
+    FormattedText & SetBits(const std::string & attr) {
+      BitVector & cur_bits = attr_map[attr];
       cur_bits.Resize(text.size());
       cur_bits.SetAll();
       return *this;
     }
 
-    FormattedText & SetBit(BitVector & cur_bits, size_t pos) {
+    FormattedText & SetBit(const std::string & attr, size_t pos) {
+      BitVector & cur_bits = attr_map[attr];
       if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
       cur_bits.Set(pos);
       return *this;
     }
 
-    FormattedText & SetBits(BitVector & cur_bits, size_t start, size_t end) {
+    FormattedText & SetBits(const std::string & attr, size_t start, size_t end) {
+      BitVector & cur_bits = attr_map[attr];
       emp_assert(end <= text.size());
       emp_assert(start <= end);
       if (cur_bits.size() <= end) cur_bits.Resize(end+1);
