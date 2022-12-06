@@ -149,12 +149,24 @@ namespace emp {
     std::string AsHTML() {
       std::map<size_t, std::string> tag_map; // Where do tags go?
       if (HasBold()) AddOutputTags(tag_map, "bold", "<b>", "</b>");
-      if (HasCode()) AddOutputTags(tag_map, "code", "<b>", "</b>");
+      if (HasCode()) AddOutputTags(tag_map, "code", "<code>", "</code>");
       if (HasItalic()) AddOutputTags(tag_map, "italic", "<i>", "</i>");
       if (HasStrike()) AddOutputTags(tag_map, "strike", "<del>", "</del>");
       if (HasSubscript()) AddOutputTags(tag_map, "subscript", "<sub>", "</sub>");
       if (HasSuperscript()) AddOutputTags(tag_map, "superscript", "<sup>", "</sup>");
       if (HasUnderline()) AddOutputTags(tag_map, "underline", "<u>", "</u>");
+
+      std::string out_string;
+      size_t copy_pos = 0;
+      for (auto [tag_pos, tags] : tag_map) {
+        if (copy_pos < tag_pos) {
+          out_string += text.substr(copy_pos, tag_pos-copy_pos);
+          copy_pos = tag_pos;
+        }
+        out_string += tags;
+      }
+
+      return out_string;
     }
 
   private:
