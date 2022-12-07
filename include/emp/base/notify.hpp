@@ -251,9 +251,9 @@ namespace notify {
   auto & WarningHandlers() { return GetData().GetHandler(Type::WARNING); }
   auto & ErrorHandlers() { return GetData().GetHandler(Type::ERROR); }
 
-  static void AddExitHandler(exit_fun_t fun) { GetData().exit_funs.push_back(fun); }
-  static void ClearExitHandlers() { GetData().exit_funs.resize(0); }
-  static void ReplaceExitHandlers() { ClearExitHandlers(); }
+  [[maybe_unused]] static void AddExitHandler(exit_fun_t fun) { GetData().exit_funs.push_back(fun); }
+  [[maybe_unused]] static void ClearExitHandlers() { GetData().exit_funs.resize(0); }
+  [[maybe_unused]] static void ReplaceExitHandlers() { ClearExitHandlers(); }
   template <typename... FUN_Ts>
   static void ReplaceExitHandlers(exit_fun_t fun, FUN_Ts... extras) {
     ReplaceExitHandlers(extras...);
@@ -261,7 +261,7 @@ namespace notify {
   }
 
   /// Generic exit handler that calls all of the provided functions.
-  static void Exit(int exit_code) {
+  [[maybe_unused]] static void Exit(int exit_code) {
     NotifyData & data = GetData();
 
     // Run any cleanup functions.
@@ -295,12 +295,12 @@ namespace notify {
     return result;
   }
 
-  static void Pause() {
+  [[maybe_unused]] static void Pause() {
     NotifyData & data = GetData();
     data.is_paused = true;
   }
 
-  static void Unpause() {
+  [[maybe_unused]] static void Unpause() {
     NotifyData & data = GetData();
 
     // Step through the notifications that have accrued.
@@ -352,18 +352,18 @@ namespace notify {
   }
 
   /// Ignore exceptions of a specific type.
-  static HandlerSet & Ignore(id_arg_t id) {
+  [[maybe_unused]] static HandlerSet & Ignore(id_arg_t id) {
     return AddHandler(id, [](id_arg_t, message_arg_t){ return true; });
   }
 
   /// Turn on a particular verbosity category.
-  void SetVerbose(std::string id, bool make_active=true) {
+  [[maybe_unused]] void SetVerbose(std::string id, bool make_active=true) {
     GetData().verbose_map[id] = make_active;
   }
 
   /// Send out a notification of an "verbose" message.
   template <typename... Ts>
-  static bool Verbose(const std::string & id, Ts... args) {
+  [[maybe_unused]] static bool Verbose(const std::string & id, Ts... args) {
     NotifyData & data = GetData();
 
     if (data.verbose_map[id]) {
@@ -374,7 +374,7 @@ namespace notify {
   }
 
   /// Send out a notification of an Exception.
-  static bool Exception(id_arg_t id, message_arg_t message="", except_data_t except_data=0) {
+  [[maybe_unused]] static bool Exception(id_arg_t id, message_arg_t message="", except_data_t except_data=0) {
     NotifyData & data = GetData();
 
     if (data.is_paused) {
@@ -401,38 +401,38 @@ namespace notify {
   }
 
   /// Retrieve a vector of ALL unresolved exceptions.
-  static const emp::vector<ExceptInfo> & GetExceptions() { return GetData().except_queue; }
+  [[maybe_unused]] static const emp::vector<ExceptInfo> & GetExceptions() { return GetData().except_queue; }
 
   /// Retrieve the first unresolved exception with a given id.
-  static ExceptInfo GetException(id_arg_t id) {
+  [[maybe_unused]] static ExceptInfo GetException(id_arg_t id) {
     for (ExceptInfo & x : GetData().except_queue) if (x.id == id) return x;
     return ExceptInfo{};
   }
 
   /// Return a total count of how many unresolved exceptions are left.
-  static size_t CountExceptions() { return GetData().except_queue.size(); }
+  [[maybe_unused]] static size_t CountExceptions() { return GetData().except_queue.size(); }
 
   /// Return a total count of how many unresolved exceptions have a given id.
-  static size_t CountExceptions(id_arg_t id) {
+  [[maybe_unused]] static size_t CountExceptions(id_arg_t id) {
     size_t count = 0;
     for (ExceptInfo & x : GetData().except_queue) if (x.id == id) ++count;
     return count;
   }
 
   /// Identify whether there are ANY unresolved exceptions.
-  static bool HasExceptions() { return CountExceptions(); }
+  [[maybe_unused]] static bool HasExceptions() { return CountExceptions(); }
 
   /// Identify whether there are any unresolved exceptions with a given id.
-  static bool HasException(id_arg_t id) {
+  [[maybe_unused]] static bool HasException(id_arg_t id) {
     for (ExceptInfo & x : GetData().except_queue) if (x.id == id) return true;
     return false;
   }
 
   /// Remove all unresolved exceptions.
-  static void ClearExceptions() { GetData().except_queue.resize(0); }
+  [[maybe_unused]] static void ClearExceptions() { GetData().except_queue.resize(0); }
 
   /// Remove first exception with a given id.
-  static void ClearException(id_arg_t id) {
+  [[maybe_unused]] static void ClearException(id_arg_t id) {
     auto & except_queue = GetData().except_queue;
     for (size_t i = 0; i < except_queue.size(); ++i) {
       if (except_queue[i].id == id) {
