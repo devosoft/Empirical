@@ -238,9 +238,11 @@ namespace emp {
     /// Set all bits to 1.
     BitVector & SetAll();
 
-    /// Set a range of bits to one: [start, stop)
-    BitVector & SetRange(size_t start, size_t stop)
-      { return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop); }
+    /// Set a range of bits to value (default one): [start, stop)
+    BitVector & SetRange(size_t start, size_t stop, bool value=true) {
+      if (value) return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop);
+      return Clear(start, stop);
+    }
 
     /// Set all bits to 0.
     BitVector & Clear();
@@ -721,11 +723,11 @@ namespace emp {
 
     [[nodiscard]] size_t size() const { return num_bits; }
     void resize(std::size_t new_size) { Resize(new_size); }
-    [[nodiscard]] auto & at(size_t pos) { return operator[](pos); }
+    [[nodiscard]] auto at(size_t pos) { return operator[](pos); }
     [[nodiscard]] auto at(size_t pos) const { return operator[](pos); }
-    [[nodiscard]] auto & front() { return at(0); }
+    [[nodiscard]] auto front() { return at(0); }
     [[nodiscard]] auto front() const { return at(0); }
-    [[nodiscard]] auto & back() { return at(GetSize()-1); }
+    [[nodiscard]] auto back() { return at(GetSize()-1); }
     [[nodiscard]] auto back() const { return at(GetSize()-1); }
     [[nodiscard]] bool all() const { return All(); }
     [[nodiscard]] bool any() const { return Any(); }
