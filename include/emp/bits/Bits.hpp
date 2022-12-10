@@ -304,9 +304,11 @@ namespace emp {
     /// @brief Set all bits to 1.
     Bits & SetAll();
 
-    /// @brief Set a range of bits to one: [start, stop)
-    Bits & SetRange(size_t start, size_t stop)
-      { return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop); }
+    /// @brief Set a range of bits to value (default one): [start, stop)
+    Bits & SetRange(size_t start, size_t stop, bool value=true) {
+      if (value) return ApplyRange([](field_t){ return FIELD_ALL; }, start, stop);
+      return Clear(start, stop);
+    }
 
     /// @brief Set all bits to 0.
     Bits & Clear();
