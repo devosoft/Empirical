@@ -18,6 +18,7 @@
  *    bool is_digits(const std::string & test_str)
  *    bool is_number(const std::string & test_str)
  *    bool is_alphanumeric(const std::string & test_str)
+ *    bool is_whitespace(const std::string & test_str)
  *    bool is_valid(const std::string & test_str, FUNS... funs)
  *    bool has_whitespace(const std::string & test_str)
  *    bool has_nonwhitespace(const std::string & test_str)
@@ -293,6 +294,11 @@ namespace emp {
   inline bool is_alphanumeric(const std::string & str) {
     if (str.size() == 0) return false;      // If string is empty, there are NO characters.
     return AlphanumericCharSet().Has(str);  // Otherwise return false if any character is not a digit.
+  }
+
+  inline bool is_whitespace(const std::string & str) {
+    if (str.size() == 0) return true; // Empty string is just whitespace.
+    return WhitespaceCharSet().Has(str);
   }
 
   /// Determine if string is only letters, digits, or underscore ('_').
