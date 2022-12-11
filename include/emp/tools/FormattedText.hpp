@@ -33,6 +33,13 @@ namespace emp {
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
     std::unordered_map<std::string, BitVector> attr_map;
 
+    struct TagInfo{
+      std::string open;
+      std::string close;
+    };    
+    using tag_map_t = std::unordered_map<std::string, TagInfo>;
+    std::unordered_map<std::string, tag_map_t> tag_maps;
+
   public:
     FormattedText() = default;
     FormattedText(const FormattedText &) = default;
@@ -145,6 +152,20 @@ namespace emp {
     // Compatibility with std::string
     size_t size() const { return GetSize(); }
 
+    tag_map_t & GetHTMLMap() {
+      tag_map_t & html_map = tag_maps["html"];
+      if (html_map.size() == 0) {
+      html_map["bold"] = TagInfo{"<b>", "</b>"};
+      html_map["code"] = TagInfo{"<code>", "</code>"};
+      html_map["italic"] = TagInfo{"<i>", "</i>"};
+      html_map["strike"] = TagInfo{"<del>", "</del>"};
+      html_map["subscript"] = TagInfo{"<sub>", "</sub>"};
+      html_map["superscript"] = TagInfo{"<sup>", "</sup>"};
+      html_map["underline"] = TagInfo{"<u>", "</u>"};
+      }
+      return html_map;
+    }
+
     // Convert this to a string in HTML format.
     std::string AsHTML() {
       std::map<size_t, std::string> tag_map; // Where do tags go?
@@ -165,12 +186,15 @@ namespace emp {
         }
         out_string += tags;
       }
+      if (copy_pos < text.size()) {
+        out_string += text.substr(copy_pos, text.size()-copy_pos);
+      }
 
       return out_string;
     }
 
   private:
-    // ----   Helper functions   ----
+    // ------------   Helper functions   ------------
 
     FormattedText & SetBits(const std::string & attr) {
       BitVector & cur_bits = attr_map[attr];
