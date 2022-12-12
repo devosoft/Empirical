@@ -86,68 +86,126 @@ namespace emp {
     }
 
     // Simple formatting: set all characters to a specified format.
-    FormattedText & Bold() { return SetBits("bold"); }
-    FormattedText & Code() { return SetBits("code"); }
-    FormattedText & Italic() { return SetBits("italic"); }
-    FormattedText & Strike() { return SetBits("strike"); }
-    FormattedText & Subscript() { return SetBits("subscript"); }
-    FormattedText & Superscript() { return SetBits("superscript"); }
-    FormattedText & Underline() { return SetBits("underline"); }
+    FormattedText & SetStyle(std::string style) {
+      BitVector & cur_bits = attr_map[style];
+      cur_bits.Resize(text.size());
+      cur_bits.SetAll();
+      return *this;
+    }
+    FormattedText & Bold() { return SetStyle("bold"); }
+    FormattedText & Code() { return SetStyle("code"); }
+    FormattedText & Italic() { return SetStyle("italic"); }
+    FormattedText & Strike() { return SetStyle("strike"); }
+    FormattedText & Subscript() { return SetStyle("subscript"); }
+    FormattedText & Superscript() { return SetStyle("superscript"); }
+    FormattedText & Underline() { return SetStyle("underline"); }
 
     // Simple formatting: set a single character to a specified format.
-    FormattedText & Bold(size_t pos) { return SetBit("bold", pos); }
-    FormattedText & Code(size_t pos) { return SetBit("code", pos); }
-    FormattedText & Italic(size_t pos) { return SetBit("italic", pos); }
-    FormattedText & Strike(size_t pos) { return SetBit("strike", pos); }
-    FormattedText & Subscript(size_t pos) { return SetBit("subscript", pos); }
-    FormattedText & Superscript(size_t pos) { return SetBit("superscript", pos); }
-    FormattedText & Underline(size_t pos) { return SetBit("underline", pos); }
+    FormattedText & SetStyle(std::string style, size_t pos) {
+      BitVector & cur_bits = attr_map[style];
+      if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
+      cur_bits.Set(pos);
+      return *this;
+    }
+    FormattedText & Bold(size_t pos) { return SetStyle("bold", pos); }
+    FormattedText & Code(size_t pos) { return SetStyle("code", pos); }
+    FormattedText & Italic(size_t pos) { return SetStyle("italic", pos); }
+    FormattedText & Strike(size_t pos) { return SetStyle("strike", pos); }
+    FormattedText & Subscript(size_t pos) { return SetStyle("subscript", pos); }
+    FormattedText & Superscript(size_t pos) { return SetStyle("superscript", pos); }
+    FormattedText & Underline(size_t pos) { return SetStyle("underline", pos); }
 
     // Simple formatting: set a range of characters to a specified format.
-    FormattedText & Bold(size_t start, size_t end) { return SetBits("bold", start, end ); }
-    FormattedText & Code(size_t start, size_t end) { return SetBits("code", start, end); }
-    FormattedText & Italic(size_t start, size_t end) { return SetBits("italic", start, end); }
-    FormattedText & Strike(size_t start, size_t end) { return SetBits("strike", start, end); }
-    FormattedText & Subscript(size_t start, size_t end) { return SetBits("subscript", start, end); }
-    FormattedText & Superscript(size_t start, size_t end) { return SetBits("superscript", start, end); }
-    FormattedText & Underline(size_t start, size_t end) { return SetBits("underline", start, end); }
+    FormattedText & SetStyle(std::string style, size_t start, size_t end) {
+      BitVector & cur_bits = attr_map[style];
+      emp_assert(start <= end && end <= text.size());
+      if (cur_bits.size() <= end) cur_bits.Resize(end+1);
+      cur_bits.SetRange(start, end);
+      return *this;
+    }
+    FormattedText & Bold(size_t start, size_t end) { return SetStyle("bold", start, end ); }
+    FormattedText & Code(size_t start, size_t end) { return SetStyle("code", start, end); }
+    FormattedText & Italic(size_t start, size_t end) { return SetStyle("italic", start, end); }
+    FormattedText & Strike(size_t start, size_t end) { return SetStyle("strike", start, end); }
+    FormattedText & Subscript(size_t start, size_t end) { return SetStyle("subscript", start, end); }
+    FormattedText & Superscript(size_t start, size_t end) { return SetStyle("superscript", start, end); }
+    FormattedText & Underline(size_t start, size_t end) { return SetStyle("underline", start, end); }
 
-    // Test if a particular attribute is present.
-    bool HasBold() const { return HasAttr("bold"); }
-    bool HasCode() const { return HasAttr("code"); }
-    bool HasItalic() const { return HasAttr("italic"); }
-    bool HasStrike() const { return HasAttr("strike"); }
-    bool HasSubscript() const { return HasAttr("subscript"); }
-    bool HasSuperscript() const { return HasAttr("superscript"); }
-    bool HasUnderline() const { return HasAttr("underline"); }
+    // Test if a particular style is present anywhere in the text
+    bool HasStyle(const std::string & style) const {
+      if (!emp::Has(attr_map, style)) return false;
+      return GetConstRef(attr_map, style).Any();
+    }
+    bool HasBold() const { return HasStyle("bold"); }
+    bool HasCode() const { return HasStyle("code"); }
+    bool HasItalic() const { return HasStyle("italic"); }
+    bool HasStrike() const { return HasStyle("strike"); }
+    bool HasSubscript() const { return HasStyle("subscript"); }
+    bool HasSuperscript() const { return HasStyle("superscript"); }
+    bool HasUnderline() const { return HasStyle("underline"); }
+
+    // Test if a particular style is present at a given position.
+    bool HasStyle(const std::string & style, size_t pos) const {
+      auto it = attr_map.find(style);
+      if (it == attr_map.end()) return false; // Style is nowhere.
+      return it->second.Has(pos);
+    }
+    bool HasBold(size_t pos) const { return HasStyle("bold", pos); }
+    bool HasCode(size_t pos) const { return HasStyle("code", pos); }
+    bool HasItalic(size_t pos) const { return HasStyle("italic", pos); }
+    bool HasStrike(size_t pos) const { return HasStyle("strike", pos); }
+    bool HasSubscript(size_t pos) const { return HasStyle("subscript", pos); }
+    bool HasSuperscript(size_t pos) const { return HasStyle("superscript", pos); }
+    bool HasUnderline(size_t pos) const { return HasStyle("underline", pos); }
 
     // Clear ALL formatting
     FormattedText & Clear() { attr_map.clear(); return *this; }
-    FormattedText & ClearBold() { attr_map.erase("bold"); return *this; }
-    FormattedText & ClearCode() { attr_map.erase("code"); return *this; }
-    FormattedText & ClearItalic() { attr_map.erase("italic"); return *this; }
-    FormattedText & ClearStrike() { attr_map.erase("strike"); return *this; }
-    FormattedText & ClearSubscript() { attr_map.erase("subscript"); return *this; }
-    FormattedText & ClearSuperscript() { attr_map.erase("superscript"); return *this; }
-    FormattedText & ClearUnderline() { attr_map.erase("underline"); return *this; }
+
+    // Clear specific formatting across all text
+    FormattedText & Clear(const std::string & style) {
+      attr_map.erase(style);
+      return *this;
+    }
+    FormattedText & ClearBold() { return Clear("bold"); }
+    FormattedText & ClearCode() { return Clear("code"); }
+    FormattedText & ClearItalic() { return Clear("italic"); }
+    FormattedText & ClearStrike() { return Clear("strike"); }
+    FormattedText & ClearSubscript() { return Clear("subscript"); }
+    FormattedText & ClearSuperscript() { return Clear("superscript"); }
+    FormattedText & ClearUnderline() { return Clear("underline"); }
     
     // Simple formatting: clear a single character from a specified format.
-    FormattedText & ClearBold(size_t pos) { return SetBit("bold", pos, false); }
-    FormattedText & ClearCode(size_t pos) { return SetBit("code", pos, false); }
-    FormattedText & ClearItalic(size_t pos) { return SetBit("italic", pos, false); }
-    FormattedText & ClearStrike(size_t pos) { return SetBit("strike", pos, false); }
-    FormattedText & ClearSubscript(size_t pos) { return SetBit("subscript", pos, false); }
-    FormattedText & ClearSuperscript(size_t pos) { return SetBit("superscript", pos, false); }
-    FormattedText & ClearUnderline(size_t pos) { return SetBit("underline", pos, false); }
+    FormattedText & Clear(const std::string & style, size_t pos) {
+      auto it = attr_map.find(style);
+      if (it != attr_map.end() && it->second.size() > pos) {  // If style bit exists...
+        it->second.Clear(pos);
+      }
+      return *this;
+    }
+    FormattedText & ClearBold(size_t pos) { return Clear("bold", pos); }
+    FormattedText & ClearCode(size_t pos) { return Clear("code", pos); }
+    FormattedText & ClearItalic(size_t pos) { return Clear("italic", pos); }
+    FormattedText & ClearStrike(size_t pos) { return Clear("strike", pos); }
+    FormattedText & ClearSubscript(size_t pos) { return Clear("subscript", pos); }
+    FormattedText & ClearSuperscript(size_t pos) { return Clear("superscript", pos); }
+    FormattedText & ClearUnderline(size_t pos) { return Clear("underline", pos); }
 
     // Simple formatting: clear a range of characters from a specified format.
-    FormattedText & ClearBold(size_t start, size_t end) { return SetBits("bold", start, end, false); }
-    FormattedText & ClearCode(size_t start, size_t end) { return SetBits("code", start, end, false); }
-    FormattedText & ClearItalic(size_t start, size_t end) { return SetBits("italic", start, end, false); }
-    FormattedText & ClearStrike(size_t start, size_t end) { return SetBits("strike", start, end, false); }
-    FormattedText & ClearSubscript(size_t start, size_t end) { return SetBits("subscript", start, end, false); }
-    FormattedText & ClearSuperscript(size_t start, size_t end) { return SetBits("superscript", start, end, false); }
-    FormattedText & ClearUnderline(size_t start, size_t end) { return SetBits("underline", start, end, false); }
+    FormattedText & Clear(const std::string & style, size_t start, size_t end) {
+      auto it = attr_map.find(style);
+      if (it != attr_map.end() && it->second.size() > start) {  // If style bits exist...
+        if (end > it->second.size()) end = it->second.size();   // ...don't pass text end
+        it->second.Clear(start, end);
+      }
+      return *this;
+    }
+    FormattedText & ClearBold(size_t start, size_t end) { return Clear("bold", start, end); }
+    FormattedText & ClearCode(size_t start, size_t end) { return Clear("code", start, end); }
+    FormattedText & ClearItalic(size_t start, size_t end) { return Clear("italic", start, end); }
+    FormattedText & ClearStrike(size_t start, size_t end) { return Clear("strike", start, end); }
+    FormattedText & ClearSubscript(size_t start, size_t end) { return Clear("subscript", start, end); }
+    FormattedText & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
+    FormattedText & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
     // Compatibility with std::string
     size_t size() const { return GetSize(); }
@@ -196,34 +254,8 @@ namespace emp {
   private:
     // ------------   Helper functions   ------------
 
-    FormattedText & SetBits(const std::string & attr) {
-      BitVector & cur_bits = attr_map[attr];
-      cur_bits.Resize(text.size());
-      cur_bits.SetAll();
-      return *this;
-    }
-
-    FormattedText & SetBit(const std::string & attr, size_t pos, bool value=true) {
-      BitVector & cur_bits = attr_map[attr];
-      if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
-      cur_bits.Set(pos, value);
-      return *this;
-    }
-
-    FormattedText & SetBits(const std::string & attr, size_t start, size_t end, bool value=true) {
-      BitVector & cur_bits = attr_map[attr];
-      emp_assert(end <= text.size());
-      emp_assert(start <= end);
-      if (cur_bits.size() <= end) cur_bits.Resize(end+1);
-      cur_bits.SetRange(start, end, value);
-      return *this;
-    }
-
-    bool HasAttr(const std::string & attr) const {
-      if (!emp::Has(attr_map, attr)) return false;
-      return GetConstRef(attr_map, attr).Any();
-    }
-
+    // A helper to add start and end tag info to tag map for insertion into
+    // the output string as it's created.
     void AddOutputTags(
       std::map<size_t, std::string> & tag_map,
       std::string attr,
