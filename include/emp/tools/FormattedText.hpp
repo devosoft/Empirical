@@ -66,7 +66,10 @@ namespace emp {
     size_t GetSize() const { return text.size(); }
 
     // Return the current text as an unformatted string.
-    const std::string & GetString() { return text; }
+    const std::string & GetString() const { return text; }
+
+    /// Automatic conversion back to a (unformatted) string
+    operator const std::string &() const { return GetString(); }
 
     void Resize(size_t new_size) {
       text.resize(new_size);
@@ -84,6 +87,12 @@ namespace emp {
       emp_assert(pos < GetSize(), pos, GetSize());
       return text[pos];
     }
+
+    // STL-like functions for perfect compatability with string.
+    size_t size() const { return text.size(); }
+    void resize(size_t new_size) { Resize(new_size); }
+
+    // ---------------- FORMATTING functions ----------------
 
     // Simple formatting: set all characters to a specified format.
     FormattedText & SetStyle(std::string style) {
