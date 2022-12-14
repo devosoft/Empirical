@@ -92,6 +92,33 @@ namespace emp {
     size_t size() const { return text.size(); }
     void resize(size_t new_size) { Resize(new_size); }
 
+    template <typename... Ts>
+    FormattedText & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); }
+    char & front() { return text[0]; }
+    char front() const { return text[0]; }
+    char & back() { return text[size()-1]; }
+    char back() const { return text[size()-1]; }
+    bool empty() const { return text.empty(); }
+    // void push_back(char c) { text.push_back(c); }
+    // void pop_back() { text.pop_back(); }
+    template <typename... Ts>
+    bool starts_with(Ts &&... in) const { text.starts_with(std::forward<Ts>(in)... ); }
+    template <typename... Ts>
+    bool ends_with(Ts &&... in) const { text.ends_with(std::forward<Ts>(in)... ); }
+
+    template <typename... Ts>
+    size_t find(Ts &&.. in) const { return text.find(std::forward<Ts>(in)...); }
+    template <typename... Ts>
+    size_t rfind(Ts &&.. in) const { return text.rfind(std::forward<Ts>(in)...); }
+    template <typename... Ts>
+    size_t find_first_of(Ts &&.. in) const { return text.find_first_of(std::forward<Ts>(in)...); }
+    template <typename... Ts>
+    size_t find_first_not_of(Ts &&.. in) const { return text.find_first_not_of(std::forward<Ts>(in)...); }
+    template <typename... Ts>
+    size_t find_last_of(Ts &&.. in) const { return text.find_last_of(std::forward<Ts>(in)...); }
+    template <typename... Ts>
+    size_t find_last_not_of(Ts &&.. in) const { return text.find_last_not_of(std::forward<Ts>(in)...); }
+
     // ---------------- FORMATTING functions ----------------
 
     // Simple formatting: set all characters to a specified format.
