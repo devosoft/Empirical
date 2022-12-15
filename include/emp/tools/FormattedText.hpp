@@ -3,17 +3,17 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2022.
  *
- *  @file FormattedText.hpp
+ *  @file Text.hpp
  *  @brief Functionality similar to std::string, but tracks text formatting for easy conversion.
  *  @note Status: ALPHA
  * 
- *  FormattedText should be functionally interchangable with string, but can easily convert to
+ *  Text should be functionally interchangable with string, but can easily convert to
  *  HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
  *  etc.
  */
 
-#ifndef EMP_TOOLS_FORMATTED_TEXT_HPP_INCLUDE
-#define EMP_TOOLS_FORMATTED_TEXT_HPP_INCLUDE
+#ifndef EMP_TOOLS_TEXT_HPP_INCLUDE
+#define EMP_TOOLS_TEXT_HPP_INCLUDE
 
 #include <map>
 #include <string>
@@ -25,7 +25,7 @@
 
 namespace emp {
 
-  class FormattedText {
+  class Text {
   private:
     std::string text = "";
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
@@ -41,22 +41,22 @@ namespace emp {
     std::unordered_map<std::string, tag_map_t> tag_maps;
 
   public:
-    FormattedText() = default;
-    FormattedText(const FormattedText &) = default;
-    FormattedText(FormattedText &&) = default;
-    FormattedText(const std::string & in) : text(in) { };
-    FormattedText(std::string && in) : text(std::move(in)) { };
-    ~FormattedText() = default;
+    Text() = default;
+    Text(const Text &) = default;
+    Text(Text &&) = default;
+    Text(const std::string & in) : text(in) { };
+    Text(std::string && in) : text(std::move(in)) { };
+    ~Text() = default;
 
-    FormattedText & operator=(const FormattedText &) = default;
-    FormattedText & operator=(FormattedText &&) = default;
+    Text & operator=(const Text &) = default;
+    Text & operator=(Text &&) = default;
 
-    FormattedText & operator=(const std::string & in) {
+    Text & operator=(const std::string & in) {
       attr_map.clear(); // Clear out existing content.
       text=in;
       return *this;
     };
-    FormattedText & operator=(std::string && in) {
+    Text & operator=(std::string && in) {
       attr_map.clear(); // Clear out existing content.
       text = std::move(in);
       return *this;
@@ -68,7 +68,7 @@ namespace emp {
     // Return the current text as an unformatted string.
     const std::string & GetString() const { return text; }
 
-    /// Automatic conversion back to a (unformatted) string
+    /// Automatic conversion back to an unformatted string
     operator const std::string &() const { return GetString(); }
 
     void Resize(size_t new_size) {
@@ -93,7 +93,7 @@ namespace emp {
     void resize(size_t new_size) { Resize(new_size); }
 
     template <typename... Ts>
-    FormattedText & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); }
+    Text & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); }
     char & front() { return text[0]; }
     char front() const { return text[0]; }
     char & back() { return text[size()-1]; }
@@ -122,50 +122,50 @@ namespace emp {
     // ---------------- FORMATTING functions ----------------
 
     // Simple formatting: set all characters to a specified format.
-    FormattedText & SetStyle(std::string style) {
+    Text & SetStyle(std::string style) {
       BitVector & cur_bits = attr_map[style];
       cur_bits.Resize(text.size());
       cur_bits.SetAll();
       return *this;
     }
-    FormattedText & Bold() { return SetStyle("bold"); }
-    FormattedText & Code() { return SetStyle("code"); }
-    FormattedText & Italic() { return SetStyle("italic"); }
-    FormattedText & Strike() { return SetStyle("strike"); }
-    FormattedText & Subscript() { return SetStyle("subscript"); }
-    FormattedText & Superscript() { return SetStyle("superscript"); }
-    FormattedText & Underline() { return SetStyle("underline"); }
+    Text & Bold() { return SetStyle("bold"); }
+    Text & Code() { return SetStyle("code"); }
+    Text & Italic() { return SetStyle("italic"); }
+    Text & Strike() { return SetStyle("strike"); }
+    Text & Subscript() { return SetStyle("subscript"); }
+    Text & Superscript() { return SetStyle("superscript"); }
+    Text & Underline() { return SetStyle("underline"); }
 
     // Simple formatting: set a single character to a specified format.
-    FormattedText & SetStyle(std::string style, size_t pos) {
+    Text & SetStyle(std::string style, size_t pos) {
       BitVector & cur_bits = attr_map[style];
       if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
       cur_bits.Set(pos);
       return *this;
     }
-    FormattedText & Bold(size_t pos) { return SetStyle("bold", pos); }
-    FormattedText & Code(size_t pos) { return SetStyle("code", pos); }
-    FormattedText & Italic(size_t pos) { return SetStyle("italic", pos); }
-    FormattedText & Strike(size_t pos) { return SetStyle("strike", pos); }
-    FormattedText & Subscript(size_t pos) { return SetStyle("subscript", pos); }
-    FormattedText & Superscript(size_t pos) { return SetStyle("superscript", pos); }
-    FormattedText & Underline(size_t pos) { return SetStyle("underline", pos); }
+    Text & Bold(size_t pos) { return SetStyle("bold", pos); }
+    Text & Code(size_t pos) { return SetStyle("code", pos); }
+    Text & Italic(size_t pos) { return SetStyle("italic", pos); }
+    Text & Strike(size_t pos) { return SetStyle("strike", pos); }
+    Text & Subscript(size_t pos) { return SetStyle("subscript", pos); }
+    Text & Superscript(size_t pos) { return SetStyle("superscript", pos); }
+    Text & Underline(size_t pos) { return SetStyle("underline", pos); }
 
     // Simple formatting: set a range of characters to a specified format.
-    FormattedText & SetStyle(std::string style, size_t start, size_t end) {
+    Text & SetStyle(std::string style, size_t start, size_t end) {
       BitVector & cur_bits = attr_map[style];
       emp_assert(start <= end && end <= text.size());
       if (cur_bits.size() <= end) cur_bits.Resize(end+1);
       cur_bits.SetRange(start, end);
       return *this;
     }
-    FormattedText & Bold(size_t start, size_t end) { return SetStyle("bold", start, end ); }
-    FormattedText & Code(size_t start, size_t end) { return SetStyle("code", start, end); }
-    FormattedText & Italic(size_t start, size_t end) { return SetStyle("italic", start, end); }
-    FormattedText & Strike(size_t start, size_t end) { return SetStyle("strike", start, end); }
-    FormattedText & Subscript(size_t start, size_t end) { return SetStyle("subscript", start, end); }
-    FormattedText & Superscript(size_t start, size_t end) { return SetStyle("superscript", start, end); }
-    FormattedText & Underline(size_t start, size_t end) { return SetStyle("underline", start, end); }
+    Text & Bold(size_t start, size_t end) { return SetStyle("bold", start, end ); }
+    Text & Code(size_t start, size_t end) { return SetStyle("code", start, end); }
+    Text & Italic(size_t start, size_t end) { return SetStyle("italic", start, end); }
+    Text & Strike(size_t start, size_t end) { return SetStyle("strike", start, end); }
+    Text & Subscript(size_t start, size_t end) { return SetStyle("subscript", start, end); }
+    Text & Superscript(size_t start, size_t end) { return SetStyle("superscript", start, end); }
+    Text & Underline(size_t start, size_t end) { return SetStyle("underline", start, end); }
 
     // Test if a particular style is present anywhere in the text
     bool HasStyle(const std::string & style) const {
@@ -195,39 +195,39 @@ namespace emp {
     bool HasUnderline(size_t pos) const { return HasStyle("underline", pos); }
 
     // Clear ALL formatting
-    FormattedText & Clear() { attr_map.clear(); return *this; }
+    Text & Clear() { attr_map.clear(); return *this; }
 
     // Clear specific formatting across all text
-    FormattedText & Clear(const std::string & style) {
+    Text & Clear(const std::string & style) {
       attr_map.erase(style);
       return *this;
     }
-    FormattedText & ClearBold() { return Clear("bold"); }
-    FormattedText & ClearCode() { return Clear("code"); }
-    FormattedText & ClearItalic() { return Clear("italic"); }
-    FormattedText & ClearStrike() { return Clear("strike"); }
-    FormattedText & ClearSubscript() { return Clear("subscript"); }
-    FormattedText & ClearSuperscript() { return Clear("superscript"); }
-    FormattedText & ClearUnderline() { return Clear("underline"); }
+    Text & ClearBold() { return Clear("bold"); }
+    Text & ClearCode() { return Clear("code"); }
+    Text & ClearItalic() { return Clear("italic"); }
+    Text & ClearStrike() { return Clear("strike"); }
+    Text & ClearSubscript() { return Clear("subscript"); }
+    Text & ClearSuperscript() { return Clear("superscript"); }
+    Text & ClearUnderline() { return Clear("underline"); }
     
     // Simple formatting: clear a single character from a specified format.
-    FormattedText & Clear(const std::string & style, size_t pos) {
+    Text & Clear(const std::string & style, size_t pos) {
       auto it = attr_map.find(style);
       if (it != attr_map.end() && it->second.size() > pos) {  // If style bit exists...
         it->second.Clear(pos);
       }
       return *this;
     }
-    FormattedText & ClearBold(size_t pos) { return Clear("bold", pos); }
-    FormattedText & ClearCode(size_t pos) { return Clear("code", pos); }
-    FormattedText & ClearItalic(size_t pos) { return Clear("italic", pos); }
-    FormattedText & ClearStrike(size_t pos) { return Clear("strike", pos); }
-    FormattedText & ClearSubscript(size_t pos) { return Clear("subscript", pos); }
-    FormattedText & ClearSuperscript(size_t pos) { return Clear("superscript", pos); }
-    FormattedText & ClearUnderline(size_t pos) { return Clear("underline", pos); }
+    Text & ClearBold(size_t pos) { return Clear("bold", pos); }
+    Text & ClearCode(size_t pos) { return Clear("code", pos); }
+    Text & ClearItalic(size_t pos) { return Clear("italic", pos); }
+    Text & ClearStrike(size_t pos) { return Clear("strike", pos); }
+    Text & ClearSubscript(size_t pos) { return Clear("subscript", pos); }
+    Text & ClearSuperscript(size_t pos) { return Clear("superscript", pos); }
+    Text & ClearUnderline(size_t pos) { return Clear("underline", pos); }
 
     // Simple formatting: clear a range of characters from a specified format.
-    FormattedText & Clear(const std::string & style, size_t start, size_t end) {
+    Text & Clear(const std::string & style, size_t start, size_t end) {
       auto it = attr_map.find(style);
       if (it != attr_map.end() && it->second.size() > start) {  // If style bits exist...
         if (end > it->second.size()) end = it->second.size();   // ...don't pass text end
@@ -235,13 +235,13 @@ namespace emp {
       }
       return *this;
     }
-    FormattedText & ClearBold(size_t start, size_t end) { return Clear("bold", start, end); }
-    FormattedText & ClearCode(size_t start, size_t end) { return Clear("code", start, end); }
-    FormattedText & ClearItalic(size_t start, size_t end) { return Clear("italic", start, end); }
-    FormattedText & ClearStrike(size_t start, size_t end) { return Clear("strike", start, end); }
-    FormattedText & ClearSubscript(size_t start, size_t end) { return Clear("subscript", start, end); }
-    FormattedText & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
-    FormattedText & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
+    Text & ClearBold(size_t start, size_t end) { return Clear("bold", start, end); }
+    Text & ClearCode(size_t start, size_t end) { return Clear("code", start, end); }
+    Text & ClearItalic(size_t start, size_t end) { return Clear("italic", start, end); }
+    Text & ClearStrike(size_t start, size_t end) { return Clear("strike", start, end); }
+    Text & ClearSubscript(size_t start, size_t end) { return Clear("subscript", start, end); }
+    Text & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
+    Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
     // Compatibility with std::string
     size_t size() const { return GetSize(); }
