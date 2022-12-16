@@ -25,6 +25,29 @@
 
 namespace emp {
 
+  class Text;
+
+  // An individual proxy character from Text that is format aware.
+  class TextCharRef {
+  private:
+    emp::Ptr<Text> text_ptr;
+    size_t pos;
+  public:
+    TextCharRef(emp::Ptr<Text> _ptr, size_t _pos) : text_ptr(_ptr), pos(_pos) { }
+    TextCharRef(const TextCharRef & in) = default;
+    ~TextCharRef() = default;
+
+    // Set this character equal (with same inputs) as in parameter; don't change reference.
+    TextCharRef & operator=(const TextCharRef & in);
+
+    // Set just this character; don't change style.
+    TextCharRef & operator=(char in);
+
+    // Convert to a normal C++ char.
+    operator char();
+
+  };
+
   class Text {
   private:
     std::string text = "";
