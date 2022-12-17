@@ -30,10 +30,10 @@ namespace emp {
   // An individual proxy character from Text that is format aware.
   class TextCharRef {
   private:
-    emp::Ptr<Text> text_ptr;
+    Text & text_ref;
     size_t pos;
   public:
-    TextCharRef(emp::Ptr<Text> _ptr, size_t _pos) : text_ptr(_ptr), pos(_pos) { }
+    TextCharRef(emp::Ptr<Text> _ptr, size_t _pos) : text_ref(_ptr), pos(_pos) { }
     TextCharRef(const TextCharRef & in) = default;
     ~TextCharRef() = default;
 
@@ -44,8 +44,33 @@ namespace emp {
     TextCharRef & operator=(char in);
 
     // Convert to a normal C++ char.
-    operator char();
+    operator char() const;
 
+    auto operator<=>(const TextCharRef & in) const;
+    auto operator<=>(char in) const;
+
+    Text & GetText() { return text_ref; }
+    const Text & GetText() const { return text_ref; }
+    size_t GetPos() const { return pos; }
+    emp::vector<std::string> GetStyle() const;
+
+    bool IsStyle(const std::string & style) const;
+    bool IsBold()        { return IsStyle("bold"); }
+    bool IsCode()        { return IsStyle("code"); }
+    bool IsItalic()      { return IsStyle("italic"); }
+    bool IsStrike()      { return IsStyle("strike"); }
+    bool IsSubscript()   { return IsStyle("subscript"); }
+    bool IsSuperscript() { return IsStyle("superscript"); }
+    bool IsUnderline()   { return IsStyle("underline"); }
+
+    TextCharRef & SetStyle(const std::string & style);
+    TextCharRef & Bold()        { return SetStyle("bold"); }
+    TextCharRef & Code()        { return SetStyle("code"); }
+    TextCharRef & Italic()      { return SetStyle("italic"); }
+    TextCharRef & Strike()      { return SetStyle("strike"); }
+    TextCharRef & Subscript()   { return SetStyle("subscript"); }
+    TextCharRef & Superscript() { return SetStyle("superscript"); }
+    TextCharRef & Underline()   { return SetStyle("underline"); }
   };
 
   class Text {
