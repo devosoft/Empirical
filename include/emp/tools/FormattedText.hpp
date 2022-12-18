@@ -54,14 +54,14 @@ namespace emp {
     size_t GetPos() const { return pos; }
     emp::vector<std::string> GetStyle() const;
 
-    bool IsStyle(const std::string & style) const;
-    bool IsBold()        { return IsStyle("bold"); }
-    bool IsCode()        { return IsStyle("code"); }
-    bool IsItalic()      { return IsStyle("italic"); }
-    bool IsStrike()      { return IsStyle("strike"); }
-    bool IsSubscript()   { return IsStyle("subscript"); }
-    bool IsSuperscript() { return IsStyle("superscript"); }
-    bool IsUnderline()   { return IsStyle("underline"); }
+    bool HasStyle(const std::string & style) const;
+    bool IsBold()        { return HasStyle("bold"); }
+    bool IsCode()        { return HasStyle("code"); }
+    bool IsItalic()      { return HasStyle("italic"); }
+    bool IsStrike()      { return HasStyle("strike"); }
+    bool IsSubscript()   { return HasStyle("subscript"); }
+    bool IsSuperscript() { return HasStyle("superscript"); }
+    bool IsUnderline()   { return HasStyle("underline"); }
 
     TextCharRef & SetStyle(const std::string & style);
     TextCharRef & Bold()        { return SetStyle("bold"); }
@@ -359,6 +359,37 @@ namespace emp {
     }
   };
 
+  // Set this character equal (with same inputs) as in parameter; don't change reference.
+  TextCharRef & TextCharRef::operator=(const TextCharRef & in) {
+    text_ref.Set(text_ref.pos, in);
+  }
+
+  // Set just this character; don't change style.
+  TextCharRef & TextCharRef::operator=(char in) {
+    text_ref.SetChar(text_ref.pos, in);
+  }
+
+  // Convert to a normal C++ char.
+  TextCharRef::operator char() const {
+    return text_ref.GetChar(text_ref.pos);
+  }
+
+  auto TextCharRef::operator<=>(const TextCharRef & in) const {
+    return text_ref.GetChar(text_ref.pos) <=> in.text_ref.GetChar(in.text_ref.pos);
+  }
+  auto TextCharRef::operator<=>(char in) const {
+    return text_ref.GetChar(text_ref.pos) <=> in;
+  }
+
+  emp::vector<std::string> TextCharRef::GetStyle() const {
+    return text_ref.GetStyle(text_ref.pos);
+  }
+
+  bool TextCharRef::HasStyle(const std::string & style) const {
+    return text_ref.HasStyle(style, text_ref.pos);
+  }
+
+  TextCharRef & TextCharRef::SetStyle(const std::string & style);
 }
 
 
