@@ -442,15 +442,16 @@ namespace emp {
     {
       if (internal::ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
+      void* base = dynamic_cast<void*>(ptr);
 
       // If this pointer is already active, link to it.
-      if (Tracker().IsActive(ptr)) {
-        id = Tracker().GetCurID(ptr);
+      if (Tracker().IsActive(base)) {
+        id = Tracker().GetCurID(base);
         Tracker().IncID(id);
       }
       // If we are not already tracking this pointer, but should be, add it.
       else if (track) {
-        id = Tracker().New(ptr);
+        id = Tracker().New(base);
         DebugInfo().AddPtr();
       }
     }
@@ -464,16 +465,17 @@ namespace emp {
                                << ". size=" << array_size << "(" << array_bytes
                                << " bytes); track=" << track << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_ptr)) );
+      void* base = dynamic_cast<void*>(ptr);
 
       // If this pointer is already active, link to it.
-      if (Tracker().IsActive(ptr)) {
-        id = Tracker().GetCurID(ptr);
+      if (Tracker().IsActive(base)) {
+        id = Tracker().GetCurID(base);
         Tracker().IncID(id);
         emp_assert(Tracker().GetArrayBytes(id) == array_bytes); // Make sure pointer is consistent.
       }
       // If we are not already tracking this pointer, but should be, add it.
       else if (track) {
-        id = Tracker().NewArray(ptr, array_bytes);
+        id = Tracker().NewArray(base, array_bytes);
         DebugInfo().AddPtr();
       }
     }
@@ -593,7 +595,7 @@ namespace emp {
       emp_assert(ptr, "Trying to delete null Ptr.");
       emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
-      emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
+      emp_assert(Tracker().IsActive(dynamic_cast<void*>(ptr)), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
       Tracker().MarkDeleted(id);
@@ -605,7 +607,7 @@ namespace emp {
       emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
       emp_assert(ptr, "Trying to delete null Ptr.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
-      emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
+      emp_assert(Tracker().IsActive(dynamic_cast<void*>(ptr)), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
       delete [] ptr;
       Tracker().MarkDeleted(id);
@@ -770,10 +772,10 @@ namespace emp {
 
     bool OK() const {
       // Untracked ID's should not have pointers in the Tracker.
-      if (id == UNTRACKED_ID) return !Tracker().HasPtr(ptr);
+      if (id == UNTRACKED_ID) return !Tracker().HasPtr(dynamic_cast<void*>(ptr));
 
       // Make sure this pointer is linked to the correct info.
-      if (Tracker().GetInfo(id).GetPtr() != ptr) return false;
+      if (Tracker().GetInfo(id).GetPtr() != dynamic_cast<void*>(ptr)) return false;
 
       // And make sure that info itself is okay.
       return Tracker().GetInfo(id).OK();
