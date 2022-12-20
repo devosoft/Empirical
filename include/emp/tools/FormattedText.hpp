@@ -33,7 +33,7 @@ namespace emp {
     Text & text_ref;
     size_t pos;
   public:
-    TextCharRef(emp::Ptr<Text> _ptr, size_t _pos) : text_ref(_ptr), pos(_pos) { }
+    TextCharRef(Text & _ref, size_t _pos) : text_ref(_ref), pos(_pos) { }
     TextCharRef(const TextCharRef & in) = default;
     ~TextCharRef() = default;
 
@@ -155,17 +155,17 @@ namespace emp {
     bool ends_with(Ts &&... in) const { text.ends_with(std::forward<Ts>(in)... ); }
 
     template <typename... Ts>
-    size_t find(Ts &&.. in) const { return text.find(std::forward<Ts>(in)...); }
+    size_t find(Ts &&... in) const { return text.find(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t rfind(Ts &&.. in) const { return text.rfind(std::forward<Ts>(in)...); }
+    size_t rfind(Ts &&... in) const { return text.rfind(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_first_of(Ts &&.. in) const { return text.find_first_of(std::forward<Ts>(in)...); }
+    size_t find_first_of(Ts &&... in) const { return text.find_first_of(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_first_not_of(Ts &&.. in) const { return text.find_first_not_of(std::forward<Ts>(in)...); }
+    size_t find_first_not_of(Ts &&... in) const { return text.find_first_not_of(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_last_of(Ts &&.. in) const { return text.find_last_of(std::forward<Ts>(in)...); }
+    size_t find_last_of(Ts &&... in) const { return text.find_last_of(std::forward<Ts>(in)...); }
     template <typename... Ts>
-    size_t find_last_not_of(Ts &&.. in) const { return text.find_last_not_of(std::forward<Ts>(in)...); }
+    size_t find_last_not_of(Ts &&... in) const { return text.find_last_not_of(std::forward<Ts>(in)...); }
 
     // ---------------- FORMATTING functions ----------------
 
@@ -291,9 +291,6 @@ namespace emp {
     Text & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
     Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
-    // Compatibility with std::string
-    size_t size() const { return GetSize(); }
-
     tag_map_t & GetHTMLMap() {
       tag_map_t & html_map = tag_maps["html"];
       if (html_map.size() == 0) {
@@ -389,7 +386,10 @@ namespace emp {
     return text_ref.HasStyle(style, text_ref.pos);
   }
 
-  TextCharRef & TextCharRef::SetStyle(const std::string & style);
+  TextCharRef & TextCharRef::SetStyle(const std::string & style) {
+    text_ref.HasStyle(style, text_ref.pos);
+    return *this;
+  }
 }
 
 
