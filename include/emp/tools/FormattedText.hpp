@@ -29,10 +29,10 @@ namespace emp {
   class Text;
 
   // An individual proxy character from Text that is format aware.
-  template <bool IS_CONST>
+  template <bool IS_CONST=false>
   class TextCharRef {
   private:
-    using text_t = std::conditional<IS_CONST, const Text, Text>::type;
+    using text_t = typename std::conditional<IS_CONST, const Text, Text>::type;
     text_t & text_ref;
     size_t pos;
   public:
@@ -130,14 +130,14 @@ namespace emp {
       }
     }
 
-    TextCharRef operator[](size_t pos) {
+    TextCharRef<false> operator[](size_t pos) {
       emp_assert(pos < GetSize(), pos, GetSize());
-      return TextCharRef(text, pos);
+      return TextCharRef<false>(*this, pos);
     }
 
     TextCharRef<true> operator[](size_t pos) const {
       emp_assert(pos < GetSize(), pos, GetSize());
-      return TextCharRef<true>(text, pos);
+      return TextCharRef<true>(*this, pos);
     }
 
     // STL-like functions for perfect compatability with string.
@@ -401,7 +401,7 @@ namespace emp {
   }
 
   template <bool IS_CONST>
-  TextCharRef & TextCharRef<IS_CONST>::SetStyle(const std::string & style) {
+  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::SetStyle(const std::string & style) {
     text_ref.HasStyle(style, text_ref.pos);
     return *this;
   }
