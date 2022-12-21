@@ -17,6 +17,7 @@
 
 #include <map>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 #include "../base/assert.hpp"
@@ -28,17 +29,21 @@ namespace emp {
   class Text;
 
   // An individual proxy character from Text that is format aware.
+  template <bool IS_CONST>
   class TextCharRef {
   private:
-    Text & text_ref;
+    using text_t = std::conditional<IS_CONST, const Text, Text>::type;
+    text_t & text_ref;
     size_t pos;
   public:
-    TextCharRef(Text & _ref, size_t _pos) : text_ref(_ref), pos(_pos) { }
-    TextCharRef(const TextCharRef & in) = default;
+    TextCharRef(text_t & _ref, size_t _pos) : text_ref(_ref), pos(_pos) { }
+    TextCharRef(const TextCharRef<false> & in) : text_ref(in.text_ref), pos(in.pos) { }
+    TextCharRef(const TextCharRef<true> & in) : text_ref(in.text_ref), pos(in.pos) { }
     ~TextCharRef() = default;
 
     // Set this character equal (with same inputs) as in parameter; don't change reference.
-    TextCharRef & operator=(const TextCharRef & in);
+    template <bool IS_CONST2>
+    TextCharRef & operator=(const TextCharRef<IS_CONST2> & in);
 
     // Set just this character; don't change style.
     TextCharRef & operator=(char in);
@@ -49,8 +54,7 @@ namespace emp {
     auto operator<=>(const TextCharRef & in) const;
     auto operator<=>(char in) const;
 
-    Text & GetText() { return text_ref; }
-    const Text & GetText() const { return text_ref; }
+    text_t & GetText() const { return text_ref; }
     size_t GetPos() const { return pos; }
     emp::vector<std::string> GetStyle() const;
 
@@ -126,14 +130,14 @@ namespace emp {
       }
     }
 
-    char & operator[](size_t pos) {
+    TextCharRef operator[](size_t pos) {
       emp_assert(pos < GetSize(), pos, GetSize());
-      return text[pos];
+      return TextCharRef(text, pos);
     }
 
-    char operator[](size_t pos) const {
+    TextCharRef<true> operator[](size_t pos) const {
       emp_assert(pos < GetSize(), pos, GetSize());
-      return text[pos];
+      return TextCharRef<true>(text, pos);
     }
 
     // STL-like functions for perfect compatability with string.
@@ -357,36 +361,47 @@ namespace emp {
   };
 
   // Set this character equal (with same inputs) as in parameter; don't change reference.
-  TextCharRef & TextCharRef::operator=(const TextCharRef & in) {
+  template <bool IS_CONST>
+  template <bool IS_CONST2>
+  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<IS_CONST2> & in) {
     text_ref.Set(text_ref.pos, in);
+    return *this;
   }
 
   // Set just this character; don't change style.
-  TextCharRef & TextCharRef::operator=(char in) {
+  template <bool IS_CONST>
+  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(char in) {
     text_ref.SetChar(text_ref.pos, in);
+    return *this;
   }
 
   // Convert to a normal C++ char.
-  TextCharRef::operator char() const {
+  template <bool IS_CONST>
+  TextCharRef<IS_CONST>::operator char() const {
     return text_ref.GetChar(text_ref.pos);
   }
 
-  auto TextCharRef::operator<=>(const TextCharRef & in) const {
+  template <bool IS_CONST>
+  auto TextCharRef<IS_CONST>::operator<=>(const TextCharRef & in) const {
     return text_ref.GetChar(text_ref.pos) <=> in.text_ref.GetChar(in.text_ref.pos);
   }
-  auto TextCharRef::operator<=>(char in) const {
+  template <bool IS_CONST>
+  auto TextCharRef<IS_CONST>::operator<=>(char in) const {
     return text_ref.GetChar(text_ref.pos) <=> in;
   }
 
-  emp::vector<std::string> TextCharRef::GetStyle() const {
+  template <bool IS_CONST>
+  emp::vector<std::string> TextCharRef<IS_CONST>::GetStyle() const {
     return text_ref.GetStyle(text_ref.pos);
   }
 
-  bool TextCharRef::HasStyle(const std::string & style) const {
+  template <bool IS_CONST>
+  bool TextCharRef<IS_CONST>::HasStyle(const std::string & style) const {
     return text_ref.HasStyle(style, text_ref.pos);
   }
 
-  TextCharRef & TextCharRef::SetStyle(const std::string & style) {
+  template <bool IS_CONST>
+  TextCharRef & TextCharRef<IS_CONST>::SetStyle(const std::string & style) {
     text_ref.HasStyle(style, text_ref.pos);
     return *this;
   }
