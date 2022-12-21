@@ -49,7 +49,8 @@ namespace emp {
     TextCharRef & operator=(char in);
 
     // Convert to a normal C++ char.
-    operator char() const;
+    char AsChar() const;
+    operator char() const { return AsChar(); }
 
     auto operator<=>(const TextCharRef & in) const;
     auto operator<=>(char in) const;
@@ -129,6 +130,24 @@ namespace emp {
         if (bits.GetSize() > new_size) bits.Resize(new_size);
       }
     }
+
+    // Direct Get accessors
+    char GetChar(size_t pos) const {
+      emp_assert(pos < text.size());
+      return text[pos];
+    }
+
+    // Direct Set accessors
+    Text & Set(size_t pos, char in) {
+      text[pos] = in;
+      return *this;
+    }
+
+    Text & Set(size_t pos, TextCharRef<true> in) {
+      text[pos] = in.AsChar();
+      // @CAO Match formatting!
+      return *this;
+    }    
 
     TextCharRef<false> operator[](size_t pos) {
       emp_assert(pos < GetSize(), pos, GetSize());
@@ -371,38 +390,38 @@ namespace emp {
   // Set just this character; don't change style.
   template <bool IS_CONST>
   TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(char in) {
-    text_ref.SetChar(text_ref.pos, in);
+    text_ref.Set(text_ref.pos, in);
     return *this;
   }
 
   // Convert to a normal C++ char.
   template <bool IS_CONST>
-  TextCharRef<IS_CONST>::operator char() const {
-    return text_ref.GetChar(text_ref.pos);
+  char TextCharRef<IS_CONST>::AsChar() const {
+    return text_ref.GetChar(pos);
   }
 
   template <bool IS_CONST>
   auto TextCharRef<IS_CONST>::operator<=>(const TextCharRef & in) const {
-    return text_ref.GetChar(text_ref.pos) <=> in.text_ref.GetChar(in.text_ref.pos);
+    return text_ref.GetChar(pos) <=> in.text_ref.GetChar(in.pos);
   }
   template <bool IS_CONST>
   auto TextCharRef<IS_CONST>::operator<=>(char in) const {
-    return text_ref.GetChar(text_ref.pos) <=> in;
+    return text_ref.GetChar(pos) <=> in;
   }
 
   template <bool IS_CONST>
   emp::vector<std::string> TextCharRef<IS_CONST>::GetStyle() const {
-    return text_ref.GetStyle(text_ref.pos);
+    return text_ref.GetStyle(pos);
   }
 
   template <bool IS_CONST>
   bool TextCharRef<IS_CONST>::HasStyle(const std::string & style) const {
-    return text_ref.HasStyle(style, text_ref.pos);
+    return text_ref.HasStyle(style, pos);
   }
 
   template <bool IS_CONST>
   TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::SetStyle(const std::string & style) {
-    text_ref.HasStyle(style, text_ref.pos);
+    text_ref.HasStyle(style, pos);
     return *this;
   }
 }
