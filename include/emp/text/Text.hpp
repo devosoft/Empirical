@@ -59,7 +59,7 @@ namespace emp {
 
     text_t & GetText() const { return text_ref; }
     size_t GetPos() const { return pos; }
-    emp::vector<std::string> GetStyle() const;
+    emp::vector<std::string> GetStyles() const;
 
     bool HasStyle(const std::string & style) const;
     bool IsBold()        { return HasStyle("bold"); }
@@ -162,7 +162,7 @@ namespace emp {
       text[pos] = in.AsChar();
 
       // Match style of in.
-      emp::vector<std::string> styles = in.GetStyle();
+      emp::vector<std::string> styles = in.GetStyles();
       Clear(pos);  // Clear old style.
       for (const std::string & style : styles) {
         SetStyle(style, pos);
@@ -258,6 +258,22 @@ namespace emp {
     Text & Subscript(size_t start, size_t end) { return SetStyle("subscript", start, end); }
     Text & Superscript(size_t start, size_t end) { return SetStyle("superscript", start, end); }
     Text & Underline(size_t start, size_t end) { return SetStyle("underline", start, end); }
+
+    /// Return the set of active styles in this text.
+    /// @param pos optional position to specify only styles used at position.
+    emp::vector<std::string> GetStyles(size_t pos=MAX_SIZE_T) {
+      emp::vector<std::string> styles;
+      emp::vector<std::string> to_clear;
+      for (const auto & [name, bits] : attr_map) {
+        if (bits.None()) to_clear.push_back(name);
+        else if (pos == MAX_SIZE_T || bits.Has(pos)) {
+          styles.push_back(name);
+        }
+      }
+      for (const auto & name : to_clear) Clear(name);
+
+      return styles;
+    }
 
     // Test if a particular style is present anywhere in the text
     bool HasStyle(const std::string & style) const {
@@ -446,8 +462,8 @@ namespace emp {
   }
 
   template <bool IS_CONST>
-  emp::vector<std::string> TextCharRef<IS_CONST>::GetStyle() const {
-    return text_ref.GetStyle(pos);
+  emp::vector<std::string> TextCharRef<IS_CONST>::GetStyles() const {
+    return text_ref.GetStyles(pos);
   }
 
   template <bool IS_CONST>
