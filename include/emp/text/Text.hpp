@@ -81,7 +81,7 @@ namespace emp {
   };
 
   class Text {
-  private:
+  protected:
     std::string text = "";
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
     // "strike", "superscript", "subscript", and "code".  Fonts are described as font name,
@@ -95,12 +95,25 @@ namespace emp {
     using tag_map_t = std::unordered_map<std::string, TagInfo>;
     std::unordered_map<std::string, tag_map_t> tag_maps;
 
+    // Internal function to remove unused styles.
+    void Cleanup() {
+      // Scan for styles that are now unused.
+      emp::vector<std::string> unused_styles;
+      for (auto & [tag, bits] : attr_map) {
+        if (bits.None()) unused_styles.push_back(tag);
+      }
+      // If any styles need to be deleted, do so.
+      for (const std::string & style : unused_styles) {
+        attr_map.erase(style);
+      }
+    }
+
   public:
     Text() = default;
     Text(const Text &) = default;
     Text(Text &&) = default;
-    Text(const std::string & in) : text(in) { };
-    Text(std::string && in) : text(std::move(in)) { };
+    Text(const std::string & in) : text(in) { }
+    Text(std::string && in) : text(std::move(in)) { }
     ~Text() = default;
 
     Text & operator=(const Text &) = default;
@@ -141,8 +154,11 @@ namespace emp {
     void Resize(size_t new_size) {
       text.resize(new_size);
       for (auto & [tag, bits] : attr_map) {
-        if (bits.GetSize() > new_size) bits.Resize(new_size);
+        if (bits.GetSize() > new_size) {
+          bits.Resize(new_size);
+        }
       }
+      Cleanup(); // Remove any styles that are no longer used.
     }
 
     // Direct Get accessors
