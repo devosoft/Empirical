@@ -23,6 +23,7 @@
 #include "../base/assert.hpp"
 #include "../bits/BitVector.hpp"
 #include "../datastructs/map_utils.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 
@@ -42,8 +43,8 @@ namespace emp {
     ~TextCharRef() = default;
 
     // Set this character equal (with same inputs) as in parameter; don't change reference.
-    template <bool IS_CONST2>
-    TextCharRef & operator=(const TextCharRef<IS_CONST2> & in);
+    TextCharRef & operator=(const TextCharRef<false> & in);
+    TextCharRef & operator=(const TextCharRef<true> & in);
 
     // Set just this character; don't change style.
     TextCharRef & operator=(char in);
@@ -52,6 +53,7 @@ namespace emp {
     char AsChar() const;
     operator char() const { return AsChar(); }
 
+    // Comparison operators
     auto operator<=>(const TextCharRef & in) const;
     auto operator<=>(char in) const;
 
@@ -124,6 +126,18 @@ namespace emp {
     /// Automatic conversion back to an unformatted string
     operator const std::string &() const { return GetString(); }
 
+    // Stream operator.
+    template <typename T>
+    Text & operator<<(T && in) {
+      using in_t = std::remove_reference_t< std::remove_const_t<T> >;
+      if constexpr (std::is_same_v<in_t, std::string>) {
+        text += in;
+      } else {
+        text += emp::to_string(in);
+      }
+      return *this;
+    }
+
     void Resize(size_t new_size) {
       text.resize(new_size);
       for (auto & [tag, bits] : attr_map) {
@@ -143,9 +157,16 @@ namespace emp {
       return *this;
     }
 
-    Text & Set(size_t pos, TextCharRef<true> in) {
+    template <bool IS_CONST>
+    Text & Set(size_t pos, TextCharRef<IS_CONST> in) {
       text[pos] = in.AsChar();
-      // @CAO Match formatting!
+
+      // Match style of in.
+      emp::vector<std::string> styles = in.GetStyle();
+      Clear(pos);  // Clear old style.
+      for (const std::string & style : styles) {
+        SetStyle(style, pos);
+      }
       return *this;
     }    
 
@@ -268,6 +289,14 @@ namespace emp {
     // Clear ALL formatting
     Text & Clear() { attr_map.clear(); return *this; }
 
+    // Clear ALL formatting at a specified position.
+    Text & Clear(size_t pos) {
+      for (auto & [style,bits] : attr_map) {
+        if (bits.Has(pos)) bits.Clear(pos);
+      }
+      return *this;
+    }
+
     // Clear specific formatting across all text
     Text & Clear(const std::string & style) {
       attr_map.erase(style);
@@ -381,16 +410,23 @@ namespace emp {
 
   // Set this character equal (with same inputs) as in parameter; don't change reference.
   template <bool IS_CONST>
-  template <bool IS_CONST2>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<IS_CONST2> & in) {
-    text_ref.Set(text_ref.pos, in);
+  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<false> & in) {
+    text_ref.Set(pos, in);
+    return *this;
+  }
+
+  template <bool IS_CONST>
+  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<true> & in) {
+    static_assert(IS_CONST == false,
+      "Cannot assign a const TextCharRef to a mutatble version.");
+    text_ref.Set(pos, in);
     return *this;
   }
 
   // Set just this character; don't change style.
   template <bool IS_CONST>
   TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(char in) {
-    text_ref.Set(text_ref.pos, in);
+    text_ref.Set(pos, in);
     return *this;
   }
 
