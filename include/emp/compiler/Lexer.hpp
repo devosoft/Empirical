@@ -1,11 +1,32 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
+ *  @date 2016-2022.
  *
  *  @file Lexer.hpp
  *  @brief A general-purpose, fast lexer.
- *  @note Status: ALPHA
+ *  @note Status: BETA
+ * 
+ *  Build a lexer that can convert input strings or streams into a series of provided tokens.
+ * 
+ *  Use AddToken(name, regex) to list out the relevant tokens.
+ *   'name' is the unique name for this token.
+ *   'regex' is the regular expression that describes this token.
+ *  It will return a unique ID associated with this lexeme.
+ * 
+ *  IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
+ *  should be skipped over.
+ * 
+ *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
+ * 
+ *  Once all of the tokens are in place, run Generate() to build the internal tables.
+ * 
+ *  Tokens can be retrieved either one at a time with Process(string) or Process(stream),
+ *  which will return the next (non-ignored) token.
+ * 
+ *  Alternatively, an entire series of tokens can be processed with Tokenize().
+ * 
+ *  Finally, GetLexeme() can be used to retrieve the lexeme from the most recent token found.
  */
 
 #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
@@ -167,8 +188,12 @@ namespace emp {
 
     /// Add a new token, specified by a name and the regex used to identify it.
     /// Note that token ids count down with highest IDs having priority.
-    int AddToken(const std::string & name, const std::string & regex,
-                    bool save_lexeme=true, bool save_token=true, const std::string & desc="") {
+    int AddToken(const std::string & name,
+                 const std::string & regex,
+                 bool save_lexeme = true,
+                 bool save_token = true,
+                 const std::string & desc = "")
+    {
       int id = cur_token_id--;                // Grab the next available token id.
       generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
       token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
