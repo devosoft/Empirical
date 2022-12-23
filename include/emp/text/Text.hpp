@@ -83,17 +83,11 @@ namespace emp {
   class Text {
   protected:
     std::string text = "";
+    
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
     // "strike", "superscript", "subscript", and "code".  Fonts are described as font name,
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
     std::unordered_map<std::string, BitVector> attr_map;
-
-    struct TagInfo{
-      std::string open;
-      std::string close;
-    };    
-    using tag_map_t = std::unordered_map<std::string, TagInfo>;
-    std::unordered_map<std::string, tag_map_t> tag_maps;
 
     // Internal function to remove unused styles.
     void Cleanup() {
@@ -375,69 +369,6 @@ namespace emp {
     Text & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
     Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
-    tag_map_t & GetHTMLMap() {
-      tag_map_t & html_map = tag_maps["html"];
-      if (html_map.size() == 0) {
-      html_map["bold"] = TagInfo{"<b>", "</b>"};
-      html_map["code"] = TagInfo{"<code>", "</code>"};
-      html_map["italic"] = TagInfo{"<i>", "</i>"};
-      html_map["strike"] = TagInfo{"<del>", "</del>"};
-      html_map["subscript"] = TagInfo{"<sub>", "</sub>"};
-      html_map["superscript"] = TagInfo{"<sup>", "</sup>"};
-      html_map["underline"] = TagInfo{"<u>", "</u>"};
-      }
-      return html_map;
-    }
-
-    // Convert this to a string in HTML format.
-    std::string AsHTML() {
-      std::map<size_t, std::string> tag_map; // Where do tags go?
-      if (HasBold()) AddOutputTags(tag_map, "bold", "<b>", "</b>");
-      if (HasCode()) AddOutputTags(tag_map, "code", "<code>", "</code>");
-      if (HasItalic()) AddOutputTags(tag_map, "italic", "<i>", "</i>");
-      if (HasStrike()) AddOutputTags(tag_map, "strike", "<del>", "</del>");
-      if (HasSubscript()) AddOutputTags(tag_map, "subscript", "<sub>", "</sub>");
-      if (HasSuperscript()) AddOutputTags(tag_map, "superscript", "<sup>", "</sup>");
-      if (HasUnderline()) AddOutputTags(tag_map, "underline", "<u>", "</u>");
-
-      std::string out_string;
-      size_t copy_pos = 0;
-      for (auto [tag_pos, tags] : tag_map) {
-        if (copy_pos < tag_pos) {
-          out_string += text.substr(copy_pos, tag_pos-copy_pos);
-          copy_pos = tag_pos;
-        }
-        out_string += tags;
-      }
-      if (copy_pos < text.size()) {
-        out_string += text.substr(copy_pos, text.size()-copy_pos);
-      }
-
-      return out_string;
-    }
-
-  private:
-    // ------------   Helper functions   ------------
-
-    // A helper to add start and end tag info to tag map for insertion into
-    // the output string as it's created.
-    void AddOutputTags(
-      std::map<size_t, std::string> & tag_map,
-      std::string attr,
-      std::string start_tag,
-      std::string end_tag)
-    {
-      const BitVector & sites = attr_map[attr];
-
-      if (sites.Has(0)) tag_map[0] += start_tag;
-      for (size_t i = 1; i < sites.size(); ++i) {
-        if (sites[i] != sites[i-1]) {
-          if (sites[i]) tag_map[i] += start_tag;
-          else tag_map[i] += end_tag;
-        }
-      }
-      if (sites.back()) tag_map[sites.size()] += end_tag;
-    }
   };
 
   // Set this character equal (with same inputs) as in parameter; don't change reference.
