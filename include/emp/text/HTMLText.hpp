@@ -12,9 +12,12 @@
 #ifndef EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
 #define EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
 
+#include <string>
+#include <sstream>
 #include <unordered_map>
 
 #include "../base/assert.hpp"
+#include "../compiler/Lexer.hpp"
 
 #include "Text.hpp"
 
@@ -22,24 +25,62 @@ namespace emp {
 
   class HTMLText : public emp::Text {
   private:
-    struct TagInfo{
+    struct StyleInfo{
       std::string open;
       std::string close;
-    };    
-    std::unordered_map<std::string, TagInfo> tag_map;
+    };
+    enum class TagType {
+      UNKNOWN = 0,
+      OPEN,
+      CLOSE,
+      STRUCTURE,
+      CHAR
+    };
+    struct TagInfo {
+      TagType type;
+      std::string style;
+    };
+
+    std::unordered_map<std::string, StyleInfo> style_info;
+    std::unordered_map<std::string, TagInfo> tag_info;
+    std::stringstream tag_regex;
+    emp::Lexer lexer;
+
+    void SetupStyle(const std::string & style,
+                   const std::string & open,
+                   const std::string & close)
+    {
+      if (style_info.size()) tag_regex << '|';
+      tag_regex << open << '|' << close;
+
+      style_info[style] = StyleInfo{open, close};
+      tag_info[open] = TagInfo{TagType::OPEN, style};
+      tag_info[close] = TagInfo{TagType::CLOSE, style};
+    }
 
     void SetupTags() {
-      tag_map["bold"] = TagInfo{"<b>", "</b>"};
-      tag_map["code"] = TagInfo{"<code>", "</code>"};
-      tag_map["italic"] = TagInfo{"<i>", "</i>"};
-      tag_map["strike"] = TagInfo{"<del>", "</del>"};
-      tag_map["subscript"] = TagInfo{"<sub>", "</sub>"};
-      tag_map["superscript"] = TagInfo{"<sup>", "</sup>"};
-      tag_map["underline"] = TagInfo{"<u>", "</u>"};
+      SetupStyle("bold", "<b>", "</b>");
+      SetupStyle("code", "<code>", "</code>");
+      SetupStyle("italic", "<i>", "</i>");
+      SetupStyle("strike", "<del>", "</del>");
+      SetupStyle("subscript", "<sub>", "</sub>");
+      SetupStyle("superscript", "<sup>", "</sup>");
+      SetupStyle("underline", "<u>", "</u>");
+
+      // Now that all of the tags are loaded, put them into the lexer.
+      lexer.AddToken("text","[^<&]+");         // Non-tag or special characters.
+      lexer.AddToken("tags", tag_regex.str()); // Tags
+      lexer.AddToken("chars", "[<&]");         // Special char, but not as tag.
+      lexer.Generate();
     }
 
     void Append(const std::string & in) {
+      for (size_t scan_id = in.find('<');
+           scan_id != std::string::npos;
+           scan_id = in.find('<', scan_id)
+      {
 
+      }
     }
 
   public:
@@ -72,26 +113,26 @@ namespace emp {
 
     // Convert this to a string in HTML format.
     std::string ToString() {
-      std::map<size_t, std::string> tag_map; // Where do tags go?
-      if (HasBold()) AddOutputTags(tag_map, "bold", "<b>", "</b>");
-      if (HasCode()) AddOutputTags(tag_map, "code", "<code>", "</code>");
-      if (HasItalic()) AddOutputTags(tag_map, "italic", "<i>", "</i>");
-      if (HasStrike()) AddOutputTags(tag_map, "strike", "<del>", "</del>");
-      if (HasSubscript()) AddOutputTags(tag_map, "subscript", "<sub>", "</sub>");
-      if (HasSuperscript()) AddOutputTags(tag_map, "superscript", "<sup>", "</sup>");
-      if (HasUnderline()) AddOutputTags(tag_map, "underline", "<u>", "</u>");
+      // Determine where tags should be placed.
+      std::map<size_t, std::string> tag_map;
+      for (const auto & [style, info] : style_info) {
+        if (HasStyle(style)) AddOutputTags(tag_map, style, info.open, info.close);
+      }
 
+      // Convert the string, adding tags back in as we go.
       std::string out_string;
-      size_t copy_pos = 0;
+      size_t output_pos = 0;
       for (auto [tag_pos, tags] : tag_map) {
-        if (copy_pos < tag_pos) {
-          out_string += text.substr(copy_pos, tag_pos-copy_pos);
-          copy_pos = tag_pos;
+        if (output_pos < tag_pos) {
+          out_string += text.substr(output_pos, tag_pos-output_pos);
+          output_pos = tag_pos;
         }
         out_string += tags;
       }
-      if (copy_pos < text.size()) {
-        out_string += text.substr(copy_pos, text.size()-copy_pos);
+
+      // Add any final text after the last tag.
+      if (output_pos < text.size()) {
+        out_string += text.substr(output_pos, text.size()-output_pos);
       }
 
       return out_string;
@@ -110,13 +151,18 @@ namespace emp {
     {
       const BitVector & sites = attr_map[attr];
 
+      // Test if this style should be opened at the beginning.
       if (sites.Has(0)) tag_map[0] += start_tag;
+
+      // Loop through other site checking for shifts in style.
       for (size_t i = 1; i < sites.size(); ++i) {
         if (sites[i] != sites[i-1]) {
           if (sites[i]) tag_map[i] += start_tag;
           else tag_map[i] += end_tag;
         }
       }
+
+      // Close any styles left open by the end.
       if (sites.back()) tag_map[sites.size()] += end_tag;
     }
   };
