@@ -12,8 +12,8 @@
 #ifndef EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
 #define EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
 
+#include <set>
 #include <string>
-#include <sstream>
 #include <unordered_map>
 
 #include "../base/assert.hpp"
@@ -31,55 +31,99 @@ namespace emp {
     };
     enum class TagType {
       UNKNOWN = 0,
-      OPEN,
-      CLOSE,
-      STRUCTURE,
-      CHAR
+      OPEN,    // Start a new style (e.g., '<b>')
+      CLOSE,   // Stop using a style (e.g., '</b>')
+      FORMAT,  // Indicate a structural element (e.g., '<p>')
+      REPLACE, // Indicate a direct replacement (e.g., '&lt;' means '<')
+      COUNT    // Track total number of tag types.
     };
     struct TagInfo {
       TagType type;
-      std::string style;
+      std::string style;  // The style that this tag is associated with.
+      std::string text;   // Basic text associated with this tag (e.g., for replacements)
     };
 
     std::unordered_map<std::string, StyleInfo> style_info;
     std::unordered_map<std::string, TagInfo> tag_info;
-    std::stringstream tag_regex;
+    std::string tag_regex;
     emp::Lexer lexer;
 
-    void SetupStyle(const std::string & style,
+    int token_text = -1;
+    int token_tag = -1;
+    int token_char = -1;
+
+    std::set<std::string> active_styles; // Styles to use on appended text.
+
+    void BuildStyle(const std::string & style,
                    const std::string & open,
                    const std::string & close)
     {
-      if (style_info.size()) tag_regex << '|';
-      tag_regex << open << '|' << close;
+      if (style_info.size()) tag_regex += '|';
+      tag_regex += open + '|' + close;
 
       style_info[style] = StyleInfo{open, close};
       tag_info[open] = TagInfo{TagType::OPEN, style};
       tag_info[close] = TagInfo{TagType::CLOSE, style};
     }
 
-    void SetupTags() {
-      SetupStyle("bold", "<b>", "</b>");
-      SetupStyle("code", "<code>", "</code>");
-      SetupStyle("italic", "<i>", "</i>");
-      SetupStyle("strike", "<del>", "</del>");
-      SetupStyle("subscript", "<sub>", "</sub>");
-      SetupStyle("superscript", "<sup>", "</sup>");
-      SetupStyle("underline", "<u>", "</u>");
-
-      // Now that all of the tags are loaded, put them into the lexer.
-      lexer.AddToken("text","[^<&]+");         // Non-tag or special characters.
-      lexer.AddToken("tags", tag_regex.str()); // Tags
-      lexer.AddToken("chars", "[<&]");         // Special char, but not as tag.
-      lexer.Generate();
+    void BuildReplacement(const std::string & html_v, const std::string & txt_v) {
+      if (style_info.size()) tag_regex += '|';
+      tag_regex += html_v;
+      tag_info[html_v] = TagInfo{TagType::REPLACE, txt_v};
     }
 
-    void Append(const std::string & in) {
-      for (size_t scan_id = in.find('<');
-           scan_id != std::string::npos;
-           scan_id = in.find('<', scan_id)
-      {
+    void SetupTags() {
+      BuildStyle("bold", "<b>", "</b>");
+      BuildStyle("code", "<code>", "</code>");
+      BuildStyle("italic", "<i>", "</i>");
+      BuildStyle("strike", "<del>", "</del>");
+      BuildStyle("subscript", "<sub>", "</sub>");
+      BuildStyle("superscript", "<sup>", "</sup>");
+      BuildStyle("underline", "<u>", "</u>");
 
+      BuildReplacement("&amp;", "&");
+      BuildReplacement("&gt;", ">");
+      BuildReplacement("&lt;", "<");
+      BuildReplacement("&nbsp;", " ");
+
+      // Now that all of the tags are loaded, put them into the lexer.
+      token_text = lexer.AddToken("text","[^<&]+");        // Non-tag or special characters.
+      token_tag = lexer.AddToken("tags", tag_regex); // Tags
+      token_char = lexer.AddToken("chars", "[<&]");        // Special char, but not as tag.
+    }
+
+    void Append_Tag(const std::string & tag) {
+      const auto & info = tag_info[tag];
+      switch (info.type) {
+        case TagType::OPEN:
+          active_styles.insert(info.style);
+          break;
+        case TagType::CLOSE:
+          active_styles.erase(info.style);
+          break;
+        case TagType::REPLACE:
+          text += info.text;
+          break;
+        default:
+          break;
+      }
+    }
+
+    void Append_Char(const std::string & in) {
+      // @CAO Should provide warning.
+      text += in;
+    }
+
+    // Add new HTML into this object.
+    void Append(std::string in) {
+      auto tokens = lexer.Tokenize(in);
+      for (const auto & token : tokens) {
+        if (token.id == token_text) text += token.lexeme;
+        else if (token.id == token_tag) Append_Tag(token.lexeme);
+        else if (token.id == token_char) Append_Char(token.lexeme);
+        else {
+          std::cerr << "Error, unknown tag: " << token.lexeme << std::endl;
+        }
       }
     }
 
