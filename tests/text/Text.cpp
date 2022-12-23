@@ -17,30 +17,44 @@ TEST_CASE("Test Text", "[text]") {
   emp::Text text("Test Text");
   REQUIRE(text.GetSize() == 9);
   REQUIRE(text.GetString() == "Test Text");
-  REQUIRE(text.AsHTML() == "Test Text");
+  REQUIRE(text.HasBold(0) == false);
+  REQUIRE(text.HasBold(5) == false);
 
   // Try adding style.
   text.Bold(5,9);
   REQUIRE(text.GetSize() == 9);
   REQUIRE(text.GetString() == "Test Text");
-  REQUIRE(text.AsHTML() == "Test <b>Text</b>");
+  REQUIRE(text.HasBold(0) == false);
+  REQUIRE(text.HasBold(5) == true);
 
   // Try appending.
   text << " and more Text.";
   REQUIRE(text.GetSize() == 24);
   REQUIRE(text.GetString() == "Test Text and more Text.");
-  REQUIRE(text.AsHTML() == "Test <b>Text</b> and more Text.");
+  REQUIRE(text.HasBold(0) == false);
+  REQUIRE(text.HasBold(5) == true);
+  REQUIRE(text.HasBold(18) == false);
+  REQUIRE(text.HasBold(19) == false);
+  REQUIRE(text.HasBold(20) == false);
 
   // Try changing letters.
   text[21] = 's';
   text[23] = 's';
   REQUIRE(text.GetSize() == 24);
   REQUIRE(text.GetString() == "Test Text and more Tests");
-  REQUIRE(text.AsHTML() == "Test <b>Text</b> and more Tests");
+  REQUIRE(text.HasBold(0) == false);
+  REQUIRE(text.HasBold(5) == true);
+  REQUIRE(text.HasBold(18) == false);
+  REQUIRE(text.HasBold(19) == false);
+  REQUIRE(text.HasBold(20) == false);
 
   // Try making a change that involves style.
   text[19] = text[5];
   REQUIRE(text.GetSize() == 24);
   REQUIRE(text.GetString() == "Test Text and more Tests");
-  REQUIRE(text.AsHTML() == "Test <b>Text</b> and more <b>T</b>ests");
+  REQUIRE(text.HasBold(0) == false);
+  REQUIRE(text.HasBold(5) == true);
+  REQUIRE(text.HasBold(18) == false);
+  REQUIRE(text.HasBold(19) == true);
+  REQUIRE(text.HasBold(20) == false);
 }
