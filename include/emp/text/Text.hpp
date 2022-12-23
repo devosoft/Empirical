@@ -83,7 +83,7 @@ namespace emp {
   class Text {
   protected:
     std::string text = "";
-    
+
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
     // "strike", "superscript", "subscript", and "code".  Fonts are described as font name,
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
@@ -128,10 +128,10 @@ namespace emp {
     size_t GetSize() const { return text.size(); }
 
     // Return the current text as an unformatted string.
-    const std::string & GetString() const { return text; }
+    const std::string & GetText() const { return text; }
 
     /// Automatic conversion back to an unformatted string
-    operator const std::string &() const { return GetString(); }
+    operator const std::string &() const { return GetText(); }
 
     // Stream operator.
     template <typename T>
