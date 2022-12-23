@@ -19,10 +19,8 @@
  * 
  *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
  * 
- *  Once all of the tokens are in place, run Generate() to build the internal tables.
- * 
  *  Tokens can be retrieved either one at a time with Process(string) or Process(stream),
- *  which will return the next (non-ignored) token.
+ *  which will return the next (non-ignored) token, removing it from the input.
  * 
  *  Alternatively, an entire series of tokens can be processed with Tokenize().
  * 
@@ -54,9 +52,12 @@ namespace emp {
     bool save_lexeme;    ///< Preserve the lexeme for this token?
     bool save_token;     ///< Keep token at all? (Whitespace and comments are often discarded).
 
+    // Default constructor produces an error token.
+    TokenInfo() : name(""), desc("Unable to parse input!"), regex(""),
+                  id(-1), save_lexeme(true), save_token(true) { }
     TokenInfo(const std::string & _name, const std::string & _regex, int _id,
               bool _save_l=true, bool _save_t=true, const std::string & _desc="")
-      : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { ; }
+      : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { }
     TokenInfo(const TokenInfo &) = default;
     TokenInfo(TokenInfo &&) = default;
     TokenInfo & operator=(const TokenInfo &) = default;
@@ -75,19 +76,19 @@ namespace emp {
 
   /// Information about a token instance from an input stream.
   struct Token {
-    int token_id;        ///< Which type of token is this?
+    int id;              ///< Which type of token is this?
     std::string lexeme;  ///< Sequence matched by this token (or empty if not saved)
     size_t line_id;      ///< Which line did this token start on?
 
-    Token(int id, const std::string & str="", size_t _line=0)
-      : token_id(id), lexeme(str), line_id(_line) { ; }
+    Token(int _id, const std::string & str="", size_t _line=0)
+      : id(_id), lexeme(str), line_id(_line) { ; }
     Token(const Token &) = default;
     Token(Token &&) = default;
     Token & operator=(const Token &) = default;
     Token & operator=(Token &&) = default;
 
     /// Token will automatically convert to its ID if used as an int.
-    operator int() const { return token_id; }
+    operator int() const { return id; }
 
     /// Token will automatically convert to its matched sequence (lexeme) is used as a string.
     operator const std::string &() const { return lexeme; }
@@ -175,11 +176,19 @@ namespace emp {
     mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
     mutable std::string lexeme;             ///< Current state of lexeme being generated.
 
-    const TokenInfo ERROR_TOKEN{"", "", ERROR_ID, true, true, "Unable to parse input!"};
+    static const TokenInfo & ERROR_TOKEN() {
+      static const TokenInfo token;
+      return token;
+    }
 
   public:
-    Lexer() { ; }
-    ~Lexer() { ; }
+    Lexer() = default;
+    Lexer(const Lexer &) = default;
+    Lexer(Lexer &&) = default;
+    ~Lexer() = default;
+
+    Lexer & operator=(const Lexer &) = default;
+    Lexer & operator=(Lexer &&) = default;
 
     /// How many types of tokens can be identified in this Lexer?
     size_t GetNumTokens() const { return token_set.size(); }
@@ -219,7 +228,7 @@ namespace emp {
 
     /// Get the full information about a token (you provide the id)
     const TokenInfo & GetTokenInfo(int id) const {
-      if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN;
+      if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN();
       return token_set[(size_t)(MAX_ID - id)];
     }
 
@@ -312,7 +321,7 @@ namespace emp {
     }
 
     /// Turn an input stream of text into a vector of tokens.
-    TokenStream Tokenize(std::istream & is, const std::string & name) const {
+    TokenStream Tokenize(std::istream & is, const std::string & name="in_stream") const {
       emp::vector<Token> out_tokens;
       size_t cur_line = 1;
       emp::Token token = Process(is);
@@ -326,17 +335,19 @@ namespace emp {
     }
 
     /// Turn an input string into a vector of tokens.
-    TokenStream Tokenize(std::string_view str, const std::string & name) const {
+    TokenStream Tokenize(std::string_view str, const std::string & name="in_view") const {
       std::stringstream ss;
       ss << str;
       return Tokenize(ss, name);
     }
 
     /// Turn a vector of strings into a vector of tokens.
-    TokenStream Tokenize(const emp::vector<std::string> & str_v, const std::string & name) const {
+    TokenStream Tokenize(const emp::vector<std::string> & str_v, 
+                         const std::string & name="in_string vector") const
+    {
       std::stringstream ss;
       for (auto & str : str_v) {
-        ss << str;
+        ss << str << '\n';
       }
 
       return Tokenize(ss, name);
