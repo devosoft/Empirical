@@ -59,7 +59,7 @@ namespace emp {
                    const std::string & close)
     {
       if (style_info.size()) tag_regex += '|';
-      tag_regex += open + '|' + close;
+      tag_regex += emp::to_literal(open) + '|' + emp::to_literal(close);
 
       style_info[style] = StyleInfo{open, close};
       tag_info[open] = TagInfo{TagType::OPEN, style};
@@ -68,7 +68,7 @@ namespace emp {
 
     void BuildReplacement(const std::string & html_v, const std::string & txt_v) {
       if (style_info.size()) tag_regex += '|';
-      tag_regex += html_v;
+      tag_regex += emp::to_literal(html_v);
       tag_info[html_v] = TagInfo{TagType::REPLACE, txt_v};
     }
 
@@ -87,9 +87,19 @@ namespace emp {
       BuildReplacement("&nbsp;", " ");
 
       // Now that all of the tags are loaded, put them into the lexer.
-      token_text = lexer.AddToken("text","[^<&]+");        // Non-tag or special characters.
-      token_tag = lexer.AddToken("tags", tag_regex); // Tags
-      token_char = lexer.AddToken("chars", "[<&]");        // Special char, but not as tag.
+      token_text = lexer.AddToken("text","[^<&]+");    // Non-tag or special characters.
+      token_tag = lexer.AddToken("tags", tag_regex);   // Tags
+      token_char = lexer.AddToken("chars", "[<&]");    // Special char, but not as tag.
+    }
+
+    // Append a string that has already been otherwise processed.
+    void Append_String(const std::string & in) {
+      size_t start = text.size();
+      size_t end = start + in.size();
+      text += in;      
+      for (const std::string & style : active_styles) {
+        SetStyle(style, start, end);
+      }
     }
 
     void Append_Tag(const std::string & tag) {
@@ -102,25 +112,22 @@ namespace emp {
           active_styles.erase(info.style);
           break;
         case TagType::REPLACE:
-          text += info.text;
+          Append_String(info.text);
           break;
         default:
           break;
       }
     }
 
-    void Append_Char(const std::string & in) {
-      // @CAO Should provide warning.
-      text += in;
-    }
-
     // Add new HTML into this object.
     void Append(std::string in) {
+//      std::cout << "APPEND: " << in << std::endl;
+
       auto tokens = lexer.Tokenize(in);
       for (const auto & token : tokens) {
-        if (token.id == token_text) text += token.lexeme;
+        if (token.id == token_text) Append_String(token.lexeme);
         else if (token.id == token_tag) Append_Tag(token.lexeme);
-        else if (token.id == token_char) Append_Char(token.lexeme);
+        else if (token.id == token_char) Append_String(token.lexeme);
         else {
           std::cerr << "Error, unknown tag: " << token.lexeme << std::endl;
         }
