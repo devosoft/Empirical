@@ -54,5 +54,5 @@ TEST_CASE("Testing HTMLText", "[text]") {
   text << "This is <i><b>Pre-</i>formatted</b> text.";
   // REQUIRE(text.GetSize() == 27);
   REQUIRE(text.GetText() == "This is Pre-formatted text.");
-  REQUIRE(text.ToString() == "This is <b><i>Pre-</i>formatted</b> text.");
+  REQUIRE(text.ToString() == "This is <i><b>Pre-</i>formatted</b> text.");
 }
