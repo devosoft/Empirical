@@ -162,7 +162,7 @@ namespace emp {
       encodings["txt"] = NewPtr<TextEncoding>(*this, "txt");
       encoding_ptr = encodings["txt"];
     };
-    Text(const Text & in) {
+    Text(const Text & in) : text(in.text), style_map(in.style_map) {
       for (const auto & [e_name, ptr] : encodings) {
         encodings[e_name] = ptr->Clone(*this);
       }
@@ -208,11 +208,20 @@ namespace emp {
     /// Automatic conversion back to an unformatted string
     operator const std::string &() const { return GetText(); }
 
+    /// @brief Test if this Text object is aware of how to use a specified encoding.
+    /// @param name Name of the encoding to test for.
+    /// @return A true/false indicate if the named encoding is known.
     bool HasEncoding(const std::string & name) const {
       return emp::Has(encodings, name);
     }
 
-    // Change the current encoding being used.
+    /// @brief Get the name of the current encoding being applied.
+    /// @return Name of the current encoding.
+    const std::string & GetEncoding() const { return encoding_ptr->GetName(); }
+
+    /// @brief Change the current encoding being used to another known encoding type.
+    /// @param name Name of the encoding type to be used.
+    /// @return A reference to this object itself.
     Text & SetEncoding(const std::string & name) {
       if (!emp::Has(encodings, name)) {
         notify::Error("Trying to set unknown encoding '", name, "'; No change made.");
@@ -224,6 +233,12 @@ namespace emp {
 
     /// Add a new encoding to this Text object.  Newly added encodings automatically become
     /// active (use SetEncoding() to choose a different encoding option).
+
+    /// @brief Add an encoding to this Text object; new encodings automatically become active.
+    /// @tparam ENCODING_T The type of the new encoding to use
+    /// @tparam ...EXTRA_Ts Automatically set by variadic arguments.
+    /// @param name Name to be used for this new encoding.
+    /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
     template <typename ENCODING_T, typename... EXTRA_Ts>
     void AddEncoding(const std::string & name, EXTRA_Ts &&... args) {
       if (emp::Has(encodings, name)) {
@@ -258,6 +273,10 @@ namespace emp {
     Text & operator+=(T && in) {
       return Append(emp::to_string(in));
     }
+
+    /// @brief Convert text to a string using the current encoding.
+    /// @return The resulting string.
+    std::string ToString() const { return encoding_ptr->ToString(); }
 
     void Resize(size_t new_size) {
       text.resize(new_size);
