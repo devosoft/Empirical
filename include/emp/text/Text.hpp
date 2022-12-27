@@ -11,11 +11,11 @@
  *  HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
  *  etc.
  * 
- *  The main Text class tracks a string of text (called simply "text") and any special attributes
- *  associated with each text position (in "attr_map").  The current TextEncoding class helps
+ *  The main Text class tracks a string of text (called simply "text") and any special styles
+ *  associated with each text position (in "style_map").  The current TextEncoding class helps
  *  guide the conversion from one text encoding to another.
  *
- *  Internally, attributes that encodings should be able to handle are:
+ *  Internally, styles that all encodings should be able to handle (or at least be aware of) are:
  *    BASIC FORMATS :
  *     "bold" (alias: "b" or "strong")
  *     "code" (alias: "tt" or "teletype")
@@ -47,6 +47,7 @@
 #include <unordered_map>
 
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 #include "../bits/BitVector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
@@ -134,10 +135,10 @@ namespace emp {
     // Current state of the text, minus all formatting.
     std::string text = "";
 
-    // Attributes are basic formatting for strings, including "bold", "italic", "underline",
+    // Styles are basic formatting for strings, including "bold", "italic", "underline",
     // "strike", "superscript", "subscript", and "code".  Fonts are described as font name,
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
-    std::unordered_map<std::string, BitVector> attr_map;
+    std::unordered_map<std::string, BitVector> style_map;
 
     // A set of encodings that this Text object can handle.
     std::map< std::string, emp::Ptr<TextEncoding> > encodings;
@@ -147,12 +148,12 @@ namespace emp {
     void Cleanup() {
       // Scan for styles that are no longer unused.
       emp::vector<std::string> unused_styles;
-      for (auto & [tag, bits] : attr_map) {
+      for (auto & [tag, bits] : style_map) {
         if (bits.None()) unused_styles.push_back(tag);
       }
       // If any styles need to be deleted, do so.
       for (const std::string & style : unused_styles) {
-        attr_map.erase(style);
+        style_map.erase(style);
       }
     }
 
@@ -187,7 +188,7 @@ namespace emp {
     }
 
     Text & operator=(const std::string & in) {
-      attr_map.clear(); // Clear out existing content.
+      style_map.clear(); // Clear out existing content.
       text.resize(0);
       Append(in);
       return *this;
@@ -199,8 +200,36 @@ namespace emp {
     // Return the current text as an unformatted string.
     const std::string & GetText() const { return text; }
 
+    // Return the current bit pattern for a specified style.
+    const BitVector & GetStyle(const std::string & style) const {
+      return emp::GetConstRef(style_map, style);
+    }
+
     /// Automatic conversion back to an unformatted string
     operator const std::string &() const { return GetText(); }
+
+    // Change the current encoding being used.
+    void SetEncoding(const std::string & name) {
+      if (!emp::Has(encodings, name)) {
+        notify::Error("Trying to set unknown encoding '", name, "'; No change made.");
+      } else {
+        encoding_ptr = encodings[name];
+      }
+    }
+
+    /// Add a new encoding to this Text object.  Newly added encodings automatically become
+    /// active (use SetEncoding() to choose a different encoding option).
+    template <typename ENCODING_T, typename... EXTRA_Ts>
+    void AddEncoding(const std::string & name, EXTRA_Ts &&... args) {
+      if (emp::Has(encodings, name)) {
+        notify::Warning("Adding encoding '", name,
+                        "'; Replacing existing encoding with the same name.");
+        encodings[name].Delete();
+      }
+      encoding_ptr = NewPtr<ENCODING_T>(*this, name, std::forward<EXTRA_Ts>(args)...);
+      encodings[name] = encoding_ptr;
+    }
+
 
     /// Append potentially-formatted text through the current encoding.
     Text & Append(const std::string & in) {
@@ -223,7 +252,7 @@ namespace emp {
 
     void Resize(size_t new_size) {
       text.resize(new_size);
-      for (auto & [tag, bits] : attr_map) {
+      for (auto & [tag, bits] : style_map) {
         if (bits.GetSize() > new_size) {
           bits.Resize(new_size);
         }
@@ -301,7 +330,7 @@ namespace emp {
 
     // Simple formatting: set all characters to a specified format.
     Text & SetStyle(std::string style) {
-      BitVector & cur_bits = attr_map[style];
+      BitVector & cur_bits = style_map[style];
       cur_bits.Resize(text.size());
       cur_bits.SetAll();
       return *this;
@@ -316,7 +345,7 @@ namespace emp {
 
     // Simple formatting: set a single character to a specified format.
     Text & SetStyle(std::string style, size_t pos) {
-      BitVector & cur_bits = attr_map[style];
+      BitVector & cur_bits = style_map[style];
       if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
       cur_bits.Set(pos);
       return *this;
@@ -331,7 +360,7 @@ namespace emp {
 
     // Simple formatting: set a range of characters to a specified format.
     Text & SetStyle(std::string style, size_t start, size_t end) {
-      BitVector & cur_bits = attr_map[style];
+      BitVector & cur_bits = style_map[style];
       emp_assert(start <= end && end <= text.size());
       if (cur_bits.size() <= end) cur_bits.Resize(end+1);
       cur_bits.SetRange(start, end);
@@ -350,7 +379,7 @@ namespace emp {
     emp::vector<std::string> GetStyles(size_t pos=MAX_SIZE_T) {
       emp::vector<std::string> styles;
       emp::vector<std::string> to_clear;
-      for (const auto & [name, bits] : attr_map) {
+      for (const auto & [name, bits] : style_map) {
         if (bits.None()) to_clear.push_back(name);
         else if (pos == MAX_SIZE_T || bits.Has(pos)) {
           styles.push_back(name);
@@ -363,8 +392,8 @@ namespace emp {
 
     // Test if a particular style is present anywhere in the text
     bool HasStyle(const std::string & style) const {
-      if (!emp::Has(attr_map, style)) return false;
-      return GetConstRef(attr_map, style).Any();
+      if (!emp::Has(style_map, style)) return false;
+      return GetConstRef(style_map, style).Any();
     }
     bool HasBold() const { return HasStyle("bold"); }
     bool HasCode() const { return HasStyle("code"); }
@@ -376,8 +405,8 @@ namespace emp {
 
     // Test if a particular style is present at a given position.
     bool HasStyle(const std::string & style, size_t pos) const {
-      auto it = attr_map.find(style);
-      if (it == attr_map.end()) return false; // Style is nowhere.
+      auto it = style_map.find(style);
+      if (it == style_map.end()) return false; // Style is nowhere.
       return it->second.Has(pos);
     }
     bool HasBold(size_t pos) const { return HasStyle("bold", pos); }
@@ -389,11 +418,11 @@ namespace emp {
     bool HasUnderline(size_t pos) const { return HasStyle("underline", pos); }
 
     // Clear ALL formatting
-    Text & Clear() { attr_map.clear(); return *this; }
+    Text & Clear() { style_map.clear(); return *this; }
 
     // Clear ALL formatting at a specified position.
     Text & Clear(size_t pos) {
-      for (auto & [style,bits] : attr_map) {
+      for (auto & [style,bits] : style_map) {
         if (bits.Has(pos)) bits.Clear(pos);
       }
       return *this;
@@ -401,7 +430,7 @@ namespace emp {
 
     // Clear specific formatting across all text
     Text & Clear(const std::string & style) {
-      attr_map.erase(style);
+      style_map.erase(style);
       return *this;
     }
     Text & ClearBold() { return Clear("bold"); }
@@ -414,8 +443,8 @@ namespace emp {
     
     // Simple formatting: clear a single character from a specified format.
     Text & Clear(const std::string & style, size_t pos) {
-      auto it = attr_map.find(style);
-      if (it != attr_map.end() && it->second.size() > pos) {  // If style bit exists...
+      auto it = style_map.find(style);
+      if (it != style_map.end() && it->second.size() > pos) {  // If style bit exists...
         it->second.Clear(pos);
       }
       return *this;
@@ -430,8 +459,8 @@ namespace emp {
 
     // Simple formatting: clear a range of characters from a specified format.
     Text & Clear(const std::string & style, size_t start, size_t end) {
-      auto it = attr_map.find(style);
-      if (it != attr_map.end() && it->second.size() > start) {  // If style bits exist...
+      auto it = style_map.find(style);
+      if (it != style_map.end() && it->second.size() > start) {  // If style bits exist...
         if (end > it->second.size()) end = it->second.size();   // ...don't pass text end
         it->second.Clear(start, end);
       }
