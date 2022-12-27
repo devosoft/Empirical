@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2022.
  *
- *  @file HTMLText.hpp
- *  @brief Builds on Text.hpp, but assumes all text input and output are in HTML encodings.
+ *  @file HTMLEncoding.hpp
+ *  @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
  *  @note Status: ALPHA
  * 
  */
 
-#ifndef EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
-#define EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
+#ifndef EMP_TOOLS_HTML_ENCODING_HPP_INCLUDE
+#define EMP_TOOLS_HTML_ENCODING_HPP_INCLUDE
 
 #include <set>
 #include <string>
