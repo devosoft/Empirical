@@ -55,4 +55,22 @@ TEST_CASE("Testing HTMLText", "[text]") {
   // REQUIRE(text.GetSize() == 27);
   REQUIRE(text.GetText() == "This is Pre-formatted text.");
   REQUIRE(text.ToString() == "This is <i><b>Pre-</i>formatted</b> text.");
+
+  emp::Text plain_text("The <b> and </b> here should not be converted.");
+  REQUIRE(plain_text.ToString() == "The <b> and </b> here should not be converted.");
+
+  // Now let's bold the word "not".
+  plain_text.Bold(29,32);
+
+  // Should not change the output of ToString(), just internal style.
+  REQUIRE(plain_text.ToString() == "The <b> and </b> here should not be converted.");
+  REQUIRE(plain_text[28].IsBold() == false);
+  REQUIRE(plain_text[29].IsBold() == true);
+  REQUIRE(plain_text[31].IsBold() == true);
+  REQUIRE(plain_text[32].IsBold() == false);
+
+  // But if we put it into an HTML object, the style should be reflected.
+  emp::HTMLText html_text(plain_text);
+  REQUIRE(html_text.GetText() == "The <b> and </b> here should not be converted.");
+  REQUIRE(html_text.ToString() == "The &lt;b&gt; and &lt;/b&gt; here should <b>not</b> be converted.");
 }
