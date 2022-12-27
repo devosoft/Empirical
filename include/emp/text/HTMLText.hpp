@@ -23,7 +23,7 @@
 
 namespace emp {
 
-  class HTMLText : public emp::Text {
+  class HTMLEncoding : public emp::TextEncoding {
   private:
     struct StyleInfo{
       std::string open;
@@ -31,11 +31,11 @@ namespace emp {
     };
     enum class TagType {
       UNKNOWN = 0,
-      OPEN,    // Start a new style (e.g., '<b>')
-      CLOSE,   // Stop using a style (e.g., '</b>')
-      FORMAT,  // Indicate a structural element (e.g., '<p>')
-      REPLACE, // Indicate a direct replacement (e.g., '&lt;' means '<')
-      COUNT    // Track total number of tag types.
+      OPEN,     // Start a new style (e.g., '<b>')
+      CLOSE,    // Stop using a style (e.g., '</b>')
+      FORMAT,   // Indicate a structural element (e.g., '<p>')
+      REPLACE,  // Indicate a direct replacement (e.g., '&lt;' means '<')
+      TAG_COUNT // Track total number of tag types.
     };
     struct TagInfo {
       TagType type;
@@ -96,9 +96,9 @@ namespace emp {
     void Append_String(const std::string & in) {
       size_t start = text.size();
       size_t end = start + in.size();
-      text += in;      
+      text.Append_Raw(in);
       for (const std::string & style : active_styles) {
-        SetStyle(style, start, end);
+        text.SetStyle(style, start, end);
       }
     }
 
@@ -119,8 +119,13 @@ namespace emp {
       }
     }
 
+  public:
+    HTMLEncoding(Text & _text, const std::string _name="html")
+      : TextEncoding(_text, _name) { SetupTags(); }
+    ~HTMLEncoding() = default;
+
     // Add new HTML into this object.
-    void Append(std::string in) {
+    void Append(std::string in) override {
 //      std::cout << "APPEND: " << in << std::endl;
 
       auto tokens = lexer.Tokenize(in);
@@ -134,40 +139,12 @@ namespace emp {
       }
     }
 
-  public:
-    HTMLText() { SetupTags(); }
-    HTMLText(const HTMLText &) = default;
-    HTMLText(HTMLText &&) = default;
-    HTMLText(const std::string & in) { SetupTags(); Append(in); }
-    ~HTMLText() = default;
-
-    HTMLText & operator=(const HTMLText &) = default;
-    HTMLText & operator=(HTMLText &&) = default;
-
-    Text & operator=(const std::string & in) {
-      Resize(0); // Clear out existing content.
-      Append(in);
-      return *this;
-    };
-
-    // Stream operator.
-    template <typename T>
-    Text & operator<<(T && in) {
-      using in_t = std::remove_reference_t< std::remove_const_t<T> >;
-      if constexpr (std::is_same_v<in_t, std::string>) {
-        Append(in);
-      } else {
-        Append(emp::to_string(in));
-      }
-      return *this;
-    }
-
     // Convert this to a string in HTML format.
-    std::string ToString() {
+    std::string ToString() const override {
       // Determine where tags should be placed.
       std::map<size_t, std::string> tag_map;
       for (const auto & [style, info] : style_info) {
-        if (HasStyle(style)) AddOutputTags(tag_map, style, info.open, info.close);
+        if (text.HasStyle(style)) AddOutputTags(tag_map, style, info.open, info.close);
       }
 
       // Convert the string, adding tags back in as we go.
@@ -175,7 +152,7 @@ namespace emp {
       size_t output_pos = 0;
       for (auto [tag_pos, tags] : tag_map) {
         if (output_pos < tag_pos) {
-          out_string += text.substr(output_pos, tag_pos-output_pos);
+          out_string += text.GetText().substr(output_pos, tag_pos-output_pos);
           output_pos = tag_pos;
         }
         out_string += tags;
@@ -183,7 +160,7 @@ namespace emp {
 
       // Add any final text after the last tag.
       if (output_pos < text.size()) {
-        out_string += text.substr(output_pos, text.size()-output_pos);
+        out_string += text.GetText().substr(output_pos, text.size()-output_pos);
       }
 
       return out_string;
@@ -196,11 +173,11 @@ namespace emp {
     // the output string as it's created.
     void AddOutputTags(
       std::map<size_t, std::string> & tag_map,
-      std::string attr,
+      std::string style,
       std::string start_tag,
-      std::string end_tag)
+      std::string end_tag) const
     {
-      const BitVector & sites = attr_map[attr];
+      const BitVector & sites = text.GetStyle(style);
 
       // Test if this style should be opened at the beginning.
       if (sites.Has(0)) tag_map[0] += start_tag;
