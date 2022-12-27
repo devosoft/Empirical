@@ -208,13 +208,18 @@ namespace emp {
     /// Automatic conversion back to an unformatted string
     operator const std::string &() const { return GetText(); }
 
+    bool HasEncoding(const std::string & name) const {
+      return emp::Has(encodings, name);
+    }
+
     // Change the current encoding being used.
-    void SetEncoding(const std::string & name) {
+    Text & SetEncoding(const std::string & name) {
       if (!emp::Has(encodings, name)) {
         notify::Error("Trying to set unknown encoding '", name, "'; No change made.");
       } else {
         encoding_ptr = encodings[name];
       }
+      return *this;
     }
 
     /// Add a new encoding to this Text object.  Newly added encodings automatically become
@@ -246,8 +251,12 @@ namespace emp {
     // Stream operator.
     template <typename T>
     Text & operator<<(T && in) {
-      Append(emp::to_string(in));
-      return *this;
+      return Append(emp::to_string(in));
+    }
+
+    template <typename T>
+    Text & operator+=(T && in) {
+      return Append(emp::to_string(in));
     }
 
     void Resize(size_t new_size) {
@@ -306,8 +315,6 @@ namespace emp {
     char & back() { return text.back(); }
     char back() const { return text.back(); }
     bool empty() const { return text.empty(); }
-    // void push_back(char c) { text.push_back(c); }
-    // void pop_back() { text.pop_back(); }
     template <typename... Ts>
     bool starts_with(Ts &&... in) const { text.starts_with(std::forward<Ts>(in)... ); }
     template <typename... Ts>
