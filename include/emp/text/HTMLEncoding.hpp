@@ -151,9 +151,16 @@ namespace emp {
       std::string out_string;
       size_t output_pos = 0;
       for (auto [tag_pos, tags] : tag_map) {
-        if (output_pos < tag_pos) {
-          out_string += text.GetText().substr(output_pos, tag_pos-output_pos);
-          output_pos = tag_pos;
+        while (output_pos < tag_pos) {
+          char next_char = text.GetChar(output_pos);
+          switch (next_char) {
+          case '<':  out_string += "&lt;";   break;
+          case '>':  out_string += "&gt;";   break;
+          case '&':  out_string += "&amp;";  break;
+          default:
+            out_string += next_char;
+          }
+          ++output_pos;
         }
         out_string += tags;
       }
