@@ -10,6 +10,32 @@
  *  Text should be functionally interchangable with string, but can easily convert to
  *  HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
  *  etc.
+ * 
+ *  The main Text class tracks a string of text (called simply "text") and any special attributes
+ *  associated with each text position (in "attr_map").  The current TextEncoding class helps
+ *  guide the conversion from one text encoding to another.
+ *
+ *  Internally, attributes that encodings should be able to handle are:
+ *    BASIC FORMATS :
+ *     "bold" (alias: "b" or "strong")
+ *     "code" (alias: "tt" or "teletype")
+ *     "italic" (alias: "i", "em", or "emphasis")
+ *     "strike" (alias "strikethrough")
+ *     "subscript" (alias "sub")
+ *     "superscript" (alias "sup")
+ *     "underline"
+ *     "color:NAME"
+ *     "font:NAME"
+ *     "size:NAME" (in point size)
+ * 
+ *    STRUCTURAL :
+ *     "heading:1" through "heading:6" different levels of headings.
+ *     "blockquote"
+ *     "bullet:1" through "bullet:6" (only on character after bulleted; stops an newline)
+ *     "indent:1" through "indent:6" (same as bullet, but no bullet)
+ *     "ordered:1" through "ordered:6" (numbers; reset less-tabbed structure is used)
+ *     "link:URL" (create a link to the specified URL)
+ *     "image:URL" (include in the specified image)
  */
 
 #ifndef EMP_TOOLS_TEXT_HPP_INCLUDE
