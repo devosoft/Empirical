@@ -80,8 +80,32 @@ namespace emp {
     TextCharRef & Underline()   { return SetStyle("underline"); }
   };
 
+  // A base class for any special encodings that should work with Text objects.
+  class TextEncoding {
+  protected:
+    Text & text;      // The emp::Text this encoding is associated with.
+    std::string name; // The name by which this encoding should be called.
+  public:
+    TextEncoding(Text & _text, const std::string _name) : text(_text), name(_name) { }
+    virtual ~TextEncoding() { }
+
+    const std::string & GetName() const { return name; }
+
+    // By default, append text assuming that there is no special formatting in it.
+    virtual void Append(std::string in);
+
+    // By default, return text and ignore all formatting.
+    virtual std::string ToString() const;
+
+    // Make a copy of this TextEncoding, including proper derived class.
+    virtual emp::Ptr<TextEncoding> Clone(Text & _text) const {
+      return emp::NewPtr<TextEncoding>(_text, name);
+    }
+  };
+
   class Text {
   protected:
+    // Current state of the text, minus all formatting.
     std::string text = "";
 
     // Attributes are basic formatting for strings, including "bold", "italic", "underline",
@@ -89,9 +113,13 @@ namespace emp {
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
     std::unordered_map<std::string, BitVector> attr_map;
 
+    // A set of encodings that this Text object can handle.
+    std::map< std::string, emp::Ptr<TextEncoding> > encodings;
+    emp::Ptr<TextEncoding> encoding_ptr = nullptr;
+
     // Internal function to remove unused styles.
     void Cleanup() {
-      // Scan for styles that are now unused.
+      // Scan for styles that are no longer unused.
       emp::vector<std::string> unused_styles;
       for (auto & [tag, bits] : attr_map) {
         if (bits.None()) unused_styles.push_back(tag);
@@ -103,26 +131,41 @@ namespace emp {
     }
 
   public:
-    Text() = default;
-    Text(const Text &) = default;
-    Text(Text &&) = default;
-    Text(const std::string & in) : text(in) { }
-    Text(std::string && in) : text(std::move(in)) { }
-    ~Text() = default;
+    Text() {
+      encodings["txt"] = NewPtr<TextEncoding>(*this, "txt");
+      encoding_ptr = encodings["txt"];
+    };
+    Text(const Text & in) {
+      for (const auto & [e_name, ptr] : encodings) {
+        encodings[e_name] = ptr->Clone(*this);
+      }
+      encoding_ptr = encodings[in.encoding_ptr->GetName()];
+    }
+    Text(const std::string & in) {      
+      encodings["txt"] = NewPtr<TextEncoding>(*this, "txt");
+      encoding_ptr = encodings["txt"];
+      Append(in);
+    }
+    ~Text() {
+      if (encoding_ptr != nullptr) {
+        for (auto & [e_name, ptr] : encodings) {
+          ptr.Delete();
+        }
+      }
+    }
 
-    Text & operator=(const Text &) = default;
-    Text & operator=(Text &&) = default;
+    Text & operator=(const Text & in) {
+      Text new_text(in);
+      std::swap(*this, new_text);
+      return *this;
+    }
 
     Text & operator=(const std::string & in) {
       attr_map.clear(); // Clear out existing content.
-      text=in;
+      text.resize(0);
+      Append(in);
       return *this;
     };
-    Text & operator=(std::string && in) {
-      attr_map.clear(); // Clear out existing content.
-      text = std::move(in);
-      return *this;
-    }
 
     // GetSize() returns the number of characters IGNORING all formatting.
     size_t GetSize() const { return text.size(); }
@@ -133,15 +176,22 @@ namespace emp {
     /// Automatic conversion back to an unformatted string
     operator const std::string &() const { return GetText(); }
 
+    /// Append potentially-formatted text through the current encoding.
+    Text & Append(const std::string & in) {
+      encoding_ptr->Append(in);
+      return *this;
+    }
+
+    // Append raw text; assume no formatting.
+    Text & Append_Raw(const std::string & in) {
+      text += in;
+      return *this;
+    }
+
     // Stream operator.
     template <typename T>
     Text & operator<<(T && in) {
-      using in_t = std::remove_reference_t< std::remove_const_t<T> >;
-      if constexpr (std::is_same_v<in_t, std::string>) {
-        text += in;
-      } else {
-        text += emp::to_string(in);
-      }
+      Append(emp::to_string(in));
       return *this;
     }
 
@@ -196,10 +246,10 @@ namespace emp {
 
     template <typename... Ts>
     Text & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); }
-    char & front() { return text[0]; }
-    char front() const { return text[0]; }
-    char & back() { return text[size()-1]; }
-    char back() const { return text[size()-1]; }
+    char & front() { return text.front(); }
+    char front() const { return text.front(); }
+    char & back() { return text.back(); }
+    char back() const { return text.back(); }
     bool empty() const { return text.empty(); }
     // void push_back(char c) { text.push_back(c); }
     // void pop_back() { text.pop_back(); }
@@ -423,6 +473,21 @@ namespace emp {
     text_ref.HasStyle(style, pos);
     return *this;
   }
+
+
+  // ------- TextEncoding --------
+
+    // By default, append text assuming that there is no special formatting in it.
+  void TextEncoding::Append(std::string in) {
+    text.Append_Raw(in);
+  }
+
+  // By default, return text and ignore all formatting.
+  std::string TextEncoding::ToString() const {
+    return text;
+  }
+
+
 }
 
 
