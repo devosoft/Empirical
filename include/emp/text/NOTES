@@ -42,8 +42,8 @@ Supported text formats:
  * 
  *  Now for the crazy.  We can embed code as needed.
  * 
- *  `$variable = value || other_code`$
- *  `#var_value_printed_here#
+ *  `{variable = value || other_code}
+ *  `$var_value_printed_here$
  * 
  *  Anything with four spaces at the beginning will be treated like indented code.
  *  Add a `= at the beginning of a line if you don't want special formatting.
@@ -56,7 +56,8 @@ Supported text formats:
  *  ``{This would also be code}``
  * 
  *  Escape characters do work.
- *  \\ is \
- *  \` is a backtick in the actual string
- *  \n is newline
+ *  \\ is a regular backslash ('\')
+ *  \` is a backtick in the actual string ('`')
+ *  \  (backlash space) is a non-breaking space.
+ *  \n is a newline
  *  \t is a tab
