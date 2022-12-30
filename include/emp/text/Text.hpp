@@ -329,10 +329,11 @@ namespace emp {
 
     template <typename... Ts>
     Text & assign(Ts &&... in) { text.assign( std::forward<Ts>(in)... ); }
-    char & front() { return text.front(); }
-    char front() const { return text.front(); }
-    char & back() { return text.back(); }
-    char back() const { return text.back(); }
+    TextCharRef<false> front()      { return operator[](0); }
+    TextCharRef<true> front() const { return operator[](0); }
+    TextCharRef<false> back()       { return operator[](text.size()-1); }
+    TextCharRef<true> back() const  { return operator[](text.size()-1); }
+
     bool empty() const { return text.empty(); }
     template <typename... Ts>
     bool starts_with(Ts &&... in) const { text.starts_with(std::forward<Ts>(in)... ); }
