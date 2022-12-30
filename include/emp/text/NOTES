@@ -61,3 +61,34 @@ Supported text formats:
  *  \  (backlash space) is a non-breaking space.
  *  \n is a newline
  *  \t is a tab
+
+
+Some saved notes:
+    // Tag layout differs substantially from one language to the next.  For example, to make
+    // text have the style "bold", it may look like:
+    //   HTML:      One word is <b>bold</b>.
+    //   MarkDown:  One word is *bold*.
+    //   LaTeX:     One word is \textbf{bold}.
+    //   Emphatic:  One word is `*bold`*
+    //
+    // Some styles need to have arguments associated with them.  For example, a heading needs
+    // to have a level.  A level 3 heading, for example, would be stored as style "heading:3".
+    //   HTML:      <h3>A level 3 heading</h3>
+    //   MarkDown:  ### A level 3 heading
+    //   LaTeX:     \subsubsection{A level 3 heading}
+    //   Emphatic:  `### A level 3 heading
+    //
+    // The patterns associated with these can either be broken up into multiple tags (for example,
+    // in LaTeX it's easier to match a specific "\subsubsection{" open tag with "header:3" style),
+    // while HTML can use the pattern "H$d" mapping to "header:$0".  In Markdown we would use
+    // "$r{#}" mapping to "header:$0"
+    //
+    // Finally, more complex tags are possible.  For example, if a tag is supposed to map a
+    // series of words to a linked URL:
+    //   HTML:      This is <a href="http://www.exmaple.com/">linked</a> text.
+    //   MarkDown:  This is [linked](http://www.exmaple.com/) text.
+    //   LaTeX:     This is \href{http://www.exmaple.com/}{linked} text.
+    //   Emphatic:  This is `[linked](http://www.exmaple.com/) text.
+    //
+    // For these patterns, HTML open would look like: <a href="%u">
+    // And it would be set to the style: "link:$0".
