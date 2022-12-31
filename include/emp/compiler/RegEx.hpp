@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
+ *  @date 2016-2022.
  *
  *  @file RegEx.hpp
  *  @brief Basic regular expression handler.
@@ -29,8 +29,11 @@
  *    static DFA to_DFA(const RegEx & regex);
  *
  *
- *  @todo Need to implement  ^ and $ (beginning and end of line)
- *  @todo Need to implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respecitvely)
+ *  @todo Implement  ^ and $ (beginning and end of line)
+ *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
+ *  @todo Implement \d (for digits), \s (for whitespace), etc.
+ *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
+ *        the result can be returned by each section as a vector of strings.
  */
 
 #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
