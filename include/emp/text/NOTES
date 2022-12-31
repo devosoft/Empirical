@@ -92,3 +92,57 @@ Some saved notes:
     //
     // For these patterns, HTML open would look like: <a href="%u">
     // And it would be set to the style: "link:$0".
+
+Original comments on tag pattern:
+      // What pattern will identify this tag?  Any characters EXCEPT $ will be taken literally.
+      // $$ will be a single $.  A $ followed by a letter will have a specific meaning.
+      //   $d = A single digit (0 to 9)
+      //   $f = Any filename (includes a-z, A-Z, 0-9, '_', '/', '.', and '-')
+      //   $i = Any identifier sequence (includes a-z, A-Z, 0-9 and '_')
+      //   $n = Any whole number sequence (a series of digits)
+      //   $r{pattern} = A repeated pattern
+      //   @CAO FUTURE ADDITION: $t = Any normal text
+      //   $u = Any URL
+
+For style replacements:
+      // A more complex style uses a replacement pattern to generate its description.  It can use $0
+      // through $9 for the $letter material in the pattern. (e.g., a font should track the
+      // name of the font.)
+
+And for converting a pattern to a normal regex:
+      std::string AsRegEx() {
+        std::string out;
+        for (size_t i = 0; i < pattern.size(); ++i) {
+          if (pattern[i] == '$') {
+            ++i;
+            emp_assert(i < pattern.size());
+            switch (pattern[i]) {
+              case '$': out += "$"; break;
+              case 'd': out += "[0-9]"; break;
+              case 'f': out += "[a-zA-Z0-9_/.-]+"; break;
+              case 'i': out += "[a-zA-Z0-9_]+"; break;
+              case 'n': out += "[0-9]+"; break;
+              case 'r':
+                {
+                  size_t start = i;
+                  i = emp::find_paren_match(pattern, i, '{', '}', false);
+                  out += "\"" + pattern.substr(start+1, i-start-1) + "\"+";
+                }
+                break;
+              case 't': out += "[]"; break;
+              case 'u': out += "[a-zA-Z0-9_/.+:-]"; break;
+            }
+          }
+          else if (pattern[0] == '[') out += "[\\[]";
+          else if (pattern[0] == ']') out += "[\\]]";
+          else if (pattern[0] == '*') out += "[*]";
+          else if (pattern[0] == '.') out += "[.]";
+          else if (pattern[0] == '+') out += "[+]";
+          else if (pattern[0] == '?') out += "[?]";
+          else if (pattern[0] == '|') out += "[|]";
+          else if (pattern[0] == '(') out += "[()]";
+          else if (pattern[0] == ')') out += "[)]";
+          else out += pattern[i];
+        }
+        return out;
+      }
