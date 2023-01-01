@@ -108,13 +108,13 @@ namespace emp {
   };
 
   // A base class for any special encodings that should work with Text objects.
-  class TextEncoding {
+  class TextEncoding_Base {
   protected:
     Text & text;      // The emp::Text this encoding is associated with.
     std::string name; // The name by which this encoding should be called.
   public:
-    TextEncoding(Text & _text, const std::string _name) : text(_text), name(_name) { }
-    virtual ~TextEncoding() { }
+    TextEncoding_Base(Text & _text, const std::string _name) : text(_text), name(_name) { }
+    virtual ~TextEncoding_Base() { }
 
     const std::string & GetName() const { return name; }
 
@@ -125,8 +125,8 @@ namespace emp {
     virtual std::string ToString() const;
 
     // Make a copy of this TextEncoding, including proper derived class.
-    virtual emp::Ptr<TextEncoding> Clone(Text & _text) const {
-      return emp::NewPtr<TextEncoding>(_text, name);
+    virtual emp::Ptr<TextEncoding_Base> Clone(Text & _text) const {
+      return emp::NewPtr<TextEncoding_Base>(_text, name);
     }
   };
 
@@ -141,8 +141,8 @@ namespace emp {
     std::unordered_map<std::string, BitVector> style_map;
 
     // A set of encodings that this Text object can handle.
-    std::map< std::string, emp::Ptr<TextEncoding> > encodings;
-    emp::Ptr<TextEncoding> encoding_ptr = nullptr;
+    std::map< std::string, emp::Ptr<TextEncoding_Base> > encodings;
+    emp::Ptr<TextEncoding_Base> encoding_ptr = nullptr;
 
     // Internal function to remove unused styles.
     void Cleanup() {
@@ -159,7 +159,7 @@ namespace emp {
 
   public:
     Text() {
-      encodings["txt"] = NewPtr<TextEncoding>(*this, "txt");
+      encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
       encoding_ptr = encodings["txt"];
     };
     Text(const Text & in) : text(in.text), style_map(in.style_map) {
@@ -169,7 +169,7 @@ namespace emp {
       encoding_ptr = encodings[in.encoding_ptr->GetName()];
     }
     Text(const std::string & in) {      
-      encodings["txt"] = NewPtr<TextEncoding>(*this, "txt");
+      encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
       encoding_ptr = encodings["txt"];
       Append(in);
     }
@@ -557,15 +557,15 @@ namespace emp {
   }
 
 
-  // ------- TextEncoding --------
+  // ------- TextEncoding_Base --------
 
     // By default, append text assuming that there is no special formatting in it.
-  void TextEncoding::Append(std::string in) {
+  void TextEncoding_Base::Append(std::string in) {
     text.Append_Raw(in);
   }
 
   // By default, return text and ignore all formatting.
-  std::string TextEncoding::ToString() const {
+  std::string TextEncoding_Base::ToString() const {
     return text;
   }
 
