@@ -25,22 +25,30 @@ namespace emp {
 
   class HTMLEncoding : public emp::TextEncoding {
   private:
-    struct StyleInfo{
-      std::string open;
-      std::string close;
-    };
+    // A categorical description of how a particular style tag should work.
     enum class TagType {
-      UNKNOWN = 0,
-      OPEN,     // Start a new style (e.g., '<b>')
-      CLOSE,    // Stop using a style (e.g., '</b>')
-      FORMAT,   // Indicate a structural element (e.g., '<p>')
-      REPLACE,  // Indicate a direct replacement (e.g., '&lt;' means '<')
-      TAG_COUNT // Track total number of tag types.
+      OPEN,      // Start a new style that needs to be ended (e.g., '<b>' in HTML)
+      CLOSE,     // Stop using a style (e.g., '</b>' in HTML)
+      TOGGLE,    // Toggle a style on/off (e.g., '*' in markdown)
+      LINE,      // Set a style until the end of line (e.g., <li> in HTML or # in markdown)
+      STRUCTURE, // Indicate a structural element (e.g., '<div>' in HTML)
+      REPLACE    // Indicate a simple replacement (e.g., '&lt;' means '<' in HTML)
     };
+
+    // TagInfo provides detailed information for how tags should be handled.
     struct TagInfo {
       TagType type;
-      std::string style;  // The style that this tag is associated with.
-      std::string text;   // Basic text associated with this tag (e.g., for replacements)
+      std::string base_style; // The base style that this tag is associated with. (e.g., "bold")
+      std::string text;       // Basic text associated with this tag (e.g., for simple replacements)
+      std::string pattern;    // A regex pattern for identifying this tag.
+    };
+
+    // A struct to help translate a style back into relevant tags.
+    struct StyleInfo {
+      std::string name;   // What is the base name of this style? (e.g. "bold" or "font")
+      std::string open;   // What tag should be used when this style starts?
+      std::string close;  // What tag should be used when this style ends?
+      bool has_args;      // Does this style have arguments associated with it?
     };
 
     std::unordered_map<std::string, StyleInfo> style_info;
@@ -54,16 +62,32 @@ namespace emp {
 
     std::set<std::string> active_styles; // Styles to use on appended text.
 
-    void BuildStyle(const std::string & style,
-                   const std::string & open,
-                   const std::string & close)
+    void BuildBaseStyle(
+      const std::string & name,
+      const std::string & open,
+      const std::string & close)
     {
-      if (style_info.size()) tag_regex += '|';
-      tag_regex += emp::to_literal(open) + '|' + emp::to_literal(close);
+      
+      const bool is_toggle = (open == close); // If open and close are the same, tag is a TOGGLE.
+      const bool is_line = (close == "\n");   // If close is a newline, tag is a LINE type.
 
-      style_info[style] = StyleInfo{open, close};
-      tag_info[open] = TagInfo{TagType::OPEN, style};
-      tag_info[close] = TagInfo{TagType::CLOSE, style};
+      // We always want to track the open tag.
+      if (style_info.size()) tag_regex += '|';
+      tag_regex += emp::to_literal(open);
+
+      // Only track the close tag if meaningful.
+      if (!is_toggle && !is_line) tag_regex += emp::to_string('|', emp::to_literal(close));
+
+      style_info[name] = StyleInfo{name, open, close, false};
+
+      if (is_toggle) {
+        tag_info[open] = TagInfo{TagType::TOGGLE, name};
+      } else if (is_line) {
+        tag_info[open] = TagInfo{TagType::LINE, name};        
+      } else {
+        tag_info[open] = TagInfo{TagType::OPEN, name};      
+        tag_info[close] = TagInfo{TagType::CLOSE, name};
+      }
     }
 
     void BuildReplacement(const std::string & html_v, const std::string & txt_v) {
@@ -73,13 +97,19 @@ namespace emp {
     }
 
     void SetupTags() {
-      BuildStyle("bold", "<b>", "</b>");
-      BuildStyle("code", "<code>", "</code>");
-      BuildStyle("italic", "<i>", "</i>");
-      BuildStyle("strike", "<del>", "</del>");
-      BuildStyle("subscript", "<sub>", "</sub>");
-      BuildStyle("superscript", "<sup>", "</sup>");
-      BuildStyle("underline", "<u>", "</u>");
+      BuildBaseStyle("bold", "<b>", "</b>");
+      BuildBaseStyle("code", "<code>", "</code>");
+      BuildBaseStyle("italic", "<i>", "</i>");
+      BuildBaseStyle("strike", "<del>", "</del>");
+      BuildBaseStyle("subscript", "<sub>", "</sub>");
+      BuildBaseStyle("superscript", "<sup>", "</sup>");
+      BuildBaseStyle("underline", "<u>", "</u>");
+      BuildBaseStyle("header1", "<h1>", "</h1>");
+      BuildBaseStyle("header2", "<h2>", "</h2>");
+      BuildBaseStyle("header3", "<h3>", "</h3>");
+      BuildBaseStyle("header4", "<h4>", "</h4>");
+      BuildBaseStyle("header5", "<h5>", "</h5>");
+      BuildBaseStyle("header6", "<h6>", "</h6>");
 
       BuildReplacement("&amp;", "&");
       BuildReplacement("&gt;", ">");
@@ -106,10 +136,10 @@ namespace emp {
       const auto & info = tag_info[tag];
       switch (info.type) {
         case TagType::OPEN:
-          active_styles.insert(info.style);
+          active_styles.insert(info.base_style);
           break;
         case TagType::CLOSE:
-          active_styles.erase(info.style);
+          active_styles.erase(info.base_style);
           break;
         case TagType::REPLACE:
           Append_String(info.text);
