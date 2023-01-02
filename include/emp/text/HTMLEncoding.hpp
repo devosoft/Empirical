@@ -28,19 +28,19 @@ namespace emp {
   private:
 
     void SetupTags() {
-      AddBasicTags("bold", "<b>", "</b>");
-      AddBasicTags("code", "<code>", "</code>");
-      AddBasicTags("italic", "<i>", "</i>");
-      AddBasicTags("strike", "<del>", "</del>");
-      AddBasicTags("subscript", "<sub>", "</sub>");
-      AddBasicTags("superscript", "<sup>", "</sup>");
-      AddBasicTags("underline", "<u>", "</u>");
-      AddBasicTags("header1", "<h1>", "</h1>");
-      AddBasicTags("header2", "<h2>", "</h2>");
-      AddBasicTags("header3", "<h3>", "</h3>");
-      AddBasicTags("header4", "<h4>", "</h4>");
-      AddBasicTags("header5", "<h5>", "</h5>");
-      AddBasicTags("header6", "<h6>", "</h6>");
+      AddBasicTag("bold", "<b>", "</b>");
+      AddBasicTag("code", "<code>", "</code>");
+      AddBasicTag("italic", "<i>", "</i>");
+      AddBasicTag("strike", "<del>", "</del>");
+      AddBasicTag("subscript", "<sub>", "</sub>");
+      AddBasicTag("superscript", "<sup>", "</sup>");
+      AddBasicTag("underline", "<u>", "</u>");
+      AddBasicTag("header1", "<h1>", "</h1>");
+      AddBasicTag("header2", "<h2>", "</h2>");
+      AddBasicTag("header3", "<h3>", "</h3>");
+      AddBasicTag("header4", "<h4>", "</h4>");
+      AddBasicTag("header5", "<h5>", "</h5>");
+      AddBasicTag("header6", "<h6>", "</h6>");
 
       AddReplacementTag("&amp;", "&");
       AddReplacementTag("&gt;", ">");
