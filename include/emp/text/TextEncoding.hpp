@@ -31,7 +31,8 @@ namespace emp {
       OPEN,        // Start a new style that needs to be ended (e.g., '<b>' in HTML)
       CLOSE,       // Stop using a style (e.g., '</b>' in HTML)
       TOGGLE,      // Toggle a style on/off (e.g., '*' in markdown)
-      LINE,        // Set a style until the end of line (e.g., <li> in HTML or # in markdown)
+      LINE,        // Set a style until the end of line (e.g., # in markdown)
+      CHAR,        // Set a style for only a single character (e.g., <li> in HTML)
       STRUCTURE,   // Indicate a structural element (e.g., '<div>' in HTML)
       REPLACE      // Indicate a simple replacement (e.g., '&lt;' means '<' in HTML)
     };
@@ -63,38 +64,88 @@ namespace emp {
 
     std::set<std::string> active_styles; // Styles to use on appended text.
 
-    void BuildBaseStyle(
-      const std::string & name,
-      const std::string & open,
-      const std::string & close)
-    {
-      
-      const bool is_toggle = (open == close); // If open and close are the same, tag is a TOGGLE.
-      const bool is_line = (close == "\n");   // If close is a newline, tag is a LINE type.
+    /// @brief Add a simple tag associated with a text style.
+    /// @param style The text style associated with the new tag.
+    /// @param start The main tag to start this style.
+    /// @param stop  The tags (or other indication) that should end this style.
+    /// The specific behavior of these tags depends on what as provided as stop:
+    /// * Another tag  : the tags indicate the beginning and end of a style (E.g., "<b>", "</b>")
+    /// * The same tag : tag toggles the style (e.g., "*"" in Markdown)
+    /// * newline (\n) : the style should apply to the rest of the line (e.g., blockquote)
+    /// * empty ("")   : the style should only be applied to one character (e.g., indent)    
+    void AddBasicTag (
+      const std::string & style,
+      const std::string & start,
+      const std::string & stop="")
+    { 
+      TagType tag_type = TagType::OPEN;
+      if (stop == "") tag_type = TagType::CHAR;
+      else if (stop == "\n") tag_type = TagType::LINE;
+      else if (stop == start) tag_type = TagType::TOGGLE;
 
-      // We always want to track the open tag.
+      // We always want to track the start tag.
       if (style_info.size()) tag_regex += '|';
-      tag_regex += emp::to_literal(open);
+      tag_regex += emp::to_literal(start);
 
-      // Only track the close tag if meaningful.
-      if (!is_toggle && !is_line) tag_regex += emp::to_string('|', emp::to_literal(close));
+      style_info[style] = StyleInfo{style, start, stop, false};
+      tag_info[start] = TagInfo{tag_type, style};
 
-      style_info[name] = StyleInfo{name, open, close, false};
-
-      if (is_toggle) {
-        tag_info[open] = TagInfo{TagType::TOGGLE, name};
-      } else if (is_line) {
-        tag_info[open] = TagInfo{TagType::LINE, name};        
-      } else {
-        tag_info[open] = TagInfo{TagType::OPEN, name};      
-        tag_info[close] = TagInfo{TagType::CLOSE, name};
+      // Only track the stop tag if meaningful.
+      if (tag_type == TagType::OPEN) {
+        tag_regex += emp::to_string('|', emp::to_literal(stop));
+        tag_info[stop] = TagInfo{TagType::CLOSE, style};
       }
     }
 
-    void BuildReplacement(const std::string & html_v, const std::string & txt_v) {
+    /// @brief Add a simple tag that is always replaced in a specific way.
+    /// @param encode_v The tag from the encoding.
+    /// @param txt_v The text it should be replaced with.
+    /// @param style The style of the replacement text (if any)
+    void AddReplacementTag(
+      const std::string & encode_v, // Encoding for this symbol (e.g., "&nbsp;"")
+      const std::string & txt_v,    // Text to convert this symbol to (e.g., " ")
+      const std::string & style="") // Special style for this symbol, if any (e.g., "no_break")
+    {
       if (style_info.size()) tag_regex += '|';
-      tag_regex += emp::to_literal(html_v);
-      tag_info[html_v] = TagInfo{TagType::REPLACE, txt_v};
+      tag_regex += emp::to_literal(encode_v);
+      tag_info[encode_v] = TagInfo{ TagType::REPLACE, style, txt_v, encode_v };
+    }
+
+    // Take a tag, return associate style.
+    using style_fun_t = std::function<std::string(const std::string &)>;
+    // Take a tag, return associated text.
+    using text_fun_t = std::function<std::string(const std::string &)>;
+    // Take a style and text and return the associated tag.
+    using tag_fun_t = std::function<std::string(const std::string &, const std::string &)>;
+
+    /// @brief Create a more complex tag/style that uses arguments.
+    /// @param style A unique style name used as the base style (E.g., "anchor").
+    /// @param regex A regular expression that will uniquely identify this tag.
+    /// @param tag_fun A function that takes style and text to generate this tag.
+    /// @param style_fun A function that takes this tag and returns the style to use for it.
+    /// @param text_fun A function that takes this tag and returns the text to use for it.
+    void AddComplexTag(
+      const std::string & style, // The base style name (without extra arguments)
+      const std::string & regex, // Regular expression to identify this tag.
+      tag_fun_t tag_fun,         // Function to covert style and text to associated tag.
+      style_fun_t style_fun,     // Function to convert this tag to a style with details.
+      text_fun_t text_fun)       // Function to convert this tag to associated text.
+    {      
+    }
+
+    /// @brief Create a more complex tag/style that uses arguments.
+    /// @param style A unique style name used as the base style (E.g., "anchor").
+    /// @param regex A regular expression that will uniquely identify this tag.
+    /// @param tag_fun A function that takes style and text to generate this tag.
+    /// @param style_fun A function that takes this tag and returns the style to use for it.
+    /// @param stop A string that represents the close tag for this entry (e.g., "</a>")
+    void AddComplexTag(
+      const std::string & style,   // The base style name (without extra arguments)
+      const std::string & regex,   // Regular expression to identify this tag.
+      tag_fun_t tag_fun,           // Function to covert style and text to associated tag.
+      style_fun_t style_fun,       // Function to convert this tag to a style with details.
+      const std::string & stop="") // Tag that should stop this style.
+    {
     }
 
     // Append a string that has already been otherwise processed.
