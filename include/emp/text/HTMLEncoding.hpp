@@ -28,24 +28,24 @@ namespace emp {
   private:
 
     void SetupTags() {
-      BuildBaseStyle("bold", "<b>", "</b>");
-      BuildBaseStyle("code", "<code>", "</code>");
-      BuildBaseStyle("italic", "<i>", "</i>");
-      BuildBaseStyle("strike", "<del>", "</del>");
-      BuildBaseStyle("subscript", "<sub>", "</sub>");
-      BuildBaseStyle("superscript", "<sup>", "</sup>");
-      BuildBaseStyle("underline", "<u>", "</u>");
-      BuildBaseStyle("header1", "<h1>", "</h1>");
-      BuildBaseStyle("header2", "<h2>", "</h2>");
-      BuildBaseStyle("header3", "<h3>", "</h3>");
-      BuildBaseStyle("header4", "<h4>", "</h4>");
-      BuildBaseStyle("header5", "<h5>", "</h5>");
-      BuildBaseStyle("header6", "<h6>", "</h6>");
+      AddBasicTags("bold", "<b>", "</b>");
+      AddBasicTags("code", "<code>", "</code>");
+      AddBasicTags("italic", "<i>", "</i>");
+      AddBasicTags("strike", "<del>", "</del>");
+      AddBasicTags("subscript", "<sub>", "</sub>");
+      AddBasicTags("superscript", "<sup>", "</sup>");
+      AddBasicTags("underline", "<u>", "</u>");
+      AddBasicTags("header1", "<h1>", "</h1>");
+      AddBasicTags("header2", "<h2>", "</h2>");
+      AddBasicTags("header3", "<h3>", "</h3>");
+      AddBasicTags("header4", "<h4>", "</h4>");
+      AddBasicTags("header5", "<h5>", "</h5>");
+      AddBasicTags("header6", "<h6>", "</h6>");
 
-      BuildReplacement("&amp;", "&");
-      BuildReplacement("&gt;", ">");
-      BuildReplacement("&lt;", "<");
-      BuildReplacement("&nbsp;", " ");
+      AddReplacementTag("&amp;", "&");
+      AddReplacementTag("&gt;", ">");
+      AddReplacementTag("&lt;", "<");
+      AddReplacementTag("&nbsp;", " ", "no_break");
 
       // Now that all of the tags are loaded, put them into the lexer.
       token_text = lexer.AddToken("text","[^<&]+");    // Non-tag or special characters.
