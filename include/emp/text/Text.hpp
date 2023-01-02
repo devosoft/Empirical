@@ -17,13 +17,14 @@
  *
  *  Internally, styles that all encodings should be able to handle (or at least be aware of) are:
  *    BASIC FORMATS :
- *     "bold" (alias: "b" or "strong")
- *     "code" (alias: "tt" or "teletype")
- *     "italic" (alias: "i", "em", or "emphasis")
- *     "strike" (alias "strikethrough")
- *     "subscript" (alias "sub")
- *     "superscript" (alias "sup")
+ *     "bold"
+ *     "code"
+ *     "italic"
+ *     "strike"
+ *     "subscript"
+ *     "superscript"
  *     "underline"
+ *     "no_break"
  *     "color:NAME"
  *     "font:NAME"
  *     "size:NAME" (in point size)
