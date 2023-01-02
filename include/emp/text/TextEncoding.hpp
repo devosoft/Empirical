@@ -33,7 +33,6 @@ namespace emp {
       TOGGLE,      // Toggle a style on/off (e.g., '*' in markdown)
       LINE,        // Set a style until the end of line (e.g., # in markdown)
       CHAR,        // Set a style for only a single character (e.g., <li> in HTML)
-      STRUCTURE,   // Indicate a structural element (e.g., '<div>' in HTML)
       REPLACE      // Indicate a simple replacement (e.g., '&lt;' means '<' in HTML)
     };
 
@@ -43,6 +42,20 @@ namespace emp {
       std::string base_style; // The base style that this tag is associated with. (e.g., "bold")
       std::string text;       // Basic text associated with this tag (e.g., for simple replacements)
       std::string pattern;    // A regex pattern for identifying this tag.
+      bool is_complex=false;  // Are there function-rules (rather than patterns) for this tag?
+    };
+
+    // Take a style and text and return the associated tag.
+    using tag_fun_t = std::function<std::string(const std::string &, const std::string &)>;
+    // Take a tag, return associate style.
+    using style_fun_t = std::function<std::string(const std::string &)>;
+    // Take a tag, return associated text.
+    using text_fun_t = std::function<std::string(const std::string &)>;
+
+    struct TagFuns {
+      tag_fun_t tag_fun;
+      style_fun_t style_fun;
+      text_fun_t text_fun;
     };
 
     // A struct to help translate a style back into relevant tags.
@@ -55,6 +68,7 @@ namespace emp {
 
     std::unordered_map<std::string, StyleInfo> style_info;
     std::unordered_map<std::string, TagInfo> tag_info;
+    std::unordered_map<std::string, TagFuns> tag_funs;  // Functions for complex tags.
     std::string tag_regex;
     emp::Lexer lexer;
 
@@ -111,41 +125,57 @@ namespace emp {
       tag_info[encode_v] = TagInfo{ TagType::REPLACE, style, txt_v, encode_v };
     }
 
-    // Take a tag, return associate style.
-    using style_fun_t = std::function<std::string(const std::string &)>;
-    // Take a tag, return associated text.
-    using text_fun_t = std::function<std::string(const std::string &)>;
-    // Take a style and text and return the associated tag.
-    using tag_fun_t = std::function<std::string(const std::string &, const std::string &)>;
 
     /// @brief Create a more complex tag/style that uses arguments.
-    /// @param style A unique style name used as the base style (E.g., "anchor").
+    /// @param name The base tag name (e.g., "<a>" for all anchors)
+    /// @param style A unique style name used as the base style (E.g., "link").
     /// @param regex A regular expression that will uniquely identify this tag.
     /// @param tag_fun A function that takes style and text to generate this tag.
     /// @param style_fun A function that takes this tag and returns the style to use for it.
     /// @param text_fun A function that takes this tag and returns the text to use for it.
     void AddComplexTag(
-      const std::string & style, // The base style name (without extra arguments)
+      const std::string & name,  // The base tag name (e.g., "<a>" for all anchors)
+      const std::string & style, // The base style name (without extra arguments, e.g. "link")
       const std::string & regex, // Regular expression to identify this tag.
       tag_fun_t tag_fun,         // Function to covert style and text to associated tag.
       style_fun_t style_fun,     // Function to convert this tag to a style with details.
       text_fun_t text_fun)       // Function to convert this tag to associated text.
-    {      
+    {
+      emp_assert(!emp::Has(style_info, style));
+      style_info[style] = StyleInfo{style, name, "", true};
+      tag_info[name] = TagInfo{TagType::REPLACE, style, "", regex, true};
+      tag_funs[name] = TagFuns{tag_fun, style_fun, text_fun};
     }
 
     /// @brief Create a more complex tag/style that uses arguments.
-    /// @param style A unique style name used as the base style (E.g., "anchor").
+    /// @param name The base tag name (e.g., "<a>" for all anchors)
+    /// @param style A unique style name used as the base style (E.g., "link").
     /// @param regex A regular expression that will uniquely identify this tag.
     /// @param tag_fun A function that takes style and text to generate this tag.
     /// @param style_fun A function that takes this tag and returns the style to use for it.
     /// @param stop A string that represents the close tag for this entry (e.g., "</a>")
     void AddComplexTag(
+      const std::string & name,    // The base tag name (e.g., "<a>" for all anchors)
       const std::string & style,   // The base style name (without extra arguments)
       const std::string & regex,   // Regular expression to identify this tag.
       tag_fun_t tag_fun,           // Function to covert style and text to associated tag.
       style_fun_t style_fun,       // Function to convert this tag to a style with details.
       const std::string & stop="") // Tag that should stop this style.
     {
+      TagType tag_type = TagType::OPEN;
+      if (stop == "") tag_type = TagType::CHAR;
+      else if (stop == "\n") tag_type = TagType::LINE;
+      // NOTE: Complex tags cannot currently be of TOGGLE type.
+
+      style_info[style] = StyleInfo{style, name, stop, true};
+      tag_info[name] = TagInfo{tag_type, style, "", regex, true};
+      tag_funs[name] = TagFuns{tag_fun, style_fun, nullptr};
+
+      // Track the stop tag if meaningful.
+      if (tag_type == TagType::OPEN) {
+        tag_regex += emp::to_string('|', emp::to_literal(stop));
+        tag_info[stop] = TagInfo{TagType::CLOSE, style};
+      }
     }
 
     // Append a string that has already been otherwise processed.
