@@ -39,6 +39,8 @@
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
  *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results, bool ignore_quoted=false)
  *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool ignore_quoted=false)
+ *    size_t find_any_of(const std::string & test_str, std::string... tests)
+ *    size_t find_any_of(const std::string & test_str, size_t start_pos, std::string... tests)
  *
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
@@ -391,6 +393,31 @@ namespace emp {
     emp::vector<size_t> out;
     find_all(in_string, target, out, ignore_quoted);
     return out;
+  }
+
+  /// Return the first position found for any of a set of substring tests
+  /// (or std::string::npos if none are found).
+  template <typename... Ts>
+  static inline size_t find_any_of(
+    const std::string & test_str,
+    size_t start_pos,
+    std::string test1,
+    Ts... tests)
+  {
+    size_t pos1 = test_str.find(test1, start_pos);
+    if constexpr (sizeof...(Ts) == 0) return pos1;
+    else {
+      size_t pos2 = find_any_of(test_str, start_pos, tests...);
+      if (pos1 == std::string::npos) return pos2;
+      if (pos2 == std::string::npos) return pos1;
+      return std::min(pos1, pos2);
+    }
+  }
+
+  template <typename... Ts>
+  static inline size_t find_any_of(const std::string & test_str, std::string test1, Ts... tests)
+  {
+    return find_any_of(test_str, 0, test1, tests...);
   }
 
   /// Convert a single character to one that uses a proper escape sequence (in a string) if needed.
