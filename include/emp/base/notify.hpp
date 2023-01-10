@@ -339,6 +339,21 @@ namespace notify {
     return success;
   }
 
+  // Trigger a warning only if a specified condition is true.
+  template <typename... Ts>
+  static bool TestWarning(bool test, Ts... args) {
+    if (test) return Warning(std::forward<Ts>(args)...);
+    return true;
+  }
+
+  // Trigger an error only if a specified condition is true.
+  template <typename... Ts>
+  static bool TestError(bool test, Ts... args) {
+    if (test) return Error(std::forward<Ts>(args)...);
+    return true;
+  }
+
+
   /// Add a handler for a particular exception type.
   template <typename FUN_T>
   static HandlerSet & AddHandler(id_arg_t id, FUN_T fun) {
