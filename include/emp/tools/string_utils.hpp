@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2023.
  *
  *  @file string_utils.hpp
  *  @brief Simple functions to manipulate strings.
@@ -76,6 +76,8 @@
  *    std::string string_pop(std::string & in_string, const char delim=' ')
  *    std::string string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0)
  *    std::string string_pop(std::string & in_string, const std::string & delim_set)
+ *    std::string string_get_to(const std::string & in_string, const std::string & delim=" ")
+ *    std::string string_pop_to(std::string & in_string, const std::string & delim=" ")
  *    std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0)
  *    std::string string_pop_word(std::string & in_string)
  *    std::string string_get_word(const std::string & in_string, size_t start_pos=0)
@@ -105,6 +107,7 @@
  *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
  *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set, char delim='\n', bool preserve_quotes=false)
  *    emp::vector<std::string_view> view_slices(const std::string_view & in_string, char delim='\n', bool preserve_quotes=false)
+ *    std::map<std::string, std::string> slice_assign(const std::string_view & in_string, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
  *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
  *    std::string_view ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
  *    std::string join_on(Range const& elements, const char *const delimiter)
@@ -853,6 +856,16 @@ namespace emp {
   string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
     emp_assert(start_pos <= in_string.size());
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
+  }
+
+  inline std::string
+  string_pop_to(std::string & in_string, const std::string & delim=" ", size_t start_pos=0) {
+    return string_pop_fixed(in_string, in_string.find(delim, start_pos), delim.size());
+  }
+
+  [[nodiscard]] inline std::string
+  string_get_to(const std::string & in_string, const std::string & delim=" ", size_t start_pos=0) {
+    return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));    
   }
 
   /// Remove a prefix of a string, up to the first whitespace, and return it.
