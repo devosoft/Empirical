@@ -8,7 +8,7 @@
  *  @note Status: RELEASE
  *
  *  Available Functions
- *    const std::string & empty_string()               - Reference to an empty string for null returns
+ *    const std::string & empty_string() - Reference to an empty string for null returns
  *
  *    -- CLASSIFICATION --
  *    size_t count(const std::string & str, char c)    - Count the occurrences of c in str.
@@ -36,9 +36,12 @@
  *
  *    -- SEARCHING --
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
- *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0, bool ignore_quotes=true)
- *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results, bool ignore_quoted=false)
- *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool ignore_quoted=false)
+ *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0,
+ *                            bool ignore_quotes=true)
+ *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results,
+ *                  bool ignore_quoted=false)
+ *    emp::vector<size_t> find_all(std::string_view in_string, char target,
+ *                                 bool ignore_quoted=false)
  *    size_t find_any_of(const std::string & test_str, std::string... tests)
  *    size_t find_any_of(const std::string & test_str, size_t start_pos, std::string... tests)
  *
@@ -61,9 +64,11 @@
  *    std::string slugify(const std::string & in_string)
  *    std::string combine_strings(const string_vec_t & strings, std::string spacer=" ")
  *    std::string to_english_list(const string_vec_t & strings)
- *    string_vec_t transform_strings(const string_vec_t & in_strings, std::function<std::string(const std::string &)> fun)
+ *    string_vec_t transform_strings(const string_vec_t & in_strings,
+ *                                   std::function<std::string(const std::string &)> fun)
  *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string quote="'")
- *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote, const std::string close_quote)
+ *    string_vec_t quote_strings(const string_vec_t & in_strings, const std::string open_quote,
+ *                               const std::string close_quote)
  *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
  *    std::string format_string( const std::string& format, Args... args )
  *    std::string replace_vars( const std::string& base, const MAP_T & map )
@@ -71,14 +76,18 @@
  *    -- EXTRACTIONS and CROPPING --
  *    void remove_chars(std::string & in_string, std::string chars)
  *    bool string_pop_if_char(std::string & in_string, char c)
- *    std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
- *    std::string string_get_range(const std::string & in_string, std::size_t start_pos, std::size_t end_pos)
+ *    std::string string_pop_fixed(std::string & in_string, std::size_t end_pos,
+ *                                 size_t delim_size=0)
+ *    std::string string_get_range(const std::string & in_string, std::size_t start_pos,
+ *                                 std::size_t end_pos)
  *    std::string string_pop(std::string & in_string, const char delim=' ')
- *    std::string string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0)
+ *    std::string string_get(const std::string & in_string, const char delim=' ',
+ *                           size_t start_pos=0)
  *    std::string string_pop(std::string & in_string, const std::string & delim_set)
  *    std::string string_get_to(const std::string & in_string, const std::string & delim=" ")
  *    std::string string_pop_to(std::string & in_string, const std::string & delim=" ")
- *    std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0)
+ *    std::string string_get(const std::string & in_string, const std::string & delim_set,
+ *                           size_t start_pos=0)
  *    std::string string_pop_word(std::string & in_string)
  *    std::string string_get_word(const std::string & in_string, size_t start_pos=0)
  *    std::string string_pop_line(std::string & in_string)
@@ -97,19 +106,27 @@
  *    std::string_view view_string_front(const std::string_view & str, size_t npos)
  *    std::string_view view_string_back(const std::string_view & str, size_t npos)
  *    std::string_view view_string_range(const std::string_view & str, size_t start, size_t end)
- *    std::string_view view_string_to(const std::string_view & in_string, const char delim, size_t start_pos=0)
+ *    std::string_view view_string_to(const std::string_view & in_string, const char delim,
+ *                                    size_t start_pos=0)
  *
  *    -- OTHER MANIPULATIONS --
  *    std::string pad_front(const std::string & in_string, char padding, size_t target_size)
  *    std::string pad_back(const std::string & in_string, char padding, size_t target_size)
  *    std::string repeat(const std::string& value, const size_t n)
- *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
- *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
- *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set, char delim='\n', bool preserve_quotes=false)
- *    emp::vector<std::string_view> view_slices(const std::string_view & in_string, char delim='\n', bool preserve_quotes=false)
- *    std::map<std::string, std::string> slice_assign(const std::string_view & in_string, const char delim='\n', [size_t max_split], bool preserve_quotes=false)
+ *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set,
+ *               const char delim='\n', [size_t max_split], bool preserve_quotes=false)
+ *    emp::vector<std::string> slice(const std::string_view & in_string, const char delim='\n',
+ *                                   [size_t max_split], bool preserve_quotes=false)
+ *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set,
+ *                     char delim='\n', bool preserve_quotes=false)
+ *    emp::vector<std::string_view> view_slices(const std::string_view & in_string,
+ *                                              char delim='\n', bool preserve_quotes=false)
+ *    std::map<std::string, std::string>
+ *      slice_assign(const std::string_view & in_string, const char delim='\n',
+ *                   std::string assign="=", [size_t max_split], bool preserve_quotes=false)
  *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
- *    std::string_view ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
+ *    std::string_view
+ *      ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
  *    std::string join_on(Range const& elements, const char *const delimiter)
  *    std::string to_string(...)
  *    void from_string(const std::string & str, ...)
@@ -1099,6 +1116,34 @@ namespace emp {
     emp::vector<std::string_view> result;
     view_slices(in_string, result, delim, preserve_quotes);
     return result;
+  }
+
+  /// Slice a string without passing in result vector (may be less efficient).
+  /// @param in_string string to be sliced
+  /// @param delim delimiter to split on (default ',')
+  /// @param assign separator for left and right side of assignment (default: "=")
+  /// @param max_split defines the maximum number of splits (default, no max)
+  /// @param preserve_quotes Should quoted text be kept together? (default: no)
+  static inline std::map<std::string,std::string> slice_assign(
+    const std::string_view & in_string,
+    const char delim=',',
+    std::string assign="=",
+    const size_t max_split=std::numeric_limits<size_t>::max(),
+    const bool preserve_quotes=false
+  ) {
+    auto assign_set = emp::slice(in_string, delim, max_split, preserve_quotes);
+    std::map<std::string,std::string> result_map;
+    for (auto setting : assign_set) {
+      size_t assign_pos = setting.find(assign);
+      if (assign_pos == std::string::npos) {
+        emp::notify::Exception("emp::string_utils::slice_assing::missing_assign",
+                               "No close brace found in string_utils::replace_vars()",
+                               setting);
+      }
+      std::string var_name = emp::string_pop_to(setting, assign);
+      result_map[var_name] = setting;
+    }
+    return result_map;
   }
 
   static inline emp::vector<std::string_view> ViewCSV( const std::string_view & in_string ) {
