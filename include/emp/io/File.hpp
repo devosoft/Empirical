@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2020.
+ *  @date 2018-2023.
  *
  *  @file File.hpp
  *  @brief The File object maintains a simple, in-memory file.
@@ -27,7 +27,7 @@
 
 namespace emp {
 
-  /// A class to maintin files for loading, writing, storing, and easy access to components.
+  /// A class to maintain files for loading, writing, storing, and easy access to components.
   class File {
   protected:
     emp::vector<std::string> lines;
@@ -265,6 +265,12 @@ namespace emp {
         results[i] = fun(lines[i]);
       }
       return results;
+    }
+
+    /// Get a series of lines.
+    emp::vector<std::string> GetLines(size_t start, size_t end) {
+      if (end > lines.size()) end = lines.size();
+      return emp::vector<std::string>(lines.begin()+start, lines.begin()+end);
     }
 
     /// Remove the first column from the file, returning it as a vector of strings.
