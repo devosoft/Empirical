@@ -231,9 +231,26 @@ namespace emp{
         emp_error("Error! VirtualCPU genome file is either empty or missing: ", filename);
         return false;
       }
+      /// Load genome from a string of characters
+      bool LoadFromChars(const std::string & new_genome){
+        ClearGenome();
+        for(size_t idx = 0; idx < new_genome.size(); ++idx){
+          PushInst(new_genome[idx]);
+        }
+        nops_need_curated = true;
+        return true;
+      }
       /// Add a new instruction to the end of the genome, by index in the instruction library
       void PushInst(size_t idx){
         const size_t id = GetInstLib()->GetID(idx);
+        genome.emplace_back(idx, id);
+        genome_working.emplace_back(idx, id);
+        nops_need_curated = true;
+      }
+      /// Add a new instruction to the end of the genome, by the instruction's symbol/char 
+      void PushInst(char c){
+        const size_t id = GetInstLib()->GetIDFromSymbol(c);
+        const size_t idx = GetInstLib()->GetIndex(id);
         genome.emplace_back(idx, id);
         genome_working.emplace_back(idx, id);
         nops_need_curated = true;
@@ -789,6 +806,19 @@ namespace emp{
       std::string GetGenomeString() const{
         std::stringstream sstr;
         sstr << "[" << genome.size() << "]";
+        for(size_t idx = 0; idx < genome.size(); idx++){
+          unsigned char c = 'a' + genome[idx].id;
+          if(genome[idx].id > 25) c = 'A' + genome[idx].id - 26;
+          sstr << c;
+        }
+        return sstr.str();
+      }
+      /// Return the original genome in string form, without the genome length.
+      ///
+      /// Each instruction is represented by a single character, dictated by the
+      /// instruction's ID.
+      std::string GetRawGenomeString() const{
+        std::stringstream sstr;
         for(size_t idx = 0; idx < genome.size(); idx++){
           unsigned char c = 'a' + genome[idx].id;
           if(genome[idx].id > 25) c = 'A' + genome[idx].id - 26;

@@ -135,7 +135,7 @@ namespace emp {
     }
 
     /// Return the ID of the instruction associated with the specified symbol.
-    size_t GetID(char symbol) {
+    size_t GetIDFromSymbol(char symbol) const {
       emp_assert(symbol > 0);
       return symbol_map[(size_t) symbol];
     }
