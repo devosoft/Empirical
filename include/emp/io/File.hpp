@@ -273,6 +273,20 @@ namespace emp {
       return emp::vector<std::string>(lines.begin()+start, lines.begin()+end);
     }
 
+    /// Get a series of lines until a line meets a certain condition.
+    emp::vector<std::string> GetLinesUntil(size_t start, auto test_fun) {
+      size_t end = start;
+      while (end < lines.size() && !test_fun(lines)) ++end;
+      return GetLines(start, end);
+    }
+
+    /// Get a series of lines while lines continue to meet a certain condition.
+    emp::vector<std::string> GetLinesWhile(size_t start, auto test_fun) {
+      size_t end = start;
+      while (end < lines.size() && test_fun(lines)) ++end;
+      return GetLines(start, end);
+    }
+
     /// Remove the first column from the file, returning it as a vector of strings.
     emp::vector<std::string> ExtractCol(char delim=',') {
       return Process<std::string>( [delim](std::string & line){
