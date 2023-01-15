@@ -268,23 +268,23 @@ namespace emp {
     }
 
     /// Get a series of lines.
-    emp::vector<std::string> GetLines(size_t start, size_t end) {
+    emp::vector<std::string> Read(size_t start, size_t end) const {
       if (end > lines.size()) end = lines.size();
       return emp::vector<std::string>(lines.begin()+start, lines.begin()+end);
     }
 
     /// Get a series of lines until a line meets a certain condition.
-    emp::vector<std::string> GetLinesUntil(size_t start, auto test_fun) {
+    emp::vector<std::string> ReadUntil(size_t start, auto test_fun) const {
       size_t end = start;
       while (end < lines.size() && !test_fun(lines)) ++end;
-      return GetLines(start, end);
+      return Read(start, end);
     }
 
     /// Get a series of lines while lines continue to meet a certain condition.
-    emp::vector<std::string> GetLinesWhile(size_t start, auto test_fun) {
+    emp::vector<std::string> ReadWhile(size_t start, auto test_fun) const {
       size_t end = start;
       while (end < lines.size() && test_fun(lines)) ++end;
-      return GetLines(start, end);
+      return Read(start, end);
     }
 
     /// Remove the first column from the file, returning it as a vector of strings.
@@ -352,6 +352,58 @@ namespace emp {
       return out_data;
     }
 
+    // A File::Scan object allows a user to easily step through a File.
+    class Scan {
+    private:
+      const File & file;
+      size_t line = 0;
+
+    public:
+      Scan(const File & in, size_t start=0) : file(in), line(start) { }
+      Scan(const Scan & in) = default;
+
+      const File & GetFile() const { return file; }
+      size_t GetLine() const { return line; }
+
+      bool AtStart() const { return line == 0; }
+      bool AtEnd() const { return line >= file.size(); }
+      operator bool() const { return !AtEnd(); }
+
+      void Set(size_t in_line) { line = in_line; }
+      void Reset() { line = 0; }
+      void SetEnd() { line = file.size(); }
+
+      // Get the very next line.
+      const std::string & Read() {
+        if (line > file.size()) return emp::empty_string();
+        return file[line++];
+      }
+
+      // Get a block of lines.
+      emp::vector<std::string> ReadTo(size_t end) {
+        emp_assert(end >= line);
+        if (end > file.size()) end = file.size();
+        size_t start = line;
+        line = end;
+        return file.Read(start, end);
+      }
+
+      // Get a block of lines, ending when a condition is met.
+      emp::vector<std::string> ReadUntil(auto test_fun) {
+        auto out = file.ReadUntil(line, test_fun);
+        line += out.size();
+        return out;
+      }
+
+      // Get a block of lines for as lone as a condition is met.
+      emp::vector<std::string> ReadWhile(auto test_fun) {
+        auto out = file.ReadWhile(line, test_fun);
+        line += out.size();
+        return out;
+      }
+    };
+
+    Scan StartScan(size_t start=0) const { return Scan(*this, start); }
   };
 
 }
