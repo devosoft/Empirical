@@ -58,6 +58,7 @@
  *    std::string to_lower(std::string value)
  *    std::string to_titlecase(std::string value)
  *    std::string to_roman_numeral(int val, const std::string & prefix="")
+ *    void trim_whitespace(std::string & in_string)
  *    void compress_whitespace(std::string & in_string)
  *    void remove_whitespace(std::string & in_string)
  *    void remove_punctuation(std::string & in_string)
@@ -204,6 +205,7 @@
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include <map>
 #include <memory>
 #include <numeric>
 #include <regex>
@@ -653,6 +655,17 @@ namespace emp {
 
     // else we already have it exactly and don't need to return anything.
     return ret_string;
+  }
+
+  /// Remove whitespace from the beginning or end of a string.
+  static inline void trim_whitespace(std::string & in_str) {
+    size_t start_count=0;
+    while (start_count < in_str.size() && is_whitespace(in_str[start_count])) ++start_count;
+    if (start_count) in_str.erase(0, start_count);
+
+    size_t new_size = in_str.size();
+    while (new_size > 0 && is_whitespace(in_str[new_size-1])) --new_size;
+    in_str.resize(new_size);
   }
 
   /// Every time one or more whitespace characters appear replace them with a single space.
@@ -1124,23 +1137,28 @@ namespace emp {
   /// @param assign separator for left and right side of assignment (default: "=")
   /// @param max_split defines the maximum number of splits (default, no max)
   /// @param preserve_quotes Should quoted text be kept together? (default: no)
+  /// @param trim_whitespace Should extra whitespace around delim or assign be ignored?
   static inline std::map<std::string,std::string> slice_assign(
     const std::string_view & in_string,
     const char delim=',',
     std::string assign="=",
     const size_t max_split=std::numeric_limits<size_t>::max(),
-    const bool preserve_quotes=false
+    const bool preserve_quotes=false,
+    const bool trim_whitespace=true
   ) {
     auto assign_set = emp::slice(in_string, delim, max_split, preserve_quotes);
     std::map<std::string,std::string> result_map;
     for (auto setting : assign_set) {
       size_t assign_pos = setting.find(assign);
       if (assign_pos == std::string::npos) {
-        emp::notify::Exception("emp::string_utils::slice_assing::missing_assign",
-                               "No close brace found in string_utils::replace_vars()",
+        emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
+                               "No assignment found in slice_assign()",
                                setting);
       }
       std::string var_name = emp::string_pop_to(setting, assign);
+      if (trim_whitespace) {
+
+      }
       result_map[var_name] = setting;
     }
     return result_map;
