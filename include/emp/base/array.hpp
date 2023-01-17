@@ -89,9 +89,9 @@ namespace emp {
     }
 
     this_t & operator++() { emp_assert(OK(true,false)); ++it; return *this; }
-    this_t operator++(int x) { emp_assert(OK(true,false)); return this_t(it++, arr_ptr); }
+    this_t operator++(int /*x*/) { emp_assert(OK(true,false)); return this_t(it++, arr_ptr); }
     this_t & operator--() { emp_assert(OK(false,true)); --it; return *this; }
-    this_t operator--(int x) { emp_assert(OK(false,true)); return this_t(it--, arr_ptr); }
+    this_t operator--(int /*x*/) { emp_assert(OK(false,true)); return this_t(it--, arr_ptr); }
 
     this_t operator+(int in) { emp_assert(OK()); return this_t(it + in, arr_ptr); }
     this_t operator-(int in) { emp_assert(OK()); return this_t(it - in, arr_ptr); }
@@ -172,19 +172,19 @@ namespace emp {
     void pop_back() { emp_assert(false, "invalid operation for array!"); }
 
     template <typename... ARGS>
-    iterator insert(ARGS &&... args) {
+    iterator insert(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
       return end();
     }
 
     template <typename... ARGS>
-    iterator erase(ARGS &&... args) {
+    iterator erase(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
       return end();
     }
 
     template <typename... ARGS>
-    iterator emplace(ARGS &&... args) {
+    iterator emplace(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
       return end();
     }
