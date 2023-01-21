@@ -123,7 +123,7 @@
  *    emp::vector<std::string_view> view_slices(const std::string_view & in_string,
  *                                              char delim='\n', bool preserve_quotes=false)
  *    std::map<std::string, std::string>
- *      slice_assign(const std::string_view & in_string, const char delim='\n',
+ *      slice_assign(const std::string_view & in_string, const char delim=',',
  *                   std::string assign="=", [size_t max_split], bool preserve_quotes=false)
  *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
  *    std::string_view
@@ -420,7 +420,7 @@ namespace emp {
   /// Return the first position found for any of a set of substring tests
   /// (or std::string::npos if none are found).
   template <typename... Ts>
-  static inline size_t find_any_of(
+  static inline size_t find_any_of_from(
     const std::string & test_str,
     size_t start_pos,
     std::string test1,
@@ -429,17 +429,22 @@ namespace emp {
     size_t pos1 = test_str.find(test1, start_pos);
     if constexpr (sizeof...(Ts) == 0) return pos1;
     else {
-      size_t pos2 = find_any_of(test_str, start_pos, tests...);
+      size_t pos2 = find_any_of_from(test_str, start_pos, tests...);
       if (pos1 == std::string::npos) return pos2;
       if (pos2 == std::string::npos) return pos1;
       return std::min(pos1, pos2);
     }
   }
 
-  template <typename... Ts>
-  static inline size_t find_any_of(const std::string & test_str, std::string test1, Ts... tests)
+  template <typename T, typename... Ts>
+  static inline size_t find_any_of(const std::string & test_str, T test1, Ts... tests)
   {
-    return find_any_of(test_str, 0, test1, tests...);
+    // If an offset is provided, use it.
+    if constexpr (std::is_arithmetic_v<T>) {
+      return find_any_of_from(test_str, test1, std::forward<Ts>(tests)...);
+    } else {
+      return find_any_of_from(test_str, 0, test1, tests...);
+    }
   }
 
   /// Convert a single character to one that uses a proper escape sequence (in a string) if needed.
@@ -1141,23 +1146,26 @@ namespace emp {
   static inline std::map<std::string,std::string> slice_assign(
     const std::string_view & in_string,
     const char delim=',',
-    std::string assign="=",
+    std::string assign_op="=",
     const size_t max_split=std::numeric_limits<size_t>::max(),
-    const bool preserve_quotes=false,
+    const bool preserve_quotes=true,
     const bool trim_whitespace=true
   ) {
     auto assign_set = emp::slice(in_string, delim, max_split, preserve_quotes);
     std::map<std::string,std::string> result_map;
     for (auto setting : assign_set) {
-      size_t assign_pos = setting.find(assign);
-      if (assign_pos == std::string::npos) {
-        emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
-                               "No assignment found in slice_assign()",
-                               setting);
-      }
-      std::string var_name = emp::string_pop_to(setting, assign);
+      // Remove any extra spaces around parsed values.
+      std::string var_name = emp::string_pop_to(setting, assign_op);
       if (trim_whitespace) {
-
+        emp::trim_whitespace(var_name);
+        emp::trim_whitespace(setting);
+      }
+      if (setting.size() == 0) {
+        std::stringstream msg;
+        msg << "No assignment found in slice_assign(): " << in_string;
+        abort();
+        emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
+                               msg.str(), setting);                               
       }
       result_map[var_name] = setting;
     }
@@ -1729,6 +1737,7 @@ namespace emp {
     const bool preserve_quotes
   ) {
     const size_t test_size = in_string.size();
+    if (test_size == 0) return; // Nothing to set!
 
     // Count produced strings
     size_t out_count = 0;
