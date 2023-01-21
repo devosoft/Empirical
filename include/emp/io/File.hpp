@@ -276,7 +276,7 @@ namespace emp {
     /// Get a series of lines until a line meets a certain condition.
     emp::vector<std::string> ReadUntil(size_t start, auto test_fun) const {
       size_t end = start;
-      while (end < lines.size() && !test_fun(lines)) ++end;
+      while (end < lines.size() && !test_fun(lines[end])) ++end;
       return Read(start, end);
     }
 

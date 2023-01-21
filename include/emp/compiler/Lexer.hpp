@@ -275,7 +275,7 @@ namespace emp {
       lexeme.resize(0);
 
       // Keep looking as long as:
-      // 1: We may still be able to contine the current lexeme.
+      // 1: We may still be able to continue the current lexeme.
       // 2: We have not entered an invalid state.
       // 3: Our input stream has more symbols.
       while (cur_stop >= 0 && cur_state >= 0 && is) {

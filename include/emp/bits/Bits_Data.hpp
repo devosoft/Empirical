@@ -168,7 +168,7 @@ namespace emp {
       Bits_Data_Mem_Static_Base() = default;
       Bits_Data_Mem_Static_Base(size_t num_bits) : BASE_T(num_bits)
       {
-        emp_assert(num_bits <= CAPACITY);
+        emp_assert(num_bits <= CAPACITY, num_bits, CAPACITY);
       }
       Bits_Data_Mem_Static_Base(const Bits_Data_Mem_Static_Base &) = default;
       Bits_Data_Mem_Static_Base(Bits_Data_Mem_Static_Base &&) = default;
