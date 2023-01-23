@@ -51,7 +51,7 @@ namespace emp{
       struct Instruction;
 
       using derived_t = DERIVED;
-      using data_t = uint32_t;
+      using data_t = int32_t;
       using inst_t = Instruction;
       using inst_lib_t = VirtualCPU_InstLib<derived_t, data_t, 0>;
       using genome_t = Genome<Instruction, inst_lib_t>;
