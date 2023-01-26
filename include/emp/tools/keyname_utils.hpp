@@ -64,12 +64,12 @@ namespace emp::keyname {
             }
             return true;
           }());
-          return emp::join_on(arr, "=");
+          return emp::join(arr, "=");
         }
       );
     }
 
-    return emp::join_on(res, "+");
+    return emp::join(res, "+");
 
   }
 
