@@ -133,7 +133,6 @@
  *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
  *    std::string_view
  *      ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
- *    std::string join_on(Range const& elements, const char *const delimiter)
  *    std::string to_string(...)
  *    void from_string(const std::string & str, ...)
  *    std::string join(const emp::vector<T> & v, std::string join_str)
@@ -1235,27 +1234,6 @@ namespace emp {
   template <typename T, typename... Ts>
   inline std::string ToString(const emp::vector<T, Ts...> & container);
 
-  /// Join a container of strings with a delimiter.
-  /// Adapted from https://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
-  template <typename Range, typename Value = typename Range::value_type>
-  std::string join_on(
-    Range const& elements,
-    const char *const delimiter
-  ) {
-    std::ostringstream os;
-    auto b = std::begin(elements), e = std::end(elements);
-
-    if (b != e) {
-        std::copy(b, std::prev(e), std::ostream_iterator<Value>(os, delimiter));
-        b = std::prev(e);
-    }
-    if (b != e) {
-        os << *b;
-    }
-
-    return os.str();
-  }
-
 
   namespace internal {
     // If the item passed in has a ToString(), always use it.
@@ -1279,15 +1257,22 @@ namespace emp {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 
-  /// This function does its very best to convert anything it gets to a string. Takes any number
-  /// of arguments and returns a single string containing all of them concatenated.  Any objects
-  /// that can go through a stringstream, have a ToString() member function, or are defined to
-  /// be passed into emp::ToString(x) will work correctly.
+  /// This function does its best to convert any type to a string. Accepts any number of
+  /// arguments and returns a single concatenated string. Conversions attempted for an
+  /// object 'x' include (in order):
+  /// - Call a x.ToString()
+  /// - Call appropriate emp::ToString(x) overload
+  /// - Pass x through stringstream
   template <typename... Ts>
   inline std::string to_string(const Ts &... values) {
     std::stringstream ss;
     (ss << ... << internal::to_stream_item(values, true));
     return ss.str();
+  }
+
+  /// Overload of to_string() string arguments to be directly returned.
+  inline const std::string & to_string(const std::string & value) {
+    return value;
   }
 
   /// Setup emp::ToString to work on arrays.
@@ -1369,30 +1354,23 @@ namespace emp {
     return out_val;
   }
 
-  /**
-   * This function returns the values in a vector as a string separated
-   * by a given delimeter.
-   *
-   * @param v a vector
-   * @param join_str delimeter
-   * @return string of vector values
-   */
-  template <typename T>
-  inline std::string join(const emp::vector<T> & v, std::string join_str) {
+  /// This function returns values from a container as a single string separated
+  /// by a given delimeter.
+  /// @param container is any standard-interface container holding objects to be joined.
+  /// @param join_str optional delimeter
+  /// @return merged string of all values
+  template <typename CONTAINER_T>
+  inline std::string join(const CONTAINER_T & container, std::string join_str="") {
+    if (container.size() == 0) return "";
+    if (container.size() == 1) return to_string(container.front());
 
-    if (v.size() == 0) {
-      return "";
-    } else if (v.size() == 1) {
-      return to_string(v[0]);
-    } else {
-      std::stringstream res;
-      res << v[0];
-      for (size_t i = 1; i < v.size(); i++) {
-        res << join_str;
-        res << to_string(v[i]);
-      }
-      return res.str();
+    std::stringstream out;
+    for (auto it = container.begin(); it != container.end(); ++it) {
+      if (it != container.begin()) out << join_str;
+      out << to_string(*it);
     }
+
+    return out.str();
   }
 
 
