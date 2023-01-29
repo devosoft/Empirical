@@ -8,7 +8,6 @@
  *  @note Status: BETA
  *
  *  @todo We need to modify this code so that File can work with Emscripten.
- *        Alternatively, we might want to have a more flexible file class that wraps this one.
  *
  */
 
@@ -23,6 +22,7 @@
 #include <string>
 
 #include "../base/vector.hpp"
+#include "../meta/FunInfo.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {
@@ -110,16 +110,16 @@ namespace emp {
     }
 
     /// Extract first line from file
-    auto operator>>(std::string &out) {
+    auto operator>>(std::string & out) {
       out = size() ? front() : out;
       lines.erase(begin());
     }
 
     /// Test if two files are identical.
-    bool operator==(const File in) { return lines == in.lines; }
+    bool operator==(const File & in) { return lines == in.lines; }
 
     /// Test if two files are different.
-    bool operator!=(const File in) { return lines != in.lines; }
+    bool operator!=(const File & in) { return lines != in.lines; }
 
     /// Load a line from an input stream into a file.
     File & LoadLine(std::istream & input) {
@@ -185,9 +185,17 @@ namespace emp {
     }
 
     /// Apply a string manipulation function to all lines in the file.
-    File & Apply(const std::function<void(std::string &)> & fun) {
+    template <typename FUN_T>
+    File & Apply(FUN_T fun) {
       for (std::string & cur_line : lines) {
-        fun(cur_line);
+        // If the function returns a string, assume that's what we're supposed to use.
+        // Otherwise assume that the string gets modified.
+        using return_t = FunInfo<FUN_T>::return_t;
+        if constexpr ( std::is_same<return_t, std::string>() ) {
+          cur_line = fun(cur_line);
+        } else {
+          fun(cur_line);          
+        }
       }
       return *this;
     }
