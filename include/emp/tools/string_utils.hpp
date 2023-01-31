@@ -38,6 +38,7 @@
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0,
  *                            bool skip_quotes=true)
+ *    size_t find(std::string_view in_string, std::string target, bool skip_quotes=false)
  *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results,
  *                  bool skip_quotes=false)
  *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool skip_quotes=false)
@@ -401,6 +402,25 @@ namespace emp {
     }
 
     return start_pos;
+  }
+
+  // A version of string::find() that can skip over quotes.
+  static inline size_t find(std::string_view in_string, std::string target, bool skip_quotes) {
+    size_t found_pos = in_string.find(target);
+    if (!skip_quotes) return found_pos;
+
+    // Make sure we are not in a quote; adjust as needed!
+    for (size_t scan_pos=0;
+         scan_pos < found_pos && found_pos != std::string::npos;
+         scan_pos++)
+    {
+      if (in_string[scan_pos] == '"' || in_string[scan_pos] == '\'') {
+        scan_pos = find_quote_match(in_string, scan_pos, in_string[scan_pos]);
+        if (found_pos < scan_pos) found_pos = in_string.find(target, scan_pos);
+      }
+    }
+
+    return found_pos;
   }
 
   static inline void find_all(std::string_view in_string, char target,
