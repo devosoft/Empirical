@@ -253,16 +253,18 @@ namespace emp {
     }
 
     /// A technique to remove all comments in a file.
-    File & RemoveComments(const std::string & marker) {
-      Apply( [marker](std::string & str) {
-        size_t pos = str.find(marker);
+    File & RemoveComments(const std::string & marker, bool skip_quotes=true) {
+      Apply( [marker,skip_quotes](std::string & str) {
+        size_t pos = emp::find(str, marker, skip_quotes);
         if (pos !=std::string::npos) str.resize( pos );
       } );
       return *this;
     }
 
     /// Allow remove comments to also be specified with a single character.
-    File & RemoveComments(char marker) { return RemoveComments(emp::to_string(marker)); }
+    File & RemoveComments(char marker, bool skip_quotes=true) {
+      return RemoveComments(emp::to_string(marker), skip_quotes);
+    }
 
     /// Run a function on each line of a file and return the restults as a vector.
     /// Note: Function is allowed to modify string.
