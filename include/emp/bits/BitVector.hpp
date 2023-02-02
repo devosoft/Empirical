@@ -723,6 +723,7 @@ namespace emp {
 
     [[nodiscard]] size_t size() const { return num_bits; }
     void resize(std::size_t new_size) { Resize(new_size); }
+    void push_back(bool value) { PushBack(value); }
     [[nodiscard]] auto at(size_t pos) { return operator[](pos); }
     [[nodiscard]] auto at(size_t pos) const { return operator[](pos); }
     [[nodiscard]] auto front() { return at(0); }
