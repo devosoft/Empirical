@@ -869,7 +869,7 @@ namespace emp {
     if (end_pos == 0) return "";                   // Not popping anything!
 
     std::string out_string = "";
-    if (end_pos == std::string::npos) {            // Popping whole string.
+    if (end_pos >= in_string.size()) {            // Popping whole string.
       out_string = in_string;
       in_string = "";
     }
@@ -1200,6 +1200,9 @@ namespace emp {
     auto assign_set = emp::slice(in_string, delim, max_split, keep_quotes, keep_parens, keep_braces);
     std::map<std::string,std::string> result_map;
     for (auto setting : assign_set) {
+      // Skip blank settings (especially at the end).
+      if (emp::is_whitespace(setting)) continue;
+
       // Remove any extra spaces around parsed values.
       std::string var_name = emp::string_pop_to(setting, assign_op);
       if (trim_whitespace) {
