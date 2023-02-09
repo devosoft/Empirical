@@ -255,7 +255,7 @@ namespace emp {
     /// A technique to remove all comments in a file.
     File & RemoveComments(const std::string & marker, bool skip_quotes=true) {
       Apply( [marker,skip_quotes](std::string & str) {
-        size_t pos = emp::find(str, marker, skip_quotes);
+        size_t pos = emp::find(str, marker, 0, skip_quotes);
         if (pos !=std::string::npos) str.resize( pos );
       } );
       return *this;
