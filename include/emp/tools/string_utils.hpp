@@ -38,12 +38,13 @@
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0,
  *                            bool skip_quotes=true)
- *    size_t find(std::string_view in_string, std::string target, bool skip_quotes=false)
+ *    size_t find(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=false)
  *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results,
  *                  bool skip_quotes=false)
  *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool skip_quotes=false)
  *    size_t find_any_of(const std::string & test_str, std::string... tests)
  *    size_t find_any_of(const std::string & test_str, size_t start_pos, std::string... tests)
+ *    size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true)
  *
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
@@ -405,8 +406,8 @@ namespace emp {
   }
 
   // A version of string::find() that can skip over quotes.
-  static inline size_t find(std::string_view in_string, std::string target, bool skip_quotes) {
-    size_t found_pos = in_string.find(target);
+  static inline size_t find(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes) {
+    size_t found_pos = in_string.find(target, start_pos);
     if (!skip_quotes) return found_pos;
 
     // Make sure we are not in a quote; adjust as needed!
@@ -469,6 +470,22 @@ namespace emp {
     } else {
       return find_any_of_from(test_str, 0, test1, tests...);
     }
+  }
+
+  // Find an identifier.  A key here is that the found string should NOT have an alphanumeric
+  // character immediately before it or after it.
+  static inline size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true) {
+    size_t pos = emp::find(in_string, target, start_pos, skip_quotes);
+    while (pos != std::string::npos) {
+      bool before_ok = (pos == 0) || !is_alphanumeric(pos-1);
+      size_t after_pos = pos+target.size();
+      bool after_ok = (after_pos == in_string.size()) || !is_alphanumeric(after_pos);
+      if (before_ok && after_ok) return pos;
+
+      pos = emp::find(in_string, target, pos+target.size(), skip_quotes);
+    }
+
+    return std::string::npos;
   }
 
   /// Convert a single character to one that uses a proper escape sequence (in a string) if needed.
