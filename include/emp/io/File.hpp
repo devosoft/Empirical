@@ -31,6 +31,7 @@ namespace emp {
   class File {
   protected:
     emp::vector<std::string> lines;
+    std::string file_error = "";
 
   public:
     File() : lines() { ; }
@@ -81,6 +82,15 @@ namespace emp {
 
     /// Return a const reference to the last line in the file.
     const std::string & back() const { return lines.back(); }
+
+    // Was there an error working with this file?
+    bool HasError() const { return file_error.size(); }
+
+    // Text of error.
+    const std::string & GetError() const { return file_error; }
+
+    // Remove any errors.
+    void ClearError() { file_error.resize(0); }
 
     /// Append a new line to the end of the file.
     File & Append(const std::string & line) { lines.emplace_back(line); return *this; }
@@ -147,6 +157,8 @@ namespace emp {
       if (file.is_open()) {
         Load(file);
         file.close();
+      } else {
+        file_error = emp::to_string("File '", filename, "' failed to open.");
       }
       return *this;
     }
