@@ -45,6 +45,7 @@
  *    size_t find_any_of(const std::string & test_str, std::string... tests)
  *    size_t find_any_of(const std::string & test_str, size_t start_pos, std::string... tests)
  *    size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true)
+ *    size_t find_non_whitespace(std::string_view in_string, size_t start_pos)
  *
  *    -- FORMATTING --
  *    std::string to_escaped_string(char value)
@@ -74,6 +75,8 @@
  *    to_quoted_list(const string_vec_t & in_strings, const std::string quote="'")
  *    std::string format_string( const std::string& format, Args... args )
  *    std::string replace_vars( const std::string& base, const MAP_T & map )
+ *    std::string replace_macro( const std:string &in_string, std::string macro_name,
+ *                               string(string) fun, bool skip_quotes=true)
  *
  *    -- EXTRACTIONS and CROPPING --
  *    void remove_chars(std::string & in_string, std::string chars)
@@ -477,14 +480,23 @@ namespace emp {
   static inline size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true) {
     size_t pos = emp::find(in_string, target, start_pos, skip_quotes);
     while (pos != std::string::npos) {
-      bool before_ok = (pos == 0) || !is_alphanumeric(pos-1);
+      bool before_ok = (pos == 0) || !is_alphanumeric(in_string[pos-1]);
       size_t after_pos = pos+target.size();
-      bool after_ok = (after_pos == in_string.size()) || !is_alphanumeric(after_pos);
+      bool after_ok = (after_pos == in_string.size()) || !is_alphanumeric(in_string[after_pos]);
       if (before_ok && after_ok) return pos;
 
       pos = emp::find(in_string, target, pos+target.size(), skip_quotes);
     }
 
+    return std::string::npos;
+  }
+
+  // Search for a non-whitespace character.
+  static inline size_t find_non_whitespace(std::string_view in_string, size_t pos) {
+    while (pos < in_string.size()) {
+      if (!is_whitespace(in_string[pos])) return pos;
+      ++pos;
+    }
     return std::string::npos;
   }
 
@@ -1035,6 +1047,11 @@ namespace emp {
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
   [[nodiscard]] std::string replace_vars( const std::string& in_string, const MAP_T & var_map );
+
+  /// Find any instance of MACRO_NAME(ARGS) and call replace it with fun(ARGS).
+  template <typename FUN_T>
+  [[nodiscard]] std::string replace_macro( const std::string & str, std::string macro_name,
+                                           FUN_T && fun, bool skip_quotes=true );
 
   /// Provide a string_view on a given string
   static inline std::string_view view_string(const std::string_view & str) {
@@ -1767,6 +1784,57 @@ namespace emp {
     return result;
   }
 
+  /// @brief Find any instance of MACRO_NAME(ARGS) and replace it with fun(ARGS).
+  /// @param in_string String to perform macro replacement.
+  /// @param macro_name Name of the macro to look for.
+  /// @param macro_fun Function to call with contents of macro.  Params are macro_args (string), line_num (size_t), and hit_num (size_t)
+  /// @param skip_quotes Should we skip quotes when looking for macro?
+  /// @return Processed version of in_string with macros replaced.
+  template <typename FUN_T>
+  [[nodiscard]] std::string replace_macro(
+    const std::string & in_string,
+    std::string macro_name,
+    FUN_T && macro_fun,
+    bool skip_quotes
+  ) {
+    std::stringstream out;
+
+    // We need to identify the comparator and divide up arguments in macro.
+    size_t macro_count = 0;     // Count of the number of hits for this macro.
+    size_t line_num = 0;        // Line number where current macro hit was found.
+    size_t macro_end = 0;
+    for (size_t macro_pos = emp::find_id(in_string, macro_name, 0, skip_quotes);
+         macro_pos != std::string::npos;
+         macro_pos = emp::find_id(in_string, macro_name, macro_end, skip_quotes))
+    {
+      // Output everything from the end of the last macro hit to the beginning of this one.
+      std::string code_segment = in_string.substr(macro_end, macro_pos-macro_end);
+      line_num += emp::count(code_segment, '\n');
+      out << code_segment;
+
+      // Make sure this macro is okay.
+      macro_pos = emp::find_non_whitespace(in_string, macro_pos+5);
+      if (in_string[macro_pos] != '(') {
+        emp::notify::Warning("Line ", line_num, ": Invalid MACRO, ", macro_name, ".");
+        macro_end = macro_pos;
+        continue;
+      }
+
+      // Isolate this macro instance and call the conversion function.
+      macro_end = emp::find_paren_match(in_string, macro_pos);
+      const std::string macro_body = in_string.substr(macro_pos+1, macro_end-macro_pos-1);
+      macro_end += 2;  // Advance the end past the ");" at the end of the macro.
+
+      out << macro_fun(macro_body, line_num, macro_count);
+
+      // Find the next macro instance and loop starting from the end of this one.
+      macro_count++;
+    }
+
+    // Grab the rest of the in_string and output the processed string.
+    out << in_string.substr(macro_end);
+    return out.str();
+  }
 
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param in_string string to be sliced
