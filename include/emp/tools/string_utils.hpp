@@ -476,13 +476,13 @@ namespace emp {
   }
 
   // Find an identifier.  A key here is that the found string should NOT have an alphanumeric
-  // character immediately before it or after it.
+  // character or '_' immediately before it or after it.
   static inline size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true) {
     size_t pos = emp::find(in_string, target, start_pos, skip_quotes);
     while (pos != std::string::npos) {
-      bool before_ok = (pos == 0) || !is_alphanumeric(in_string[pos-1]);
+      bool before_ok = (pos == 0) || !is_idchar(in_string[pos-1]);
       size_t after_pos = pos+target.size();
-      bool after_ok = (after_pos == in_string.size()) || !is_alphanumeric(in_string[after_pos]);
+      bool after_ok = (after_pos == in_string.size()) || !is_idchar(in_string[after_pos]);
       if (before_ok && after_ok) return pos;
 
       pos = emp::find(in_string, target, pos+target.size(), skip_quotes);
@@ -1813,9 +1813,10 @@ namespace emp {
       out << code_segment;
 
       // Make sure this macro is okay.
-      macro_pos = emp::find_non_whitespace(in_string, macro_pos+5);
+      macro_pos = emp::find_non_whitespace(in_string, macro_pos+macro_name.size());
       if (in_string[macro_pos] != '(') {
-        emp::notify::Warning("Line ", line_num, ": Invalid MACRO, ", macro_name, ".");
+        emp::notify::Warning("Line ", line_num, ": Invalid MACRO instance of '", macro_name,
+          "' - found ", in_string[macro_pos], "instead of '('.");
         macro_end = macro_pos;
         continue;
       }
