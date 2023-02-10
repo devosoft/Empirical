@@ -27,6 +27,15 @@
 
 namespace emp {
 
+  // Remove and return the first element of a vector.
+  template <typename T>
+  T PopFront(emp::vector<T> & v) {
+    emp_assert(v.size());
+    T out = v[0];
+    v.erase(v.begin());
+    return out;
+  }
+
   /// Base case for Append; we just have a single vector with nothing to append.
   template <typename T>
   emp::vector<T> & Append(emp::vector<T> & base) {
