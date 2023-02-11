@@ -38,13 +38,18 @@
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0,
  *                            bool skip_quotes=true)
- *    size_t find(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=false)
+ *    size_t find(std::string_view in_string, std::string target, size_t start_pos,
+ *                bool skip_quotes=false, bool skip_parens=false, bool skip_braces=false,
+ *                bool skip_brackets=false)
  *    void find_all(std::string_view in_string, char target, emp::vector<size_t> & results,
- *                  bool skip_quotes=false)
- *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool skip_quotes=false)
+ *                bool skip_quotes=false, bool skip_parens=false, bool skip_braces=false,
+ *                bool skip_brackets=false)
+ *    emp::vector<size_t> find_all(std::string_view in_string, char target, bool skip_quotes=false
+ *      bool skip_parens=false, bool skip_braces=false, bool skip_brackets=false)
  *    size_t find_any_of(const std::string & test_str, std::string... tests)
  *    size_t find_any_of(const std::string & test_str, size_t start_pos, std::string... tests)
- *    size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true)
+ *    size_t find_id(std::string_view in_string, std::string target, size_t start_pos,
+ *      bool skip_quotes=true, bool skip_parens=false, bool skip_braces=false, bool skip_brackets=false)
  *    size_t find_non_whitespace(std::string_view in_string, size_t start_pos)
  *
  *    -- FORMATTING --
@@ -90,7 +95,9 @@
  *                           size_t start_pos=0)
  *    std::string string_pop(std::string & in_string, const std::string & delim_set)
  *    std::string string_get_to(const std::string & in_string, const std::string & delim=" ")
- *    std::string string_pop_to(std::string & in_string, const std::string & delim=" ")
+ *    std::string string_pop_to(std::string & in_string, const std::string & delim=" ",
+ *      size_t start_pos=0, bool skip_quotes=false, bool skip_parens=false,
+ *      bool skip_braces=false, bool skip_brackets=false)
  *    std::string string_get(const std::string & in_string, const std::string & delim_set,
  *                           size_t start_pos=0)
  *    std::string string_pop_word(std::string & in_string)
@@ -119,22 +126,24 @@
  *    std::string pad_back(const std::string & in_string, char padding, size_t target_size)
  *    std::string repeat(const std::string& value, const size_t n)
  *    void slice(const std::string_view & in_string, emp::vector<std::string> & out_set,
- *               const char delim='\n', [size_t max_split],
- *               bool keep_quotes=false, bool keep_parens=false, bool keep_braces=false)
+ *               const char delim='\n', [size_t max_split], bool keep_quotes=false,
+ *               bool keep_parens=false, bool keep_braces=false, bool kee_brackets=false)
  *    emp::vector<std::string>
  *      slice(const std::string_view & in_string, const char delim='\n', [size_t max_split],
- *            bool keep_quotes=false, bool keep_parens=false, bool keep_braces=false)
+ *            bool keep_quotes=false, bool keep_parens=false, bool keep_braces=false,
+ *            bool keep_brackets=false)
  *    void view_slices(const std::string_view & in_string, emp::vector<std::string_view> & out_set,
  *                     char delim='\n', bool keep_quotes=false, bool keep_parens=false,
- *                     bool keep_braces=false)
+ *                     bool keep_braces=false, bool keep_brackets=false)
  *    emp::vector<std::string_view>
  *      view_slices(const std::string_view & in_string, char delim='\n',
  *                  bool keep_quotes=false, bool keep_parens=false,
- *                  bool keep_braces=false)
+ *                  bool keep_braces=false, bool keep_brackets=false)
  *    std::map<std::string, std::string>
  *      slice_assign(const std::string_view & in_string, const char delim=',',
  *                   std::string assign="=", [size_t max_split], bool trim_whitespace=true,
- *                   bool keep_quotes=true, bool keep_parens=true, bool keep_braces=true)
+ *                   bool keep_quotes=true, bool keep_parens=true, bool keep_braces=true,
+ *                   bool keep_brackets=true)
  *    emp::vector<std::string_view> ViewCSV(const std::string_view & csv_line)
  *    std::string_view
  *      ViewNestedBlock(std::string_view str, const std::string symbols="()", size_t start=0)
@@ -409,17 +418,32 @@ namespace emp {
   }
 
   // A version of string::find() that can skip over quotes.
-  static inline size_t find(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes) {
+  static inline size_t find(std::string_view in_string, std::string target, size_t start_pos,
+                            bool skip_quotes=false, bool skip_parens=false,
+                            bool skip_braces=false, bool skip_brackets=false) {
     size_t found_pos = in_string.find(target, start_pos);
-    if (!skip_quotes) return found_pos;
+    if (!skip_quotes && !skip_parens && !skip_braces && !skip_brackets) return found_pos;
 
-    // Make sure we are not in a quote; adjust as needed!
+    // Make sure we are not in a quote and/or parens; adjust as needed!
     for (size_t scan_pos=0;
          scan_pos < found_pos && found_pos != std::string::npos;
          scan_pos++)
     {
-      if (in_string[scan_pos] == '"' || in_string[scan_pos] == '\'') {
+      // Skip quotes, if needed...
+      if (skip_quotes && (in_string[scan_pos] == '"' || in_string[scan_pos] == '\'')) {
         scan_pos = find_quote_match(in_string, scan_pos, in_string[scan_pos]);
+        if (found_pos < scan_pos) found_pos = in_string.find(target, scan_pos);
+      }
+      else if (skip_parens && in_string[scan_pos] == '(') {
+        scan_pos = find_paren_match(in_string, scan_pos, '(', ')', skip_quotes);
+        if (found_pos < scan_pos) found_pos = in_string.find(target, scan_pos);
+      }
+      else if (skip_braces && in_string[scan_pos] == '{') {
+        scan_pos = find_paren_match(in_string, scan_pos, '{', '}', skip_quotes);
+        if (found_pos < scan_pos) found_pos = in_string.find(target, scan_pos);
+      }
+      else if (skip_brackets && in_string[scan_pos] == '[') {
+        scan_pos = find_paren_match(in_string, scan_pos, '[', ']', skip_quotes);
         if (found_pos < scan_pos) found_pos = in_string.find(target, scan_pos);
       }
     }
@@ -427,21 +451,39 @@ namespace emp {
     return found_pos;
   }
 
-  static inline void find_all(std::string_view in_string, char target,
-                              emp::vector<size_t> & results, const bool skip_quotes=false) {
+  static inline void find_all(
+    std::string_view in_string, char target, emp::vector<size_t> & results,
+    const bool skip_quotes=false, bool skip_parens=false, bool skip_braces=false,
+    bool skip_brackets=false
+  ) {
     results.resize(0);
     for (size_t pos=0; pos < in_string.size(); pos++) {
-      if (skip_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
-        pos = find_quote_match(in_string, pos, in_string[pos]);
+      if (in_string[pos] == target) results.push_back(pos);
+      // See if we need to skip over a section...
+      switch (in_string[pos]) {
+        case '"':
+        case '\'':
+          if (skip_quotes) pos = find_quote_match(in_string, pos, in_string[pos]);
+          break;
+        case '(':
+          if (skip_parens) pos = find_paren_match(in_string, pos, '(', ')', skip_quotes);
+          break;
+        case '{':
+          if (skip_braces) pos = find_paren_match(in_string, pos, '{', '}', skip_quotes);
+          break;
+        case '[':
+          if (skip_brackets) pos = find_paren_match(in_string, pos, '[', ']', skip_quotes);
+          break;
       }
-      else if (in_string[pos] == target) results.push_back(pos);
     }
   }
 
-  static inline emp::vector<size_t> find_all(std::string_view in_string, char target,
-                                             bool skip_quotes=false) {
+  static inline emp::vector<size_t> find_all(
+    std::string_view in_string, char target, bool skip_quotes=false,
+    bool skip_parens=false, bool skip_braces=false, bool skip_brackets=false
+  ) {
     emp::vector<size_t> out;
-    find_all(in_string, target, out, skip_quotes);
+    find_all(in_string, target, out, skip_quotes, skip_parens, skip_braces, skip_brackets);
     return out;
   }
 
@@ -477,15 +519,18 @@ namespace emp {
 
   // Find an identifier.  A key here is that the found string should NOT have an alphanumeric
   // character or '_' immediately before it or after it.
-  static inline size_t find_id(std::string_view in_string, std::string target, size_t start_pos, bool skip_quotes=true) {
-    size_t pos = emp::find(in_string, target, start_pos, skip_quotes);
+  static inline size_t find_id(
+    std::string_view in_string, std::string target, size_t start_pos,
+    bool skip_quotes=true, bool skip_parens=false, bool skip_braces=false, bool skip_brackets=false
+  ) {
+    size_t pos = emp::find(in_string, target, start_pos, skip_quotes, skip_parens, skip_braces, skip_brackets);
     while (pos != std::string::npos) {
       bool before_ok = (pos == 0) || !is_idchar(in_string[pos-1]);
       size_t after_pos = pos+target.size();
       bool after_ok = (after_pos == in_string.size()) || !is_idchar(in_string[after_pos]);
       if (before_ok && after_ok) return pos;
 
-      pos = emp::find(in_string, target, pos+target.size(), skip_quotes);
+      pos = emp::find(in_string, target, pos+target.size(), skip_quotes, skip_parens, skip_braces, skip_brackets);
     }
 
     return std::string::npos;
@@ -947,8 +992,12 @@ namespace emp {
   }
 
   inline std::string
-  string_pop_to(std::string & in_string, const std::string & delim=" ", size_t start_pos=0) {
-    return string_pop_fixed(in_string, in_string.find(delim, start_pos), delim.size());
+  string_pop_to(std::string & in_string, const std::string & delim=" ", size_t start_pos=0,
+                bool skip_quotes=false, bool skip_parens=false,
+                bool skip_braces=false, bool skip_brackets=false) {
+    const size_t found_pos =
+      emp::find(in_string, delim, start_pos, skip_quotes, skip_parens, skip_braces, skip_brackets);
+    return string_pop_fixed(in_string, found_pos, delim.size());
   }
 
   [[nodiscard]] inline std::string
@@ -1134,6 +1183,7 @@ namespace emp {
   /// @param keep_quotes Should quoted text be kept together?
   /// @param keep_parens Should parentheses ('(' and ')') be kept together?
   /// @param keep_braces Should braces ('{' and '}') be kept together?
+  /// @param keep_brackets Should brackets ('[' and ']') be kept together?
   static inline void slice(
     const std::string_view & in_string,
     emp::vector<std::string> & out_set,
@@ -1141,7 +1191,8 @@ namespace emp {
     const size_t max_split=std::numeric_limits<size_t>::max(),
     const bool keep_quotes=false,
     const bool keep_parens=false,
-    const bool keep_braces=false
+    const bool keep_braces=false,
+    const bool keep_brackets=false
   );
 
   /// Slice a string without passing in result vector (may be less efficient).
@@ -1151,16 +1202,18 @@ namespace emp {
   /// @param keep_quotes Should quoted text be kept together?
   /// @param keep_parens Should parentheses ('(' and ')') be kept together?
   /// @param keep_braces Should braces ('{' and '}') be kept together?
+  /// @param keep_brackets Should brackets ('[' and ']') be kept together?
   static inline emp::vector<std::string> slice(
     const std::string_view & in_string,
     const char delim='\n',
     const size_t max_split=std::numeric_limits<size_t>::max(),
     const bool keep_quotes=false,
     const bool keep_parens=false,
-    const bool keep_braces=false
+    const bool keep_braces=false,
+    const bool keep_brackets=false
   ) {
     emp::vector<std::string> result;
-    slice(in_string, result, delim, max_split, keep_quotes, keep_parens, keep_braces);
+    slice(in_string, result, delim, max_split, keep_quotes, keep_parens, keep_braces, keep_brackets);
     return result;
   }
 
@@ -1171,13 +1224,15 @@ namespace emp {
   /// @param keep_quotes Should quoted text be kept together?
   /// @param keep_parens Should parentheses ('(' and ')') be kept together?
   /// @param keep_braces Should braces ('{' and '}') be kept together?
+  /// @param keep_brackets Should brackets ('[' and ']') be kept together?
   static inline void view_slices(
     const std::string_view & in_string,
     emp::vector<std::string_view> & out_set,
     char delim='\n',
     const bool keep_quotes=false,
     const bool keep_parens=false,
-    const bool keep_braces=false
+    const bool keep_braces=false,
+    const bool keep_brackets=false
   ) {
     out_set.resize(0);
     size_t start_pos = 0;
@@ -1190,6 +1245,9 @@ namespace emp {
       }
       else if (keep_braces && in_string[pos] == '{') {
         pos = find_paren_match(in_string, pos, '{', '}', keep_quotes);
+      }
+      else if (keep_brackets && in_string[pos] == '[') {
+        pos = find_paren_match(in_string, pos, '[', ']', keep_quotes);
       }
       else if (in_string[pos] == delim) {  // Hit an end point!
         out_set.push_back( view_string_range(in_string, start_pos, pos) );
@@ -1207,10 +1265,11 @@ namespace emp {
     char delim='\n',
     const bool keep_quotes=false,
     const bool keep_parens=false,
-    const bool keep_braces=false
+    const bool keep_braces=false,
+    const bool keep_brackets=false
   ) {
     emp::vector<std::string_view> result;
-    view_slices(in_string, result, delim, keep_quotes, keep_parens, keep_braces);
+    view_slices(in_string, result, delim, keep_quotes, keep_parens, keep_braces, keep_brackets);
     return result;
   }
 
@@ -1229,9 +1288,10 @@ namespace emp {
     const bool trim_whitespace=true,
     const bool keep_quotes=true,
     const bool keep_parens=true,
-    const bool keep_braces=true
+    const bool keep_braces=true,
+    const bool keep_brackets=true
   ) {
-    auto assign_set = emp::slice(in_string, delim, max_split, keep_quotes, keep_parens, keep_braces);
+    auto assign_set = emp::slice(in_string, delim, max_split, keep_quotes, keep_parens, keep_braces, keep_brackets);
     std::map<std::string,std::string> result_map;
     for (auto setting : assign_set) {
       // Skip blank settings (especially at the end).
@@ -1850,7 +1910,8 @@ namespace emp {
     const size_t max_split,
     const bool keep_quotes,
     const bool keep_parens,
-    const bool keep_braces
+    const bool keep_braces,
+    const bool keep_brackets
   ) {
     const size_t test_size = in_string.size();
     if (test_size == 0) return; // Nothing to set!
@@ -1870,6 +1931,9 @@ namespace emp {
         }
         else if (keep_braces && in_string[pos] == '{') {
           pos = find_paren_match(in_string, pos, '{', '}', keep_quotes);
+        }
+        else if (keep_brackets && in_string[pos] == '[') {
+          pos = find_paren_match(in_string, pos, '[', ']', keep_quotes);
         }
         pos++;
       }
