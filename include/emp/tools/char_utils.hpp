@@ -70,6 +70,14 @@ namespace emp {
       return (pos < str.size()) && Has(str[pos]);
     }
 
+    size_t FindIn(const std::string & str, size_t pos=0) const {
+      while (pos < str.size()) {
+        if (Has(str[pos])) return pos;
+        ++pos;
+      }
+      return std::string::npos;
+    }
+
     bool operator[](CHAR_T index) const { return char_set[static_cast<size_t>(index)]; }
 
     /// Count up the number of characters in the set.
@@ -102,7 +110,13 @@ namespace emp {
 
     CharSetBase<CHAR_T,MAX_CHAR> operator+(const this_t & other) const {
       this_t out(*this);
-      for (char c : other) out.Set(c);
+      for (CHAR_T c : other) out.Set(c);
+      return out;
+    }
+
+    CharSetBase<CHAR_T,MAX_CHAR> operator!() const {
+      this_t out(*this);
+      for (CHAR_T & c : char_set) c = !c;
       return out;
     }
 
