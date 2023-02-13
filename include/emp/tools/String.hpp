@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2023.
  *
- *  @file StringUtils.hpp
+ *  @file String.hpp
  *  @brief Simple class to facilitate string manipulations
  *  @note Status: ALPHA
  *
@@ -205,10 +205,17 @@
  *    to_ansi_blink(const std::string & _in)
  *    to_ansi_reverse(const std::string & _in)
  *
+ *
+ *
+ *  @todo Make constexpr
+ *  @todo Make handle non-char strings (i.e., use CharT template parameter)
+ *  @todo Make handle allocators
+ *  @todo Make work with stringviews
+ *
  */
 
-#ifndef EMP_TOOLS_STRING_UTILS_CLASS_HPP_INCLUDE
-#define EMP_TOOLS_STRING_UTILS_CLASS_HPP_INCLUDE
+#ifndef EMP_TOOLS_STRING_HPP_INCLUDE
+#define EMP_TOOLS_STRING_HPP_INCLUDE
 
 #include <algorithm>
 #include <cctype>
@@ -240,37 +247,48 @@
 
 namespace emp {
 
-  class StringUtils {
+  class String {
   private:
     std::string str;   // The main string that we are manipulating.
 
-    bool use_quote_single = true;
-    bool use_quote_double = true;
-    bool use_quote_back = false;
-    bool use_paren_round = true;   // Parentheses
-    bool use_paren_square = true;  // Brackets
-    bool use_paren_curly = true;   // Braces
-    bool use_paren_angle = false;  // Chevrons
-    bool use_paren_quotes = false; // Forward/back single quote
+    enum Mask {
+      USE_QUOTE_SINGLE =  1,
+      USE_QUOTE_DOUBLE =  2,
+      USE_QUOTE_BACK   =  4,
+      USE_PAREN_ROUND  =  8,    // Parentheses
+      USE_PAREN_SQUARE = 0x10,  // Brackets
+      USE_PAREN_CURLY  = 0x20,  // Braces
+      USE_PAREN_ANGLE  = 0x40,  // Chevrons
+      USE_PAREN_QUOTES = 0x80   // Forward/back single quote
+    };
+
+    uint8_t mode = USE_QUOTE_SINGLE + USE_QUOTE_DOUBLE +
+                   USE_PAREN_ROUND + USE_PAREN_SQUARE + USE_PAREN_CURLY;
 
     // ------ HELPER FUNCTIONS ------
 
+    String & _ChangeMode(Mask mask, bool use) {
+      if (use) mode |= mask;
+      else mode &= ~mask;
+      return *this;      
+    }
+
     bool IsQuote(char c) const {
       switch (c) {
-        case '\'': return use_quote_single;
-        case '"': return use_quote_double;
-        case '`': return use_quote_back;
+        case '\'': return mode & USE_QUOTE_SINGLE;
+        case '"': return mode & USE_QUOTE_DOUBLE;
+        case '`': return mode & USE_QUOTE_BACK;
       }
       return false;
     }
 
     bool IsParen(char c) const {
       switch (c) {
-        case '(': return use_paren_round;
-        case '[': return use_paren_square;
-        case '{': return use_paren_curly;
-        case '<': return use_paren_angle;
-        case '`': return use_paren_quotes;
+        case '(': return mode & USE_PAREN_ROUND;
+        case '[': return mode & USE_PAREN_SQUARE;
+        case '{': return mode & USE_PAREN_CURLY;
+        case '<': return mode & USE_PAREN_ANGLE;
+        case '`': return mode & USE_PAREN_QUOTES;
       }
       return false;
     }
@@ -296,7 +314,7 @@ namespace emp {
     }
 
     template <typename FUN_T>
-    StringUtils & _StrAsInput(FUN_T fun) {
+    String & _StrAsInput(FUN_T fun) {
       std::string backup_str;
       std::swap(str,backup_str);  // Backup current string value.
       fun(backup_str);            // Run the internal function on original string.
@@ -304,17 +322,54 @@ namespace emp {
     }
 
   public:
-    StringUtils(std::string _str="") : str(_str) { }
-    StringUtils(const StringUtils &) = default;
-    StringUtils(StringUtils &&) = default;
+    String(const String &) = default;
+    String(String &&) = default;
+    String(const std::string & _in="") : str(_in) { }
+    String(std::string && _in="") : str(std::move(_in)) { }
+    String(const char * _in) : str(_in) { }
+    String(size_t count, char _in) : str(count, _in) { }
+    String(std::initializer_list<char> _in) : str(_in) { }
+    String(const String & _in, size_t start, size_t count=std::string::npos)
+      : str(_in.str, start, count), mode(_in.mode) { }
+    String(const std::string & _in, size_t start, size_t count=std::string::npos)
+      : str(_in, start, count) { }
+    String(const char * _in, size_t count) : str(_in, count) { }
+    template< class InputIt >
+    String(InputIt first, InputIt last) : str(first, last) { }
+    String(std::nullptr_t) = delete;
 
-    StringUtils & operator=(const StringUtils &) = default;
-    StringUtils & operator=(StringUtils &&) = default;
-    StringUtils & operator=(const std::string & _in) { str = _in; }
-    StringUtils & operator=(std::string && _in) { str = std::move(_in); }
+    String & operator=(const String &) = default;
+    String & operator=(String &&) = default;
+    String & operator=(const std::string & _in) { str = _in; }
+    String & operator=(std::string && _in) { str = std::move(_in); }
+    String & operator=(const char * _in) { str = _in; }
+    String & operator=(char _in) { str = _in; }
+    String & operator=(std::initializer_list<char> _in) { str = _in; }
+    String & operator=( std::nullptr_t ) = delete;
 
-    const std::string & Get() const { return str; }
-    StringUtils & Set(const std::string & _in) { str = _in; return *this; }
+    const std::string & as_string() const { return str; }
+
+
+
+    // ------ CONFIGURATION ------
+
+    String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
+    String & UseQuoteDouble(bool use=true) { return _ChangeMode(USE_QUOTE_DOUBLE, use); }
+    String & UseQuoteBack  (bool use=true) { return _ChangeMode(USE_QUOTE_BACK,   use); }
+    String & UseParenRound (bool use=true) { return _ChangeMode(USE_PAREN_ROUND,  use); }
+    String & UseParenSquare(bool use=true) { return _ChangeMode(USE_PAREN_SQUARE, use); }
+    String & UseParenCurly (bool use=true) { return _ChangeMode(USE_PAREN_CURLY,  use); }
+    String & UseParenAngle (bool use=true) { return _ChangeMode(USE_PAREN_ANGLE,  use); }
+    String & UseParenQuotes(bool use=true) { return _ChangeMode(USE_PAREN_QUOTES, use); }
+
+    bool Get_UseQuoteSingle() const { return mode & USE_QUOTE_SINGLE; }
+    bool Get_UseQuoteDouble() const { return mode & USE_QUOTE_DOUBLE; }
+    bool Get_UseQuoteBack  () const { return mode & USE_QUOTE_BACK; }
+    bool Get_UseParenRound () const { return mode & USE_PAREN_ROUND; }
+    bool Get_UseParenSquare() const { return mode & USE_PAREN_SQUARE; }
+    bool Get_UseParenCurly () const { return mode & USE_PAREN_CURLY; }
+    bool Get_UseParenAngle () const { return mode & USE_PAREN_ANGLE; }
+    bool Get_UseParenQuotes() const { return mode & USE_PAREN_QUOTES; }
 
     // ------ CLASSIFICATION ------
 
@@ -425,19 +480,19 @@ namespace emp {
     // To* Converts the current string.
     // As* Returns a modified version of the current string, leaving original intact.
     static std::string MakeEscaped(char c);
-    StringUtils & AppendEscaped(char c) { str += MakeEscaped(c); }
-    StringUtils & SetEscaped(char c) { str = MakeEscaped(c); }
+    String & AppendEscaped(char c) { str += MakeEscaped(c); }
+    String & SetEscaped(char c) { str = MakeEscaped(c); }
 
     static std::string MakeEscaped(const std::string & in);
-    StringUtils & AppendEscaped(const std::string & in) { str+=MakeEscaped(in); return *this; }
-    StringUtils & SetEscaped(const std::string & in) { str = MakeEscaped(in); return *this; }
-    StringUtils & ToEscaped() { str = MakeEscaped(str); }
+    String & AppendEscaped(const std::string & in) { str+=MakeEscaped(in); return *this; }
+    String & SetEscaped(const std::string & in) { str = MakeEscaped(in); return *this; }
+    String & ToEscaped() { str = MakeEscaped(str); }
     [[nodiscard]] std::string AsEscaped() { return MakeEscaped(str); }
 
     static std::string MakeWebSafe(const std::string & in);
-    StringUtils & AppendWebSafe(std::string in) { str+=MakeWebSafe(in); return *this; }
-    StringUtils & SetWebSafe(const std::string & in) { str = MakeWebSafe(in); return *this;; }
-    StringUtils & ToWebSafe() { str = MakeWebSafe(str); }
+    String & AppendWebSafe(std::string in) { str+=MakeWebSafe(in); return *this; }
+    String & SetWebSafe(const std::string & in) { str = MakeWebSafe(in); return *this;; }
+    String & ToWebSafe() { str = MakeWebSafe(str); }
     [[nodiscard]] std::string AsWebSafe() { return MakeWebSafe(str); }
 
     // <= Creating Literals =>
@@ -451,17 +506,17 @@ namespace emp {
     MakeLiteral(const T & value);
 
     template <typename T>
-    StringUtils & AppendLiteral(const T & in) { str+=MakeLiteral(in); return *this; }
+    String & AppendLiteral(const T & in) { str+=MakeLiteral(in); return *this; }
     template <typename T>
-    StringUtils & SetLiteral(const T & in) { str = MakeLiteral(in); return *this;; }
-    StringUtils & ToLiteral() { str = MakeLiteral(str); }
+    String & SetLiteral(const T & in) { str = MakeLiteral(in); return *this;; }
+    String & ToLiteral() { str = MakeLiteral(str); }
     [[nodiscard]] std::string AsLiteral() { return MakeLiteral(str); }
 
   };
 
 
   /// Determine if this string represents a proper number.
-  bool StringUtils::IsNumber() const {
+  bool String::IsNumber() const {
     if (!str.size()) return false;           // If string is empty, not a number!
     size_t pos = 0;
     if (HasOneOfAt("+-", pos)) ++pos;        // Allow leading +/-
@@ -482,7 +537,7 @@ namespace emp {
   }
 
   // Given the start position of a quote, find where it ends; marks must be identical
-  size_t StringUtils::FindQuoteMatch(size_t pos) const {
+  size_t String::FindQuoteMatch(size_t pos) const {
     while (++pos < str.size()) {
       const char mark = str[pos];
       if (str[pos] == '\\') { ++pos; continue; } // Skip escaped characters
@@ -492,7 +547,7 @@ namespace emp {
   }
 
   // Given an open parenthesis, find where it closes (including nesting).  Marks must be different.
-  size_t StringUtils::FindParenMatch(size_t pos, bool skip_quotes) const {
+  size_t String::FindParenMatch(size_t pos, bool skip_quotes) const {
     const char open = str[pos];
     const char close = GetMatch(open);
     size_t open_count = 1;
@@ -505,14 +560,14 @@ namespace emp {
     return std::string::npos;
   }
 
-  size_t StringUtils::FindMatch(size_t pos) const {
+  size_t String::FindMatch(size_t pos) const {
     if (IsQuote(str[pos])) return FindQuoteMatch(pos);
     if (IsParen(str[pos])) return FindParenMatch(pos);
     return std::string::npos;
   }
 
   // A version of string::find() that can skip over quotes.
-  size_t StringUtils::Find(std::string target, size_t start, bool skip_quotes, bool skip_parens) const {
+  size_t String::Find(std::string target, size_t start, bool skip_quotes, bool skip_parens) const {
     size_t found_pos = str.find(target, start);
     if (!skip_quotes && !skip_parens) return found_pos;
 
@@ -536,7 +591,7 @@ namespace emp {
   }
 
   // Find any of a set of characters.
-  size_t StringUtils::Find(const CharSet & char_set, size_t start,
+  size_t String::Find(const CharSet & char_set, size_t start,
                            bool skip_quotes, bool skip_parens) const
   {
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
@@ -549,7 +604,7 @@ namespace emp {
     return std::string::npos;
   }
 
-  void StringUtils::FindAll(char target, emp::vector<size_t> & results,
+  void String::FindAll(char target, emp::vector<size_t> & results,
                             const bool skip_quotes, bool skip_parens) const {
     results.resize(0);
     for (size_t pos=0; pos < str.size(); pos++) {
@@ -561,14 +616,14 @@ namespace emp {
     }
   }
 
-  emp::vector<size_t> StringUtils::FindAll(char target, bool skip_quotes, bool skip_parens) const {
+  emp::vector<size_t> String::FindAll(char target, bool skip_quotes, bool skip_parens) const {
     emp::vector<size_t> out;
     FindAll(target, out, skip_quotes, skip_parens);
     return out;
   }
 
   template <typename... Ts>
-  size_t StringUtils::FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const {
+  size_t String::FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const {
     if constexpr (sizeof...(Ts) == 0) return test_str.find(test1, start);
     else {
       size_t pos1 = test_str.find(test1, start);
@@ -578,7 +633,7 @@ namespace emp {
   }
 
   template <typename T, typename... Ts>
-  size_t StringUtils::FindAnyOf(T test1, Ts... tests) const {
+  size_t String::FindAnyOf(T test1, Ts... tests) const {
     // If an offset is provided, use it.
     if constexpr (std::is_arithmetic_v<T>) {
       return find_any_of_from(test1, std::forward<Ts>(tests)...);
@@ -588,7 +643,7 @@ namespace emp {
   }
 
   // Find an whole identifier (same as find, but cannot have letter, digit or '_' before or after.) 
-  size_t StringUtils::FindID(std::string target, size_t start,
+  size_t String::FindID(std::string target, size_t start,
                              bool skip_quotes, bool skip_parens) const
   {
     size_t pos = Find(target, start, skip_quotes, skip_parens);
@@ -605,7 +660,7 @@ namespace emp {
   }
 
 
-  static std::string StringUtils::MakeEscaped(char c) {
+  static std::string String::MakeEscaped(char c) {
     // If we just append as a normal character, do so!
     if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return std::string(c);
     switch (c) {
@@ -651,7 +706,7 @@ namespace emp {
     return std::string(c);
   }
 
-  static std::string StringUtils::MakeEscaped(const std::string & in) {
+  static std::string String::MakeEscaped(const std::string & in) {
     std::string out;
     out.reserve(in.size()); // Reserve minimum needed size. 
     for (char c : in) out += MakeEscaped(c);
@@ -659,7 +714,7 @@ namespace emp {
   }
 
   /// Take a string and replace reserved HTML characters with character entities
-  static std::string StringUtils::MakeWebSafe(const std::string & in) {
+  static std::string String::MakeWebSafe(const std::string & in) {
     std::string out;
     out.reserve(in.size());
     for (char c : in) {
@@ -678,12 +733,12 @@ namespace emp {
   /// Take a value and convert it to a C++-style literal.
   template <typename T>
   [[nodiscard]] static typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
-  StringUtils::MakeLiteral(const T & value) {
+  String::MakeLiteral(const T & value) {
     return std::to_string(value);
   }
 
   /// Take a char and convert it to a C++-style literal.
-  [[nodiscard]] static std::string StringUtils::MakeLiteral(char value) {
+  [[nodiscard]] static std::string String::MakeLiteral(char value) {
     std::stringstream ss;
     ss << "'" << MakeEscaped(value) << "'";
     return ss.str();
@@ -691,7 +746,7 @@ namespace emp {
 
   /// Take a string or iterable and convert it to a C++-style literal.
   // This is the version for string. The version for an iterable is below.
-  [[nodiscard]] static std::string StringUtils::MakeLiteral(const std::string & value) {
+  [[nodiscard]] static std::string String::MakeLiteral(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -707,12 +762,12 @@ namespace emp {
   /// Take any iterable value and convert it to a C++-style literal.
   template <typename T>
   [[nodiscard]] static typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
-  StringUtils::MakeLiteral(const T & value) {
+  String::MakeLiteral(const T & value) {
     std::stringstream ss;
     ss << "{ ";
     for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
       if (iter != std::begin( value )) ss << " ";
-      ss << StringUtils::MakeLiteral< std::decay_t<decltype(*iter)> >( *iter );
+      ss << String::MakeLiteral< std::decay_t<decltype(*iter)> >( *iter );
     }
     ss << " }";
 
@@ -730,7 +785,7 @@ namespace emp {
 
 
 
-  [[nodiscard]] static std::string StringUtils::MakeFromLiteral(const std::string & value) {
+  [[nodiscard]] static std::string String::MakeFromLiteral(const std::string & value) {
     if (value.size() == 0) return "";
     if (value[0] == '\'') return std::string(MakeFromLiteral_Char(value)); 
     if (value[0] == '"') return MakeFromLiteral_String(value);
