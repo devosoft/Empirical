@@ -321,23 +321,44 @@ namespace emp {
       return *this;
     }
 
+    inline void _AssertPos(size_t pos) const { emp_assert(pos < str.size(), pos, str.size()); }
+
   public:
+    using value_type = std::string::value_type;
+    using allocator_type = std::string::allocator_type;
+    using size_type = std::string::size_type;
+    using difference_type = std::string::difference_type;
+    using reference = std::string::reference;
+    using const_reference = std::string::const_reference;
+    using pointer = std::string::pointer;
+    using const_pointer = std::string::const_pointer;
+    using iterator = std::string::iterator;
+    using const_iterator = std::string::const_iterator;
+    using reverse_iterator = std::string::reverse_iterator;
+    using const_reverse_iterator = std::string::const_reverse_iterator;
+
+    static constexpr size_t npos = std::string::npos;
+
+    String() = default;
     String(const String &) = default;
     String(String &&) = default;
-    String(const std::string & _in="") : str(_in) { }
-    String(std::string && _in="") : str(std::move(_in)) { }
+    String(const std::string & _in) : str(_in) { }
+    String(std::string && _in) : str(std::move(_in)) { }
     String(const char * _in) : str(_in) { }
     String(size_t count, char _in) : str(count, _in) { }
     String(std::initializer_list<char> _in) : str(_in) { }
-    String(const String & _in, size_t start, size_t count=std::string::npos)
+    String(const String & _in, size_t start, size_t count=npos)
       : str(_in.str, start, count), mode(_in.mode) { }
-    String(const std::string & _in, size_t start, size_t count=std::string::npos)
+    String(const std::string & _in, size_t start, size_t count=npos)
       : str(_in, start, count) { }
     String(const char * _in, size_t count) : str(_in, count) { }
     template< class InputIt >
     String(InputIt first, InputIt last) : str(first, last) { }
     String(std::nullptr_t) = delete;
 
+    // ------ IMPORT ALL std::string PROPERTIES AND EXPAND TO emp::String ------
+
+    // Assignment operators
     String & operator=(const String &) = default;
     String & operator=(String &&) = default;
     String & operator=(const std::string & _in) { str = _in; }
@@ -347,11 +368,95 @@ namespace emp {
     String & operator=(std::initializer_list<char> _in) { str = _in; }
     String & operator=( std::nullptr_t ) = delete;
 
-    const std::string & as_string() const { return str; }
+    // Element Access
+    char & operator[](size_t pos) { _AssertPos(pos); return str[pos]; }
+    char operator[](size_t pos) const { _AssertPos(pos); return str[pos]; }
+    char & front() { _AssertPos(0); return str.front(); }
+    char front() const { _AssertPos(0); return str.front(); }
+    char & back() { _AssertPos(0); return str.back(); }
+    char back() const { _AssertPos(0); return str.back(); }
+    char * data() { return str.data(); }
+    const char * data() const { return str.data(); }
+    const char * c_str() const { return str.c_str(); }
+    const std::string & cpp_str() const { return str; }
 
+    // Iterators
+    iterator begin() { return str.begin(); }
+    const_iterator begin() const { return str.begin(); }
+    const_iterator cbegin() const { return str.cbegin(); }
+    reverse_iterator rbegin() { return str.rbegin(); }
+    const_reverse_iterator rbegin() const { return str.rbegin(); }
+    const_reverse_iterator crbegin() const { return str.crbegin(); }
 
+    iterator end() { return str.end(); }
+    const_iterator end() const { return str.end(); }
+    const_iterator cend() const { return str.cend(); }
+    reverse_iterator rend() { return str.rend(); }
+    const_reverse_iterator rend() const { return str.rend(); }
+    const_reverse_iterator crend() const { return str.crend(); }
 
-    // ------ CONFIGURATION ------
+    // Capacity
+    bool empty() const { return str.empty(); }
+    size_t size() const { return str.size()); }
+    size_t length() const { return str.length()); }
+    size_t max_size() const { return str.max_size()); }
+    void reserve(size_t new_cap) { str.reserve(new_cap); }
+    void reserve() { str.reserve(); }
+    size_t capacity() const { return str.capacity(); }
+    void shrink_to_fit() { str.shrink_to_fit(); }
+    
+    // Operations
+    void clear() noexcept { str.clear(); }
+
+    String & insert(size_t index, const String & in) { str.insert(index, in.str); return *this; }
+    String & insert(size_t index, const String & in, size_t pos, size_t count=npos)
+      { str.insert(index, in.str, pos, count); return *this; }
+    template <typename... ARG_Ts> String & insert(size_t index, ARG_Ts &&... args) {
+      str.insert(index, std::forward<ARG_Ts>(args)...);
+      return *this;
+    }
+    template <typename... ARG_Ts> String & insert(const_iterator pos, ARG_Ts &&... args) {
+      return str.insert(pos, std::forward<ARG_Ts>(args)...);
+    }
+
+    String & erase(size_t index=0, size_t count=npos) { str.erase(index,count); return *this; }
+    iterator erase(const_iterator pos) { return str.erase(pos); }
+    iterator erase(const_iterator first, const_iterator last) { return str.erase(first, last); }
+
+    void push_back(char c) { str.push_back(c); }
+    void pop_back() { str.pop_back(); }
+
+    String & append(const String & in) { str.append(in.str); return *this; }
+    String & append(const String & in, size_t pos, size_t count)
+      { str.append(in.str, pos, count); return *this; }
+    template <typename... ARG_Ts> String & append(ARG_Ts &&... args) {
+      str.append(std::forward<ARG_Ts>(args)...);
+      return *this;
+    }
+
+    String & operator+=(const String & in) { str += in.str; return *this; }
+    template <typename ARG_T> String & operator+=(ARG_T && arg) {
+      str += std::forward<ARG_T>(arg);
+      return *this;
+    }
+
+    int compare(const String & in) { return str.compare(in.str()); }
+    template <typename... ARG_Ts> int compare(ARG_Ts &&... args)
+      { return str.compare(std::forward<ARG_Ts>(args)...); }
+
+    bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
+    template <typename ARG_T> bool starts_with( ARG_T && in ) const noexcept
+      { return str.starts_with(std::forward<ARG_T>(arg)); }
+
+    bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
+    template <typename ARG_T> bool ends_with( ARG_T && in ) const noexcept
+      { return str.ends_with(std::forward<ARG_T>(arg)); }
+
+    bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
+    template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
+      { return str.find(std::forward<ARG_T>(arg)) != npos; }
+
+    // ------ SPECIAL CONFIGURATION ------
 
     String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
     String & UseQuoteDouble(bool use=true) { return _ChangeMode(USE_QUOTE_DOUBLE, use); }
@@ -543,7 +648,7 @@ namespace emp {
       if (str[pos] == '\\') { ++pos; continue; } // Skip escaped characters
       if (str[pos] == mark) { return pos; }      // Found match!
     }
-    return std::string::npos; // Not found.
+    return npos; // Not found.
   }
 
   // Given an open parenthesis, find where it closes (including nesting).  Marks must be different.
@@ -557,13 +662,13 @@ namespace emp {
       else if (skip_quotes && IsQuote(str[pos]) ) pos = FindQuoteMatch(pos);
     }
 
-    return std::string::npos;
+    return npos;
   }
 
   size_t String::FindMatch(size_t pos) const {
     if (IsQuote(str[pos])) return FindQuoteMatch(pos);
     if (IsParen(str[pos])) return FindParenMatch(pos);
-    return std::string::npos;
+    return npos;
   }
 
   // A version of string::find() that can skip over quotes.
@@ -573,7 +678,7 @@ namespace emp {
 
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
     for (size_t scan_pos=0;
-         scan_pos < found_pos && found_pos != std::string::npos;
+         scan_pos < found_pos && found_pos != npos;
          scan_pos++)
     {
       // Skip quotes, if needed...
@@ -601,7 +706,7 @@ namespace emp {
       else if (skip_parens && IsParen(str[pos])) pos = FindParenMatch(pos);
     }
 
-    return std::string::npos;
+    return npos;
   }
 
   void String::FindAll(char target, emp::vector<size_t> & results,
@@ -647,7 +752,7 @@ namespace emp {
                              bool skip_quotes, bool skip_parens) const
   {
     size_t pos = Find(target, start, skip_quotes, skip_parens);
-    while (pos != std::string::npos) {
+    while (pos != npos) {
       bool before_ok = (pos == 0) || !is_idchar(in_string[pos-1]);
       size_t after_pos = pos+target.size();
       bool after_ok = (after_pos == in_string.size()) || !is_idchar(in_string[after_pos]);
@@ -656,7 +761,7 @@ namespace emp {
       pos = Find(target, pos+target.size(), skip_quotes, skip_parens);
     }
 
-    return std::string::npos;
+    return npos;
   }
 
 
