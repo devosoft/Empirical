@@ -262,33 +262,35 @@ namespace emp {
       USE_PAREN_QUOTES = 0x80   // Forward/back single quote
     };
 
-    uint8_t mode = USE_QUOTE_SINGLE + USE_QUOTE_DOUBLE +
-                   USE_PAREN_ROUND + USE_PAREN_SQUARE + USE_PAREN_CURLY;
+    struct Mode {
+      uint8_t val = USE_QUOTE_SINGLE + USE_QUOTE_DOUBLE +
+                    USE_PAREN_ROUND + USE_PAREN_SQUARE + USE_PAREN_CURLY;
+    } mode;
 
     // ------ HELPER FUNCTIONS ------
 
     String & _ChangeMode(Mask mask, bool use) {
-      if (use) mode |= mask;
-      else mode &= ~mask;
+      if (use) mode.val |= mask;
+      else mode.val &= ~mask;
       return *this;      
     }
 
     bool IsQuote(char c) const {
       switch (c) {
-        case '\'': return mode & USE_QUOTE_SINGLE;
-        case '"': return mode & USE_QUOTE_DOUBLE;
-        case '`': return mode & USE_QUOTE_BACK;
+        case '\'': return mode.val & USE_QUOTE_SINGLE;
+        case '"': return mode.val & USE_QUOTE_DOUBLE;
+        case '`': return mode.val & USE_QUOTE_BACK;
       }
       return false;
     }
 
     bool IsParen(char c) const {
       switch (c) {
-        case '(': return mode & USE_PAREN_ROUND;
-        case '[': return mode & USE_PAREN_SQUARE;
-        case '{': return mode & USE_PAREN_CURLY;
-        case '<': return mode & USE_PAREN_ANGLE;
-        case '`': return mode & USE_PAREN_QUOTES;
+        case '(': return mode.val & USE_PAREN_ROUND;
+        case '[': return mode.val & USE_PAREN_SQUARE;
+        case '{': return mode.val & USE_PAREN_CURLY;
+        case '<': return mode.val & USE_PAREN_ANGLE;
+        case '`': return mode.val & USE_PAREN_QUOTES;
       }
       return false;
     }
@@ -344,6 +346,8 @@ namespace emp {
     String(String &&) = default;
     String(const std::string & _in) : str(_in) { }
     String(std::string && _in) : str(std::move(_in)) { }
+    String(const std::string & _in, Mode _mode) : str(_in), mode(_mode) { }
+    String(std::string && _in, Mode _mode) : str(std::move(_in)), mode(_mode) { }
     String(const char * _in) : str(_in) { }
     String(size_t count, char _in) : str(count, _in) { }
     String(std::initializer_list<char> _in) : str(_in) { }
@@ -456,6 +460,74 @@ namespace emp {
     template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
       { return str.find(std::forward<ARG_T>(arg)) != npos; }
 
+    template <typename... ARG_Ts> String & replace(ARG_Ts &&... args)
+      { str.replace(std::forward<ARG_Ts>(args)...); return *this; }
+
+    String substr(size_t pos=0, size_t count=npos ) const {
+      return String(str.substr(pos, count), mode);
+    }
+
+    size_t copy(char * dest, size_t count, size_t pos=0) const { return str.copy(dest, count, pos); }
+
+    void resize( size_t count, char c='\0') { str.resize(count, c); }
+
+    void swap(String & other) { str.swap(other.str); std::swap(mode, other.mode); }
+
+    // Searching
+    size_t find(const std::string & str, size_t pos=0) const noexcept { return find(str,pos); }
+    size_t find(const char* s, size_t pos=0) const { return str.find(s,pos); }
+    size_t find(const char* s, size_t pos, size_t count) const { return str.find(s,pos,count); }
+    size_t find(char c, size_t pos=0) const noexcept { return str.find(c,pos); }
+    template < class SVIEW_T > size_t find(const SVIEW_T & sv, size_t pos=0) const
+      { return str.find(sv,pos); }
+
+    size_t rfind(const std::string & str, size_t pos=0) const noexcept { return rfind(str,pos); }
+    size_t rfind(const char* s, size_t pos=0) const { return str.rfind(s,pos); }
+    size_t rfind(const char* s, size_t pos, size_t count) const { return str.rfind(s,pos,count); }
+    size_t rfind(char c, size_t pos=0) const noexcept { return str.rfind(c,pos); }
+    template < class SVIEW_T > size_t rfind(const SVIEW_T & sv, size_t pos=0) const
+      { return str.rfind(sv,pos); }
+
+    size_t find_first_of(const std::string & str, size_t pos=0) const noexcept
+      { return find_first_of(str,pos); }
+    size_t find_first_of(const char* s, size_t pos=0) const { return str.find_first_of(s,pos); }
+    size_t find_first_of(const char* s, size_t pos, size_t count) const
+      { return str.find_first_of(s,pos,count); }
+    size_t find_first_of(char c, size_t pos=0) const noexcept { return str.find_first_of(c,pos); }
+    template < class SVIEW_T > size_t find_first_of(const SVIEW_T & sv, size_t pos=0) const
+      { return str.find_first_of(sv,pos); }
+
+    size_t find_first_not_of(const std::string & str, size_t pos=0) const noexcept
+      { return find_first_not_of(str,pos); }
+    size_t find_first_not_of(const char* s, size_t pos=0) const
+      { return str.find_first_not_of(s,pos); }
+    size_t find_first_not_of(const char* s, size_t pos, size_t count) const
+      { return str.find_first_not_of(s,pos,count); }
+    size_t find_first_not_of(char c, size_t pos=0) const noexcept
+      { return str.find_first_not_of(c,pos); }
+    template < class SVIEW_T > size_t find_first_not_of(const SVIEW_T & sv, size_t pos=0) const
+      { return str.find_first_not_of(sv,pos); }
+
+    size_t find_last_of(const std::string & str, size_t pos=0) const noexcept
+      { return find_last_of(str,pos); }
+    size_t find_last_of(const char* s, size_t pos=0) const { return str.find_last_of(s,pos); }
+    size_t find_last_of(const char* s, size_t pos, size_t count) const
+      { return str.find_last_of(s,pos,count); }
+    size_t find_last_of(char c, size_t pos=0) const noexcept { return str.find_last_of(c,pos); }
+    template < class SVIEW_T > size_t find_last_of(const SVIEW_T & sv, size_t pos=0) const
+      { return str.find_last_of(sv,pos); }
+
+    size_t find_last_not_of(const std::string & str, size_t pos=0) const noexcept
+      { return find_last_not_of(str,pos); }
+    size_t find_last_not_of(const char* s, size_t pos=0) const
+      { return str.find_last_not_of(s,pos); }
+    size_t find_last_not_of(const char* s, size_t pos, size_t count) const
+      { return str.find_last_not_of(s,pos,count); }
+    size_t find_last_not_of(char c, size_t pos=0) const noexcept
+      { return str.find_last_not_of(c,pos); }
+    template < class SVIEW_T > size_t find_last_not_of(const SVIEW_T & sv, size_t pos=0) const
+      { return str.find_last_not_of(sv,pos); }
+
     // ------ SPECIAL CONFIGURATION ------
 
     String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
@@ -467,14 +539,14 @@ namespace emp {
     String & UseParenAngle (bool use=true) { return _ChangeMode(USE_PAREN_ANGLE,  use); }
     String & UseParenQuotes(bool use=true) { return _ChangeMode(USE_PAREN_QUOTES, use); }
 
-    bool Get_UseQuoteSingle() const { return mode & USE_QUOTE_SINGLE; }
-    bool Get_UseQuoteDouble() const { return mode & USE_QUOTE_DOUBLE; }
-    bool Get_UseQuoteBack  () const { return mode & USE_QUOTE_BACK; }
-    bool Get_UseParenRound () const { return mode & USE_PAREN_ROUND; }
-    bool Get_UseParenSquare() const { return mode & USE_PAREN_SQUARE; }
-    bool Get_UseParenCurly () const { return mode & USE_PAREN_CURLY; }
-    bool Get_UseParenAngle () const { return mode & USE_PAREN_ANGLE; }
-    bool Get_UseParenQuotes() const { return mode & USE_PAREN_QUOTES; }
+    bool Get_UseQuoteSingle() const { return mode.val & USE_QUOTE_SINGLE; }
+    bool Get_UseQuoteDouble() const { return mode.val & USE_QUOTE_DOUBLE; }
+    bool Get_UseQuoteBack  () const { return mode.val & USE_QUOTE_BACK; }
+    bool Get_UseParenRound () const { return mode.val & USE_PAREN_ROUND; }
+    bool Get_UseParenSquare() const { return mode.val & USE_PAREN_SQUARE; }
+    bool Get_UseParenCurly () const { return mode.val & USE_PAREN_CURLY; }
+    bool Get_UseParenAngle () const { return mode.val & USE_PAREN_ANGLE; }
+    bool Get_UseParenQuotes() const { return mode.val & USE_PAREN_QUOTES; }
 
     // ------ CLASSIFICATION ------
 
