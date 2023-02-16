@@ -528,6 +528,14 @@ namespace emp {
     template < class SVIEW_T > size_t find_last_not_of(const SVIEW_T & sv, size_t pos=0) const
       { return str.find_last_not_of(sv,pos); }
 
+    // Operators
+
+    template <typename T> String operator+(T && in)
+      { return String(str + std::forward<T>(in), mode); }
+    template <typename T> bool operator==(T && in) { return in.str == std::forward<T>(in); }
+    template <typename T> bool operator<=>(T && in) { return in.str <=> std::forward<T>(in); }
+    
+
     // ------ SPECIAL CONFIGURATION ------
 
     String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
@@ -837,7 +845,7 @@ namespace emp {
   }
 
 
-  static std::string String::MakeEscaped(char c) {
+  std::string String::MakeEscaped(char c) {
     // If we just append as a normal character, do so!
     if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return std::string(c);
     switch (c) {
@@ -883,7 +891,7 @@ namespace emp {
     return std::string(c);
   }
 
-  static std::string String::MakeEscaped(const std::string & in) {
+  std::string String::MakeEscaped(const std::string & in) {
     std::string out;
     out.reserve(in.size()); // Reserve minimum needed size. 
     for (char c : in) out += MakeEscaped(c);
@@ -891,7 +899,7 @@ namespace emp {
   }
 
   /// Take a string and replace reserved HTML characters with character entities
-  static std::string String::MakeWebSafe(const std::string & in) {
+  std::string String::MakeWebSafe(const std::string & in) {
     std::string out;
     out.reserve(in.size());
     for (char c : in) {
@@ -909,13 +917,13 @@ namespace emp {
 
   /// Take a value and convert it to a C++-style literal.
   template <typename T>
-  [[nodiscard]] static typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
+  [[nodiscard]] typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
   String::MakeLiteral(const T & value) {
     return std::to_string(value);
   }
 
   /// Take a char and convert it to a C++-style literal.
-  [[nodiscard]] static std::string String::MakeLiteral(char value) {
+  [[nodiscard]] std::string String::MakeLiteral(char value) {
     std::stringstream ss;
     ss << "'" << MakeEscaped(value) << "'";
     return ss.str();
@@ -923,7 +931,7 @@ namespace emp {
 
   /// Take a string or iterable and convert it to a C++-style literal.
   // This is the version for string. The version for an iterable is below.
-  [[nodiscard]] static std::string String::MakeLiteral(const std::string & value) {
+  [[nodiscard]] std::string String::MakeLiteral(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -938,7 +946,7 @@ namespace emp {
 
   /// Take any iterable value and convert it to a C++-style literal.
   template <typename T>
-  [[nodiscard]] static typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
+  [[nodiscard]] typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
   String::MakeLiteral(const T & value) {
     std::stringstream ss;
     ss << "{ ";
@@ -2202,6 +2210,27 @@ namespace emp {
     out_set.resize(out_count); // Shrink out_set if needed.
   }
 
+  // External function overrides
+
+  std::ostream & operator<<(std::ostream & os, const emp::String & str) {
+    return os << str;
+  }
+
+  std::istream & operator>>(std::istream & is, emp::String & str) {
+    return is >> str;
+  }
+
+  template< class Traits, class Allocator >
+  std::basic_istream<char, Traits>&
+  getline(std::basic_istream<char, Traits>&& input, emp::String str, char delim) {
+    return getline(input, str.str, delim);
+  }
+
+  template< class Traits, class Allocator >
+  std::basic_istream<char, Traits>&
+  getline(std::basic_istream<char, Traits>&& input, emp::String str) {
+    return getline(input, str.str);
+  }
 }
 
 #endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
