@@ -232,6 +232,28 @@ namespace emp {
     return fun1(test_char) || is_valid(test_char, funs...);
   }
 
+  /// Convert a char after a backslash to its escaped version.
+  char ToEscapeChar(char c) {
+    switch (c) {
+      case 'b': return '\b';   // Backspace
+      case 'f': return '\f';   // Form feed
+      case 'n': return '\n';   // Newline
+      case 'r': return '\r';   // Return
+      case 't': return '\t';   // Tab
+      case 'v': return '\v';   // Vertical tab
+      case '0': return '\0';   // Empty (character 0)
+      case '\\': return '\\';  // Backslash
+      case '"': return '"';    // Double quote
+      case '\'': return '\'';  // Single quote
+      case '`': return '`';    // Backquote
+      default:
+        emp_assert(false, "unknown escape char used; probably need to update converter!");
+    }
+
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+    return '\0';
+  }
+
 }
 
 #endif // #ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
