@@ -247,6 +247,21 @@
 
 namespace emp {
 
+  // Some stand-alone functions.
+  [[nodiscard]] std::string MakeEscaped(char c);
+  [[nodiscard]] std::string MakeEscaped(const std::string & in);
+  [[nodiscard]] std::string MakeWebSafe(const std::string & in);
+  [[nodiscard]] std::string MakeLiteral(char value);
+  [[nodiscard]] std::string MakeLiteral(char value);
+  template <typename T>
+  [[nodiscard]] typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type MakeLiteral(const T & value);
+  template <typename T>
+  [[nodiscard]] typename std::enable_if<emp::IsIterable<T>::value, std::string>::type MakeLiteral(const T & value);
+  [[nodiscard]] std::string MakeUpper(const std::string & in);
+  [[nodiscard]] std::string MakeLower(const std::string & in);
+  [[nodiscard]] std::string MakeTitleCase(const std::string & in);
+  [[nodiscard]] std::string MakeRoman(int val);
+
   class String {
   private:
     std::string str;   // The main string that we are manipulating.
@@ -401,9 +416,9 @@ namespace emp {
 
     // Capacity
     bool empty() const { return str.empty(); }
-    size_t size() const { return str.size()); }
-    size_t length() const { return str.length()); }
-    size_t max_size() const { return str.max_size()); }
+    size_t size() const { return str.size(); }
+    size_t length() const { return str.length(); }
+    size_t max_size() const { return str.max_size(); }
     void reserve(size_t new_cap) { str.reserve(new_cap); }
     void reserve() { str.reserve(); }
     size_t capacity() const { return str.capacity(); }
@@ -444,7 +459,7 @@ namespace emp {
       return *this;
     }
 
-    int compare(const String & in) { return str.compare(in.str()); }
+    int compare(const String & in) { return str.compare(in.str); }
     template <typename... ARG_Ts> int compare(ARG_Ts &&... args)
       { return str.compare(std::forward<ARG_Ts>(args)...); }
 
@@ -659,37 +674,26 @@ namespace emp {
       { return Find(!IDCharSet(), start, skip_q, skip_p); }
 
     //  ------ FORMATTING ------
-    // Make* is static; it takes input a produces a properly formatted string.
     // Append* adds to the end of the current string.
     // Set* replaces the current string.
     // To* Converts the current string.
     // As* Returns a modified version of the current string, leaving original intact.
-    static std::string MakeEscaped(char c);
+    // Most also have stand-along Make* versions where the core implementation is found.
+
     String & AppendEscaped(char c) { str += MakeEscaped(c); }
     String & SetEscaped(char c) { str = MakeEscaped(c); }
 
-    static std::string MakeEscaped(const std::string & in);
     String & AppendEscaped(const std::string & in) { str+=MakeEscaped(in); return *this; }
     String & SetEscaped(const std::string & in) { str = MakeEscaped(in); return *this; }
     String & ToEscaped() { str = MakeEscaped(str); }
     [[nodiscard]] std::string AsEscaped() { return MakeEscaped(str); }
 
-    static std::string MakeWebSafe(const std::string & in);
     String & AppendWebSafe(std::string in) { str+=MakeWebSafe(in); return *this; }
     String & SetWebSafe(const std::string & in) { str = MakeWebSafe(in); return *this;; }
     String & ToWebSafe() { str = MakeWebSafe(str); }
     [[nodiscard]] std::string AsWebSafe() { return MakeWebSafe(str); }
 
     // <= Creating Literals =>
-    [[nodiscard]] static std::string MakeLiteral(char value);
-    [[nodiscard]] static std::string MakeLiteral(const std::string & value);
-    template <typename T>
-    [[nodiscard]] static typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
-    MakeLiteral(const T & value);
-    template <typename T>
-    [[nodiscard]] static typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
-    MakeLiteral(const T & value);
-
     template <typename T>
     String & AppendLiteral(const T & in) { str+=MakeLiteral(in); return *this; }
     template <typename T>
@@ -697,6 +701,23 @@ namespace emp {
     String & ToLiteral() { str = MakeLiteral(str); }
     [[nodiscard]] std::string AsLiteral() { return MakeLiteral(str); }
 
+    String & AppendUpper(const std::string & in) { str+=MakeUpper(in); return this; }
+    String & SetUpper(const std::string & in) { str = MakeUpper(in); return *this; }
+    String & ToUpper() { str = MakeUpper(str); }
+    [[nodiscard]] std::string AsUpper() { return MakeUpper(str); }
+
+    String & AppendLower(const std::string & in) { str+=MakeLower(in); return this; }
+    String & SetLower(const std::string & in) { str = MakeLower(in); return *this; }
+    String & ToLower() { str = MakeLower(str); }
+    [[nodiscard]] std::string AsLower() { return MakeLower(str); }
+
+    String & AppendTitleCase(const std::string & in) { str+=MakeTitleCase(in); return this; }
+    String & SetTitleCase(const std::string & in) { str = MakeTitleCase(in); return *this; }
+    String & ToTitleCase() { str = MakeTitleCase(str); }
+    [[nodiscard]] std::string AsTitleCase() { return MakeTitleCase(str); }
+
+    String & AppendRoman(int val) { str+=MakeRoman(val); return this; }
+    String & SetRoman(int val) { str = MakeRoman(val); return *this; }
   };
 
 
@@ -821,9 +842,9 @@ namespace emp {
   size_t String::FindAnyOf(T test1, Ts... tests) const {
     // If an offset is provided, use it.
     if constexpr (std::is_arithmetic_v<T>) {
-      return find_any_of_from(test1, std::forward<Ts>(tests)...);
+      return FindAnyOfFrom(test1, std::forward<Ts>(tests)...);
     } else {
-      return find_any_of_from(0, test1, std::forward<Ts>(tests)...);
+      return FindAnyOfFrom(0, test1, std::forward<Ts>(tests)...);
     }
   }
 
@@ -845,229 +866,11 @@ namespace emp {
   }
 
 
-  std::string String::MakeEscaped(char c) {
-    // If we just append as a normal character, do so!
-    if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return std::string(c);
-    switch (c) {
-    case '\0': return "\\0";
-    case 1: return "\\001";
-    case 2: return "\\002";
-    case 3: return "\\003";
-    case 4: return "\\004";
-    case 5: return "\\005";
-    case 6: return "\\006";
-    case '\a': return "\\a";  // case  7 (audible bell)
-    case '\b': return "\\b";  // case  8 (backspace)
-    case '\t': return "\\t";  // case  9 (tab)
-    case '\n': return "\\n";  // case 10 (newline)
-    case '\v': return "\\v";  // case 11 (vertical tab)
-    case '\f': return "\\f";  // case 12 (form feed - new page)
-    case '\r': return "\\r";  // case 13 (carriage return)
-    case 14: return "\\016";
-    case 15: return "\\017";
-    case 16: return "\\020";
-    case 17: return "\\021";
-    case 18: return "\\022";
-    case 19: return "\\023";
-    case 20: return "\\024";
-    case 21: return "\\025";
-    case 22: return "\\026";
-    case 23: return "\\027";
-    case 24: return "\\030";
-    case 25: return "\\031";
-    case 26: return "\\032";
-    case 27: return "\\033";  // case 27 (ESC), sometimes \e
-    case 28: return "\\034";
-    case 29: return "\\035";
-    case 30: return "\\036";
-    case 31: return "\\037";
-
-    case '\"': return "\\\"";  // case 34
-    case '\'': return "\\\'";  // case 39
-    case '\\': return "\\\\";  // case 92
-    case 127: return "\\177";  // (delete)
-    };
-
-    return std::string(c);
-  }
-
-  std::string String::MakeEscaped(const std::string & in) {
-    std::string out;
-    out.reserve(in.size()); // Reserve minimum needed size. 
-    for (char c : in) out += MakeEscaped(c);
-    return out;
-  }
-
-  /// Take a string and replace reserved HTML characters with character entities
-  std::string String::MakeWebSafe(const std::string & in) {
-    std::string out;
-    out.reserve(in.size());
-    for (char c : in) {
-      switch (c) {
-      case '&': out += "&amp"; break;
-      case '<': out += "&lt"; break;
-      case '>': out += "&gt"; break;
-      case '\'': out += "&apos"; break;
-      case '"': out += "&quot"; break;
-      default: out += c;
-      }
-    }
-    return out;
-  }
-
-  /// Take a value and convert it to a C++-style literal.
-  template <typename T>
-  [[nodiscard]] typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
-  String::MakeLiteral(const T & value) {
-    return std::to_string(value);
-  }
-
-  /// Take a char and convert it to a C++-style literal.
-  [[nodiscard]] std::string String::MakeLiteral(char value) {
-    std::stringstream ss;
-    ss << "'" << MakeEscaped(value) << "'";
-    return ss.str();
-  }
-
-  /// Take a string or iterable and convert it to a C++-style literal.
-  // This is the version for string. The version for an iterable is below.
-  [[nodiscard]] std::string String::MakeLiteral(const std::string & value) {
-    // Add quotes to the ends and convert each character.
-    std::stringstream ss;
-    ss << "\"";
-    for (char c : value) {
-      ss << MakeEscaped(c);
-    }
-    ss << "\"";
-    return ss.str();
-  }
-
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  /// Take any iterable value and convert it to a C++-style literal.
-  template <typename T>
-  [[nodiscard]] typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
-  String::MakeLiteral(const T & value) {
-    std::stringstream ss;
-    ss << "{ ";
-    for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
-      if (iter != std::begin( value )) ss << " ";
-      ss << String::MakeLiteral< std::decay_t<decltype(*iter)> >( *iter );
-    }
-    ss << " }";
-
-    return ss.str();
-  }
-
-  #endif
 
 
 
+/////// @CAO CONTINUE HERE!!!!!!!!
 
-
-
-
-
-
-
-  [[nodiscard]] static std::string String::MakeFromLiteral(const std::string & value) {
-    if (value.size() == 0) return "";
-    if (value[0] == '\'') return std::string(MakeFromLiteral_Char(value)); 
-    if (value[0] == '"') return MakeFromLiteral_String(value);
-    // @CAO Add conversion from numerical literals, and especially octal (0-), binary (0b-), and hex (0x-)
-  }
-
-
-
-
-  /// Convert a literal character representation to an actual string.
-  /// (i.e., 'A', ';', or '\n')
-  [[nodiscard]] static char MakeFromLiteral_Char(const std::string & value) {
-    emp_assert(is_literal_char(value));
-    // Given the assert, we can assume the string DOES contain a literal representation,
-    // and we just need to convert it.
-
-    if (value.size() == 3) return value[1];
-    if (value.size() == 4) {
-      switch (value[2]) {
-        case 'n': return '\n';   // Newline
-        case 'r': return '\r';   // Return
-        case 't': return '\t';   // Tab
-        case '0': return '\0';   // Empty (character 0)
-        case '\\': return '\\';  // Backslash
-        case '\'': return '\'';  // Single quote
-      }
-    }
-
-    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
-
-    // Problem!
-    return '0';
-  }
-
-
-  /// Convert a literal string representation to an actual string.
-  [[nodiscard]] static inline std::string from_literal_string(
-    const std::string & value,
-    [[maybe_unused]] const std::string & quote_marks="\""
-  );
-
-  /// Convert a string to all uppercase.
-  [[nodiscard]] static inline std::string to_upper(std::string value) {
-    constexpr int char_shift = 'a' - 'A';
-    for (auto & x : value) {
-      if (x >= 'a' && x <= 'z') x = (char) (x - char_shift);
-    }
-    return value;
-  }
-
-  /// Convert a string to all lowercase.
-  [[nodiscard]] static inline std::string to_lower(std::string value) {
-    constexpr int char_shift = 'a' - 'A';
-    for (auto & x : value) {
-      if (x >= 'A' && x <= 'Z') x = (char) (x + char_shift);
-    }
-    return value;
-  }
-
-  /// Make first letter of each word upper case
-  [[nodiscard]] static inline std::string to_titlecase(std::string value) {
-    constexpr int char_shift = 'a' - 'A';
-    bool next_upper = true;
-    for (size_t i = 0; i < value.size(); i++) {
-      if (next_upper && value[i] >= 'a' && value[i] <= 'z') {
-        value[i] = (char) (value[i] - char_shift);
-      } else if (!next_upper && value[i] >= 'A' && value[i] <= 'Z') {
-        value[i] = (char) (value[i] + char_shift);
-      }
-
-      next_upper = (value[i] == ' ');
-    }
-    return value;
-  }
-
-  /// Convert an integer to a roman numeral string.
-  [[nodiscard]] static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
-    std::string ret_string(prefix);
-    if (val < 0) ret_string += to_roman_numeral(-val, "-");
-    else if (val > 3999) { ; } // Out of bounds; return a blank;
-    else if (val >= 1000) ret_string += to_roman_numeral(val - 1000, "M");
-    else if (val >= 900) ret_string += to_roman_numeral(val - 900, "CM");
-    else if (val >= 500) ret_string += to_roman_numeral(val - 500, "D");
-    else if (val >= 400) ret_string += to_roman_numeral(val - 400, "CD");
-    else if (val >= 100) ret_string += to_roman_numeral(val - 100, "C");
-    else if (val >= 90) ret_string += to_roman_numeral(val - 90, "XC");
-    else if (val >= 50) ret_string += to_roman_numeral(val - 50, "L");
-    else if (val >= 40) ret_string += to_roman_numeral(val - 40, "XL");
-    else if (val >= 10) ret_string += to_roman_numeral(val - 10, "X");
-    else if (val == 9) ret_string += "IX";
-    else if (val >= 5) ret_string += to_roman_numeral(val - 5, "V");
-    else if (val == 4) ret_string += "IV";
-    else if (val > 0) ret_string += to_roman_numeral(val - 1, "I");
-
-    // else we already have it exactly and don't need to return anything.
-    return ret_string;
-  }
 
   /// Remove whitespace from the beginning or end of a string.
   static inline void trim_whitespace(std::string & in_str) {
@@ -2019,46 +1822,6 @@ namespace emp {
 
 
 
-  /// Convert a literal string representation to an actual string.
-  static inline std::string from_literal_string(
-    const std::string & value,
-    [[maybe_unused]] const std::string & quote_marks)
-  {
-    emp_assert(is_literal_string(value, quote_marks),
-               value, diagnose_literal_string(value, quote_marks));
-    // Given the assert, assume string DOES contain a literal string representation.
-
-    std::string out_string;
-    out_string.reserve(value.size()-2);  // Make a guess on final size.
-
-    for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      // If we don't have an escaped character, just move it over.
-      if (value[pos] != '\\') {
-        out_string.push_back(value[pos]);
-        continue;
-      }
-
-      // If we do have an escape character, convert it.
-      pos++;
-
-      switch (value[pos]) {
-        case 'b': out_string.push_back('\b'); break;   // Backspace
-        case 'f': out_string.push_back('\f'); break;   // Form feed
-        case 'n': out_string.push_back('\n'); break;   // Newline
-        case 'r': out_string.push_back('\r'); break;   // Return
-        case 't': out_string.push_back('\t'); break;   // Tab
-        case 'v': out_string.push_back('\v'); break;   // Vertical tab
-        case '0': out_string.push_back('\0'); break;   // Empty (character 0)
-        case '\\': out_string.push_back('\\'); break;  // Backslash
-        case '"': out_string.push_back('"'); break;    // Double quote
-        case '\'': out_string.push_back('\''); break;  // Single quote
-        default:
-          emp_assert(false, "unknown escape char used; probably need to update converter!");
-      }
-    }
-
-    return out_string;
-  }
 
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
@@ -2210,7 +1973,236 @@ namespace emp {
     out_set.resize(out_count); // Shrink out_set if needed.
   }
 
-  // External function overrides
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //------------- Stand-along function definitions --------------
+
+  std::string MakeEscaped(char c) {
+    // If we just append as a normal character, do so!
+    if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return std::string(c);
+    switch (c) {
+    case '\0': return "\\0";
+    case 1: return "\\001";
+    case 2: return "\\002";
+    case 3: return "\\003";
+    case 4: return "\\004";
+    case 5: return "\\005";
+    case 6: return "\\006";
+    case '\a': return "\\a";  // case  7 (audible bell)
+    case '\b': return "\\b";  // case  8 (backspace)
+    case '\t': return "\\t";  // case  9 (tab)
+    case '\n': return "\\n";  // case 10 (newline)
+    case '\v': return "\\v";  // case 11 (vertical tab)
+    case '\f': return "\\f";  // case 12 (form feed - new page)
+    case '\r': return "\\r";  // case 13 (carriage return)
+    case 14: return "\\016";
+    case 15: return "\\017";
+    case 16: return "\\020";
+    case 17: return "\\021";
+    case 18: return "\\022";
+    case 19: return "\\023";
+    case 20: return "\\024";
+    case 21: return "\\025";
+    case 22: return "\\026";
+    case 23: return "\\027";
+    case 24: return "\\030";
+    case 25: return "\\031";
+    case 26: return "\\032";
+    case 27: return "\\033";  // case 27 (ESC), sometimes \e
+    case 28: return "\\034";
+    case 29: return "\\035";
+    case 30: return "\\036";
+    case 31: return "\\037";
+
+    case '\"': return "\\\"";  // case 34
+    case '\'': return "\\\'";  // case 39
+    case '\\': return "\\\\";  // case 92
+    case 127: return "\\177";  // (delete)
+    };
+
+    return std::string(c);
+  }
+  
+  std::string MakeEscaped(const std::string & in) {
+    std::string out;
+    out.reserve(in.size()); // Reserve minimum needed size. 
+    for (char c : in) out += MakeEscaped(c);
+    return out;
+  }
+
+  /// Take a string and replace reserved HTML characters with character entities
+  std::string MakeWebSafe(const std::string & in) {
+    std::string out;
+    out.reserve(in.size());
+    for (char c : in) {
+      switch (c) {
+      case '&': out += "&amp"; break;
+      case '<': out += "&lt"; break;
+      case '>': out += "&gt"; break;
+      case '\'': out += "&apos"; break;
+      case '"': out += "&quot"; break;
+      default: out += c;
+      }
+    }
+    return out;
+  }
+
+  /// Take a value and convert it to a C++-style literal.
+  template <typename T>
+  [[nodiscard]] typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
+  MakeLiteral(const T & value) {
+    return std::to_string(value);
+  }
+
+  /// Take a char and convert it to a C++-style literal.
+  [[nodiscard]] std::string MakeLiteral(char value) {
+    std::stringstream ss;
+    ss << "'" << MakeEscaped(value) << "'";
+    return ss.str();
+  }
+
+  /// Take a string or iterable and convert it to a C++-style literal.
+  // This is the version for string. The version for an iterable is below.
+  [[nodiscard]] std::string MakeLiteral(const std::string & value) {
+    // Add quotes to the ends and convert each character.
+    std::stringstream ss;
+    ss << "\"";
+    for (char c : value) {
+      ss << MakeEscaped(c);
+    }
+    ss << "\"";
+    return ss.str();
+  }
+
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+  /// Take any iterable value and convert it to a C++-style literal.
+  template <typename T>
+  [[nodiscard]] typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
+  MakeLiteral(const T & value) {
+    std::stringstream ss;
+    ss << "{ ";
+    for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
+      if (iter != std::begin( value )) ss << " ";
+      ss << String::MakeLiteral< std::decay_t<decltype(*iter)> >( *iter );
+    }
+    ss << " }";
+
+    return ss.str();
+  }
+
+  #endif
+
+  [[nodiscard]] std::string MakeFromLiteral(const std::string & value) {
+    if (value.size() == 0) return "";
+    if (value[0] == '\'') return std::string(MakeFromLiteral_Char(value)); 
+    if (value[0] == '"') return MakeFromLiteral_String(value);
+    // @CAO Add conversion from numerical literals, and especially octal (0-), binary (0b-), and hex (0x-)
+  }
+
+  /// Convert a literal character representation to an actual string.
+  /// (i.e., 'A', ';', or '\n')
+  [[nodiscard]] char MakeFromLiteral_Char(const std::string & value) {
+    emp_assert(is_literal_char(value));
+    // Given the assert, we can assume the string DOES contain a literal representation,
+    // and we just need to convert it.
+
+    if (value.size() == 3) return value[1];
+    if (value.size() == 4) return ToEscapeChar(value[2]);
+
+    return '\0'; // Error!
+  }
+
+
+  /// Convert a literal string representation to an actual string.
+  [[nodiscard]] std::string MakeFromLiteral_String(const std::string & value) {
+  /// Convert a literal string representation to an actual string.
+    emp_assert(is_literal_string(value),
+               value, diagnose_literal_string(value));
+    // Given the assert, we can assume string DOES contain a literal string representation.
+
+    std::string out_string;
+    out_string.reserve(value.size()-2);  // Make a guess on final size.
+
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      // If we don't have an escaped character, just move it over.
+      if (value[pos] != '\\') out_string.push_back(value[pos]);
+      else out_string.push_back(ToEscapeChar(value[++pos]));
+    }
+
+    return out_string;
+  }
+
+  /// Convert a string to all uppercase.
+  [[nodiscard]] std::string MakeUpper(std::string value) {
+    constexpr int char_shift = 'a' - 'A';
+    for (auto & x : value) {
+      if (x >= 'a' && x <= 'z') x = (char) (x - char_shift);
+    }
+    return value;
+  }
+
+  /// Convert a string to all lowercase.
+  [[nodiscard]] std::string MakeLower(std::string value) {
+    constexpr int char_shift = 'a' - 'A';
+    for (auto & x : value) {
+      if (x >= 'A' && x <= 'Z') x = (char) (x + char_shift);
+    }
+    return value;
+  }
+
+  /// Make first letter of each word upper case
+  [[nodiscard]] std::string MakeTitleCase(std::string value) {
+    constexpr int char_shift = 'a' - 'A';
+    bool next_upper = true;
+    for (size_t i = 0; i < value.size(); i++) {
+      if (next_upper && value[i] >= 'a' && value[i] <= 'z') {
+        value[i] = (char) (value[i] - char_shift);
+      } else if (!next_upper && value[i] >= 'A' && value[i] <= 'Z') {
+        value[i] = (char) (value[i] + char_shift);
+      }
+
+      next_upper = (value[i] == ' ');
+    }
+    return value;
+  }
+
+  /// Convert an integer to a roman numeral string.
+  [[nodiscard]] std::string MakeRoman(int val, const std::string & prefix="") {
+    std::string ret_string(prefix);
+    if (val < 0) ret_string += to_roman_numeral(-val, "-");
+    else if (val > 3999) { ; } // Out of bounds; return a blank;
+    else if (val >= 1000) ret_string += to_roman_numeral(val - 1000, "M");
+    else if (val >= 900) ret_string += to_roman_numeral(val - 900, "CM");
+    else if (val >= 500) ret_string += to_roman_numeral(val - 500, "D");
+    else if (val >= 400) ret_string += to_roman_numeral(val - 400, "CD");
+    else if (val >= 100) ret_string += to_roman_numeral(val - 100, "C");
+    else if (val >= 90) ret_string += to_roman_numeral(val - 90, "XC");
+    else if (val >= 50) ret_string += to_roman_numeral(val - 50, "L");
+    else if (val >= 40) ret_string += to_roman_numeral(val - 40, "XL");
+    else if (val >= 10) ret_string += to_roman_numeral(val - 10, "X");
+    else if (val == 9) ret_string += "IX";
+    else if (val >= 5) ret_string += to_roman_numeral(val - 5, "V");
+    else if (val == 4) ret_string += "IV";
+    else if (val > 0) ret_string += to_roman_numeral(val - 1, "I");
+
+    // else we already have it exactly and don't need to return anything.
+    return ret_string;
+  }
+
+
+  // ------ External function overrides ------
 
   std::ostream & operator<<(std::ostream & os, const emp::String & str) {
     return os << str;
@@ -2220,16 +2212,14 @@ namespace emp {
     return is >> str;
   }
 
-  template< class Traits, class Allocator >
-  std::basic_istream<char, Traits>&
-  getline(std::basic_istream<char, Traits>&& input, emp::String str, char delim) {
-    return getline(input, str.str, delim);
+  template<typename STREAM_T>
+  STREAM_T & getline(STREAM_T && input, emp::String str, char delim) {
+    return getline(std::forward<STREAM_T>(input), str.str, delim);
   }
 
-  template< class Traits, class Allocator >
-  std::basic_istream<char, Traits>&
-  getline(std::basic_istream<char, Traits>&& input, emp::String str) {
-    return getline(input, str.str);
+  template<typename STREAM_T>
+  STREAM_T & getline(STREAM_T && input, emp::String str) {
+    return getline(std::forward<STREAM_T>(input), str.str);
   }
 }
 
