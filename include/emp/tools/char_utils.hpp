@@ -208,6 +208,11 @@ namespace emp {
     return cs;
   }
 
+  static const CharSet & PunctuationCharSet() {
+    static CharSet cs = !(AlphanumericCharSet() + '_' + WhitespaceCharSet());
+    return cs;
+  }
+
 
   inline bool is_whitespace(char test_char)   { return WhitespaceCharSet().Has(test_char); }
   inline bool is_upper_letter(char test_char) { return UpperCharSet().Has(test_char); }
