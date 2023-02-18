@@ -247,20 +247,20 @@
 
 namespace emp {
 
+  class String;
+
   // Some stand-alone functions.
-  [[nodiscard]] std::string MakeEscaped(char c);
-  [[nodiscard]] std::string MakeEscaped(const std::string & in);
-  [[nodiscard]] std::string MakeWebSafe(const std::string & in);
-  [[nodiscard]] std::string MakeLiteral(char value);
-  [[nodiscard]] std::string MakeLiteral(char value);
+  [[nodiscard]] emp::String MakeEscaped(char c);
+  [[nodiscard]] emp::String MakeEscaped(const std::string & in);
+  [[nodiscard]] emp::String MakeWebSafe(const std::string & in);
+  [[nodiscard]] emp::String MakeLiteral(char value);
+  [[nodiscard]] emp::String MakeLiteral(char value);
   template <typename T>
-  [[nodiscard]] typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type MakeLiteral(const T & value);
-  template <typename T>
-  [[nodiscard]] typename std::enable_if<emp::IsIterable<T>::value, std::string>::type MakeLiteral(const T & value);
-  [[nodiscard]] std::string MakeUpper(const std::string & in);
-  [[nodiscard]] std::string MakeLower(const std::string & in);
-  [[nodiscard]] std::string MakeTitleCase(const std::string & in);
-  [[nodiscard]] std::string MakeRoman(int val);
+  [[nodiscard]] emp::String MakeLiteral(const T & value);
+  [[nodiscard]] emp::String MakeUpper(const std::string & in);
+  [[nodiscard]] emp::String MakeLower(const std::string & in);
+  [[nodiscard]] emp::String MakeTitleCase(const std::string & in);
+  [[nodiscard]] emp::String MakeRoman(int val);
 
   class String {
   private:
@@ -356,28 +356,48 @@ namespace emp {
 
     static constexpr size_t npos = std::string::npos;
 
+    // Constructors duplicating from std::string
     String() = default;
-    String(const String &) = default;
-    String(String &&) = default;
-    String(const std::string & _in) : str(_in) { }
-    String(std::string && _in) : str(std::move(_in)) { }
-    String(const std::string & _in, Mode _mode) : str(_in), mode(_mode) { }
-    String(std::string && _in, Mode _mode) : str(std::move(_in)), mode(_mode) { }
-    String(const char * _in) : str(_in) { }
-    String(size_t count, char _in) : str(count, _in) { }
-    String(std::initializer_list<char> _in) : str(_in) { }
-    String(const String & _in, size_t start, size_t count=npos)
-      : str(_in.str, start, count), mode(_in.mode) { }
-    String(const std::string & _in, size_t start, size_t count=npos)
-      : str(_in, start, count) { }
-    String(const char * _in, size_t count) : str(_in, count) { }
+    String(const std::string & _str) : str(_str) { }
+    String(std::string && _str) : str(std::move(_str)) { }
+    String(const std::string & _str, Mode _mode) : str(_str), mode(_mode) { }
+    String(std::string && _str, Mode _mode) : str(std::move(_str)), mode(_mode) { }
+    String(const char * _str) : str(_str) { }
+    String(size_t count, char _str) : str(count, _str) { }
+    String(std::initializer_list<char> _str) : str(_str) { }
+    String(const String & _str, size_t start, size_t count=npos)
+      : str(_str.str, start, count), mode(_str.mode) { }
+    String(const std::string & _str, size_t start, size_t count=npos)
+      : str(_str, start, count) { }
+    String(const char * _str, size_t count) : str(_str, count) { }
     template< class InputIt >
     String(InputIt first, InputIt last) : str(first, last) { }
     String(std::nullptr_t) = delete;
 
-    // ------ IMPORT ALL std::string PROPERTIES AND EXPAND TO emp::String ------
+    // ------ New constructors ------
 
-    // Assignment operators
+    String(const String &) = default;
+    String(String &&) = default;
+
+    // Allow a string to be transformed during construction, 1-to-1
+    String(const std::string & _str, std::function<char(char)> transform_fun) {
+      str.reserve(_str.size());  // Setup expected size.
+      for (auto & c : _str) { str.push_back(transform_fun(c)); }
+    }
+
+    // Allow a string to be transformed during construction, 1-to-any
+    String(const std::string & _str, std::function<std::string(char)> transform_fun) {
+      str.reserve(_str.size());  // Setup expected size; assume size will be 1-to-1 by default.
+      for (auto & c : _str) { str += transform_fun(c); }
+    }
+
+
+
+    // ====== IMPORT ALL std::string PROPERTIES AND EXPAND TO emp::String ======
+
+
+    // ------ Assignment operators ------
+
     String & operator=(const String &) = default;
     String & operator=(String &&) = default;
     String & operator=(const std::string & _in) { str = _in; }
@@ -387,7 +407,9 @@ namespace emp {
     String & operator=(std::initializer_list<char> _in) { str = _in; }
     String & operator=( std::nullptr_t ) = delete;
 
-    // Element Access
+
+    // ------ Element Access ------
+
     char & operator[](size_t pos) { _AssertPos(pos); return str[pos]; }
     char operator[](size_t pos) const { _AssertPos(pos); return str[pos]; }
     char & front() { _AssertPos(0); return str.front(); }
@@ -399,7 +421,13 @@ namespace emp {
     const char * c_str() const { return str.c_str(); }
     const std::string & cpp_str() const { return str; }
 
-    // Iterators
+    String substr(size_t pos=0, size_t count=npos ) const {
+      return String(str.substr(pos, count), mode);
+    }
+
+
+    // ------ Iterators ------
+
     iterator begin() { return str.begin(); }
     const_iterator begin() const { return str.begin(); }
     const_iterator cbegin() const { return str.cbegin(); }
@@ -414,7 +442,9 @@ namespace emp {
     const_reverse_iterator rend() const { return str.rend(); }
     const_reverse_iterator crend() const { return str.crend(); }
 
-    // Capacity
+
+    // ------ Capacity ------
+
     bool empty() const { return str.empty(); }
     size_t size() const { return str.size(); }
     size_t length() const { return str.length(); }
@@ -424,8 +454,102 @@ namespace emp {
     size_t capacity() const { return str.capacity(); }
     void shrink_to_fit() { str.shrink_to_fit(); }
     
-    // Operations
+
+    // ------ Classification and Comparisons ------
+    
+    int compare(const String & in) { return str.compare(in.str); }
+    template <typename... ARG_Ts> int compare(ARG_Ts &&... args)
+      { return str.compare(std::forward<ARG_Ts>(args)...); }
+
+    bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
+    template <typename ARG_T> bool starts_with( ARG_T && in ) const noexcept
+      { return str.starts_with(std::forward<ARG_T>(arg)); }
+    bool HasPrefix(const std::string & prefix) const { return str.rfind(prefix, 0) == 0; }
+
+    bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
+    template <typename ARG_T> bool ends_with( ARG_T && in ) const noexcept
+      { return str.ends_with(std::forward<ARG_T>(arg)); }
+
+    bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
+    template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
+      { return str.find(std::forward<ARG_T>(arg)) != npos; }
+
+
+    // ------ Analysis ------
+
+    // Count the number of occurrences of a specific character.
+    size_t Count(char c) const { return (size_t) std::count(str.begin(), str.end(), c); }
+
+    /// Test if an string is formatted as a literal character.
+    bool IsLiteralChar() const;
+
+    /// Test if an string is formatted as a literal string.
+    bool IsLiteralString(const std::string & quote_marks="\"") const;
+
+    /// Explain what string is NOT formatted as a literal string.
+    std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
+
+    /// Determine a string is composed only of a set of characters (represented as a string)
+    bool IsComposedOf(const std::string & char_set) const {
+      for (char x : str) if (!is_one_of(x, char_set)) return false;
+      return true;
+    }
+
+    /// Determine if string is a valid number.
+    bool IsNumber() const;
+
+    /// Determine if string is a valid identifier (in most languages).
+    bool IsIdentifier() const {
+      // At least one character; cannot begin with digit, only letters, digits and `_`
+      return str.size() && !is_digit(str[0]) && IDCharSet().Has(str);
+    }
+
+    bool OnlyLower() const { return (str.size()) ? LowerCharSet().Has(str) : true; }
+    bool OnlyUpper() const { return (str.size()) ? UpperCharSet().Has(str) : true; }
+    bool OnlyDigits() const { return (str.size()) ? DigitCharSet().Has(str) : true; }
+    bool OnlyAlphanumeric() const { return (str.size()) ? AlphanumericCharSet().Has(str) : true; }
+    bool OnlyWhitespace() const { return (str.size()) ? WhitespaceCharSet().Has(str) : true; }
+
+    bool HasOneOf(const std::string & char_set) const {
+      for (char c : str) if (is_one_of(c, char_set)) return true;
+      return false;
+    }
+    bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
+    bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
+    bool HasUpperLetter() const { return UpperCharSet().HasAny(str); }
+    bool HasLowerLetter() const { return LowerCharSet().HasAny(str); }
+    bool HasLetter() const { return LetterCharSet().HasAny(str); }
+    bool HasDigit() const { return DigitCharSet().HasAny(str); }
+    bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(str); }
+
+    bool HasCharAt(char c, size_t pos) const { return (pos < str.size()) && (str[pos] == c); }
+    bool HasOneOfAt(const std::string & opts, size_t pos) const {
+      return (pos < str.size()) && is_one_of(str[pos], opts);
+    }
+    bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(str, pos); }
+    bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(str, pos); }
+
+
+    // ------ Removals and Extractions ------
+
     void clear() noexcept { str.clear(); }
+
+    String & erase(size_t index=0, size_t count=npos) { str.erase(index,count); return *this; }
+    iterator erase(const_iterator pos) { return str.erase(pos); }
+    iterator erase(const_iterator first, const_iterator last) { return str.erase(first, last); }
+
+    void pop_back() { str.pop_back(); }
+
+    emp::String & RemoveChars(const CharSet & chars);
+    emp::String & RemoveWhitespace()  { return RemoveChars(WhitespaceCharSet()); }
+    emp::String & RemoveUpper()       { return RemoveChars(UpperCharSet()); }
+    emp::String & RemoveLower()       { return RemoveChars(LowerCharSet()); }
+    emp::String & RemoveLetters()     { return RemoveChars(LettersCharSet()); }
+    emp::String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
+    emp::String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
+
+
+    // ------ Insertions and Additions ------
 
     String & insert(size_t index, const String & in) { str.insert(index, in.str); return *this; }
     String & insert(size_t index, const String & in, size_t pos, size_t count=npos)
@@ -438,12 +562,7 @@ namespace emp {
       return str.insert(pos, std::forward<ARG_Ts>(args)...);
     }
 
-    String & erase(size_t index=0, size_t count=npos) { str.erase(index,count); return *this; }
-    iterator erase(const_iterator pos) { return str.erase(pos); }
-    iterator erase(const_iterator first, const_iterator last) { return str.erase(first, last); }
-
     void push_back(char c) { str.push_back(c); }
-    void pop_back() { str.pop_back(); }
 
     String & append(const String & in) { str.append(in.str); return *this; }
     String & append(const String & in, size_t pos, size_t count)
@@ -459,28 +578,11 @@ namespace emp {
       return *this;
     }
 
-    int compare(const String & in) { return str.compare(in.str); }
-    template <typename... ARG_Ts> int compare(ARG_Ts &&... args)
-      { return str.compare(std::forward<ARG_Ts>(args)...); }
 
-    bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
-    template <typename ARG_T> bool starts_with( ARG_T && in ) const noexcept
-      { return str.starts_with(std::forward<ARG_T>(arg)); }
-
-    bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
-    template <typename ARG_T> bool ends_with( ARG_T && in ) const noexcept
-      { return str.ends_with(std::forward<ARG_T>(arg)); }
-
-    bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
-    template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
-      { return str.find(std::forward<ARG_T>(arg)) != npos; }
+    // ------ Direct Modifications ------
 
     template <typename... ARG_Ts> String & replace(ARG_Ts &&... args)
       { str.replace(std::forward<ARG_Ts>(args)...); return *this; }
-
-    String substr(size_t pos=0, size_t count=npos ) const {
-      return String(str.substr(pos, count), mode);
-    }
 
     size_t copy(char * dest, size_t count, size_t pos=0) const { return str.copy(dest, count, pos); }
 
@@ -488,7 +590,12 @@ namespace emp {
 
     void swap(String & other) { str.swap(other.str); std::swap(mode, other.mode); }
 
-    // Searching
+    emp::String & TrimWhitespace();
+    emp::String & CompressWhitespace();
+
+
+    // ------ Searching ------
+
     size_t find(const std::string & str, size_t pos=0) const noexcept { return find(str,pos); }
     size_t find(const char* s, size_t pos=0) const { return str.find(s,pos); }
     size_t find(const char* s, size_t pos, size_t count) const { return str.find(s,pos,count); }
@@ -543,92 +650,6 @@ namespace emp {
     template < class SVIEW_T > size_t find_last_not_of(const SVIEW_T & sv, size_t pos=0) const
       { return str.find_last_not_of(sv,pos); }
 
-    // Operators
-
-    template <typename T> String operator+(T && in)
-      { return String(str + std::forward<T>(in), mode); }
-    template <typename T> bool operator==(T && in) { return in.str == std::forward<T>(in); }
-    template <typename T> bool operator<=>(T && in) { return in.str <=> std::forward<T>(in); }
-    
-
-    // ------ SPECIAL CONFIGURATION ------
-
-    String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
-    String & UseQuoteDouble(bool use=true) { return _ChangeMode(USE_QUOTE_DOUBLE, use); }
-    String & UseQuoteBack  (bool use=true) { return _ChangeMode(USE_QUOTE_BACK,   use); }
-    String & UseParenRound (bool use=true) { return _ChangeMode(USE_PAREN_ROUND,  use); }
-    String & UseParenSquare(bool use=true) { return _ChangeMode(USE_PAREN_SQUARE, use); }
-    String & UseParenCurly (bool use=true) { return _ChangeMode(USE_PAREN_CURLY,  use); }
-    String & UseParenAngle (bool use=true) { return _ChangeMode(USE_PAREN_ANGLE,  use); }
-    String & UseParenQuotes(bool use=true) { return _ChangeMode(USE_PAREN_QUOTES, use); }
-
-    bool Get_UseQuoteSingle() const { return mode.val & USE_QUOTE_SINGLE; }
-    bool Get_UseQuoteDouble() const { return mode.val & USE_QUOTE_DOUBLE; }
-    bool Get_UseQuoteBack  () const { return mode.val & USE_QUOTE_BACK; }
-    bool Get_UseParenRound () const { return mode.val & USE_PAREN_ROUND; }
-    bool Get_UseParenSquare() const { return mode.val & USE_PAREN_SQUARE; }
-    bool Get_UseParenCurly () const { return mode.val & USE_PAREN_CURLY; }
-    bool Get_UseParenAngle () const { return mode.val & USE_PAREN_ANGLE; }
-    bool Get_UseParenQuotes() const { return mode.val & USE_PAREN_QUOTES; }
-
-    // ------ CLASSIFICATION ------
-
-    // Count the number of occurrences of a specific character.
-    size_t Count(char c) const { return (size_t) std::count(str.begin(), str.end(), c); }
-
-    /// Test if an string is formatted as a literal character.
-    bool IsLiteralChar() const;
-
-    /// Test if an string is formatted as a literal string.
-    bool IsLiteralString(const std::string & quote_marks="\"") const;
-
-    /// Explain what string is NOT formatted as a literal string.
-    std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
-
-    /// Determine a string is composed only of a set of characters (represented as a string)
-    bool IsComposedOf(const std::string & char_set) const {
-      for (char x : str) if (!is_one_of(x, char_set)) return false;
-      return true;
-    }
-
-    /// Determine if string is a valid number.
-    bool IsNumber() const;
-
-    /// Determine if string is a valid identifier (in most languages).
-    bool IsIdentifier() const {
-      // At least one character; cannot begin with digit, only letters, digits and `_`
-      return str.size() && !is_digit(str[0]) && IDCharSet().Has(str);
-    }
-
-    bool OnlyLower() const { return (str.size()) ? LowerCharSet().Has(str) : true; }
-    bool OnlyUpper() const { return (str.size()) ? UpperCharSet().Has(str) : true; }
-    bool OnlyDigits() const { return (str.size()) ? DigitCharSet().Has(str) : true; }
-    bool OnlyAlphanumeric() const { return (str.size()) ? AlphanumericCharSet().Has(str) : true; }
-    bool OnlyWhitespace() const { return (str.size()) ? WhitespaceCharSet().Has(str) : true; }
-
-    bool HasOneOf(const std::string & char_set) const {
-      for (char c : str) if (is_one_of(c, char_set)) return true;
-      return false;
-    }
-    bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
-    bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
-    bool HasUpperLetter() const { return UpperCharSet().HasAny(str); }
-    bool HasLowerLetter() const { return LowerCharSet().HasAny(str); }
-    bool HasLetter() const { return LetterCharSet().HasAny(str); }
-    bool HasDigit() const { return DigitCharSet().HasAny(str); }
-    bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(str); }
-
-    bool HasCharAt(char c, size_t pos) const { return (pos < str.size()) && (str[pos] == c); }
-    bool HasOneOfAt(const std::string & opts, size_t pos) const {
-      return (pos < str.size()) && is_one_of(str[pos], opts);
-    }
-    bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(str, pos); }
-    bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(str, pos); }
-
-    bool HasPrefix(const std::string & prefix) const { return str.rfind(prefix, 0) == 0; }
-
-    // ------ SEARCHING ------
-
     size_t FindQuoteMatch(size_t pos) const;
     size_t FindParenMatch(size_t pos, bool skip_quotes=true) const;
     size_t FindMatch(size_t pos) const;
@@ -672,6 +693,35 @@ namespace emp {
       { return Find(IDCharSet(), start, skip_q, skip_p); }
     size_t FindNonIDChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
       { return Find(!IDCharSet(), start, skip_q, skip_p); }
+
+    // ------ Other Operators ------
+
+    template <typename T> String operator+(T && in)
+      { return String(str + std::forward<T>(in), mode); }
+    template <typename T> bool operator==(T && in) { return in.str == std::forward<T>(in); }
+    template <typename T> bool operator<=>(T && in) { return in.str <=> std::forward<T>(in); }
+    
+
+    // ------ SPECIAL CONFIGURATION ------
+
+    String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
+    String & UseQuoteDouble(bool use=true) { return _ChangeMode(USE_QUOTE_DOUBLE, use); }
+    String & UseQuoteBack  (bool use=true) { return _ChangeMode(USE_QUOTE_BACK,   use); }
+    String & UseParenRound (bool use=true) { return _ChangeMode(USE_PAREN_ROUND,  use); }
+    String & UseParenSquare(bool use=true) { return _ChangeMode(USE_PAREN_SQUARE, use); }
+    String & UseParenCurly (bool use=true) { return _ChangeMode(USE_PAREN_CURLY,  use); }
+    String & UseParenAngle (bool use=true) { return _ChangeMode(USE_PAREN_ANGLE,  use); }
+    String & UseParenQuotes(bool use=true) { return _ChangeMode(USE_PAREN_QUOTES, use); }
+
+    bool Get_UseQuoteSingle() const { return mode.val & USE_QUOTE_SINGLE; }
+    bool Get_UseQuoteDouble() const { return mode.val & USE_QUOTE_DOUBLE; }
+    bool Get_UseQuoteBack  () const { return mode.val & USE_QUOTE_BACK; }
+    bool Get_UseParenRound () const { return mode.val & USE_PAREN_ROUND; }
+    bool Get_UseParenSquare() const { return mode.val & USE_PAREN_SQUARE; }
+    bool Get_UseParenCurly () const { return mode.val & USE_PAREN_CURLY; }
+    bool Get_UseParenAngle () const { return mode.val & USE_PAREN_ANGLE; }
+    bool Get_UseParenQuotes() const { return mode.val & USE_PAREN_QUOTES; }
+
 
     //  ------ FORMATTING ------
     // Append* adds to the end of the current string.
@@ -873,76 +923,56 @@ namespace emp {
 
 
   /// Remove whitespace from the beginning or end of a string.
-  static inline void trim_whitespace(std::string & in_str) {
+  emp::String & String::TrimWhitespace() {
     size_t start_count=0;
-    while (start_count < in_str.size() && is_whitespace(in_str[start_count])) ++start_count;
-    if (start_count) in_str.erase(0, start_count);
+    while (start_count < str.size() && is_whitespace(str[start_count])) ++start_count;
+    if (start_count) str.erase(0, start_count);
 
-    size_t new_size = in_str.size();
-    while (new_size > 0 && is_whitespace(in_str[new_size-1])) --new_size;
-    in_str.resize(new_size);
+    size_t new_size = str.size();
+    while (new_size > 0 && is_whitespace(str[new_size-1])) --new_size;
+    str.resize(new_size);
+
+    return *this;
   }
 
   /// Every time one or more whitespace characters appear replace them with a single space.
-  static inline void compress_whitespace(std::string & in_string) {
-    const size_t strlen = in_string.size();
-    bool last_whitespace = true;          // Remove whitespace from beginning of line.
+  emp::String & String::CompressWhitespace() {
+    bool skip_whitespace = true;          // Remove whitespace from beginning of line.
     size_t pos = 0;
 
-    for (size_t i = 0; i < strlen; i++) {
-      if (is_whitespace(in_string[i])) {  // This char is whitespace
-        if (last_whitespace) continue;
-        in_string[pos++] = ' ';
-        last_whitespace = true;
-      }
-      else {  // Not whitespace
-        in_string[pos++] = in_string[i];
-        last_whitespace = false;
+    for (const auto c : str) {
+      if (is_whitespace(c)) {          // This char is whitespace
+        if (skip_whitespace) continue; // Already skipping...
+        str[pos++] = ' ';
+        skip_whitespace = true;
+      } else {  // Not whitespace
+        str[pos++] = c;
+        skip_whitespace = false;
       }
     }
 
-    if (pos && last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
+    if (pos && skip_whitespace) pos--;   // If the end of the line is whitespace, remove it.
+    str.resize(pos);
 
-    in_string.resize(pos);
+    return *this;
   }
 
-  /// Remove all whitespace from anywhere within a string.
-  static inline void remove_whitespace(std::string & in_string) {
-    const size_t strlen = in_string.size();
-    size_t pos = 0;
-
-    for (size_t i = 0; i < strlen; i++) {
-      if (is_whitespace(in_string[i])) continue;
-      in_string[pos++] = in_string[i];
-    }
-
-    in_string.resize(pos);
-  }
-
-  /// Remove all characters from a string except letters, numbers, and whitespace.
-  static inline void remove_punctuation(std::string & in_string) {
-    const size_t strlen = in_string.size();
-    size_t pos = 0;
-
-    for (size_t i = 0; i < strlen; i++) {
-      const char cur_char = in_string[i];
-      if (is_alphanumeric(cur_char) || is_whitespace(cur_char)) {
-        in_string[pos++] = cur_char;
-      }
-    }
-
-    in_string.resize(pos);
-  }
-
-  /// Remove instances of characters from file.
-  static inline void remove_chars(std::string & in_string, std::string chars) {
+  /// Remove all instances of specified characters from file.
+  emp::String & String::RemoveChars(const CharSet & chars) {
     size_t cur_pos = 0;
-    for (size_t i = 0; i < in_string.size(); i++) {
-      if (is_one_of(in_string[i], chars)) continue;
-      in_string[cur_pos++] = in_string[i];
+    for (const auto c : str) {
+      if (!chars.Has(c)) str[cur_pos++] = c;
     }
-    in_string.resize(cur_pos);
+    str.resize(cur_pos);
+    return *this;
   }
+
+
+
+
+
+
+
 
   /// Make a string safe(r)
   [[nodiscard]] static inline std::string slugify(const std::string & in_string) {
@@ -1988,9 +2018,9 @@ namespace emp {
 
   //------------- Stand-along function definitions --------------
 
-  std::string MakeEscaped(char c) {
+  emp::String MakeEscaped(char c) {
     // If we just append as a normal character, do so!
-    if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return std::string(c);
+    if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return emp::String(c);
     switch (c) {
     case '\0': return "\\0";
     case 1: return "\\001";
@@ -2031,19 +2061,14 @@ namespace emp {
     case 127: return "\\177";  // (delete)
     };
 
-    return std::string(c);
+    return emp::String(c);
   }
   
-  std::string MakeEscaped(const std::string & in) {
-    std::string out;
-    out.reserve(in.size()); // Reserve minimum needed size. 
-    for (char c : in) out += MakeEscaped(c);
-    return out;
-  }
+  emp::String MakeEscaped(const std::string & in) { return emp::String(in, MakeEscaped); }
 
   /// Take a string and replace reserved HTML characters with character entities
-  std::string MakeWebSafe(const std::string & in) {
-    std::string out;
+  emp::String MakeWebSafe(const std::string & in) {
+    emp::String out;
     out.reserve(in.size());
     for (char c : in) {
       switch (c) {
@@ -2058,15 +2083,8 @@ namespace emp {
     return out;
   }
 
-  /// Take a value and convert it to a C++-style literal.
-  template <typename T>
-  [[nodiscard]] typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type
-  MakeLiteral(const T & value) {
-    return std::to_string(value);
-  }
-
   /// Take a char and convert it to a C++-style literal.
-  [[nodiscard]] std::string MakeLiteral(char value) {
+  [[nodiscard]] emp::String MakeLiteral(char value) {
     std::stringstream ss;
     ss << "'" << MakeEscaped(value) << "'";
     return ss.str();
@@ -2074,7 +2092,7 @@ namespace emp {
 
   /// Take a string or iterable and convert it to a C++-style literal.
   // This is the version for string. The version for an iterable is below.
-  [[nodiscard]] std::string MakeLiteral(const std::string & value) {
+  [[nodiscard]] emp::String MakeLiteral(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -2087,26 +2105,26 @@ namespace emp {
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  /// Take any iterable value and convert it to a C++-style literal.
-  template <typename T>
-  [[nodiscard]] typename std::enable_if<emp::IsIterable<T>::value, std::string>::type
-  MakeLiteral(const T & value) {
+  /// Take a value and convert it to a C++-style literal.
+  template <typename T> [[nodiscard]] emp::String MakeLiteral(const T & value) {
     std::stringstream ss;
-    ss << "{ ";
-    for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
-      if (iter != std::begin( value )) ss << " ";
-      ss << String::MakeLiteral< std::decay_t<decltype(*iter)> >( *iter );
+    if constexpr (emp::IsIterable<T>::value) {
+      ss << "{ ";
+      for (auto it = std::begin( value ); it != std::end( value ); ++it) {
+        if (it != std::begin( value )) ss << ",";
+        ss << MakeLiteral< std::decay_t<decltype(*it)> >( *it );
+      }
+      ss << " }";
     }
-    ss << " }";
-
+    else ss << value;
     return ss.str();
   }
 
   #endif
 
-  [[nodiscard]] std::string MakeFromLiteral(const std::string & value) {
+  [[nodiscard]] emp::String MakeFromLiteral(const std::string & value) {
     if (value.size() == 0) return "";
-    if (value[0] == '\'') return std::string(MakeFromLiteral_Char(value)); 
+    if (value[0] == '\'') return emp::String(MakeFromLiteral_Char(value)); 
     if (value[0] == '"') return MakeFromLiteral_String(value);
     // @CAO Add conversion from numerical literals, and especially octal (0-), binary (0b-), and hex (0x-)
   }
@@ -2126,7 +2144,7 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  [[nodiscard]] std::string MakeFromLiteral_String(const std::string & value) {
+  [[nodiscard]] emp::String MakeFromLiteral_String(const std::string & value) {
   /// Convert a literal string representation to an actual string.
     emp_assert(is_literal_string(value),
                value, diagnose_literal_string(value));
@@ -2145,25 +2163,17 @@ namespace emp {
   }
 
   /// Convert a string to all uppercase.
-  [[nodiscard]] std::string MakeUpper(std::string value) {
-    constexpr int char_shift = 'a' - 'A';
-    for (auto & x : value) {
-      if (x >= 'a' && x <= 'z') x = (char) (x - char_shift);
-    }
-    return value;
+  [[nodiscard]] emp::String MakeUpper(std::string value) {
+    return emp::String(value, std::toupper);
   }
 
   /// Convert a string to all lowercase.
-  [[nodiscard]] std::string MakeLower(std::string value) {
-    constexpr int char_shift = 'a' - 'A';
-    for (auto & x : value) {
-      if (x >= 'A' && x <= 'Z') x = (char) (x + char_shift);
-    }
-    return value;
+  [[nodiscard]] emp::String MakeLower(std::string value) {
+    return emp::String(value, std::tolower);
   }
 
   /// Make first letter of each word upper case
-  [[nodiscard]] std::string MakeTitleCase(std::string value) {
+  [[nodiscard]] emp::String MakeTitleCase(std::string value) {
     constexpr int char_shift = 'a' - 'A';
     bool next_upper = true;
     for (size_t i = 0; i < value.size(); i++) {
@@ -2179,26 +2189,31 @@ namespace emp {
   }
 
   /// Convert an integer to a roman numeral string.
-  [[nodiscard]] std::string MakeRoman(int val, const std::string & prefix="") {
-    std::string ret_string(prefix);
-    if (val < 0) ret_string += to_roman_numeral(-val, "-");
-    else if (val > 3999) { ; } // Out of bounds; return a blank;
-    else if (val >= 1000) ret_string += to_roman_numeral(val - 1000, "M");
-    else if (val >= 900) ret_string += to_roman_numeral(val - 900, "CM");
-    else if (val >= 500) ret_string += to_roman_numeral(val - 500, "D");
-    else if (val >= 400) ret_string += to_roman_numeral(val - 400, "CD");
-    else if (val >= 100) ret_string += to_roman_numeral(val - 100, "C");
-    else if (val >= 90) ret_string += to_roman_numeral(val - 90, "XC");
-    else if (val >= 50) ret_string += to_roman_numeral(val - 50, "L");
-    else if (val >= 40) ret_string += to_roman_numeral(val - 40, "XL");
-    else if (val >= 10) ret_string += to_roman_numeral(val - 10, "X");
-    else if (val == 9) ret_string += "IX";
-    else if (val >= 5) ret_string += to_roman_numeral(val - 5, "V");
-    else if (val == 4) ret_string += "IV";
-    else if (val > 0) ret_string += to_roman_numeral(val - 1, "I");
+  [[nodiscard]] emp::String MakeRoman(int val) {
+    emp::String out(prefix);
+    if (val < 0) { out += "-"; val *= -1; }
 
-    // else we already have it exactly and don't need to return anything.
-    return ret_string;
+    // If out of bounds, divide up into sections of 1000 each.
+    if (val > 3999) { out += MakeRoman(val/1000); val %= 1000; out += '|'; }
+
+    // Loop through dealing with the rest of the number.
+    while (val > 0) {
+      else if (val >= 1000) { out += "M";  val -= 1000; }
+      else if (val >= 900)  { out += "CM"; val -= 900; }
+      else if (val >= 500)  { out += "D";  val -= 500; }
+      else if (val >= 400)  { out += "CD"; val -= 400; }
+      else if (val >= 100)  { out += "C";  val -= 100; }
+      else if (val >= 90)   { out += "XC"; val -= 90; }
+      else if (val >= 50)   { out += "L";  val -= 50; }
+      else if (val >= 40)   { out += "XL"; val -= 40; }
+      else if (val >= 10)   { out += "X";  val -= 10; }
+      else if (val == 9)    { out += "IX"; val -= 9; }
+      else if (val >= 5)    { out += "V";  val -= 5; }
+      else if (val == 4)    { out += "IV"; val -= 4; }
+      else                  { out += "I";  val -= 1; }
+    }
+
+    return out;
   }
 
 
