@@ -261,6 +261,12 @@ namespace emp {
   [[nodiscard]] emp::String MakeLower(const std::string & in);
   [[nodiscard]] emp::String MakeTitleCase(const std::string & in);
   [[nodiscard]] emp::String MakeRoman(int val);
+  template <typename CONTAINER_T>
+  [[nodiscard]] emp::String MakeEnglishList(const CONTAINER_T & container)
+  template <typename CONTAINER_T>
+  [[nodiscard]] emp::String Join(const CONTAINER_T & container, std::string join_str="",
+                                 std::string open="", std::string close="") {
+
 
   class String {
   private:
@@ -421,9 +427,10 @@ namespace emp {
     const char * c_str() const { return str.c_str(); }
     const std::string & cpp_str() const { return str; }
 
-    String substr(size_t pos=0, size_t count=npos ) const {
-      return String(str.substr(pos, count), mode);
-    }
+    [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
+      { return String(str.substr(pos, count), mode); }
+    [[nodiscard]] String GetRange(std::size_t start_pos, std::size_t end_pos) const
+      { return substr(start_pos, end_pos - start_pos); }
 
 
     // ------ Iterators ------
@@ -590,9 +597,10 @@ namespace emp {
 
     void swap(String & other) { str.swap(other.str); std::swap(mode, other.mode); }
 
+    emp::String * ReplaceChar(char from, char to) { for (char & c : str) if (c == from) c = to; }
     emp::String & TrimWhitespace();
     emp::String & CompressWhitespace();
-
+    emp::String & Slugify();
 
     // ------ Searching ------
 
@@ -694,6 +702,12 @@ namespace emp {
     size_t FindNonIDChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
       { return Find(!IDCharSet(), start, skip_q, skip_p); }
 
+
+    // ------ Transformations ------
+
+
+
+
     // ------ Other Operators ------
 
     template <typename T> String operator+(T && in)
@@ -751,23 +765,38 @@ namespace emp {
     String & ToLiteral() { str = MakeLiteral(str); }
     [[nodiscard]] std::string AsLiteral() { return MakeLiteral(str); }
 
-    String & AppendUpper(const std::string & in) { str+=MakeUpper(in); return this; }
+    String & AppendUpper(const std::string & in) { str+=MakeUpper(in); return *this; }
     String & SetUpper(const std::string & in) { str = MakeUpper(in); return *this; }
     String & ToUpper() { str = MakeUpper(str); }
     [[nodiscard]] std::string AsUpper() { return MakeUpper(str); }
 
-    String & AppendLower(const std::string & in) { str+=MakeLower(in); return this; }
+    String & AppendLower(const std::string & in) { str+=MakeLower(in); return *this; }
     String & SetLower(const std::string & in) { str = MakeLower(in); return *this; }
     String & ToLower() { str = MakeLower(str); }
     [[nodiscard]] std::string AsLower() { return MakeLower(str); }
 
-    String & AppendTitleCase(const std::string & in) { str+=MakeTitleCase(in); return this; }
+    String & AppendTitleCase(const std::string & in) { str+=MakeTitleCase(in); return *this; }
     String & SetTitleCase(const std::string & in) { str = MakeTitleCase(in); return *this; }
     String & ToTitleCase() { str = MakeTitleCase(str); }
     [[nodiscard]] std::string AsTitleCase() { return MakeTitleCase(str); }
 
-    String & AppendRoman(int val) { str+=MakeRoman(val); return this; }
+    String & AppendRoman(int val) { str+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { str = MakeRoman(val); return *this; }
+
+    template <typename CONTAINER_T>
+    String & AppendJoin(const CONTAINER_T & container, std::string delim,
+                        std::string open, std::string close)
+      { str += Join(container, delim, open, close); return *this;}
+    template <typename CONTAINER_T>
+    String & SetJoin(const CONTAINER_T & container, std::string delim,
+                     std::string open, std::string close)
+      { str = Join(container); return *this;}
+      
+    template <typename CONTAINER_T> String & AppendEnglishList(const CONTAINER_T & container)
+      { str += MakeEnglishList(container); return *this;}
+    template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
+      { str = MakeEnglishList(container); return *this;}
+      
   };
 
 
@@ -916,12 +945,6 @@ namespace emp {
   }
 
 
-
-
-
-/////// @CAO CONTINUE HERE!!!!!!!!
-
-
   /// Remove whitespace from the beginning or end of a string.
   emp::String & String::TrimWhitespace() {
     size_t start_count=0;
@@ -967,251 +990,100 @@ namespace emp {
     return *this;
   }
 
-
-
-
-
-
-
-
   /// Make a string safe(r)
-  [[nodiscard]] static inline std::string slugify(const std::string & in_string) {
-    //TODO handle complicated unicode strings
-    std::string res = to_lower(in_string);
-    remove_punctuation(res);
-    compress_whitespace(res);
-    std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
-      return (ch == ' ') ? '-' : ch;
-    });
-    return res;
+  emp::String & Slugify() {
+    SetLower();
+    RemovePunctuation();
+    CompressWhitespace(res);
+    ReplaceChar(' ', '-');
+    return *this;
   }
+
+
+
+
+
+
+
+
+
+/////// @CAO CONTINUE HERE!!!!!!!!
+
+
+
 
   // -------- Functions that operate on VECTORS of strings --------
 
   using string_vec_t = emp::vector<std::string>;
 
-  [[nodiscard]] static inline std::string
-  combine_strings(const string_vec_t & strings, std::string spacer=" ") {
-    // If there are no input strings, return an empty string.
-    if (strings.size() == 0) { return ""; }
 
-    // If there is one string provided, return it by itself.
-    if (strings.size() == 1) { return strings[0]; }
 
-    // If there is more than one, separate with spaces.
-    std::string out_string = strings[0];
-    for (size_t i = 1; i < strings.size(); ++i) {
-      out_string += spacer;
-      out_string += strings[i];
-    }
-    return out_string;
+
+  bool PopIf(char c) {
+    if (str.size() && str[0] == c) { str.erase(0,1); return true; }
+    return false;
   }
 
- /// Convert a vector of strings to an English list, such as "one, two, three, and four."
-  [[nodiscard]] static inline std::string to_english_list(const string_vec_t & strings) {
-    // If there are no input strings, return an empty string.
-    if (strings.size() == 0) { return ""; }
-
-    // If there is one string provided, return it by itself.
-    if (strings.size() == 1) { return strings[0]; }
-
-    // If two strings are provided, link them by an "and".
-    if (strings.size() == 2) { return strings[0] + " and " + strings[1]; }
-
-    // If MORE than two strings are provided, list the first n-1 followed by commas, ending
-    // with an "and" before the final one.
-    std::string out_str;
-    for (size_t i = 0; i < strings.size(); i++) {
-      if (i) {
-        out_str += ", ";
-        if (i == strings.size()-1) out_str += "and ";
-      }
-      out_str += strings[i];
-    }
-
-    return out_str;
-  }
-
-
-  /// Transform all strings in a vector.
-  [[nodiscard]] static inline string_vec_t
-  transform_strings(const string_vec_t & in_strings,
-                    std::function<std::string(const std::string &)> fun) {
-    string_vec_t out_strings(in_strings.size());
-    for (size_t i = 0; i < in_strings.size(); i++) {
-      out_strings[i] = fun(in_strings[i]);
-    }
-    return out_strings;
-  }
-
-  /// Put all strings provided in quotes (Like 'this'), pre- and post-fixing another string if
-  /// provided.
-  [[nodiscard]] static inline string_vec_t
-  quote_strings(const string_vec_t & in_strings, const std::string quote="'") {
-    return transform_strings(in_strings, [quote](const std::string & str) {
-      return quote + str + quote;
-    });
-  }
-
-  /// Pre-pend and post-pend specified sequences to all strings provided.
-  [[nodiscard]] static inline string_vec_t
-  quote_strings(const string_vec_t & in_strings,
-                const std::string open_quote,
-                const std::string close_quote) {
-    return transform_strings(in_strings, [open_quote, close_quote](const std::string & str) {
-      return open_quote + str + close_quote;
-    });
-  }
-
-  /// Take a vector of strings, put them in quotes, and then transform it into an English list.
-  [[nodiscard]] static inline std::string to_quoted_list(const string_vec_t & in_strings,
-                                                         const std::string quote="'") {
-    return to_english_list(quote_strings(in_strings, quote));
-  }
-
-  static inline bool string_pop_if_char(std::string & in_string, char c)
-  {
-    if (in_string.size() && in_string[0] == c) {
-      in_string.erase(0,1);
-      return true;
-    }
+  bool PopIf(String in) {
+    if (HasPrefix(in))) { PopFixed(in.size()); return true; }
     return false;
   }
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
-  static inline std::string
-  string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
+  emp::String PopFixed(std::size_t end_pos, size_t delim_size=0)
   {
-    if (end_pos == 0) return "";                   // Not popping anything!
+    if (!end_pos) return ""; // Not popping anything!
 
-    std::string out_string = "";
-    if (end_pos >= in_string.size()) {            // Popping whole string.
-      out_string = in_string;
-      in_string = "";
-    }
-    else {
-      out_string = in_string.substr(0, end_pos);  // Copy up to the deliminator for ouput
-      in_string.erase(0, end_pos + delim_size);   // Delete output string AND deliminator
+    if (end_pos >= str.size()) {  // Pop whole string.
+      std::string out = str;
+      str.resize(0);
+      return out;
     }
 
-    return out_string;
+    emp::String out = str.substr(0, end_pos); // Copy up to the deliminator for ouput
+    str.erase(0, end_pos + delim_size);       // Delete output string AND delimiter
+    return out;
   }
 
-  /// Get a segment from the beginning of a string as another string, leaving original untouched.
-  [[nodiscard]] static inline std::string
-  string_get_range(const std::string & in_string, std::size_t start_pos, std::size_t end_pos) {
-    emp_assert(start_pos <= in_string.size());
-    if (end_pos == std::string::npos) end_pos = in_string.size();
-    emp_assert(end_pos <= in_string.size());
-    return in_string.substr(start_pos, end_pos - start_pos);
+  /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
+  /// delimeter is not found, return the entire string and clear it.
+  emp::String Pop(CharSet chars=" \n\t\r", bool skip_quotes=false, bool skip_parens=false) {
+    size_t pop_end = chars.FindIn(str);
+    size_t delim_end = pop_end+1;
+    while(delim_end < str.size() && chars.Has(str[delim_end])) ++delim_end;
+    return PopFixed(pop_end, delim_end - pop_end);
   }
 
-  /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
-  /// delimeter is not found, return the entire input string and clear it.
-  inline std::string string_pop(std::string & in_string, const char delim=' ') {
-    return string_pop_fixed(in_string, in_string.find(delim), 1);
+  /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
+  /// delimeter is not found, return the entire string and clear it.
+  emp::String PopTo(std::string delim, bool skip_quotes=false, bool skip_parens=false) {
+    return PopFixed(Find(delim, skip_quotes, skip_parents), delim.size());
   }
 
-  /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
-  /// If the delimeter is not found, return the entire input string.
-  [[nodiscard]] inline std::string
-  string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0) {
-    return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
+  emp::String PopWord() { return Pop(); }
+  emp::String PopLine() { return Pop("\n"); }
+
+  emp::String PopQuote() {
+    const size_t end_pos = FindQuoteMatch(0);
+    return end_pos==std::string::npos ? "" : PopFixed(in_string, end_pos+1);
   }
 
-  /// Remove a prefix of the input string (up to any of a specified set of delimeters) and
-  /// return it.  If the delimeter is not found, return the entire input string and clear it.
-  inline std::string string_pop(std::string & in_string, const std::string & delim_set) {
-    return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
+  emp::String PopParen(bool skip_quotes=false) {
+    const size_t end_pos = FindParenMatch(0, skip_quotes);
+    return end_pos==std::string::npos ? "" : PopFixed(in_string, end_pos+1);
   }
 
-  /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
-  /// modify it. If the delimeter is not found, return the entire input string.
-  [[nodiscard]] inline std::string
-  string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
-    emp_assert(start_pos <= in_string.size());
-    return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
-  }
-
-  inline std::string
-  string_pop_to(std::string & in_string, const std::string & delim=" ", size_t start_pos=0,
-                bool skip_quotes=false, bool skip_parens=false,
-                bool skip_braces=false, bool skip_brackets=false) {
-    const size_t found_pos =
-      emp::find(in_string, delim, start_pos, skip_quotes, skip_parens, skip_braces, skip_brackets);
-    return string_pop_fixed(in_string, found_pos, delim.size());
-  }
-
-  [[nodiscard]] inline std::string
-  string_get_to(const std::string & in_string, const std::string & delim=" ", size_t start_pos=0) {
-    return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));    
-  }
-
-  /// Remove a prefix of a string, up to the first whitespace, and return it.
-  inline std::string string_pop_word(std::string & in_string) {
-    // Whitespace = ' ' '\n' '\r' or '\t'
-    return string_pop(in_string, " \n\r\t");
-  }
-
-  /// Return a prefix of a string, up to the first whitespace (do not modify the original string)
-  [[nodiscard]] inline std::string
-  string_get_word(const std::string & in_string, size_t start_pos=0) {
-    // Whitespace = ' ' '\n' '\r' or '\t'
-    return string_get(in_string, " \n\r\t", start_pos);
-  }
-
-  /// Remove a prefix of a string, up to the first newline, and return it.
-  inline std::string string_pop_line(std::string & in_string) {
-    return string_pop(in_string, '\n');
-  }
-
-  /// Return a prefix of a string, up to the first newline (do not modify the original string)
-  [[nodiscard]] inline std::string
-  string_get_line(const std::string & in_string, size_t start_pos=0) {
-    return string_get(in_string, '\n', start_pos);
-  }
-
-  inline std::string string_pop_quote(std::string & in_string) {
-    const size_t end_pos = emp::find_quote_match(in_string);
-    return end_pos ? string_pop_fixed(in_string, end_pos+1) : "";
-  }
-
-  inline size_t string_pop_uint(std::string & in_string) {
+  size_t PopUInt() {
     size_t uint_size = 0;
-    for (char c : in_string) {
-      if (is_digit(c)) uint_size++;
-      else break;
-    }
-    std::string out_uint = string_pop_fixed(in_string, uint_size);
+    while (uint_size < str.size() && isdigit(str[uint_size])) ++uint_size;
+    std::string out_uint = PopFixed(uint_size);
     return std::stoull(out_uint);
   }
 
-  inline size_t string_get_uint(const std::string & in_string) {
-    size_t uint_size = 0;
-    for (char c : in_string) {
-      if (is_digit(c)) uint_size++;
-      else break;
-    }
-    std::string out_uint = string_get_range(in_string, 0, uint_size);
-    return std::stoull(out_uint);
-  }
 
-  /// Remove all whitespace at the beginning of a string.  Return the whitespace removed.
-  inline std::string left_justify(std::string & in_string) {
-    return string_pop_fixed(in_string, in_string.find_first_not_of(" \n\r\t"));
-  }
 
-  /// Remove all whitespace at the end of a string.
-  inline void right_justify(std::string & in_string) {
-    // @CAO *very* inefficient at the moment.
-    while (is_whitespace(in_string.back())) in_string.pop_back();
-  }
 
-  /// Remove all whitespace at both the beginning and the end of a string.
-  inline void justify(std::string & in_string) {
-    left_justify(in_string);
-    right_justify(in_string);
-  }
+
 
   /// Apply sprintf-like formatting to a string.
   /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
@@ -1613,24 +1485,6 @@ namespace emp {
     return out_val;
   }
 
-  /// This function returns values from a container as a single string separated
-  /// by a given delimeter.
-  /// @param container is any standard-interface container holding objects to be joined.
-  /// @param join_str optional delimeter
-  /// @return merged string of all values
-  template <typename CONTAINER_T>
-  inline std::string join(const CONTAINER_T & container, std::string join_str="") {
-    if (container.size() == 0) return "";
-    if (container.size() == 1) return to_string(container.front());
-
-    std::stringstream out;
-    for (auto it = container.begin(); it != container.end(); ++it) {
-      if (it != container.begin()) out << join_str;
-      out << to_string(*it);
-    }
-
-    return out.str();
-  }
 
 
   // Some ANSI helper functions.
@@ -2190,7 +2044,7 @@ namespace emp {
 
   /// Convert an integer to a roman numeral string.
   [[nodiscard]] emp::String MakeRoman(int val) {
-    emp::String out(prefix);
+    emp::String out;
     if (val < 0) { out += "-"; val *= -1; }
 
     // If out of bounds, divide up into sections of 1000 each.
@@ -2212,6 +2066,49 @@ namespace emp {
       else if (val == 4)    { out += "IV"; val -= 4; }
       else                  { out += "I";  val -= 1; }
     }
+
+    return out;
+  }
+
+  /// This function returns values from a container as a single string separated
+  /// by a given delimeter and with optional surrounding strings.
+  /// @param container is any standard-interface container holding objects to be joined.
+  /// @param join_str optional delimeter
+  /// @param open string to place before each string (e.g., "[" or "'")
+  /// @param close string to place after each string (e.g., "]" or "'")
+  /// @return merged string of all values
+  template <typename CONTAINER_T>
+  emp::String Join(const CONTAINER_T & container, std::string join_str,
+                   std::string open, std::string close) {
+    if (container.size() == 0) return "";
+    if (container.size() == 1) return to_string(open, container.front(), close);
+
+    std::stringstream out;
+    for (auto it = container.begin(); it != container.end(); ++it) {
+      if (it != container.begin()) out << join_str;
+      out << open << to_string(*it) << close;
+    }
+
+    return out.str();
+  }
+
+  template <typename CONTAINER_T>
+  String MakeEnglishList(const CONTAINER_T & container) {
+    if (container.size() == 0) return "";
+    if (container.size() == 1) return to_string(container.front());
+
+    auto it = container.begin();
+    if (container.size() == 2) return to_string(*it, " and ", *(it+1));
+
+    auto last_it = container.end() - 1;
+    String out(to_string(*it))
+    ++it;
+    while (it != last_it) {
+      out += ',';
+      out += to_string(*it);
+      ++it;
+    }
+    out += to_string(", and ", *it);
 
     return out;
   }
