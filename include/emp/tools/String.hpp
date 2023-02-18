@@ -211,6 +211,7 @@
  *  @todo Make handle non-char strings (i.e., use CharT template parameter)
  *  @todo Make handle allocators
  *  @todo Make work with stringviews
+ *  @todo Add construct types like RESERVE, REPEAT, and TO_STRING for special builds.
  *
  */
 
@@ -263,6 +264,9 @@ namespace emp {
   [[nodiscard]] emp::String MakeRoman(int val);
   template <typename CONTAINER_T>
   [[nodiscard]] emp::String MakeEnglishList(const CONTAINER_T & container)
+  template<typename... Args>
+  [[nodiscard]] emp::String MakeFormatted(const std::string& format, Args... args);
+
   template <typename CONTAINER_T>
   [[nodiscard]] emp::String Join(const CONTAINER_T & container, std::string join_str="",
                                  std::string open="", std::string close="") {
@@ -398,10 +402,6 @@ namespace emp {
     }
 
 
-
-    // ====== IMPORT ALL std::string PROPERTIES AND EXPAND TO emp::String ======
-
-
     // ------ Assignment operators ------
 
     String & operator=(const String &) = default;
@@ -431,6 +431,18 @@ namespace emp {
       { return String(str.substr(pos, count), mode); }
     [[nodiscard]] String GetRange(std::size_t start_pos, std::size_t end_pos) const
       { return substr(start_pos, end_pos - start_pos); }
+
+    [[nodiscard]] std::string_view View(size_t start=0, size_t out_size=npos) const {
+      emp_assert(start + npos <= str.size());
+      return std::string_view(str.data()+start, out_size);
+    }
+    [[nodiscard]] std::string_view ViewFront(size_t out_size) const { return View(0, out_size); }
+    [[nodiscard]] std::string_view ViewBack(size_t out_size) const
+      { return View(str.data()+(str.size()-out_size), out_size); }
+    [[nodiscard]] std::string_view ViewRange(size_t start, size_t end) const {
+      emp_assert(start <= end && end <= str.size());
+      return View(str.data()+start, end - start);
+    }
 
 
     // ------ Iterators ------
@@ -585,6 +597,15 @@ namespace emp {
       return *this;
     }
 
+    String & PadFront(char padding, size_t target_size) {
+      if (str.size() < target_size) str = emp::String(target_size - size(), padding) + str;
+      return *this;
+    }
+
+    String & PadBack(char padding, size_t target_size) {
+      if (str.size() < target_size) str = str + emp::String(target_size - size(), padding);
+      return *this;
+    }
 
     // ------ Direct Modifications ------
 
@@ -783,6 +804,16 @@ namespace emp {
     String & AppendRoman(int val) { str+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { str = MakeRoman(val); return *this; }
 
+    template <typename CONTAINER_T> String & AppendEnglishList(const CONTAINER_T & container)
+      { str += MakeEnglishList(container); return *this;}
+    template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
+      { str = MakeEnglishList(container); return *this;}
+      
+    template<typename... ARG_Ts> String & AppendFormatted(const std::string& format, ARG_Ts... args)
+      { str += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+    template<typename... ARG_Ts> String & SetFormatted(const std::string& format, ARG_Ts... args)
+      { str = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+
     template <typename CONTAINER_T>
     String & AppendJoin(const CONTAINER_T & container, std::string delim,
                         std::string open, std::string close)
@@ -791,11 +822,6 @@ namespace emp {
     String & SetJoin(const CONTAINER_T & container, std::string delim,
                      std::string open, std::string close)
       { str = Join(container); return *this;}
-      
-    template <typename CONTAINER_T> String & AppendEnglishList(const CONTAINER_T & container)
-      { str += MakeEnglishList(container); return *this;}
-    template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
-      { str = MakeEnglishList(container); return *this;}
       
   };
 
@@ -1000,24 +1026,7 @@ namespace emp {
   }
 
 
-
-
-
-
-
-
-
-/////// @CAO CONTINUE HERE!!!!!!!!
-
-
-
-
-  // -------- Functions that operate on VECTORS of strings --------
-
-  using string_vec_t = emp::vector<std::string>;
-
-
-
+  // Pop functions...
 
   bool PopIf(char c) {
     if (str.size() && str[0] == c) { str.erase(0,1); return true; }
@@ -1084,28 +1093,9 @@ namespace emp {
 
 
 
+/////// @CAO CONTINUE HERE!!!!!!!!
 
-  /// Apply sprintf-like formatting to a string.
-  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
-  /// Adapted from https://stackoverflow.com/a/26221725.
-  template<typename... Args>
-  [[nodiscard]] std::string format_string( const std::string& format, Args... args ) {
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-security"
-
-    // Extra space for '\0'
-    const size_t size = static_cast<size_t>(std::snprintf(nullptr, 0, format.c_str(), args...) + 1);
-
-    emp::vector<char> buf( size );
-    std::snprintf( buf.data(), size, format.c_str(), args... );
-
-     // We don't want the '\0' inside
-    return std::string( buf.data(), buf.data() + size - 1 );
-
-    #pragma GCC diagnostic pop
-
-  }
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
@@ -1116,78 +1106,7 @@ namespace emp {
   [[nodiscard]] std::string replace_macro( const std::string & str, std::string macro_name,
                                            FUN_T && fun, bool skip_quotes=true );
 
-  /// Provide a string_view on a given string
-  static inline std::string_view view_string(const std::string_view & str) {
-    return std::string_view(str);
-  }
 
-  /// Provide a string_view on a string from a given starting point.
-  static inline std::string_view view_string(const std::string_view & str, size_t start) {
-    emp_assert(start <= str.size());
-    return std::string_view(str.data()+start);
-  }
-
-  /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string(const std::string_view & str,
-                                             size_t start,
-                                             size_t npos) {
-    emp_assert(start + npos <= str.size());
-    return std::string_view(str.data()+start, npos);
-  }
-
-  /// Provide a string_view on a string from the beginning to a given size.
-  static inline std::string_view view_string_front(const std::string_view & str,
-                                                   size_t npos) {
-    emp_assert(npos <= str.size());
-    return std::string_view(str.data(), npos);
-  }
-
-  /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string_back(const std::string_view & str,
-                                                  size_t npos) {
-    emp_assert(npos <= str.size());
-    return std::string_view(str.data()+(str.size()-npos), npos);
-  }
-
-  /// Provide a string_view on a string from a starting point to an ending point.
-  static inline std::string_view view_string_range(const std::string_view & str,
-                                                   size_t start,
-                                                   size_t end) {
-    emp_assert(start <= end);
-    emp_assert(end <= str.size());
-    return std::string_view(str.data()+start, end - start);
-  }
-
-  /// Return a view of the prefix of the input string up to a specified delimeter.
-  /// If the delimeter is not found, return the entire input string.
-  static inline std::string_view view_string_to(const std::string_view & in_string,
-                                                const char delim,
-                                                size_t start_pos=0) {
-    const size_t in_size = in_string.size();
-    size_t end_pos = start_pos;
-    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
-    return view_string_range(in_string, start_pos, end_pos);
-  }
-
-  inline std::string pad_front(const std::string & in_str, char padding, size_t target_size) {
-    if (in_str.size() >= target_size) return in_str;
-    const size_t pad_size = target_size - in_str.size();
-    return std::string(pad_size, padding) + in_str;
-  }
-
-  inline std::string pad_back(const std::string & in_str, char padding, size_t target_size) {
-    if (in_str.size() >= target_size) return in_str;
-    const size_t pad_size = target_size - in_str.size();
-    return in_str + std::string(pad_size, padding);
-  }
-
-  /// Concatenate n copies of a string.
-  inline std::string repeat( const std::string& value, const size_t n ) {
-    const emp::vector<std::string> repeated( n, value );
-    return std::accumulate(
-      std::begin(repeated), std::end(repeated), std::string{}
-    );
-  }
 
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param in_string string to be sliced
@@ -2070,6 +1989,55 @@ namespace emp {
     return out;
   }
 
+  template <typename CONTAINER_T>
+  String MakeEnglishList(const CONTAINER_T & container) {
+    if (container.size() == 0) return "";
+    if (container.size() == 1) return to_string(container.front());
+
+    auto it = container.begin();
+    if (container.size() == 2) return to_string(*it, " and ", *(it+1));
+
+    auto last_it = container.end() - 1;
+    String out(to_string(*it))
+    ++it;
+    while (it != last_it) {
+      out += ',';
+      out += to_string(*it);
+      ++it;
+    }
+    out += to_string(", and ", *it);
+
+    return out;
+  }
+
+  /// Apply sprintf-like formatting to a string.
+  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
+  /// Adapted from https://stackoverflow.com/a/26221725.
+  template<typename... Args>
+  emp::String MakeFormatted(const std::string& format, Args... args) {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-security"
+
+    // Extra space for '\0'
+    const size_t size = static_cast<size_t>(std::snprintf(nullptr, 0, format.c_str(), args...) + 1);
+
+    emp::vector<char> buf(size);
+    std::snprintf(buf.data(), size, format.c_str(), args...);
+
+     // We don't want the '\0' inside
+    return emp::String( buf.data(), buf.data() + size - 1 );
+
+    #pragma GCC diagnostic pop
+  }
+
+  /// Concatenate n copies of a string.
+  emp::String MakeRepeat(emp::String base, size_t n ) {
+    emp::String out;
+    out.reserve(n * base.size());
+    for (size_t i=0; i < n; ++i) out += base;
+    return out;
+  }
+
   /// This function returns values from a container as a single string separated
   /// by a given delimeter and with optional surrounding strings.
   /// @param container is any standard-interface container holding objects to be joined.
@@ -2092,26 +2060,6 @@ namespace emp {
     return out.str();
   }
 
-  template <typename CONTAINER_T>
-  String MakeEnglishList(const CONTAINER_T & container) {
-    if (container.size() == 0) return "";
-    if (container.size() == 1) return to_string(container.front());
-
-    auto it = container.begin();
-    if (container.size() == 2) return to_string(*it, " and ", *(it+1));
-
-    auto last_it = container.end() - 1;
-    String out(to_string(*it))
-    ++it;
-    while (it != last_it) {
-      out += ',';
-      out += to_string(*it);
-      ++it;
-    }
-    out += to_string(", and ", *it);
-
-    return out;
-  }
 
 
   // ------ External function overrides ------
