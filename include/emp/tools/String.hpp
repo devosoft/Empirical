@@ -71,9 +71,10 @@ namespace emp {
   [[nodiscard]] emp::String MakeFormatted(const emp::String& format, Args... args);
 
   template <typename CONTAINER_T>
-  [[nodiscard]] emp::String Join(const CONTAINER_T & container, emp::String join_str="",
-                                 emp::String open="", emp::String close="") {
+  [[nodiscard]] emp::String Join(const CONTAINER_T & container, std::string join_str="",
+                                 std::string open="", std::string close="");
 
+  const emp::String & ToString(const emp::String & in) { return in; }
 
   class String {
   private:
@@ -192,9 +193,9 @@ namespace emp {
     }
 
     // Allow a string to be transformed during construction, 1-to-any
-    String(const std::string & _str, std::function<std::String(char)> transform_fun) {
+    String(const std::string & _str, std::function<emp::String(char)> transform_fun) {
       str.reserve(_str.size());  // Setup expected size; assume size will be 1-to-1 by default.
-      for (auto & c : _str) { str += transform_fun(c); }
+      for (auto & c : _str) { str += transform_fun(c).str; }
     }
 
 
@@ -202,13 +203,18 @@ namespace emp {
 
     String & operator=(const String &) = default;
     String & operator=(String &&) = default;
-    String & operator=(const std::string & _in) { str = _in; }
-    String & operator=(std::string && _in) { str = std::move(_in); }
-    String & operator=(const char * _in) { str = _in; }
-    String & operator=(char _in) { str = _in; }
-    String & operator=(std::initializer_list<char> _in) { str = _in; }
+    String & operator=(const std::string & _in) { str = _in; return *this; }
+    String & operator=(std::string && _in) { str = std::move(_in); return *this; }
+    String & operator=(const char * _in) { str = _in; return *this; }
+    String & operator=(char _in) { str = _in; return *this; }
+    String & operator=(std::initializer_list<char> _in) { str = _in; return *this; }
     String & operator=( std::nullptr_t ) = delete;
 
+
+    // ------ Converters ------
+
+    operator std::string &() { return str; }
+    operator const std::string &() const { return str; }
 
     // ------ Element Access ------
 
@@ -234,10 +240,10 @@ namespace emp {
     }
     [[nodiscard]] std::string_view ViewFront(size_t out_size) const { return View(0, out_size); }
     [[nodiscard]] std::string_view ViewBack(size_t out_size) const
-      { return View(str.data()+(str.size()-out_size), out_size); }
+      { emp_assert(out_size <= str.size()); return View(str.size()-out_size, out_size); }
     [[nodiscard]] std::string_view ViewRange(size_t start, size_t end) const {
       emp_assert(start <= end && end <= str.size());
-      return View(str.data()+start, end - start);
+      return View(start, end - start);
     }
 
 
@@ -265,7 +271,6 @@ namespace emp {
     size_t length() const { return str.length(); }
     size_t max_size() const { return str.max_size(); }
     void reserve(size_t new_cap) { str.reserve(new_cap); }
-    void reserve() { str.reserve(); }
     size_t capacity() const { return str.capacity(); }
     void shrink_to_fit() { str.shrink_to_fit(); }
     
@@ -278,16 +283,16 @@ namespace emp {
 
     bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
     template <typename ARG_T> bool starts_with( ARG_T && in ) const noexcept
-      { return str.starts_with(std::forward<ARG_T>(arg)); }
-    bool HasPrefix(const std::String & prefix) const { return str.rfind(prefix.str, 0) == 0; }
+      { return str.starts_with(std::forward<ARG_T>(in)); }
+    bool HasPrefix(const emp::String & prefix) const { return str.rfind(prefix.str, 0) == 0; }
 
     bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
     template <typename ARG_T> bool ends_with( ARG_T && in ) const noexcept
-      { return str.ends_with(std::forward<ARG_T>(arg)); }
+      { return str.ends_with(std::forward<ARG_T>(in)); }
 
     bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
     template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
-      { return str.find(std::forward<ARG_T>(arg)) != npos; }
+      { return str.find(std::forward<ARG_T>(in)) != npos; }
 
 
     // ------ Simple Analysis ------
@@ -364,10 +369,20 @@ namespace emp {
     emp::String & RemoveWhitespace()  { return RemoveChars(WhitespaceCharSet()); }
     emp::String & RemoveUpper()       { return RemoveChars(UpperCharSet()); }
     emp::String & RemoveLower()       { return RemoveChars(LowerCharSet()); }
-    emp::String & RemoveLetters()     { return RemoveChars(LettersCharSet()); }
+    emp::String & RemoveLetters()     { return RemoveChars(LetterCharSet()); }
     emp::String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
     emp::String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
+    bool PopIf(char c);
+    bool PopIf(String in);
+    emp::String PopFixed(std::size_t end_pos, size_t delim_size=0);
+    emp::String Pop(CharSet chars=" \n\t\r", bool skip_quotes=false, bool skip_parens=false);
+    emp::String PopTo(std::string delim, bool skip_quotes=false, bool skip_parens=false);
+    emp::String PopWord();
+    emp::String PopLine();
+    emp::String PopQuote();
+    emp::String PopParen(bool skip_quotes=false);
+    size_t PopUInt();
 
     // ------ Insertions and Additions ------
 
@@ -399,12 +414,12 @@ namespace emp {
     }
 
     String & PadFront(char padding, size_t target_size) {
-      if (str.size() < target_size) str = emp::String(target_size - size(), padding) + str;
+      if (str.size() < target_size) str = std::string(target_size - size(), padding) + str;
       return *this;
     }
 
     String & PadBack(char padding, size_t target_size) {
-      if (str.size() < target_size) str = str + emp::String(target_size - size(), padding);
+      if (str.size() < target_size) str = str + std::string(target_size - size(), padding);
       return *this;
     }
 
@@ -438,22 +453,22 @@ namespace emp {
 
     // ------ Searching ------
 
-    [[nodiscard]] size_t find(const std::string & str, size_t pos=0) const noexcept { return find(str,pos); }
+    [[nodiscard]] size_t find(const std::string & s, size_t pos=0) const noexcept { return str.find(s,pos); }
     [[nodiscard]] size_t find(const char* s, size_t pos=0) const { return str.find(s,pos); }
     [[nodiscard]] size_t find(const char* s, size_t pos, size_t count) const { return str.find(s,pos,count); }
     [[nodiscard]] size_t find(char c, size_t pos=0) const noexcept { return str.find(c,pos); }
     template < class SVIEW_T > [[nodiscard]] size_t find(const SVIEW_T & sv, size_t pos=0) const
       { return str.find(sv,pos); }
 
-    [[nodiscard]] size_t rfind(const std::string & str, size_t pos=0) const noexcept { return rfind(str,pos); }
+    [[nodiscard]] size_t rfind(const std::string & s, size_t pos=0) const noexcept { return str.rfind(s,pos); }
     [[nodiscard]] size_t rfind(const char* s, size_t pos=0) const { return str.rfind(s,pos); }
     [[nodiscard]] size_t rfind(const char* s, size_t pos, size_t count) const { return str.rfind(s,pos,count); }
     [[nodiscard]] size_t rfind(char c, size_t pos=0) const noexcept { return str.rfind(c,pos); }
     template < class SVIEW_T > [[nodiscard]] size_t rfind(const SVIEW_T & sv, size_t pos=0) const
       { return str.rfind(sv,pos); }
 
-    [[nodiscard]] size_t find_first_of(const std::string & str, size_t pos=0) const noexcept
-      { return find_first_of(str,pos); }
+    [[nodiscard]] size_t find_first_of(const std::string & s, size_t pos=0) const noexcept
+      { return str.find_first_of(s,pos); }
     [[nodiscard]] size_t find_first_of(const char* s, size_t pos=0) const { return str.find_first_of(s,pos); }
     [[nodiscard]] size_t find_first_of(const char* s, size_t pos, size_t count) const
       { return str.find_first_of(s,pos,count); }
@@ -461,8 +476,8 @@ namespace emp {
     template < class SVIEW_T > [[nodiscard]] size_t find_first_of(const SVIEW_T & sv, size_t pos=0) const
       { return str.find_first_of(sv,pos); }
 
-    [[nodiscard]] size_t find_first_not_of(const std::string & str, size_t pos=0) const noexcept
-      { return find_first_not_of(str,pos); }
+    [[nodiscard]] size_t find_first_not_of(const std::string & s, size_t pos=0) const noexcept
+      { return str.find_first_not_of(s,pos); }
     [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos=0) const
       { return str.find_first_not_of(s,pos); }
     [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos, size_t count) const
@@ -472,8 +487,8 @@ namespace emp {
     template < class SVIEW_T > [[nodiscard]] size_t find_first_not_of(const SVIEW_T & sv, size_t pos=0) const
       { return str.find_first_not_of(sv,pos); }
 
-    [[nodiscard]] size_t find_last_of(const std::string & str, size_t pos=0) const noexcept
-      { return find_last_of(str,pos); }
+    [[nodiscard]] size_t find_last_of(const std::string & s, size_t pos=0) const noexcept
+      { return str.find_last_of(s,pos); }
     [[nodiscard]] size_t find_last_of(const char* s, size_t pos=0) const { return str.find_last_of(s,pos); }
     [[nodiscard]] size_t find_last_of(const char* s, size_t pos, size_t count) const
       { return str.find_last_of(s,pos,count); }
@@ -481,8 +496,8 @@ namespace emp {
     template < class SVIEW_T > [[nodiscard]] size_t find_last_of(const SVIEW_T & sv, size_t pos=0) const
       { return str.find_last_of(sv,pos); }
 
-    [[nodiscard]] size_t find_last_not_of(const std::string & str, size_t pos=0) const noexcept
-      { return find_last_not_of(str,pos); }
+    [[nodiscard]] size_t find_last_not_of(const std::string & s, size_t pos=0) const noexcept
+      { return str.find_last_not_of(s,pos); }
     [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos=0) const
       { return str.find_last_not_of(s,pos); }
     [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos, size_t count) const
@@ -541,7 +556,7 @@ namespace emp {
     std::string_view ViewNestedBlock(size_t start=0, bool skip_quotes=true)
       { return ViewRange(start+1, FindParenMatch(start, skip_quotes) - 1); }
     std::string_view ViewQuote(size_t start=0)
-      { return ViewRange(start, FindQuoteMatch(start, skip_quotes)); }
+      { return ViewRange(start, FindQuoteMatch(start)); }
 
 
     // ------ Transformations into non-Strings ------
@@ -552,16 +567,16 @@ namespace emp {
                bool keep_quotes=true, bool keep_parens=true, bool trim_whitespace=true) const;
 
     [[nodiscard]]
-    emp::vector<std::String> Slice(std::string delim=",", bool keep_quotes=true,
+    emp::vector<emp::String> Slice(std::string delim=",", bool keep_quotes=true,
                                    bool keep_parens=true, bool trim_whitespace=true) const;
 
-    void String::ViewSlices(
+    void ViewSlices(
       emp::vector<std::string_view> & out_set,
       std::string delim=",",
       bool keep_quotes=true, bool keep_parens=true
     ) const;
 
-    [[nodiscard]] emp::vector<std::string_view> String::ViewSlices(
+    [[nodiscard]] emp::vector<std::string_view> ViewSlices(
       std::string delim=",",
       bool keep_quotes=true, bool keep_parens=true
     ) const;
@@ -621,41 +636,41 @@ namespace emp {
     template <typename T>
     T As() { std::stringstream ss; ss << str; T out; ss >> out; return out; }
 
-    String & AppendEscaped(char c) { str += MakeEscaped(c); }
-    String & SetEscaped(char c) { str = MakeEscaped(c); }
+    String & AppendEscaped(char c) { str += MakeEscaped(c); return *this; }
+    String & SetEscaped(char c) { str = MakeEscaped(c); return *this; }
 
     String & AppendEscaped(const std::string & in) { str+=MakeEscaped(in); return *this; }
     String & SetEscaped(const std::string & in) { str = MakeEscaped(in); return *this; }
-    String & ToEscaped() { str = MakeEscaped(str); }
-    [[nodiscard]] std::string AsEscaped() { return MakeEscaped(str); }
+    String & ToEscaped() { str = MakeEscaped(str); return *this; }
+    [[nodiscard]] emp::String AsEscaped() { return MakeEscaped(str); }
 
     String & AppendWebSafe(std::string in) { str+=MakeWebSafe(in); return *this; }
-    String & SetWebSafe(const std::string & in) { str = MakeWebSafe(in); return *this;; }
-    String & ToWebSafe() { str = MakeWebSafe(str); }
-    [[nodiscard]] std::string AsWebSafe() { return MakeWebSafe(str); }
+    String & SetWebSafe(const std::string & in) { str = MakeWebSafe(in); return *this; }
+    String & ToWebSafe() { str = MakeWebSafe(str); return *this; }
+    [[nodiscard]] emp::String AsWebSafe() { return MakeWebSafe(str); }
 
     // <= Creating Literals =>
     template <typename T>
     String & AppendLiteral(const T & in) { str+=MakeLiteral(in); return *this; }
     template <typename T>
     String & SetLiteral(const T & in) { str = MakeLiteral(in); return *this;; }
-    String & ToLiteral() { str = MakeLiteral(str); }
-    [[nodiscard]] std::string AsLiteral() { return MakeLiteral(str); }
+    String & ToLiteral() { str = MakeLiteral(str); return *this; }
+    [[nodiscard]] emp::String AsLiteral() { return MakeLiteral(str); }
 
     String & AppendUpper(const std::string & in) { str+=MakeUpper(in); return *this; }
     String & SetUpper(const std::string & in) { str = MakeUpper(in); return *this; }
-    String & ToUpper() { str = MakeUpper(str); }
-    [[nodiscard]] std::string AsUpper() { return MakeUpper(str); }
+    String & ToUpper() { str = MakeUpper(str); return *this; }
+    [[nodiscard]] emp::String AsUpper() { return MakeUpper(str); }
 
     String & AppendLower(const std::string & in) { str+=MakeLower(in); return *this; }
     String & SetLower(const std::string & in) { str = MakeLower(in); return *this; }
-    String & ToLower() { str = MakeLower(str); }
-    [[nodiscard]] std::string AsLower() { return MakeLower(str); }
+    String & ToLower() { str = MakeLower(str); return *this; }
+    [[nodiscard]] emp::String AsLower() { return MakeLower(str); }
 
     String & AppendTitleCase(const std::string & in) { str+=MakeTitleCase(in); return *this; }
     String & SetTitleCase(const std::string & in) { str = MakeTitleCase(in); return *this; }
-    String & ToTitleCase() { str = MakeTitleCase(str); }
-    [[nodiscard]] std::string AsTitleCase() { return MakeTitleCase(str); }
+    String & ToTitleCase() { str = MakeTitleCase(str); return *this; }
+    [[nodiscard]] emp::String AsTitleCase() { return MakeTitleCase(str); }
 
     String & AppendRoman(int val) { str+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { str = MakeRoman(val); return *this; }
@@ -679,6 +694,7 @@ namespace emp {
                      std::string open, std::string close)
       { str = Join(container); return *this;}
 
+  };
 
 
   /// Determine if this string represents a proper number.
@@ -790,9 +806,9 @@ namespace emp {
 
   template <typename... Ts>
   size_t String::FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const {
-    if constexpr (sizeof...(Ts) == 0) return test_str.find(test1, start);
+    if constexpr (sizeof...(Ts) == 0) return str.find(test1, start);
     else {
-      size_t pos1 = test_str.find(test1, start);
+      size_t pos1 = str.find(test1, start);
       size_t pos2 = FindAnyOfFrom(start, tests...);
       return std::min(pos1, pos2);
     }
@@ -814,9 +830,9 @@ namespace emp {
   {
     size_t pos = Find(target, start, skip_quotes, skip_parens);
     while (pos != npos) {
-      bool before_ok = (pos == 0) || !is_idchar(in_string[pos-1]);
+      bool before_ok = (pos == 0) || !is_idchar(str[pos-1]);
       size_t after_pos = pos+target.size();
-      bool after_ok = (after_pos == in_string.size()) || !is_idchar(in_string[after_pos]);
+      bool after_ok = (after_pos == str.size()) || !is_idchar(str[after_pos]);
       if (before_ok && after_ok) return pos;
 
       pos = Find(target, pos+target.size(), skip_quotes, skip_parens);
@@ -873,11 +889,7 @@ namespace emp {
 
   /// Make a string safe(r)
   emp::String & String::Slugify() {
-    SetLower();
-    RemovePunctuation();
-    CompressWhitespace(res);
-    ReplaceChar(' ', '-');
-    return *this;
+    return ToLower().RemovePunctuation().CompressWhitespace().ReplaceChar(' ', '-');
   }
 
 
@@ -894,7 +906,7 @@ namespace emp {
   }
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
-  emp::String String::PopFixed(std::size_t end_pos, size_t delim_size=0)
+  emp::String String::PopFixed(std::size_t end_pos, size_t delim_size)
   {
     if (!end_pos) return ""; // Not popping anything!
 
@@ -911,7 +923,7 @@ namespace emp {
 
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
-  emp::String String::Pop(CharSet chars=" \n\t\r", bool skip_quotes=false, bool skip_parens=false) {
+  emp::String String::Pop(CharSet chars, bool skip_quotes, bool skip_parens) {
     size_t pop_end = chars.FindIn(str);
     size_t delim_end = pop_end+1;
     while(delim_end < str.size() && chars.Has(str[delim_end])) ++delim_end;
@@ -920,7 +932,7 @@ namespace emp {
 
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
-  emp::String String::PopTo(std::string delim, bool skip_quotes=false, bool skip_parens=false) {
+  emp::String String::PopTo(std::string delim, bool skip_quotes, bool skip_parens) {
     return PopFixed(Find(delim, skip_quotes, skip_parents), delim.size());
   }
 
@@ -932,7 +944,7 @@ namespace emp {
     return end_pos==std::string::npos ? "" : PopFixed(in_string, end_pos+1);
   }
 
-  emp::String String::PopParen(bool skip_quotes=false) {
+  emp::String String::PopParen(bool skip_quotes) {
     const size_t end_pos = FindParenMatch(0, skip_quotes);
     return end_pos==std::string::npos ? "" : PopFixed(in_string, end_pos+1);
   }
@@ -975,7 +987,7 @@ namespace emp {
   /// @param keep_quotes Should quoted text be kept together? (default: true)
   /// @param keep_parens Should contents of parens be kept together? (default: true)
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
-  emp::vector<std::String> String::Slice(
+  emp::vector<emp::String> String::Slice(
     std::string delim, bool keep_quotes, bool keep_parens, bool trim_whitespace
   ) const {
     emp::vector<emp::String> result;
@@ -1012,7 +1024,7 @@ namespace emp {
   /// @param keep_parens Should contents of parens be kept together? (default: true)
   [[nodiscard]] emp::vector<std::string_view> String::ViewSlices(
     std::string delim, bool keep_quotes, bool keep_parens
-  ) {
+  ) const {
     emp::vector<std::string_view> result;
     ViewSlices(result, delim, keep_quotes, keep_parens);
     return result;
@@ -1260,7 +1272,7 @@ namespace emp {
     case '\'': return "\\\'";  // case 39
     case '\\': return "\\\\";  // case 92
     case 127: return "\\177";  // (delete)
-    };
+    }
 
     return emp::String(c);
   }
