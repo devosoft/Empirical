@@ -618,6 +618,8 @@ namespace emp {
     String & Append(Ts... args) { str += MakeString(std::forward<Ts>(args)...); return *this; }
     template <typename... Ts>
     String & Set(Ts... args) { str = MakeString(std::forward<Ts>(args)...); return *this; }
+    template <typename T>
+    T As() { std::stringstream ss; ss << str; T out; ss >> out; return out; }
 
     String & AppendEscaped(char c) { str += MakeEscaped(c); }
     String & SetEscaped(char c) { str = MakeEscaped(c); }
@@ -676,7 +678,173 @@ namespace emp {
     String & SetJoin(const CONTAINER_T & container, std::string delim,
                      std::string open, std::string close)
       { str = Join(container); return *this;}
-      
+
+
+    // ------ ANSI Formatting ------  
+    String & FormatRange(size_t start, size_t end, String start_str, String end_str) {
+      str.insert(end, end_str);
+      str.insert(start, start_str);
+      return *this;
+    }
+    String & Format(String start_str, String end_str)
+      { return FormatRange(0, str.size(), start_str, end_str); }
+
+    static constexpr std::string ANSI_Reset = "\033[0m";
+    String & AppendANSI_Reset() { str += ANSI_Reset; return *this; }
+
+    static constexpr std::string ANSI_Bold = "\033[1m";
+    String & AppendANSI_Bold() { str += ANSI_Bold; return *this; }
+    static constexpr std::string ANSI_NoBold = "\033[22m";
+    String & AppendANSI_NoBold() { str += ANSI_NoBold; return *this; }
+    String & SetANSI_Bold() { return Format(ANSI_Bold, ANSI_NoBold); }
+    String & SetANSI_Bold(size_t start, size_t end)
+      { return FormatRange(start, end, ANSI_Bold, ANSI_NoBold); }
+
+    static constexpr std::string ANSI_Faint = "\033[2m";
+    String & AppendANSI_Faint() { str += ANSI_Faint; return *this; }
+
+    static constexpr std::string ANSI_Italic = "\033[3m";
+    String & AppendANSI_Italic() { str += ANSI_Italic; return *this; }
+    static constexpr std::string ANSI_NoItalic = "\033[23m";
+    String & AppendANSI_NoItalic() { str += ANSI_NoItalic; return *this; }
+    String & SetANSI_Italic() { return Format(ANSI_Italic, ANSI_NoItalic); }
+    String & SetANSI_Italic(size_t start, size_t end)
+      { return FormatRange(start, end, ANSI_Italic, ANSI_NoItalic); }
+
+    static constexpr std::string ANSI_Underline = "\033[4m";
+    String & AppendANSI_Underline() { str += ANSI_Underline; return *this; }
+    static constexpr std::string ANSI_NoUnderline = "\033[24m";
+    String & AppendANSI_NoUnderline() { str += ANSI_NoUnderline; return *this; }
+    String & SetANSI_Underline() { return Format(ANSI_Underline, ANSI_NoUnderline); }
+    String & SetANSI_Underline(size_t start, size_t end)
+      { return FormatRange(start, end, ANSI_Underline, ANSI_NoUnderline); }
+
+    static constexpr std::string ANSI_Blink = "\033[6m";
+    String & AppendANSI_Blink() { str += ANSI_Blink; return *this; }
+    static constexpr std::string ANSI_SlowBlink = "\033[5m";
+    String & AppendANSI_SlowBlink() { str += ANSI_SlowBlink; return *this; }
+    static constexpr std::string ANSI_NoBlink = "\033[25m";
+    String & AppendANSI_NoBlink() { str += ANSI_NoBlink; return *this; }
+    String & SetANSI_Blink() { return Format(ANSI_Blink, ANSI_NoBlink); }
+    String & SetANSI_Blink(size_t start, size_t end)
+      { return FormatRange(start, end, ANSI_Blink, ANSI_NoBlink); }
+
+    static constexpr std::string ANSI_Reverse = "\033[7m";
+    String & AppendANSI_Reverse() { str += ANSI_Reverse; return *this; }
+    static constexpr std::string ANSI_NoReverse = "\033[27m";
+    String & AppendANSI_NoReverse() { str += ANSI_NoReverse; return *this; }
+    String & SetANSI_Reverse() { return Format(ANSI_Reverse, ANSI_NoReverse); }
+    String & SetANSI_Reverse(size_t start, size_t end)
+      { return FormatRange(start, end, ANSI_Reverse, ANSI_NoReverse); }
+
+    static constexpr std::string ANSI_Strike = "\033[9m";
+    String & AppendANSI_Strike() { str += ANSI_Strike; return *this; }
+
+    static constexpr std::string ANSI_Black = "\033[30m";
+    String & AppendANSI_Black() { str += ANSI_Black; return *this; }
+    String & SetANSI_Black() { return Format(ANSI_Black, ANSI_Reset); }
+    static constexpr std::string ANSI_Red = "\033[31m";
+    String & AppendANSI_Red() { str += ANSI_Red; return *this; }
+    String & SetANSI_Red() { return Format(ANSI_Red, ANSI_Reset); }
+    static constexpr std::string ANSI_Green = "\033[32m";
+    String & AppendANSI_Green() { str += ANSI_Green; return *this; }
+    String & SetANSI_Green() { return Format(ANSI_Green, ANSI_Reset); }
+    static constexpr std::string ANSI_Yellow = "\033[33m";
+    String & AppendANSI_Yellow() { str += ANSI_Yellow; return *this; }
+    String & SetANSI_Yellow() { return Format(ANSI_Yellow, ANSI_Reset); }
+    static constexpr std::string ANSI_Blue = "\033[34m";
+    String & AppendANSI_Blue() { str += ANSI_Blue; return *this; }
+    String & SetANSI_Blue() { return Format(ANSI_Blue, ANSI_Reset); }
+    static constexpr std::string ANSI_Magenta = "\033[35m";
+    String & AppendANSI_Magenta() { str += ANSI_Magenta; return *this; }
+    String & SetANSI_Magenta() { return Format(ANSI_Magenta, ANSI_Reset); }
+    static constexpr std::string ANSI_Cyan = "\033[36m";
+    String & AppendANSI_Cyan() { str += ANSI_Cyan; return *this; }
+    String & SetANSI_Cyan() { return Format(ANSI_Cyan, ANSI_Reset); }
+    static constexpr std::string ANSI_White = "\033[37m";
+    String & AppendANSI_White() { str += ANSI_White; return *this; }
+    String & SetANSI_White() { return Format(ANSI_White, ANSI_Reset); }
+    static constexpr std::string ANSI_DefaultColor = "\033[39m";
+    String & AppendANSI_DefaultColor() { str += ANSI_DefaultColor; return *this; }
+    String & SetANSI_DefaultColor() { return Format(ANSI_DefaultColor, ANSI_Reset); }
+
+    static constexpr std::string ANSI_BlackBG = "\033[40m";
+    String & AppendANSI_BlackBG() { str += ANSI_BlackBG; return *this; }
+    String & SetANSI_BlackBG() { return Format(ANSI_BlackBG, ANSI_Reset); }
+    static constexpr std::string ANSI_RedBG = "\033[41m";
+    String & AppendANSI_RedBG() { str += ANSI_RedBG; return *this; }
+    String & SetANSI_RedBG() { return Format(ANSI_RedBG, ANSI_Reset); }
+    static constexpr std::string ANSI_GreenBG = "\033[42m";
+    String & AppendANSI_GreenBG() { str += ANSI_GreenBG; return *this; }
+    String & SetANSI_GreenBG() { return Format(ANSI_GreenBG, ANSI_Reset); }
+    static constexpr std::string ANSI_YellowBG = "\033[43m";
+    String & AppendANSI_YellowBG() { str += ANSI_YellowBG; return *this; }
+    String & SetANSI_YellowBG() { return Format(ANSI_YellowBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BlueBG = "\033[44m";
+    String & AppendANSI_BlueBG() { str += ANSI_BlueBG; return *this; }
+    String & SetANSI_BlueBG() { return Format(ANSI_BlueBG, ANSI_Reset); }
+    static constexpr std::string ANSI_MagentaBG = "\033[45m";
+    String & AppendANSI_MagentaBG() { str += ANSI_MagentaBG; return *this; }
+    String & SetANSI_MagentaBG() { return Format(ANSI_MagentaBG, ANSI_Reset); }
+    static constexpr std::string ANSI_CyanBG = "\033[46m";
+    String & AppendANSI_CyanBG() { str += ANSI_CyanBG; return *this; }
+    String & SetANSI_CyanBG() { return Format(ANSI_CyanBG, ANSI_Reset); }
+    static constexpr std::string ANSI_WhiteBG = "\033[47m";
+    String & AppendANSI_WhiteBG() { str += ANSI_WhiteBG; return *this; }
+    String & SetANSI_WhiteBG() { return Format(ANSI_WhiteBG, ANSI_Reset); }
+    static constexpr std::string ANSI_DefaultBGColor = "\033[49m";
+    String & AppendANSI_DefaultBGColor() { str += ANSI_DefaultBGColor; return *this; }
+    String & SetANSI_DefaultBGColor() { return Format(ANSI_DefaultBGColor, ANSI_Reset); }
+
+    static constexpr std::string ANSI_BrightBlack = "\033[30m";
+    String & AppendANSI_BrightBlack() { str += ANSI_BrightBlack; return *this; }
+    String & SetANSI_BrightBlack() { return Format(ANSI_BrightBlack, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightRed = "\033[31m";
+    String & AppendANSI_BrightRed() { str += ANSI_BrightRed; return *this; }
+    String & SetANSI_BrightRed() { return Format(ANSI_BrightRed, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightGreen = "\033[32m";
+    String & AppendANSI_BrightGreen() { str += ANSI_BrightGreen; return *this; }
+    String & SetANSI_BrightGreen() { return Format(ANSI_BrightGreen, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightYellow = "\033[33m";
+    String & AppendANSI_BrightYellow() { str += ANSI_BrightYellow; return *this; }
+    String & SetANSI_BrightYellow() { return Format(ANSI_BrightYellow, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightBlue = "\033[34m";
+    String & AppendANSI_BrightBlue() { str += ANSI_BrightBlue; return *this; }
+    String & SetANSI_BrightBlue() { return Format(ANSI_BrightBlue, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightMagenta = "\033[35m";
+    String & AppendANSI_BrightMagenta() { str += ANSI_BrightMagenta; return *this; }
+    String & SetANSI_BrightMagenta() { return Format(ANSI_BrightMagenta, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightCyan = "\033[36m";
+    String & AppendANSI_BrightCyan() { str += ANSI_BrightCyan; return *this; }
+    String & SetANSI_BrightCyan() { return Format(ANSI_BrightCyan, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightWhite = "\033[37m";
+    String & AppendANSI_BrightWhite() { str += ANSI_BrightWhite; return *this; }
+    String & SetANSI_BrightWhite() { return Format(ANSI_BrightWhite, ANSI_Reset); }
+
+    static constexpr std::string ANSI_BrightBlackBG = "\033[40m";
+    String & AppendANSI_BrightBlackBG() { str += ANSI_BrightBlackBG; return *this; }
+    String & SetANSI_BrightBlackBG() { return Format(ANSI_BrightBlackBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightRedBG = "\033[41m";
+    String & AppendANSI_BrightRedBG() { str += ANSI_BrightRedBG; return *this; }
+    String & SetANSI_BrightRedBG() { return Format(ANSI_BrightRedBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightGreenBG = "\033[42m";
+    String & AppendANSI_BrightGreenBG() { str += ANSI_BrightGreenBG; return *this; }
+    String & SetANSI_BrightGreenBG() { return Format(ANSI_BrightGreenBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightYellowBG = "\033[43m";
+    String & AppendANSI_BrightYellowBG() { str += ANSI_BrightYellowBG; return *this; }
+    String & SetANSI_BrightYellowBG() { return Format(ANSI_BrightYellowBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightBlueBG = "\033[44m";
+    String & AppendANSI_BrightBlueBG() { str += ANSI_BrightBlueBG; return *this; }
+    String & SetANSI_BrightBlueBG() { return Format(ANSI_BrightBlueBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightMagentaBG = "\033[45m";
+    String & AppendANSI_BrightMagentaBG() { str += ANSI_BrightMagentaBG; return *this; }
+    String & SetANSI_BrightMagentaBG() { return Format(ANSI_BrightMagentaBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightCyanBG = "\033[46m";
+    String & AppendANSI_BrightCyanBG() { str += ANSI_BrightCyanBG; return *this; }
+    String & SetANSI_BrightCyanBG() { return Format(ANSI_BrightCyanBG, ANSI_Reset); }
+    static constexpr std::string ANSI_BrightWhiteBG = "\033[47m";
+    String & AppendANSI_BrightWhiteBG() { str += ANSI_BrightWhiteBG; return *this; }
+    String & SetANSI_BrightWhiteBG() { return Format(ANSI_BrightWhiteBG, ANSI_Reset); }
   };
 
 
@@ -1143,364 +1311,78 @@ namespace emp {
     return *this;
   }
 
-
-
-
-
-/////// @CAO CONTINUE HERE!!!!!!!!
-
-
-
-
-
-
-
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  // The next functions are not efficient, but they will take any number of inputs and
-  // dynamically convert them all into a single, concatenated string.
-
-  /// Setup emp::ToString declarations for built-in types.
-  template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
-  template <typename T, typename... Ts>
-  inline std::string ToString(const emp::vector<T, Ts...> & container);
-
-
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-
-  /// This function does its best to convert any type to a string. Accepts any number of
-  /// arguments and returns a single concatenated string. Conversions attempted for an
-  /// object 'x' include (in order):
-  /// - Call a x.ToString()
-  /// - Call appropriate emp::ToString(x) overload
-  /// - Pass x through stringstream
-  template <typename... Ts>
-  inline std::string to_string(const Ts &... values) {
-    std::stringstream ss;
-    (ss << ... << internal::to_stream_item(values, true));
-    return ss.str();
-  }
-
-  /// Overload of to_string() string arguments to be directly returned.
-  inline const std::string & to_string(const std::string & value) {
-    return value;
-  }
-
-  /// Setup emp::ToString to work on arrays.
-  template <typename T, size_t N>
-  inline std::string ToString(const emp::array<T,N> & container) {
-    std::stringstream ss;
-    ss << "[ ";
-    for (const auto & el : container) {
-      ss << to_string(el);
-      ss << " ";
-    }
-    ss << "]";
-    return ss.str();
-  }
-
-  /// Setup emp::ToString to work on vectors.
-  template <typename T, typename... Ts>
-  inline std::string ToString(const emp::vector<T, Ts...> & container) {
-    std::stringstream ss;
-    ss << "[ ";
-    for (const auto & el : container) {
-      ss << to_string(el);
-      ss << " ";
-    }
-    ss << "]";
-    return ss.str();
-  }
-
-  /// This function tries to convert a string into any type you're looking for...  You just
-  /// need to specify the out type as the template argument.
-  template <typename T>
-  inline T from_string(const std::string & str) {
-    std::stringstream ss;
-    ss << str;
-    T out_val;
-    ss >> out_val;
-    return out_val;
-  }
-
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    static inline void _from_string(std::stringstream &) { ; }
-
-    template <typename T, typename... Ts>
-    void _from_string(std::stringstream & ss, T & arg1, Ts... extra_args) {
-      ss >> arg1;
-      _from_string(ss, extra_args...);
-    }
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-  /// The from_string() function can also take multiple args instead of a return.
-  template <typename... Ts>
-  inline void from_string(const std::string & str, Ts &... args) {
-    std::stringstream ss;
-    ss << str;
-    internal::_from_string(ss, args...);
-  }
-
-  /// The from_strings() function takes a vector of strings and converts them into a vector
-  /// of the appropriate type.
-  template <typename T>
-  inline emp::vector<T> from_strings(const emp::vector<std::string> & string_v) {
-    emp::vector<T> vals(string_v.size());
-    for (size_t i = 0; i < string_v.size(); i++) {
-      vals[i] = from_string<T>(string_v[i]);
-    }
-    return vals;
-  }
-
-  /// This function tries to convert a string_view into any other type...  You must
-  /// need to specify the out type as the template argument.
-  template <typename T>
-  inline T from_string(std::string_view str) {
-    std::stringstream ss;
-    ss << str;
-    T out_val;
-    ss >> out_val;
-    return out_val;
-  }
-
-
-
-  // Some ANSI helper functions.
-  inline constexpr char ANSI_ESC() { return (char) 27; }
-  inline std::string ANSI_Reset() { return "\033[0m"; }
-  inline std::string ANSI_Bold() { return "\033[1m"; }
-  inline std::string ANSI_Faint() { return "\033[2m"; }
-  inline std::string ANSI_Italic() { return "\033[3m"; }
-  inline std::string ANSI_Underline() { return "\033[4m"; }
-  inline std::string ANSI_SlowBlink() { return "\033[5m"; }
-  inline std::string ANSI_Blink() { return "\033[6m"; }
-  inline std::string ANSI_Reverse() { return "\033[7m"; }
-  inline std::string ANSI_Strike() { return "\033[9m"; }
-
-  inline std::string ANSI_NoBold() { return "\033[22m"; }
-  inline std::string ANSI_NoItalic() { return "\033[23m"; }
-  inline std::string ANSI_NoUnderline() { return "\033[24m"; }
-  inline std::string ANSI_NoBlink() { return "\033[25m"; }
-  inline std::string ANSI_NoReverse() { return "\033[27m"; }
-
-  inline std::string ANSI_Black() { return "\033[30m"; }
-  inline std::string ANSI_Red() { return "\033[31m"; }
-  inline std::string ANSI_Green() { return "\033[32m"; }
-  inline std::string ANSI_Yellow() { return "\033[33m"; }
-  inline std::string ANSI_Blue() { return "\033[34m"; }
-  inline std::string ANSI_Magenta() { return "\033[35m"; }
-  inline std::string ANSI_Cyan() { return "\033[36m"; }
-  inline std::string ANSI_White() { return "\033[37m"; }
-  inline std::string ANSI_DefaultColor() { return "\033[39m"; }
-
-  inline std::string ANSI_BlackBG() { return "\033[40m"; }
-  inline std::string ANSI_RedBG() { return "\033[41m"; }
-  inline std::string ANSI_GreenBG() { return "\033[42m"; }
-  inline std::string ANSI_YellowBG() { return "\033[43m"; }
-  inline std::string ANSI_BlueBG() { return "\033[44m"; }
-  inline std::string ANSI_MagentaBG() { return "\033[45m"; }
-  inline std::string ANSI_CyanBG() { return "\033[46m"; }
-  inline std::string ANSI_WhiteBG() { return "\033[47m"; }
-  inline std::string ANSI_DefaultBGColor() { return "\033[49m"; }
-
-  inline std::string ANSI_BrightBlack() { return "\033[30m"; }
-  inline std::string ANSI_BrightRed() { return "\033[31m"; }
-  inline std::string ANSI_BrightGreen() { return "\033[32m"; }
-  inline std::string ANSI_BrightYellow() { return "\033[33m"; }
-  inline std::string ANSI_BrightBlue() { return "\033[34m"; }
-  inline std::string ANSI_BrightMagenta() { return "\033[35m"; }
-  inline std::string ANSI_BrightCyan() { return "\033[36m"; }
-  inline std::string ANSI_BrightWhite() { return "\033[37m"; }
-
-  inline std::string ANSI_BrightBlackBG() { return "\033[40m"; }
-  inline std::string ANSI_BrightRedBG() { return "\033[41m"; }
-  inline std::string ANSI_BrightGreenBG() { return "\033[42m"; }
-  inline std::string ANSI_BrightYellowBG() { return "\033[43m"; }
-  inline std::string ANSI_BrightBlueBG() { return "\033[44m"; }
-  inline std::string ANSI_BrightMagentaBG() { return "\033[45m"; }
-  inline std::string ANSI_BrightCyanBG() { return "\033[46m"; }
-  inline std::string ANSI_BrightWhiteBG() { return "\033[47m"; }
-
-  /// Make a string appear bold when printed to the command line.
-  inline std::string to_ansi_bold(const std::string & _in) {
-    return ANSI_Bold() + _in + ANSI_NoBold();
-  }
-
-  /// Make a string appear italics when printed to the command line.
-  inline std::string to_ansi_italic(const std::string & _in) {
-    return ANSI_Italic() + _in + ANSI_NoItalic();
-  }
-
-  /// Make a string appear underline when printed to the command line.
-  inline std::string to_ansi_underline(const std::string & _in) {
-    return ANSI_Underline() + _in + ANSI_NoUnderline();
-  }
-
-  /// Make a string appear blink when printed to the command line.
-  inline std::string to_ansi_blink(const std::string & _in) {
-    return ANSI_Blink() + _in + ANSI_NoBlink();
-  }
-
-  /// Make a string appear reverse when printed to the command line.
-  inline std::string to_ansi_reverse(const std::string & _in) {
-    return ANSI_Reverse() + _in + ANSI_NoReverse();
-  }
-
-
-  //////////////////////////////////////////////////////
-  //  Implementations of larger functions (>25 lines)
-  //////////////////////////////////////////////////////
-
   /// Test if an input string is properly formatted as a literal character.
-  static inline bool is_literal_char(const std::string & value) {
-    // A literal char must begin with a single quote, contain a representation of a single
-    // character, and end with a single quote.
-    if (value.size() < 3) return false;
-    if (value[0] != '\'' || value.back() != '\'') return false;
+  bool String::IsLiteralChar() const {
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+    // Must contain a representation of a character, surrounded by single quotes.
+    if (str.size() < 3 || str.size() > 4) return false;
+    if (str[0] != '\'' || str.back() != '\'') return false;
 
     // If there's only a single character in the quotes, it's USUALLY legal.
-    if (value.size() == 3) {
-      switch (value[1]) {
-        case '\'':         // Can't be a single quote (must be escaped!)
-        case '\\':         // Can't be a backslash (must be followed by something!)
-          return false;
-        default:
-          return true;
-      }
-    }
+    if (str.size() == 3) return str[1] != '\'' && str[1] != '\\';
 
-    // If there are more characters, must be an escape sequence.
-    if (value.size() == 4) {
-      if (value[1] != '\\') return false;
+    // Multiple chars must begin with a backslash.
+    if (str[1] != '\\') return false;
 
-      // Identify legal escape sequences.
-      // @CAO Need more here!
-      switch (value[2]) {
-        case 'n':   // Newline
-        case 'r':   // Return
-        case 't':   // Tab
-        case '0':   // Empty (character 0)
-        case '\\':  // Backslash
-        case '\'':  // Single quote
-          return true;
-        default:
-          return false;
-      }
-    }
-
-    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
-
-    // If we made it here without a problem, it must be correct!
-    return true;
+    CharSet chars("nrt0\\\'");
+    return chars.Has(str[2]);
   }
 
-
   /// Test if an input string is properly formatted as a literal string.
-  static inline bool is_literal_string(const std::string & value,
-                                       const std::string & quote_marks) {
-    if (value.size() < 2) return false;               // Two short to contain even quote marks!
-    char quote = value[0];
-    if (!is_one_of(quote, quote_marks)) return false; // Must be working with allowed quote mark.
-    if (value.back() != quote) return false;          // Must use same quote at front and back.
+  bool String::IsLiteralString(const std::string & quote_marks) const {
+    // Must begin and end with proper quote marks.
+    if (str.size() < 2 || !is_one_of(str[0], quote_marks) || str.back() != str[0]) return false;
 
     // Are all of the characters valid?
-    for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == quote) return false;          // Cannot have a raw quote in the middle.
-      if (value[pos] == '\\') {                       // Allow escaped characters...
-        if (pos == value.size()-2) return false;      // Backslash must have char to escape.
-
-        // Move to the next char and make sure it is legal to be escaped.
-        // @CAO Expand on options!
-        pos++;
-        switch (value[pos]) {
-          case 'b':   // Backspace
-          case 'f':   // Form feed
-          case 'n':   // Newline
-          case 'r':   // Return
-          case 't':   // Tab
-          case 'v':   // Vertical tab.
-          case '0':   // Empty (character 0)
-          case '\\':  // Backslash
-          case '"':   // Double quote
-          case '\'':  // Single quote
-          case '`':   // Back quote
-            continue;
-          default:
-            return false;
-        }
+    for (size_t pos = 1; pos < str.size() - 1; pos++) {
+      if (str[pos] == str[0]) return false;          // Cannot have a raw quote in the middle.
+      if (str[pos] == '\\') {                        // Allow escaped characters...
+        if (pos == str.size()-2) return false;       // Backslash must have char to escape.
+        pos++;                                       // Skip past escaped character.
+        if (!is_escape_code(str[pos])) return false; // Illegal escaped character.
       }
     }
 
     // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
 
-    // If we made it here without a problem, it must be correct!
-    return true;
+    return true; // No issues found; mark as correct.
   }
 
-
   /// Test if an input string is properly formatted as a literal string.
-  static inline std::string diagnose_literal_string(const std::string & value,
-                                                    const std::string & quote_marks) {
+  std::string String::diagnose_literal_string(const std::string & quote_marks) {
     // A literal string must begin and end with a double quote and contain only valid characters.
-    if (value.size() < 2) return "Too short!";
-    char quote = value[0];
-    if (!is_one_of(quote, quote_marks)) return "Must begin an end in quotes.";
-    if (value.back() != quote) return "Begin and end quotes must match.";
+    if (str.size() < 2) return "Too short!";
+    if (!is_one_of(str[0], quote_marks)) return "Must begin an end in quotes.";
+    if (str.back() != str[0]) return "Must have begin and end quotes that match.";
 
     // Are all of the characters valid?
-    for (size_t pos = 1; pos < value.size() - 1; pos++) {
-      if (value[pos] == quote) return "Has a floating quote.";
-      if (value[pos] == '\\') {
-        if (pos == value.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
-
-        // Move to the next char and make sure it's legal to be escaped.
-        // @CAO Expand on options!
+    for (size_t pos = 1; pos < str.size() - 1; pos++) {
+      if (str[pos] == str[0]) return "Has a floating quote.";
+      if (str[pos] == '\\') {
+        if (pos == str.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
         pos++;
-        switch (value[pos]) {
-          case 'b':   // Backspace
-          case 'f':   // Form feed
-          case 'n':   // Newline
-          case 'r':   // Return
-          case 't':   // Tab
-          case 'v':   // Vertical tab.
-          case '0':   // Empty (character 0)
-          case '\\':  // Backslash
-          case '"':   // Double quote
-          case '\'':  // Single quote
-          case '`':   // Back quote
-            continue;
-          default:
-            return "Unknown escape charater.";
-        }
+        if (!is_escape_code(str[pos])) return "Unknown escape charater.";
       }
     }
 
     // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
 
-    // If we made it here without a problem, it must be correct!
     return "Good!";
   }
 
 
 
 
-
-
-
-
-
-
-
-
-  //------------- Stand-alone function definitions --------------
+  // -------------------------------------------------------------
+  //
+  // ------------- Stand-alone function definitions --------------
+  //
+  // -------------------------------------------------------------
 
   template <typename... Ts>
   emp::String MakeString(Ts... args) {
     std::stringstream ss;
-    (ss << ... << std::forward<Ts>(args));
+    (ss << ... << _Convert(std::forward<Ts>(args)));
     return ss.str();
   }
 
@@ -1796,4 +1678,4 @@ namespace emp {
   }
 }
 
-#endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
+#endif // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
