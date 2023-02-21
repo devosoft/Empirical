@@ -63,7 +63,7 @@ namespace emp {
   [[nodiscard]] emp::String MakeLiteral(const T & value);
   [[nodiscard]] emp::String MakeUpper(const emp::String & in);
   [[nodiscard]] emp::String MakeLower(const emp::String & in);
-  [[nodiscard]] emp::String MakeTitleCase(const emp::String & in);
+  [[nodiscard]] emp::String MakeTitleCase(emp::String in);
   [[nodiscard]] emp::String MakeRoman(int val);
   template <typename CONTAINER_T>
   [[nodiscard]] emp::String MakeEnglishList(const CONTAINER_T & container);
@@ -106,12 +106,12 @@ namespace emp {
 
     // Tools for converting non-strings to a string.
     template <typename T>
-    decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
+    static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
 
     template <typename T>
-    auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
+    static auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
 
-    template <typename T> const T & _Convert(const T & in, ...) { return in; }
+    template <typename T> static const T & _Convert(const T & in, ...) { return in; }
 
 
     bool IsQuote(char c) const {
@@ -227,6 +227,7 @@ namespace emp {
     char * data() { return str.data(); }
     const char * data() const { return str.data(); }
     const char * c_str() const { return str.c_str(); }
+    std::string & cpp_str() { return str; }
     const std::string & cpp_str() const { return str; }
 
     [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
@@ -284,7 +285,6 @@ namespace emp {
     bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
     template <typename ARG_T> bool starts_with( ARG_T && in ) const noexcept
       { return str.starts_with(std::forward<ARG_T>(in)); }
-    bool HasPrefix(const emp::String & prefix) const { return str.rfind(prefix.str, 0) == 0; }
 
     bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
     template <typename ARG_T> bool ends_with( ARG_T && in ) const noexcept
@@ -294,6 +294,10 @@ namespace emp {
     template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
       { return str.find(std::forward<ARG_T>(in)) != npos; }
 
+    bool HasAt(const emp::String test, size_t pos) const 
+      { return (size() < test.size()+pos) && View(pos, test.size()) == test.str; }
+    bool HasPrefix(const emp::String & prefix) const { return str.rfind(prefix.str, 0) == 0; }
+    bool HasSuffix(const emp::String & suffix) const { return ends_with(suffix); }
 
     // ------ Simple Analysis ------
 
@@ -341,8 +345,8 @@ namespace emp {
     }
     bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
     bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
-    bool HasUpperLetter() const { return UpperCharSet().HasAny(str); }
-    bool HasLowerLetter() const { return LowerCharSet().HasAny(str); }
+    bool HasUpper() const { return UpperCharSet().HasAny(str); }
+    bool HasLower() const { return LowerCharSet().HasAny(str); }
     bool HasLetter() const { return LetterCharSet().HasAny(str); }
     bool HasDigit() const { return DigitCharSet().HasAny(str); }
     bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(str); }
@@ -444,7 +448,9 @@ namespace emp {
 
     // Find any instances of ${X} and replace with dictionary lookup of X.
     template <typename MAP_T>
-    [[nodiscard]] emp::String & ReplaceVars(const MAP_T & var_map);
+    [[nodiscard]] emp::String &
+    ReplaceVars(const MAP_T & var_map, emp::String symbol="$",
+                bool skip_quotes=false, bool skip_parens=false);
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
@@ -510,7 +516,8 @@ namespace emp {
     [[nodiscard]] size_t FindQuoteMatch(size_t pos) const;
     [[nodiscard]] size_t FindParenMatch(size_t pos, bool skip_quotes=true) const;
     [[nodiscard]] size_t FindMatch(size_t pos) const;
-    [[nodiscard]] size_t Find(std::string target, size_t start, bool skip_quotes=false, bool skip_parens=false) const;
+    [[nodiscard]] size_t Find(char target, size_t start=0, bool skip_quotes=false, bool skip_parens=false) const;
+    [[nodiscard]] size_t Find(std::string target, size_t start=0, bool skip_quotes=false, bool skip_parens=false) const;
     [[nodiscard]] size_t Find(const CharSet & char_set, size_t start,
                 bool skip_quotes=false, bool skip_parens=false) const;
     void FindAll(char target, emp::vector<size_t> & results,
@@ -595,10 +602,35 @@ namespace emp {
 
     // ------ Other Operators ------
 
-    template <typename T> String operator+(T && in)
+    template <typename T> String operator+(T && in) const
       { return String(str + std::forward<T>(in), mode); }
-    template <typename T> bool operator==(T && in) { return in.str == std::forward<T>(in); }
-    template <typename T> bool operator<=>(T && in) { return in.str <=> std::forward<T>(in); }
+    bool operator==(const emp::String & in) const { return str == in.str; }
+    bool operator==(const std::string & in) const { return str == in; }
+    bool operator==(const char * in) const { return str == in; }
+
+    bool operator!=(const emp::String & in) const { return str != in.str; }
+    bool operator!=(const std::string & in) const { return str != in; }
+    bool operator!=(const char * in) const { return str != in; }
+
+    bool operator<(const emp::String & in) const { return str < in.str; }
+    bool operator<(const std::string & in) const { return str < in; }
+    bool operator<(const char * in) const { return str < in; }
+
+    bool operator<=(const emp::String & in) const { return str <= in.str; }
+    bool operator<=(const std::string & in) const { return str <= in; }
+    bool operator<=(const char * in) const { return str <= in; }
+
+    bool operator>(const emp::String & in) const { return str > in.str; }
+    bool operator>(const std::string & in) const { return str > in; }
+    bool operator>(const char * in) const { return str > in; }
+
+    bool operator>=(const emp::String & in) const { return str >= in.str; }
+    bool operator>=(const std::string & in) const { return str >= in; }
+    bool operator>=(const char * in) const { return str >= in; }
+
+    // auto operator<=>(const emp::String & in) const = default;
+    // auto operator<=>(const std::string & in) const { return str <=> in; }
+    // auto operator<=>(const char * in) const { return str <=> in; }
     
 
     // ------ SPECIAL CONFIGURATION ------
@@ -694,6 +726,12 @@ namespace emp {
                      std::string open, std::string close)
       { str = Join(container); return *this;}
 
+    template <typename... Ts>
+    static emp::String Make(Ts... args) {
+      std::stringstream ss;
+      (ss << ... << String::_Convert(std::forward<Ts>(args)));
+      return ss.str();
+    }
   };
 
 
@@ -748,6 +786,18 @@ namespace emp {
     return npos;
   }
 
+  // A version of string::find() with single chars that can skip over quotes.
+  size_t String::Find(char target, size_t start, bool skip_quotes, bool skip_parens) const {
+    // Make sure found_pos is not in a quote and/or parens; adjust as needed!
+    for (size_t pos=start; pos < str.size(); ++pos) {
+      if (str[pos] == target) return pos;
+      else if (skip_quotes && IsQuote(str[pos])) pos = FindQuoteMatch(pos);
+      else if (skip_parens && IsParen(str[pos])) pos = FindParenMatch(pos);
+    }
+
+    return npos;
+  }
+
   // A version of string::find() that can skip over quotes.
   size_t String::Find(std::string target, size_t start, bool skip_quotes, bool skip_parens) const {
     size_t found_pos = str.find(target, start);
@@ -771,7 +821,6 @@ namespace emp {
 
     return found_pos;
   }
-
   // Find any of a set of characters.
   size_t String::Find(const CharSet & char_set, size_t start,
                            bool skip_quotes, bool skip_parens) const
@@ -901,7 +950,7 @@ namespace emp {
   }
 
   bool String::PopIf(String in) {
-    if (HasPrefix(in))) { PopFixed(in.size()); return true; }
+    if (HasPrefix(in)) { PopFixed(in.size()); return true; }
     return false;
   }
 
@@ -933,7 +982,7 @@ namespace emp {
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
   emp::String String::PopTo(std::string delim, bool skip_quotes, bool skip_parens) {
-    return PopFixed(Find(delim, skip_quotes, skip_parents), delim.size());
+    return PopFixed(Find(delim, skip_quotes, skip_parens), delim.size());
   }
 
   emp::String String::PopWord() { return Pop(); }
@@ -941,12 +990,12 @@ namespace emp {
 
   emp::String String::PopQuote() {
     const size_t end_pos = FindQuoteMatch(0);
-    return end_pos==std::string::npos ? "" : PopFixed(in_string, end_pos+1);
+    return end_pos==std::string::npos ? "" : PopFixed(end_pos+1);
   }
 
   emp::String String::PopParen(bool skip_quotes) {
     const size_t end_pos = FindParenMatch(0, skip_quotes);
-    return end_pos==std::string::npos ? "" : PopFixed(in_string, end_pos+1);
+    return end_pos==std::string::npos ? "" : PopFixed(end_pos+1);
   }
 
   size_t String::PopUInt() {
@@ -964,18 +1013,17 @@ namespace emp {
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   void String::Slice(
     emp::vector<emp::String> & out_set,
-    std::string delim=",", bool keep_quotes, bool keep_parens, bool trim_whitespace
+    std::string delim, bool keep_quotes, bool keep_parens, bool trim_whitespace
   ) const {
     if (str.empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
-    for (size_t found_pos = Find(delim, 0, keep_quotes, keep_parens);
-         found_pos < str.size();
-         found_pos = Find(delim, found_pos+1, keep_quotes, keep_parens))
-    {
+    size_t found_pos = Find(delim, 0, keep_quotes, keep_parens);
+    while (found_pos < str.size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
       if (trim_whitespace) out_set.back().TrimWhitespace();
       start_pos = found_pos+delim.size();
+      found_pos = Find(delim, found_pos+1, keep_quotes, keep_parens);
     }
     out_set.push_back( GetRange(start_pos, found_pos) );
   }
@@ -991,7 +1039,7 @@ namespace emp {
     std::string delim, bool keep_quotes, bool keep_parens, bool trim_whitespace
   ) const {
     emp::vector<emp::String> result;
-    slice(result, delim, keep_quotes, keep_parens, trim_whitespace);
+    Slice(result, delim, keep_quotes, keep_parens, trim_whitespace);
     return result;
   }
 
@@ -1008,12 +1056,11 @@ namespace emp {
     if (str.empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
-    for (size_t found_pos = Find(delim, 0, keep_quotes, keep_parens);
-         found_pos < str.size();
-         found_pos = Find(delim, found_pos+1, keep_quotes, keep_parens))
-    {
+    size_t found_pos = Find(delim, 0, keep_quotes, keep_parens);
+    while (found_pos < str.size()) {
       out_set.push_back( ViewRange(start_pos, found_pos) );
       start_pos = found_pos+delim.size();
+      found_pos = Find(delim, found_pos+1, keep_quotes, keep_parens);
     }
     out_set.push_back( ViewRange(start_pos, found_pos) );
   }
@@ -1037,14 +1084,14 @@ namespace emp {
   /// @param keep_quotes Should quoted text be kept together? (default: yes)
   /// @param keep_parens Should contents of parentheses be kept together? (default: no)
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
-  void SliceAssign(
+  void String::SliceAssign(
     std::map<emp::String,emp::String> & result_map,
     std::string delim, std::string assign_op,
     bool keep_quotes, bool keep_parens, bool trim_whitespace
   ) const {
-    auto assign_set = Slice(delim, max_split, keep_quotes, keep_parens, false);
+    auto assign_set = Slice(delim, keep_quotes, keep_parens, false);
     for (auto setting : assign_set) {
-      if (setting.IsWhitespace()) continue; // Skip blank settings (especially at the end).
+      if (setting.OnlyWhitespace()) continue; // Skip blank settings (especially at the end).
 
       // Remove any extra spaces around parsed values.
       emp::String var_name = setting.PopTo(assign_op);
@@ -1054,13 +1101,12 @@ namespace emp {
       }
       if (setting.empty()) {
         std::stringstream msg;
-        msg << "No assignment found in slice_assign() for: " << var_name;
+        msg << "No assignment found in slice_assign() for: " << var_name.str;
         emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
                                msg.str(), var_name);                               
       }
       result_map[var_name] = setting;
     }
-    return result_map;
   }
 
 
@@ -1070,7 +1116,7 @@ namespace emp {
   /// @param keep_quotes Should quoted text be kept together? (default: yes)
   /// @param keep_parens Should contents of parentheses be kept together? (default: no)
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
-  std::map<emp::String,emp::String> SliceAssign(
+  std::map<emp::String,emp::String> String::SliceAssign(
     std::string delim, std::string assign_op,
     bool keep_quotes, bool keep_parens, bool trim_whitespace
   ) const {
@@ -1082,18 +1128,19 @@ namespace emp {
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
-  emp::String & String::ReplaceVars(const MAP_T & var_map) {
-    for (size_t pos = Find('$');
+  emp::String & String::ReplaceVars(const MAP_T & var_map, emp::String symbol, bool skip_quotes, bool skip_parens) {
+    for (size_t pos = Find(symbol, 0, skip_quotes, skip_parens);
          pos < size()-3;             // Need room for a replacement tag.
-         pos = Find('$', pos+1)) {
-      if (str[pos+1] == '$') {       // Compress two $$ into one $
-        str.erase(pos,1);
+         pos = Find(symbol, pos+symbol.size())) {
+      const size_t symbol_end = pos+symbol.size();
+      if (HasAt(symbol, symbol_end)) {   // Compress two symbols (e.g., "$$") into one (e.g. "$")
+        str.erase(pos,symbol.size());
         continue;
       }
-      if (result[pos+1] != '{') continue; // Eval must be surrounded by braces.
+      if (str[symbol_end] != '{') continue; // Eval must be surrounded by braces.
 
       // If we made it this far, we have a starting match!
-      size_t end_pos = FindParenMatch(pos+1);
+      size_t end_pos = FindParenMatch(symbol_end);
       if (end_pos == npos) {
         emp::notify::Exception("emp::string_utils::replace_vars::missing_close",
                                "No close brace found in string_utils::replace_vars()",
@@ -1101,11 +1148,11 @@ namespace emp {
         break;
       }
 
-      std::string key = GetRange(pos+2, end_pos);
+      std::string key = GetRange(symbol_end+1, end_pos);
       auto replacement_it = var_map.find(key);
       if (replacement_it == var_map.end()) {
         emp::notify::Exception("emp::string_utils::replace_vars::missing_var",
-                               emp::to_string("Lookup variable not found in var_map (key=", key, ")"),
+                               MakeString("Lookup variable not found in var_map (key=", key, ")"),
                                key);
         break;
       }
@@ -1117,12 +1164,11 @@ namespace emp {
   }
 
   /// @brief Find any instance of MACRO_NAME(ARGS) and replace it with fun(ARGS).
-  /// @param in_string String to perform macro replacement.
   /// @param start_str Initial sequence of macro to look for; for example "REPLACE("
   /// @param end_str   Sequence that ends the macro; for example ")"
   /// @param macro_fun Function to call with contents of macro.  Params are macro_args (string), line_num (size_t), and hit_num (size_t)
   /// @param skip_quotes Should we skip quotes when looking for macro?
-  /// @return Processed version of in_string with macros replaced.
+  /// @return This string object, post processing.
   template <typename FUN_T>
   emp::String & String::ReplaceMacro(
     std::string start_str,
@@ -1194,7 +1240,7 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  std::string String::diagnose_literal_string(const std::string & quote_marks) {
+  std::string String::DiagnoseLiteralString(const std::string & quote_marks) const {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (str.size() < 2) return "Too short!";
     if (!is_one_of(str[0], quote_marks)) return "Must begin an end in quotes.";
@@ -1224,16 +1270,35 @@ namespace emp {
   //
   // -------------------------------------------------------------
 
+  // ------ External function overrides ------
+
+  std::ostream & operator<<(std::ostream & os, const emp::String & in) {
+    return os << in.cpp_str();
+  }
+
+  std::istream & operator>>(std::istream & is, emp::String & in) {
+    return is >> in.cpp_str();
+  }
+
+  template<typename STREAM_T>
+  STREAM_T & getline(STREAM_T && input, emp::String str, char delim) {
+    return getline(std::forward<STREAM_T>(input), str.cpp_str(), delim);
+  }
+
+  template<typename STREAM_T>
+  STREAM_T & getline(STREAM_T && input, emp::String str) {
+    return getline(std::forward<STREAM_T>(input), str.cpp_str());
+  }
+
+
   template <typename... Ts>
   emp::String MakeString(Ts... args) {
-    std::stringstream ss;
-    (ss << ... << _Convert(std::forward<Ts>(args)));
-    return ss.str();
+    return String::Make(std::forward<Ts>(args)...);
   }
 
   emp::String MakeEscaped(char c) {
     // If we just append as a normal character, do so!
-    if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return emp::String(c);
+    if ( (c >= 40 && c < 91) || (c > 96 && c < 127)) return emp::MakeString(c);
     switch (c) {
     case '\0': return "\\0";
     case 1: return "\\001";
@@ -1274,13 +1339,15 @@ namespace emp {
     case 127: return "\\177";  // (delete)
     }
 
-    return emp::String(c);
+    return emp::MakeString(c);
   }
   
-  emp::String MakeEscaped(const std::string & in) { return emp::String(in, MakeEscaped); }
+  emp::String MakeEscaped(const emp::String & in) {
+    return emp::String(in, [](char c){ return MakeEscaped(c); });
+  }
 
   /// Take a string and replace reserved HTML characters with character entities
-  emp::String MakeWebSafe(const std::string & in) {
+  emp::String MakeWebSafe(const emp::String & in) {
     emp::String out;
     out.reserve(in.size());
     for (char c : in) {
@@ -1305,7 +1372,7 @@ namespace emp {
 
   /// Take a string or iterable and convert it to a C++-style literal.
   // This is the version for string. The version for an iterable is below.
-  [[nodiscard]] emp::String MakeLiteral(const std::string & value) {
+  [[nodiscard]] emp::String MakeLiteral(const emp::String & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -1335,17 +1402,10 @@ namespace emp {
 
   #endif
 
-  [[nodiscard]] emp::String MakeFromLiteral(const std::string & value) {
-    if (value.size() == 0) return "";
-    if (value[0] == '\'') return emp::String(MakeFromLiteral_Char(value)); 
-    if (value[0] == '"') return MakeFromLiteral_String(value);
-    // @CAO Add conversion from numerical literals, and especially octal (0-), binary (0b-), and hex (0x-)
-  }
-
   /// Convert a literal character representation to an actual string.
   /// (i.e., 'A', ';', or '\n')
-  [[nodiscard]] char MakeFromLiteral_Char(const std::string & value) {
-    emp_assert(is_literal_char(value));
+  [[nodiscard]] char MakeFromLiteral_Char(const emp::String & value) {
+    emp_assert(value.IsLiteralChar());
     // Given the assert, we can assume the string DOES contain a literal representation,
     // and we just need to convert it.
 
@@ -1357,13 +1417,12 @@ namespace emp {
 
 
   /// Convert a literal string representation to an actual string.
-  [[nodiscard]] emp::String MakeFromLiteral_String(const std::string & value) {
+  [[nodiscard]] emp::String MakeFromLiteral_String(const emp::String & value) {
   /// Convert a literal string representation to an actual string.
-    emp_assert(is_literal_string(value),
-               value, diagnose_literal_string(value));
+    emp_assert(value.IsLiteralString(), value, value.DiagnoseLiteralString());
     // Given the assert, we can assume string DOES contain a literal string representation.
 
-    std::string out_string;
+    emp::String out_string;
     out_string.reserve(value.size()-2);  // Make a guess on final size.
 
     for (size_t pos = 1; pos < value.size() - 1; pos++) {
@@ -1375,18 +1434,26 @@ namespace emp {
     return out_string;
   }
 
+  [[nodiscard]] emp::String MakeFromLiteral(const emp::String & value) {
+    if (value.size() == 0) return "";
+    if (value[0] == '\'') return MakeString(MakeFromLiteral_Char(value));
+    if (value[0] == '"') return MakeFromLiteral_String(value);
+    // @CAO Add conversion from numerical literals, and especially octal (0-), binary (0b-), and hex (0x-)
+    return value;
+  }
+
   /// Convert a string to all uppercase.
-  [[nodiscard]] emp::String MakeUpper(std::string value) {
-    return emp::String(value, std::toupper);
+  [[nodiscard]] emp::String MakeUpper(const emp::String & value) {
+    return emp::String(value, [](char c){ return std::toupper(c); });
   }
 
   /// Convert a string to all lowercase.
-  [[nodiscard]] emp::String MakeLower(std::string value) {
-    return emp::String(value, std::tolower);
+  [[nodiscard]] emp::String MakeLower(const emp::String & value) {
+    return emp::String(value, [](char c){ return std::tolower(c); });
   }
 
   /// Make first letter of each word upper case
-  [[nodiscard]] emp::String MakeTitleCase(std::string value) {
+  [[nodiscard]] emp::String MakeTitleCase(emp::String value) {
     constexpr int char_shift = 'a' - 'A';
     bool next_upper = true;
     for (size_t i = 0; i < value.size(); i++) {
@@ -1411,7 +1478,7 @@ namespace emp {
 
     // Loop through dealing with the rest of the number.
     while (val > 0) {
-      else if (val >= 1000) { out += "M";  val -= 1000; }
+      if (val >= 1000) { out += "M";  val -= 1000; }
       else if (val >= 900)  { out += "CM"; val -= 900; }
       else if (val >= 500)  { out += "D";  val -= 500; }
       else if (val >= 400)  { out += "CD"; val -= 400; }
@@ -1438,14 +1505,14 @@ namespace emp {
     if (container.size() == 2) return to_string(*it, " and ", *(it+1));
 
     auto last_it = container.end() - 1;
-    String out(to_string(*it))
+    String out = MakeString(*it);
     ++it;
     while (it != last_it) {
       out += ',';
-      out += to_string(*it);
+      out += MakeString(*it);
       ++it;
     }
-    out += to_string(", and ", *it);
+    out += MakeString(", and ", *it);
 
     return out;
   }
@@ -1489,38 +1556,18 @@ namespace emp {
   emp::String Join(const CONTAINER_T & container, std::string join_str,
                       std::string open, std::string close) {
     if (container.size() == 0) return "";
-    if (container.size() == 1) return to_string(open, container.front(), close);
+    if (container.size() == 1) return MakeString(open, container.front(), close);
 
     std::stringstream out;
     for (auto it = container.begin(); it != container.end(); ++it) {
       if (it != container.begin()) out << join_str;
-      out << open << to_string(*it) << close;
+      out << open << MakeString(*it) << close;
     }
 
     return out.str();
   }
 
 
-
-  // ------ External function overrides ------
-
-  std::ostream & operator<<(std::ostream & os, const emp::String & str) {
-    return os << str;
-  }
-
-  std::istream & operator>>(std::istream & is, emp::String & str) {
-    return is >> str;
-  }
-
-  template<typename STREAM_T>
-  STREAM_T & getline(STREAM_T && input, emp::String str, char delim) {
-    return getline(std::forward<STREAM_T>(input), str.str, delim);
-  }
-
-  template<typename STREAM_T>
-  STREAM_T & getline(STREAM_T && input, emp::String str) {
-    return getline(std::forward<STREAM_T>(input), str.str);
-  }
 }
 
 #endif // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
