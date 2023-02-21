@@ -45,12 +45,20 @@ namespace emp {
   public:
     CharSetBase() : char_set() { }
 
-    CharSetBase(CHAR_T in_char) { char_set[static_cast<size_t>(in_char)] = true; }
+    CharSetBase(CHAR_T c) { char_set[static_cast<size_t>(c)] = true; }
     CharSetBase(const std::string & in_chars) {
       for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;
     }
+    CharSetBase(const char * in_chars) : CharSetBase(std::string(in_chars)) { }
     CharSetBase(const this_t &) = default;
+
     this_t & operator=(const this_t &) = default;
+    this_t & operator=(char c) { Reset(); char_set[static_cast<size_t>(c)] = true; }
+    this_t & operator=(const std::string & in_chars) {
+      for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;      
+    }
+
+    CharSetBase & Reset() { char_set.fill(0); }
 
     size_t GetMaxChar() const noexcept { return MAX_CHAR; }
     bool Has(CHAR_T index) const { return char_set[static_cast<size_t>(index)]; }
@@ -116,7 +124,7 @@ namespace emp {
 
     CharSetBase<CHAR_T,MAX_CHAR> operator!() const {
       this_t out(*this);
-      for (CHAR_T & c : char_set) c = !c;
+      for (CHAR_T & c : out.char_set) c = !c;
       return out;
     }
 
@@ -213,6 +221,11 @@ namespace emp {
     return cs;
   }
 
+  /// Which characters can come after a backslash in a string?
+  static const CharSet & EscapeCodeCharSet() {
+    static CharSet cs("bfnrtv0\\\"\'`");
+    return cs;
+  }
 
   inline bool is_whitespace(char test_char)   { return WhitespaceCharSet().Has(test_char); }
   inline bool is_upper_letter(char test_char) { return UpperCharSet().Has(test_char); }
@@ -221,6 +234,7 @@ namespace emp {
   inline bool is_digit(char test_char)        { return DigitCharSet().Has(test_char); }
   inline bool is_alphanumeric(char test_char) { return AlphanumericCharSet().Has(test_char); }
   inline bool is_idchar(char test_char)       { return IDCharSet().Has(test_char); }
+  inline bool is_escape_code(char test_char)   { return EscapeCodeCharSet().Has(test_char); }
 
   /// Determine if a character is in a set of characters (represented as a string)
   static inline bool is_one_of(char test_char, const std::string & char_set) {
