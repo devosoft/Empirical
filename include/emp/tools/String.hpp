@@ -9,10 +9,10 @@
  *
  *
  *  @todo Make constexpr
- *  @todo Make handle non-char strings (i.e., use CharT template parameter)
+ *  @todo Make handle non-'char' strings (i.e., use CharT template parameter)
  *  @todo Make handle allocators
- *  @todo Make work with stringviews
- *  @todo Add construct types like RESERVE, REPEAT, and TO_STRING for special builds.
+ *  @todo Make work more broadly with stringviews
+ *  @todo Maybe add special construct types like RESERVE, REPEAT, and TO_STRING for special builds?
  *
  */
 
@@ -94,56 +94,17 @@ namespace emp {
     struct Mode {
       uint8_t val = USE_QUOTE_SINGLE + USE_QUOTE_DOUBLE +
                     USE_PAREN_ROUND + USE_PAREN_SQUARE + USE_PAREN_CURLY;
+
+      void Set(Mask mask, bool use) { if (use) val |= mask; else val &= ~mask; }
     } mode;
 
     // ------ HELPER FUNCTIONS ------
 
-    String & _ChangeMode(Mask mask, bool use) {
-      if (use) mode.val |= mask;
-      else mode.val &= ~mask;
-      return *this;      
-    }
 
-    // Tools for converting non-strings to a string.
-    template <typename T>
-    static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
-
-    template <typename T>
-    static auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
-
+    // Convert objects into a streamable type using _Convert(obj)
+    template <typename T> static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
+    template <typename T> static auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
     template <typename T> static const T & _Convert(const T & in, ...) { return in; }
-
-
-    bool IsQuote(char c) const {
-      switch (c) {
-        case '\'': return mode.val & USE_QUOTE_SINGLE;
-        case '"': return mode.val & USE_QUOTE_DOUBLE;
-        case '`': return mode.val & USE_QUOTE_BACK;
-      }
-      return false;
-    }
-
-    bool IsParen(char c) const {
-      switch (c) {
-        case '(': return mode.val & USE_PAREN_ROUND;
-        case '[': return mode.val & USE_PAREN_SQUARE;
-        case '{': return mode.val & USE_PAREN_CURLY;
-        case '<': return mode.val & USE_PAREN_ANGLE;
-        case '`': return mode.val & USE_PAREN_QUOTES;
-      }
-      return false;
-    }
-
-    static char GetMatch(char c) {
-      switch (c) {
-        case '`': return '\'';
-        case '(': return ')';
-        case '[': return ']';
-        case '{': return '}';
-        case '<': return '>';
-      }
-      return '\0';
-    }
 
     void _AssertPos(size_t pos) const { emp_assert(pos < str.size(), pos, str.size()); }
 
@@ -216,19 +177,24 @@ namespace emp {
     operator std::string &() { return str; }
     operator const std::string &() const { return str; }
 
+    // ------ Mode Handlers ------
+    [[nodiscard]] inline bool IsQuote(char c) const;
+    [[nodiscard]] inline bool IsParen(char c) const;
+    [[nodiscard]] inline static char GetMatch(char c);
+
     // ------ Element Access ------
 
-    char & operator[](size_t pos) { _AssertPos(pos); return str[pos]; }
-    char operator[](size_t pos) const { _AssertPos(pos); return str[pos]; }
-    char & front() { _AssertPos(0); return str.front(); }
-    char front() const { _AssertPos(0); return str.front(); }
-    char & back() { _AssertPos(0); return str.back(); }
-    char back() const { _AssertPos(0); return str.back(); }
-    char * data() { return str.data(); }
-    const char * data() const { return str.data(); }
-    const char * c_str() const { return str.c_str(); }
-    std::string & cpp_str() { return str; }
-    const std::string & cpp_str() const { return str; }
+    [[nodiscard]] char & operator[](size_t pos) { _AssertPos(pos); return str[pos]; }
+    [[nodiscard]] char operator[](size_t pos) const { _AssertPos(pos); return str[pos]; }
+    [[nodiscard]] char & front() { _AssertPos(0); return str.front(); }
+    [[nodiscard]] char front() const { _AssertPos(0); return str.front(); }
+    [[nodiscard]] char & back() { _AssertPos(0); return str.back(); }
+    [[nodiscard]] char back() const { _AssertPos(0); return str.back(); }
+    [[nodiscard]] char * data() { return str.data(); }
+    [[nodiscard]] const char * data() const { return str.data(); }
+    [[nodiscard]] const char * c_str() const { return str.c_str(); }
+    [[nodiscard]] std::string & cpp_str() { return str; }
+    [[nodiscard]] const std::string & cpp_str() const { return str; }
 
     [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
       { return String(str.substr(pos, count), mode); }
@@ -267,96 +233,98 @@ namespace emp {
 
     // ------ Capacity ------
 
-    bool empty() const { return str.empty(); }
-    size_t size() const { return str.size(); }
-    size_t length() const { return str.length(); }
-    size_t max_size() const { return str.max_size(); }
+    [[nodiscard]] bool empty() const { return str.empty(); }
+    [[nodiscard]] size_t size() const { return str.size(); }
+    [[nodiscard]] size_t length() const { return str.length(); }
+    [[nodiscard]] size_t max_size() const { return str.max_size(); }
+    [[nodiscard]] size_t capacity() const { return str.capacity(); }
     void reserve(size_t new_cap) { str.reserve(new_cap); }
-    size_t capacity() const { return str.capacity(); }
     void shrink_to_fit() { str.shrink_to_fit(); }
     
 
     // ------ Classification and Comparisons ------
     
-    int compare(const String & in) { return str.compare(in.str); }
-    template <typename... ARG_Ts> int compare(ARG_Ts &&... args)
+    [[nodiscard]] int compare(const String & in) { return str.compare(in.str); }
+    template <typename... ARG_Ts> [[nodiscard]] int compare(ARG_Ts &&... args)
       { return str.compare(std::forward<ARG_Ts>(args)...); }
 
-    bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
-    template <typename ARG_T> bool starts_with( ARG_T && in ) const noexcept
+    [[nodiscard]] bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
+    template <typename ARG_T> [[nodiscard]] bool starts_with( ARG_T && in ) const noexcept
       { return str.starts_with(std::forward<ARG_T>(in)); }
 
-    bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
-    template <typename ARG_T> bool ends_with( ARG_T && in ) const noexcept
+    [[nodiscard]] bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
+    template <typename ARG_T> [[nodiscard]] bool ends_with( ARG_T && in ) const noexcept
       { return str.ends_with(std::forward<ARG_T>(in)); }
 
-    bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
-    template <typename ARG_T> bool contains( ARG_T && in ) const noexcept
+    [[nodiscard]] bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
+    template <typename ARG_T> [[nodiscard]] bool contains( ARG_T && in ) const noexcept
       { return str.find(std::forward<ARG_T>(in)) != npos; }
 
-    bool HasAt(const emp::String test, size_t pos) const 
+    [[nodiscard]] bool HasAt(const emp::String test, size_t pos) const 
       { return (size() < test.size()+pos) && View(pos, test.size()) == test.str; }
-    bool HasPrefix(const emp::String & prefix) const { return str.rfind(prefix.str, 0) == 0; }
-    bool HasSuffix(const emp::String & suffix) const { return ends_with(suffix); }
+    [[nodiscard]] bool HasPrefix(const emp::String & prefix) const { return starts_with(prefix); }
+    [[nodiscard]] bool HasSuffix(const emp::String & suffix) const { return ends_with(suffix); }
 
     // ------ Simple Analysis ------
 
     // Count the number of occurrences of a specific character.
-    size_t Count(char c, size_t start=0) const
+    [[nodiscard]] size_t Count(char c, size_t start=0) const
       { return (size_t) std::count(str.begin()+start, str.end(), c); }
 
     // Count the number of occurrences of a specific character within a range.
-    size_t Count(char c, size_t start, size_t end) const
+    [[nodiscard]] size_t Count(char c, size_t start, size_t end) const
       { return (size_t) std::count(str.begin()+start, str.begin()+end, c); }
 
     /// Test if an string is formatted as a literal character.
-    bool IsLiteralChar() const;
+    [[nodiscard]] bool IsLiteralChar() const;
 
     /// Test if an string is formatted as a literal string.
-    bool IsLiteralString(const std::string & quote_marks="\"") const;
+    [[nodiscard]] bool IsLiteralString(const std::string & quote_marks="\"") const;
 
     /// Explain what string is NOT formatted as a literal string.
-    std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
+    [[nodiscard]] std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
 
     /// Determine a string is composed only of a set of characters (represented as a string)
-    bool IsComposedOf(const std::string & char_set) const {
+    [[nodiscard]] bool IsComposedOf(const std::string & char_set) const {
       for (char x : str) if (!is_one_of(x, char_set)) return false;
       return true;
     }
 
     /// Determine if string is a valid number.
-    bool IsNumber() const;
+    [[nodiscard]] bool IsNumber() const;
 
     /// Determine if string is a valid identifier (in most languages).
-    bool IsIdentifier() const {
+    [[nodiscard]] bool IsIdentifier() const {
       // At least one character; cannot begin with digit, only letters, digits and `_`
       return str.size() && !is_digit(str[0]) && IDCharSet().Has(str);
     }
 
-    bool OnlyLower() const { return (str.size()) ? LowerCharSet().Has(str) : true; }
-    bool OnlyUpper() const { return (str.size()) ? UpperCharSet().Has(str) : true; }
-    bool OnlyDigits() const { return (str.size()) ? DigitCharSet().Has(str) : true; }
-    bool OnlyAlphanumeric() const { return (str.size()) ? AlphanumericCharSet().Has(str) : true; }
-    bool OnlyWhitespace() const { return (str.size()) ? WhitespaceCharSet().Has(str) : true; }
+    [[nodiscard]] bool OnlyLower() const { return (str.size()) ? LowerCharSet().Has(str) : true; }
+    [[nodiscard]] bool OnlyUpper() const { return (str.size()) ? UpperCharSet().Has(str) : true; }
+    [[nodiscard]] bool OnlyDigits() const { return (str.size()) ? DigitCharSet().Has(str) : true; }
+    [[nodiscard]] bool OnlyAlphanumeric() const
+      { return (str.size()) ? AlphanumericCharSet().Has(str) : true; }
+    [[nodiscard]] bool OnlyWhitespace() const
+      { return (str.size()) ? WhitespaceCharSet().Has(str) : true; }
 
-    bool HasOneOf(const std::string & char_set) const {
+    [[nodiscard]] bool HasOneOf(const std::string & char_set) const {
       for (char c : str) if (is_one_of(c, char_set)) return true;
       return false;
     }
-    bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
-    bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
-    bool HasUpper() const { return UpperCharSet().HasAny(str); }
-    bool HasLower() const { return LowerCharSet().HasAny(str); }
-    bool HasLetter() const { return LetterCharSet().HasAny(str); }
-    bool HasDigit() const { return DigitCharSet().HasAny(str); }
-    bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(str); }
+    [[nodiscard]] bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
+    [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
+    [[nodiscard]] bool HasUpper() const { return UpperCharSet().HasAny(str); }
+    [[nodiscard]] bool HasLower() const { return LowerCharSet().HasAny(str); }
+    [[nodiscard]] bool HasLetter() const { return LetterCharSet().HasAny(str); }
+    [[nodiscard]] bool HasDigit() const { return DigitCharSet().HasAny(str); }
+    [[nodiscard]] bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(str); }
 
-    bool HasCharAt(char c, size_t pos) const { return (pos < str.size()) && (str[pos] == c); }
-    bool HasOneOfAt(const std::string & opts, size_t pos) const {
-      return (pos < str.size()) && is_one_of(str[pos], opts);
-    }
-    bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(str, pos); }
-    bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(str, pos); }
+    [[nodiscard]] bool HasCharAt(char c, size_t pos) const
+      { return (pos < str.size()) && (str[pos] == c); }
+    [[nodiscard]] bool HasOneOfAt(const std::string & opts, size_t pos) const
+      { return (pos < str.size()) && is_one_of(str[pos], opts); }
+    [[nodiscard]] bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(str, pos); }
+    [[nodiscard]] bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(str, pos); }
 
 
     // ------ Removals and Extractions ------
@@ -448,13 +416,12 @@ namespace emp {
 
     // Find any instances of ${X} and replace with dictionary lookup of X.
     template <typename MAP_T>
-    [[nodiscard]] emp::String &
-    ReplaceVars(const MAP_T & var_map, emp::String symbol="$",
-                bool skip_quotes=false, bool skip_parens=false);
+    emp::String & ReplaceVars(const MAP_T & var_map, emp::String symbol="$",
+                              bool skip_quotes=false, bool skip_parens=false);
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
-    [[nodiscard]] String & ReplaceMacro(std::string start_str, std::string end_str, FUN_T && fun, bool skip_quotes=true);
+    String & ReplaceMacro(std::string start_str, std::string end_str, FUN_T && fun, bool skip_quotes=true);
 
 
     // ------ Searching ------
@@ -602,31 +569,31 @@ namespace emp {
 
     // ------ Other Operators ------
 
-    template <typename T> String operator+(T && in) const
+    template <typename T> [[nodiscard]] String operator+(T && in) const
       { return String(str + std::forward<T>(in), mode); }
-    bool operator==(const emp::String & in) const { return str == in.str; }
-    bool operator==(const std::string & in) const { return str == in; }
-    bool operator==(const char * in) const { return str == in; }
+    [[nodiscard]] bool operator==(const emp::String & in) const { return str == in.str; }
+    [[nodiscard]] bool operator==(const std::string & in) const { return str == in; }
+    [[nodiscard]] bool operator==(const char * in) const { return str == in; }
 
-    bool operator!=(const emp::String & in) const { return str != in.str; }
-    bool operator!=(const std::string & in) const { return str != in; }
-    bool operator!=(const char * in) const { return str != in; }
+    [[nodiscard]] bool operator!=(const emp::String & in) const { return str != in.str; }
+    [[nodiscard]] bool operator!=(const std::string & in) const { return str != in; }
+    [[nodiscard]] bool operator!=(const char * in) const { return str != in; }
 
-    bool operator<(const emp::String & in) const { return str < in.str; }
-    bool operator<(const std::string & in) const { return str < in; }
-    bool operator<(const char * in) const { return str < in; }
+    [[nodiscard]] bool operator<(const emp::String & in) const { return str < in.str; }
+    [[nodiscard]] bool operator<(const std::string & in) const { return str < in; }
+    [[nodiscard]] bool operator<(const char * in) const { return str < in; }
 
-    bool operator<=(const emp::String & in) const { return str <= in.str; }
-    bool operator<=(const std::string & in) const { return str <= in; }
-    bool operator<=(const char * in) const { return str <= in; }
+    [[nodiscard]] bool operator<=(const emp::String & in) const { return str <= in.str; }
+    [[nodiscard]] bool operator<=(const std::string & in) const { return str <= in; }
+    [[nodiscard]] bool operator<=(const char * in) const { return str <= in; }
 
-    bool operator>(const emp::String & in) const { return str > in.str; }
-    bool operator>(const std::string & in) const { return str > in; }
-    bool operator>(const char * in) const { return str > in; }
+    [[nodiscard]] bool operator>(const emp::String & in) const { return str > in.str; }
+    [[nodiscard]] bool operator>(const std::string & in) const { return str > in; }
+    [[nodiscard]] bool operator>(const char * in) const { return str > in; }
 
-    bool operator>=(const emp::String & in) const { return str >= in.str; }
-    bool operator>=(const std::string & in) const { return str >= in; }
-    bool operator>=(const char * in) const { return str >= in; }
+    [[nodiscard]] bool operator>=(const emp::String & in) const { return str >= in.str; }
+    [[nodiscard]] bool operator>=(const std::string & in) const { return str >= in; }
+    [[nodiscard]] bool operator>=(const char * in) const { return str >= in; }
 
     // auto operator<=>(const emp::String & in) const = default;
     // auto operator<=>(const std::string & in) const { return str <=> in; }
@@ -635,23 +602,23 @@ namespace emp {
 
     // ------ SPECIAL CONFIGURATION ------
 
-    String & UseQuoteSingle(bool use=true) { return _ChangeMode(USE_QUOTE_SINGLE, use); }
-    String & UseQuoteDouble(bool use=true) { return _ChangeMode(USE_QUOTE_DOUBLE, use); }
-    String & UseQuoteBack  (bool use=true) { return _ChangeMode(USE_QUOTE_BACK,   use); }
-    String & UseParenRound (bool use=true) { return _ChangeMode(USE_PAREN_ROUND,  use); }
-    String & UseParenSquare(bool use=true) { return _ChangeMode(USE_PAREN_SQUARE, use); }
-    String & UseParenCurly (bool use=true) { return _ChangeMode(USE_PAREN_CURLY,  use); }
-    String & UseParenAngle (bool use=true) { return _ChangeMode(USE_PAREN_ANGLE,  use); }
-    String & UseParenQuotes(bool use=true) { return _ChangeMode(USE_PAREN_QUOTES, use); }
+    String & UseQuoteSingle(bool use=true) { mode.Set(USE_QUOTE_SINGLE, use); return *this; }
+    String & UseQuoteDouble(bool use=true) { mode.Set(USE_QUOTE_DOUBLE, use); return *this; }
+    String & UseQuoteBack  (bool use=true) { mode.Set(USE_QUOTE_BACK,   use); return *this; }
+    String & UseParenRound (bool use=true) { mode.Set(USE_PAREN_ROUND,  use); return *this; }
+    String & UseParenSquare(bool use=true) { mode.Set(USE_PAREN_SQUARE, use); return *this; }
+    String & UseParenCurly (bool use=true) { mode.Set(USE_PAREN_CURLY,  use); return *this; }
+    String & UseParenAngle (bool use=true) { mode.Set(USE_PAREN_ANGLE,  use); return *this; }
+    String & UseParenQuotes(bool use=true) { mode.Set(USE_PAREN_QUOTES, use); return *this; }
 
-    bool Get_UseQuoteSingle() const { return mode.val & USE_QUOTE_SINGLE; }
-    bool Get_UseQuoteDouble() const { return mode.val & USE_QUOTE_DOUBLE; }
-    bool Get_UseQuoteBack  () const { return mode.val & USE_QUOTE_BACK; }
-    bool Get_UseParenRound () const { return mode.val & USE_PAREN_ROUND; }
-    bool Get_UseParenSquare() const { return mode.val & USE_PAREN_SQUARE; }
-    bool Get_UseParenCurly () const { return mode.val & USE_PAREN_CURLY; }
-    bool Get_UseParenAngle () const { return mode.val & USE_PAREN_ANGLE; }
-    bool Get_UseParenQuotes() const { return mode.val & USE_PAREN_QUOTES; }
+    [[nodiscard]] bool Get_UseQuoteSingle() const { return mode.val & USE_QUOTE_SINGLE; }
+    [[nodiscard]] bool Get_UseQuoteDouble() const { return mode.val & USE_QUOTE_DOUBLE; }
+    [[nodiscard]] bool Get_UseQuoteBack  () const { return mode.val & USE_QUOTE_BACK; }
+    [[nodiscard]] bool Get_UseParenRound () const { return mode.val & USE_PAREN_ROUND; }
+    [[nodiscard]] bool Get_UseParenSquare() const { return mode.val & USE_PAREN_SQUARE; }
+    [[nodiscard]] bool Get_UseParenCurly () const { return mode.val & USE_PAREN_CURLY; }
+    [[nodiscard]] bool Get_UseParenAngle () const { return mode.val & USE_PAREN_ANGLE; }
+    [[nodiscard]] bool Get_UseParenQuotes() const { return mode.val & USE_PAREN_QUOTES; }
 
 
     //  ------ FORMATTING ------
@@ -735,6 +702,44 @@ namespace emp {
   };
 
 
+  ////////////////////////////////////////////////////////////////////////////
+  //
+  //    FUNCTION DEFINITIONS
+  //
+  ////////////////////////////////////////////////////////////////////////////
+
+
+  inline bool String::IsQuote(char c) const {
+    switch (c) {
+      case '\'': return mode.val & USE_QUOTE_SINGLE;
+      case '"': return mode.val & USE_QUOTE_DOUBLE;
+      case '`': return mode.val & USE_QUOTE_BACK;
+    }
+    return false;
+  }
+
+  inline bool String::IsParen(char c) const {
+    switch (c) {
+      case '(': return mode.val & USE_PAREN_ROUND;
+      case '[': return mode.val & USE_PAREN_SQUARE;
+      case '{': return mode.val & USE_PAREN_CURLY;
+      case '<': return mode.val & USE_PAREN_ANGLE;
+      case '`': return mode.val & USE_PAREN_QUOTES;
+    }
+    return false;
+  }
+
+  inline char String::GetMatch(char c) {
+    switch (c) {
+      case '`': return '\'';
+      case '(': return ')';
+      case '[': return ']';
+      case '{': return '}';
+      case '<': return '>';
+    }
+    return '\0';
+  }
+  
   /// Determine if this string represents a proper number.
   bool String::IsNumber() const {
     if (!str.size()) return false;           // If string is empty, not a number!
