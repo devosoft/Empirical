@@ -51,16 +51,14 @@ namespace emp {
 
   class String;
 
-  // Some stand-alone functions.
-  template <typename... Ts>
-  [[nodiscard]] emp::String MakeString(Ts... args);
+  // Some stand-alone functions to generate String objects.
+  template <typename... Ts> [[nodiscard]] emp::String MakeString(Ts... args);
   [[nodiscard]] emp::String MakeEscaped(char c);
   [[nodiscard]] emp::String MakeEscaped(const emp::String & in);
   [[nodiscard]] emp::String MakeWebSafe(const emp::String & in);
   [[nodiscard]] emp::String MakeLiteral(char value);
   [[nodiscard]] emp::String MakeLiteral(char value);
-  template <typename T>
-  [[nodiscard]] emp::String MakeLiteral(const T & value);
+  template <typename T> [[nodiscard]] emp::String MakeLiteral(const T & value);
   [[nodiscard]] emp::String MakeUpper(const emp::String & in);
   [[nodiscard]] emp::String MakeLower(const emp::String & in);
   [[nodiscard]] emp::String MakeTitleCase(emp::String in);
@@ -74,6 +72,7 @@ namespace emp {
   [[nodiscard]] emp::String Join(const CONTAINER_T & container, std::string join_str="",
                                  std::string open="", std::string close="");
 
+  // ToString specialization for emp::String
   const emp::String & ToString(const emp::String & in) { return in; }
 
   class String {
@@ -81,25 +80,15 @@ namespace emp {
     std::string str;   // The main string that we are manipulating.
 
     enum Mask {
-      USE_QUOTE_SINGLE =  1,
-      USE_QUOTE_DOUBLE =  2,
-      USE_QUOTE_BACK   =  4,
-      USE_PAREN_ROUND  =  8,    // Parentheses
-      USE_PAREN_SQUARE = 0x10,  // Brackets
-      USE_PAREN_CURLY  = 0x20,  // Braces
-      USE_PAREN_ANGLE  = 0x40,  // Chevrons
-      USE_PAREN_QUOTES = 0x80   // Forward/back single quote
+      USE_QUOTE_SINGLE=   1, USE_QUOTE_DOUBLE=   2, USE_QUOTE_BACK =   4, USE_PAREN_ROUND  =  8,
+      USE_PAREN_SQUARE=0x10, USE_PAREN_CURLY =0x20, USE_PAREN_ANGLE=0x40, USE_PAREN_QUOTES = 0x80
     };
 
     struct Mode {
       uint8_t val = USE_QUOTE_SINGLE + USE_QUOTE_DOUBLE +
                     USE_PAREN_ROUND + USE_PAREN_SQUARE + USE_PAREN_CURLY;
-
       void Set(Mask mask, bool use) { if (use) val |= mask; else val &= ~mask; }
     } mode;
-
-    // ------ HELPER FUNCTIONS ------
-
 
     // Convert objects into a streamable type using _Convert(obj)
     template <typename T> static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
@@ -284,33 +273,23 @@ namespace emp {
     /// Explain what string is NOT formatted as a literal string.
     [[nodiscard]] std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
 
-    /// Determine a string is composed only of a set of characters (represented as a string)
-    [[nodiscard]] bool IsComposedOf(const std::string & char_set) const {
-      for (char x : str) if (!is_one_of(x, char_set)) return false;
-      return true;
-    }
+    /// Is string composed only of a set of characters (can be provided as a string)
+    [[nodiscard]] bool IsComposedOf(emp::CharSet char_set) const { return char_set.Has(str); }
 
-    /// Determine if string is a valid number.
+    /// Is string a valid number (int, floating point, or scientific notation all valid)
     [[nodiscard]] bool IsNumber() const;
 
-    /// Determine if string is a valid identifier (in most languages).
-    [[nodiscard]] bool IsIdentifier() const {
-      // At least one character; cannot begin with digit, only letters, digits and `_`
-      return str.size() && !is_digit(str[0]) && IDCharSet().Has(str);
-    }
+    /// Is string a valid identifier? At least one char; cannot begin with digit, only letters, digits and `_`
+    [[nodiscard]] bool IsIdentifier() const
+      { return str.size() && !is_digit(str[0]) && IDCharSet().Has(str); }
 
-    [[nodiscard]] bool OnlyLower() const { return (str.size()) ? LowerCharSet().Has(str) : true; }
-    [[nodiscard]] bool OnlyUpper() const { return (str.size()) ? UpperCharSet().Has(str) : true; }
-    [[nodiscard]] bool OnlyDigits() const { return (str.size()) ? DigitCharSet().Has(str) : true; }
-    [[nodiscard]] bool OnlyAlphanumeric() const
-      { return (str.size()) ? AlphanumericCharSet().Has(str) : true; }
-    [[nodiscard]] bool OnlyWhitespace() const
-      { return (str.size()) ? WhitespaceCharSet().Has(str) : true; }
+    [[nodiscard]] bool OnlyLower() const { return LowerCharSet().Has(str); }
+    [[nodiscard]] bool OnlyUpper() const { return UpperCharSet().Has(str); }
+    [[nodiscard]] bool OnlyDigits() const { return DigitCharSet().Has(str); }
+    [[nodiscard]] bool OnlyAlphanumeric() const { return AlphanumericCharSet().Has(str); }
+    [[nodiscard]] bool OnlyWhitespace() const { return WhitespaceCharSet().Has(str); }
 
-    [[nodiscard]] bool HasOneOf(const std::string & char_set) const {
-      for (char c : str) if (is_one_of(c, char_set)) return true;
-      return false;
-    }
+    [[nodiscard]] bool HasOneOf(emp::CharSet char_set) const { return char_set.HasAny(str); }
     [[nodiscard]] bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
     [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
     [[nodiscard]] bool HasUpper() const { return UpperCharSet().HasAny(str); }
@@ -321,8 +300,7 @@ namespace emp {
 
     [[nodiscard]] bool HasCharAt(char c, size_t pos) const
       { return (pos < str.size()) && (str[pos] == c); }
-    [[nodiscard]] bool HasOneOfAt(const std::string & opts, size_t pos) const
-      { return (pos < str.size()) && is_one_of(str[pos], opts); }
+    [[nodiscard]] bool HasOneOfAt(emp::CharSet opts, size_t pos) const { return opts.HasAt(str, pos); }
     [[nodiscard]] bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(str, pos); }
     [[nodiscard]] bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(str, pos); }
 
@@ -361,29 +339,22 @@ namespace emp {
     String & insert(size_t index, const String & in) { str.insert(index, in.str); return *this; }
     String & insert(size_t index, const String & in, size_t pos, size_t count=npos)
       { str.insert(index, in.str, pos, count); return *this; }
-    template <typename... ARG_Ts> String & insert(size_t index, ARG_Ts &&... args) {
-      str.insert(index, std::forward<ARG_Ts>(args)...);
-      return *this;
-    }
-    template <typename... ARG_Ts> String & insert(const_iterator pos, ARG_Ts &&... args) {
-      return str.insert(pos, std::forward<ARG_Ts>(args)...);
-    }
+    template <typename... ARG_Ts> String & insert(size_t index, ARG_Ts &&... args)
+      { str.insert(index, std::forward<ARG_Ts>(args)...); return *this; }
+    template <typename... ARG_Ts> String & insert(const_iterator pos, ARG_Ts &&... args)
+      { return str.insert(pos, std::forward<ARG_Ts>(args)...); }
 
     void push_back(char c) { str.push_back(c); }
 
     String & append(const String & in) { str.append(in.str); return *this; }
     String & append(const String & in, size_t pos, size_t count)
       { str.append(in.str, pos, count); return *this; }
-    template <typename... ARG_Ts> String & append(ARG_Ts &&... args) {
-      str.append(std::forward<ARG_Ts>(args)...);
-      return *this;
-    }
+    template <typename... ARG_Ts> String & append(ARG_Ts &&... args)
+      { str.append(std::forward<ARG_Ts>(args)...); return *this; }
 
     String & operator+=(const String & in) { str += in.str; return *this; }
-    template <typename ARG_T> String & operator+=(ARG_T && arg) {
-      str += std::forward<ARG_T>(arg);
-      return *this;
-    }
+    template <typename ARG_T> String & operator+=(ARG_T && arg)
+      { str += std::forward<ARG_T>(arg); return *this; }
 
     String & PadFront(char padding, size_t target_size) {
       if (str.size() < target_size) str = std::string(target_size - size(), padding) + str;
@@ -685,13 +656,13 @@ namespace emp {
       { str = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
 
     template <typename CONTAINER_T>
-    String & AppendJoin(const CONTAINER_T & container, std::string delim,
-                        std::string open, std::string close)
+    String & AppendJoin(const CONTAINER_T & container, std::string delim="",
+                        std::string open="", std::string close="")
       { str += Join(container, delim, open, close); return *this;}
     template <typename CONTAINER_T>
-    String & SetJoin(const CONTAINER_T & container, std::string delim,
-                     std::string open, std::string close)
-      { str = Join(container); return *this;}
+    String & SetJoin(const CONTAINER_T & container, std::string delim="",
+                     std::string open="", std::string close="")
+      { str = Join(container, delim, open, close); return *this;}
 
     template <typename... Ts>
     static emp::String Make(Ts... args) {
@@ -978,16 +949,15 @@ namespace emp {
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
   emp::String String::Pop(CharSet chars, bool skip_quotes, bool skip_parens) {
-    size_t pop_end = chars.FindIn(str);
-    size_t delim_end = pop_end+1;
-    while(delim_end < str.size() && chars.Has(str[delim_end])) ++delim_end;
-    return PopFixed(pop_end, delim_end - pop_end);
+    size_t pop_end = Find(chars, 0, skip_quotes, skip_parens);
+    size_t delim_size = pop_end == npos ? 0 : 1;
+    return PopFixed(pop_end, delim_size);
   }
 
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
   emp::String String::PopTo(std::string delim, bool skip_quotes, bool skip_parens) {
-    return PopFixed(Find(delim, skip_quotes, skip_parens), delim.size());
+    return PopFixed(Find(delim, 0, skip_quotes, skip_parens), delim.size());
   }
 
   emp::String String::PopWord() { return Pop(); }
@@ -1136,7 +1106,7 @@ namespace emp {
   emp::String & String::ReplaceVars(const MAP_T & var_map, emp::String symbol, bool skip_quotes, bool skip_parens) {
     for (size_t pos = Find(symbol, 0, skip_quotes, skip_parens);
          pos < size()-3;             // Need room for a replacement tag.
-         pos = Find(symbol, pos+symbol.size())) {
+         pos = Find(symbol, pos+symbol.size(), skip_quotes, skip_parens)) {
       const size_t symbol_end = pos+symbol.size();
       if (HasAt(symbol, symbol_end)) {   // Compress two symbols (e.g., "$$") into one (e.g. "$")
         str.erase(pos,symbol.size());
