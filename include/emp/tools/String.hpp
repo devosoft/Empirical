@@ -325,6 +325,7 @@ namespace emp {
 
     bool PopIf(char c);
     bool PopIf(String in);
+    emp::String PopAll();
     emp::String PopFixed(std::size_t end_pos, size_t delim_size=0);
     emp::String Pop(CharSet chars=" \n\t\r", bool skip_quotes=false, bool skip_parens=false);
     emp::String PopTo(std::string delim, bool skip_quotes=false, bool skip_parens=false);
@@ -930,19 +931,21 @@ namespace emp {
     return false;
   }
 
+  /// Pop the entire string.
+  emp::String String::PopAll() {
+    std::string out;
+    out.swap(str);
+    return out;
+  }
+
   /// Pop a segment from the beginning of a string as another string, shortening original.
   emp::String String::PopFixed(std::size_t end_pos, size_t delim_size)
   {
-    if (!end_pos) return ""; // Not popping anything!
+    if (!end_pos) return "";                    // Not popping anything!
+    if (end_pos >= str.size()) return PopAll(); // Popping everything!
 
-    if (end_pos >= str.size()) {  // Pop whole string.
-      std::string out = str;
-      str.resize(0);
-      return out;
-    }
-
-    emp::String out = str.substr(0, end_pos); // Copy up to the deliminator for ouput
-    str.erase(0, end_pos + delim_size);       // Delete output string AND delimiter
+    emp::String out = str.substr(0, end_pos);   // Copy up to the deliminator for ouput
+    str.erase(0, end_pos + delim_size);         // Delete output string AND delimiter
     return out;
   }
 
