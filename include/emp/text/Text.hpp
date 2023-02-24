@@ -4,7 +4,7 @@
  *  @date 2022.
  *
  *  @file Text.hpp
- *  @brief Functionality similar to std::string, but tracks text formatting for easy conversion.
+ *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
  *  @note Status: ALPHA
  * 
  *  Text should be functionally interchangable with string, but can easily convert to
@@ -27,7 +27,7 @@
  *     "no_break"
  *     "color:NAME"
  *     "font:NAME"
- *     "size:NAME" (in point size)
+ *     "size:POINT_SIZE"
  * 
  *    STRUCTURAL :
  *     "heading:1" through "heading:6" different levels of headings.
@@ -43,7 +43,6 @@
 #define EMP_TOOLS_TEXT_HPP_INCLUDE
 
 #include <map>
-#include <string>
 #include <type_traits>
 #include <unordered_map>
 
@@ -51,7 +50,7 @@
 #include "../base/notify.hpp"
 #include "../bits/BitVector.hpp"
 #include "../datastructs/map_utils.hpp"
-#include "../tools/string_utils.hpp"
+#include "../tools/String.hpp"
 
 namespace emp {
 
@@ -87,9 +86,9 @@ namespace emp {
 
     text_t & GetText() const { return text_ref; }
     size_t GetPos() const { return pos; }
-    emp::vector<std::string> GetStyles() const;
+    emp::vector<String> GetStyles() const;
 
-    bool HasStyle(const std::string & style) const;
+    bool HasStyle(const String & style) const;
     bool IsBold()        { return HasStyle("bold"); }
     bool IsCode()        { return HasStyle("code"); }
     bool IsItalic()      { return HasStyle("italic"); }
@@ -98,7 +97,7 @@ namespace emp {
     bool IsSuperscript() { return HasStyle("superscript"); }
     bool IsUnderline()   { return HasStyle("underline"); }
 
-    TextCharRef & SetStyle(const std::string & style);
+    TextCharRef & SetStyle(const String & style);
     TextCharRef & Bold()        { return SetStyle("bold"); }
     TextCharRef & Code()        { return SetStyle("code"); }
     TextCharRef & Italic()      { return SetStyle("italic"); }
@@ -111,19 +110,19 @@ namespace emp {
   // A base class for any special encodings that should work with Text objects.
   class TextEncoding_Base {
   protected:
-    Text & text;      // The emp::Text this encoding is associated with.
-    std::string name; // The name by which this encoding should be called.
+    Text & text;  // The emp::Text this encoding is associated with.
+    String name;  // The name by which this encoding should be called.
   public:
-    TextEncoding_Base(Text & _text, const std::string _name) : text(_text), name(_name) { }
+    TextEncoding_Base(Text & _text, const String _name) : text(_text), name(_name) { }
     virtual ~TextEncoding_Base() { }
 
-    const std::string & GetName() const { return name; }
+    const String & GetName() const { return name; }
 
     // By default, append text assuming that there is no special formatting in it.
-    virtual void Append(std::string in);
+    virtual void Append(const String & in);
 
     // By default, return text and ignore all formatting.
-    virtual std::string ToString() const;
+    virtual String Encode() const;
 
     // Make a copy of this TextEncoding, including proper derived class.
     virtual emp::Ptr<TextEncoding_Base> Clone(Text & _text) const {
@@ -134,26 +133,26 @@ namespace emp {
   class Text {
   protected:
     // Current state of the text, minus all formatting.
-    std::string text = "";
+    String text = "";
 
     // Styles are basic formatting for strings, including "bold", "italic", "underline",
     // "strike", "superscript", "subscript", and "code".  Fonts are described as font name,
     // a colon, and the font size.  E.g.: "TimesNewRoman:12"
-    std::unordered_map<std::string, BitVector> style_map;
+    std::unordered_map<String, BitVector> style_map;
 
     // A set of encodings that this Text object can handle.
-    std::map< std::string, emp::Ptr<TextEncoding_Base> > encodings;
+    std::map< String, emp::Ptr<TextEncoding_Base> > encodings;
     emp::Ptr<TextEncoding_Base> encoding_ptr = nullptr;
 
     // Internal function to remove unused styles.
     void Cleanup() {
       // Scan for styles that are no longer unused.
-      emp::vector<std::string> unused_styles;
+      emp::vector<String> unused_styles;
       for (auto & [tag, bits] : style_map) {
         if (bits.None()) unused_styles.push_back(tag);
       }
       // If any styles need to be deleted, do so.
-      for (const std::string & style : unused_styles) {
+      for (const String & style : unused_styles) {
         style_map.erase(style);
       }
     }
@@ -169,7 +168,7 @@ namespace emp {
       }
       encoding_ptr = encodings[in.encoding_ptr->GetName()];
     }
-    Text(const std::string & in) {      
+    Text(const String & in) {      
       encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
       encoding_ptr = encodings["txt"];
       Append(in);
@@ -188,9 +187,9 @@ namespace emp {
       return *this;
     }
 
-    Text & operator=(const std::string & in) {
+    Text & operator=(const String & in) {
       style_map.clear(); // Clear out existing content.
-      text.resize(0);
+      text.clear();
       Append(in);
       return *this;
     };
@@ -199,31 +198,31 @@ namespace emp {
     size_t GetSize() const { return text.size(); }
 
     // Return the current text as an unformatted string.
-    const std::string & GetText() const { return text; }
+    const String & GetText() const { return text; }
 
     // Return the current bit pattern for a specified style.
-    const BitVector & GetStyle(const std::string & style) const {
+    const BitVector & GetStyle(const String & style) const {
       return emp::GetConstRef(style_map, style);
     }
 
     /// Automatic conversion back to an unformatted string
-    operator const std::string &() const { return GetText(); }
+    operator const String &() const { return GetText(); }
 
     /// @brief Test if this Text object is aware of how to use a specified encoding.
     /// @param name Name of the encoding to test for.
     /// @return A true/false indicate if the named encoding is known.
-    bool HasEncoding(const std::string & name) const {
+    bool HasEncoding(const String & name) const {
       return emp::Has(encodings, name);
     }
 
     /// @brief Get the name of the current encoding being applied.
     /// @return Name of the current encoding.
-    const std::string & GetEncoding() const { return encoding_ptr->GetName(); }
+    const String & GetEncoding() const { return encoding_ptr->GetName(); }
 
     /// @brief Change the current encoding being used to another known encoding type.
     /// @param name Name of the encoding type to be used.
     /// @return A reference to this object itself.
-    Text & SetEncoding(const std::string & name) {
+    Text & SetEncoding(const String & name) {
       if (!emp::Has(encodings, name)) {
         notify::Error("Trying to set unknown encoding '", name, "'; No change made.");
       } else {
@@ -241,7 +240,7 @@ namespace emp {
     /// @param name Name to be used for this new encoding.
     /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
     template <typename ENCODING_T, typename... EXTRA_Ts>
-    void AddEncoding(const std::string & name, EXTRA_Ts &&... args) {
+    void AddEncoding(const String & name, EXTRA_Ts &&... args) {
       if (emp::Has(encodings, name)) {
         notify::Warning("Adding encoding '", name,
                         "'; Replacing existing encoding with the same name.");
@@ -253,31 +252,32 @@ namespace emp {
 
 
     /// Append potentially-formatted text through the current encoding.
-    Text & Append(const std::string & in) {
+    Text & Append(const String & in) {
       encoding_ptr->Append(in);
       return *this;
     }
 
     // Append raw text; assume no formatting.
-    Text & Append_Raw(const std::string & in) {
-      text += in;
+    template <typename T>
+    Text & Append_Raw(T && in) {
+      text += std::forward<T>(in);
       return *this;
     }
 
     // Stream operator.
     template <typename T>
     Text & operator<<(T && in) {
-      return Append(emp::to_string(in));
+      return Append(emp::MakeString(in));
     }
 
     template <typename T>
     Text & operator+=(T && in) {
-      return Append(emp::to_string(in));
+      return Append(emp::MakeString(in));
     }
 
     /// @brief Convert text to a string using the current encoding.
     /// @return The resulting string.
-    std::string ToString() const { return encoding_ptr->ToString(); }
+    String Encode() const { return encoding_ptr->Encode(); }
 
     void Resize(size_t new_size) {
       text.resize(new_size);
@@ -306,9 +306,9 @@ namespace emp {
       text[pos] = in.AsChar();
 
       // Match style of in.
-      emp::vector<std::string> styles = in.GetStyles();
+      emp::vector<String> styles = in.GetStyles();
       Clear(pos);  // Clear old style.
-      for (const std::string & style : styles) {
+      for (const String & style : styles) {
         SetStyle(style, pos);
       }
       return *this;
@@ -357,7 +357,7 @@ namespace emp {
     // ---------------- FORMATTING functions ----------------
 
     // Simple formatting: set all characters to a specified format.
-    Text & SetStyle(std::string style) {
+    Text & SetStyle(String style) {
       BitVector & cur_bits = style_map[style];
       cur_bits.Resize(text.size());
       cur_bits.SetAll();
@@ -372,7 +372,7 @@ namespace emp {
     Text & Underline() { return SetStyle("underline"); }
 
     // Simple formatting: set a single character to a specified format.
-    Text & SetStyle(std::string style, size_t pos) {
+    Text & SetStyle(String style, size_t pos) {
       BitVector & cur_bits = style_map[style];
       if (cur_bits.size() <= pos) cur_bits.Resize(pos+1);
       cur_bits.Set(pos);
@@ -387,7 +387,7 @@ namespace emp {
     Text & Underline(size_t pos) { return SetStyle("underline", pos); }
 
     // Simple formatting: set a range of characters to a specified format.
-    Text & SetStyle(std::string style, size_t start, size_t end) {
+    Text & SetStyle(String style, size_t start, size_t end) {
       BitVector & cur_bits = style_map[style];
       emp_assert(start <= end && end <= text.size());
       if (cur_bits.size() <= end) cur_bits.Resize(end+1);
@@ -404,9 +404,9 @@ namespace emp {
 
     /// Return the set of active styles in this text.
     /// @param pos optional position to specify only styles used at position.
-    emp::vector<std::string> GetStyles(size_t pos=MAX_SIZE_T) {
-      emp::vector<std::string> styles;
-      emp::vector<std::string> to_clear;
+    emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) {
+      emp::vector<String> styles;
+      emp::vector<String> to_clear;
       for (const auto & [name, bits] : style_map) {
         if (bits.None()) to_clear.push_back(name);
         else if (pos == MAX_SIZE_T || bits.Has(pos)) {
@@ -419,7 +419,7 @@ namespace emp {
     }
 
     // Test if a particular style is present anywhere in the text
-    bool HasStyle(const std::string & style) const {
+    bool HasStyle(const String & style) const {
       if (!emp::Has(style_map, style)) return false;
       return GetConstRef(style_map, style).Any();
     }
@@ -432,7 +432,7 @@ namespace emp {
     bool HasUnderline() const { return HasStyle("underline"); }
 
     // Test if a particular style is present at a given position.
-    bool HasStyle(const std::string & style, size_t pos) const {
+    bool HasStyle(const String & style, size_t pos) const {
       auto it = style_map.find(style);
       if (it == style_map.end()) return false; // Style is nowhere.
       return it->second.Has(pos);
@@ -457,7 +457,7 @@ namespace emp {
     }
 
     // Clear specific formatting across all text
-    Text & Clear(const std::string & style) {
+    Text & Clear(const String & style) {
       style_map.erase(style);
       return *this;
     }
@@ -470,7 +470,7 @@ namespace emp {
     Text & ClearUnderline() { return Clear("underline"); }
     
     // Simple formatting: clear a single character from a specified format.
-    Text & Clear(const std::string & style, size_t pos) {
+    Text & Clear(const String & style, size_t pos) {
       auto it = style_map.find(style);
       if (it != style_map.end() && it->second.size() > pos) {  // If style bit exists...
         it->second.Clear(pos);
@@ -486,7 +486,7 @@ namespace emp {
     Text & ClearUnderline(size_t pos) { return Clear("underline", pos); }
 
     // Simple formatting: clear a range of characters from a specified format.
-    Text & Clear(const std::string & style, size_t start, size_t end) {
+    Text & Clear(const String & style, size_t start, size_t end) {
       auto it = style_map.find(style);
       if (it != style_map.end() && it->second.size() > start) {  // If style bits exist...
         if (end > it->second.size()) end = it->second.size();   // ...don't pass text end
@@ -542,17 +542,17 @@ namespace emp {
   }
 
   template <bool IS_CONST>
-  emp::vector<std::string> TextCharRef<IS_CONST>::GetStyles() const {
+  emp::vector<String> TextCharRef<IS_CONST>::GetStyles() const {
     return text_ref.GetStyles(pos);
   }
 
   template <bool IS_CONST>
-  bool TextCharRef<IS_CONST>::HasStyle(const std::string & style) const {
+  bool TextCharRef<IS_CONST>::HasStyle(const String & style) const {
     return text_ref.HasStyle(style, pos);
   }
 
   template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::SetStyle(const std::string & style) {
+  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::SetStyle(const String & style) {
     text_ref.HasStyle(style, pos);
     return *this;
   }
@@ -561,12 +561,12 @@ namespace emp {
   // ------- TextEncoding_Base --------
 
     // By default, append text assuming that there is no special formatting in it.
-  void TextEncoding_Base::Append(std::string in) {
+  void TextEncoding_Base::Append(const String & in) {
     text.Append_Raw(in);
   }
 
   // By default, return text and ignore all formatting.
-  std::string TextEncoding_Base::ToString() const {
+  String TextEncoding_Base::Encode() const {
     return text;
   }
 
