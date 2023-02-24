@@ -38,6 +38,7 @@
  *    size_t find_quote_match(std::string_view in_string, size_t start_pos=0)
  *    size_t find_paren_match(std::string_view in_string, size_t start_pos=0,
  *                            bool skip_quotes=true)
+ *    size_t find_match(std::string_view in_string, size_t start_pos=0, bool skip_quotes=true)
  *    size_t find(std::string_view in_string, std::string target, size_t start_pos,
  *                bool skip_quotes=false, bool skip_parens=false, bool skip_braces=false,
  *                bool skip_brackets=false)
