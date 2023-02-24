@@ -160,6 +160,10 @@ namespace emp {
     String & operator=(std::initializer_list<char> _in) { str = _in; return *this; }
     String & operator=( std::nullptr_t ) = delete;
 
+    template <typename... ARG_Ts>
+    String & assign(ARG_Ts &&... args) {
+      return str.assign(std::forward<ARG_Ts>(args)...);
+    }
 
     // ------ Converters ------
 
@@ -1545,7 +1549,19 @@ namespace emp {
     return out.str();
   }
 
-
 }
+
+// ---------------------- Implementations to work with standard library ----------------------
+
+namespace std {
+  /// Hash function to allow String to be used with unordered maps and sets (must be in std).
+  template <>
+  struct hash<emp::String> {
+    std::size_t operator()(const emp::String & str) const {
+      return std::hash<std::string>()(str.cpp_str()); 
+    }
+  };
+}
+
 
 #endif // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
