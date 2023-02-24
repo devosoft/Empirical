@@ -19,7 +19,7 @@
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../compiler/Lexer.hpp"
-#include "../datastruct/map_utils.hpp"
+#include "../datastructs/map_utils.hpp"
 
 #include "Text.hpp"
 
@@ -174,7 +174,6 @@ namespace emp {
     }
 
 
-
     // Append a string that has already been otherwise processed.
     void Append_RawText(const String & in) {
       size_t start = text.size();
@@ -251,7 +250,7 @@ namespace emp {
 
     // Add new text into this object, translated as needed
     void Append(const String & in) override {
-
+      SetupLexer();
       auto tokens = lexer.Tokenize(in.cpp_str());
       String raw_text;  // Place to accumulate raw text.
       for (const auto & token : tokens) {        
@@ -270,7 +269,7 @@ namespace emp {
       emp::vector<String> style_list = text.GetStyles();
       for (String style_desc : style_list) {
         String style_name = style_desc.Pop(":");
-        const Style & style = style_set[ emp::Find(name_to_style_id, style_name, "") ];
+        const Style & style = style_set[ emp::Find(name_to_style_id, style_name, 0) ];
         AddOutputTags(tag_map, style_name, style.make_open_tag(style_desc), style.make_close_tag(style_desc));
       }
 
@@ -280,9 +279,13 @@ namespace emp {
       for (auto [tag_pos, tags] : tag_map) {
         while (output_pos < tag_pos) {
           char next_char = text.GetChar(output_pos);
+          // If there is a tag associated with this character AND the associated type (if any) use tag.
           if (char_tags[next_char]) {
             const Tag & tag = tag_set[char_tags[next_char]];
-            out_string += tag.out_encoding;
+            const Style & style = style_set[tag.replace_style_id];
+            if (!tag.replace_style_id || text.HasStyle(style.name, output_pos)) {
+              out_string += tag.out_encoding; // Char match AND style match (or no style), so print tag
+            } else out_string += next_char;   // Wrong style for tag; just print character.
           } else {
             out_string += next_char;
           }
