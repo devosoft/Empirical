@@ -33,10 +33,10 @@ namespace emp {
     //  2: End an ongoing style, or
     //  3: Be replaced with text (which may have a style associated)
     struct Tag {
-      String name;     // Unique name for this tag; default encoding symbol.
-      String pattern;  // Regular expression to identify tag.
-      size_t id;       // Unique ID for this tag (index in tag_map)
-      int token_id;    // ID of this tag in the lexer.
+      String name;                  // Unique name for this tag; default encoding symbol.
+      String pattern;               // Regular expression to identify tag.
+      size_t id = emp::MAX_SIZE_T;  // Unique ID for this tag (index in tag_map)
+      int token_id = -1;            // ID of this tag in the lexer.
 
       // -- Starting a Style --
       // Tags can indicate that they start a style.  Since the style may have arguments, the
@@ -51,7 +51,7 @@ namespace emp {
       // end a whole set of styles in an encoding.  A "</b>" in HTML, on the other hand might only
       // end the bold style.  A "}" in latex would end the most recent style started.
       std::set<size_t> end_style_ids;  // Set of styles this tag can end.
-      bool multi_end = false;         // Can this tag end more than one style at a time?
+      bool multi_end = false;          // Can this tag end more than one style at a time?
 
       // -- Text Replacement --
       // Some tags might be used to produce a special character in the output text. For example,
@@ -64,7 +64,7 @@ namespace emp {
 
     struct Style {
       String name;                      // Unique name for this style.
-      size_t id;                        // Unique ID number (vector position) for this style.
+      size_t id = emp::MAX_SIZE_T;      // Unique ID number (vector position) for this style.
       std::set<size_t> open_tag_ids;    // Which tags start this style?
       std::set<size_t> close_tag_ids;   // Which tags close this style?
       std::set<size_t> replace_tag_ids; // Which replacements use this style?
@@ -91,7 +91,7 @@ namespace emp {
     };
     std::vector<StyleEntry> active_styles; // Styles to use on appended text; done as stack.
 
-    Tag & GetTag(const String & tag_name, const String & tag_pattern) {
+    size_t GetTagID(const String & tag_name, const String & tag_pattern) {
       // If we don't have this tag yet, build it.
       if (!emp::Has(pattern_to_tag_id, tag_pattern)) {
         Tag new_tag;
@@ -100,15 +100,14 @@ namespace emp {
         new_tag.id = tag_set.size();
         tag_set.push_back(new_tag);
         pattern_to_tag_id[tag_pattern] = new_tag.id;
-        return tag_set.back();
+        return tag_set.back().id;
       }
-      size_t tag_id = pattern_to_tag_id[tag_pattern];
-      return tag_set[tag_id];
+      return pattern_to_tag_id[tag_pattern];
     }
 
     // If no pattern is provided in get, use the tag name to generate it.
-    Tag & GetTag(const String & tag_name) {
-      return GetTag(tag_name, emp::MakeLiteral(tag_name));
+    size_t GetTagID(const String & tag_name) {
+      return GetTagID(tag_name, emp::MakeLiteral(tag_name));
     }
 
     // Get a style entry.  If it doesn't exist yet, add it.
@@ -131,8 +130,10 @@ namespace emp {
     //   SetupStyleTags("bold, "{\bf", "}")       for Latex
     void SetupStyleTags(String style_name, String open_name, String close_name) {
       Style & style = GetStyle(style_name);
-      Tag & open_tag = GetTag(open_name);
-      Tag & close_tag = GetTag(close_name);
+      size_t open_id = GetTagID(open_name);
+      size_t close_id = GetTagID(close_name);
+      Tag & open_tag = tag_set[open_id];
+      Tag & close_tag = tag_set[close_id];
 
       style.open_tag_ids.insert(open_tag.id);
       style.close_tag_ids.insert(close_tag.id);
@@ -149,7 +150,7 @@ namespace emp {
     //   SetupReplaceTag("&nbsp;", '<')               for less-than in HTML -or-
     //   SetupReplaceTag("&nbsp;", ' ', "no_break")   for non-breaking spaces.
     void SetupReplaceTag(String tag_name, char replace_char, String style_name="") {
-      Tag & replace_tag = GetTag(tag_name);
+      Tag & replace_tag = tag_set[ GetTagID(tag_name) ];
       replace_tag.replace_char = replace_char;
       replace_tag.out_encoding = tag_name;
 
@@ -186,7 +187,7 @@ namespace emp {
 
     void Append_Tag(int token_id, const String & lexeme) {
       Tag & tag = tag_set[ token_to_tag_id[token_id] ];
- 
+
       // If this token might END a style, search for options.
       if (tag.end_style_ids.size()) {
         // Scan through active styles from most recent to figure out which one to remove.
@@ -300,6 +301,17 @@ namespace emp {
       }
 
       return out_string;
+    }
+
+    void PrintDebug(std::ostream & os = std::cout) const override {
+      os << "Tags:\n";
+      for (const auto & tag : tag_set) {
+        os << "  '" << tag.name << "' id=" << tag.id << "; start_style=" << tag.start_style_id << "\n";
+      }
+      os << "Styles:\n";
+      for (const auto & style : style_set) {
+        os << "  '" << style.name << "' id=" << style.id << "; open_count=" << style.open_tag_ids.size() << "\n";
+      }
     }
 
   protected:
