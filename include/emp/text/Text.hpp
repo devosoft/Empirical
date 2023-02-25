@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
+ *  @date 2022-23.
  *
  *  @file Text.hpp
  *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
@@ -128,6 +128,8 @@ namespace emp {
     virtual emp::Ptr<TextEncoding_Base> Clone(Text & _text) const {
       return emp::NewPtr<TextEncoding_Base>(_text, name);
     }
+
+    virtual void PrintDebug(std::ostream &) const { };
   };
 
   class Text {
@@ -502,6 +504,19 @@ namespace emp {
     Text & ClearSuperscript(size_t start, size_t end) { return Clear("superscript", start, end); }
     Text & ClearUnderline(size_t start, size_t end) { return Clear("underline", start, end); }
 
+    String ToDebugString() {
+      String out;
+      out += MakeString("Text: ", text, "\n");
+      for (auto [name, bits] : style_map) {
+        out += MakeString("      ", bits, " : ", name, "\n");
+      }
+      return out;
+    }
+
+    void PrintDebug(std::ostream & os = std::cout) {
+      os << ToDebugString();
+      encoding_ptr->PrintDebug(os);
+    }
   };
 
   // Set this character equal (with same inputs) as in parameter; don't change reference.
