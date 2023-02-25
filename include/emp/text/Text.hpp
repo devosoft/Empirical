@@ -189,12 +189,22 @@ namespace emp {
       return *this;
     }
 
-    Text & operator=(const String & in) {
+    Text & operator=(Text && in) {
+      std::swap(text, in.text);
+      std::swap(style_map, in.style_map);
+      std::swap(encodings, in.encodings);
+      std::swap(encoding_ptr, in.encoding_ptr);
+      return *this;
+    }
+
+    template <typename T>
+    Text & operator=(const T & in) {
       style_map.clear(); // Clear out existing content.
       text.clear();
       Append(in);
       return *this;
     };
+
 
     // GetSize() returns the number of characters IGNORING all formatting.
     size_t GetSize() const { return text.size(); }
@@ -234,7 +244,8 @@ namespace emp {
     }
 
     /// Add a new encoding to this Text object.  Newly added encodings automatically become
-    /// active (use SetEncoding() to choose a different encoding option).
+    /// active (use SetEncoding() to choose a different encoding option).  Will give a warning
+    /// if encoding already exists, and then replace it.
 
     /// @brief Add an encoding to this Text object; new encodings automatically become active.
     /// @tparam ENCODING_T The type of the new encoding to use
@@ -243,19 +254,42 @@ namespace emp {
     /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
     template <typename ENCODING_T, typename... EXTRA_Ts>
     void AddEncoding(const String & name, EXTRA_Ts &&... args) {
-      if (emp::Has(encodings, name)) {
-        notify::Warning("Adding encoding '", name,
-                        "'; Replacing existing encoding with the same name.");
-        encodings[name].Delete();
-      }
+      emp_assert(!HasEncoding(name), name, "Trying to add a TextEncoding that already exists. To replace, use RemoveEncoding() first.");
       encoding_ptr = NewPtr<ENCODING_T>(*this, name, std::forward<EXTRA_Ts>(args)...);
       encodings[name] = encoding_ptr;
+    }
+
+    void RemoveEncoding(const String & name) {
+      emp_assert(HasEncoding(name), name, "Trying to remove a TextEncoding that does not exist.");
+      if (HasEncoding(name)) {
+        if (encoding_ptr == encodings[name]) encoding_ptr = nullptr;
+        encodings[name].Delete();
+        encodings.erase(name);
+      }
+    }
+
+    /// ActivateEncoding will add an encoding if (and only if) it doesn't exist already.
+    template <typename ENCODING_T, typename... EXTRA_Ts>
+    void ActivateEncoding(const String & name, EXTRA_Ts &&... args) {
+      if (!HasEncoding(name)) {
+        AddEncoding<ENCODING_T>(name, std::forward<EXTRA_Ts>(args)...);
+      } else {
+        SetEncoding(name);
+      }
     }
 
 
     /// Append potentially-formatted text through the current encoding.
     Text & Append(const String & in) {
       encoding_ptr->Append(in);
+      return *this;
+    }
+
+    /// Specify the encoding of a value being appended.
+    template <typename ENCODING_T, typename IN_T>
+    Text & AppendAs(const String & encode_name, IN_T && in) {
+      ActivateEncoding<ENCODING_T>(encode_name);
+      Append(std::forward<IN_T>(in));
       return *this;
     }
 
