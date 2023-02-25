@@ -232,6 +232,27 @@ namespace emp {
       text_token = lexer.AddToken("plain text", ".");
     }
 
+    void _EncodeChar(String & out_string, const size_t char_pos) const {
+      const char c = text.GetChar(char_pos);
+      // If there is a tag associated with this character AND the associated type (if any) use tag.
+      if (char_tags[c]) {
+        const Tag & tag = tag_set[char_tags[c]];
+        const Style & style = style_set[tag.replace_style_id];
+        if (!tag.replace_style_id || text.HasStyle(style.name, char_pos)) {
+          out_string += tag.out_encoding; // Char match AND style match (or no style), so print tag
+        } else out_string += c;   // Wrong style for tag; just print character.
+      } else {
+        out_string += c;
+      }
+    }
+
+    void _EncodeTo(String & out_string, size_t & start, const size_t end) const {
+      while (start < end) {
+        _EncodeChar(out_string, start);
+        ++start;
+      }
+    }
+
   public:
     TextEncoding(Text & _text, const String & _name="html")
       : TextEncoding_Base(_text, _name) {
@@ -271,6 +292,7 @@ namespace emp {
       for (String style_desc : style_list) {
         String style_name = style_desc.Pop(":");
         const Style & style = style_set[ emp::Find(name_to_style_id, style_name, 0) ];
+        if (!style.make_open_tag) continue; // If no tags are available, assume a replacement style.
         AddOutputTags(tag_map, style_name, style.make_open_tag(style_desc), style.make_close_tag(style_desc));
       }
 
@@ -278,27 +300,10 @@ namespace emp {
       String out_string;
       size_t output_pos = 0;
       for (auto [tag_pos, tags] : tag_map) {
-        while (output_pos < tag_pos) {
-          char next_char = text.GetChar(output_pos);
-          // If there is a tag associated with this character AND the associated type (if any) use tag.
-          if (char_tags[next_char]) {
-            const Tag & tag = tag_set[char_tags[next_char]];
-            const Style & style = style_set[tag.replace_style_id];
-            if (!tag.replace_style_id || text.HasStyle(style.name, output_pos)) {
-              out_string += tag.out_encoding; // Char match AND style match (or no style), so print tag
-            } else out_string += next_char;   // Wrong style for tag; just print character.
-          } else {
-            out_string += next_char;
-          }
-          ++output_pos;
-        }
+        _EncodeTo(out_string, output_pos, tag_pos);
         out_string += tags;
       }
-
-      // Add any final text after the last tag.
-      if (output_pos < text.size()) {
-        out_string += text.GetText().substr(output_pos, text.size()-output_pos);
-      }
+      _EncodeTo(out_string, output_pos, text.size()); // Add final text after the last tag.
 
       return out_string;
     }
