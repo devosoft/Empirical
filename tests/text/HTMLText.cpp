@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022
+ *  @date 2022-23.
  *
  *  @file Text.cpp
  */
@@ -79,4 +79,8 @@ TEST_CASE("Testing HTMLText", "[text]") {
   emp::HTMLText html_text(plain_text);
   REQUIRE(html_text.GetText() == "The <b> and </b> here should not be converted.");
   REQUIRE(html_text.Encode() == "The &lt;b&gt; and &lt;/b&gt; here should <b>not</b> be converted.");
+
+  emp::HTMLText text2 = "Now let's try something with a non-breaking&nbsp;space.";
+  REQUIRE(text2.GetText() == "Now let's try something with a non-breaking space.");
+  REQUIRE(text2.Encode() == "Now let's try something with a non-breaking&nbsp;space.");
 }
