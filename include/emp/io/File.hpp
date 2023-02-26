@@ -126,27 +126,28 @@ namespace emp {
     }
 
     /// Test if two files are identical.
-    bool operator==(const File & in) { return lines == in.lines; }
+    bool operator==(const File & in) const { return lines == in.lines; }
 
     /// Test if two files are different.
-    bool operator!=(const File & in) { return lines != in.lines; }
+    bool operator!=(const File & in) const { return lines != in.lines; }
 
-    /// Load a line from an input stream into a file.
-    File & LoadLine(std::istream & input) {
+    /// Load a line from an input stream into a file; return whether load was successful.
+    bool LoadLine(std::istream & input) {
       lines.emplace_back("");
-      std::getline(input, lines.back());
+      if (!std::getline(input, lines.back())) {
+        lines.pop_back();
+        return false;
+      }
 
       // If the input file is DOS formatted, make sure to remove the \r at the end of each line.
       if (lines.back().size() && lines.back().back() == '\r') lines.back().pop_back();
 
-      return *this;
+      return true;
     }
 
     /// Load an entire input stream into a file.
     File & Load(std::istream & input) {
-      while (!input.eof()) {
-        LoadLine(input);
-      }
+      while (LoadLine(input));
       return *this;
     }
 
@@ -202,7 +203,7 @@ namespace emp {
       for (std::string & cur_line : lines) {
         // If the function returns a string, assume that's what we're supposed to use.
         // Otherwise assume that the string gets modified.
-        using return_t = FunInfo<FUN_T>::return_t;
+        using return_t = typename FunInfo<FUN_T>::return_t;
         if constexpr ( std::is_same<return_t, std::string>() ) {
           cur_line = fun(cur_line);
         } else {
