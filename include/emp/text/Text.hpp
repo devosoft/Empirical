@@ -39,8 +39,8 @@
  *     "image:URL" (include in the specified image)
  */
 
-#ifndef EMP_TOOLS_TEXT_HPP_INCLUDE
-#define EMP_TOOLS_TEXT_HPP_INCLUDE
+#ifndef EMP_TEXT_TEXT_HPP_INCLUDE
+#define EMP_TEXT_TEXT_HPP_INCLUDE
 
 #include <map>
 #include <type_traits>
@@ -623,4 +623,4 @@ namespace emp {
 }
 
 
-#endif
+#endif // #ifndef EMP_TEXT_TEXT_HPP_INCLUDE

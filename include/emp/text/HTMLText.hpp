@@ -8,8 +8,8 @@
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
-#define EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
+#ifndef EMP_TEXT_HTMLTEXT_HPP_INCLUDE
+#define EMP_TEXT_HTMLTEXT_HPP_INCLUDE
 
 #include "HTMLEncoding.hpp"
 #include "Text.hpp"
@@ -39,4 +39,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TEXT_HTMLTEXT_HPP_INCLUDE

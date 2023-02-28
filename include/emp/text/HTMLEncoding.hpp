@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef EMP_TOOLS_HTML_ENCODING_HPP_INCLUDE
-#define EMP_TOOLS_HTML_ENCODING_HPP_INCLUDE
+#ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE
+#define EMP_TEXT_HTMLENCODING_HPP_INCLUDE
 
 #include <set>
 #include <string>
@@ -58,4 +58,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE
