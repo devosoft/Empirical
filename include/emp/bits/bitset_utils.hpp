@@ -13,6 +13,7 @@
 
 #include <sstream>
 #include <string>
+#include <functional>
 
 #include "../base/Ptr.hpp"
 
