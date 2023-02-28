@@ -227,7 +227,7 @@ namespace emp {
       }
       Bits_Data_Mem_Dynamic(const Bits_Data_Mem_Dynamic & in) : bits(nullptr) { Copy(in); }
       Bits_Data_Mem_Dynamic(Bits_Data_Mem_Dynamic && in) : bits(nullptr) { Move(std::move(in)); }
-      ~Bits_Data_Mem_Dynamic() { bits.DeleteArray(); }
+      ~Bits_Data_Mem_Dynamic() { if (bits) {bits.DeleteArray();} }
 
       Bits_Data_Mem_Dynamic & operator=(const Bits_Data_Mem_Dynamic & in) { Copy(in); return *this; }
       Bits_Data_Mem_Dynamic & operator=(Bits_Data_Mem_Dynamic && in) { Move(std::move(in)); return *this; }
