@@ -11,8 +11,8 @@
 #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "../base/Ptr.hpp"
 

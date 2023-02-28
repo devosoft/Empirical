@@ -19,8 +19,8 @@
 #include "../base/assert.hpp"
 #include "../compiler/Lexer.hpp"
 
-#include "Text.hpp"
 #include "TextEncoding.hpp"
+#include "Text.hpp"
 
 namespace emp {
 

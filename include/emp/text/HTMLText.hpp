@@ -11,8 +11,8 @@
 #ifndef EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
 #define EMP_TOOLS_HTML_TEXT_HPP_INCLUDE
 
-#include "Text.hpp"
 #include "HTMLEncoding.hpp"
+#include "Text.hpp"
 
 namespace emp {
 

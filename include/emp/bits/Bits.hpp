@@ -66,9 +66,9 @@
 #include "../math/Random.hpp"
 #include "../meta/type_traits.hpp"
 
+#include "Bits_Data.hpp"
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
-#include "Bits_Data.hpp"
 
 
 namespace emp {

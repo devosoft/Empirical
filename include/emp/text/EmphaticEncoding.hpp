@@ -16,8 +16,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../base/assert.hpp"
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/notify.hpp"
 #include "../compiler/Lexer.hpp"
 #include "../tools/string_utils.hpp"
