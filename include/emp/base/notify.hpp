@@ -334,7 +334,7 @@ namespace notify {
   /// Send out a notification of an ERROR.
   template <typename... Ts>
   static bool Error(Ts... args) {
-    bool success = Notify(Type::ERROR, std::forward<Ts>(args)...);    
+    bool success = Notify(Type::ERROR, std::forward<Ts>(args)...);
     if (!success) {
 #ifdef NDEBUG
       Exit(1);

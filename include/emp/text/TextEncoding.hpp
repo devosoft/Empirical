@@ -6,7 +6,7 @@
  *  @file TextEncoding.hpp
  *  @brief Plugs into emp::Text with the specification of a given encoding.
  *  @note Status: ALPHA
- * 
+ *
  */
 
 #ifndef EMP_TEXT_TEXTENCODING_HPP_INCLUDE
@@ -119,7 +119,7 @@ namespace emp {
         new_style.id = style_set.size();
         style_set.push_back(new_style);
         name_to_style_id[style_name] = new_style.id;
-        return style_set.back();        
+        return style_set.back();
       }
       size_t style_id = name_to_style_id[style_name];
       return style_set[style_id];
@@ -275,7 +275,7 @@ namespace emp {
       SetupLexer();
       auto tokens = lexer.Tokenize(in.cpp_str());
       String raw_text;  // Place to accumulate raw text.
-      for (const auto & token : tokens) {        
+      for (const auto & token : tokens) {
         if (token.id == text_token) raw_text += token.lexeme;
         else {
           if (raw_text.size()) Append_RawText(raw_text.PopAll());

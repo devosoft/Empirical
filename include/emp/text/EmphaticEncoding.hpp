@@ -6,7 +6,7 @@
  *  @file EmphaticEncoding.hpp
  *  @brief Plugs into emp::Text, setting up inputs and output to be Emphatic encoded.
  *  @note Status: ALPHA
- * 
+ *
  */
 
 #ifndef EMP_TEXT_EMPHATICENCODING_HPP_INCLUDE

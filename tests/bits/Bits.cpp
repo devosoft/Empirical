@@ -39,7 +39,7 @@
 
 template<typename T>
 void TestBasics(const T & bits, size_t _size, std::string vals="") {
-  
+
   CHECK( bits.GetSize() == _size);
   if (vals == "") { return; } // No values to check.
   else if (vals == "Zeros") { CHECK(bits.CountOnes() == 0); }

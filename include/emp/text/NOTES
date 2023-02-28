@@ -8,13 +8,13 @@ Supported text formats:
 
 + Custom Empirical markup language, Emphatic
 
- * 
+ *
  *  Internal format is .emp, which uses just a backquote (`) as a special character.  It
  *  is otherwise heavily inspired from markdown, but makes special characters less tricky
  *  to use in your writing.
- *  
+ *
  *  The following tags toggle a formatting style.
- * 
+ *
  *  `*Bold!`*
  *  ``Code``
  *  `/Italic`/
@@ -22,11 +22,11 @@ Supported text formats:
  *  `^Superscript`^
  *  `.Subscript`.
  *  `~Strikethrough`~
- * 
+ *
  *  The following tags grab the rest of the line they are on.  These should generally
  *  be the first non-whitespace on a line, but if they are not a newline will be assumed
  *  to be before them.
- * 
+ *
  *  `# Heading level 1
  *  `## Heading level 2
  *  `### etc.
@@ -35,26 +35,26 @@ Supported text formats:
  *  `+ Numbered list entry
  *  `| Continues the previous line for other tags in this group.
  *  `% Comment that will be removed.
- * 
+ *
  *  `[Include a link name here](http://and.its.url.here)
  *  `<http://just.a.url.here>
  *  `![Link/to/image/here.jpg](with an optional URL link)
- * 
+ *
  *  Now for the crazy.  We can embed code as needed.
- * 
+ *
  *  `{variable = value || other_code}
  *  `$var_value_printed_here$
- * 
+ *
  *  Anything with four spaces at the beginning will be treated like indented code.
  *  Add a `= at the beginning of a line if you don't want special formatting.
- *   
+ *
  *  A single or double backtick indicates that everything in between is going to be inline
  *  code.  A single backtick must be followed by an alphanumeric character or whitespace,
  *  but a double backtick can be followed by anything.
- * 
+ *
  *  `This would be rendered as CODE`
  *  ``{This would also be code}``
- * 
+ *
  *  Escape characters do work.
  *  \\ is a regular backslash ('\')
  *  \` is a backtick in the actual string ('`')

@@ -1003,7 +1003,7 @@ namespace emp {
 
   [[nodiscard]] inline std::string
   string_get_to(const std::string & in_string, const std::string & delim=" ", size_t start_pos=0) {
-    return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));    
+    return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
   /// Remove a prefix of a string, up to the first whitespace, and return it.
@@ -1309,7 +1309,7 @@ namespace emp {
         msg << "No assignment found in slice_assign(): " << in_string;
         abort();
         emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
-                               msg.str(), setting);                               
+                               msg.str(), setting);
       }
       result_map[var_name] = setting;
     }

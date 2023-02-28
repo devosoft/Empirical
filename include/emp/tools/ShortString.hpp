@@ -6,11 +6,11 @@
  *  @file ShortString.hpp
  *  @brief String substitute with a max of 31 characters and always in place.
  *  @note Status: ALPHA
- * 
+ *
  *  A fixed number of chars are reserved for the string; errors will trigger for longer attempts.
  *  The last allocated byte stores the number of unused positions in the string; this naturally
  *  becomes zero (the final character in a string) when all positions are used.
- * 
+ *
  */
 
 #ifndef EMP_TOOLS_SHORTSTRING_HPP_INCLUDE

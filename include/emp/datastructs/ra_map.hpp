@@ -6,7 +6,7 @@
  *  @file ra_map.hpp
  *  @brief This file defines a Random Access Map template.
  *  @note Status: ALPHA
- * 
+ *
  *  A random access map allows for simple traversal by index and a guarantee that a value at a
  *  given index will always be at that index unless any map element is deleted.  This allows
  *  storage of indices for maps with a fixed layout, resulting in easy access.
@@ -131,7 +131,7 @@ namespace emp {
       return true;
     }
 
-    
+
     size_t count(const KEY_T & key) const { return id_map.count(key); } /// Is value included? (0 or 1).
 
     /// Index into the ra_map by key.

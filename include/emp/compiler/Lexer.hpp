@@ -6,24 +6,24 @@
  *  @file Lexer.hpp
  *  @brief A general-purpose, fast lexer.
  *  @note Status: BETA
- * 
+ *
  *  Build a lexer that can convert input strings or streams into a series of provided tokens.
- * 
+ *
  *  Use AddToken(name, regex) to list out the relevant tokens.
  *   'name' is the unique name for this token.
  *   'regex' is the regular expression that describes this token.
  *  It will return a unique ID associated with this lexeme.
- * 
+ *
  *  IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
  *  should be skipped over.
- * 
+ *
  *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
- * 
+ *
  *  Tokens can be retrieved either one at a time with Process(string) or Process(stream),
  *  which will return the next (non-ignored) token, removing it from the input.
- * 
+ *
  *  Alternatively, an entire series of tokens can be processed with Tokenize().
- * 
+ *
  *  Finally, GetLexeme() can be used to retrieve the lexeme from the most recent token found.
  */
 
@@ -342,7 +342,7 @@ namespace emp {
     }
 
     /// Turn a vector of strings into a vector of tokens.
-    TokenStream Tokenize(const emp::vector<std::string> & str_v, 
+    TokenStream Tokenize(const emp::vector<std::string> & str_v,
                          const std::string & name="in_string vector") const
     {
       std::stringstream ss;

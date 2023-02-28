@@ -43,7 +43,7 @@ This directory contains a set of tools for managing more or less genetic data.
 * DataMapParser.hpp - A parser to take an equation based on variables in a DataLayout that
   will produce a lambda.  If a DataMap is passed into the lambda the equation will be
   calculated and the result returned.
-  
+
 * Trait.hpp - ?
 
 
@@ -55,7 +55,7 @@ DataRow - Same interface as DataMap; refers to associated DataFrame.
 
 DataTracker - Handles all of the functionality of DataNode, DataLog, etc., but more dynamic
   using lambdas to deal with values as needed.
-  
+
 
 ## To modify?
 

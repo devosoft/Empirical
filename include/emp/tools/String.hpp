@@ -233,10 +233,10 @@ namespace emp {
     [[nodiscard]] size_t capacity() const { return str.capacity(); }
     void reserve(size_t new_cap) { str.reserve(new_cap); }
     void shrink_to_fit() { str.shrink_to_fit(); }
-    
+
 
     // ------ Classification and Comparisons ------
-    
+
     [[nodiscard]] int compare(const String & in) { return str.compare(in.str); }
     template <typename... ARG_Ts> [[nodiscard]] int compare(ARG_Ts &&... args)
       { return str.compare(std::forward<ARG_Ts>(args)...); }
@@ -253,7 +253,7 @@ namespace emp {
     template <typename ARG_T> [[nodiscard]] bool contains( ARG_T && in ) const noexcept
       { return str.find(std::forward<ARG_T>(in)) != npos; }
 
-    [[nodiscard]] bool HasAt(const emp::String test, size_t pos) const 
+    [[nodiscard]] bool HasAt(const emp::String test, size_t pos) const
       { return (size() < test.size()+pos) && View(pos, test.size()) == test.str; }
     [[nodiscard]] bool HasPrefix(const emp::String & prefix) const { return starts_with(prefix); }
     [[nodiscard]] bool HasSuffix(const emp::String & suffix) const { return ends_with(suffix); }
@@ -472,33 +472,33 @@ namespace emp {
     [[nodiscard]] size_t FindAnyOf(T test1, Ts... tests) const;
     [[nodiscard]] size_t FindID(std::string target, size_t start, bool skip_quotes=true, bool skip_parens=false) const;
 
-    [[nodiscard]] size_t FindWhitespace(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindWhitespace(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(WhitespaceCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonWhitespace(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonWhitespace(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!WhitespaceCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindUpperChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindUpperChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(UpperCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonUpperChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonUpperChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!UpperCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindLowerChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindLowerChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(LowerCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonLowerChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonLowerChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!LowerCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindLetterChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindLetterChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(LetterCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonLetterChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonLetterChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!LetterCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindDigitChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindDigitChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(DigitCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonDigitChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonDigitChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!DigitCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindAlphanumericChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindAlphanumericChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(AlphanumericCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonAlphanumericChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonAlphanumericChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!AlphanumericCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindIDChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindIDChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(IDCharSet(), start, skip_q, skip_p); }
-    [[nodiscard]] size_t FindNonIDChar(size_t start=0, bool skip_q=false, bool skip_p=false) const 
+    [[nodiscard]] size_t FindNonIDChar(size_t start=0, bool skip_q=false, bool skip_p=false) const
       { return Find(!IDCharSet(), start, skip_q, skip_p); }
 
 
@@ -530,7 +530,7 @@ namespace emp {
       std::string delim=",",
       bool keep_quotes=true, bool keep_parens=true
     ) const;
-  
+
     void SliceAssign(
       std::map<emp::String,emp::String> & out_map,
       std::string delim=",", std::string assign_op="=",
@@ -574,7 +574,7 @@ namespace emp {
     // auto operator<=>(const emp::String & in) const = default;
     // auto operator<=>(const std::string & in) const { return str <=> in; }
     // auto operator<=>(const char * in) const { return str <=> in; }
-    
+
 
     // ------ SPECIAL CONFIGURATION ------
 
@@ -654,7 +654,7 @@ namespace emp {
       { str += MakeEnglishList(container); return *this;}
     template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
       { str = MakeEnglishList(container); return *this;}
-      
+
     template<typename... ARG_Ts> String & AppendFormatted(const std::string& format, ARG_Ts... args)
       { str += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
     template<typename... ARG_Ts> String & SetFormatted(const std::string& format, ARG_Ts... args)
@@ -715,7 +715,7 @@ namespace emp {
     }
     return '\0';
   }
-  
+
   /// Determine if this string represents a proper number.
   bool String::IsNumber() const {
     if (!str.size()) return false;           // If string is empty, not a number!
@@ -854,7 +854,7 @@ namespace emp {
     }
   }
 
-  // Find an whole identifier (same as find, but cannot have letter, digit or '_' before or after.) 
+  // Find an whole identifier (same as find, but cannot have letter, digit or '_' before or after.)
   size_t String::FindID(std::string target, size_t start,
                              bool skip_quotes, bool skip_parens) const
   {
@@ -1058,7 +1058,7 @@ namespace emp {
     ViewSlices(result, delim, keep_quotes, keep_parens);
     return result;
   }
-  
+
 
   /// @brief Slice a string and treat each section as an assignment; place results in provided map.
   /// @param delim delimiter to split on (default ',')
@@ -1085,7 +1085,7 @@ namespace emp {
         std::stringstream msg;
         msg << "No assignment found in slice_assign() for: " << var_name.str;
         emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
-                               msg.str(), var_name);                               
+                               msg.str(), var_name);
       }
       result_map[var_name] = setting;
     }
@@ -1323,7 +1323,7 @@ namespace emp {
 
     return emp::MakeString(c);
   }
-  
+
   emp::String MakeEscaped(const emp::String & in) {
     return emp::String(in, [](char c){ return MakeEscaped(c); });
   }
@@ -1558,7 +1558,7 @@ namespace std {
   template <>
   struct hash<emp::String> {
     std::size_t operator()(const emp::String & str) const {
-      return std::hash<std::string>()(str.cpp_str()); 
+      return std::hash<std::string>()(str.cpp_str());
     }
   };
 }

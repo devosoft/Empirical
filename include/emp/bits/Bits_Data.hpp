@@ -177,7 +177,7 @@ namespace emp {
       Bits_Data_Mem_Static_Base & operator=(Bits_Data_Mem_Static_Base &&) = default;
 
       // --- Helper functions --
-      
+
       [[nodiscard]] Ptr<field_t> FieldPtr() { return bits.data(); }
       [[nodiscard]] Ptr<const field_t> FieldPtr() const { return bits.data(); }
 
@@ -185,7 +185,7 @@ namespace emp {
         const size_t old_num_fields = BASE_T::NumFields();
         BASE_T::SetSize(new_size);
         if (preserve_data && BASE_T::NumEndBits()) {
-          bits[BASE_T::LastField()] &= BASE_T::EndMask();          
+          bits[BASE_T::LastField()] &= BASE_T::EndMask();
           for (size_t id = BASE_T::NumFields(); id < old_num_fields; ++id) bits[id] = 0;
         }
       }
@@ -202,7 +202,7 @@ namespace emp {
       }
 
     };
-    
+
     template <size_t CAPACITY, size_t DEFAULT_SIZE=0>
     using Bits_Data_Mem_Static =
       Bits_Data_Mem_Static_Base< Bits_Data_Size_Var<DEFAULT_SIZE>, CAPACITY >;
@@ -367,7 +367,7 @@ namespace emp {
         base_t::SetSize(new_size);
 
         if (preserve_data) {
-          // Clear any new (or previously unused) fields.            
+          // Clear any new (or previously unused) fields.
           for (size_t i = num_old_fields; i < num_new_fields; ++i) bits[i] = 0;
 
           // Clear out any extra end bits.

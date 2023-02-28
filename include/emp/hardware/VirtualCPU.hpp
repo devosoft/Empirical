@@ -322,7 +322,7 @@ namespace emp{
 
 
       //////// HEAD MANIPULATION
-      
+
       void ResetIP() { inst_ptr = 0; }   ///< Move instruction pointer to beginning of the genome.
       void ResetRH() { read_head = 0; }  ///< Move read head to beginning of the genome.
       void ResetWH() { write_head = 0; } ///< Move write head to beginning of the genome.

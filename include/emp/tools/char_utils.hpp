@@ -55,7 +55,7 @@ namespace emp {
     this_t & operator=(const this_t &) = default;
     this_t & operator=(char c) { Reset(); char_set[static_cast<size_t>(c)] = true; }
     this_t & operator=(const std::string & in_chars) {
-      for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;      
+      for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;
     }
 
     CharSetBase & Reset() { char_set.fill(0); }
