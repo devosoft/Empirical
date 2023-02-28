@@ -53,7 +53,7 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(query.find("TEST_CONST=91") != std::string::npos);
     REQUIRE(query.find("TEST_STRING_SPACE=abc%20def%20%20%20ghi") != std::string::npos);
     REQUIRE(query.find("TEST_STRING_QUOTE=%22Quote%22andonemore%22soit%27sodd") != std::string::npos);
-    REQUIRE(query.find("MUTATION_RATE=0.025") != std::string::npos);
+    REQUIRE(query.find("MUTATION_RATE=0.099") != std::string::npos);
 
   }
 
