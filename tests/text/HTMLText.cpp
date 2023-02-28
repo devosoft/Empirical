@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2022-23.
  *
- *  @file Text.cpp
+ *  @file HTMLText.cpp
  */
 
 #include <iostream>
