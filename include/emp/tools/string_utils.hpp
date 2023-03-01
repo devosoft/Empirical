@@ -1952,6 +1952,10 @@ namespace emp {
       out_count++;        // Keep count of segments.
     }
 
+    if (start_pos < in_string.size()-1) {
+      out_set[out_count-1] += in_string.substr(start_pos - 1, in_string.size()-1);
+    }
+    
     out_set.resize(out_count); // Shrink out_set if needed.
   }
 

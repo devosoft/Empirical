@@ -68,16 +68,16 @@ TEST_CASE("Test keyname_utils", "[tools]")
     {"_", "key/with/no+=value/file+ext=.pdf"}
   }));
 
-  // name = "multiple/=s/file=biz=blah+ext=.pdf";
-  // auto res = emp::keyname::unpack(name);
-  // std::cout << res["file"] << std::endl;
-  // std::cout << res["ext"] << std::endl;
-  // std::cout << res["_"] << std::endl;
-  // REQUIRE( res == (emp::keyname::unpack_t{
-  //   {"file", "biz=blah"},
-  //   {"ext", ".pdf"},
-  //   {"_", "multiple/=s/file=biz=blah+ext=.pdf"}
-  // }));
+  name = "multiple/=s/file=biz=blah+ext=.pdf";
+  auto res = emp::keyname::unpack(name);
+  std::cout << res["file"] << std::endl;
+  std::cout << res["ext"] << std::endl;
+  std::cout << res["_"] << std::endl;
+  REQUIRE( res == (emp::keyname::unpack_t{
+    {"file", "biz=blah"},
+    {"ext", ".pdf"},
+    {"_", "multiple/=s/file=biz=blah+ext=.pdf"}
+  }));
 
   // test pack
   // reorderings
