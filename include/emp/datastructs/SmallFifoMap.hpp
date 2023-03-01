@@ -27,8 +27,8 @@ class SmallFifoMap {
   using value_type = std::pair<Key, Value>;
 
 private:
-
-  using storage_t = emp::array<value_type, N>;
+  // TODO: Turn this back into an emp::array once iterator is fixed
+  using storage_t = std::array<value_type, N>;
 
   storage_t storage;
 
