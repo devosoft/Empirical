@@ -1589,7 +1589,7 @@ TEST_CASE("VirtualCPU_String_Methods", "[Hardware]") {
     CHECK(string_vec[1] == "[0] 0");
     CHECK(string_vec[2] == "[1] 1");
     CHECK(string_vec[3] == "[2] 2");
-    CHECK(string_vec[4] == "[3] 3\n"); // last line gets to keep its newline character
+    CHECK(string_vec[4] == "[3] 3"); // last line gets to keep its newline character
   /*
     [X] GetWorkingGenomeString returns a string representation of the working genome
     [X] GetGenomeString returns a string representation of the (non-working) genome
