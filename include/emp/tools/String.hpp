@@ -95,7 +95,8 @@ namespace emp {
     template <typename T> static auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
     template <typename T> static const T & _Convert(const T & in, ...) { return in; }
 
-    void _AssertPos(size_t pos) const { emp_assert(pos < str.size(), pos, str.size()); }
+    void _AssertPos([[maybe_unused]] size_t pos) const
+      { emp_assert(pos < str.size(), pos, str.size()); }
 
   public:
     using value_type = std::string::value_type;
@@ -605,9 +606,9 @@ namespace emp {
     // Most also have stand-along Make* versions where the core implementation is found.
 
     template <typename... Ts>
-    String & Append(Ts... args) { str += MakeString(std::forward<Ts>(args)...); return *this; }
+    String & Append(Ts... args) { return str += MakeString(std::forward<Ts>(args)...);}
     template <typename... Ts>
-    String & Set(Ts... args) { str = MakeString(std::forward<Ts>(args)...); return *this; }
+    String & Set(Ts... args) { return str = MakeString(std::forward<Ts>(args)...); }
     template <typename T>
     T As() { std::stringstream ss; ss << str; T out; ss >> out; return out; }
 
@@ -656,9 +657,9 @@ namespace emp {
       { str = MakeEnglishList(container); return *this;}
 
     template<typename... ARG_Ts> String & AppendFormatted(const std::string& format, ARG_Ts... args)
-      { str += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+      { return str += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
     template<typename... ARG_Ts> String & SetFormatted(const std::string& format, ARG_Ts... args)
-      { str = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+      { return str = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
 
     template <typename CONTAINER_T>
     String & AppendJoin(const CONTAINER_T & container, std::string delim="",

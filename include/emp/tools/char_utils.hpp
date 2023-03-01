@@ -234,6 +234,7 @@ namespace emp {
   inline bool is_digit(char test_char)        { return DigitCharSet().Has(test_char); }
   inline bool is_alphanumeric(char test_char) { return AlphanumericCharSet().Has(test_char); }
   inline bool is_idchar(char test_char)       { return IDCharSet().Has(test_char); }
+  inline bool is_punctuation(char test_char)   { return PunctuationCharSet().Has(test_char); }
   inline bool is_escape_code(char test_char)   { return EscapeCodeCharSet().Has(test_char); }
 
   /// Determine if a character is in a set of characters (represented as a string)

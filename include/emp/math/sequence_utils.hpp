@@ -8,7 +8,7 @@
  *  @note Status: BETA
  *
  *  A set of functions for analyzing sequences, including distance metrics (Hamming and
- *  Edit/Levenschtein) and alignment.
+ *  Edit/Levenshtein) and alignment.
  */
 
 #ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
@@ -49,7 +49,7 @@ namespace emp {
       }
       else if (range_slices.size() > 3) {
         emp::notify::Exception("math::sequence_utils::ToSequence::invalid_range",
-                               "emp::ToSequnce() provided with range with too many ':'",
+                               "emp::ToSequence() provided with range with too many ':'",
                                slice);
       }
 
@@ -144,7 +144,7 @@ namespace emp {
     emp::vector<size_t> prev_row(size1);  // The previous row we calculated
     emp::vector<emp::vector<char> > edit_info(size2, emp::vector<char>(size1));
 
-    // Initialize the previous row to record the differece from nothing.
+    // Initialize the previous row to record the difference from nothing.
     for (size_t i = 0; i < size1; i++) {
       prev_row[i] = i + 1;
       edit_info[0][i] = 'i';
