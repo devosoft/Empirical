@@ -54,7 +54,8 @@ namespace emp {
     using genome_t = Genome<Instruction, inst_lib_t>;
 
     using stack_t = emp::vector<double>;
-    using arg_set_t = emp::array<arg_t, INST_ARGS>;
+    // TODO: Turn this back into emp::array when possible
+    using arg_set_t = std::array<arg_t, INST_ARGS>;
 
     struct Instruction : public inst_lib_t::InstructionBase {
       size_t id;
