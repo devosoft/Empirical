@@ -238,8 +238,8 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
     auto data = file.ToData<std::string>();
 
-    // buffer should be empty, so must only have a header and an EOF
-    REQUIRE(data.size() == 2);
+    // buffer should be empty, so must only have a header
+    REQUIRE(data.size() == 1);
 
     bin.Match(1);
     bin.MatchRaw(1);
@@ -249,7 +249,7 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
     data = file.ToData<std::string>();
 
-    REQUIRE(data.size() == 2);
+    REQUIRE(data.size() == 1);
     REQUIRE(bin.log.GetLogBuffer().empty());
   }
   // test whether we write the correct number of lines with a single matchbin
@@ -280,12 +280,11 @@ TEST_CASE("Test MatchBin", "[matchbin]")
     auto data = file.ToData<std::string>();
 
     /*
-     there have to be four lines written to our file:
+     there have to be three lines written to our file:
       * 1 header
       * 2 matches
-      * 1 EOF newline
     */
-    REQUIRE(data.size() == 4);
+    REQUIRE(data.size() == 3);
     REQUIRE(bin.log.GetLogBuffer().empty());
   }
   // test whether multiple matchbins can write to the same ostream concurrently
@@ -329,9 +328,9 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 
     auto data = file.ToData<std::string>();
 
-    // data must be equal to 3n + 1, given that for each matchbin we have
-    // 1 header and 2 matches, and at the end an EOF newline
-    REQUIRE(data.size() == 3 * n + 1);
+    // data must be equal to 3n, given that for each matchbin we have
+    // 1 header and 2 matches
+    REQUIRE(data.size() == 3 * n);
   }
     // test logging misses
   {
