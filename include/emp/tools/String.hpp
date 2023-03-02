@@ -131,8 +131,6 @@ namespace emp {
     String() = default;
     String(const std::string & _str) : std::string(_str) { }
     String(std::string && _str) : std::string(std::move(_str)) { }
-    // String(const std::string & _str, Mode _mode) : std::string(_str), mode(_mode) { }
-    // String(std::string && _str, Mode _mode) : std::string(std::move(_str)), mode(_mode) { }
     String(const char * _str) : std::string(_str) { }
     String(size_t count, char _str) : std::string(count, _str) { }
     String(std::initializer_list<char> _str) : std::string(_str) { }
@@ -179,6 +177,10 @@ namespace emp {
       { std::string::assign(std::forward<ARG_Ts>(args)...); return *this; }
 
     // ------ Element Access ------
+    // Inherited functions from std::string:
+    //  char * data();
+    //  const char * data() const;
+    //  const char * c_str() const;
 
     [[nodiscard]] char & operator[](size_t pos)
       { _AssertPos(pos); return std::string::operator[](pos); }
@@ -188,9 +190,6 @@ namespace emp {
     [[nodiscard]] char front() const { _AssertPos(0); return std::string::front(); }
     [[nodiscard]] char & back() { _AssertPos(0); return std::string::back(); }
     [[nodiscard]] char back() const { _AssertPos(0); return std::string::back(); }
-    // [[nodiscard]] char * data() { return std::string::data(); }
-    // [[nodiscard]] const char * data() const { return std::string::data(); }
-    // [[nodiscard]] const char * c_str() const { return std::string::c_str(); }
     [[nodiscard]] char & Get(size_t pos) { return operator[](pos); }
     [[nodiscard]] char Get(size_t pos) const { return operator[](pos); }
 
@@ -214,50 +213,38 @@ namespace emp {
 
 
     // ------ Iterators ------
-
-    // iterator begin() { return std::string::begin(); }
-    // const_iterator begin() const { return std::string::begin(); }
-    // const_iterator cbegin() const { return std::string::cbegin(); }
-    // reverse_iterator rbegin() { return std::string::rbegin(); }
-    // const_reverse_iterator rbegin() const { return std::string::rbegin(); }
-    // const_reverse_iterator crbegin() const { return std::string::crbegin(); }
-
-    // iterator end() { return std::string::end(); }
-    // const_iterator end() const { return std::string::end(); }
-    // const_iterator cend() const { return std::string::cend(); }
-    // reverse_iterator rend() { return std::string::rend(); }
-    // const_reverse_iterator rend() const { return std::string::rend(); }
-    // const_reverse_iterator crend() const { return std::string::crend(); }
+    // Inherited functions from std::string:
+    //  iterator begin();
+    //  const_iterator begin() const;
+    //  const_iterator cbegin() const;
+    //  reverse_iterator rbegin();
+    //  const_reverse_iterator rbegin() const;
+    //  const_reverse_iterator crbegin() const;
+    //  iterator end();
+    //  const_iterator end() const;
+    //  const_iterator cend() const;
+    //  reverse_iterator rend();
+    //  const_reverse_iterator rend() const;
+    //  const_reverse_iterator crend() const;
 
 
     // ------ Capacity ------
-
-    // [[nodiscard]] bool empty() const { return std::string::empty(); }
-    // [[nodiscard]] size_t size() const { return size(); }
-    // [[nodiscard]] size_t length() const { return std::string::length(); }
-    // [[nodiscard]] size_t max_size() const { return std::string::max_size(); }
-    // [[nodiscard]] size_t capacity() const { return std::string::capacity(); }
-    // void reserve(size_t new_cap) { std::string::reserve(new_cap); }
-    // void shrink_to_fit() { std::string::shrink_to_fit(); }
+    // Inherited functions from std::string:
+    //  bool empty() const;
+    //  size_t size() const;
+    //  size_t length() const;
+    //  size_t max_size() const;
+    //  size_t capacity() const;
+    //  void reserve(size_t new_cap);
+    //  void shrink_to_fit();
     
 
     // ------ Classification and Comparisons ------
-    
-    // [[nodiscard]] int compare(const String & in) { return std::string::compare(in); }
-    // template <typename... ARG_Ts> [[nodiscard]] int compare(ARG_Ts &&... args)
-    //   { return std::string::compare(std::forward<ARG_Ts>(args)...); }
-
-    // [[nodiscard]] bool starts_with(const String & in) const noexcept { return std::string::starts_with(in); }
-    // template <typename ARG_T> [[nodiscard]] bool starts_with( ARG_T && in ) const noexcept
-    //   { return std::string::starts_with(std::forward<ARG_T>(in)); }
-
-    // [[nodiscard]] bool ends_with(const String & in) const noexcept { return std::string::ends_with(in); }
-    // template <typename ARG_T> [[nodiscard]] bool ends_with( ARG_T && in ) const noexcept
-    //   { return std::string::ends_with(std::forward<ARG_T>(in)); }
-
-    // [[nodiscard]] bool contains(const String & in) const noexcept { return std::string::find(in) != npos; }
-    // template <typename ARG_T> [[nodiscard]] bool contains( ARG_T && in ) const noexcept
-    //   { return std::string::find(std::forward<ARG_T>(in)) != npos; }
+    // Inherited functions from std::string:
+    //  int compare(...);
+    //  bool starts_with(...) const noexcept;
+    //  bool ends_with(...) const noexcept;
+    //  bool contains(...) const noexcept;
 
     [[nodiscard]] bool HasAt(const emp::String test, size_t pos) const 
       { return (size() < test.size()+pos) && View(pos, test.size()) == test; }
@@ -316,14 +303,14 @@ namespace emp {
 
 
     // ------ Removals and Extractions ------
+    // Inherited functions from std::string:
+    //  void pop_back();
 
     String & clear() noexcept { std::string::clear(); return *this; }
 
     String & erase(size_t index=0, size_t count=npos) { std::string::erase(index,count); return *this; }
     iterator erase(const_iterator pos) { return std::string::erase(pos); }
     iterator erase(const_iterator first, const_iterator last) { return std::string::erase(first, last); }
-
-    // void pop_back() { std::string::pop_back(); }
 
     emp::String & RemoveChars(const CharSet & chars);
     emp::String & RemoveWhitespace()  { return RemoveChars(WhitespaceCharSet()); }
@@ -346,6 +333,8 @@ namespace emp {
     size_t PopUInt();
 
     // ------ Insertions and Additions ------
+    // Inherited functions from std::string:
+    //  void push_back(char c);
 
     String & insert(size_t index, const String & in) { std::string::insert(index, in); return *this; }
     String & insert(size_t index, const String & in, size_t pos, size_t count=npos)
@@ -355,15 +344,12 @@ namespace emp {
     template <typename... ARG_Ts> String & insert(const_iterator pos, ARG_Ts &&... args)
       { return std::string::insert(pos, std::forward<ARG_Ts>(args)...); }
 
-    // void push_back(char c) { std::string::push_back(c); }
-
     String & append(const String & in) { std::string::append(in); return *this; }
     String & append(const String & in, size_t pos, size_t count)
       { std::string::append(in, pos, count); return *this; }
     template <typename... ARG_Ts> String & append(ARG_Ts &&... args)
       { std::string::append(std::forward<ARG_Ts>(args)...); return *this; }
 
-//    String & operator+=(const String & in) { return append(in); }
     template <typename ARG_T> String & operator+=(ARG_T && arg)
       { std::string::operator+=(std::forward<ARG_T>(arg)); return *this; }
 
@@ -378,15 +364,14 @@ namespace emp {
     }
 
     // ------ Direct Modifications ------
+    // Inherited functions from std::string:
+    //  size_t copy(char * dest, size_t count, size_t pos=0) const
+    //  void swap(String & other)
 
     template <typename... ARG_Ts> String & replace(ARG_Ts &&... args)
       { std::string::replace(std::forward<ARG_Ts>(args)...); return *this; }
 
-    // size_t copy(char * dest, size_t count, size_t pos=0) const { return std::string::copy(dest, count, pos); }
-
     String & resize( size_t count, char c='\0') { std::string::resize(count, c); return *this; }
-
-    // void swap(String & other) { std::string::swap(other); }
 
     emp::String & ReplaceChar(char from, char to, size_t start=0)
       { for (size_t i=start; i < size(); ++i) if (Get(i) == from) Get(i) = to; return *this; }
@@ -408,60 +393,13 @@ namespace emp {
 
 
     // ------ Searching ------
-
-    // [[nodiscard]] size_t find(const std::string & s, size_t pos=0) const noexcept { return std::string::find(s,pos); }
-    // [[nodiscard]] size_t find(const char* s, size_t pos=0) const { return std::string::find(s,pos); }
-    // [[nodiscard]] size_t find(const char* s, size_t pos, size_t count) const { return std::string::find(s,pos,count); }
-    // [[nodiscard]] size_t find(char c, size_t pos=0) const noexcept { return std::string::find(c,pos); }
-    // template < class SVIEW_T > [[nodiscard]] size_t find(const SVIEW_T & sv, size_t pos=0) const
-    //   { return std::string::find(sv,pos); }
-
-    // [[nodiscard]] size_t rfind(const std::string & s, size_t pos=0) const noexcept { return std::string::rfind(s,pos); }
-    // [[nodiscard]] size_t rfind(const char* s, size_t pos=0) const { return std::string::rfind(s,pos); }
-    // [[nodiscard]] size_t rfind(const char* s, size_t pos, size_t count) const { return std::string::rfind(s,pos,count); }
-    // [[nodiscard]] size_t rfind(char c, size_t pos=0) const noexcept { return std::string::rfind(c,pos); }
-    // template < class SVIEW_T > [[nodiscard]] size_t rfind(const SVIEW_T & sv, size_t pos=0) const
-    //   { return std::string::rfind(sv,pos); }
-
-    // [[nodiscard]] size_t find_first_of(const std::string & s, size_t pos=0) const noexcept
-    //   { return std::string::find_first_of(s,pos); }
-    // [[nodiscard]] size_t find_first_of(const char* s, size_t pos=0) const { return std::string::find_first_of(s,pos); }
-    // [[nodiscard]] size_t find_first_of(const char* s, size_t pos, size_t count) const
-    //   { return std::string::find_first_of(s,pos,count); }
-    // [[nodiscard]] size_t find_first_of(char c, size_t pos=0) const noexcept { return std::string::find_first_of(c,pos); }
-    // template < class SVIEW_T > [[nodiscard]] size_t find_first_of(const SVIEW_T & sv, size_t pos=0) const
-    //   { return std::string::find_first_of(sv,pos); }
-
-    // [[nodiscard]] size_t find_first_not_of(const std::string & s, size_t pos=0) const noexcept
-    //   { return std::string::find_first_not_of(s,pos); }
-    // [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos=0) const
-    //   { return std::string::find_first_not_of(s,pos); }
-    // [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos, size_t count) const
-    //   { return std::string::find_first_not_of(s,pos,count); }
-    // [[nodiscard]] size_t find_first_not_of(char c, size_t pos=0) const noexcept
-    //   { return std::string::find_first_not_of(c,pos); }
-    // template < class SVIEW_T > [[nodiscard]] size_t find_first_not_of(const SVIEW_T & sv, size_t pos=0) const
-    //   { return std::string::find_first_not_of(sv,pos); }
-
-    // [[nodiscard]] size_t find_last_of(const std::string & s, size_t pos=0) const noexcept
-    //   { return std::string::find_last_of(s,pos); }
-    // [[nodiscard]] size_t find_last_of(const char* s, size_t pos=0) const { return std::string::find_last_of(s,pos); }
-    // [[nodiscard]] size_t find_last_of(const char* s, size_t pos, size_t count) const
-    //   { return std::string::find_last_of(s,pos,count); }
-    // [[nodiscard]] size_t find_last_of(char c, size_t pos=0) const noexcept { return std::string::find_last_of(c,pos); }
-    // template < class SVIEW_T > [[nodiscard]] size_t find_last_of(const SVIEW_T & sv, size_t pos=0) const
-    //   { return std::string::find_last_of(sv,pos); }
-
-    // [[nodiscard]] size_t find_last_not_of(const std::string & s, size_t pos=0) const noexcept
-    //   { return std::string::find_last_not_of(s,pos); }
-    // [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos=0) const
-    //   { return std::string::find_last_not_of(s,pos); }
-    // [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos, size_t count) const
-    //   { return std::string::find_last_not_of(s,pos,count); }
-    // [[nodiscard]] size_t find_last_not_of(char c, size_t pos=0) const noexcept
-    //   { return std::string::find_last_not_of(c,pos); }
-    // template < class SVIEW_T > [[nodiscard]] size_t find_last_not_of(const SVIEW_T & sv, size_t pos=0) const
-    //   { return std::string::find_last_not_of(sv,pos); }
+    // Inherited functions from std::string:
+    // size_t find(...) const
+    // size_t rfind(...) const
+    // size_t find_first_of(...) const
+    // size_t find_first_not_of(...) const
+    // size_t find_last_of(...) const
+    // size_t find_last_not_of(...) const
 
     [[nodiscard]] size_t FindQuoteMatch(size_t pos) const;
     [[nodiscard]] size_t FindParenMatch(size_t pos, const Mode & mode=ParensMode()) const;
@@ -549,36 +487,14 @@ namespace emp {
 
 
     // ------ Other Operators ------
-
-    // template <typename T> [[nodiscard]] String operator+(T && in) const
-    //   { return std::string::operator+(std::forward<T>(in)); }
-    // [[nodiscard]] bool operator==(const emp::String & in) const { return std::string::operator==(in); }
-    // [[nodiscard]] bool operator==(const std::string & in) const { return std::string::operator==(in); }
-    // [[nodiscard]] bool operator==(const char * in) const { return std::string::operator==(in); }
-
-    // [[nodiscard]] bool operator!=(const emp::String & in) const { return std::string::operator!=(in); }
-    // [[nodiscard]] bool operator!=(const std::string & in) const { return std::string::operator!=(in); }
-    // [[nodiscard]] bool operator!=(const char * in) const { return std::string::operator!=(in); }
-
-    // [[nodiscard]] bool operator<(const emp::String & in) const { return std::string::operator<(in); }
-    // [[nodiscard]] bool operator<(const std::string & in) const { return std::string::operator<(in) in; }
-    // [[nodiscard]] bool operator<(const char * in) const { return std::string::operator<(in) in; }
-
-    // [[nodiscard]] bool operator<=(const emp::String & in) const { return std::string::operator<=(in); }
-    // [[nodiscard]] bool operator<=(const std::string & in) const { return std::string::operator<=(in); }
-    // [[nodiscard]] bool operator<=(const char * in) const { return std::string::operator<=(in); }
-
-    // [[nodiscard]] bool operator>(const emp::String & in) const { return std::string::operator>(in); }
-    // [[nodiscard]] bool operator>(const std::string & in) const { return std::string::operator>(in) in; }
-    // [[nodiscard]] bool operator>(const char * in) const { return std::string::operator>(in) in; }
-
-    // [[nodiscard]] bool operator>=(const emp::String & in) const { return std::string::operator>=(in); }
-    // [[nodiscard]] bool operator>=(const std::string & in) const { return std::string::operator>=(in); }
-    // [[nodiscard]] bool operator>=(const char * in) const { return std::string::operator>=(in); }
-
-    // auto operator<=>(const emp::String & in) const = default;
-    // auto operator<=>(const std::string & in) const { return *this <=> in; }
-    // auto operator<=>(const char * in) const { return *this <=> in; }
+    // Inherited functions from std::string:
+    //  bool operator==(const std::string & in) const
+    //  bool operator!=(const std::string & in) const
+    //  bool operator<(const std::string & in) const
+    //  bool operator<=(const std::string & in) const
+    //  bool operator>(const std::string & in) const
+    //  bool operator>=(const std::string & in) const
+    //  bool operator<=>(const std::string & in) const
     
 
     //  ------ FORMATTING ------
@@ -1194,16 +1110,6 @@ namespace emp {
   //
   // -------------------------------------------------------------
 
-  // ------ External function overrides ------
-
-  // std::ostream & operator<<(std::ostream & os, const emp::String & in) {
-  //   return os << in.cpp_str();
-  // }
-
-  // std::istream & operator>>(std::istream & is, emp::String & in) {
-  //   return is >> in.cpp_str();
-  // }
-
 
   template <typename... Ts>
   emp::String MakeString(Ts... args) {
@@ -1482,18 +1388,6 @@ namespace emp {
   }
 
 }
-
-// ---------------------- Implementations to work with standard library ----------------------
-
-// namespace std {
-//   /// Hash function to allow String to be used with unordered maps and sets (must be in std).
-//   template <>
-//   struct hash<emp::String> {
-//     std::size_t operator()(const emp::String & str) const {
-//       return std::hash<std::string>()(str.cpp_str()); 
-//     }
-//   };
-// }
 
 
 #endif // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
