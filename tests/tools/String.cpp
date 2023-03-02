@@ -42,7 +42,10 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::MakeRoman(500000) == "D|");
   CHECK(emp::MakeRoman(500000000) == "D||");
   CHECK(emp::MakeRoman(500500500) == "D|D|D");
+}
 
+TEST_CASE("Test String Composition Functions", "[tools]")
+{
   emp::String abc = "aabcccabbcccabcbca";
   CHECK(abc.IsComposedOf("abc"));
   CHECK(!abc.IsComposedOf("abx"));
@@ -61,34 +64,79 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::String("!@#$%^&*()0987654321").HasDigit());
   CHECK(!emp::String("!@#$%^&*()abcdefg").HasDigit());
 
+  CHECK(emp::String("all letters").HasAlphanumeric());
+  CHECK(emp::String("12345").HasAlphanumeric());
+  CHECK(emp::String("s0m3 l3tt3r5 @nd num83r5").HasAlphanumeric());
+  CHECK(!emp::String(")(!*#@&#^%&!").HasAlphanumeric());
+
+  CHECK(emp::String("abcdefghijklmnopqrstuvwxyz").HasOneOf("aeiou"));
+  CHECK(emp::String("abcdefghijklmnopqrstuvwxyz").HasOneOf("abc123"));
+  CHECK(!emp::String("abcdefghijklmnopqrstuvwxyz").HasOneOf("12345"));
+
+  CHECK(emp::String("391830581734").OnlyDigits());
+  CHECK(!emp::String("3h91830581734").OnlyDigits());
+  CHECK(!emp::String("3.14").OnlyDigits());
+  CHECK(!emp::String("8.5e-6").OnlyDigits());
+  CHECK(!emp::String("9e27").OnlyDigits());
+
+  CHECK(emp::String("391830581734").IsNumber());
+  CHECK(!emp::String("3h91830581734").IsNumber());
+  CHECK(emp::String("3.14").IsNumber());
+  CHECK(emp::String("8.5e-6").IsNumber());
+  CHECK(emp::String("9e27").IsNumber());
+  CHECK(!emp::String("e").IsNumber());
+  CHECK(!emp::String("-.e").IsNumber());
+  CHECK(!emp::String("-4.5e").IsNumber());
+  CHECK(emp::String("-4.5e+4").IsNumber());
+  CHECK(!emp::String(".").IsNumber());
+  CHECK(emp::String(".1").IsNumber());
+  CHECK(!emp::String("1.").IsNumber());
+
+  CHECK(emp::String("39adg18af3tj05ykty81734").OnlyAlphanumeric());
+  CHECK(!emp::String("39adg18af?3tj05ykty81734").OnlyAlphanumeric());
+
+  CHECK(emp::String("'f'").IsLiteralChar());
+  CHECK(emp::String("' '").IsLiteralChar());
+  CHECK(!emp::String("f").IsLiteralChar());
+  CHECK(emp::String("'\n'").IsLiteralChar());
+  CHECK(!emp::String("'\\'").IsLiteralChar());
+  CHECK(emp::MakeFromLiteral_Char("'f'") == 'f');
+  CHECK(emp::MakeFromLiteral_Char("'\n'") == '\n');
+  
+  CHECK(emp::String("\"He llo!\"").IsLiteralString());
+  CHECK(!emp::String("\"\\\\He\"llo!\"").IsLiteralString());
+  CHECK(emp::String("\"Hel\n\t\r\\\'lo!\"").IsLiteralString());
+  CHECK(emp::String("\"Hel\n \t \r \'lo!\"").IsLiteralString());
+  CHECK(emp::MakeFromLiteral_String("\"Hello!\"") == "Hello!");
+  CHECK(emp::MakeFromLiteral_String("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
+
 /*
-  CHECK(emp::has_alphanumeric("all letters"));
-  CHECK(emp::has_alphanumeric("12345"));
-  CHECK(emp::has_alphanumeric("s0m3 l3tt3r5 @nd num83r5"));
-  CHECK(!emp::has_alphanumeric(")(!*#@&#^%&!"));
-
-  CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","aeiou"));
-  CHECK(emp::has_one_of("abcdefghijklmnopqrstuvwxyz","abc123"));
-  CHECK(!emp::has_one_of("abcdefghijklmnopqrstuvwxyz","12345"));
-
   CHECK(emp::is_valid("aaaaaaaaa", [](char x) { return (x == 'a'); } ));
   CHECK( !(emp::is_valid("aaaabaaaa", [](char x) { return (x == 'a'); })) );
+*/
+}
 
-  std::string start = "a string.";
-  CHECK(emp::string_pop_fixed(start, 9) == "a string.");
+TEST_CASE("Test String Pop Functions", "[tools]")
+{
+  emp::String start = "a string.";
+  CHECK(start.PopFixed(9) == "a string.");
   CHECK(start == "");
+}
 
-  CHECK(emp::string_get("John Doe"," ") == "John");
-  CHECK(emp::string_get_line("Line1\nLine2\nLine3") == "Line1");
+TEST_CASE("Test String Removal Functions", "[tools]")
+{
 
-  std::string hello = "!!h&&e#l!!&l###o&!!";
-  emp::remove_chars(hello, "!&#");
+  emp::String hello = "!!h&&e#l!!&l###o&!!";
+  hello.RemoveChars("!&#");
   CHECK(hello == "hello");
 
-  std::string email = "you@example.com";
-  emp::remove_punctuation(email);
+  emp::String email = "you@example.com";
+  email.RemovePunctuation();
   CHECK(email == "youexamplecom");
+}
 
+
+/*
   emp::vector<std::string> numbers;
   numbers.push_back("1");
   numbers.push_back("2");
@@ -98,50 +146,8 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(int_numbers[1] == 2);
   CHECK(int_numbers[2] == 3);
 
-  CHECK(emp::is_digits("391830581734"));
-  CHECK(!emp::is_digits("3h91830581734"));
-  CHECK(!emp::is_digits("3.14"));
-  CHECK(!emp::is_digits("8.5e-6"));
-  CHECK(!emp::is_digits("9e27"));
-
-  CHECK(emp::is_number("391830581734"));
-  CHECK(!emp::is_number("3h91830581734"));
-  CHECK(emp::is_number("3.14"));
-  CHECK(emp::is_number("8.5e-6"));
-  CHECK(emp::is_number("9e27"));
-  CHECK(!emp::is_number("e"));
-  CHECK(!emp::is_number("-.e"));
-  CHECK(!emp::is_number("-4.5e"));
-  CHECK(emp::is_number("-4.5e+4"));
-  CHECK(!emp::is_number("."));
-  CHECK(emp::is_number(".1"));
-  CHECK(!emp::is_number("1."));
-
-  CHECK(emp::is_alphanumeric("39adg18af3tj05ykty81734"));
-  CHECK(!emp::is_alphanumeric("39adg18af?3tj05ykty81734"));
-
-  CHECK(emp::is_literal_char("'f'"));
-  CHECK(emp::is_literal_char("' '"));
-  CHECK(!emp::is_literal_char("f"));
-  CHECK(emp::is_literal_char("'\n'"));
-  CHECK(!emp::is_literal_char("'\\'"));
-  CHECK(emp::from_literal_char("'f'") == 'f');
-  CHECK(emp::from_literal_char("'\n'") == '\n');
-  CHECK(emp::is_literal_string("\"He llo!\""));
-  CHECK(!emp::is_literal_string("\"\\\\He\"llo!\""));
-  CHECK(emp::is_literal_string("\"Hel\n\t\r\\\'lo!\""));
-  CHECK(emp::is_literal_string("\"Hel\n \t \r \'lo!\""));
-  CHECK(emp::from_literal_string("\"Hello!\"") == "Hello!");
-  CHECK(emp::from_literal_string("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
-
-  // TODO: try this with more arguments
-  int one;
-  emp::from_string<int>("1", one);
-  CHECK(one == 1);
-  */
 }
 
-/*
 TEST_CASE("Another Test string_utils", "[tools]")
 {
 
