@@ -75,10 +75,8 @@ namespace emp {
   // ToString specialization for emp::String
   const emp::String & ToString(const emp::String & in) { return in; }
 
-  class String {
+  class String : public std::string {
   private:
-    std::string str;   // The main string that we are manipulating.
-
     // Special class for tracking character interactions.
     struct Mode {
       emp::array<char, 128> char_matches;
@@ -111,8 +109,7 @@ namespace emp {
     template <typename T> static auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
     template <typename T> static const T & _Convert(const T & in, ...) { return in; }
 
-    void _AssertPos([[maybe_unused]] size_t pos) const
-      { emp_assert(pos < str.size(), pos, str.size()); }
+    void _AssertPos([[maybe_unused]] size_t pos) const { emp_assert(pos < size(), pos, size()); }
 
   public:
     using value_type = std::string::value_type;
@@ -132,20 +129,20 @@ namespace emp {
 
     // Constructors duplicating from std::string
     String() = default;
-    String(const std::string & _str) : str(_str) { }
-    String(std::string && _str) : str(std::move(_str)) { }
-    // String(const std::string & _str, Mode _mode) : str(_str), mode(_mode) { }
-    // String(std::string && _str, Mode _mode) : str(std::move(_str)), mode(_mode) { }
-    String(const char * _str) : str(_str) { }
-    String(size_t count, char _str) : str(count, _str) { }
-    String(std::initializer_list<char> _str) : str(_str) { }
+    String(const std::string & _str) : std::string(_str) { }
+    String(std::string && _str) : std::string(std::move(_str)) { }
+    // String(const std::string & _str, Mode _mode) : std::string(_str), mode(_mode) { }
+    // String(std::string && _str, Mode _mode) : std::string(std::move(_str)), mode(_mode) { }
+    String(const char * _str) : std::string(_str) { }
+    String(size_t count, char _str) : std::string(count, _str) { }
+    String(std::initializer_list<char> _str) : std::string(_str) { }
     String(const String & _str, size_t start, size_t count=npos)
-      : str(_str.str, start, count) { }
+      : std::string(_str, start, count) { }
     String(const std::string & _str, size_t start, size_t count=npos)
-      : str(_str, start, count) { }
-    String(const char * _str, size_t count) : str(_str, count) { }
+      : std::string(_str, start, count) { }
+    String(const char * _str, size_t count) : std::string(_str, count) { }
     template< class InputIt >
-    String(InputIt first, InputIt last) : str(first, last) { }
+    String(InputIt first, InputIt last) : std::string(first, last) { }
     String(std::nullptr_t) = delete;
 
     // ------ New constructors ------
@@ -155,14 +152,14 @@ namespace emp {
 
     // Allow a string to be transformed during construction, 1-to-1
     String(const std::string & _str, std::function<char(char)> transform_fun) {
-      str.reserve(_str.size());  // Setup expected size.
-      for (auto & c : _str) { str.push_back(transform_fun(c)); }
+      reserve(_str.size());  // Setup expected size.
+      for (auto & c : _str) { push_back(transform_fun(c)); }
     }
 
     // Allow a string to be transformed during construction, 1-to-any
     String(const std::string & _str, std::function<emp::String(char)> transform_fun) {
-      str.reserve(_str.size());  // Setup expected size; assume size will be 1-to-1 by default.
-      for (auto & c : _str) { str += transform_fun(c).str; }
+      reserve(_str.size());  // Setup expected size; assume size will be 1-to-1 by default.
+      for (auto & c : _str) { append(transform_fun(c)); }
     }
 
 
@@ -170,103 +167,100 @@ namespace emp {
 
     String & operator=(const String &) = default;
     String & operator=(String &&) = default;
-    String & operator=(const std::string & _in) { str = _in; return *this; }
-    String & operator=(std::string && _in) { str = std::move(_in); return *this; }
-    String & operator=(const char * _in) { str = _in; return *this; }
-    String & operator=(char _in) { str = _in; return *this; }
-    String & operator=(std::initializer_list<char> _in) { str = _in; return *this; }
-    String & operator=( std::nullptr_t ) = delete;
+    String & operator=(const std::string & _in) { std::string::operator=(_in); return *this; }
+    String & operator=(std::string && _in) { std::string::operator=(std::move(_in)); return *this; }
+    String & operator=(const char * _in) { std::string::operator=(_in); return *this; }
+    String & operator=(char _in) { std::string::operator=(_in); return *this; }
+    String & operator=(std::initializer_list<char> _in) { std::string::operator=(_in); return *this; }
+    String & operator=(std::nullptr_t) = delete;
 
     template <typename... ARG_Ts>
-    String & assign(ARG_Ts &&... args) {
-      return str.assign(std::forward<ARG_Ts>(args)...);
-    }
-
-    // ------ Converters ------
-
-    operator std::string &() { return str; }
-    operator const std::string &() const { return str; }
+    String & assign(ARG_Ts &&... args)
+      { std::string::assign(std::forward<ARG_Ts>(args)...); return *this; }
 
     // ------ Element Access ------
 
-    [[nodiscard]] char & operator[](size_t pos) { _AssertPos(pos); return str[pos]; }
-    [[nodiscard]] char operator[](size_t pos) const { _AssertPos(pos); return str[pos]; }
-    [[nodiscard]] char & front() { _AssertPos(0); return str.front(); }
-    [[nodiscard]] char front() const { _AssertPos(0); return str.front(); }
-    [[nodiscard]] char & back() { _AssertPos(0); return str.back(); }
-    [[nodiscard]] char back() const { _AssertPos(0); return str.back(); }
-    [[nodiscard]] char * data() { return str.data(); }
-    [[nodiscard]] const char * data() const { return str.data(); }
-    [[nodiscard]] const char * c_str() const { return str.c_str(); }
-    [[nodiscard]] std::string & cpp_str() { return str; }
-    [[nodiscard]] const std::string & cpp_str() const { return str; }
+    [[nodiscard]] char & operator[](size_t pos)
+      { _AssertPos(pos); return std::string::operator[](pos); }
+    [[nodiscard]] char operator[](size_t pos) const
+      { _AssertPos(pos); return std::string::operator[](pos); }
+    [[nodiscard]] char & front() { _AssertPos(0); return std::string::front(); }
+    [[nodiscard]] char front() const { _AssertPos(0); return std::string::front(); }
+    [[nodiscard]] char & back() { _AssertPos(0); return std::string::back(); }
+    [[nodiscard]] char back() const { _AssertPos(0); return std::string::back(); }
+    // [[nodiscard]] char * data() { return std::string::data(); }
+    // [[nodiscard]] const char * data() const { return std::string::data(); }
+    // [[nodiscard]] const char * c_str() const { return std::string::c_str(); }
+    [[nodiscard]] char & Get(size_t pos) { return operator[](pos); }
+    [[nodiscard]] char Get(size_t pos) const { return operator[](pos); }
+
 
     [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
-      { return str.substr(pos, count); }
+      { _AssertPos(pos); return std::string::substr(pos, count); }
     [[nodiscard]] String GetRange(std::size_t start_pos, std::size_t end_pos) const
-      { return substr(start_pos, end_pos - start_pos); }
+      { return std::string::substr(start_pos, end_pos - start_pos); }
 
     [[nodiscard]] std::string_view View(size_t start=0, size_t out_size=npos) const {
-      emp_assert(start + npos <= str.size());
-      return std::string_view(str.data()+start, out_size);
+      emp_assert(start + out_size <= size());
+      return std::string_view(data()+start, out_size);
     }
     [[nodiscard]] std::string_view ViewFront(size_t out_size) const { return View(0, out_size); }
     [[nodiscard]] std::string_view ViewBack(size_t out_size) const
-      { emp_assert(out_size <= str.size()); return View(str.size()-out_size, out_size); }
+      { emp_assert(out_size <= size()); return View(size()-out_size, out_size); }
     [[nodiscard]] std::string_view ViewRange(size_t start, size_t end) const {
-      emp_assert(start <= end && end <= str.size());
+      emp_assert(start <= end && end <= size());
       return View(start, end - start);
     }
 
 
     // ------ Iterators ------
 
-    iterator begin() { return str.begin(); }
-    const_iterator begin() const { return str.begin(); }
-    const_iterator cbegin() const { return str.cbegin(); }
-    reverse_iterator rbegin() { return str.rbegin(); }
-    const_reverse_iterator rbegin() const { return str.rbegin(); }
-    const_reverse_iterator crbegin() const { return str.crbegin(); }
+    // iterator begin() { return std::string::begin(); }
+    // const_iterator begin() const { return std::string::begin(); }
+    // const_iterator cbegin() const { return std::string::cbegin(); }
+    // reverse_iterator rbegin() { return std::string::rbegin(); }
+    // const_reverse_iterator rbegin() const { return std::string::rbegin(); }
+    // const_reverse_iterator crbegin() const { return std::string::crbegin(); }
 
-    iterator end() { return str.end(); }
-    const_iterator end() const { return str.end(); }
-    const_iterator cend() const { return str.cend(); }
-    reverse_iterator rend() { return str.rend(); }
-    const_reverse_iterator rend() const { return str.rend(); }
-    const_reverse_iterator crend() const { return str.crend(); }
+    // iterator end() { return std::string::end(); }
+    // const_iterator end() const { return std::string::end(); }
+    // const_iterator cend() const { return std::string::cend(); }
+    // reverse_iterator rend() { return std::string::rend(); }
+    // const_reverse_iterator rend() const { return std::string::rend(); }
+    // const_reverse_iterator crend() const { return std::string::crend(); }
 
 
     // ------ Capacity ------
 
-    [[nodiscard]] bool empty() const { return str.empty(); }
-    [[nodiscard]] size_t size() const { return str.size(); }
-    [[nodiscard]] size_t length() const { return str.length(); }
-    [[nodiscard]] size_t max_size() const { return str.max_size(); }
-    [[nodiscard]] size_t capacity() const { return str.capacity(); }
-    void reserve(size_t new_cap) { str.reserve(new_cap); }
-    void shrink_to_fit() { str.shrink_to_fit(); }
+    // [[nodiscard]] bool empty() const { return std::string::empty(); }
+    // [[nodiscard]] size_t size() const { return size(); }
+    // [[nodiscard]] size_t length() const { return std::string::length(); }
+    // [[nodiscard]] size_t max_size() const { return std::string::max_size(); }
+    // [[nodiscard]] size_t capacity() const { return std::string::capacity(); }
+    // void reserve(size_t new_cap) { std::string::reserve(new_cap); }
+    // void shrink_to_fit() { std::string::shrink_to_fit(); }
     
 
     // ------ Classification and Comparisons ------
     
-    [[nodiscard]] int compare(const String & in) { return str.compare(in.str); }
-    template <typename... ARG_Ts> [[nodiscard]] int compare(ARG_Ts &&... args)
-      { return str.compare(std::forward<ARG_Ts>(args)...); }
+    // [[nodiscard]] int compare(const String & in) { return std::string::compare(in); }
+    // template <typename... ARG_Ts> [[nodiscard]] int compare(ARG_Ts &&... args)
+    //   { return std::string::compare(std::forward<ARG_Ts>(args)...); }
 
-    [[nodiscard]] bool starts_with(const String & in) const noexcept { return str.starts_with(in.str); }
-    template <typename ARG_T> [[nodiscard]] bool starts_with( ARG_T && in ) const noexcept
-      { return str.starts_with(std::forward<ARG_T>(in)); }
+    // [[nodiscard]] bool starts_with(const String & in) const noexcept { return std::string::starts_with(in); }
+    // template <typename ARG_T> [[nodiscard]] bool starts_with( ARG_T && in ) const noexcept
+    //   { return std::string::starts_with(std::forward<ARG_T>(in)); }
 
-    [[nodiscard]] bool ends_with(const String & in) const noexcept { return str.ends_with(in.str); }
-    template <typename ARG_T> [[nodiscard]] bool ends_with( ARG_T && in ) const noexcept
-      { return str.ends_with(std::forward<ARG_T>(in)); }
+    // [[nodiscard]] bool ends_with(const String & in) const noexcept { return std::string::ends_with(in); }
+    // template <typename ARG_T> [[nodiscard]] bool ends_with( ARG_T && in ) const noexcept
+    //   { return std::string::ends_with(std::forward<ARG_T>(in)); }
 
-    [[nodiscard]] bool contains(const String & in) const noexcept { return str.find(in.str) != npos; }
-    template <typename ARG_T> [[nodiscard]] bool contains( ARG_T && in ) const noexcept
-      { return str.find(std::forward<ARG_T>(in)) != npos; }
+    // [[nodiscard]] bool contains(const String & in) const noexcept { return std::string::find(in) != npos; }
+    // template <typename ARG_T> [[nodiscard]] bool contains( ARG_T && in ) const noexcept
+    //   { return std::string::find(std::forward<ARG_T>(in)) != npos; }
 
     [[nodiscard]] bool HasAt(const emp::String test, size_t pos) const 
-      { return (size() < test.size()+pos) && View(pos, test.size()) == test.str; }
+      { return (size() < test.size()+pos) && View(pos, test.size()) == test; }
     [[nodiscard]] bool HasPrefix(const emp::String & prefix) const { return starts_with(prefix); }
     [[nodiscard]] bool HasSuffix(const emp::String & suffix) const { return ends_with(suffix); }
 
@@ -274,11 +268,11 @@ namespace emp {
 
     // Count the number of occurrences of a specific character.
     [[nodiscard]] size_t Count(char c, size_t start=0) const
-      { return (size_t) std::count(str.begin()+start, str.end(), c); }
+      { return (size_t) std::count(begin()+start, end(), c); }
 
     // Count the number of occurrences of a specific character within a range.
     [[nodiscard]] size_t Count(char c, size_t start, size_t end) const
-      { return (size_t) std::count(str.begin()+start, str.begin()+end, c); }
+      { return (size_t) std::count(begin()+start, begin()+end, c); }
 
     /// Test if an string is formatted as a literal character.
     [[nodiscard]] bool IsLiteralChar() const;
@@ -290,46 +284,46 @@ namespace emp {
     [[nodiscard]] std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
 
     /// Is string composed only of a set of characters (can be provided as a string)
-    [[nodiscard]] bool IsComposedOf(emp::CharSet char_set) const { return char_set.Has(str); }
+    [[nodiscard]] bool IsComposedOf(emp::CharSet char_set) const { return char_set.Has(*this); }
 
     /// Is string a valid number (int, floating point, or scientific notation all valid)
     [[nodiscard]] bool IsNumber() const;
 
     /// Is string a valid identifier? At least one char; cannot begin with digit, only letters, digits and `_`
     [[nodiscard]] bool IsIdentifier() const
-      { return str.size() && !is_digit(str[0]) && IDCharSet().Has(str); }
+      { return size() && !is_digit(Get(0)) && IDCharSet().Has(*this); }
 
-    [[nodiscard]] bool OnlyLower() const { return LowerCharSet().Has(str); }
-    [[nodiscard]] bool OnlyUpper() const { return UpperCharSet().Has(str); }
-    [[nodiscard]] bool OnlyDigits() const { return DigitCharSet().Has(str); }
-    [[nodiscard]] bool OnlyAlphanumeric() const { return AlphanumericCharSet().Has(str); }
-    [[nodiscard]] bool OnlyWhitespace() const { return WhitespaceCharSet().Has(str); }
+    [[nodiscard]] bool OnlyLower() const { return LowerCharSet().Has(*this); }
+    [[nodiscard]] bool OnlyUpper() const { return UpperCharSet().Has(*this); }
+    [[nodiscard]] bool OnlyDigits() const { return DigitCharSet().Has(*this); }
+    [[nodiscard]] bool OnlyAlphanumeric() const { return AlphanumericCharSet().Has(*this); }
+    [[nodiscard]] bool OnlyWhitespace() const { return WhitespaceCharSet().Has(*this); }
 
-    [[nodiscard]] bool HasOneOf(emp::CharSet char_set) const { return char_set.HasAny(str); }
-    [[nodiscard]] bool HasWhitespace() const { return WhitespaceCharSet().HasAny(str); }
-    [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(str); }
-    [[nodiscard]] bool HasUpper() const { return UpperCharSet().HasAny(str); }
-    [[nodiscard]] bool HasLower() const { return LowerCharSet().HasAny(str); }
-    [[nodiscard]] bool HasLetter() const { return LetterCharSet().HasAny(str); }
-    [[nodiscard]] bool HasDigit() const { return DigitCharSet().HasAny(str); }
-    [[nodiscard]] bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(str); }
+    [[nodiscard]] bool HasOneOf(emp::CharSet char_set) const { return char_set.HasAny(*this); }
+    [[nodiscard]] bool HasWhitespace() const { return WhitespaceCharSet().HasAny(*this); }
+    [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(*this); }
+    [[nodiscard]] bool HasUpper() const { return UpperCharSet().HasAny(*this); }
+    [[nodiscard]] bool HasLower() const { return LowerCharSet().HasAny(*this); }
+    [[nodiscard]] bool HasLetter() const { return LetterCharSet().HasAny(*this); }
+    [[nodiscard]] bool HasDigit() const { return DigitCharSet().HasAny(*this); }
+    [[nodiscard]] bool HasAlphanumeric() const { return AlphanumericCharSet().HasAny(*this); }
 
     [[nodiscard]] bool HasCharAt(char c, size_t pos) const
-      { return (pos < str.size()) && (str[pos] == c); }
-    [[nodiscard]] bool HasOneOfAt(emp::CharSet opts, size_t pos) const { return opts.HasAt(str, pos); }
-    [[nodiscard]] bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(str, pos); }
-    [[nodiscard]] bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(str, pos); }
+      { return (pos < size()) && (Get(pos) == c); }
+    [[nodiscard]] bool HasOneOfAt(emp::CharSet opts, size_t pos) const { return opts.HasAt(*this, pos); }
+    [[nodiscard]] bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(*this, pos); }
+    [[nodiscard]] bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(*this, pos); }
 
 
     // ------ Removals and Extractions ------
 
-    void clear() noexcept { str.clear(); }
+    String & clear() noexcept { std::string::clear(); return *this; }
 
-    String & erase(size_t index=0, size_t count=npos) { str.erase(index,count); return *this; }
-    iterator erase(const_iterator pos) { return str.erase(pos); }
-    iterator erase(const_iterator first, const_iterator last) { return str.erase(first, last); }
+    String & erase(size_t index=0, size_t count=npos) { std::string::erase(index,count); return *this; }
+    iterator erase(const_iterator pos) { return std::string::erase(pos); }
+    iterator erase(const_iterator first, const_iterator last) { return std::string::erase(first, last); }
 
-    void pop_back() { str.pop_back(); }
+    // void pop_back() { std::string::pop_back(); }
 
     emp::String & RemoveChars(const CharSet & chars);
     emp::String & RemoveWhitespace()  { return RemoveChars(WhitespaceCharSet()); }
@@ -353,49 +347,49 @@ namespace emp {
 
     // ------ Insertions and Additions ------
 
-    String & insert(size_t index, const String & in) { str.insert(index, in.str); return *this; }
+    String & insert(size_t index, const String & in) { std::string::insert(index, in); return *this; }
     String & insert(size_t index, const String & in, size_t pos, size_t count=npos)
-      { str.insert(index, in.str, pos, count); return *this; }
+      { std::string::insert(index, in, pos, count); return *this; }
     template <typename... ARG_Ts> String & insert(size_t index, ARG_Ts &&... args)
-      { str.insert(index, std::forward<ARG_Ts>(args)...); return *this; }
+      { std::string::insert(index, std::forward<ARG_Ts>(args)...); return *this; }
     template <typename... ARG_Ts> String & insert(const_iterator pos, ARG_Ts &&... args)
-      { return str.insert(pos, std::forward<ARG_Ts>(args)...); }
+      { return std::string::insert(pos, std::forward<ARG_Ts>(args)...); }
 
-    void push_back(char c) { str.push_back(c); }
+    // void push_back(char c) { std::string::push_back(c); }
 
-    String & append(const String & in) { str.append(in.str); return *this; }
+    String & append(const String & in) { std::string::append(in); return *this; }
     String & append(const String & in, size_t pos, size_t count)
-      { str.append(in.str, pos, count); return *this; }
+      { std::string::append(in, pos, count); return *this; }
     template <typename... ARG_Ts> String & append(ARG_Ts &&... args)
-      { str.append(std::forward<ARG_Ts>(args)...); return *this; }
+      { std::string::append(std::forward<ARG_Ts>(args)...); return *this; }
 
-    String & operator+=(const String & in) { str += in.str; return *this; }
+//    String & operator+=(const String & in) { return append(in); }
     template <typename ARG_T> String & operator+=(ARG_T && arg)
-      { str += std::forward<ARG_T>(arg); return *this; }
+      { std::string::operator+=(std::forward<ARG_T>(arg)); return *this; }
 
     String & PadFront(char padding, size_t target_size) {
-      if (str.size() < target_size) str = std::string(target_size - size(), padding) + str;
+      if (size() < target_size) *this = std::string(target_size - size(), padding) + *this;
       return *this;
     }
 
     String & PadBack(char padding, size_t target_size) {
-      if (str.size() < target_size) str = str + std::string(target_size - size(), padding);
+      if (size() < target_size) *this = *this + std::string(target_size - size(), padding);
       return *this;
     }
 
     // ------ Direct Modifications ------
 
     template <typename... ARG_Ts> String & replace(ARG_Ts &&... args)
-      { str.replace(std::forward<ARG_Ts>(args)...); return *this; }
+      { std::string::replace(std::forward<ARG_Ts>(args)...); return *this; }
 
-    size_t copy(char * dest, size_t count, size_t pos=0) const { return str.copy(dest, count, pos); }
+    // size_t copy(char * dest, size_t count, size_t pos=0) const { return std::string::copy(dest, count, pos); }
 
-    void resize( size_t count, char c='\0') { str.resize(count, c); }
+    String & resize( size_t count, char c='\0') { std::string::resize(count, c); return *this; }
 
-    void swap(String & other) { str.swap(other.str); }
+    // void swap(String & other) { std::string::swap(other); }
 
     emp::String & ReplaceChar(char from, char to, size_t start=0)
-      { for (size_t i=start; i < str.size(); ++i) if (str[i] == from) str[i] = to; return *this; }
+      { for (size_t i=start; i < size(); ++i) if (Get(i) == from) Get(i) = to; return *this; }
     emp::String & ReplaceRange(size_t start, size_t end, std::string value)
       { return replace(start, end-start, value); }
     emp::String & TrimWhitespace();
@@ -415,59 +409,59 @@ namespace emp {
 
     // ------ Searching ------
 
-    [[nodiscard]] size_t find(const std::string & s, size_t pos=0) const noexcept { return str.find(s,pos); }
-    [[nodiscard]] size_t find(const char* s, size_t pos=0) const { return str.find(s,pos); }
-    [[nodiscard]] size_t find(const char* s, size_t pos, size_t count) const { return str.find(s,pos,count); }
-    [[nodiscard]] size_t find(char c, size_t pos=0) const noexcept { return str.find(c,pos); }
-    template < class SVIEW_T > [[nodiscard]] size_t find(const SVIEW_T & sv, size_t pos=0) const
-      { return str.find(sv,pos); }
+    // [[nodiscard]] size_t find(const std::string & s, size_t pos=0) const noexcept { return std::string::find(s,pos); }
+    // [[nodiscard]] size_t find(const char* s, size_t pos=0) const { return std::string::find(s,pos); }
+    // [[nodiscard]] size_t find(const char* s, size_t pos, size_t count) const { return std::string::find(s,pos,count); }
+    // [[nodiscard]] size_t find(char c, size_t pos=0) const noexcept { return std::string::find(c,pos); }
+    // template < class SVIEW_T > [[nodiscard]] size_t find(const SVIEW_T & sv, size_t pos=0) const
+    //   { return std::string::find(sv,pos); }
 
-    [[nodiscard]] size_t rfind(const std::string & s, size_t pos=0) const noexcept { return str.rfind(s,pos); }
-    [[nodiscard]] size_t rfind(const char* s, size_t pos=0) const { return str.rfind(s,pos); }
-    [[nodiscard]] size_t rfind(const char* s, size_t pos, size_t count) const { return str.rfind(s,pos,count); }
-    [[nodiscard]] size_t rfind(char c, size_t pos=0) const noexcept { return str.rfind(c,pos); }
-    template < class SVIEW_T > [[nodiscard]] size_t rfind(const SVIEW_T & sv, size_t pos=0) const
-      { return str.rfind(sv,pos); }
+    // [[nodiscard]] size_t rfind(const std::string & s, size_t pos=0) const noexcept { return std::string::rfind(s,pos); }
+    // [[nodiscard]] size_t rfind(const char* s, size_t pos=0) const { return std::string::rfind(s,pos); }
+    // [[nodiscard]] size_t rfind(const char* s, size_t pos, size_t count) const { return std::string::rfind(s,pos,count); }
+    // [[nodiscard]] size_t rfind(char c, size_t pos=0) const noexcept { return std::string::rfind(c,pos); }
+    // template < class SVIEW_T > [[nodiscard]] size_t rfind(const SVIEW_T & sv, size_t pos=0) const
+    //   { return std::string::rfind(sv,pos); }
 
-    [[nodiscard]] size_t find_first_of(const std::string & s, size_t pos=0) const noexcept
-      { return str.find_first_of(s,pos); }
-    [[nodiscard]] size_t find_first_of(const char* s, size_t pos=0) const { return str.find_first_of(s,pos); }
-    [[nodiscard]] size_t find_first_of(const char* s, size_t pos, size_t count) const
-      { return str.find_first_of(s,pos,count); }
-    [[nodiscard]] size_t find_first_of(char c, size_t pos=0) const noexcept { return str.find_first_of(c,pos); }
-    template < class SVIEW_T > [[nodiscard]] size_t find_first_of(const SVIEW_T & sv, size_t pos=0) const
-      { return str.find_first_of(sv,pos); }
+    // [[nodiscard]] size_t find_first_of(const std::string & s, size_t pos=0) const noexcept
+    //   { return std::string::find_first_of(s,pos); }
+    // [[nodiscard]] size_t find_first_of(const char* s, size_t pos=0) const { return std::string::find_first_of(s,pos); }
+    // [[nodiscard]] size_t find_first_of(const char* s, size_t pos, size_t count) const
+    //   { return std::string::find_first_of(s,pos,count); }
+    // [[nodiscard]] size_t find_first_of(char c, size_t pos=0) const noexcept { return std::string::find_first_of(c,pos); }
+    // template < class SVIEW_T > [[nodiscard]] size_t find_first_of(const SVIEW_T & sv, size_t pos=0) const
+    //   { return std::string::find_first_of(sv,pos); }
 
-    [[nodiscard]] size_t find_first_not_of(const std::string & s, size_t pos=0) const noexcept
-      { return str.find_first_not_of(s,pos); }
-    [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos=0) const
-      { return str.find_first_not_of(s,pos); }
-    [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos, size_t count) const
-      { return str.find_first_not_of(s,pos,count); }
-    [[nodiscard]] size_t find_first_not_of(char c, size_t pos=0) const noexcept
-      { return str.find_first_not_of(c,pos); }
-    template < class SVIEW_T > [[nodiscard]] size_t find_first_not_of(const SVIEW_T & sv, size_t pos=0) const
-      { return str.find_first_not_of(sv,pos); }
+    // [[nodiscard]] size_t find_first_not_of(const std::string & s, size_t pos=0) const noexcept
+    //   { return std::string::find_first_not_of(s,pos); }
+    // [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos=0) const
+    //   { return std::string::find_first_not_of(s,pos); }
+    // [[nodiscard]] size_t find_first_not_of(const char* s, size_t pos, size_t count) const
+    //   { return std::string::find_first_not_of(s,pos,count); }
+    // [[nodiscard]] size_t find_first_not_of(char c, size_t pos=0) const noexcept
+    //   { return std::string::find_first_not_of(c,pos); }
+    // template < class SVIEW_T > [[nodiscard]] size_t find_first_not_of(const SVIEW_T & sv, size_t pos=0) const
+    //   { return std::string::find_first_not_of(sv,pos); }
 
-    [[nodiscard]] size_t find_last_of(const std::string & s, size_t pos=0) const noexcept
-      { return str.find_last_of(s,pos); }
-    [[nodiscard]] size_t find_last_of(const char* s, size_t pos=0) const { return str.find_last_of(s,pos); }
-    [[nodiscard]] size_t find_last_of(const char* s, size_t pos, size_t count) const
-      { return str.find_last_of(s,pos,count); }
-    [[nodiscard]] size_t find_last_of(char c, size_t pos=0) const noexcept { return str.find_last_of(c,pos); }
-    template < class SVIEW_T > [[nodiscard]] size_t find_last_of(const SVIEW_T & sv, size_t pos=0) const
-      { return str.find_last_of(sv,pos); }
+    // [[nodiscard]] size_t find_last_of(const std::string & s, size_t pos=0) const noexcept
+    //   { return std::string::find_last_of(s,pos); }
+    // [[nodiscard]] size_t find_last_of(const char* s, size_t pos=0) const { return std::string::find_last_of(s,pos); }
+    // [[nodiscard]] size_t find_last_of(const char* s, size_t pos, size_t count) const
+    //   { return std::string::find_last_of(s,pos,count); }
+    // [[nodiscard]] size_t find_last_of(char c, size_t pos=0) const noexcept { return std::string::find_last_of(c,pos); }
+    // template < class SVIEW_T > [[nodiscard]] size_t find_last_of(const SVIEW_T & sv, size_t pos=0) const
+    //   { return std::string::find_last_of(sv,pos); }
 
-    [[nodiscard]] size_t find_last_not_of(const std::string & s, size_t pos=0) const noexcept
-      { return str.find_last_not_of(s,pos); }
-    [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos=0) const
-      { return str.find_last_not_of(s,pos); }
-    [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos, size_t count) const
-      { return str.find_last_not_of(s,pos,count); }
-    [[nodiscard]] size_t find_last_not_of(char c, size_t pos=0) const noexcept
-      { return str.find_last_not_of(c,pos); }
-    template < class SVIEW_T > [[nodiscard]] size_t find_last_not_of(const SVIEW_T & sv, size_t pos=0) const
-      { return str.find_last_not_of(sv,pos); }
+    // [[nodiscard]] size_t find_last_not_of(const std::string & s, size_t pos=0) const noexcept
+    //   { return std::string::find_last_not_of(s,pos); }
+    // [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos=0) const
+    //   { return std::string::find_last_not_of(s,pos); }
+    // [[nodiscard]] size_t find_last_not_of(const char* s, size_t pos, size_t count) const
+    //   { return std::string::find_last_not_of(s,pos,count); }
+    // [[nodiscard]] size_t find_last_not_of(char c, size_t pos=0) const noexcept
+    //   { return std::string::find_last_not_of(c,pos); }
+    // template < class SVIEW_T > [[nodiscard]] size_t find_last_not_of(const SVIEW_T & sv, size_t pos=0) const
+    //   { return std::string::find_last_not_of(sv,pos); }
 
     [[nodiscard]] size_t FindQuoteMatch(size_t pos) const;
     [[nodiscard]] size_t FindParenMatch(size_t pos, const Mode & mode=ParensMode()) const;
@@ -517,7 +511,7 @@ namespace emp {
     std::string_view ViewNestedBlock(size_t start=0, const Mode & mode=QuotesMode())
       { return ViewRange(start+1, FindParenMatch(start, mode) - 1); }
     std::string_view ViewQuote(size_t start=0, const Mode & mode=QuotesMode())
-      { return ViewRange(start, mode.IsQuote(str[start]) ? FindQuoteMatch(start) : start); }
+      { return ViewRange(start, mode.IsQuote(Get(start)) ? FindQuoteMatch(start) : start); }
 
 
     // ------ Transformations into non-Strings ------
@@ -556,35 +550,35 @@ namespace emp {
 
     // ------ Other Operators ------
 
-    template <typename T> [[nodiscard]] String operator+(T && in) const
-      { return str + std::forward<T>(in); }
-    [[nodiscard]] bool operator==(const emp::String & in) const { return str == in.str; }
-    [[nodiscard]] bool operator==(const std::string & in) const { return str == in; }
-    [[nodiscard]] bool operator==(const char * in) const { return str == in; }
+    // template <typename T> [[nodiscard]] String operator+(T && in) const
+    //   { return std::string::operator+(std::forward<T>(in)); }
+    // [[nodiscard]] bool operator==(const emp::String & in) const { return std::string::operator==(in); }
+    // [[nodiscard]] bool operator==(const std::string & in) const { return std::string::operator==(in); }
+    // [[nodiscard]] bool operator==(const char * in) const { return std::string::operator==(in); }
 
-    [[nodiscard]] bool operator!=(const emp::String & in) const { return str != in.str; }
-    [[nodiscard]] bool operator!=(const std::string & in) const { return str != in; }
-    [[nodiscard]] bool operator!=(const char * in) const { return str != in; }
+    // [[nodiscard]] bool operator!=(const emp::String & in) const { return std::string::operator!=(in); }
+    // [[nodiscard]] bool operator!=(const std::string & in) const { return std::string::operator!=(in); }
+    // [[nodiscard]] bool operator!=(const char * in) const { return std::string::operator!=(in); }
 
-    [[nodiscard]] bool operator<(const emp::String & in) const { return str < in.str; }
-    [[nodiscard]] bool operator<(const std::string & in) const { return str < in; }
-    [[nodiscard]] bool operator<(const char * in) const { return str < in; }
+    // [[nodiscard]] bool operator<(const emp::String & in) const { return std::string::operator<(in); }
+    // [[nodiscard]] bool operator<(const std::string & in) const { return std::string::operator<(in) in; }
+    // [[nodiscard]] bool operator<(const char * in) const { return std::string::operator<(in) in; }
 
-    [[nodiscard]] bool operator<=(const emp::String & in) const { return str <= in.str; }
-    [[nodiscard]] bool operator<=(const std::string & in) const { return str <= in; }
-    [[nodiscard]] bool operator<=(const char * in) const { return str <= in; }
+    // [[nodiscard]] bool operator<=(const emp::String & in) const { return std::string::operator<=(in); }
+    // [[nodiscard]] bool operator<=(const std::string & in) const { return std::string::operator<=(in); }
+    // [[nodiscard]] bool operator<=(const char * in) const { return std::string::operator<=(in); }
 
-    [[nodiscard]] bool operator>(const emp::String & in) const { return str > in.str; }
-    [[nodiscard]] bool operator>(const std::string & in) const { return str > in; }
-    [[nodiscard]] bool operator>(const char * in) const { return str > in; }
+    // [[nodiscard]] bool operator>(const emp::String & in) const { return std::string::operator>(in); }
+    // [[nodiscard]] bool operator>(const std::string & in) const { return std::string::operator>(in) in; }
+    // [[nodiscard]] bool operator>(const char * in) const { return std::string::operator>(in) in; }
 
-    [[nodiscard]] bool operator>=(const emp::String & in) const { return str >= in.str; }
-    [[nodiscard]] bool operator>=(const std::string & in) const { return str >= in; }
-    [[nodiscard]] bool operator>=(const char * in) const { return str >= in; }
+    // [[nodiscard]] bool operator>=(const emp::String & in) const { return std::string::operator>=(in); }
+    // [[nodiscard]] bool operator>=(const std::string & in) const { return std::string::operator>=(in); }
+    // [[nodiscard]] bool operator>=(const char * in) const { return std::string::operator>=(in); }
 
     // auto operator<=>(const emp::String & in) const = default;
-    // auto operator<=>(const std::string & in) const { return str <=> in; }
-    // auto operator<=>(const char * in) const { return str <=> in; }
+    // auto operator<=>(const std::string & in) const { return *this <=> in; }
+    // auto operator<=>(const char * in) const { return *this <=> in; }
     
 
     //  ------ FORMATTING ------
@@ -595,69 +589,69 @@ namespace emp {
     // Most also have stand-along Make* versions where the core implementation is found.
 
     template <typename... Ts>
-    String & Append(Ts... args) { return str += MakeString(std::forward<Ts>(args)...);}
+    String & Append(Ts... args) { return *this += MakeString(std::forward<Ts>(args)...);}
     template <typename... Ts>
-    String & Set(Ts... args) { return str = MakeString(std::forward<Ts>(args)...); }
+    String & Set(Ts... args) { return *this = MakeString(std::forward<Ts>(args)...); }
     template <typename T>
-    T As() { std::stringstream ss; ss << str; T out; ss >> out; return out; }
+    T As() { std::stringstream ss; ss << *this; T out; ss >> out; return out; }
 
-    String & AppendEscaped(char c) { str += MakeEscaped(c); return *this; }
-    String & SetEscaped(char c) { str = MakeEscaped(c); return *this; }
+    String & AppendEscaped(char c) { *this += MakeEscaped(c); return *this; }
+    String & SetEscaped(char c) { *this = MakeEscaped(c); return *this; }
 
-    String & AppendEscaped(const std::string & in) { str+=MakeEscaped(in); return *this; }
-    String & SetEscaped(const std::string & in) { str = MakeEscaped(in); return *this; }
-    String & ToEscaped() { str = MakeEscaped(str); return *this; }
-    [[nodiscard]] emp::String AsEscaped() { return MakeEscaped(str); }
+    String & AppendEscaped(const std::string & in) { *this+=MakeEscaped(in); return *this; }
+    String & SetEscaped(const std::string & in) { *this = MakeEscaped(in); return *this; }
+    String & ToEscaped() { *this = MakeEscaped(*this); return *this; }
+    [[nodiscard]] emp::String AsEscaped() { return MakeEscaped(*this); }
 
-    String & AppendWebSafe(std::string in) { str+=MakeWebSafe(in); return *this; }
-    String & SetWebSafe(const std::string & in) { str = MakeWebSafe(in); return *this; }
-    String & ToWebSafe() { str = MakeWebSafe(str); return *this; }
-    [[nodiscard]] emp::String AsWebSafe() { return MakeWebSafe(str); }
+    String & AppendWebSafe(std::string in) { *this+=MakeWebSafe(in); return *this; }
+    String & SetWebSafe(const std::string & in) { *this = MakeWebSafe(in); return *this; }
+    String & ToWebSafe() { *this = MakeWebSafe(*this); return *this; }
+    [[nodiscard]] emp::String AsWebSafe() { return MakeWebSafe(*this); }
 
     // <= Creating Literals =>
     template <typename T>
-    String & AppendLiteral(const T & in) { str+=MakeLiteral(in); return *this; }
+    String & AppendLiteral(const T & in) { *this+=MakeLiteral(in); return *this; }
     template <typename T>
-    String & SetLiteral(const T & in) { str = MakeLiteral(in); return *this;; }
-    String & ToLiteral() { str = MakeLiteral(str); return *this; }
-    [[nodiscard]] emp::String AsLiteral() { return MakeLiteral(str); }
+    String & SetLiteral(const T & in) { *this = MakeLiteral(in); return *this;; }
+    String & ToLiteral() { *this = MakeLiteral(*this); return *this; }
+    [[nodiscard]] emp::String AsLiteral() { return MakeLiteral(*this); }
 
-    String & AppendUpper(const std::string & in) { str+=MakeUpper(in); return *this; }
-    String & SetUpper(const std::string & in) { str = MakeUpper(in); return *this; }
-    String & ToUpper() { str = MakeUpper(str); return *this; }
-    [[nodiscard]] emp::String AsUpper() { return MakeUpper(str); }
+    String & AppendUpper(const std::string & in) { *this+=MakeUpper(in); return *this; }
+    String & SetUpper(const std::string & in) { *this = MakeUpper(in); return *this; }
+    String & ToUpper() { *this = MakeUpper(*this); return *this; }
+    [[nodiscard]] emp::String AsUpper() { return MakeUpper(*this); }
 
-    String & AppendLower(const std::string & in) { str+=MakeLower(in); return *this; }
-    String & SetLower(const std::string & in) { str = MakeLower(in); return *this; }
-    String & ToLower() { str = MakeLower(str); return *this; }
-    [[nodiscard]] emp::String AsLower() { return MakeLower(str); }
+    String & AppendLower(const std::string & in) { *this+=MakeLower(in); return *this; }
+    String & SetLower(const std::string & in) { *this = MakeLower(in); return *this; }
+    String & ToLower() { *this = MakeLower(*this); return *this; }
+    [[nodiscard]] emp::String AsLower() { return MakeLower(*this); }
 
-    String & AppendTitleCase(const std::string & in) { str+=MakeTitleCase(in); return *this; }
-    String & SetTitleCase(const std::string & in) { str = MakeTitleCase(in); return *this; }
-    String & ToTitleCase() { str = MakeTitleCase(str); return *this; }
-    [[nodiscard]] emp::String AsTitleCase() { return MakeTitleCase(str); }
+    String & AppendTitleCase(const std::string & in) { *this+=MakeTitleCase(in); return *this; }
+    String & SetTitleCase(const std::string & in) { *this = MakeTitleCase(in); return *this; }
+    String & ToTitleCase() { *this = MakeTitleCase(*this); return *this; }
+    [[nodiscard]] emp::String AsTitleCase() { return MakeTitleCase(*this); }
 
-    String & AppendRoman(int val) { str+=MakeRoman(val); return *this; }
-    String & SetRoman(int val) { str = MakeRoman(val); return *this; }
+    String & AppendRoman(int val) { *this+=MakeRoman(val); return *this; }
+    String & SetRoman(int val) { *this = MakeRoman(val); return *this; }
 
     template <typename CONTAINER_T> String & AppendEnglishList(const CONTAINER_T & container)
-      { str += MakeEnglishList(container); return *this;}
+      { *this += MakeEnglishList(container); return *this;}
     template <typename CONTAINER_T> String & SetEnglishList(const CONTAINER_T & container)
-      { str = MakeEnglishList(container); return *this;}
+      { *this = MakeEnglishList(container); return *this;}
       
     template<typename... ARG_Ts> String & AppendFormatted(const std::string& format, ARG_Ts... args)
-      { return str += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+      { return *this += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
     template<typename... ARG_Ts> String & SetFormatted(const std::string& format, ARG_Ts... args)
-      { return str = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+      { return *this = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
 
     template <typename CONTAINER_T>
     String & AppendJoin(const CONTAINER_T & container, std::string delim="",
                         std::string open="", std::string close="")
-      { str += Join(container, delim, open, close); return *this;}
+      { *this += Join(container, delim, open, close); return *this;}
     template <typename CONTAINER_T>
     String & SetJoin(const CONTAINER_T & container, std::string delim="",
                      std::string open="", std::string close="")
-      { str = Join(container, delim, open, close); return *this;}
+      { *this = Join(container, delim, open, close); return *this;}
 
     template <typename... Ts>
     static emp::String Make(Ts... args) {
@@ -676,7 +670,7 @@ namespace emp {
   
   /// Determine if this string represents a proper number.
   bool String::IsNumber() const {
-    if (!str.size()) return false;           // If string is empty, not a number!
+    if (!size()) return false;           // If string is empty, not a number!
     size_t pos = 0;
     if (HasOneOfAt("+-", pos)) ++pos;        // Allow leading +/-
     while (HasDigitAt(pos)) ++pos;           // Any number of digits (none is okay)
@@ -692,46 +686,46 @@ namespace emp {
       while (HasDigitAt(pos)) ++pos;         // Allow for MORE digits.
     }
     // If we've made it to the end of the string AND there was at least one digit, success!
-    return (pos == str.size()) && HasDigit();
+    return (pos == size()) && HasDigit();
   }
 
   // Given the start position of a quote, find where it ends; marks must be identical
   size_t String::FindQuoteMatch(size_t pos) const {
-    while (++pos < str.size()) {
-      const char mark = str[pos];
-      if (str[pos] == '\\') { ++pos; continue; } // Skip escaped characters in quotes
-      if (str[pos] == mark) { return pos; }      // Found match!
+    while (++pos < size()) {
+      const char mark = Get(pos);
+      if (Get(pos) == '\\') { ++pos; continue; } // Skip escaped characters in quotes
+      if (Get(pos) == mark) { return pos; }      // Found match!
     }
     return npos; // Not found.
   }
 
   // Given an open parenthesis, find where it closes (including nesting).  Marks must be different.
   size_t String::FindParenMatch(size_t pos, const Mode & mode) const {
-    const char open = str[pos];
+    const char open = Get(pos);
     const char close = mode.GetMatch(open);
     size_t open_count = 1;
-    while (++pos < str.size()) {
-      if (str[pos] == open) ++open_count;
-      else if (str[pos] == close) { if (--open_count == 0) return pos; }
-      else if (mode.IsQuote(str[pos]) ) pos = FindQuoteMatch(pos);
+    while (++pos < size()) {
+      if (Get(pos) == open) ++open_count;
+      else if (Get(pos) == close) { if (--open_count == 0) return pos; }
+      else if (mode.IsQuote(Get(pos)) ) pos = FindQuoteMatch(pos);
     }
 
     return npos;
   }
 
   size_t String::FindMatch(size_t pos, const Mode & mode) const {
-    if (mode.IsQuote(str[pos])) return FindQuoteMatch(pos);
-    if (mode.IsParen(str[pos])) return FindParenMatch(pos, mode);
+    if (mode.IsQuote(Get(pos))) return FindQuoteMatch(pos);
+    if (mode.IsParen(Get(pos))) return FindParenMatch(pos, mode);
     return npos;
   }
 
   // A version of string::find() with single chars that can skip over quotes.
   size_t String::Find(char target, size_t start, const Mode & mode) const {
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
-    for (size_t pos=start; pos < str.size(); ++pos) {
-      if (str[pos] == target) return pos;
-      else if (mode.IsQuote(str[pos])) pos = FindQuoteMatch(pos);
-      else if (mode.IsParen(str[pos])) pos = FindParenMatch(pos, mode);
+    for (size_t pos=start; pos < size(); ++pos) {
+      if (Get(pos) == target) return pos;
+      else if (mode.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
+      else if (mode.IsParen(Get(pos))) pos = FindParenMatch(pos, mode);
     }
 
     return npos;
@@ -739,7 +733,7 @@ namespace emp {
 
   // A version of string::find() that can skip over quotes.
   size_t String::Find(std::string target, size_t start, const Mode & mode) const {
-    size_t found_pos = str.find(target, start);
+    size_t found_pos = find(target, start);
     if (mode.GetCount() == 0) return found_pos;
 
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
@@ -748,13 +742,13 @@ namespace emp {
          scan_pos++)
     {
       // Skip quotes, if needed...
-      if (mode.IsQuote(str[scan_pos])) {
+      if (mode.IsQuote(Get(scan_pos))) {
         scan_pos = FindQuoteMatch(scan_pos);
-        if (found_pos < scan_pos) found_pos = str.find(target, scan_pos);
+        if (found_pos < scan_pos) found_pos = find(target, scan_pos);
       }
-      else if (mode.IsParen(str[scan_pos])) {
+      else if (mode.IsParen(Get(scan_pos))) {
         scan_pos = FindParenMatch(scan_pos);
-        if (found_pos < scan_pos) found_pos = str.find(target, scan_pos);
+        if (found_pos < scan_pos) found_pos = find(target, scan_pos);
       }
     }
 
@@ -764,10 +758,10 @@ namespace emp {
   size_t String::Find(const CharSet & char_set, size_t start, const Mode & mode) const
   {
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
-    for (size_t pos=start; pos < str.size(); ++pos) {
-      if (char_set.Has(str[pos])) return pos;
-      else if (mode.IsQuote(str[pos])) pos = FindQuoteMatch(pos);
-      else if (mode.IsParen(str[pos])) pos = FindParenMatch(pos, mode);
+    for (size_t pos=start; pos < size(); ++pos) {
+      if (char_set.Has(Get(pos))) return pos;
+      else if (mode.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
+      else if (mode.IsParen(Get(pos))) pos = FindParenMatch(pos, mode);
     }
 
     return npos;
@@ -775,12 +769,12 @@ namespace emp {
 
   void String::FindAll(char target, emp::vector<size_t> & results, const Mode & mode) const {
     results.resize(0);
-    for (size_t pos=0; pos < str.size(); pos++) {
-      if (str[pos] == target) results.push_back(pos);
+    for (size_t pos=0; pos < size(); pos++) {
+      if (Get(pos) == target) results.push_back(pos);
 
       // Skip quotes, if needed...
-      if (mode.IsQuote(str[pos])) pos = FindQuoteMatch(pos);
-      else if (mode.IsParen(str[pos])) pos = FindParenMatch(pos, mode);
+      if (mode.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
+      else if (mode.IsParen(Get(pos))) pos = FindParenMatch(pos, mode);
     }
   }
 
@@ -792,9 +786,9 @@ namespace emp {
 
   template <typename... Ts>
   size_t String::FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const {
-    if constexpr (sizeof...(Ts) == 0) return str.find(test1, start);
+    if constexpr (sizeof...(Ts) == 0) return find(test1, start);
     else {
-      size_t pos1 = str.find(test1, start);
+      size_t pos1 = find(test1, start);
       size_t pos2 = FindAnyOfFrom(start, tests...);
       return std::min(pos1, pos2);
     }
@@ -815,9 +809,9 @@ namespace emp {
   {
     size_t pos = Find(target, start, mode);
     while (pos != npos) {
-      bool before_ok = (pos == 0) || !is_idchar(str[pos-1]);
+      bool before_ok = (pos == 0) || !is_idchar(Get(pos-1));
       size_t after_pos = pos+target.size();
-      bool after_ok = (after_pos == str.size()) || !is_idchar(str[after_pos]);
+      bool after_ok = (after_pos == size()) || !is_idchar(Get(after_pos));
       if (before_ok && after_ok) return pos;
 
       pos = Find(target, pos+target.size(), mode);
@@ -830,12 +824,12 @@ namespace emp {
   /// Remove whitespace from the beginning or end of a string.
   emp::String & String::TrimWhitespace() {
     size_t start_count=0;
-    while (start_count < str.size() && is_whitespace(str[start_count])) ++start_count;
-    if (start_count) str.erase(0, start_count);
+    while (start_count < size() && is_whitespace(Get(start_count))) ++start_count;
+    if (start_count) erase(0, start_count);
 
-    size_t new_size = str.size();
-    while (new_size > 0 && is_whitespace(str[new_size-1])) --new_size;
-    str.resize(new_size);
+    size_t new_size = size();
+    while (new_size > 0 && is_whitespace(Get(new_size-1))) --new_size;
+    resize(new_size);
 
     return *this;
   }
@@ -845,19 +839,19 @@ namespace emp {
     bool skip_whitespace = true;          // Remove whitespace from beginning of line.
     size_t pos = 0;
 
-    for (const auto c : str) {
+    for (const auto c : *this) {
       if (is_whitespace(c)) {          // This char is whitespace
         if (skip_whitespace) continue; // Already skipping...
-        str[pos++] = ' ';
+        Get(pos++) = ' ';
         skip_whitespace = true;
       } else {  // Not whitespace
-        str[pos++] = c;
+        Get(pos++) = c;
         skip_whitespace = false;
       }
     }
 
     if (pos && skip_whitespace) pos--;   // If the end of the line is whitespace, remove it.
-    str.resize(pos);
+    resize(pos);
 
     return *this;
   }
@@ -865,10 +859,10 @@ namespace emp {
   /// Remove all instances of specified characters from file.
   emp::String & String::RemoveChars(const CharSet & chars) {
     size_t cur_pos = 0;
-    for (const auto c : str) {
-      if (!chars.Has(c)) str[cur_pos++] = c;
+    for (const auto c : *this) {
+      if (!chars.Has(c)) Get(cur_pos++) = c;
     }
-    str.resize(cur_pos);
+    resize(cur_pos);
     return *this;
   }
 
@@ -881,7 +875,7 @@ namespace emp {
   // Pop functions...
 
   bool String::PopIf(char c) {
-    if (str.size() && str[0] == c) { str.erase(0,1); return true; }
+    if (size() && Get(0) == c) { erase(0,1); return true; }
     return false;
   }
 
@@ -893,18 +887,18 @@ namespace emp {
   /// Pop the entire string.
   emp::String String::PopAll() {
     std::string out;
-    out.swap(str);
+    swap(out);
     return out;
   }
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
   emp::String String::PopFixed(std::size_t end_pos, size_t delim_size)
   {
-    if (!end_pos) return "";                    // Not popping anything!
-    if (end_pos >= str.size()) return PopAll(); // Popping everything!
+    if (!end_pos) return "";                  // Not popping anything!
+    if (end_pos >= size()) return PopAll();   // Popping everything!
 
-    emp::String out = str.substr(0, end_pos);   // Copy up to the deliminator for ouput
-    str.erase(0, end_pos + delim_size);         // Delete output string AND delimiter
+    emp::String out = substr(0, end_pos);     // Copy up to the deliminator for ouput
+    erase(0, end_pos + delim_size);       // Delete output string AND delimiter
     return out;
   }
 
@@ -926,7 +920,7 @@ namespace emp {
   emp::String String::PopLine(const Mode & mode) { return Pop("\n", mode); }
 
   emp::String String::PopQuote(const Mode & mode) {
-    if (!mode.IsQuote(str[0])) return emp::String();
+    if (!mode.IsQuote(Get(0))) return emp::String();
     const size_t end_pos = FindQuoteMatch(0);
     return (end_pos==std::string::npos) ? "" : PopFixed(end_pos+1);
   }
@@ -938,7 +932,7 @@ namespace emp {
 
   size_t String::PopUInt() {
     size_t uint_size = 0;
-    while (uint_size < str.size() && isdigit(str[uint_size])) ++uint_size;
+    while (uint_size < size() && isdigit(Get(uint_size))) ++uint_size;
     std::string out_uint = PopFixed(uint_size);
     return std::stoull(out_uint);
   }
@@ -951,11 +945,11 @@ namespace emp {
   void String::Slice(
     emp::vector<emp::String> & out_set, std::string delim, const Mode & mode, bool trim_whitespace
   ) const {
-    if (str.empty()) return; // Nothing to set!
+    if (empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
     size_t found_pos = Find(delim, 0, mode);
-    while (found_pos < str.size()) {
+    while (found_pos < size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
       if (trim_whitespace) out_set.back().TrimWhitespace();
       start_pos = found_pos+delim.size();
@@ -986,11 +980,11 @@ namespace emp {
     emp::vector<std::string_view> & out_set, std::string delim, const Mode & mode
   ) const {
     out_set.resize(0);
-    if (str.empty()) return; // Nothing to set!
+    if (empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
     size_t found_pos = Find(delim, 0, mode);
-    while (found_pos < str.size()) {
+    while (found_pos < size()) {
       out_set.push_back( ViewRange(start_pos, found_pos) );
       start_pos = found_pos+delim.size();
       found_pos = Find(delim, found_pos+1, mode);
@@ -1032,7 +1026,7 @@ namespace emp {
       }
       if (setting.empty()) {
         std::stringstream msg;
-        msg << "No assignment found in slice_assign() for: " << var_name.str;
+        msg << "No assignment found in slice_assign() for: " << var_name;
         emp::notify::Exception("emp::string_utils::slice_assign::missing_assign",
                                msg.str(), var_name);                               
       }
@@ -1064,17 +1058,17 @@ namespace emp {
          pos = Find(symbol, pos+symbol.size(), mode)) {
       const size_t symbol_end = pos+symbol.size();
       if (HasAt(symbol, symbol_end)) {   // Compress two symbols (e.g., "$$") into one (e.g. "$")
-        str.erase(pos,symbol.size());
+        erase(pos, symbol.size());
         continue;
       }
-      if (str[symbol_end] != '{') continue; // Eval must be surrounded by braces.
+      if (Get(symbol_end) != '{') continue; // Eval must be surrounded by braces.
 
       // If we made it this far, we have a starting match!
       size_t end_pos = FindParenMatch(symbol_end);
       if (end_pos == npos) {
         emp::notify::Exception("emp::string_utils::replace_vars::missing_close",
                                "No close brace found in string_utils::replace_vars()",
-                               str);
+                               *this);
         break;
       }
 
@@ -1115,7 +1109,7 @@ namespace emp {
          macro_pos = Find(start_str, macro_pos+1, mode))
     {
       // Make sure we're not just extending a previous identifier.
-      if (macro_pos && is_idchar(str[macro_pos-1])) continue;
+      if (macro_pos && is_idchar(Get(macro_pos-1))) continue;
 
       line_num += Count('\n', prev_pos, macro_pos);  // Count lines leading up to this macro.
 
@@ -1136,31 +1130,31 @@ namespace emp {
   bool String::IsLiteralChar() const {
     // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
     // Must contain a representation of a character, surrounded by single quotes.
-    if (str.size() < 3 || str.size() > 4) return false;
-    if (str[0] != '\'' || str.back() != '\'') return false;
+    if (size() < 3 || size() > 4) return false;
+    if (Get(0) != '\'' || back() != '\'') return false;
 
     // If there's only a single character in the quotes, it's USUALLY legal.
-    if (str.size() == 3) return str[1] != '\'' && str[1] != '\\';
+    if (size() == 3) return Get(1) != '\'' && Get(1) != '\\';
 
     // Multiple chars must begin with a backslash.
-    if (str[1] != '\\') return false;
+    if (Get(1) != '\\') return false;
 
     CharSet chars("nrt0\\\'");
-    return chars.Has(str[2]);
+    return chars.Has(Get(2));
   }
 
   /// Test if an input string is properly formatted as a literal string.
   bool String::IsLiteralString(const std::string & quote_marks) const {
     // Must begin and end with proper quote marks.
-    if (str.size() < 2 || !is_one_of(str[0], quote_marks) || str.back() != str[0]) return false;
+    if (size() < 2 || !is_one_of(Get(0), quote_marks) || back() != Get(0)) return false;
 
     // Are all of the characters valid?
-    for (size_t pos = 1; pos < str.size() - 1; pos++) {
-      if (str[pos] == str[0]) return false;          // Cannot have a raw quote in the middle.
-      if (str[pos] == '\\') {                        // Allow escaped characters...
-        if (pos == str.size()-2) return false;       // Backslash must have char to escape.
+    for (size_t pos = 1; pos < size() - 1; pos++) {
+      if (Get(pos) == Get(0)) return false;          // Cannot have a raw quote in the middle.
+      if (Get(pos) == '\\') {                        // Allow escaped characters...
+        if (pos == size()-2) return false;       // Backslash must have char to escape.
         pos++;                                       // Skip past escaped character.
-        if (!is_escape_code(str[pos])) return false; // Illegal escaped character.
+        if (!is_escape_code(Get(pos))) return false; // Illegal escaped character.
       }
     }
 
@@ -1172,17 +1166,17 @@ namespace emp {
   /// Test if an input string is properly formatted as a literal string.
   std::string String::DiagnoseLiteralString(const std::string & quote_marks) const {
     // A literal string must begin and end with a double quote and contain only valid characters.
-    if (str.size() < 2) return "Too short!";
-    if (!is_one_of(str[0], quote_marks)) return "Must begin an end in quotes.";
-    if (str.back() != str[0]) return "Must have begin and end quotes that match.";
+    if (size() < 2) return "Too short!";
+    if (!is_one_of(Get(0), quote_marks)) return "Must begin an end in quotes.";
+    if (back() != Get(0)) return "Must have begin and end quotes that match.";
 
     // Are all of the characters valid?
-    for (size_t pos = 1; pos < str.size() - 1; pos++) {
-      if (str[pos] == str[0]) return "Has a floating quote.";
-      if (str[pos] == '\\') {
-        if (pos == str.size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
+    for (size_t pos = 1; pos < size() - 1; pos++) {
+      if (Get(pos) == Get(0)) return "Has a floating quote.";
+      if (Get(pos) == '\\') {
+        if (pos == size()-2) return "Cannot escape the final quote.";  // Backslash must have char to escape.
         pos++;
-        if (!is_escape_code(str[pos])) return "Unknown escape charater.";
+        if (!is_escape_code(Get(pos))) return "Unknown escape charater.";
       }
     }
 
@@ -1202,23 +1196,13 @@ namespace emp {
 
   // ------ External function overrides ------
 
-  std::ostream & operator<<(std::ostream & os, const emp::String & in) {
-    return os << in.cpp_str();
-  }
+  // std::ostream & operator<<(std::ostream & os, const emp::String & in) {
+  //   return os << in.cpp_str();
+  // }
 
-  std::istream & operator>>(std::istream & is, emp::String & in) {
-    return is >> in.cpp_str();
-  }
-
-  template<typename STREAM_T>
-  STREAM_T & getline(STREAM_T && input, emp::String str, char delim) {
-    return getline(std::forward<STREAM_T>(input), str.cpp_str(), delim);
-  }
-
-  template<typename STREAM_T>
-  STREAM_T & getline(STREAM_T && input, emp::String str) {
-    return getline(std::forward<STREAM_T>(input), str.cpp_str());
-  }
+  // std::istream & operator>>(std::istream & is, emp::String & in) {
+  //   return is >> in.cpp_str();
+  // }
 
 
   template <typename... Ts>
@@ -1501,15 +1485,15 @@ namespace emp {
 
 // ---------------------- Implementations to work with standard library ----------------------
 
-namespace std {
-  /// Hash function to allow String to be used with unordered maps and sets (must be in std).
-  template <>
-  struct hash<emp::String> {
-    std::size_t operator()(const emp::String & str) const {
-      return std::hash<std::string>()(str.cpp_str()); 
-    }
-  };
-}
+// namespace std {
+//   /// Hash function to allow String to be used with unordered maps and sets (must be in std).
+//   template <>
+//   struct hash<emp::String> {
+//     std::size_t operator()(const emp::String & str) const {
+//       return std::hash<std::string>()(str.cpp_str()); 
+//     }
+//   };
+// }
 
 
 #endif // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
