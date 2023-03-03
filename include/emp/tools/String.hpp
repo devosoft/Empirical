@@ -78,33 +78,34 @@ namespace emp {
   class String : public std::string {
   private:
     // Special class for tracking character interactions.
-    struct Mode {
+    struct Syntax {
       emp::array<char, 128> char_matches;
       uint8_t count = 0;
-      Mode() { char_matches.fill('\0'); }
-      Mode(std::string quotes, std::string parens="") {
-        emp_assert(parens.size() % 2 == 0, "String::Mode must have odd number of paren chars.");
+      Syntax() { char_matches.fill('\0'); }
+      Syntax(std::string quotes, std::string parens="") {
+        emp_assert(parens.size() % 2 == 0, "String::Syntax must have odd number of paren chars.");
         char_matches.fill('\0');
         for (char c : quotes) char_matches[c] = c;
         for (size_t i=0; i < parens.size(); i+=2) char_matches[parens[i]] = parens[i+1];
         count = static_cast<uint8_t>(quotes.size() + parens.size()/2);
       }
-      Mode(const char * quotes, const char * parens)
-        : Mode(std::string(quotes), std::string(parens)) { }
-      Mode & operator=(const Mode &) = default;
-      Mode & operator=(Mode &&) = default;
+      Syntax(const char * quotes, const char * parens)
+        : Syntax(std::string(quotes), std::string(parens)) { }
+      Syntax & operator=(const Syntax &) = default;
+      Syntax & operator=(Syntax &&) = default;
       bool IsQuote(char c) const { return c && char_matches[c] && (char_matches[c] == c); }
       bool IsParen(char c) const { return c && char_matches[c] && (char_matches[c] != c); }
       char GetMatch(char c) const { return char_matches[c]; }
       uint8_t GetCount() const { return count; }
       std::string GetQuotes() const { std::string out; for (uint8_t i=0; i < 128; ++i) if (char_matches[i]==i) out+=(char)i; return out;}
+
+      static Syntax None()   { return Syntax(); }
+      static Syntax Quotes() { return Syntax("\"'"); }
+      static Syntax Parens() { return Syntax("",     "()[]{}"); }
+      static Syntax Full()   { return Syntax("\"'",  "()[]{}"); }
+      static Syntax Max()    { return Syntax("\"'`", "()[]{}<>"); }
     };
 
-    static Mode EmptyMode() { return Mode(); }
-    static Mode QuotesMode() { return Mode("\"'"); }
-    static Mode ParensMode() { return Mode("", "()[]{}"); }
-    static Mode BothMode() { return Mode("\"'", "()[]{}"); }
-    static Mode FullMode() { return Mode("\"'`", "()[]{}<>"); }
 
 
     // Convert objects into a streamable type using _Convert(obj)
@@ -325,12 +326,12 @@ namespace emp {
     bool PopIf(String in);
     emp::String PopAll();
     emp::String PopFixed(std::size_t end_pos, size_t delim_size=0);
-    emp::String Pop(CharSet chars=" \n\t\r", const Mode & mode=EmptyMode());
-    emp::String PopTo(std::string delim, const Mode & mode=EmptyMode());
-    emp::String PopWord(const Mode & mode=EmptyMode());
-    emp::String PopLine(const Mode & mode=EmptyMode());
-    emp::String PopQuote(const Mode & mode=QuotesMode());
-    emp::String PopParen(const Mode & mode=ParensMode());
+    emp::String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
+    emp::String PopTo(std::string delim, const Syntax & syntax=Syntax::None());
+    emp::String PopWord(const Syntax & syntax=Syntax::None());
+    emp::String PopLine(const Syntax & syntax=Syntax::None());
+    emp::String PopQuote(const Syntax & syntax=Syntax::Quotes());
+    emp::String PopParen(const Syntax & syntax=Syntax::Parens());
     size_t PopUInt();
 
     // ------ Insertions and Additions ------
@@ -385,12 +386,12 @@ namespace emp {
     // Find any instances of ${X} and replace with dictionary lookup of X.
     template <typename MAP_T>
     emp::String & ReplaceVars(const MAP_T & var_map, emp::String symbol="$",
-                              const Mode & mode=QuotesMode());
+                              const Syntax & syntax=Syntax::Quotes());
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
     String & ReplaceMacro(std::string start_str, std::string end_str, FUN_T && fun,
-                          const Mode & mode=QuotesMode());
+                          const Syntax & syntax=Syntax::Quotes());
 
 
     // ------ Searching ------
@@ -403,54 +404,54 @@ namespace emp {
     // size_t find_last_not_of(...) const
 
     [[nodiscard]] size_t FindQuoteMatch(size_t pos=0) const;
-    [[nodiscard]] size_t FindParenMatch(size_t pos=0, const Mode & mode=ParensMode()) const;
-    [[nodiscard]] size_t FindMatch(size_t pos=0, const Mode & mode=BothMode()) const;
-    [[nodiscard]] size_t Find(char target, size_t start=0, const Mode & mode=EmptyMode()) const;
-    [[nodiscard]] size_t Find(std::string target, size_t start=0, const Mode & mode=EmptyMode()) const;
-    [[nodiscard]] size_t Find(const CharSet & char_set, size_t start, const Mode & mode=EmptyMode()) const;
-    void FindAll(char target, emp::vector<size_t> & results, const Mode & mode=EmptyMode()) const;
-    [[nodiscard]] emp::vector<size_t> FindAll(char target, const Mode & mode=EmptyMode()) const;
+    [[nodiscard]] size_t FindParenMatch(size_t pos=0, const Syntax & syntax=Syntax::Parens()) const;
+    [[nodiscard]] size_t FindMatch(size_t pos=0, const Syntax & syntax=Syntax::Full()) const;
+    [[nodiscard]] size_t Find(char target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] size_t Find(std::string target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] size_t Find(const CharSet & char_set, size_t start, const Syntax & syntax=Syntax::None()) const;
+    void FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] emp::vector<size_t> FindAll(char target, const Syntax & syntax=Syntax::None()) const;
     template <typename... Ts>
     [[nodiscard]] size_t FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const;
     template <typename T, typename... Ts>
     [[nodiscard]] size_t FindAnyOf(T test1, Ts... tests) const;
-    [[nodiscard]] size_t FindID(std::string target, size_t start, const Mode & mode=QuotesMode()) const;
+    [[nodiscard]] size_t FindID(std::string target, size_t start, const Syntax & syntax=Syntax::Quotes()) const;
 
-    [[nodiscard]] size_t FindWhitespace(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(WhitespaceCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonWhitespace(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!WhitespaceCharSet(), start, mode); }
-    [[nodiscard]] size_t FindUpperChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(UpperCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonUpperChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!UpperCharSet(), start, mode); }
-    [[nodiscard]] size_t FindLowerChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(LowerCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonLowerChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!LowerCharSet(), start, mode); }
-    [[nodiscard]] size_t FindLetterChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(LetterCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonLetterChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!LetterCharSet(), start, mode); }
-    [[nodiscard]] size_t FindDigitChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(DigitCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonDigitChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!DigitCharSet(), start, mode); }
-    [[nodiscard]] size_t FindAlphanumericChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(AlphanumericCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonAlphanumericChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!AlphanumericCharSet(), start, mode); }
-    [[nodiscard]] size_t FindIDChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(IDCharSet(), start, mode); }
-    [[nodiscard]] size_t FindNonIDChar(size_t start=0, const Mode & mode=EmptyMode()) const 
-      { return Find(!IDCharSet(), start, mode); }
+    [[nodiscard]] size_t FindWhitespace(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(WhitespaceCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonWhitespace(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!WhitespaceCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindUpperChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(UpperCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonUpperChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!UpperCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindLowerChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(LowerCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonLowerChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!LowerCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindLetterChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(LetterCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonLetterChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!LetterCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindDigitChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(DigitCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonDigitChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!DigitCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindAlphanumericChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(AlphanumericCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonAlphanumericChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!AlphanumericCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindIDChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(IDCharSet(), start, syntax); }
+    [[nodiscard]] size_t FindNonIDChar(size_t start=0, const Syntax & syntax=Syntax::None()) const 
+      { return Find(!IDCharSet(), start, syntax); }
 
 
     // ------ Other Views ------
-    std::string_view ViewNestedBlock(size_t start=0, const Mode & mode=QuotesMode())
-      { return ViewRange(start+1, FindParenMatch(start, mode) - 1); }
-    std::string_view ViewQuote(size_t start=0, const Mode & mode=QuotesMode())
-      { return ViewRange(start, mode.IsQuote(Get(start)) ? FindQuoteMatch(start) : start); }
+    std::string_view ViewNestedBlock(size_t start=0, const Syntax & syntax=Syntax::Quotes())
+      { return ViewRange(start+1, FindParenMatch(start, syntax) - 1); }
+    std::string_view ViewQuote(size_t start=0, const Syntax & syntax=Syntax::Quotes())
+      { return ViewRange(start, syntax.IsQuote(Get(start)) ? FindQuoteMatch(start) : start); }
 
 
     // ------ Transformations into non-Strings ------
@@ -458,32 +459,32 @@ namespace emp {
     // data structure is provided and one where it must be generated.
 
     void Slice(emp::vector<emp::String> & out_set, std::string delim=",",
-               const Mode & mode=QuotesMode(), bool trim_whitespace=true) const;
+               const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true) const;
 
     [[nodiscard]]
-    emp::vector<emp::String> Slice(std::string delim=",", const Mode & mode=QuotesMode(),
+    emp::vector<emp::String> Slice(std::string delim=",", const Syntax & syntax=Syntax::Quotes(),
                                    bool trim_whitespace=true) const;
 
     void ViewSlices(
       emp::vector<std::string_view> & out_set,
       std::string delim=",",
-      const Mode & mode=QuotesMode()
+      const Syntax & syntax=Syntax::Quotes()
     ) const;
 
     [[nodiscard]] emp::vector<std::string_view> ViewSlices(
       std::string delim=",",
-      const Mode & mode=QuotesMode()
+      const Syntax & syntax=Syntax::Quotes()
     ) const;
   
     void SliceAssign(
       std::map<emp::String,emp::String> & out_map,
       std::string delim=",", std::string assign_op="=",
-      const Mode & mode=QuotesMode(), bool trim_whitespace=true
+      const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true
     ) const;
 
     [[nodiscard]] std::map<emp::String,emp::String> SliceAssign(
       std::string delim=",", std::string assign_op="=",
-      const Mode & mode=QuotesMode(), bool trim_whitespace=true
+      const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true
     ) const;
 
 
@@ -619,10 +620,10 @@ namespace emp {
   }
 
   // Given an open parenthesis, find where it closes (including nesting).  Marks must be different.
-  size_t String::FindParenMatch(size_t pos, const Mode & mode) const {
+  size_t String::FindParenMatch(size_t pos, const Syntax & syntax) const {
     const char open = Get(pos);
-    if (!mode.IsParen(open)) return npos; // Not a paren that we know!
-    const char close = mode.GetMatch(open);
+    if (!syntax.IsParen(open)) return npos; // Not a paren that we know!
+    const char close = syntax.GetMatch(open);
     size_t open_count = 1;
     while (++pos < size()) {
       const char c = Get(pos);
@@ -630,34 +631,34 @@ namespace emp {
       else if (c == close) {
         if (--open_count == 0) return pos;
       }
-      else if (mode.IsQuote(c)) pos = FindQuoteMatch(pos);
+      else if (syntax.IsQuote(c)) pos = FindQuoteMatch(pos);
     }
 
     return npos;
   }
 
-  size_t String::FindMatch(size_t pos, const Mode & mode) const {
-    if (mode.IsQuote(Get(pos))) return FindQuoteMatch(pos);
-    if (mode.IsParen(Get(pos))) return FindParenMatch(pos, mode);
+  size_t String::FindMatch(size_t pos, const Syntax & syntax) const {
+    if (syntax.IsQuote(Get(pos))) return FindQuoteMatch(pos);
+    if (syntax.IsParen(Get(pos))) return FindParenMatch(pos, syntax);
     return npos;
   }
 
   // A version of string::find() with single chars that can skip over quotes.
-  size_t String::Find(char target, size_t start, const Mode & mode) const {
+  size_t String::Find(char target, size_t start, const Syntax & syntax) const {
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
     for (size_t pos=start; pos < size(); ++pos) {
       if (Get(pos) == target) return pos;
-      else if (mode.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
-      else if (mode.IsParen(Get(pos))) pos = FindParenMatch(pos, mode);
+      else if (syntax.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
+      else if (syntax.IsParen(Get(pos))) pos = FindParenMatch(pos, syntax);
     }
 
     return npos;
   }
 
   // A version of string::find() that can skip over quotes.
-  size_t String::Find(std::string target, size_t start, const Mode & mode) const {
+  size_t String::Find(std::string target, size_t start, const Syntax & syntax) const {
     size_t found_pos = find(target, start);
-    if (mode.GetCount() == 0) return found_pos;
+    if (syntax.GetCount() == 0) return found_pos;
 
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
     for (size_t scan_pos=0;
@@ -665,11 +666,11 @@ namespace emp {
          scan_pos++)
     {
       // Skip quotes, if needed...
-      if (mode.IsQuote(Get(scan_pos))) {
+      if (syntax.IsQuote(Get(scan_pos))) {
         scan_pos = FindQuoteMatch(scan_pos);
         if (found_pos < scan_pos) found_pos = find(target, scan_pos);
       }
-      else if (mode.IsParen(Get(scan_pos))) {
+      else if (syntax.IsParen(Get(scan_pos))) {
         scan_pos = FindParenMatch(scan_pos);
         if (found_pos < scan_pos) found_pos = find(target, scan_pos);
       }
@@ -678,32 +679,32 @@ namespace emp {
     return found_pos;
   }
   // Find any of a set of characters.
-  size_t String::Find(const CharSet & char_set, size_t start, const Mode & mode) const
+  size_t String::Find(const CharSet & char_set, size_t start, const Syntax & syntax) const
   {
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
     for (size_t pos=start; pos < size(); ++pos) {
       if (char_set.Has(Get(pos))) return pos;
-      else if (mode.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
-      else if (mode.IsParen(Get(pos))) pos = FindParenMatch(pos, mode);
+      else if (syntax.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
+      else if (syntax.IsParen(Get(pos))) pos = FindParenMatch(pos, syntax);
     }
 
     return npos;
   }
 
-  void String::FindAll(char target, emp::vector<size_t> & results, const Mode & mode) const {
+  void String::FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax) const {
     results.resize(0);
     for (size_t pos=0; pos < size(); ++pos) {
       if (Get(pos) == target) results.push_back(pos);
 
       // Skip quotes, if needed...
-      if (mode.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
-      else if (mode.IsParen(Get(pos))) pos = FindParenMatch(pos, mode);
+      if (syntax.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
+      else if (syntax.IsParen(Get(pos))) pos = FindParenMatch(pos, syntax);
     }
   }
 
-  emp::vector<size_t> String::FindAll(char target, const Mode & mode) const {
+  emp::vector<size_t> String::FindAll(char target, const Syntax & syntax) const {
     emp::vector<size_t> out;
-    FindAll(target, out, mode);
+    FindAll(target, out, syntax);
     return out;
   }
 
@@ -728,16 +729,16 @@ namespace emp {
   }
 
   // Find an whole identifier (same as find, but cannot have letter, digit or '_' before or after.) 
-  size_t String::FindID(std::string target, size_t start, const Mode & mode) const
+  size_t String::FindID(std::string target, size_t start, const Syntax & syntax) const
   {
-    size_t pos = Find(target, start, mode);
+    size_t pos = Find(target, start, syntax);
     while (pos != npos) {
       bool before_ok = (pos == 0) || !is_idchar(Get(pos-1));
       size_t after_pos = pos+target.size();
       bool after_ok = (after_pos == size()) || !is_idchar(Get(after_pos));
       if (before_ok && after_ok) return pos;
 
-      pos = Find(target, pos+target.size(), mode);
+      pos = Find(target, pos+target.size(), syntax);
     }
 
     return npos;
@@ -827,29 +828,29 @@ namespace emp {
 
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
-  emp::String String::Pop(CharSet chars, const Mode & mode) {
-    size_t pop_end = Find(chars, 0, mode);
+  emp::String String::Pop(CharSet chars, const Syntax & syntax) {
+    size_t pop_end = Find(chars, 0, syntax);
     size_t delim_size = pop_end == npos ? 0 : 1;
     return PopFixed(pop_end, delim_size);
   }
 
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
-  emp::String String::PopTo(std::string delim, const Mode & mode) {
-    return PopFixed(Find(delim, 0, mode), delim.size());
+  emp::String String::PopTo(std::string delim, const Syntax & syntax) {
+    return PopFixed(Find(delim, 0, syntax), delim.size());
   }
 
-  emp::String String::PopWord(const Mode & mode) { return Pop(" \n\t\r", mode); }
-  emp::String String::PopLine(const Mode & mode) { return Pop("\n", mode); }
+  emp::String String::PopWord(const Syntax & syntax) { return Pop(" \n\t\r", syntax); }
+  emp::String String::PopLine(const Syntax & syntax) { return Pop("\n", syntax); }
 
-  emp::String String::PopQuote(const Mode & mode) {
-    if (!mode.IsQuote(Get(0))) return emp::String();
+  emp::String String::PopQuote(const Syntax & syntax) {
+    if (!syntax.IsQuote(Get(0))) return emp::String();
     const size_t end_pos = FindQuoteMatch(0);
     return (end_pos==std::string::npos) ? "" : PopFixed(end_pos+1);
   }
 
-  emp::String String::PopParen(const Mode & mode) {
-    const size_t end_pos = FindParenMatch(0, mode);
+  emp::String String::PopParen(const Syntax & syntax) {
+    const size_t end_pos = FindParenMatch(0, syntax);
     return (end_pos==std::string::npos) ? "" : PopFixed(end_pos+1);
   }
 
@@ -863,20 +864,20 @@ namespace emp {
   /// @brief Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param out_set destination vector
   /// @param delim delimiter to split on (default: ",")
-  /// @param mode identify quotes and parens that should be kept together.
+  /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   void String::Slice(
-    emp::vector<emp::String> & out_set, std::string delim, const Mode & mode, bool trim_whitespace
+    emp::vector<emp::String> & out_set, std::string delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     if (empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
-    size_t found_pos = Find(delim, 0, mode);
+    size_t found_pos = Find(delim, 0, syntax);
     while (found_pos < size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
       if (trim_whitespace) out_set.back().TrimWhitespace();
       start_pos = found_pos+delim.size();
-      found_pos = Find(delim, found_pos+1, mode);
+      found_pos = Find(delim, found_pos+1, syntax);
     }
     out_set.push_back( GetRange(start_pos, found_pos) );
   }
@@ -885,44 +886,44 @@ namespace emp {
   /// @brief Slice a String on a delimiter; return a vector of results.
   /// @note May be less efficient, but easier than other version of Slice()
   /// @param delim delimiter to split on (default: ",")
-  /// @param mode identify quotes and parens that should be kept together.
+  /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   emp::vector<emp::String> String::Slice(
-    std::string delim, const Mode & mode, bool trim_whitespace
+    std::string delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     emp::vector<emp::String> result;
-    Slice(result, delim, mode, trim_whitespace);
+    Slice(result, delim, syntax, trim_whitespace);
     return result;
   }
 
   /// @brief Fill vector out_set of string_views based on the provided delimiter.
   /// @param out_set destination vector
   /// @param delim delimiter to split on (default: ",")
-  /// @param mode identify quotes and parens that should be kept together.
+  /// @param syntax identify quotes and parens that should be kept together.
   void String::ViewSlices(
-    emp::vector<std::string_view> & out_set, std::string delim, const Mode & mode
+    emp::vector<std::string_view> & out_set, std::string delim, const Syntax & syntax
   ) const {
     out_set.resize(0);
     if (empty()) return; // Nothing to set!
 
     size_t start_pos = 0;
-    size_t found_pos = Find(delim, 0, mode);
+    size_t found_pos = Find(delim, 0, syntax);
     while (found_pos < size()) {
       out_set.push_back( ViewRange(start_pos, found_pos) );
       start_pos = found_pos+delim.size();
-      found_pos = Find(delim, found_pos+1, mode);
+      found_pos = Find(delim, found_pos+1, syntax);
     }
     out_set.push_back( ViewRange(start_pos, found_pos) );
   }
 
   /// @brief Generate vector of string_views based on the provided delimiter.
   /// @param delim delimiter to split on (default: ",")
-  /// @param mode identify quotes and parens that should be kept together.
+  /// @param syntax identify quotes and parens that should be kept together.
   [[nodiscard]] emp::vector<std::string_view> String::ViewSlices(
-    std::string delim, const Mode & mode
+    std::string delim, const Syntax & syntax
   ) const {
     emp::vector<std::string_view> result;
-    ViewSlices(result, delim, mode);
+    ViewSlices(result, delim, syntax);
     return result;
   }
   
@@ -930,14 +931,14 @@ namespace emp {
   /// @brief Slice a string and treat each section as an assignment; place results in provided map.
   /// @param delim delimiter to split on (default ',')
   /// @param assign_op separator for left and right side of assignment (default: "=")
-  /// @param mode identify quotes and parens that should be kept together.
+  /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   void String::SliceAssign(
     std::map<emp::String,emp::String> & result_map,
     std::string delim, std::string assign_op,
-    const Mode & mode, bool trim_whitespace
+    const Syntax & syntax, bool trim_whitespace
   ) const {
-    auto assign_set = Slice(delim, mode, false);
+    auto assign_set = Slice(delim, syntax, false);
     for (auto setting : assign_set) {
       if (setting.OnlyWhitespace()) continue; // Skip blank settings (especially at the end).
 
@@ -961,24 +962,24 @@ namespace emp {
   /// @brief Slice a string and treat each section as an assignment; fill out a map and return it.
   /// @param delim delimiter to split on (default ',')
   /// @param assign_op separator for left and right side of assignment (default: "=")
-  /// @param mode identify quotes and parens that should be kept together.
+  /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   std::map<emp::String,emp::String> String::SliceAssign(
     std::string delim, std::string assign_op,
-    const Mode & mode, bool trim_whitespace
+    const Syntax & syntax, bool trim_whitespace
   ) const {
     std::map<emp::String,emp::String> result_map;
-    SliceAssign(result_map, delim, assign_op, mode, trim_whitespace);
+    SliceAssign(result_map, delim, assign_op, syntax, trim_whitespace);
     return result_map;
   }
 
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
-  emp::String & String::ReplaceVars(const MAP_T & var_map, emp::String symbol, const Mode & mode) {
-    for (size_t pos = Find(symbol, 0, mode);
+  emp::String & String::ReplaceVars(const MAP_T & var_map, emp::String symbol, const Syntax & syntax) {
+    for (size_t pos = Find(symbol, 0, syntax);
          pos < size()-3;             // Need room for a replacement tag.
-         pos = Find(symbol, pos+symbol.size(), mode)) {
+         pos = Find(symbol, pos+symbol.size(), syntax)) {
       const size_t symbol_end = pos+symbol.size();
       if (HasAt(symbol, symbol_end)) {   // Compress two symbols (e.g., "$$") into one (e.g. "$")
         erase(pos, symbol.size());
@@ -1014,22 +1015,22 @@ namespace emp {
   /// @param start_str Initial sequence of macro to look for; for example "REPLACE("
   /// @param end_str   Sequence that ends the macro; for example ")"
   /// @param macro_fun Function to call with contents of macro.  Params are macro_args (string), line_num (size_t), and hit_num (size_t)
-  /// @param mode What values should we skip as quotes or parens?
+  /// @param syntax What values should we skip as quotes or parens?
   /// @return This string object, post processing.
   template <typename FUN_T>
   emp::String & String::ReplaceMacro(
     std::string start_str,
     std::string end_str,
     FUN_T && macro_fun,
-    const String::Mode & mode
+    const String::Syntax & syntax
   ) {
     // We need to identify the comparator and divide up arguments in macro.
     size_t macro_count = 0;     // Count of the number of hits for this macro.
     size_t line_num = 0;        // Line number where current macro hit was found.
     size_t prev_pos = 0;
-    for (size_t macro_pos = Find(start_str, 0, mode);
+    for (size_t macro_pos = Find(start_str, 0, syntax);
          macro_pos != npos;
-         macro_pos = Find(start_str, macro_pos+1, mode))
+         macro_pos = Find(start_str, macro_pos+1, syntax))
     {
       // Make sure we're not just extending a previous identifier.
       if (macro_pos && is_idchar(Get(macro_pos-1))) continue;
@@ -1037,7 +1038,7 @@ namespace emp {
       line_num += Count('\n', prev_pos, macro_pos);  // Count lines leading up to this macro.
 
       // Isolate this macro instance and call the conversion function.
-      size_t end_pos = Find(end_str, macro_pos+start_str.size(), mode);
+      size_t end_pos = Find(end_str, macro_pos+start_str.size(), syntax);
       const std::string macro_body = GetRange(macro_pos+start_str.size(), end_pos);
 
       std::string new_str = macro_fun(macro_body, line_num, macro_count);
