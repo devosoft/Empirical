@@ -44,7 +44,7 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::MakeRoman(500500500) == "D|D|D");
 }
 
-TEST_CASE("Test String Composition Functions", "[tools]")
+TEST_CASE("Test String Composition-ID Functions", "[tools]")
 {
   emp::String abc = "aabcccabbcccabcbca";
   CHECK(abc.IsComposedOf("abc"));
@@ -116,11 +116,73 @@ TEST_CASE("Test String Composition Functions", "[tools]")
 */
 }
 
-TEST_CASE("Test String Pop Functions", "[tools]")
+TEST_CASE("Test String Find Functions", "[tools]")
+{
+  // Do some tests on quotes in strings...
+  emp::String quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";  // "abc""def"123 """long\"er"
+  CHECK( quotes.FindQuoteMatch() == 4 );
+  CHECK( quotes.FindQuoteMatch(1) == std::string::npos );
+  CHECK( quotes.FindQuoteMatch(5) == 9 );
+  CHECK( quotes.FindQuoteMatch(10) == std::string::npos );
+  CHECK( quotes.FindQuoteMatch(14) == 15 );
+  CHECK( quotes.FindQuoteMatch(16) == 25 );
+
+  // Do some tests on parentheses matching...
+  emp::String parens = "(()(()()))((())\")))))()\")";
+  CHECK( parens.FindParenMatch() == 9 );
+  CHECK( parens.FindParenMatch(0) == 9 );
+  CHECK( parens.FindParenMatch(1) == 2 );
+  CHECK( parens.FindParenMatch(2) == std::string::npos );
+  CHECK( parens.FindParenMatch(3) == 8 );
+  CHECK( parens.FindParenMatch(10) == 16 );
+  CHECK( parens.FindParenMatch(11) == 14 );
+  CHECK( parens.FindParenMatch(21) == 22 ); // Works inside a quote if start there.
+  CHECK( parens.FindParenMatch(10,{"","()"}) == 16 );   // Specify parens and show works.
+  CHECK( parens.FindParenMatch(10,{"\"","()"}) == 24 ); // Do not ignore quotes.
+  CHECK( parens.FindParenMatch(10,{"","ab"}) == std::string::npos );   // Using non-parens works.
+  CHECK( quotes.FindParenMatch(1,{"","ab"}) == 2 );   // Using non-parens works.
+
+  // Extra tests with braces and single quotes.
+  emp::String braces = "{{}{}}{'{}}'}";
+  CHECK( braces.FindParenMatch(0) == 5 );
+  CHECK( braces.FindParenMatch(0,{"","{}"}) == 5 );
+  CHECK( braces.FindParenMatch(1,{"","{}"}) == 2 );
+  CHECK( braces.FindParenMatch(2,{"","{}"}) == std::string::npos );
+  CHECK( braces.FindParenMatch(3,{"","{}"}) == 4 );
+  CHECK( braces.FindParenMatch(6,{"","{}"}) == 10 );  // Across single quotes
+  CHECK( braces.FindParenMatch(6,{"'","{}"}) == 12 ); // Don't ignore quotes.
+
+  // Test a multi-find.
+  emp::String test_str = "This is my best test!";
+  emp::vector<size_t> found = test_str.FindAll(' ');
+  CHECK( found == emp::vector<size_t>{4,7,10,15} );
+  test_str.FindAll('i', found);
+  CHECK( found == emp::vector<size_t>{2,5} );
+  parens.FindAll(')', found);
+  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,16,17,18,19,20,22,24} );
+  parens.FindAll(')', found, {"\""}); // Ignore items in quotes.
+  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,24} );
+}
+
+TEST_CASE("Test String Pop and Slice Functions", "[tools]")
 {
   emp::String start = "a string.";
   CHECK(start.PopFixed(9) == "a string.");
   CHECK(start == "");
+
+  start = "This is a slightly longer string";
+  auto split = start.Slice(" ");
+  CHECK(split.size() == 6);
+  CHECK(split[0] == "This");
+  CHECK(split[5] == "string");
+
+  start = "This string has \"internal quotes\" that shouldn't be split.";
+  split = start.Slice(" ", {"\""}); // Slice, but keep quotes as one unit.
+  for (auto x : split) { std::cout << ":" << x << ": "; } std::cout << std::endl;
+  CHECK(split.size() == 8);
+  CHECK(split[0] == "This");
+  CHECK(split[3] == "\"internal quotes\"");
+  CHECK(split[5] == "shouldn't");
 }
 
 TEST_CASE("Test String Removal Functions", "[tools]")
@@ -137,17 +199,6 @@ TEST_CASE("Test String Removal Functions", "[tools]")
 
 
 /*
-  emp::vector<std::string> numbers;
-  numbers.push_back("1");
-  numbers.push_back("2");
-  numbers.push_back("3");
-  emp::vector<int> int_numbers = emp::from_strings<int>(numbers);
-  CHECK(int_numbers[0] == 1);
-  CHECK(int_numbers[1] == 2);
-  CHECK(int_numbers[2] == 3);
-
-}
-
 TEST_CASE("Another Test string_utils", "[tools]")
 {
 
@@ -260,15 +311,6 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::view_string_to(view_test, ' ') == "This" );
   CHECK( emp::view_string_to(view_test, ' ', 5) == "is" );
 
-  // Do some tests on quotes in strings...
-  std::string quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";  // "abc""def"123 """long\"er"
-  CHECK( emp::find_quote_match(quotes) == 4 );
-  CHECK( emp::find_quote_match(quotes, 1) == 1 );
-  CHECK( emp::find_quote_match(quotes, 5) == 9 );
-  CHECK( emp::find_quote_match(quotes, 10) == 10 );
-  CHECK( emp::find_quote_match(quotes, 14) == 15 );
-  CHECK( emp::find_quote_match(quotes, 16) == 25 );
-
   CHECK( emp::string_pop_quote(quotes) == "\"abc\"");
   CHECK( emp::string_pop_quote(quotes) == "\"def\"");
   CHECK( emp::string_pop_quote(quotes) == "");
@@ -277,39 +319,6 @@ TEST_CASE("Another Test string_utils", "[tools]")
   CHECK( emp::string_pop_quote(quotes) == "\"long\\\"er\"");
   CHECK( emp::string_pop_quote(quotes) == "");
 
-  // Do some tests on parentheses matching...
-  std::string parens = "(()(()()))((())\")))))()\")";
-  CHECK( emp::find_paren_match(parens) == 9 );
-  CHECK( emp::find_paren_match(parens, 0) == 9 );
-  CHECK( emp::find_paren_match(parens, 1) == 2 );
-  CHECK( emp::find_paren_match(parens, 2) == 2 );
-  CHECK( emp::find_paren_match(parens, 3) == 8 );
-  CHECK( emp::find_paren_match(parens, 3) == 8 );
-  CHECK( emp::find_paren_match(parens, 10) == 24 );
-  CHECK( emp::find_paren_match(parens, 11) == 14 );
-  CHECK( emp::find_paren_match(parens, 21) == 22 ); // Works inside a quote if start there.
-  CHECK( emp::find_paren_match(parens, 10,'(',')',true) == 24 );  // Specify parens and show works.
-  CHECK( emp::find_paren_match(parens, 10,'(',')',false) == 16 ); // Do no ignore quotes.
-  CHECK( emp::find_paren_match(parens, 10,'a','b',false) == 10 ); // Using non-parens works.
-
-  // Extra tests with braces and single quotes.
-  std::string braces = "{{}{}}{'{}}'}";
-  CHECK( emp::find_paren_match(braces, 0) == 0 );
-  CHECK( emp::find_paren_match(braces, 0, '{', '}') == 5 );
-  CHECK( emp::find_paren_match(braces, 1, '{', '}') == 2 );
-  CHECK( emp::find_paren_match(braces, 3, '{', '}') == 4 );
-  CHECK( emp::find_paren_match(braces, 6, '{', '}') == 12 );  // Across single quotes
-  CHECK( emp::find_paren_match(braces, 6, '{', '}', false) == 10 ); // Don't ignore quotes.
-
-  // Test a multi-find.
-  emp::vector<size_t> found = emp::find_all(view_test, ' ');
-  CHECK( found == emp::vector<size_t>{4,7,10,15} );
-  emp::find_all(view_test, 'i', found);
-  CHECK( found == emp::vector<size_t>{2,5,12} );
-  emp::find_all(parens, ')', found);
-  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,16,17,18,19,20,22,24} );
-  emp::find_all(parens, ')', found, true); // Ignore items in quotes.
-  CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,24} );
 
   emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
   CHECK( slice_view.size() == 5 );
