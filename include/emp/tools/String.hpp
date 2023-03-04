@@ -58,6 +58,15 @@ namespace emp {
   template <typename... Args>
   [[nodiscard]] emp::String MakeFormatted(const emp::String& format, Args... args);
 
+  [[nodiscard]] emp::String MakeTrimFront(const emp::String & in, const emp::CharSet & chars=WhitespaceCharSet());
+  [[nodiscard]] emp::String MakeTrimBack(const emp::String & in, const emp::CharSet & chars=WhitespaceCharSet());
+  [[nodiscard]] emp::String MakeTrimmed(emp::String in, const emp::CharSet & chars=WhitespaceCharSet());
+  [[nodiscard]] emp::String MakeCompressed(
+    emp::String in, const emp::CharSet & chars=WhitespaceCharSet(), char compress_to=' ',
+    bool trim_start=true, bool trim_end=true);
+  [[nodiscard]] emp::String MakeRemoveChars(emp::String in, const CharSet & chars);
+  [[nodiscard]] emp::String MakeSlugify(emp::String in);
+
   template <typename CONTAINER_T>
   [[nodiscard]] emp::String Join(const CONTAINER_T & container, std::string join_str="",
                                  std::string open="", std::string close="");
@@ -172,6 +181,13 @@ namespace emp {
       emp_assert(start <= end && end <= size());
       return View(start, end - start);
     }
+    [[nodiscard]] std::string_view ViewTo(CharSet stop_chars, size_t start=0,
+                                          const Syntax & syntax=Syntax::None()) const
+      { return ViewFront(Find(stop_chars, start, syntax)); }
+    [[nodiscard]] std::string_view ViewWord(const Syntax & syntax=Syntax::Quotes(), size_t start=0) const
+      { return ViewTo(" \n\t\r", start, syntax); }
+    [[nodiscard]] std::string_view ViewLine(const Syntax & syntax=Syntax::Quotes(), size_t start=0) const
+      { return ViewTo("\n", start, syntax); }
 
 
     // ------ Iterators ------
@@ -249,6 +265,7 @@ namespace emp {
     [[nodiscard]] bool OnlyWhitespace() const { return WhitespaceCharSet().Has(*this); }
 
     [[nodiscard]] bool HasOneOf(emp::CharSet char_set) const { return char_set.HasAny(*this); }
+    [[nodiscard]] bool Has(char c) const { return Find(c) != npos; }
     [[nodiscard]] bool HasWhitespace() const { return WhitespaceCharSet().HasAny(*this); }
     [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(*this); }
     [[nodiscard]] bool HasUpper() const { return UpperCharSet().HasAny(*this); }
@@ -262,7 +279,15 @@ namespace emp {
     [[nodiscard]] bool HasOneOfAt(emp::CharSet opts, size_t pos) const { return opts.HasAt(*this, pos); }
     [[nodiscard]] bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(*this, pos); }
     [[nodiscard]] bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(*this, pos); }
+    [[nodiscard]] bool HasWhitespaceAt(size_t pos) const { return WhitespaceCharSet().HasAt(*this, pos); }
 
+    [[nodiscard]] size_t CountWhitespace() const { return WhitespaceCharSet().CountMatches(*this); }
+    [[nodiscard]] size_t CountNonwhitespace() const { return size() - CountWhitespace(); }
+    [[nodiscard]] size_t CountUpper() const { return UpperCharSet().CountMatches(*this); }
+    [[nodiscard]] size_t CountLower() const { return LowerCharSet().CountMatches(*this); }
+    [[nodiscard]] size_t CountLetters() const { return LetterCharSet().CountMatches(*this); }
+    [[nodiscard]] size_t CountDigits() const { return DigitCharSet().CountMatches(*this); }
+    [[nodiscard]] size_t CountAlphanumeric() const { return AlphanumericCharSet().CountMatches(*this); }
 
     // ------ Removals and Extractions ------
     // Inherited functions from std::string:
@@ -274,7 +299,6 @@ namespace emp {
     iterator erase(const_iterator pos) { return std::string::erase(pos); }
     iterator erase(const_iterator first, const_iterator last) { return std::string::erase(first, last); }
 
-    emp::String & RemoveChars(const CharSet & chars);
     emp::String & RemoveWhitespace()  { return RemoveChars(WhitespaceCharSet()); }
     emp::String & RemoveUpper()       { return RemoveChars(UpperCharSet()); }
     emp::String & RemoveLower()       { return RemoveChars(LowerCharSet()); }
@@ -339,9 +363,6 @@ namespace emp {
       { for (size_t i=start; i < size(); ++i) if (Get(i) == from) Get(i) = to; return *this; }
     emp::String & ReplaceRange(size_t start, size_t end, String value)
       { return replace(start, end-start, value); }
-    emp::String & TrimWhitespace();
-    emp::String & CompressWhitespace();
-    emp::String & Slugify();
 
     // Find any instances of ${X} and replace with dictionary lookup of X.
     template <typename MAP_T>
@@ -460,54 +481,53 @@ namespace emp {
     
 
     //  ------ FORMATTING ------
-    // Append* adds to the end of the current string.
-    // Set* replaces the current string.
-    // To* Converts the current string.
+    // Set* replaces the current string with argument OR converts the current string if no argument.
     // As* Returns a modified version of the current string, leaving original intact.
-    // Most also have stand-along Make* versions where the core implementation is found.
+    // Append* adds to the end of the current string.
+    // Most also have stand-alone Make* versions where the core implementation is found.
 
     template <typename... Ts>
     String & Append(Ts... args) { return *this += MakeString(std::forward<Ts>(args)...);}
     template <typename... Ts>
     String & Set(Ts... args) { return *this = MakeString(std::forward<Ts>(args)...); }
     template <typename T>
-    T As() { std::stringstream ss; ss << *this; T out; ss >> out; return out; }
+    T As() const { std::stringstream ss; ss << *this; T out; ss >> out; return out; }
 
     String & AppendEscaped(char c) { *this += MakeEscaped(c); return *this; }
     String & SetEscaped(char c) { *this = MakeEscaped(c); return *this; }
 
     String & AppendEscaped(const String & in) { *this+=MakeEscaped(in); return *this; }
     String & SetEscaped(const String & in) { *this = MakeEscaped(in); return *this; }
-    String & ToEscaped() { *this = MakeEscaped(*this); return *this; }
-    [[nodiscard]] emp::String AsEscaped() { return MakeEscaped(*this); }
+    String & SetEscaped() { *this = MakeEscaped(*this); return *this; }
+    [[nodiscard]] emp::String AsEscaped() const { return MakeEscaped(*this); }
 
     String & AppendWebSafe(String in) { *this+=MakeWebSafe(in); return *this; }
     String & SetWebSafe(const String & in) { *this = MakeWebSafe(in); return *this; }
-    String & ToWebSafe() { *this = MakeWebSafe(*this); return *this; }
-    [[nodiscard]] emp::String AsWebSafe() { return MakeWebSafe(*this); }
+    String & SetWebSafe() { *this = MakeWebSafe(*this); return *this; }
+    [[nodiscard]] emp::String AsWebSafe() const { return MakeWebSafe(*this); }
 
     // <= Creating Literals =>
     template <typename T>
     String & AppendLiteral(const T & in) { *this+=MakeLiteral(in); return *this; }
     template <typename T>
     String & SetLiteral(const T & in) { *this = MakeLiteral(in); return *this;; }
-    String & ToLiteral() { *this = MakeLiteral(*this); return *this; }
-    [[nodiscard]] emp::String AsLiteral() { return MakeLiteral(*this); }
+    String & SetLiteral() { *this = MakeLiteral(*this); return *this; }
+    [[nodiscard]] emp::String AsLiteral() const { return MakeLiteral(*this); }
 
     String & AppendUpper(const String & in) { *this+=MakeUpper(in); return *this; }
     String & SetUpper(const String & in) { *this = MakeUpper(in); return *this; }
-    String & ToUpper() { *this = MakeUpper(*this); return *this; }
+    String & SetUpper() { *this = MakeUpper(*this); return *this; }
     [[nodiscard]] emp::String AsUpper() { return MakeUpper(*this); }
 
     String & AppendLower(const String & in) { *this+=MakeLower(in); return *this; }
     String & SetLower(const String & in) { *this = MakeLower(in); return *this; }
-    String & ToLower() { *this = MakeLower(*this); return *this; }
+    String & SetLower() { *this = MakeLower(*this); return *this; }
     [[nodiscard]] emp::String AsLower() { return MakeLower(*this); }
 
     String & AppendTitleCase(const String & in) { *this+=MakeTitleCase(in); return *this; }
     String & SetTitleCase(const String & in) { *this = MakeTitleCase(in); return *this; }
-    String & ToTitleCase() { *this = MakeTitleCase(*this); return *this; }
-    [[nodiscard]] emp::String AsTitleCase() { return MakeTitleCase(*this); }
+    String & SetTitleCase() { *this = MakeTitleCase(*this); return *this; }
+    [[nodiscard]] emp::String AsTitleCase() const { return MakeTitleCase(*this); }
 
     String & AppendRoman(int val) { *this+=MakeRoman(val); return *this; }
     String & SetRoman(int val) { *this = MakeRoman(val); return *this; }
@@ -521,6 +541,62 @@ namespace emp {
       { return *this += MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
     template<typename... ARG_Ts> String & SetFormatted(const std::string& format, ARG_Ts... args)
       { return *this = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
+
+
+    emp::String & AppendTrimFront(const String & in, const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this += MakeTrimFront(in, chars); }
+    emp::String & SetTrimFront(const String & in, const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this = MakeTrimFront(in, chars); }
+    emp::String & TrimFront(const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this = MakeTrimFront(*this, chars); }
+    [[nodiscard]] emp::String AsTrimFront(const emp::CharSet & chars=WhitespaceCharSet()) const
+      { return MakeTrimFront(*this, chars); }
+
+    emp::String & AppendTrimBack(const String & in, const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this += MakeTrimBack(in, chars); }
+    emp::String & SetTrimBack(const String & in, const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this = MakeTrimBack(in, chars); }
+    emp::String & TrimBack(const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this = MakeTrimBack(*this, chars); }
+    [[nodiscard]] emp::String AsTrimBack(const emp::CharSet & chars=WhitespaceCharSet()) const
+      { return MakeTrimBack(*this, chars); }
+
+    emp::String & AppendTrimmed(const String & in, const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this += MakeTrimmed(in, chars); }
+    emp::String & SetTrimmed(const String & in, const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this = MakeTrimmed(in, chars); }
+    emp::String & Trim(const emp::CharSet & chars=WhitespaceCharSet())
+      { return *this = MakeTrimmed(*this, chars); }
+    [[nodiscard]] emp::String AsTrimmed(const emp::CharSet & chars=WhitespaceCharSet()) const
+      { return MakeTrimmed(*this, chars); }
+
+    emp::String & AppendCompressed(const String & in, const emp::CharSet & chars=WhitespaceCharSet(),
+                                   char compress_to=' ', bool trim_start=true, bool trim_end=true)
+      { return *this += MakeCompressed(in, chars, compress_to, trim_start, trim_end); }
+    emp::String & SetCompressed(const String & in, const emp::CharSet & chars=WhitespaceCharSet(),
+                                char compress_to=' ', bool trim_start=true, bool trim_end=true)
+      { return *this = MakeCompressed(in, chars, compress_to, trim_start, trim_end); }
+    emp::String & Compress(const emp::CharSet & chars=WhitespaceCharSet(), char compress_to=' ',
+                           bool trim_start=true, bool trim_end=true)
+      { return *this = MakeCompressed(*this, chars, compress_to, trim_start, trim_end); }
+    [[nodiscard]] emp::String AsCompressed(const emp::CharSet & chars=WhitespaceCharSet(), char compress_to=' ',
+                                           bool trim_start=true, bool trim_end=true) const
+      { return MakeCompressed(*this, chars, compress_to, trim_start, trim_end); }
+
+    emp::String & AppendRemoveChars(const String & in, const CharSet & chars)
+      { return *this += MakeRemoveChars(in, chars); }
+    emp::String & SetRemoveChars(const String & in, const CharSet & chars)
+      { return *this = MakeRemoveChars(in, chars); }
+    emp::String & RemoveChars(const CharSet & chars)
+      { return *this = MakeRemoveChars(*this, chars); }
+    [[nodiscard]] emp::String AsRemoveChars(const CharSet & chars) const
+      { return MakeRemoveChars(*this, chars); }
+
+    emp::String & AppendSlugify(String in) { return *this += std::move(in.Slugify()); }
+    emp::String & SetSlugify(String in) { return *this = std::move(in.Slugify()); }
+    emp::String & Slugify()
+      { return SetLower().RemovePunctuation().Compress().ReplaceChar(' ', '-'); }
+    [[nodiscard]] emp::String AsSlugify() const { return MakeSlugify(*this); }
 
     template <typename CONTAINER_T>
     String & AppendJoin(const CONTAINER_T & container, String delim="",
@@ -705,56 +781,6 @@ namespace emp {
   }
 
 
-  /// Remove whitespace from the beginning or end of a string.
-  emp::String & String::TrimWhitespace() {
-    size_t start_count=0;
-    while (start_count < size() && is_whitespace(Get(start_count))) ++start_count;
-    if (start_count) erase(0, start_count);
-
-    size_t new_size = size();
-    while (new_size > 0 && is_whitespace(Get(new_size-1))) --new_size;
-    resize(new_size);
-
-    return *this;
-  }
-
-  /// Every time one or more whitespace characters appear replace them with a single space.
-  emp::String & String::CompressWhitespace() {
-    bool skip_whitespace = true;          // Remove whitespace from beginning of line.
-    size_t pos = 0;
-
-    for (const auto c : *this) {
-      if (is_whitespace(c)) {          // This char is whitespace
-        if (skip_whitespace) continue; // Already skipping...
-        Get(pos++) = ' ';
-        skip_whitespace = true;
-      } else {  // Not whitespace
-        Get(pos++) = c;
-        skip_whitespace = false;
-      }
-    }
-
-    if (pos && skip_whitespace) pos--;   // If the end of the line is whitespace, remove it.
-    resize(pos);
-
-    return *this;
-  }
-
-  /// Remove all instances of specified characters from file.
-  emp::String & String::RemoveChars(const CharSet & chars) {
-    size_t cur_pos = 0;
-    for (const auto c : *this) {
-      if (!chars.Has(c)) Get(cur_pos++) = c;
-    }
-    resize(cur_pos);
-    return *this;
-  }
-
-  /// Make a string safe(r)
-  emp::String & String::Slugify() {
-    return ToLower().RemovePunctuation().CompressWhitespace().ReplaceChar(' ', '-');
-  }
-
 
   // Pop functions...
 
@@ -835,7 +861,7 @@ namespace emp {
     size_t found_pos = Find(delim, 0, syntax);
     while (found_pos < size()) {
       out_set.push_back( GetRange(start_pos, found_pos) );
-      if (trim_whitespace) out_set.back().TrimWhitespace();
+      if (trim_whitespace) out_set.back().Trim();
       start_pos = found_pos+delim.size();
       found_pos = Find(delim, found_pos+1, syntax);
     }
@@ -905,8 +931,8 @@ namespace emp {
       // Remove any extra spaces around parsed values.
       emp::String var_name = setting.PopTo(assign_op);
       if (trim_whitespace) {
-        var_name.TrimWhitespace();
-        setting.TrimWhitespace();
+        var_name.Trim();
+        setting.Trim();
       }
       if (setting.empty()) {
         std::stringstream msg;
@@ -1184,6 +1210,13 @@ namespace emp {
       }
       ss << " }";
     }
+    else if constexpr (std::is_arithmetic_v<T>) {
+      ss << value;
+      String out = ss.str();
+      // If there is a decimal point, remove extra zeros at back (and point if needed)
+      if (out.Has('.')) out.TrimBack('0').TrimBack('.');
+      return out;
+    }
     else ss << value;
     return ss.str();
   }
@@ -1198,7 +1231,7 @@ namespace emp {
     // and we just need to convert it.
 
     if (value.size() == 3) return value[1];
-    if (value.size() == 4) return ToEscapeChar(value[2]);
+    if (value.size() == 4) return emp::ToEscapeChar(value[2]);
 
     return '\0'; // Error!
   }
@@ -1216,7 +1249,7 @@ namespace emp {
     for (size_t pos = 1; pos < value.size() - 1; pos++) {
       // If we don't have an escaped character, just move it over.
       if (value[pos] != '\\') out_string.push_back(value[pos]);
-      else out_string.push_back(ToEscapeChar(value[++pos]));
+      else out_string.push_back(emp::ToEscapeChar(value[++pos]));
     }
 
     return out_string;
@@ -1331,6 +1364,54 @@ namespace emp {
     out.reserve(n * base.size());
     for (size_t i=0; i < n; ++i) out += base;
     return out;
+  }
+
+  emp::String MakeTrimFront(const emp::String & in, const CharSet & chars)
+    { return in.substr( chars.CountFrontMatches(in) ); }
+
+  emp::String MakeTrimBack(const emp::String & in, const CharSet & chars)
+    { return in.substr(0, in.size() - chars.CountBackMatches(in)); }
+
+  /// Remove chars from the beginning AND end of a string.
+  emp::String MakeTrimmed(emp::String in, const CharSet & chars)
+    { return in.TrimFront(chars).TrimBack(chars); }
+
+  // Take a set of characters and compress sequences of them down to a single character.
+  emp::String MakeCompressed(emp::String in, const emp::CharSet & chars, char compress_to,
+                             bool trim_start, bool trim_end)
+  {
+    bool skip_next = trim_start;     // Remove characters from beginning of line?
+    size_t pos = 0;
+    for (const auto c : in) {
+      if (chars.Has(c)) {            // This char should be compressed.
+        if (skip_next) continue;     // Already skipping...
+        in.Get(pos++) = compress_to; // Convert any block of chars to a single replace char.
+        skip_next = true;
+      } else {                       // Not a compress char.
+        in.Get(pos++) = c;
+        skip_next = false;
+      }
+    }
+
+    if (trim_end && pos && skip_next) pos--;   // Remove chars from end if needed.
+    in.resize(pos);
+
+    return in;
+  }
+
+  /// Remove all instances of specified characters from file.
+  emp::String MakeRemoveChars(emp::String in, const CharSet & chars) {
+    size_t cur_pos = 0;
+    for (const auto c : in) {
+      if (!chars.Has(c)) in.Get(cur_pos++) = c;
+    }
+    in.resize(cur_pos);
+    return in;
+  }
+
+  /// Make a string safe(r)
+  emp::String MakeSlugify(emp::String in) {
+    return in.SetLower().RemovePunctuation().Compress().ReplaceChar(' ', '-');
   }
 
   /// This function returns values from a container as a single string separated
