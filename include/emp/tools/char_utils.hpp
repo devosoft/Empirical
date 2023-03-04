@@ -165,6 +165,19 @@ namespace emp {
       return count;
     }
 
+    /// Count the number of matches that occur at the beginning of a string.
+    size_t CountFrontMatches(const std::string & str) const {
+      size_t count = 0;
+      while (count < str.size() && Has(str[count])) count++;
+      return count;
+    }
+
+    size_t CountBackMatches(const std::string & str) const {
+      size_t end_pos = str.size();
+      while (end_pos > 0 && Has(str[end_pos-1])) end_pos--;
+      return str.size() - end_pos;
+    }
+
     /// Convert this set of characters into a regex-style character set.
     std::string AsString() const {
       std::string out("[");
