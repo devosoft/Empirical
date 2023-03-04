@@ -19,33 +19,23 @@
 #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
 #define EMP_TOOLS_STRING_HPP_INCLUDE
 
-#include <algorithm>
-#include <cctype>
-#include <cstdio>
-#include <functional>
+#include <algorithm>              // std::count
+#include <cctype>                 // std::toupper and std::tolower
+#include <functional>             // std::function
 #include <initializer_list>
-#include <iomanip>
-#include <iostream>
-#include <iterator>
-#include <limits>
 #include <map>
-#include <memory>
-#include <numeric>
-#include <regex>
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <unordered_set>
 
-#include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"
-#include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../meta/reflection.hpp"
-#include "../meta/type_traits.hpp"
+#include "../meta/type_traits.hpp"  // emp::IsIterable()
 
+#include "_StringSyntax.hpp"
 #include "char_utils.hpp"
+
 
 namespace emp {
 
@@ -77,36 +67,7 @@ namespace emp {
 
   class String : public std::string {
   private:
-    // Special class for tracking character interactions.
-    struct Syntax {
-      emp::array<char, 128> char_matches;
-      uint8_t count = 0;
-      Syntax() { char_matches.fill('\0'); }
-      Syntax(std::string quotes, std::string parens="") {
-        emp_assert(parens.size() % 2 == 0, "String::Syntax must have odd number of paren chars.");
-        char_matches.fill('\0');
-        for (char c : quotes) char_matches[c] = c;
-        for (size_t i=0; i < parens.size(); i+=2) char_matches[parens[i]] = parens[i+1];
-        count = static_cast<uint8_t>(quotes.size() + parens.size()/2);
-      }
-      Syntax(const char * quotes, const char * parens)
-        : Syntax(std::string(quotes), std::string(parens)) { }
-      Syntax & operator=(const Syntax &) = default;
-      Syntax & operator=(Syntax &&) = default;
-      bool IsQuote(char c) const { return c && char_matches[c] && (char_matches[c] == c); }
-      bool IsParen(char c) const { return c && char_matches[c] && (char_matches[c] != c); }
-      char GetMatch(char c) const { return char_matches[c]; }
-      uint8_t GetCount() const { return count; }
-      std::string GetQuotes() const { std::string out; for (uint8_t i=0; i < 128; ++i) if (char_matches[i]==i) out+=(char)i; return out;}
-
-      static Syntax None()   { return Syntax(); }
-      static Syntax Quotes() { return Syntax("\"'"); }
-      static Syntax Parens() { return Syntax("",     "()[]{}"); }
-      static Syntax Full()   { return Syntax("\"'",  "()[]{}"); }
-      static Syntax Max()    { return Syntax("\"'`", "()[]{}<>"); }
-    };
-
-
+    using Syntax = StringSyntax;
 
     // Convert objects into a streamable type using _Convert(obj)
     template <typename T> static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
@@ -116,18 +77,18 @@ namespace emp {
     void _AssertPos([[maybe_unused]] size_t pos) const { emp_assert(pos < size(), pos, size()); }
 
   public:
-    using value_type = std::string::value_type;
-    using allocator_type = std::string::allocator_type;
-    using size_type = std::string::size_type;
-    using difference_type = std::string::difference_type;
-    using reference = std::string::reference;
-    using const_reference = std::string::const_reference;
-    using pointer = std::string::pointer;
-    using const_pointer = std::string::const_pointer;
-    using iterator = std::string::iterator;
-    using const_iterator = std::string::const_iterator;
-    using reverse_iterator = std::string::reverse_iterator;
-    using const_reverse_iterator = std::string::const_reverse_iterator;
+    using std::string::value_type;
+    using std::string::allocator_type;
+    using std::string::size_type;
+    using std::string::difference_type;
+    using std::string::reference;
+    using std::string::const_reference;
+    using std::string::pointer;
+    using std::string::const_pointer;
+    using std::string::iterator;
+    using std::string::const_iterator;
+    using std::string::reverse_iterator;
+    using std::string::const_reverse_iterator;
 
     // Constructors duplicating from std::string
     String() = default;
@@ -194,7 +155,6 @@ namespace emp {
     [[nodiscard]] char back() const { _AssertPos(0); return std::string::back(); }
     [[nodiscard]] char & Get(size_t pos) { return operator[](pos); }
     [[nodiscard]] char Get(size_t pos) const { return operator[](pos); }
-
 
     [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
       { _AssertPos(pos); return std::string::substr(pos, count); }
@@ -267,10 +227,10 @@ namespace emp {
     [[nodiscard]] bool IsLiteralChar() const;
 
     /// Test if an string is formatted as a literal string.
-    [[nodiscard]] bool IsLiteralString(const std::string & quote_marks="\"") const;
+    [[nodiscard]] bool IsLiteralString(const String & quote_marks="\"") const;
 
     /// Explain what string is NOT formatted as a literal string.
-    [[nodiscard]] std::string DiagnoseLiteralString(const std::string & quote_marks="\"") const;
+    [[nodiscard]] String DiagnoseLiteralString(const String & quote_marks="\"") const;
 
     /// Is string composed only of a set of characters (can be provided as a string)
     [[nodiscard]] bool IsComposedOf(emp::CharSet char_set) const { return char_set.Has(*this); }
@@ -327,7 +287,7 @@ namespace emp {
     emp::String PopAll();
     emp::String PopFixed(std::size_t end_pos, size_t delim_size=0);
     emp::String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
-    emp::String PopTo(std::string delim, const Syntax & syntax=Syntax::None());
+    emp::String PopTo(String delim, const Syntax & syntax=Syntax::None());
     emp::String PopWord(const Syntax & syntax=Syntax::None());
     emp::String PopLine(const Syntax & syntax=Syntax::None());
     emp::String PopQuote(const Syntax & syntax=Syntax::Quotes());
@@ -377,7 +337,7 @@ namespace emp {
 
     emp::String & ReplaceChar(char from, char to, size_t start=0)
       { for (size_t i=start; i < size(); ++i) if (Get(i) == from) Get(i) = to; return *this; }
-    emp::String & ReplaceRange(size_t start, size_t end, std::string value)
+    emp::String & ReplaceRange(size_t start, size_t end, String value)
       { return replace(start, end-start, value); }
     emp::String & TrimWhitespace();
     emp::String & CompressWhitespace();
@@ -390,7 +350,7 @@ namespace emp {
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
-    String & ReplaceMacro(std::string start_str, std::string end_str, FUN_T && fun,
+    String & ReplaceMacro(String start_str, String end_str, FUN_T && fun,
                           const Syntax & syntax=Syntax::Quotes());
 
 
@@ -407,15 +367,15 @@ namespace emp {
     [[nodiscard]] size_t FindParenMatch(size_t pos=0, const Syntax & syntax=Syntax::Parens()) const;
     [[nodiscard]] size_t FindMatch(size_t pos=0, const Syntax & syntax=Syntax::Full()) const;
     [[nodiscard]] size_t Find(char target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
-    [[nodiscard]] size_t Find(std::string target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] size_t Find(String target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
     [[nodiscard]] size_t Find(const CharSet & char_set, size_t start, const Syntax & syntax=Syntax::None()) const;
     void FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax=Syntax::None()) const;
     [[nodiscard]] emp::vector<size_t> FindAll(char target, const Syntax & syntax=Syntax::None()) const;
     template <typename... Ts>
-    [[nodiscard]] size_t FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const;
+    [[nodiscard]] size_t FindAnyOfFrom(size_t start, String test1, Ts... tests) const;
     template <typename T, typename... Ts>
     [[nodiscard]] size_t FindAnyOf(T test1, Ts... tests) const;
-    [[nodiscard]] size_t FindID(std::string target, size_t start, const Syntax & syntax=Syntax::Quotes()) const;
+    [[nodiscard]] size_t FindID(String target, size_t start, const Syntax & syntax=Syntax::Quotes()) const;
 
     [[nodiscard]] size_t FindWhitespace(size_t start=0, const Syntax & syntax=Syntax::None()) const 
       { return Find(WhitespaceCharSet(), start, syntax); }
@@ -458,45 +418,45 @@ namespace emp {
     // Note: For efficiency there are two versions of most of these: one where the output
     // data structure is provided and one where it must be generated.
 
-    void Slice(emp::vector<emp::String> & out_set, std::string delim=",",
+    void Slice(emp::vector<emp::String> & out_set, String delim=",",
                const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true) const;
 
     [[nodiscard]]
-    emp::vector<emp::String> Slice(std::string delim=",", const Syntax & syntax=Syntax::Quotes(),
+    emp::vector<emp::String> Slice(String delim=",", const Syntax & syntax=Syntax::Quotes(),
                                    bool trim_whitespace=true) const;
 
     void ViewSlices(
       emp::vector<std::string_view> & out_set,
-      std::string delim=",",
+      String delim=",",
       const Syntax & syntax=Syntax::Quotes()
     ) const;
 
     [[nodiscard]] emp::vector<std::string_view> ViewSlices(
-      std::string delim=",",
+      String delim=",",
       const Syntax & syntax=Syntax::Quotes()
     ) const;
   
     void SliceAssign(
       std::map<emp::String,emp::String> & out_map,
-      std::string delim=",", std::string assign_op="=",
+      String delim=",", String assign_op="=",
       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true
     ) const;
 
     [[nodiscard]] std::map<emp::String,emp::String> SliceAssign(
-      std::string delim=",", std::string assign_op="=",
+      String delim=",", String assign_op="=",
       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true
     ) const;
 
 
     // ------ Other Operators ------
     // Inherited functions from std::string:
-    //  bool operator==(const std::string & in) const
-    //  bool operator!=(const std::string & in) const
-    //  bool operator<(const std::string & in) const
-    //  bool operator<=(const std::string & in) const
-    //  bool operator>(const std::string & in) const
-    //  bool operator>=(const std::string & in) const
-    //  bool operator<=>(const std::string & in) const
+    //  bool operator==(const String & in) const
+    //  bool operator!=(const String & in) const
+    //  bool operator<(const String & in) const
+    //  bool operator<=(const String & in) const
+    //  bool operator>(const String & in) const
+    //  bool operator>=(const String & in) const
+    //  bool operator<=>(const String & in) const
     
 
     //  ------ FORMATTING ------
@@ -516,13 +476,13 @@ namespace emp {
     String & AppendEscaped(char c) { *this += MakeEscaped(c); return *this; }
     String & SetEscaped(char c) { *this = MakeEscaped(c); return *this; }
 
-    String & AppendEscaped(const std::string & in) { *this+=MakeEscaped(in); return *this; }
-    String & SetEscaped(const std::string & in) { *this = MakeEscaped(in); return *this; }
+    String & AppendEscaped(const String & in) { *this+=MakeEscaped(in); return *this; }
+    String & SetEscaped(const String & in) { *this = MakeEscaped(in); return *this; }
     String & ToEscaped() { *this = MakeEscaped(*this); return *this; }
     [[nodiscard]] emp::String AsEscaped() { return MakeEscaped(*this); }
 
-    String & AppendWebSafe(std::string in) { *this+=MakeWebSafe(in); return *this; }
-    String & SetWebSafe(const std::string & in) { *this = MakeWebSafe(in); return *this; }
+    String & AppendWebSafe(String in) { *this+=MakeWebSafe(in); return *this; }
+    String & SetWebSafe(const String & in) { *this = MakeWebSafe(in); return *this; }
     String & ToWebSafe() { *this = MakeWebSafe(*this); return *this; }
     [[nodiscard]] emp::String AsWebSafe() { return MakeWebSafe(*this); }
 
@@ -534,18 +494,18 @@ namespace emp {
     String & ToLiteral() { *this = MakeLiteral(*this); return *this; }
     [[nodiscard]] emp::String AsLiteral() { return MakeLiteral(*this); }
 
-    String & AppendUpper(const std::string & in) { *this+=MakeUpper(in); return *this; }
-    String & SetUpper(const std::string & in) { *this = MakeUpper(in); return *this; }
+    String & AppendUpper(const String & in) { *this+=MakeUpper(in); return *this; }
+    String & SetUpper(const String & in) { *this = MakeUpper(in); return *this; }
     String & ToUpper() { *this = MakeUpper(*this); return *this; }
     [[nodiscard]] emp::String AsUpper() { return MakeUpper(*this); }
 
-    String & AppendLower(const std::string & in) { *this+=MakeLower(in); return *this; }
-    String & SetLower(const std::string & in) { *this = MakeLower(in); return *this; }
+    String & AppendLower(const String & in) { *this+=MakeLower(in); return *this; }
+    String & SetLower(const String & in) { *this = MakeLower(in); return *this; }
     String & ToLower() { *this = MakeLower(*this); return *this; }
     [[nodiscard]] emp::String AsLower() { return MakeLower(*this); }
 
-    String & AppendTitleCase(const std::string & in) { *this+=MakeTitleCase(in); return *this; }
-    String & SetTitleCase(const std::string & in) { *this = MakeTitleCase(in); return *this; }
+    String & AppendTitleCase(const String & in) { *this+=MakeTitleCase(in); return *this; }
+    String & SetTitleCase(const String & in) { *this = MakeTitleCase(in); return *this; }
     String & ToTitleCase() { *this = MakeTitleCase(*this); return *this; }
     [[nodiscard]] emp::String AsTitleCase() { return MakeTitleCase(*this); }
 
@@ -563,12 +523,12 @@ namespace emp {
       { return *this = MakeFormatted(format, std::forward<ARG_Ts>(args)...); }
 
     template <typename CONTAINER_T>
-    String & AppendJoin(const CONTAINER_T & container, std::string delim="",
-                        std::string open="", std::string close="")
+    String & AppendJoin(const CONTAINER_T & container, String delim="",
+                        String open="", String close="")
       { *this += Join(container, delim, open, close); return *this;}
     template <typename CONTAINER_T>
-    String & SetJoin(const CONTAINER_T & container, std::string delim="",
-                     std::string open="", std::string close="")
+    String & SetJoin(const CONTAINER_T & container, String delim="",
+                     String open="", String close="")
       { *this = Join(container, delim, open, close); return *this;}
 
     template <typename... Ts>
@@ -656,7 +616,7 @@ namespace emp {
   }
 
   // A version of string::find() that can skip over quotes.
-  size_t String::Find(std::string target, size_t start, const Syntax & syntax) const {
+  size_t String::Find(String target, size_t start, const Syntax & syntax) const {
     size_t found_pos = find(target, start);
     if (syntax.GetCount() == 0) return found_pos;
 
@@ -709,7 +669,7 @@ namespace emp {
   }
 
   template <typename... Ts>
-  size_t String::FindAnyOfFrom(size_t start, std::string test1, Ts... tests) const {
+  size_t String::FindAnyOfFrom(size_t start, String test1, Ts... tests) const {
     if constexpr (sizeof...(Ts) == 0) return find(test1, start);
     else {
       size_t pos1 = find(test1, start);
@@ -729,7 +689,7 @@ namespace emp {
   }
 
   // Find an whole identifier (same as find, but cannot have letter, digit or '_' before or after.) 
-  size_t String::FindID(std::string target, size_t start, const Syntax & syntax) const
+  size_t String::FindID(String target, size_t start, const Syntax & syntax) const
   {
     size_t pos = Find(target, start, syntax);
     while (pos != npos) {
@@ -810,7 +770,7 @@ namespace emp {
 
   /// Pop the entire string.
   emp::String String::PopAll() {
-    std::string out;
+    String out;
     swap(out);
     return out;
   }
@@ -836,7 +796,7 @@ namespace emp {
 
   /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire string and clear it.
-  emp::String String::PopTo(std::string delim, const Syntax & syntax) {
+  emp::String String::PopTo(String delim, const Syntax & syntax) {
     return PopFixed(Find(delim, 0, syntax), delim.size());
   }
 
@@ -857,7 +817,7 @@ namespace emp {
   size_t String::PopUInt() {
     size_t uint_size = 0;
     while (uint_size < size() && isdigit(Get(uint_size))) ++uint_size;
-    std::string out_uint = PopFixed(uint_size);
+    String out_uint = PopFixed(uint_size);
     return std::stoull(out_uint);
   }
 
@@ -867,7 +827,7 @@ namespace emp {
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   void String::Slice(
-    emp::vector<emp::String> & out_set, std::string delim, const Syntax & syntax, bool trim_whitespace
+    emp::vector<emp::String> & out_set, String delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     if (empty()) return; // Nothing to set!
 
@@ -889,7 +849,7 @@ namespace emp {
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   emp::vector<emp::String> String::Slice(
-    std::string delim, const Syntax & syntax, bool trim_whitespace
+    String delim, const Syntax & syntax, bool trim_whitespace
   ) const {
     emp::vector<emp::String> result;
     Slice(result, delim, syntax, trim_whitespace);
@@ -901,7 +861,7 @@ namespace emp {
   /// @param delim delimiter to split on (default: ",")
   /// @param syntax identify quotes and parens that should be kept together.
   void String::ViewSlices(
-    emp::vector<std::string_view> & out_set, std::string delim, const Syntax & syntax
+    emp::vector<std::string_view> & out_set, String delim, const Syntax & syntax
   ) const {
     out_set.resize(0);
     if (empty()) return; // Nothing to set!
@@ -920,7 +880,7 @@ namespace emp {
   /// @param delim delimiter to split on (default: ",")
   /// @param syntax identify quotes and parens that should be kept together.
   [[nodiscard]] emp::vector<std::string_view> String::ViewSlices(
-    std::string delim, const Syntax & syntax
+    String delim, const Syntax & syntax
   ) const {
     emp::vector<std::string_view> result;
     ViewSlices(result, delim, syntax);
@@ -935,7 +895,7 @@ namespace emp {
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   void String::SliceAssign(
     std::map<emp::String,emp::String> & result_map,
-    std::string delim, std::string assign_op,
+    String delim, String assign_op,
     const Syntax & syntax, bool trim_whitespace
   ) const {
     auto assign_set = Slice(delim, syntax, false);
@@ -965,7 +925,7 @@ namespace emp {
   /// @param syntax identify quotes and parens that should be kept together.
   /// @param trim_whitespace Should whitespace around delim or assign be ignored? (default: true)
   std::map<emp::String,emp::String> String::SliceAssign(
-    std::string delim, std::string assign_op,
+    String delim, String assign_op,
     const Syntax & syntax, bool trim_whitespace
   ) const {
     std::map<emp::String,emp::String> result_map;
@@ -996,7 +956,7 @@ namespace emp {
         break;
       }
 
-      std::string key = GetRange(symbol_end+1, end_pos);
+      String key = GetRange(symbol_end+1, end_pos);
       auto replacement_it = var_map.find(key);
       if (replacement_it == var_map.end()) {
         emp::notify::Exception("emp::string_utils::replace_vars::missing_var",
@@ -1019,8 +979,8 @@ namespace emp {
   /// @return This string object, post processing.
   template <typename FUN_T>
   emp::String & String::ReplaceMacro(
-    std::string start_str,
-    std::string end_str,
+    String start_str,
+    String end_str,
     FUN_T && macro_fun,
     const String::Syntax & syntax
   ) {
@@ -1039,9 +999,9 @@ namespace emp {
 
       // Isolate this macro instance and call the conversion function.
       size_t end_pos = Find(end_str, macro_pos+start_str.size(), syntax);
-      const std::string macro_body = GetRange(macro_pos+start_str.size(), end_pos);
+      const String macro_body = GetRange(macro_pos+start_str.size(), end_pos);
 
-      std::string new_str = macro_fun(macro_body, line_num, macro_count);
+      String new_str = macro_fun(macro_body, line_num, macro_count);
       ReplaceRange(macro_pos, end_pos+end_str.size(), new_str);
       prev_pos = macro_pos;
       macro_count++;
@@ -1068,7 +1028,7 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  bool String::IsLiteralString(const std::string & quote_marks) const {
+  bool String::IsLiteralString(const String & quote_marks) const {
     // Must begin and end with proper quote marks.
     if (size() < 2 || !is_one_of(Get(0), quote_marks) || back() != Get(0)) return false;
 
@@ -1088,7 +1048,7 @@ namespace emp {
   }
 
   /// Test if an input string is properly formatted as a literal string.
-  std::string String::DiagnoseLiteralString(const std::string & quote_marks) const {
+  String String::DiagnoseLiteralString(const String & quote_marks) const {
     // A literal string must begin and end with a double quote and contain only valid characters.
     if (size() < 2) return "Too short!";
     if (!is_one_of(Get(0), quote_marks)) return "Must begin an end in quotes.";
