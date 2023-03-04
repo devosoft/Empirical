@@ -31,8 +31,8 @@ TEST_CASE("Test String Constructors", "[tools]")
   CHECK(emp::MakeLiteral('\\') == "'\\\\'");
 
   emp::String up = "A String!";
-  CHECK(up.ToUpper() == "A STRING!");
-  CHECK(up.ToLower() == "a string!");
+  CHECK(up.AsUpper() == "A STRING!");
+  CHECK(up.AsLower() == "a string!");
 
   CHECK(emp::MakeRoman(50) == "L");
   CHECK(emp::MakeRoman(562) == "DLXII");
@@ -110,7 +110,18 @@ TEST_CASE("Test String Composition-ID Functions", "[tools]")
   CHECK(emp::MakeFromLiteral_String("\"Hello!\"") == "Hello!");
   CHECK(emp::MakeFromLiteral_String("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
 
-/*
+  // Make sure that we can properly identify different types of characters.
+  const emp::String special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
+
+  CHECK(special_string.CountWhitespace() == 6);
+  CHECK(special_string.CountUpper() == 6);
+  CHECK(special_string.CountLower() == 16);
+  CHECK(special_string.CountLetters() == 22);
+  CHECK(special_string.CountDigits() == 3);
+  CHECK(special_string.CountAlphanumeric() == 25);
+  CHECK(special_string.CountNonwhitespace() == 30);
+  
+  /*
   CHECK(emp::is_valid("aaaaaaaaa", [](char x) { return (x == 'a'); } ));
   CHECK( !(emp::is_valid("aaaabaaaa", [](char x) { return (x == 'a'); })) );
 */
@@ -197,109 +208,63 @@ TEST_CASE("Test String Removal Functions", "[tools]")
   CHECK(email == "youexamplecom");
 }
 
-
-/*
-TEST_CASE("Another Test string_utils", "[tools]")
+TEST_CASE("Test String Conversion Functions", "[tools]")
 {
-
-  // TEST1: lets test our conversion to an escaped string.
-  const std::string special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
-  std::string escaped_string = emp::to_escaped_string(special_string);
+  // Test conversion to an escaped string.
+  const emp::String special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
+  emp::String escaped_string = emp::MakeEscaped(special_string);
 
   // note: we had to double-escape the test to make sure this worked.
   CHECK(escaped_string == "This\\t5tr1ng\\nis\\non THREE (3) \\\"lines\\\".");
 
-  // TEST2: Test more general conversion to literals.
-  CHECK(emp::to_literal(42) == "42");
-  CHECK(emp::to_literal('a') == "'a'");
-  CHECK(emp::to_literal('\t') == "'\\t'");
-  CHECK(emp::to_literal(1.234) == "1.234000");
+  // Test more general conversion to literals.
+  CHECK(emp::MakeLiteral(42) == "42");
+  CHECK(emp::MakeLiteral('a') == "'a'");
+  CHECK(emp::MakeLiteral('\t') == "'\\t'");
+  CHECK(emp::MakeLiteral(1.234) == "1.234");
 
-  // TEST3: Make sure that we can properly identify different types of characters.
-  int num_ws = 0;
-  int num_cap = 0;
-  int num_lower = 0;
-  int num_let = 0;
-  int num_num = 0;
-  int num_alphanum = 0;
-  int num_i = 0;
-  int num_vowel = 0;
-  for (char cur_char : special_string) {
-    if (emp::is_whitespace(cur_char)) num_ws++;
-    if (emp::is_upper_letter(cur_char)) num_cap++;
-    if (emp::is_lower_letter(cur_char)) num_lower++;
-    if (emp::is_letter(cur_char)) num_let++;
-    if (emp::is_digit(cur_char)) num_num++;
-    if (emp::is_alphanumeric(cur_char)) num_alphanum++;
-    if (emp::is_valid(cur_char, [](char c){ return c=='i'; })) num_i++;
-    if (emp::is_valid(cur_char, [](char c){return c=='a' || c=='A';},
-                      [](char c){return c=='e' || c=='E';},
-                      [](char c){return c=='i' || c=='I';},
-                      [](char c){return c=='o' || c=='O';},
-                      [](char c){return c=='u' || c=='U';},
-                      [](char c){return c=='y';}
-                      )) num_vowel++;
-  }
-  int num_other = ((int) special_string.size()) - num_alphanum - num_ws;
+  CHECK(special_string.AsEscaped() == escaped_string);
 
 
-  CHECK(num_ws == 6);
-  CHECK(num_cap == 6);
-  CHECK(num_lower == 16);
-  CHECK(num_let == 22);
-  CHECK(num_num == 3);
-  CHECK(num_alphanum == 25);
-  CHECK(num_other == 5);
-  CHECK(num_i == 3);
-  CHECK(num_vowel == 7);
 
-  std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
+  emp::String base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
 
   CHECK(
-    emp::slugify(base_string)
+    emp::MakeSlugify(base_string)
     == "this-is-an-okay-string-this-is-my-very-best-string"
   );
 
-  std::string first_line = emp::string_pop_line(base_string);
+  emp::String first_line = base_string.PopLine();
 
   CHECK(first_line == "This is an okay string.");
-  CHECK(emp::string_get_word(first_line) == "This");
+  CHECK(first_line.ViewWord() == "This");
 
-  emp::string_pop_word(first_line);
-
+  CHECK(first_line.PopWord() == "This");
   CHECK(first_line == "is an okay string.");
 
-  emp::remove_whitespace(first_line);
+  CHECK(first_line.RemoveWhitespace() == "isanokaystring.");
 
-  CHECK(first_line == "isanokaystring.");
-
-  std::string popped_str = emp::string_pop(first_line, "ns");
-
-  CHECK(popped_str == "i");
+  CHECK(first_line.Pop("ns") == "i");
   CHECK(first_line == "anokaystring.");
 
-
-  popped_str = emp::string_pop(first_line, "ns");
-
-
+  emp::String popped_str = first_line.Pop("ns");
   CHECK(popped_str == "a");
   CHECK(first_line == "okaystring.");
 
-
-  popped_str = emp::string_pop(first_line, 'y');
-
+  popped_str = first_line.Pop('y');
   CHECK(popped_str == "oka");
   CHECK(first_line == "string.");
 
-  emp::left_justify(base_string);
-  CHECK(base_string == "This\nis   -MY-    very best string!!!!   ");
+  CHECK(base_string.TrimFront() == "This\nis   -MY-    very best string!!!!   ");
+  CHECK(base_string.TrimBack() == "This\nis   -MY-    very best string!!!!");
+  CHECK(base_string.Compress() == "This is -MY- very best string!!!!");
+}
 
-  emp::right_justify(base_string);
-  CHECK(base_string == "This\nis   -MY-    very best string!!!!");
 
-  emp::compress_whitespace(base_string);
-  CHECK(base_string == "This is -MY- very best string!!!!");
 
+/*
+TEST_CASE("Another Test string_utils", "[tools]")
+{
 
   std::string view_test = "This is my view test!";
   CHECK( emp::view_string(view_test) == "This is my view test!" );
