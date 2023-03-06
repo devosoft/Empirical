@@ -42,37 +42,41 @@ namespace emp {
   class String;
 
   // Some stand-alone functions to generate String objects.
-  template <typename... Ts> [[nodiscard]] emp::String MakeString(Ts... args);
-  [[nodiscard]] emp::String MakeEscaped(char c);
-  [[nodiscard]] emp::String MakeEscaped(const emp::String & in);
-  [[nodiscard]] emp::String MakeWebSafe(const emp::String & in);
-  [[nodiscard]] emp::String MakeLiteral(char value);
-  [[nodiscard]] emp::String MakeLiteral(char value);
-  template <typename T> [[nodiscard]] emp::String MakeLiteral(const T & value);
-  [[nodiscard]] emp::String MakeUpper(const emp::String & in);
-  [[nodiscard]] emp::String MakeLower(const emp::String & in);
-  [[nodiscard]] emp::String MakeTitleCase(emp::String in);
-  [[nodiscard]] emp::String MakeRoman(int val);
+  template <typename... Ts> [[nodiscard]] inline emp::String MakeString(Ts... args);
+  [[nodiscard]] inline emp::String MakeEscaped(char c);
+  [[nodiscard]] inline emp::String MakeEscaped(const emp::String & in);
+  [[nodiscard]] inline emp::String MakeWebSafe(const emp::String & in);
+  [[nodiscard]] inline emp::String MakeLiteral(char value);
+  [[nodiscard]] inline emp::String MakeLiteral(const emp::String & value);
+  template <typename T> [[nodiscard]] inline emp::String MakeLiteral(const T & value);
+  [[nodiscard]] inline char MakeFromLiteral_Char(const emp::String & value);
+  [[nodiscard]] inline emp::String MakeFromLiteral_String(const emp::String & value);
+  [[nodiscard]] inline emp::String MakeFromLiteral(const emp::String & value);
+  [[nodiscard]] inline emp::String MakeUpper(const emp::String & in);
+  [[nodiscard]] inline emp::String MakeLower(const emp::String & in);
+  [[nodiscard]] inline emp::String MakeTitleCase(emp::String in);
+  [[nodiscard]] inline emp::String MakeRoman(int val);
   template <typename CONTAINER_T>
-  [[nodiscard]] emp::String MakeEnglishList(const CONTAINER_T & container);
+  [[nodiscard]] inline emp::String MakeEnglishList(const CONTAINER_T & container);
   template <typename... Args>
-  [[nodiscard]] emp::String MakeFormatted(const emp::String& format, Args... args);
+  [[nodiscard]] inline emp::String MakeFormatted(const emp::String& format, Args... args);
+  [[nodiscard]] inline emp::String MakeRepeat(emp::String base, size_t n);
 
-  [[nodiscard]] emp::String MakeTrimFront(const emp::String & in, const emp::CharSet & chars=WhitespaceCharSet());
-  [[nodiscard]] emp::String MakeTrimBack(const emp::String & in, const emp::CharSet & chars=WhitespaceCharSet());
-  [[nodiscard]] emp::String MakeTrimmed(emp::String in, const emp::CharSet & chars=WhitespaceCharSet());
-  [[nodiscard]] emp::String MakeCompressed(
+  [[nodiscard]] inline emp::String MakeTrimFront(const emp::String & in, const emp::CharSet & chars=WhitespaceCharSet());
+  [[nodiscard]] inline emp::String MakeTrimBack(const emp::String & in, const emp::CharSet & chars=WhitespaceCharSet());
+  [[nodiscard]] inline emp::String MakeTrimmed(emp::String in, const emp::CharSet & chars=WhitespaceCharSet());
+  [[nodiscard]] inline emp::String MakeCompressed(
     emp::String in, const emp::CharSet & chars=WhitespaceCharSet(), char compress_to=' ',
     bool trim_start=true, bool trim_end=true);
-  [[nodiscard]] emp::String MakeRemoveChars(emp::String in, const CharSet & chars);
-  [[nodiscard]] emp::String MakeSlugify(emp::String in);
+  [[nodiscard]] inline emp::String MakeRemoveChars(emp::String in, const CharSet & chars);
+  [[nodiscard]] inline emp::String MakeSlugify(emp::String in);
 
   template <typename CONTAINER_T>
-  [[nodiscard]] emp::String Join(const CONTAINER_T & container, std::string join_str="",
-                                 std::string open="", std::string close="");
+  [[nodiscard]] inline emp::String Join(const CONTAINER_T & container, std::string join_str="",
+                                        std::string open="", std::string close="");
 
   // ToString specialization for emp::String
-  const emp::String & ToString(const emp::String & in) { return in; }
+  inline const emp::String & ToString(const emp::String & in) { return in; }
 
   class String : public std::string {
   private:
@@ -141,12 +145,16 @@ namespace emp {
     String & operator=(std::string && _in) { std::string::operator=(std::move(_in)); return *this; }
     String & operator=(const char * _in) { std::string::operator=(_in); return *this; }
     String & operator=(char _in) { std::string::operator=(_in); return *this; }
+    String & operator=(std::string_view _in) { std::string::operator=(_in); return *this; }
     String & operator=(std::initializer_list<char> _in) { std::string::operator=(_in); return *this; }
     String & operator=(std::nullptr_t) = delete;
 
     template <typename... ARG_Ts>
     String & assign(ARG_Ts &&... args)
       { std::string::assign(std::forward<ARG_Ts>(args)...); return *this; }
+
+    // ------ Static Values ------
+    [[nodiscard]] static const String & Empty() { static String empty=""; return empty; }
 
     // ------ Element Access ------
     // Inherited functions from std::string:
@@ -240,19 +248,19 @@ namespace emp {
       { return (size_t) std::count(begin()+start, begin()+end, c); }
 
     /// Test if an string is formatted as a literal character.
-    [[nodiscard]] bool IsLiteralChar() const;
+    [[nodiscard]] inline bool IsLiteralChar() const;
 
     /// Test if an string is formatted as a literal string.
-    [[nodiscard]] bool IsLiteralString(const String & quote_marks="\"") const;
+    [[nodiscard]] inline bool IsLiteralString(const String & quote_marks="\"") const;
 
     /// Explain what string is NOT formatted as a literal string.
-    [[nodiscard]] String DiagnoseLiteralString(const String & quote_marks="\"") const;
+    [[nodiscard]] inline String DiagnoseLiteralString(const String & quote_marks="\"") const;
 
     /// Is string composed only of a set of characters (can be provided as a string)
     [[nodiscard]] bool IsComposedOf(emp::CharSet char_set) const { return char_set.Has(*this); }
 
     /// Is string a valid number (int, floating point, or scientific notation all valid)
-    [[nodiscard]] bool IsNumber() const;
+    [[nodiscard]] inline bool IsNumber() const;
 
     /// Is string a valid identifier? At least one char; cannot begin with digit, only letters, digits and `_`
     [[nodiscard]] bool IsIdentifier() const
@@ -306,17 +314,17 @@ namespace emp {
     emp::String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
     emp::String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
-    bool PopIf(char c);
-    bool PopIf(String in);
-    emp::String PopAll();
-    emp::String PopFixed(std::size_t end_pos, size_t delim_size=0);
-    emp::String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
-    emp::String PopTo(String delim, const Syntax & syntax=Syntax::None());
-    emp::String PopWord(const Syntax & syntax=Syntax::None());
-    emp::String PopLine(const Syntax & syntax=Syntax::None());
-    emp::String PopQuote(const Syntax & syntax=Syntax::Quotes());
-    emp::String PopParen(const Syntax & syntax=Syntax::Parens());
-    size_t PopUInt();
+    inline bool PopIf(char c);
+    inline bool PopIf(String in);
+    inline emp::String PopAll();
+    inline emp::String PopFixed(std::size_t end_pos, size_t delim_size=0);
+    inline emp::String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
+    inline emp::String PopTo(String delim, const Syntax & syntax=Syntax::None());
+    inline emp::String PopWord(const Syntax & syntax=Syntax::None());
+    inline emp::String PopLine(const Syntax & syntax=Syntax::None());
+    inline emp::String PopQuote(const Syntax & syntax=Syntax::Quotes());
+    inline emp::String PopParen(const Syntax & syntax=Syntax::Parens());
+    inline size_t PopUInt();
 
     // ------ Insertions and Additions ------
     // Inherited functions from std::string:
@@ -384,19 +392,19 @@ namespace emp {
     // size_t find_last_of(...) const
     // size_t find_last_not_of(...) const
 
-    [[nodiscard]] size_t FindQuoteMatch(size_t pos=0) const;
-    [[nodiscard]] size_t FindParenMatch(size_t pos=0, const Syntax & syntax=Syntax::Parens()) const;
-    [[nodiscard]] size_t FindMatch(size_t pos=0, const Syntax & syntax=Syntax::Full()) const;
-    [[nodiscard]] size_t Find(char target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
-    [[nodiscard]] size_t Find(String target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
-    [[nodiscard]] size_t Find(const CharSet & char_set, size_t start, const Syntax & syntax=Syntax::None()) const;
-    void FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax=Syntax::None()) const;
-    [[nodiscard]] emp::vector<size_t> FindAll(char target, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t FindQuoteMatch(size_t pos=0) const;
+    [[nodiscard]] inline size_t FindParenMatch(size_t pos=0, const Syntax & syntax=Syntax::Parens()) const;
+    [[nodiscard]] inline size_t FindMatch(size_t pos=0, const Syntax & syntax=Syntax::Full()) const;
+    [[nodiscard]] inline size_t Find(char target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t Find(String target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t Find(const CharSet & char_set, size_t start, const Syntax & syntax=Syntax::None()) const;
+    inline void FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline emp::vector<size_t> FindAll(char target, const Syntax & syntax=Syntax::None()) const;
     template <typename... Ts>
-    [[nodiscard]] size_t FindAnyOfFrom(size_t start, String test1, Ts... tests) const;
+    [[nodiscard]] inline size_t FindAnyOfFrom(size_t start, String test1, Ts... tests) const;
     template <typename T, typename... Ts>
-    [[nodiscard]] size_t FindAnyOf(T test1, Ts... tests) const;
-    [[nodiscard]] size_t FindID(String target, size_t start, const Syntax & syntax=Syntax::Quotes()) const;
+    [[nodiscard]] inline size_t FindAnyOf(T test1, Ts... tests) const;
+    [[nodiscard]] inline size_t FindID(String target, size_t start, const Syntax & syntax=Syntax::Quotes()) const;
 
     [[nodiscard]] size_t FindWhitespace(size_t start=0, const Syntax & syntax=Syntax::None()) const 
       { return Find(WhitespaceCharSet(), start, syntax); }
@@ -429,9 +437,9 @@ namespace emp {
 
 
     // ------ Other Views ------
-    std::string_view ViewNestedBlock(size_t start=0, const Syntax & syntax=Syntax::Quotes())
+    [[nodiscard]] std::string_view ViewNestedBlock(size_t start=0, const Syntax & syntax=Syntax::Quotes()) const
       { return ViewRange(start+1, FindParenMatch(start, syntax) - 1); }
-    std::string_view ViewQuote(size_t start=0, const Syntax & syntax=Syntax::Quotes())
+    [[nodiscard]] std::string_view ViewQuote(size_t start=0, const Syntax & syntax=Syntax::Quotes()) const
       { return ViewRange(start, syntax.IsQuote(Get(start)) ? FindQuoteMatch(start) : start); }
 
 
@@ -439,31 +447,31 @@ namespace emp {
     // Note: For efficiency there are two versions of most of these: one where the output
     // data structure is provided and one where it must be generated.
 
-    void Slice(emp::vector<emp::String> & out_set, String delim=",",
-               const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true) const;
+    inline void Slice(emp::vector<emp::String> & out_set, String delim=",",
+                      const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true) const;
 
     [[nodiscard]]
-    emp::vector<emp::String> Slice(String delim=",", const Syntax & syntax=Syntax::Quotes(),
-                                   bool trim_whitespace=true) const;
+    inline emp::vector<emp::String> Slice(String delim=",", const Syntax & syntax=Syntax::Quotes(),
+                                          bool trim_whitespace=true) const;
 
-    void ViewSlices(
+    inline void ViewSlices(
       emp::vector<std::string_view> & out_set,
       String delim=",",
       const Syntax & syntax=Syntax::Quotes()
     ) const;
 
-    [[nodiscard]] emp::vector<std::string_view> ViewSlices(
+    [[nodiscard]] inline emp::vector<std::string_view> ViewSlices(
       String delim=",",
       const Syntax & syntax=Syntax::Quotes()
     ) const;
   
-    void SliceAssign(
+    inline void SliceAssign(
       std::map<emp::String,emp::String> & out_map,
       String delim=",", String assign_op="=",
       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true
     ) const;
 
-    [[nodiscard]] std::map<emp::String,emp::String> SliceAssign(
+    [[nodiscard]] inline std::map<emp::String,emp::String> SliceAssign(
       String delim=",", String assign_op="=",
       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true
     ) const;
