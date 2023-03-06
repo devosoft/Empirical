@@ -33,12 +33,19 @@ namespace emp {
 
   public:
     StringSyntax() { char_matches.fill('\0'); }
-    StringSyntax(std::string quotes, std::string parens="") {
+    StringSyntax(std::string quotes, std::string parens="") : StringSyntax() {
       emp_assert(parens.size() % 2 == 0, "String::StringSyntax must have odd number of paren chars.");
-      char_matches.fill('\0');
       for (char c : quotes) char_matches[c] = c;
       for (size_t i=0; i < parens.size(); i+=2) char_matches[parens[i]] = parens[i+1];
       count = static_cast<uint8_t>(quotes.size() + parens.size()/2);
+    }
+    StringSyntax(bool match_quotes, bool match_parens=false) : StringSyntax() {
+      if (match_quotes) char_matches['"'] = '"';
+      if (match_parens) {
+        char_matches['('] = ')';
+        char_matches['['] = ']';
+        char_matches['{'] = '}';
+      }
     }
     StringSyntax(const char * quotes, const char * parens)
       : StringSyntax(std::string(quotes), std::string(parens)) { }
