@@ -224,15 +224,11 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
   CHECK(emp::MakeLiteral(1.234) == "1.234");
 
   CHECK(special_string.AsEscaped() == escaped_string);
-
-
+  CHECK(special_string.AsEscaped() == escaped_string);
 
   emp::String base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
 
-  CHECK(
-    emp::MakeSlugify(base_string)
-    == "this-is-an-okay-string-this-is-my-very-best-string"
-  );
+  CHECK(emp::MakeSlugify(base_string) == "this-is-an-okay-string-this-is-my-very-best-string");
 
   emp::String first_line = base_string.PopLine();
 

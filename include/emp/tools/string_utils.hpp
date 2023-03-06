@@ -1323,9 +1323,9 @@ namespace emp {
   /// View a section of a string with the properly matching nested blocks.
   /// For example if ((abc(de))f(ghi)) would return "(abc(de))f(ghi)" at 0, "de" at 5, or
   /// "" at 2 (since there is no start!)
-  std::string_view ViewNestedBlock(std::string_view str,
-                                   const std::string symbols="()",
-                                   size_t start=0) {
+  static inline std::string_view ViewNestedBlock(std::string_view str,
+                                                 const std::string symbols="()",
+                                                 size_t start=0) {
     // Test if we are not starting at the beginning of a block, return empty.
     if (str[start] != symbols[0]) return emp::view_string(str, 0, 0);
 

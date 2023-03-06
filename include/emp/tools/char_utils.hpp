@@ -266,7 +266,7 @@ namespace emp {
   }
 
   /// Convert a char after a backslash to its escaped version.
-  char ToEscapeChar(char c) {
+  inline char ToEscapeChar(char c) {
     switch (c) {
       case 'b': return '\b';   // Backspace
       case 'f': return '\f';   // Form feed
