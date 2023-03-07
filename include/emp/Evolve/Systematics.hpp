@@ -1092,6 +1092,8 @@ namespace emp {
       std::swap(v1[p1.GetIndex()], v2[p2.GetIndex()]);
     }
 
+    typename emp::HasFromString<ORG_INFO>::type LoadFromFile(const std::string & file_path, const std::string & info_col);
+
   };
 
   // =============================================================
@@ -1936,6 +1938,78 @@ namespace emp {
     return max_depth;
   }
 
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  typename emp::HasFromString<ORG_INFO>::type
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path, const std::string & info_col) {
+    emp::File in_file(file_path);
+    in_file.RemoveWhitespace(false);
+    emp::vector<std::string> header = in_file.ExtractRow();
+    auto id_pos_it = std::find(header.begin(), header.end(), "id");
+    emp_assert(id_pos_it != header.end() && 
+      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
+      "id column is missing");
+    size_t id_pos = emp::from_string<size_t>(*id_pos_it);
+
+    auto anc_pos_it = std::find(header.begin(), header.end(), "ancestor_list");
+    emp_assert(anc_pos_it != header.end() && 
+      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
+      "ancestor_list column is missing");
+    size_t anc_pos = emp::from_string<size_t>(*anc_pos_it);
+
+    auto origin_pos_it = std::find(header.begin(), header.end(), "origin_time");
+    emp_assert(origin_pos_it != header.end() && 
+      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
+      "origin_time column is missing");
+    size_t origin_pos = emp::from_string<size_t>(*origin_pos_it);
+
+    auto destruction_pos_it = std::find(header.begin(), header.end(), "destruction_time");
+    emp_assert(destruction_pos_it != header.end() && 
+      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
+      "destruction_time column is missing");
+    size_t destruction_pos = emp::from_string<size_t>(*destruction_pos_it);
+
+    auto info_pos_it = std::find(header.begin(), header.end(), info_col);
+    emp_assert(info_pos_it != header.end() && 
+      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
+      "info column name supplied is not in file.");
+    size_t info_pos = emp::from_string<size_t>(*info_pos_it);
+
+    std::unordered_map<int, emp::Ptr<taxon_t> > taxa;
+
+    for (size_t i = 0; i < in_file.GetNumLines(); i++) {
+      emp::vector<std::string> row = in_file.ExtractRow();
+      int id = emp::from_string<int>(row[id_pos]);
+      int origin_time = emp::from_string<int>(row[origin_pos]);
+      int destruction_time = emp::from_string<int>(row[destruction_pos]);
+      ORG_INFO info = emp::from_string<ORG_INFO>(row[info_pos]);
+      std::string ancestor_list_str = row[anc_pos];
+      emp::remove_chars(ancestor_list_str, "[]");
+      emp::Ptr<taxon_t> tax;
+      if (emp::to_lower(ancestor_list_str) == "none") {
+        tax.New(id, info);
+        num_roots++;
+        if (destruction_time != std::numeric_limits<double>::infinity()) {
+          ancestor_taxa.insert(tax);
+        } else {
+          active_taxa.insert(tax);
+        }
+        taxa[id] = tax;
+      } else {
+        emp::vector<std::string> ancestor_split = emp::slice(ancestor_list_str, ',');
+        emp::vector<int> ancestor_list = emp::from_strings<int>(ancestor_split);
+        tax.New(id, info, taxa[ancestor_list[0]]);        
+        if (destruction_time != std::numeric_limits<double>::infinity()) {
+          ancestor_taxa.insert(tax);
+        } else {
+          active_taxa.insert(tax);
+        }
+        taxa[id] = tax;
+      }
+
+
+    }
+
+  }
 
 }
 
