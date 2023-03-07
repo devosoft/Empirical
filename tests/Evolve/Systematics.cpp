@@ -6,9 +6,9 @@
  *  @file Systematics.cpp
  */
 
+#include <filesystem>
 #include <iostream>
 #include <sstream>
-#include <filesystem>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 

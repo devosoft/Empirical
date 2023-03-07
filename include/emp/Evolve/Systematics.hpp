@@ -2071,6 +2071,8 @@ namespace emp {
       }
     }
 
+    // Step through all taxa and fix their
+    // bookkeeping
     emp::Ptr<taxon_t> curr;
     while(!to_explore.empty()) {
       curr = to_explore.back();
@@ -2086,6 +2088,8 @@ namespace emp {
       }
     }
 
+    // If we're assuming that all leave are extant,
+    // move leaves to active taxa
     for (auto leaf : leaves) {
       if (assume_leaves_extant && !Has(active_taxa, leaf)) {
         ancestor_taxa.erase(leaf);
