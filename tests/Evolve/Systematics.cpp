@@ -1462,6 +1462,8 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
       emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
       sys.LoadFromFile(file.path(), "phenotype");
 
+      sys.AddSnapshotFun([](const emp::Systematics<int, int>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
+
       // save systematics into temp file
       const auto temp_path = std::filesystem::temp_directory_path() / file.path().filename();
       sys.Snapshot(temp_path);
