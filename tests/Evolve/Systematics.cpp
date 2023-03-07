@@ -1462,10 +1462,10 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
   for (const auto& file : std::filesystem::directory_iterator("assets/")) {
     if (file.path().extension() == ".csv") {
       // load systematics from original file
-      emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
+      emp::Systematics<int, std::string> sys([](const int & i){ return emp::to_string(i); }, true, true, true, true);
       sys.LoadFromFile(file.path(), "phenotype");
 
-      sys.AddSnapshotFun([](const emp::Systematics<int, int>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
+      sys.AddSnapshotFun([](const emp::Systematics<int, std::string>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
 
       // save systematics into temp file
       const auto temp_path = std::filesystem::temp_directory_path() / file.path().filename();
