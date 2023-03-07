@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -1452,4 +1453,27 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(sys.GetNumOutside() == 0);
   CHECK(sys.GetNumTaxa() == 10);
   // CHECK(sys.GetMaxDepth() == 4);
+}
+
+TEST_CASE("Test LoadFromFile and Snapshot behavior") {
+  for (const auto& file : std::filesystem::directory_iterator("assets/")) {
+    if (file.path().extension() == ".csv") {
+      // load systematics from original file
+      emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
+      sys.LoadFromFile(file.path(), "phenotype");
+
+      // save systematics into temp file
+      const auto temp_path = std::filesystem::temp_directory_path() / file.path().filename();
+      sys.Snapshot(temp_path);
+
+      // load original systematics file
+      emp::File original{file.path()};
+
+      // load saved file
+      emp::File saved{temp_path};
+
+      CHECK(saved == original);
+    }
+  }
+
 }
