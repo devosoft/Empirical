@@ -1436,3 +1436,20 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   CHECK(id4->GetNumOff() == 1);
   CHECK(Has(sys.GetAncestors(), id4));
 }
+
+TEST_CASE("Test Loading Phylogeny From File") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
+  sys.LoadFromFile("systematics_snapshot.csv", "genome");
+  CHECK(sys.GetNumRoots() == 1);
+  emp::Ptr<emp::Taxon<int>> mrca = sys.GetMRCA();
+  CHECK(mrca->GetID() == 1);
+  auto offspring = mrca->GetOffspring();
+  for (auto off : offspring) {
+    CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
+  }
+  CHECK(sys.GetNumActive() == 5);
+  CHECK(sys.GetNumAncestors() == 5);
+  CHECK(sys.GetNumOutside() == 0);
+  CHECK(sys.GetNumTaxa() == 10);
+  // CHECK(sys.GetMaxDepth() == 4);
+}
