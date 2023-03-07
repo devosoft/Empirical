@@ -1097,7 +1097,7 @@ namespace emp {
       std::swap(v1[p1.GetIndex()], v2[p2.GetIndex()]);
     }
 
-    typename emp::HasFromString<ORG_INFO>::type LoadFromFile(const std::string & file_path, const std::string & info_col);
+    void LoadFromFile(const std::string & file_path, const std::string & info_col);
 
   };
 
@@ -1944,8 +1944,12 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  typename emp::HasFromString<ORG_INFO>::type
-  Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path, const std::string & info_col) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path, const std::string & info_col) {
+    if constexpr (!emp::is_streamable<std::stringstream, ORG_INFO>::value) {
+      emp_assert(false && "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
+      return;
+    }
+    
     emp::File in_file(file_path);
     in_file.RemoveWhitespace();
     emp::vector<std::string> header = in_file.ExtractRow();
