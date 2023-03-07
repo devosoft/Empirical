@@ -1950,32 +1950,32 @@ namespace emp {
     in_file.RemoveWhitespace();
     emp::vector<std::string> header = in_file.ExtractRow();
     auto id_pos_it = std::find(header.begin(), header.end(), "id");
-    emp_assert(id_pos_it != header.end() && 
+    emp_assert(id_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "id column is missing");
     size_t id_pos = std::distance(header.begin(), id_pos_it);
 
     auto anc_pos_it = std::find(header.begin(), header.end(), "ancestor_list");
-    emp_assert(anc_pos_it != header.end() && 
+    emp_assert(anc_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "ancestor_list column is missing");
     size_t anc_pos = std::distance(header.begin(), anc_pos_it);
 
     auto origin_pos_it = std::find(header.begin(), header.end(), "origin_time");
-    emp_assert(origin_pos_it != header.end() && 
+    emp_assert(origin_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "origin_time column is missing");
     size_t origin_pos = std::distance(header.begin(), origin_pos_it);
 
     auto destruction_pos_it = std::find(header.begin(), header.end(), "destruction_time");
-    emp_assert(destruction_pos_it != header.end() && 
+    emp_assert(destruction_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "destruction_time column is missing");
     size_t destruction_pos = std::distance(header.begin(), destruction_pos_it);
 
     auto info_pos_it = std::find(header.begin(), header.end(), info_col);
-    
-    emp_assert(info_pos_it != header.end() && 
+
+    emp_assert(info_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "info column name supplied is not in file.");
     size_t info_pos = std::distance(header.begin(), info_pos_it);
