@@ -1949,7 +1949,7 @@ namespace emp {
       emp_assert(false && "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
       return;
     }
-    
+
     emp::File in_file(file_path);
     in_file.RemoveWhitespace();
     emp::vector<std::string> header = in_file.ExtractRow();
