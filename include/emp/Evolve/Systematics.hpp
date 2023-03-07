@@ -1097,7 +1097,8 @@ namespace emp {
       std::swap(v1[p1.GetIndex()], v2[p2.GetIndex()]);
     }
 
-    void LoadFromFile(const std::string & file_path, const std::string & info_col);
+    void LoadFromFile(const std::string & file_path, const std::string & info_col = "info",
+                                                             bool assume_leaves_extant=true);
 
   };
 
@@ -1944,15 +1945,24 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path, const std::string & info_col) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path, 
+                                                            const std::string & info_col, 
+                                                             bool assume_leaves_extant) {
+    
+    // We can only load phylogenies from file if their info can be
+    // converted to this systematics object's ORG_INFO type (if you 
+    // have a complex type, you can just use a string representation)
     if constexpr (!emp::is_streamable<std::stringstream, ORG_INFO>::value) {
       emp_assert(false && "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
       return;
     }
 
+    // Load files
     emp::File in_file(file_path);
     in_file.RemoveWhitespace();
     emp::vector<std::string> header = in_file.ExtractRow();
+    
+    // Find column ids
     auto id_pos_it = std::find(header.begin(), header.end(), "id");
     emp_assert(id_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
@@ -1983,51 +1993,110 @@ namespace emp {
       "info column name supplied is not in file.");
     size_t info_pos = std::distance(header.begin(), info_pos_it);
 
+    // Keep track taxon objects
     std::unordered_map<int, emp::Ptr<taxon_t> > taxa;
+    // File is out of order, so we have to link up parents
+    // and offspring after the fact
     std::unordered_map<int, int> unlinked_parents;
+    // Keep track of roots
+    emp::vector<emp::Ptr<taxon_t>> roots;
+
+    // Read in each row and make a taxon for it
     size_t num_lines = in_file.GetNumLines();
     for (size_t i = 0; i < num_lines; i++) {
       emp::vector<std::string> row = in_file.ExtractRow();
       int id = emp::from_string<int>(row[id_pos]);
-    
+
+      // Inf means this taxon is still alive
+      // or we don't know which taxa are alive    
       std::string destruction_time = "inf";
       if (destruction_pos != -1) {
         destruction_time = row[destruction_pos];
-      } 
+      } else {
+        destruction_time = "unknown";
+      }
 
+      // Load ancestor list
       ORG_INFO info = emp::from_string<ORG_INFO>(row[info_pos]);
       std::string ancestor_list_str = row[anc_pos];
       emp::remove_chars(ancestor_list_str, "[]\"");
       emp::Ptr<taxon_t> tax;
 
-      // std::cout << ancestor_list_str << " has no parent "<< std::endl;
+      // Make taxon (parent is nullptr for now)
       tax.New(id, info);
       if (destruction_time != "inf") {
         ancestor_taxa.insert(tax);
       } else {
         active_taxa.insert(tax);
       }
+
+      // Fill in destruction and origin time if
+      // provided
       if (origin_pos != -1 ){
         int origin_time = emp::from_string<int>(row[origin_pos]);
         tax->SetOriginationTime(origin_time);
       }
-      if (destruction_time != "inf") {
+      if (destruction_time != "inf" && destruction_time != "unknown") {
         tax->SetDestructionTime(emp::from_string<int>(destruction_time));
       }   
 
+      // Store taxon pointer
       taxa[id] = tax;
+      // Keep track of parents so we can link up later
       if (emp::to_lower(ancestor_list_str) != "none") {
         emp::vector<std::string> ancestor_split = emp::slice(ancestor_list_str, ',');
         emp::vector<int> ancestor_list = emp::from_strings<int>(ancestor_split);
         unlinked_parents[id] = ancestor_list[0];
       } else {
+        // If no parent, this is a root
         num_roots++;
+        roots.push_back(tax);
       }
     }
+
+    // Link up parents and offspring
     for (auto element : unlinked_parents) {
       taxa[element.first]->parent = taxa[element.second];
       taxa[element.second]->AddOffspring(taxa[element.first]);
     }
+
+    // Set up depth
+    emp::vector<emp::Ptr<taxon_t>> leaves;
+    emp::vector<emp::Ptr<taxon_t>> to_explore;
+    for (auto root : roots) {
+      root->depth = 0;
+      root->total_offspring = 0;
+      for (auto offspring : root->GetOffspring()) {
+        to_explore.push_back(offspring);
+      }
+    }
+ 
+    emp::Ptr<taxon_t> curr;
+    while(!to_explore.empty()) {
+      curr = to_explore.back();
+      to_explore.pop_back();
+      curr->parent->AddTotalOffspring();
+      curr->total_offspring = 0;
+      curr->depth = curr->GetParent()->depth + 1;
+      for (auto offspring : curr->GetOffspring()){
+        to_explore.push_back(offspring);
+      }
+      if (curr->GetNumOff() == 0) {
+        leaves.push_back(curr);
+      }
+    }
+
+    for (auto leaf : leaves) {
+      if (assume_leaves_extant && !Has(active_taxa, leaf)) {
+        ancestor_taxa.erase(leaf);
+        active_taxa.insert(leaf);
+      }
+    }
+
+    // Force stats to be recalculated
+    max_depth = -1;
+    mrca = nullptr;
+
   }
 
 }

@@ -1448,11 +1448,14 @@ TEST_CASE("Test Loading Phylogeny From File") {
   for (auto off : offspring) {
     CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
   }
-  CHECK(sys.GetNumActive() == 5);
-  CHECK(sys.GetNumAncestors() == 5);
+  CHECK(sys.GetNumActive() == 6);
+  CHECK(sys.GetNumAncestors() == 4);
   CHECK(sys.GetNumOutside() == 0);
   CHECK(sys.GetNumTaxa() == 10);
-  // CHECK(sys.GetMaxDepth() == 4);
+  CHECK(sys.GetMaxDepth() == 4);
+  CHECK(mrca->GetTotalOffspring() == 9);
+  CHECK(mrca->GetNumOff() == 3);
+  sys.PrintStatus();
 }
 
 TEST_CASE("Test LoadFromFile and Snapshot behavior") {
