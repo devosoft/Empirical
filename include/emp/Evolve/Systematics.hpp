@@ -1966,19 +1966,18 @@ namespace emp {
     size_t anc_pos = std::distance(header.begin(), anc_pos_it);
 
     auto origin_pos_it = std::find(header.begin(), header.end(), "origin_time");
-    emp_assert(origin_pos_it != header.end() &&
-      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
-      "origin_time column is missing");
-    size_t origin_pos = std::distance(header.begin(), origin_pos_it);
+    int origin_pos = -1;
+    if(origin_pos_it != header.end()){ 
+      origin_pos = std::distance(header.begin(), origin_pos_it);
+    }
 
     auto destruction_pos_it = std::find(header.begin(), header.end(), "destruction_time");
-    emp_assert(destruction_pos_it != header.end() &&
-      "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
-      "destruction_time column is missing");
-    size_t destruction_pos = std::distance(header.begin(), destruction_pos_it);
+    int destruction_pos = -1;
+    if (destruction_pos_it != header.end()) {
+      destruction_pos = std::distance(header.begin(), destruction_pos_it);
+    }
 
     auto info_pos_it = std::find(header.begin(), header.end(), info_col);
-
     emp_assert(info_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "info column name supplied is not in file.");
@@ -1990,8 +1989,11 @@ namespace emp {
     for (size_t i = 0; i < num_lines; i++) {
       emp::vector<std::string> row = in_file.ExtractRow();
       int id = emp::from_string<int>(row[id_pos]);
-      int origin_time = emp::from_string<int>(row[origin_pos]);
-      std::string destruction_time = row[destruction_pos];
+    
+      std::string destruction_time = "inf";
+      if (destruction_pos != -1) {
+        destruction_time = row[destruction_pos];
+      } 
 
       ORG_INFO info = emp::from_string<ORG_INFO>(row[info_pos]);
       std::string ancestor_list_str = row[anc_pos];
@@ -2005,8 +2007,13 @@ namespace emp {
       } else {
         active_taxa.insert(tax);
       }
-      tax->SetOriginationTime(origin_time);
-      tax->SetDestructionTime(emp::from_string<int>(destruction_time));
+      if (origin_pos != -1 ){
+        int origin_time = emp::from_string<int>(row[origin_pos]);
+        tax->SetOriginationTime(origin_time);
+      }
+      if (destruction_time != "inf") {
+        tax->SetDestructionTime(emp::from_string<int>(destruction_time));
+      }   
 
       taxa[id] = tax;
       if (emp::to_lower(ancestor_list_str) != "none") {
