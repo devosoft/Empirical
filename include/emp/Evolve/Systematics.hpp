@@ -1945,12 +1945,12 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path, 
-                                                            const std::string & info_col, 
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path,
+                                                            const std::string & info_col,
                                                              bool assume_leaves_extant) {
-    
+
     // We can only load phylogenies from file if their info can be
-    // converted to this systematics object's ORG_INFO type (if you 
+    // converted to this systematics object's ORG_INFO type (if you
     // have a complex type, you can just use a string representation)
     if constexpr (!emp::is_streamable<std::stringstream, ORG_INFO>::value) {
       emp_assert(false && "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
@@ -1961,7 +1961,7 @@ namespace emp {
     emp::File in_file(file_path);
     in_file.RemoveWhitespace();
     emp::vector<std::string> header = in_file.ExtractRow();
-    
+
     // Find column ids
     auto id_pos_it = std::find(header.begin(), header.end(), "id");
     emp_assert(id_pos_it != header.end() &&
@@ -1977,7 +1977,7 @@ namespace emp {
 
     auto origin_pos_it = std::find(header.begin(), header.end(), "origin_time");
     int origin_pos = -1;
-    if(origin_pos_it != header.end()){ 
+    if(origin_pos_it != header.end()){
       origin_pos = std::distance(header.begin(), origin_pos_it);
     }
 
@@ -2008,7 +2008,7 @@ namespace emp {
       int id = emp::from_string<int>(row[id_pos]);
 
       // Inf means this taxon is still alive
-      // or we don't know which taxa are alive    
+      // or we don't know which taxa are alive
       std::string destruction_time = "inf";
       if (destruction_pos != -1) {
         destruction_time = row[destruction_pos];
@@ -2038,7 +2038,7 @@ namespace emp {
       }
       if (destruction_time != "inf" && destruction_time != "unknown") {
         tax->SetDestructionTime(emp::from_string<int>(destruction_time));
-      }   
+      }
 
       // Store taxon pointer
       taxa[id] = tax;
@@ -2070,7 +2070,7 @@ namespace emp {
         to_explore.push_back(offspring);
       }
     }
- 
+
     emp::Ptr<taxon_t> curr;
     while(!to_explore.empty()) {
       curr = to_explore.back();
