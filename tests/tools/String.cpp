@@ -129,6 +129,61 @@ TEST_CASE("Test String Composition-ID Functions", "[tools]")
 
 TEST_CASE("Test String Find Functions", "[tools]")
 {
+  emp::String pal = "able was I ere I saw Elba";
+  // Search for single characters.
+  CHECK(pal.Find('a') == 0);
+  CHECK(pal.Find('b') == 1);
+  CHECK(pal.Find('c') == std::string::npos);
+  CHECK(pal.Find('e') == 3);
+  CHECK(pal.Find('I') == 9);
+  CHECK(pal.Find('E') == 21);
+
+  // Try with offset
+  CHECK(pal.Find('a', 10) == 18);
+  CHECK(pal.Find('b', 10) == 23);
+  CHECK(pal.Find('c', 10) == std::string::npos);
+  CHECK(pal.Find('e', 10) == 11);
+  CHECK(pal.Find('I', 10) == 15);
+  CHECK(pal.Find('E', 10) == 21);
+
+  // Try reversed.
+  CHECK(pal.RFind('a') == 24);
+  CHECK(pal.RFind('b') == 23);
+  CHECK(pal.RFind('c') == std::string::npos);
+  CHECK(pal.RFind('e') == 13);
+  CHECK(pal.RFind('I') == 15);
+  CHECK(pal.RFind('E') == 21);
+
+  // Try reversed with offset.
+  CHECK(pal.RFind('a', 20) == 18);
+  CHECK(pal.RFind('b', 20) == 1);
+  CHECK(pal.RFind('c', 20) == std::string::npos);
+  CHECK(pal.RFind('e', 20) == 13);
+  CHECK(pal.RFind('I', 20) == 15);
+  CHECK(pal.RFind('E', 20) == std::string::npos);
+
+  // Try string Find.
+  CHECK(pal.Find("able") == 0);
+  CHECK(pal.Find("was") == 5);
+  CHECK(pal.Find("I") == 9);
+  CHECK(pal.Find("able", 5) == std::string::npos);
+  CHECK(pal.Find("was", 5) == 5);
+  CHECK(pal.Find("I", 10) == 15);
+  CHECK(pal.RFind("able") == 0);
+  CHECK(pal.RFind("was") == 5);
+  CHECK(pal.RFind("I") == 15);
+
+  // Try CharSet Find.
+  CHECK(pal.Find(emp::LowerCharSet()) == 0);
+  CHECK(pal.Find(emp::WhitespaceCharSet()) == 4);
+  CHECK(pal.Find(emp::UpperCharSet()) == 9);
+  CHECK(pal.Find(emp::UpperCharSet(), 10) == 15);
+  CHECK(pal.Find(emp::UpperCharSet(), 16) == 21);
+  CHECK(pal.RFind(emp::UpperCharSet()) == 21);
+  CHECK(pal.RFind(emp::UpperCharSet(), 20) == 15);
+  CHECK(pal.RFind(emp::UpperCharSet(), 10) == 9);
+  CHECK(pal.RFind(emp::UpperCharSet(), 5) == std::string::npos);
+
   // Do some tests on quotes in strings...
   emp::String quotes = "\"abc\"\"def\"123 \"\"\"long\\\"er\"";  // "abc""def"123 """long\"er"
   CHECK( quotes.FindQuoteMatch() == 4 );
@@ -137,6 +192,11 @@ TEST_CASE("Test String Find Functions", "[tools]")
   CHECK( quotes.FindQuoteMatch(10) == std::string::npos );
   CHECK( quotes.FindQuoteMatch(14) == 15 );
   CHECK( quotes.FindQuoteMatch(16) == 25 );
+
+  CHECK( quotes.RFindQuoteMatch(4) == 0 );
+  CHECK( quotes.RFindQuoteMatch(9) == 5 );
+  CHECK( quotes.RFindQuoteMatch(15) == 14 );
+  CHECK( quotes.RFindQuoteMatch(25) == 16 );
 
   // Do some tests on parentheses matching...
   emp::String parens = "(()(()()))((())\")))))()\")";
@@ -152,6 +212,13 @@ TEST_CASE("Test String Find Functions", "[tools]")
   CHECK( parens.FindParenMatch(10,{"\"","()"}) == 24 ); // Do not ignore quotes.
   CHECK( parens.FindParenMatch(10,{"","ab"}) == std::string::npos );   // Using non-parens works.
   CHECK( quotes.FindParenMatch(1,{"","ab"}) == 2 );   // Using non-parens works.
+
+  CHECK( parens.RFindParenMatch(9) == 0 );
+  CHECK( parens.RFindParenMatch(2) == 1 );
+  CHECK( parens.RFindParenMatch(8) == 3 );
+  CHECK( parens.RFindParenMatch(16) == 10 );
+  CHECK( parens.RFindParenMatch(14) == 11 );
+  CHECK( parens.RFindParenMatch(22) == 21 ); // Works inside a quote if start there.
 
   // Extra tests with braces and single quotes.
   emp::String braces = "{{}{}}{'{}}'}";
@@ -171,7 +238,7 @@ TEST_CASE("Test String Find Functions", "[tools]")
   CHECK( found == emp::vector<size_t>{2,5} );
   parens.FindAll(')', found);
   CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,16,17,18,19,20,22,24} );
-  parens.FindAll(')', found, {"\""}); // Ignore items in quotes.
+  parens.FindAll(')', found, "\""); // Ignore items in quotes.
   CHECK( found == emp::vector<size_t>{2,5,7,8,9,13,14,24} );
 }
 
