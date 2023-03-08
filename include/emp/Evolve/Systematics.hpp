@@ -2033,11 +2033,11 @@ namespace emp {
       // Fill in destruction and origin time if
       // provided
       if (origin_pos != -1 ){
-        int origin_time = emp::from_string<int>(row[origin_pos]);
+        double origin_time = emp::from_string<double>(row[origin_pos]);
         tax->SetOriginationTime(origin_time);
       }
       if (destruction_time != "inf" && destruction_time != "unknown") {
-        tax->SetDestructionTime(emp::from_string<int>(destruction_time));
+        tax->SetDestructionTime(emp::from_string<double>(destruction_time));
       }
 
       // Store taxon pointer
