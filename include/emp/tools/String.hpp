@@ -47,7 +47,7 @@ namespace emp {
   [[nodiscard]] inline emp::String MakeEscaped(const emp::String & in);
   [[nodiscard]] inline emp::String MakeWebSafe(const emp::String & in);
   [[nodiscard]] inline emp::String MakeLiteral(char value);
-  [[nodiscard]] inline emp::String MakeLiteral(const emp::String & value);
+  [[nodiscard]] inline emp::String MakeLiteral(const std::string & value);
   template <typename T> [[nodiscard]] inline emp::String MakeLiteral(const T & value);
   [[nodiscard]] inline char MakeFromLiteral_Char(const emp::String & value);
   [[nodiscard]] inline emp::String MakeFromLiteral_String(const emp::String & value);
@@ -75,17 +75,21 @@ namespace emp {
   [[nodiscard]] inline emp::String Join(const CONTAINER_T & container, std::string join_str="",
                                         std::string open="", std::string close="");
 
-  // ToString specialization for emp::String
-  inline const emp::String & ToString(const emp::String & in) { return in; }
-
   class String : public std::string {
   private:
     using Syntax = StringSyntax;
 
+    // ToString specializations
+    static const emp::String & ToString(const emp::String & in) { return in; }
+    template <typename T>
+    static String ToString(const std::vector<T> & in) { return String("{") + Join(in, ",") + '}'; }
+    template <typename T>
+    static String ToString(T && in) { std::stringstream ss; ss << std::forward<T>(in); return ss.str(); }
+
     // Convert objects into a streamable type using _Convert(obj)
     template <typename T> static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
-    template <typename T> static auto _Convert(const T & in, int) -> decltype(emp::ToString(in)) { return emp::ToString(in); }
-    template <typename T> static const T & _Convert(const T & in, ...) { return in; }
+    template <typename T> static auto _Convert(const T & in, int) -> decltype(ToString(in)) { return ToString(in); }
+    // template <typename T> static const T & _Convert(const T & in, ...) { return in; }
 
     void _AssertPos([[maybe_unused]] size_t pos) const { emp_assert(pos < size(), pos, size()); }
 
@@ -179,6 +183,8 @@ namespace emp {
       { return std::string::substr(start_pos, end_pos - start_pos); }
 
     [[nodiscard]] std::string_view View(size_t start=0, size_t out_size=npos) const {
+      if (start == npos) start = size();                // Can occur w/failed find; return empty end.
+      if (out_size == npos) out_size = size() - start;  // npos size => View to end.
       emp_assert(start + out_size <= size());
       return std::string_view(data()+start, out_size);
     }
@@ -192,6 +198,9 @@ namespace emp {
     [[nodiscard]] std::string_view ViewTo(CharSet stop_chars, size_t start=0,
                                           const Syntax & syntax=Syntax::None()) const
       { return ViewFront(Find(stop_chars, start, syntax)); }
+    [[nodiscard]] std::string_view ViewBackTo(CharSet stop_chars, size_t start=npos,
+                                              const Syntax & syntax=Syntax::None()) const
+      { return View(RFind(stop_chars, start, syntax)); }
     [[nodiscard]] std::string_view ViewWord(const Syntax & syntax=Syntax::Quotes(), size_t start=0) const
       { return ViewTo(" \n\t\r", start, syntax); }
     [[nodiscard]] std::string_view ViewLine(const Syntax & syntax=Syntax::Quotes(), size_t start=0) const
@@ -628,7 +637,7 @@ namespace emp {
     template <typename... Ts>
     static emp::String Make(Ts... args) {
       std::stringstream ss;
-      (ss << ... << String::_Convert(std::forward<Ts>(args)));
+      (ss << ... << String::_Convert(std::forward<Ts>(args), true));
       return ss.str();
     }
   };
@@ -1299,7 +1308,7 @@ namespace emp {
 
   /// Take a string or iterable and convert it to a C++-style literal.
   // This is the version for string. The version for an iterable is below.
-  [[nodiscard]] emp::String MakeLiteral(const emp::String & value) {
+  [[nodiscard]] emp::String MakeLiteral(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -1315,11 +1324,15 @@ namespace emp {
   /// Take a value and convert it to a C++-style literal.
   template <typename T> [[nodiscard]] emp::String MakeLiteral(const T & value) {
     std::stringstream ss;
-    if constexpr (emp::IsIterable<T>::value) {
+    if constexpr (std::is_convertible_v<T,std::string>) {
+      std::string str(value);
+      return MakeLiteral(str);
+    }
+    else if constexpr (emp::IsIterable<T>::value) {
       ss << "{ ";
       for (auto it = std::begin( value ); it != std::end( value ); ++it) {
         if (it != std::begin( value )) ss << ",";
-        ss << MakeLiteral< std::decay_t<decltype(*it)> >( *it );
+        ss << MakeLiteral( *it );
       }
       ss << " }";
     }
