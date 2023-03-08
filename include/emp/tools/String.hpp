@@ -394,10 +394,20 @@ namespace emp {
 
     [[nodiscard]] inline size_t FindQuoteMatch(size_t pos=0) const;
     [[nodiscard]] inline size_t FindParenMatch(size_t pos=0, const Syntax & syntax=Syntax::Parens()) const;
+    [[nodiscard]] inline size_t RFindQuoteMatch(size_t pos=npos) const;
+    [[nodiscard]] inline size_t RFindParenMatch(size_t pos=npos, const Syntax & syntax=Syntax::RParens()) const;
     [[nodiscard]] inline size_t FindMatch(size_t pos=0, const Syntax & syntax=Syntax::Full()) const;
+    [[nodiscard]] inline size_t RFindMatch(size_t pos=npos, const Syntax & syntax=Syntax::Full()) const;
     [[nodiscard]] inline size_t Find(char target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
     [[nodiscard]] inline size_t Find(String target, size_t start=0, const Syntax & syntax=Syntax::None()) const;
-    [[nodiscard]] inline size_t Find(const CharSet & char_set, size_t start, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t Find(const CharSet & char_set, size_t start=0, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t Find(const char * target, size_t start=0, const Syntax & syntax=Syntax::None()) const
+       { return Find(emp::String(target), start, syntax); }
+    [[nodiscard]] inline size_t RFind(char target, size_t start=npos, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t RFind(String target, size_t start=npos, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t RFind(const CharSet & char_set, size_t start=npos, const Syntax & syntax=Syntax::None()) const;
+    [[nodiscard]] inline size_t RFind(const char * target, size_t start=npos, const Syntax & syntax=Syntax::None()) const
+       { return RFind(emp::String(target), start, syntax); }
     inline void FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax=Syntax::None()) const;
     [[nodiscard]] inline emp::vector<size_t> FindAll(char target, const Syntax & syntax=Syntax::None()) const;
     template <typename... Ts>
@@ -663,6 +673,21 @@ namespace emp {
     return npos; // Not found.
   }
 
+  // Given the start position of a quote, find where it ends; marks must be identical
+  size_t String::RFindQuoteMatch(size_t pos) const {
+    if (pos >= size()) pos = size() - 1;
+    const char mark = Get(pos);
+    while (--pos < size()) {
+      if (Get(pos) == mark) { // Found possible match! See if it is escaped...
+        size_t esc_count = 0;
+        while ((pos-esc_count) && Get(pos-esc_count-1) == '\\') esc_count++;
+        if (esc_count%2 == 0) return pos;
+      }
+    }
+    return npos; // Not found.
+  }
+
+
   // Given an open parenthesis, find where it closes (including nesting).  Marks must be different.
   size_t String::FindParenMatch(size_t pos, const Syntax & syntax) const {
     const char open = Get(pos);
@@ -681,9 +706,35 @@ namespace emp {
     return npos;
   }
 
+  // Given an open parenthesis, find where it closes (including nesting).  Marks must be different.
+  size_t String::RFindParenMatch(size_t pos, const Syntax & syntax) const {
+    if (pos >= size()) pos = size() - 1;
+    const char open = Get(pos);
+    if (!syntax.IsParen(open)) return npos; // Not a paren that we know!
+    const char close = syntax.GetMatch(open);
+    size_t open_count = 1;
+    while (--pos < size()) {
+      const char c = Get(pos);
+      if (c == open) ++open_count;
+      else if (c == close) {
+        if (--open_count == 0) return pos;
+      }
+      else if (syntax.IsQuote(c)) pos = FindQuoteMatch(pos);
+    }
+
+    return npos;
+  }
+
   size_t String::FindMatch(size_t pos, const Syntax & syntax) const {
     if (syntax.IsQuote(Get(pos))) return FindQuoteMatch(pos);
     if (syntax.IsParen(Get(pos))) return FindParenMatch(pos, syntax);
+    return npos;
+  }
+
+  size_t String::RFindMatch(size_t pos, const Syntax & syntax) const {
+    if (pos >= size()) pos = size() - 1;
+    if (syntax.IsQuote(Get(pos))) return RFindQuoteMatch(pos);
+    if (syntax.IsParen(Get(pos))) return RFindParenMatch(pos, syntax);
     return npos;
   }
 
@@ -694,6 +745,19 @@ namespace emp {
       if (Get(pos) == target) return pos;
       else if (syntax.IsQuote(Get(pos))) pos = FindQuoteMatch(pos);
       else if (syntax.IsParen(Get(pos))) pos = FindParenMatch(pos, syntax);
+    }
+
+    return npos;
+  }
+
+  // A version of string::find() with single chars that can skip over quotes.
+  size_t String::RFind(char target, size_t start, const Syntax & syntax) const {
+    if (start >= size()) start = size() - 1;
+    // Make sure found_pos is not in a quote and/or parens; adjust as needed!
+    for (size_t pos=start; pos < size(); --pos) {
+      if (Get(pos) == target) return pos;
+      else if (syntax.IsQuote(Get(pos))) pos = RFindQuoteMatch(pos);
+      else if (syntax.IsParen(Get(pos))) pos = RFindParenMatch(pos, syntax);
     }
 
     return npos;
@@ -722,6 +786,32 @@ namespace emp {
 
     return found_pos;
   }
+
+  // A version of string::find() that can skip over quotes.
+  size_t String::RFind(String target, size_t start, const Syntax & syntax) const {
+    if (start >= size()) start = size() - 1;
+    size_t found_pos = rfind(target, start);
+    if (syntax.GetCount() == 0) return found_pos;
+
+    // Make sure found_pos is not in a quote and/or parens; adjust as needed!
+    for (size_t scan_pos=size()-1;
+         scan_pos > found_pos && found_pos != npos;
+         scan_pos--)
+    {
+      // Skip quotes, if needed...
+      if (syntax.IsQuote(Get(scan_pos))) {
+        scan_pos = RFindQuoteMatch(scan_pos);
+        if (found_pos > scan_pos) found_pos = rfind(target, scan_pos);
+      }
+      else if (syntax.IsParen(Get(scan_pos))) {
+        scan_pos = RFindParenMatch(scan_pos);
+        if (found_pos > scan_pos) found_pos = rfind(target, scan_pos);
+      }
+    }
+
+    return found_pos;
+  }
+
   // Find any of a set of characters.
   size_t String::Find(const CharSet & char_set, size_t start, const Syntax & syntax) const
   {
@@ -734,6 +824,21 @@ namespace emp {
 
     return npos;
   }
+
+  // Find any of a set of characters.
+  size_t String::RFind(const CharSet & char_set, size_t start, const Syntax & syntax) const
+  {
+    if (start >= size()) start = size() - 1;
+    // Make sure found_pos is not in a quote and/or parens; adjust as needed!
+    for (size_t pos=start; pos < size(); --pos) {
+      if (char_set.Has(Get(pos))) return pos;
+      else if (syntax.IsQuote(Get(pos))) pos = RFindQuoteMatch(pos);
+      else if (syntax.IsParen(Get(pos))) pos = RFindParenMatch(pos, syntax);
+    }
+
+    return npos;
+  }
+
 
   void String::FindAll(char target, emp::vector<size_t> & results, const Syntax & syntax) const {
     results.resize(0);
