@@ -192,8 +192,14 @@ namespace emp {
     /// Get the number of living organisms currently associated with this Taxon.
     size_t GetNumOrgs() const { return num_orgs; }
 
+    /// Set the number of living organisms currently associated with this Taxon.
+    void SetNumOrgs(size_t n) { num_orgs = n; }
+
     /// Get the total number of organisms that have ever lived associated with this Taxon
     size_t GetTotOrgs() const { return tot_orgs; }
+
+    /// Set the total number of organisms that have ever lived associated with this Taxon
+    void SetTotOrgs(size_t n) { tot_orgs = n; }
 
     /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
@@ -1987,6 +1993,18 @@ namespace emp {
       destruction_pos = std::distance(header.begin(), destruction_pos_it);
     }
 
+    auto num_orgs_pos_it = std::find(header.begin(), header.end(), "num_orgs");
+    int num_orgs_pos = -1;
+    if (num_orgs_pos_it != header.end()) {
+      num_orgs_pos = std::distance(header.begin(), num_orgs_pos_it);
+    }
+
+    auto tot_orgs_pos_it = std::find(header.begin(), header.end(), "tot_orgs");
+    int tot_orgs_pos = -1;
+    if (tot_orgs_pos_it != header.end()) {
+      tot_orgs_pos = std::distance(header.begin(), tot_orgs_pos_it);
+    }
+
     auto info_pos_it = std::find(header.begin(), header.end(), info_col);
     emp_assert(info_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
@@ -2038,6 +2056,16 @@ namespace emp {
       }
       if (destruction_time != "inf" && destruction_time != "unknown") {
         tax->SetDestructionTime(emp::from_string<double>(destruction_time));
+      }
+
+      // Fill in number of current and total orgs if provided
+      if (num_orgs_pos != -1) {
+        size_t num_orgs = emp::from_string<size_t>(row[num_orgs_pos]);
+        tax->SetNumOrgs(num_orgs);
+      }
+      if (tot_orgs_pos != -1) {
+        size_t tot_orgs = emp::from_string<size_t>(row[tot_orgs_pos]);
+        tax->SetTotOrgs(tot_orgs);
       }
 
       // Store taxon pointer
