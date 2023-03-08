@@ -39,7 +39,7 @@ namespace emp {
       for (size_t i=0; i < parens.size(); i+=2) char_matches[parens[i]] = parens[i+1];
       count = static_cast<uint8_t>(quotes.size() + parens.size()/2);
     }
-    StringSyntax(bool match_quotes, bool match_parens=false) : StringSyntax() {
+    explicit StringSyntax(bool match_quotes, bool match_parens=false) : StringSyntax() {
       if (match_quotes) char_matches['"'] = '"';
       if (match_parens) {
         char_matches['('] = ')';
@@ -47,7 +47,7 @@ namespace emp {
         char_matches['{'] = '}';
       }
     }
-    StringSyntax(const char * quotes, const char * parens)
+    StringSyntax(const char * quotes, const char * parens="")
       : StringSyntax(std::string(quotes), std::string(parens)) { }
     StringSyntax & operator=(const StringSyntax &) = default;
     StringSyntax & operator=(StringSyntax &&) = default;
@@ -60,6 +60,7 @@ namespace emp {
     static StringSyntax None()   { return StringSyntax(); }
     static StringSyntax Quotes() { return StringSyntax("\"'"); }
     static StringSyntax Parens() { return StringSyntax("",     "()[]{}"); }
+    static StringSyntax RParens() { return StringSyntax("",    ")(][}{"); }
     static StringSyntax Full()   { return StringSyntax("\"'",  "()[]{}"); }
     static StringSyntax Max()    { return StringSyntax("\"'`", "()[]{}<>"); }
   };
