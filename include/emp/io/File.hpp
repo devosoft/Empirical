@@ -360,9 +360,9 @@ namespace emp {
 
     /// Remove the first row from the file, returning it as a vector of a specified type.
     template <typename T>
-    emp::vector<T> ExtractRowAs(char delim=',') {
+    emp::vector<T> ExtractRowAs(String delim=",") {
       // Identify the data as string_views
-      emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim);
+      auto sv_row = ViewRowSlices(0, delim);
 
       // Build the array to return and copy strings into it.
       emp::vector<T> out_row(sv_row.size());
@@ -374,12 +374,11 @@ namespace emp {
     }
 
     template <typename T>
-    emp::vector< emp::vector<T> > ToData(char delim=',') {
+    emp::vector< emp::vector<T> > ToData(String delim=",") {
       emp::vector< emp::vector<T> > out_data(lines.size());
 
-      emp::vector<std::string_view> sv_row;
       for (size_t row_id = 0; row_id < lines.size(); row_id++) {
-        view_slices(lines[row_id], sv_row, delim);
+        auto sv_row = lines[row_id].ViewSlices(delim);
         out_data[row_id].resize(sv_row.size());
         for (size_t i=0; i < sv_row.size(); i++) {
           out_data[row_id][i] = from_string<T>(sv_row[i]);
