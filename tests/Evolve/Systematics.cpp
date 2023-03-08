@@ -1524,6 +1524,32 @@ TEST_CASE("Test Total Offspring") {
 
 }
 
+TEST_CASE("Test Degree Distribution") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org3);
+  auto org5 = sys.AddOrg(5, org3);
+  auto org6 = sys.AddOrg(6, org2);
+  auto org7 = sys.AddOrg(7, org6);
+  auto org8 = sys.AddOrg(8, org6);
+  auto org9 = sys.AddOrg(9, org1);
+  auto org10 = sys.AddOrg(10, org9);
+  auto org11 = sys.AddOrg(11, org9);
+  auto org12 = sys.AddOrg(12, org1);
+  auto org13 = sys.AddOrg(13, org4);
+  auto org14 = sys.AddOrg(14, org13);
+
+  std::unordered_map<int, int> dist = sys.GetOutDegreeDistribution();
+  CHECK(dist[0] == 7);
+  CHECK(dist[1] == 2);
+  CHECK(dist[2] == 4);
+  CHECK(dist[3] == 1);
+
+}
+
 TEST_CASE("Test Loading Phylogeny From File") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
   sys.LoadFromFile("systematics_snapshot.csv", "genome");
@@ -1539,7 +1565,7 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(sys.GetNumOutside() == 0);
   CHECK(sys.GetNumTaxa() == 10);
   CHECK(sys.GetMaxDepth() == 4);
-  CHECK(mrca->GetTotalOffspring() == 9);
+  CHECK(mrca->GetTotalOffspring() == 6);
   CHECK(mrca->GetNumOff() == 3);
   sys.PrintStatus();
 }

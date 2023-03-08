@@ -26,6 +26,19 @@ namespace emp {
     return in_map.find(key) != in_map.end();
   }
 
+  /// Take a map where the value is an integer and a key.
+  /// Increment value associated with that key if its present
+  /// or if its not add it and set it to 1 
+  template <class MAP_T, class KEY_T>
+  inline void IncrementCounter( MAP_T & in_map, const KEY_T & key ) {
+    static_assert( std::is_same< typename MAP_T::key_type, int >::value);
+    if (emp::Has(in_map, key)) {
+      in_map[key]++;
+    } else {
+      in_map[key] = 1;
+    }
+  }
+
   // Check to see if any of the elements in a map satisfy a function.
   template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
   bool AnyOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {

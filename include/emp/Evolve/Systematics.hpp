@@ -429,6 +429,7 @@ namespace emp {
     virtual emp::vector<double> GetPairwiseDistances(bool branch_only) const = 0;
     virtual int SackinIndex() const = 0;
     virtual double CollessLikeIndex() const = 0;
+    virtual std::unordered_map<int, int> GetOutDegreeDistribution() const = 0;
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos) = 0;
@@ -495,6 +496,7 @@ namespace emp {
     using parent_t::GetSumPairwiseDistance;
     using parent_t::GetVariancePairwiseDistance;
     using parent_t::GetPairwiseDistances;
+    using parent_t::GetOutDegreeDistribution;
     using parent_t::GetMRCADepth;
     using parent_t::AddOrg;
     using parent_t::RemoveOrg;
@@ -1018,6 +1020,24 @@ namespace emp {
         sackin += GetBranchesToRoot(taxon) + 1; // Sackin index counts root as branch
       }
       return sackin;
+    }
+
+    /** Returns dictionary containing a histogram of node out degrees
+     * e.g. {1:4, 2:10, 3:4} means the tree has 4 unifurcations, 
+     * 10 bifurcations, and 4 trifurcations
+     * **/
+    std::unordered_map<int, int> GetOutDegreeDistribution() const {
+      std::unordered_map<int, int> dist;
+      for (auto tax : active_taxa) {
+        emp::IncrementCounter(dist, tax->GetNumOff());
+      }
+      for (auto tax : ancestor_taxa) {
+        emp::IncrementCounter(dist, tax->GetNumOff());
+      }
+      for (auto tax : outside_taxa) {
+        emp::IncrementCounter(dist, tax->GetNumOff());
+      }
+      return dist;
     }
 
     /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
@@ -2105,7 +2125,6 @@ namespace emp {
     while(!to_explore.empty()) {
       curr = to_explore.back();
       to_explore.pop_back();
-      curr->parent->AddTotalOffspring();
       curr->total_offspring = 0;
       curr->depth = curr->GetParent()->depth + 1;
       for (auto offspring : curr->GetOffspring()){
@@ -2123,6 +2142,11 @@ namespace emp {
         ancestor_taxa.erase(leaf);
         active_taxa.insert(leaf);
       }
+    }
+
+    // Adjust total offspring
+    for (auto tax : active_taxa) {
+      tax->parent->AddTotalOffspring();
     }
 
     // Force stats to be recalculated
