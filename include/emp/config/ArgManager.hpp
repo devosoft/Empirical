@@ -4,7 +4,7 @@
  *  @date 2019
  *
  *  @file ArgManager.hpp
- *  @brief A tool for sythesizing command-line arguments, URL query params, and config files.
+ *  @brief A tool for parsing command-line arguments, URL query params, and config files.
  *  @note Status: BETA
  */
 

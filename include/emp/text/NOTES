@@ -53,7 +53,7 @@ Supported text formats:
  *  but a double backtick can be followed by anything.
  * 
  *  `This would be rendered as CODE`
- *  ``{This would also be code}``
+ *  ``{This would also be code, with the braces appearing}``
  * 
  *  Escape characters do work.
  *  \\ is a regular backslash ('\')

@@ -39,7 +39,7 @@ namespace emp {
       for (size_t i=0; i < parens.size(); i+=2) char_matches[parens[i]] = parens[i+1];
       count = static_cast<uint8_t>(quotes.size() + parens.size()/2);
     }
-    explicit StringSyntax(bool match_quotes, bool match_parens=false) : StringSyntax() {
+    StringSyntax(bool match_quotes, bool match_parens=false) : StringSyntax() {
       if (match_quotes) char_matches['"'] = '"';
       if (match_parens) {
         char_matches['('] = ')';

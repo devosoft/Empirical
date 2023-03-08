@@ -5,6 +5,7 @@
  *
  *  @file FlagManager.hpp
  *  @brief This file contains tools for dealing with command-line flags (from argv and argc).
+ *  @note Status: ALPHA
  * 
  *  The FlagManager class will take command line arguments (either in its constructor or with
  *  the AddFlags() function) and process them appropriately.
