@@ -1438,6 +1438,92 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   CHECK(Has(sys.GetAncestors(), id4));
 }
 
+TEST_CASE("Test Total Offspring") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org3);
+  auto org5 = sys.AddOrg(5, org3);
+  auto org6 = sys.AddOrg(6, org2);
+  auto org7 = sys.AddOrg(7, org6);
+  auto org8 = sys.AddOrg(8, org6);
+  auto org9 = sys.AddOrg(9, org1);
+  auto org10 = sys.AddOrg(10, org9);
+  auto org11 = sys.AddOrg(11, org9);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 10);
+
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 6);
+
+  CHECK(org3->GetNumOff() == 2);
+  CHECK(org3->GetTotalOffspring() == 2);
+
+  CHECK(org4->GetNumOff() == 0);
+  CHECK(org4->GetTotalOffspring() == 0);
+
+  CHECK(org5->GetNumOff() == 0);
+  CHECK(org5->GetTotalOffspring() == 0);
+
+  CHECK(org6->GetNumOff() == 2);
+  CHECK(org6->GetTotalOffspring() == 2);
+
+  CHECK(org7->GetNumOff() == 0);
+  CHECK(org7->GetTotalOffspring() == 0);
+
+  CHECK(org8->GetNumOff() == 0);
+  CHECK(org8->GetTotalOffspring() == 0);
+
+  CHECK(org9->GetNumOff() == 2);
+  CHECK(org9->GetTotalOffspring() == 2);
+
+  CHECK(org10->GetNumOff() == 0);
+  CHECK(org10->GetTotalOffspring() == 0);
+
+  CHECK(org11->GetNumOff() == 0);
+  CHECK(org11->GetTotalOffspring() == 0);
+
+  sys.RemoveOrg(org1);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 10);
+  
+  sys.RemoveOrg(org2);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 9);
+
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 6);
+
+  sys.RemoveOrg(org3);
+
+  CHECK(org3->GetNumOff() == 2);
+  CHECK(org3->GetTotalOffspring() == 2);
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 5);
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 8);
+
+  sys.RemoveOrg(org4);
+
+  CHECK(org3->GetNumOff() == 1);
+  CHECK(org3->GetTotalOffspring() == 1);
+  CHECK(org2->GetNumOff() == 2);
+  CHECK(org2->GetTotalOffspring() == 4);
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 7);
+
+
+  sys.RemoveOrg(org9);
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 6);
+
+}
+
 TEST_CASE("Test Loading Phylogeny From File") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
   sys.LoadFromFile("systematics_snapshot.csv", "genome");
