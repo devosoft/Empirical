@@ -48,11 +48,22 @@ namespace emp {
     void SetMaxLower() { lower = std::numeric_limits<T>::min(); }
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
 
-    /// Determine if a provided value is in the range.
+    // Flexible lower/upper accessor that can get and set.
+    T & Lower() { return lower; }
+    T & Upper() { return upper; }
+
+    const T & Lower() const noexcept { return lower; }
+    const T & Upper() const noexcept { return upper; }
+
+    /// Determine if a provided value is in the range INCLUSIVE of the endpoints.
     bool Valid(T value) const { return value >= lower && value <= upper; }
 
     /// Force a value into range
     T Limit(T _in) const { return (_in < lower) ? lower : ((_in > upper) ? upper : _in); }
+
+    // Adjust the upper or lower if provided value is more limiting.
+    void LimitLower(T in) { if (in > lower) lower = in; }
+    void LimitUpper(T in) { if (in < upper) upper = in; }
 
     /// Produce a vector that spreads values evenly across the range.
     emp::vector<T> Spread(size_t s) const {
