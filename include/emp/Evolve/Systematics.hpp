@@ -14,8 +14,6 @@
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
  *        Over time, this will probably become a maintainability problem. We could make the inheritance
  *        go away and just use signals, but then the World could not maintain systematics managers.
- * @todo This does not currently handle situations where organisms change locations during their
- *       lifetimes gracefully.
  */
 
 #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
@@ -2181,7 +2179,7 @@ namespace emp {
     // Read in each row and make a taxon for it
     size_t num_lines = in_file.GetNumLines();
     for (size_t i = 0; i < num_lines; i++) {
-      emp::vector<std::string> row = in_file.ExtractRow();
+      emp::vector<std::string_view> row = in_file.ViewRowSlices(i);
       int id = emp::from_string<int>(row[id_pos]);
 
       // Inf means this taxon is still alive
@@ -2195,7 +2193,7 @@ namespace emp {
 
       // Load ancestor list
       ORG_INFO info = emp::from_string<ORG_INFO>(row[info_pos]);
-      std::string ancestor_list_str = row[anc_pos];
+      std::string ancestor_list_str = {row[anc_pos].begin(), row[anc_pos].end()};
       emp::remove_chars(ancestor_list_str, "[]\"");
       emp::Ptr<taxon_t> tax;
 
