@@ -28,7 +28,7 @@ namespace emp {
 
   /// Take a map where the value is an integer and a key.
   /// Increment value associated with that key if its present
-  /// or if its not add it and set it to 1 
+  /// or if its not add it and set it to 1
   template <class MAP_T, class KEY_T>
   inline void IncrementCounter( MAP_T & in_map, const KEY_T & key ) {
     static_assert( std::is_same< typename MAP_T::key_type, int >::value);

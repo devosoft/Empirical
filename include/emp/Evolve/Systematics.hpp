@@ -722,7 +722,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(const emp::Ptr<taxon_t> tax)> & fun) const {
       emp::vector<T> result;
-      const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa), 
+      const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
                   std::ranges::ref_view(outside_taxa)};
       for (emp::Ptr<taxon_t> tax : all | std::views::join) {
         result.push_back(fun(tax));
@@ -734,8 +734,8 @@ namespace emp {
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(emp::Ptr<taxon_t> tax)> & fun) {
       emp::vector<T> result;
-      const auto all = {std::ranges::ref_view(active_taxa), 
-                  std::ranges::ref_view(ancestor_taxa), 
+      const auto all = {std::ranges::ref_view(active_taxa),
+                  std::ranges::ref_view(ancestor_taxa),
                   std::ranges::ref_view(outside_taxa)};
       for (emp::Ptr<taxon_t> tax : all | std::views::join) {
         result.push_back(fun(tax));
@@ -1087,7 +1087,7 @@ namespace emp {
     }
 
     /** Returns dictionary containing a histogram of node out degrees
-     * e.g. {1:4, 2:10, 3:4} means the tree has 4 unifurcations, 
+     * e.g. {1:4, 2:10, 3:4} means the tree has 4 unifurcations,
      * 10 bifurcations, and 4 trifurcations
      * **/
     std::unordered_map<int, int> GetOutDegreeDistribution() const {
@@ -1099,8 +1099,8 @@ namespace emp {
     double GetAverageOriginTime(bool normalize=false) {
       double total = 0;
       double count = 0;
-      const auto all = {std::ranges::ref_view(active_taxa), 
-                        std::ranges::ref_view(ancestor_taxa), 
+      const auto all = {std::ranges::ref_view(active_taxa),
+                        std::ranges::ref_view(ancestor_taxa),
                         std::ranges::ref_view(outside_taxa)};
       for (emp::Ptr<taxon_t> tax : all | std::views::join) {
         double weight = 1;
@@ -1662,7 +1662,7 @@ namespace emp {
     file.PrintHeaderKeys();
 
     // Update file w/ taxa information
-    const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa), 
+    const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
                       std::ranges::ref_view(outside_taxa)};
     for (emp::Ptr<taxon_t> tax : all | std::views::join) {
       cur_taxon = tax;

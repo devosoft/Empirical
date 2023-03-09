@@ -1490,7 +1490,7 @@ TEST_CASE("Test Total Offspring") {
 
   CHECK(org1->GetNumOff() == 2);
   CHECK(org1->GetTotalOffspring() == 10);
-  
+
   sys.RemoveOrg(org2);
 
   CHECK(org1->GetNumOff() == 2);
