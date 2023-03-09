@@ -26,6 +26,7 @@
 #include <limits>
 #include <map>
 #include <ostream>
+#include <ranges>
 #include <set>
 #include <sstream>
 #include <string>
@@ -679,6 +680,69 @@ namespace emp {
     /// but cannot computationally afford to store all ancestors for your entire run.
     void RemoveBefore(int ud);
 
+    void ApplyToActiveTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
+      std::for_each(active_taxa.begin(), active_taxa.end(), fun);
+    }
+
+    void ApplyToActiveTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
+      std::for_each(active_taxa.begin(), active_taxa.end(), fun);
+    }
+
+    void ApplyToAncestorTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
+      std::for_each(ancestor_taxa.begin(), ancestor_taxa.end(), fun);
+    }
+
+    void ApplyToAncestorTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
+      std::for_each(ancestor_taxa.begin(), ancestor_taxa.end(), fun);
+    }
+
+    void ApplyToOutsideTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
+      std::for_each(outside_taxa.begin(), outside_taxa.end(), fun);
+    }
+
+    void ApplyToOutsideTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
+      std::for_each(outside_taxa.begin(), outside_taxa.end(), fun);
+    }
+
+    /// Run given function on all taxa (const version)
+    void ApplyToAllTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
+      ApplyToActiveTaxa(fun);
+      ApplyToAncestorTaxa(fun);
+      ApplyToOutsideTaxa(fun);
+    }
+
+    /// Run given function on all taxa
+    void ApplyToAllTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
+      ApplyToActiveTaxa(fun);
+      ApplyToAncestorTaxa(fun);
+      ApplyToOutsideTaxa(fun);
+    }
+
+    /// Run given function on all taxa and return result (const version)
+    template <typename T>
+    emp::vector<T> ApplyToAllTaxa(const std::function<T(const emp::Ptr<taxon_t> tax)> & fun) const {
+      emp::vector<T> result;
+      const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa), 
+                  std::ranges::ref_view(outside_taxa)};
+      for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+        result.push_back(fun(tax));
+      }
+      return result;
+    }
+
+    /// Run given function on all taxa and return result
+    template <typename T>
+    emp::vector<T> ApplyToAllTaxa(const std::function<T(emp::Ptr<taxon_t> tax)> & fun) {
+      emp::vector<T> result;
+      const auto all = {std::ranges::ref_view(active_taxa), 
+                  std::ranges::ref_view(ancestor_taxa), 
+                  std::ranges::ref_view(outside_taxa)};
+      for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+        result.push_back(fun(tax));
+      }
+      return result;
+    }
+
     // ===== Functions for querying phylogeny/systematics manager internal state ====
 
     // Currently using raw pointer because of a weird bug in emp::Ptr. Should switch when fixed.
@@ -1028,16 +1092,28 @@ namespace emp {
      * **/
     std::unordered_map<int, int> GetOutDegreeDistribution() const {
       std::unordered_map<int, int> dist;
-      for (auto tax : active_taxa) {
-        emp::IncrementCounter(dist, tax->GetNumOff());
-      }
-      for (auto tax : ancestor_taxa) {
-        emp::IncrementCounter(dist, tax->GetNumOff());
-      }
-      for (auto tax : outside_taxa) {
-        emp::IncrementCounter(dist, tax->GetNumOff());
-      }
+      ApplyToAllTaxa([&dist](emp::Ptr<taxon_t> tax){emp::IncrementCounter(dist, tax->GetNumOff());});
       return dist;
+    }
+
+    double GetAverageOriginTime(bool normalize=false) {
+      double total = 0;
+      double count = 0;
+      const auto all = {std::ranges::ref_view(active_taxa), 
+                        std::ranges::ref_view(ancestor_taxa), 
+                        std::ranges::ref_view(outside_taxa)};
+      for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+        double weight = 1;
+        if (normalize) {
+          weight = std::max(0, (int)tax->GetNumOff() - 1);
+        }
+        total += tax->GetOriginationTime() * weight;
+        count += weight;
+      }
+      if (count == 0) {
+        return 0;
+      }
+      return total/count;
     }
 
     /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
@@ -1585,24 +1661,13 @@ namespace emp {
     // Output header information.
     file.PrintHeaderKeys();
 
-    // Update file w/active taxa information
-    for (auto tax : active_taxa) {
+    // Update file w/ taxa information
+    const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa), 
+                      std::ranges::ref_view(outside_taxa)};
+    for (emp::Ptr<taxon_t> tax : all | std::views::join) {
       cur_taxon = tax;
       file.Update();
     }
-
-    // Update file w/ancestor taxa information
-    for (auto tax : ancestor_taxa) {
-      cur_taxon = tax;
-      file.Update();
-    }
-
-    // Update file w/outside taxa information
-    for (auto tax : outside_taxa) {
-      cur_taxon = tax;
-      file.Update();
-    }
-
   }
 
   // ======= Measurements about the systematics manager

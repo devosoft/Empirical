@@ -1550,6 +1550,45 @@ TEST_CASE("Test Degree Distribution") {
 
 }
 
+TEST_CASE("Test Average Origin Time") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+
+  sys.SetUpdate(0);
+  auto id1 = sys.AddOrg(25, nullptr);
+  CHECK(sys.GetAverageOriginTime() == 0);
+  CHECK(sys.GetAverageOriginTime(true) == 0);
+
+  sys.SetUpdate(6);
+  auto id2 = sys.AddOrg(-10, id1);
+  CHECK(sys.GetAverageOriginTime() == 3);
+  CHECK(sys.GetAverageOriginTime(true) == 0);
+
+  sys.SetUpdate(10);
+  auto id3 = sys.AddOrg(26, id1);
+  CHECK(sys.GetAverageOriginTime() == Approx(5.333333));
+  CHECK(sys.GetAverageOriginTime(true) == 0);
+
+  sys.SetUpdate(25);
+  auto id4 = sys.AddOrg(27, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(10.25));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(0));
+
+  sys.SetUpdate(32);
+  auto id5 = sys.AddOrg(28, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(14.6));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(3));
+
+  sys.SetUpdate(39);
+  auto id6 = sys.AddOrg(29, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(18.6666667));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(4));
+
+  sys.SetUpdate(39);
+  auto id7 = sys.AddOrg(30, id2);
+  CHECK(sys.GetAverageOriginTime() == Approx(21.571428571));
+  CHECK(sys.GetAverageOriginTime(true) == Approx(4.5));
+}
+
 TEST_CASE("Test Loading Phylogeny From File") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
   sys.LoadFromFile("systematics_snapshot.csv", "genome");
