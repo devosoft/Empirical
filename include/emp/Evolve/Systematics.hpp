@@ -1039,7 +1039,7 @@ namespace emp {
     /** @returns A vector of evolutionary distinctiveness of all active taxa
     * @param time The time step at which the calculation is being done
     */
-    emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) {
+    emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) const {
       emp::vector<double> eds;
       for (emp::Ptr<taxon_t> tax : active_taxa) {
         eds.push_back(GetEvolutionaryDistinctiveness(tax, time));
@@ -1051,21 +1051,24 @@ namespace emp {
      * @param time The time step at which the calculation is being done
     */
     double GetMeanEvolutionaryDistinctiveness(double time) const {
-      return emp::Mean(GetAllEvolutionaryDistinctivenesses(time));
+      emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
+      return emp::Mean(eds);
     }
 
    /** @returns Sum of evolutionary distinctiveness of all active taxa
      * @param time The time step at which the calculation is being done
     */
     double GetSumEvolutionaryDistinctiveness(double time) const {
-      return emp::Sum(GetAllEvolutionaryDistinctivenesses(time));
+            emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
+      return emp::Sum(eds);
     }
 
    /** @returns Variance of evolutionary distinctiveness of all active taxa
      * @param time The time step at which the calculation is being done
     */
     double GetVarianceEvolutionaryDistinctiveness(double time) const {
-      return emp::Variance(GetAllEvolutionaryDistinctivenesses(time));
+      emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
+      return emp::Variance(eds);
     }
 
     /** Calculates mean pairwise distance between extant taxa (Webb and Losos, 2000).
