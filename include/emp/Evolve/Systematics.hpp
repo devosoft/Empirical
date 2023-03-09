@@ -2276,6 +2276,7 @@ namespace emp {
       to_explore.pop_back();
       curr->total_offspring = 0;
       curr->depth = curr->GetParent()->depth + 1;
+      total_depth += curr->depth;
       for (auto offspring : curr->GetOffspring()){
         to_explore.push_back(offspring);
       }
@@ -2300,6 +2301,7 @@ namespace emp {
       for (auto tax : active_taxa) {
         tax->SetNumOrgs(1);
         tax->SetTotOrgs(1);
+        org_count++;
       }      
     }
 
