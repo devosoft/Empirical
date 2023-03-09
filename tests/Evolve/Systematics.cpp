@@ -1637,7 +1637,7 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(mrca2->GetNumOrgs() == 0);
 
   for (auto tax : sys2.GetActive()) {
-    CHECK(tax->GetNumOrgs() == 1);    
+    CHECK(tax->GetNumOrgs() == 1);
   }
 
   sys2.PrintStatus();

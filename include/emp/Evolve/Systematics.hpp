@@ -465,10 +465,10 @@ namespace emp {
     fun_calc_info_t calc_info_fun; ///< Function that takes an organism and returns the unit being tracked by systematics
     Ptr<taxon_t> next_parent;      ///< The taxon that has been marked as parent for next new org
     Ptr<taxon_t> most_recent;      ///< The most-recently added taxon
-    bool num_orgs_wrong = false;   ///< Keep track of whether we have loaded from a file that didn't 
-                                   ///  provide num_orgs 
+    bool num_orgs_wrong = false;   ///< Keep track of whether we have loaded from a file that didn't
+                                   ///  provide num_orgs
     bool total_offspring_wrong = false;   ///< Keep track of whether we have loaded from a file without
-                                          ///  recalculating total offspring 
+                                          ///  recalculating total offspring
 
     using parent_t::store_active;
     using parent_t::store_ancestors;
@@ -726,7 +726,7 @@ namespace emp {
     }
 
     /// Run given function on all taxa
-    /// @param fun the function to run on each taxon    
+    /// @param fun the function to run on each taxon
     void ApplyToAllTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       ApplyToActiveTaxa(fun);
       ApplyToAncestorTaxa(fun);
@@ -2337,7 +2337,7 @@ namespace emp {
         tax->SetNumOrgs(1);
         tax->SetTotOrgs(1);
         org_count++;
-      }      
+      }
     }
 
     // Adjust total offspring
