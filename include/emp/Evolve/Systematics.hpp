@@ -680,26 +680,32 @@ namespace emp {
     /// but cannot computationally afford to store all ancestors for your entire run.
     void RemoveBefore(int ud);
 
+    /// Apply @param fun to every active taxon (const version)
     void ApplyToActiveTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       std::for_each(active_taxa.begin(), active_taxa.end(), fun);
     }
 
+    /// Apply @param fun to every active taxon
     void ApplyToActiveTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       std::for_each(active_taxa.begin(), active_taxa.end(), fun);
     }
 
+    /// Apply @param fun to every ancestor taxon (const version)
     void ApplyToAncestorTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       std::for_each(ancestor_taxa.begin(), ancestor_taxa.end(), fun);
     }
 
+    /// Apply @param fun to every ancestor taxon
     void ApplyToAncestorTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       std::for_each(ancestor_taxa.begin(), ancestor_taxa.end(), fun);
     }
 
+    /// Apply @param fun to every outside taxon (const version)
     void ApplyToOutsideTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       std::for_each(outside_taxa.begin(), outside_taxa.end(), fun);
     }
 
+    /// Apply @param fun to every outside taxon
     void ApplyToOutsideTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       std::for_each(outside_taxa.begin(), outside_taxa.end(), fun);
     }
@@ -1096,6 +1102,12 @@ namespace emp {
       return dist;
     }
 
+    /** Get average origin time for whole phylogeny.
+     * If @param normalize is set to true, will apply normalization to make result
+     * comparable to what you would expect from a strictly bifurcating tree (as most
+     * reconstruction methods will produce). This normalization is achieved by multiplying
+     * each taxon's values by the number of offspring taxa it has minus one.
+    */
     double GetAverageOriginTime(bool normalize=false) {
       double total = 0;
       double count = 0;
