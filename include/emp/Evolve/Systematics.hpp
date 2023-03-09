@@ -1,14 +1,11 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2023
  *
  *  @file Systematics.hpp
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
- *
- *  @todo Technically, we don't need to keep the ancestors in a set in order to track a lineage...
- *        If we delete all of their descendants they should automaticaly be deleted.
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
  *        need to be kept in memory, especially if we're only doing post-analysis.
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
