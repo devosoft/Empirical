@@ -431,6 +431,7 @@ namespace emp {
     virtual int SackinIndex() const = 0;
     virtual double CollessLikeIndex() const = 0;
     virtual std::unordered_map<int, int> GetOutDegreeDistribution() const = 0;
+    virtual double GetAverageOriginTime(bool) const = 0;
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos) = 0;
@@ -498,6 +499,7 @@ namespace emp {
     using parent_t::GetVariancePairwiseDistance;
     using parent_t::GetPairwiseDistances;
     using parent_t::GetOutDegreeDistribution;
+    using parent_t::GetAverageOriginTime;
     using parent_t::GetMRCADepth;
     using parent_t::AddOrg;
     using parent_t::RemoveOrg;
@@ -1125,7 +1127,7 @@ namespace emp {
      * reconstruction methods will produce). This normalization is achieved by multiplying
      * each taxon's values by the number of offspring taxa it has minus one.
     */
-    double GetAverageOriginTime(bool normalize=false) {
+    double GetAverageOriginTime(bool normalize=false) const {
       double total = 0;
       double count = 0;
       // const auto all = {std::ranges::ref_view(active_taxa),
