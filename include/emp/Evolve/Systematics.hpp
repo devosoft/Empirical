@@ -728,9 +728,18 @@ namespace emp {
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(const emp::Ptr<taxon_t> tax)> & fun) const {
       emp::vector<T> result;
-      const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
-                  std::ranges::ref_view(outside_taxa)};
-      for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+      // const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
+      //             std::ranges::ref_view(outside_taxa)};
+      // for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+      //   result.push_back(fun(tax));
+      // }
+      for (emp::Ptr<taxon_t> tax : active_taxa) {
+        result.push_back(fun(tax));
+      }
+      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+        result.push_back(fun(tax));
+      }
+      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
         result.push_back(fun(tax));
       }
       return result;
@@ -740,12 +749,20 @@ namespace emp {
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(emp::Ptr<taxon_t> tax)> & fun) {
       emp::vector<T> result;
-      const auto all = {std::ranges::ref_view(active_taxa),
-                  std::ranges::ref_view(ancestor_taxa),
-                  std::ranges::ref_view(outside_taxa)};
-      for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+      // const auto all = {std::ranges::ref_view(active_taxa),
+      //             std::ranges::ref_view(ancestor_taxa),
+      //             std::ranges::ref_view(outside_taxa)};
+      // for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+      for (emp::Ptr<taxon_t> tax : active_taxa) {
         result.push_back(fun(tax));
       }
+      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+        result.push_back(fun(tax));
+      }
+      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+        result.push_back(fun(tax));
+      }
+
       return result;
     }
 
@@ -1111,10 +1128,11 @@ namespace emp {
     double GetAverageOriginTime(bool normalize=false) {
       double total = 0;
       double count = 0;
-      const auto all = {std::ranges::ref_view(active_taxa),
-                        std::ranges::ref_view(ancestor_taxa),
-                        std::ranges::ref_view(outside_taxa)};
-      for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+      // const auto all = {std::ranges::ref_view(active_taxa),
+      //                   std::ranges::ref_view(ancestor_taxa),
+      //                   std::ranges::ref_view(outside_taxa)};
+      // for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+      for (emp::Ptr<taxon_t> tax : active_taxa) {
         double weight = 1;
         if (normalize) {
           weight = std::max(0, (int)tax->GetNumOff() - 1);
@@ -1122,6 +1140,23 @@ namespace emp {
         total += tax->GetOriginationTime() * weight;
         count += weight;
       }
+      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+        double weight = 1;
+        if (normalize) {
+          weight = std::max(0, (int)tax->GetNumOff() - 1);
+        }
+        total += tax->GetOriginationTime() * weight;
+        count += weight;
+      }
+      for (emp::Ptr<taxon_t> tax : outside_taxa) {
+        double weight = 1;
+        if (normalize) {
+          weight = std::max(0, (int)tax->GetNumOff() - 1);
+        }
+        total += tax->GetOriginationTime() * weight;
+        count += weight;
+      }
+
       if (count == 0) {
         return 0;
       }
@@ -1674,12 +1709,21 @@ namespace emp {
     file.PrintHeaderKeys();
 
     // Update file w/ taxa information
-    const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
-                      std::ranges::ref_view(outside_taxa)};
-    for (emp::Ptr<taxon_t> tax : all | std::views::join) {
+    // const auto all = {std::ranges::ref_view(active_taxa), std::ranges::ref_view(ancestor_taxa),
+                      // std::ranges::ref_view(outside_taxa)};
+    for (emp::Ptr<taxon_t> tax : active_taxa) {
       cur_taxon = tax;
       file.Update();
     }
+    for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+      cur_taxon = tax;
+      file.Update();
+    }
+    for (emp::Ptr<taxon_t> tax : outside_taxa) {
+      cur_taxon = tax;
+      file.Update();
+    }
+
   }
 
   // ======= Measurements about the systematics manager
