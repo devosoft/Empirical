@@ -465,10 +465,10 @@ namespace emp {
     fun_calc_info_t calc_info_fun; ///< Function that takes an organism and returns the unit being tracked by systematics
     Ptr<taxon_t> next_parent;      ///< The taxon that has been marked as parent for next new org
     Ptr<taxon_t> most_recent;      ///< The most-recently added taxon
-    bool num_orgs_wrong = false;   ///< Keep track of whether we have loaded from a file that didn't 
-                                   ///  provide num_orgs 
+    bool num_orgs_wrong = false;   ///< Keep track of whether we have loaded from a file that didn't
+                                   ///  provide num_orgs
     bool total_offspring_wrong = false;   ///< Keep track of whether we have loaded from a file without
-                                          ///  recalculating total offspring 
+                                          ///  recalculating total offspring
 
     using parent_t::store_active;
     using parent_t::store_ancestors;
@@ -726,7 +726,7 @@ namespace emp {
     }
 
     /// Run given function on all taxa
-    /// @param fun the function to run on each taxon    
+    /// @param fun the function to run on each taxon
     void ApplyToAllTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       ApplyToActiveTaxa(fun);
       ApplyToAncestorTaxa(fun);
@@ -1035,6 +1035,41 @@ namespace emp {
      *
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
     double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const;
+
+    /** @returns A vector of evolutionary distinctiveness of all active taxa
+    * @param time The time step at which the calculation is being done
+    */
+    emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) const {
+      emp::vector<double> eds;
+      for (emp::Ptr<taxon_t> tax : active_taxa) {
+        eds.push_back(GetEvolutionaryDistinctiveness(tax, time));
+      }
+      return eds;
+    }
+
+    /** @returns Mean evolutionary distinctiveness of all active taxa
+     * @param time The time step at which the calculation is being done
+    */
+    double GetMeanEvolutionaryDistinctiveness(double time) const {
+      emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
+      return emp::Mean(eds);
+    }
+
+   /** @returns Sum of evolutionary distinctiveness of all active taxa
+     * @param time The time step at which the calculation is being done
+    */
+    double GetSumEvolutionaryDistinctiveness(double time) const {
+            emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
+      return emp::Sum(eds);
+    }
+
+   /** @returns Variance of evolutionary distinctiveness of all active taxa
+     * @param time The time step at which the calculation is being done
+    */
+    double GetVarianceEvolutionaryDistinctiveness(double time) const {
+      emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
+      return emp::Variance(eds);
+    }
 
     /** Calculates mean pairwise distance between extant taxa (Webb and Losos, 2000).
      * This measurement is also called Average Taxonomic Diversity (Warwick and Clark, 1998)
@@ -2302,7 +2337,7 @@ namespace emp {
         tax->SetNumOrgs(1);
         tax->SetTotOrgs(1);
         org_count++;
-      }      
+      }
     }
 
     // Adjust total offspring
