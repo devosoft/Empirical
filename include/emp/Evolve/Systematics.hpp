@@ -465,6 +465,10 @@ namespace emp {
     fun_calc_info_t calc_info_fun; ///< Function that takes an organism and returns the unit being tracked by systematics
     Ptr<taxon_t> next_parent;      ///< The taxon that has been marked as parent for next new org
     Ptr<taxon_t> most_recent;      ///< The most-recently added taxon
+    bool num_orgs_wrong = false;   ///< Keep track of whether we have loaded from a file that didn't 
+                                   ///  provide num_orgs 
+    bool total_offspring_wrong = false;   ///< Keep track of whether we have loaded from a file without
+                                          ///  recalculating total offspring 
 
     using parent_t::store_active;
     using parent_t::store_ancestors;
@@ -1260,7 +1264,8 @@ namespace emp {
     }
 
     void LoadFromFile(const std::string & file_path, const std::string & info_col = "info",
-                                                             bool assume_leaves_extant=true);
+                                                             bool assume_leaves_extant=true,
+                                                             bool adjust_total_offspring = true);
 
   };
 
@@ -1744,6 +1749,7 @@ namespace emp {
   // @returns the genetic diversity of the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
+    emp_assert(!num_orgs_wrong && "Error: calculating diversity from phylogeny missing org counts");
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
 
@@ -1953,6 +1959,10 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const {
 
+    // If we loaded this phylogeny from a file without calculating total offspring,
+    // we need to actually calculate it here
+    emp_assert(!total_offspring_wrong && "To calculate evolutionary distinctiveness on phylogeny loaded from file you must calculate total offspring.");
+
     double depth = 0; // Length (in time units) of section we're currently exploring
     double total = 0; // Count up scores for each section of tree
     double divisor = tax->GetTotalOffspring() + 1; // Number of extant taxa this will split into (1 for current taxa, plus its offspring)
@@ -2107,7 +2117,8 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path,
                                                             const std::string & info_col,
-                                                             bool assume_leaves_extant) {
+                                                            bool assume_leaves_extant,
+                                                            bool adjust_total_offspring ) {
 
     // We can only load phylogenies from file if their info can be
     // converted to this systematics object's ORG_INFO type (if you
@@ -2239,7 +2250,8 @@ namespace emp {
     // Link up parents and offspring
     for (auto element : unlinked_parents) {
       taxa[element.first]->parent = taxa[element.second];
-      taxa[element.second]->AddOffspring(taxa[element.first]);
+      taxa[element.second]->offspring.insert(taxa[element.first]);
+      taxa[element.second]->num_offspring++;
     }
 
     // Set up depth
@@ -2255,6 +2267,9 @@ namespace emp {
 
     // Step through all taxa and fix their
     // bookkeeping
+    // Traversal starting at roots to ensure
+    // parent depth is correct when setting offspring
+    // depth
     emp::Ptr<taxon_t> curr;
     while(!to_explore.empty()) {
       curr = to_explore.back();
@@ -2271,16 +2286,30 @@ namespace emp {
 
     // If we're assuming that all leave are extant,
     // move leaves to active taxa
-    for (auto leaf : leaves) {
-      if (assume_leaves_extant && !Has(active_taxa, leaf)) {
-        ancestor_taxa.erase(leaf);
-        active_taxa.insert(leaf);
+    if (assume_leaves_extant) {
+      for (auto leaf : leaves) {
+        if (!Has(active_taxa, leaf)) {
+          ancestor_taxa.erase(leaf);
+          active_taxa.insert(leaf);
+        }
       }
     }
 
+    if (num_orgs_pos == -1) {
+      num_orgs_wrong = true;
+      for (auto tax : active_taxa) {
+        tax->SetNumOrgs(1);
+        tax->SetTotOrgs(1);
+      }      
+    }
+
     // Adjust total offspring
-    for (auto tax : active_taxa) {
-      tax->parent->AddTotalOffspring();
+    if (adjust_total_offspring) {
+      for (auto tax : active_taxa) {
+        tax->parent->AddTotalOffspring();
+      }
+    } else {
+      total_offspring_wrong = true;
     }
 
     // Force stats to be recalculated

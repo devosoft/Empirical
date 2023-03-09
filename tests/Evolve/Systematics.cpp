@@ -1610,7 +1610,39 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(sys.GetMaxDepth() == 4);
   CHECK(mrca->GetTotalOffspring() == 6);
   CHECK(mrca->GetNumOff() == 3);
+  CHECK(mrca->GetNumOrgs() == 0);
+
+  for (auto tax : sys.GetActive()) {
+    CHECK(((tax->GetNumOrgs() == 1) || (tax->GetID() == 10 )));
+  }
+
   sys.PrintStatus();
+
+  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("systematics_snapshot.csv", "genome", false, false);
+  CHECK(sys2.GetNumRoots() == 1);
+  emp::Ptr<emp::Taxon<int>> mrca2 = sys.GetMRCA();
+  CHECK(mrca2->GetID() == 1);
+  auto offspring2 = mrca2->GetOffspring();
+  for (auto off : offspring2) {
+    CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
+  }
+  CHECK(sys2.GetNumActive() == 5);
+  CHECK(sys2.GetNumAncestors() == 5);
+  CHECK(sys2.GetNumOutside() == 0);
+  CHECK(sys2.GetNumTaxa() == 10);
+  CHECK(sys2.GetMaxDepth() == 3);
+  CHECK(mrca2->GetTotalOffspring() == 6);
+  CHECK(mrca2->GetNumOff() == 3);
+  CHECK(mrca2->GetNumOrgs() == 0);
+
+  for (auto tax : sys2.GetActive()) {
+    CHECK(tax->GetNumOrgs() == 1);    
+  }
+
+  sys2.PrintStatus();
+
+  sys.LoadFromFile("full.csv", "id", true, false);
 }
 
 TEST_CASE("Test LoadFromFile and Snapshot behavior") {
