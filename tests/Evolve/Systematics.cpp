@@ -58,11 +58,13 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   sys1.SetTrackSynchronous(true);
   CHECK(sys1.GetTrackSynchronous() == true);
   sys1.AddOrg(15.0, {0,0});
+  CHECK(sys1.CalcDiversity() == 0);
   CHECK(sys1.GetNumActive() == 1);
   CHECK(sys1.GetTaxonAt({0,0})->GetInfo() == "small");
   CHECK(sys1.IsTaxonAt({0,0}));
   sys1.AddOrg(56.0, {1,1});
   CHECK(sys1.GetNumActive() == 2);
+  CHECK(sys1.CalcDiversity() == 1);
   CHECK(sys1.GetTaxonAt({1,1})->GetInfo() == "large");
   CHECK(sys1.IsTaxonAt({1,1}));
   sys1.RemoveOrg({1,1});
@@ -1582,6 +1584,8 @@ TEST_CASE("Test Average Origin Time") {
   auto id6 = sys.AddOrg(29, id2);
   CHECK(sys.GetAverageOriginTime() == Approx(18.6666667));
   CHECK(sys.GetAverageOriginTime(true) == Approx(4));
+
+  CHECK(sys.CalcDiversity() == Approx(2.58496));
 
   sys.SetUpdate(39);
   auto id7 = sys.AddOrg(30, id2);

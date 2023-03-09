@@ -56,7 +56,7 @@ namespace emp {
     double entropy = 0.0;
     for (auto & o : objs) {
       double p = ((double) fun(o)) / total;
-      entropy -= p * Log2(p);
+      entropy -= p * log2(p);
     }
     return entropy;
   }

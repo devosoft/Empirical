@@ -395,7 +395,7 @@ namespace emp {
 
     /// Add a data node to this systematics manager
     /// @param name the name of the data node (so it can be found later)
-    /// @param pull_set_fun a function to run when the data node is requested to pull data (returns single value)
+    /// @param pull_fun a function to run when the data node is requested to pull data (returns single value)
     data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
@@ -576,6 +576,7 @@ namespace emp {
 
     /**
      * Contructor for Systematics; controls what information should be stored.
+     * @param calc_taxon       A function that takes an organism and calculates what taxon it belongs to
      * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
      * @param store_ancestors  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
      * @param store_all        Should all dead taxa be maintained? (typically no; it gets BIG!)
@@ -681,37 +682,44 @@ namespace emp {
     /// but cannot computationally afford to store all ancestors for your entire run.
     void RemoveBefore(int ud);
 
-    /// Apply @param fun to every active taxon (const version)
+    /// Run the given function on every active taxon (const version)
+    /// @param fun the function to run on each taxon
     void ApplyToActiveTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       std::for_each(active_taxa.begin(), active_taxa.end(), fun);
     }
 
-    /// Apply @param fun to every active taxon
+    /// Run the given function on every active taxon
+    /// @param fun the function to run on each taxon
     void ApplyToActiveTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       std::for_each(active_taxa.begin(), active_taxa.end(), fun);
     }
 
-    /// Apply @param fun to every ancestor taxon (const version)
+    /// Run the given function on every ancestor taxon (const version)
+    /// @param fun the function to run on each taxon
     void ApplyToAncestorTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       std::for_each(ancestor_taxa.begin(), ancestor_taxa.end(), fun);
     }
 
-    /// Apply @param fun to every ancestor taxon
+    /// Run the given function on every ancestor taxon
+    /// @param fun the function to run on each taxon
     void ApplyToAncestorTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       std::for_each(ancestor_taxa.begin(), ancestor_taxa.end(), fun);
     }
 
-    /// Apply @param fun to every outside taxon (const version)
+    /// Run the given function on every outside taxon (const version)
+    /// @param fun the function to run on each taxon
     void ApplyToOutsideTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       std::for_each(outside_taxa.begin(), outside_taxa.end(), fun);
     }
 
-    /// Apply @param fun to every outside taxon
+    /// Run the given function on every outside taxon
+    /// @param fun the function to run on each taxon
     void ApplyToOutsideTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       std::for_each(outside_taxa.begin(), outside_taxa.end(), fun);
     }
 
     /// Run given function on all taxa (const version)
+    /// @param fun the function to run on each taxon
     void ApplyToAllTaxa(const std::function<void(const emp::Ptr<taxon_t> tax)> & fun) const {
       ApplyToActiveTaxa(fun);
       ApplyToAncestorTaxa(fun);
@@ -719,6 +727,7 @@ namespace emp {
     }
 
     /// Run given function on all taxa
+    /// @param fun the function to run on each taxon    
     void ApplyToAllTaxa(const std::function<void(emp::Ptr<taxon_t> tax)> & fun) {
       ApplyToActiveTaxa(fun);
       ApplyToAncestorTaxa(fun);
@@ -726,6 +735,8 @@ namespace emp {
     }
 
     /// Run given function on all taxa and return result (const version)
+    /// @param fun the function to run on each taxon
+    /// @returns a vector containing the results of running the function on each taxon
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(const emp::Ptr<taxon_t> tax)> & fun) const {
       emp::vector<T> result;
@@ -746,7 +757,9 @@ namespace emp {
       return result;
     }
 
-    /// Run given function on all taxa and return result
+    /// Run given function on all taxa and return result (const version)
+    /// @param fun the function to run on each taxon
+    /// @returns a vector containing the results of running the function on each taxon
     template <typename T>
     emp::vector<T> ApplyToAllTaxa(const std::function<T(emp::Ptr<taxon_t> tax)> & fun) {
       emp::vector<T> result;
@@ -778,19 +791,19 @@ namespace emp {
     /// @returns set of outside taxa (extinct, with no active descendants)
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetOutside() const { return outside_taxa; }
 
-    /// How many taxa are still active in the population?
+    /// @returns the number of taxa that are still active in the population
     size_t GetNumActive() const { return active_taxa.size(); }
 
-    /// How many taxa are ancestors of living organisms (but have died out themselves)?
+    /// @returns the number of taxa that are ancestors of living organisms (but have died out themselves)
     size_t GetNumAncestors() const { return ancestor_taxa.size(); }
 
-    /// How many taxa are stored that have died out, as have their descendents?
+    /// @returns the number of taxa that are stored that have died out, as have their descendents
     size_t GetNumOutside() const { return outside_taxa.size(); }
 
-    /// How many taxa are in the current phylogeny?
+    /// @returns the number of taxa that are in the current phylogeny
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
 
-    /// How many taxa are stored in total?
+    /// @returns the number of taxa that are stored in total
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
     /// @returns the phylogenetic depth (lineage length) of the taxon with
@@ -1088,19 +1101,23 @@ namespace emp {
     std::set<Ptr<taxon_t>> GetCanopyExtantRoots(int time_point = 0) const;
 
 
-    /** Counts the total number of ancestors between @param tax and MRCA, if there is one. If
-     *  there is no common ancestor, distance to the root of this tree is calculated instead.*/
+    /** @returns the total number of ancestors between the given taxon and MRCA, if there is one. If
+     *  there is no common ancestor, distance to the root of this tree is calculated instead.
+     * @param tax the taxon who's distance to root you want to calculate
+     * */
     int GetDistanceToRoot(Ptr<taxon_t> tax) const ;
 
-    /** Counts the number of branching points leading to multiple extant taxa
-     * between @param tax and the most-recent common ancestor (or the root of its subtree,
+    /** Calculates the number of branching points leading to multiple extant taxa
+     * between the given taxon and the most-recent common ancestor (or the root of its subtree,
      * if no MRCA exists). This is useful because a lot
      * of stats for phylogenies are designed for phylogenies reconstructed from extant taxa.
      * These phylogenies generally only contain branching points, rather than every ancestor
-     * along the way to the current taxon.*/
+     * along the way to the current taxon.
+     * @returns Number of branching points between tax and root
+     * @param tax taxon to calculate branches from */
     int GetBranchesToRoot(Ptr<taxon_t> tax) const;
 
-    /** Calculate Sackin Index of this tree (Sackin, 1972; reviewed in Shao, 1990).
+    /** @returns Sackin Index of this tree (Sackin, 1972; reviewed in Shao, 1990).
      * Measures tree balance*/
     int SackinIndex() const {
       int sackin = 0;
