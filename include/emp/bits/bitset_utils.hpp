@@ -25,13 +25,13 @@ namespace emp {
   static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
 
   /// @brief Convert a bit count to the number of fields needed to store them.
-  [[nodiscard]] constexpr size_t NumBitFields(size_t num_bits) noexcept {
+  [[nodiscard]] static constexpr size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
 
   /// @brief Convert a single bit field to a string.
   /// @param field A single bit field to convert to a string.
-  [[nodiscard]] std::string BitFieldToString(bits_field_t field) {
+  [[nodiscard]] static std::string BitFieldToString(bits_field_t field) {
     std::stringstream ss;
     ss << '[' << std::hex << field << ']';
     return ss.str();
@@ -39,7 +39,7 @@ namespace emp {
 
   /// @brief Convert a series of bit fields to a string.
   /// @param field A single bit field to convert to a string.
-  [[nodiscard]] std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
+  [[nodiscard]] static std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
     std::stringstream ss;
     for (size_t i = 0; i < count; ++i) {
       if (i) ss << ' ';            
@@ -232,7 +232,7 @@ namespace emp {
   }
 
   /// Count the number of bits ('0' or '1') found in a string.
-  size_t CountBits(const std::string & bitstring) {
+  static size_t CountBits(const std::string & bitstring) {
     return std::count_if(
       bitstring.begin(),
       bitstring.end(),
