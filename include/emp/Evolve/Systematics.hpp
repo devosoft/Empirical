@@ -1036,6 +1036,38 @@ namespace emp {
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
     double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const;
 
+    /** @returns A vector of evolutionary distinctiveness of all active taxa
+    * @param time The time step at which the calculation is being done
+    */
+    emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) {
+      emp::vector<double> eds;
+      for (emp::Ptr<taxon_t> tax : active_taxa) {
+        eds.push_back(GetEvolutionaryDistinctiveness(tax, time));
+      }
+      return eds;
+    }
+
+    /** @returns Mean evolutionary distinctiveness of all active taxa
+     * @param time The time step at which the calculation is being done
+    */
+    double GetMeanEvolutionaryDistinctiveness(double time) const {
+      return emp::Mean(GetAllEvolutionaryDistinctivenesses(time));
+    }
+
+   /** @returns Sum of evolutionary distinctiveness of all active taxa
+     * @param time The time step at which the calculation is being done
+    */
+    double GetSumEvolutionaryDistinctiveness(double time) const {
+      return emp::Sum(GetAllEvolutionaryDistinctivenesses(time));
+    }
+
+   /** @returns Variance of evolutionary distinctiveness of all active taxa
+     * @param time The time step at which the calculation is being done
+    */
+    double GetVarianceEvolutionaryDistinctiveness(double time) const {
+      return emp::Variance(GetAllEvolutionaryDistinctivenesses(time));
+    }
+
     /** Calculates mean pairwise distance between extant taxa (Webb and Losos, 2000).
      * This measurement is also called Average Taxonomic Diversity (Warwick and Clark, 1998)
      * (for demonstration of equivalence see Tucker et al, 2016). This measurement tells
