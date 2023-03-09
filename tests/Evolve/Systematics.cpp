@@ -1641,8 +1641,6 @@ TEST_CASE("Test Loading Phylogeny From File") {
   }
 
   sys2.PrintStatus();
-
-  sys.LoadFromFile("full.csv", "id", true, false);
 }
 
 TEST_CASE("Test LoadFromFile and Snapshot behavior") {
