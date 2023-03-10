@@ -1662,7 +1662,7 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
       // load saved file
       emp::File saved{temp_path};
 
-      // CHECK(saved == original);
+      CHECK(saved.AsSet() == original.AsSet());
     }
   }
 
