@@ -1698,7 +1698,7 @@ namespace emp {
 
     //  - ancestor_list: ancestor list for taxon
     std::function<std::string()> get_ancestor_list = [&cur_taxon]() -> std::string {
-      if (cur_taxon->GetParent() == nullptr) { return "[\"NONE\"]"; }
+      if (cur_taxon->GetParent() == nullptr) { return "[None]"; }
       return "[" + to_string(cur_taxon->GetParent()->GetID()) + "]";
     };
     file.AddFun(get_ancestor_list, "ancestor_list", "Ancestor list for this taxon.");
