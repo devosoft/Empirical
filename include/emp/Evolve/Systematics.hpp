@@ -2233,8 +2233,14 @@ namespace emp {
         destruction_time = "unknown";
       }
 
+      ORG_INFO info;
+      if constexpr (std::is_same<ORG_INFO, std::string>::value) {
+        info = row[info_pos];
+      } else {
+        info = emp::from_string<ORG_INFO>(row[info_pos]);
+      }
+
       // Load ancestor list
-      ORG_INFO info = emp::from_string<ORG_INFO>(row[info_pos]);
       std::string ancestor_list_str = {row[anc_pos].begin(), row[anc_pos].end()};
       emp::remove_chars(ancestor_list_str, "[]\"");
       emp::Ptr<taxon_t> tax;
