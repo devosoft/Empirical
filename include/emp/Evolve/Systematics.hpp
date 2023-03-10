@@ -2165,7 +2165,6 @@ namespace emp {
 
     // Load files
     emp::File in_file(file_path);
-    in_file.RemoveWhitespace();
     emp::vector<std::string> header = in_file.ExtractRow();
 
     // Find column ids
