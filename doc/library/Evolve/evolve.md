@@ -13,6 +13,8 @@
 ```{include} systematics.md
 ```
 
+### Systematics API
+
 ```{eval-rst}
 .. doxygenfile:: emp/Evolve/Systematics.hpp
   :project: Empirical
