@@ -8,9 +8,15 @@
   :no-link:
 ```
 
-## Systematics
+## Systematics Manager
 
-```{ref} systematics
+```{include} systematics.md
+```
+
+```{eval-rst}
+.. doxygenfile:: emp/Evolve/Systematics.hpp
+  :project: Empirical
+  :no-link:
 ```
 
 ## NK

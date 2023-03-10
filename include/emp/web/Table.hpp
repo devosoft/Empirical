@@ -106,8 +106,10 @@ namespace web {
     };
 
     class TableInfo : public internal::WidgetInfo {
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend TableWidget; friend Table; friend TableCell; friend TableRow; friend TableCol;
       friend TableRowGroup; friend TableColGroup;
+      #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
     protected:
       size_t row_count;                        /// How big is this table?
       size_t col_count;
@@ -514,7 +516,9 @@ namespace web {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   class TableWidget : public internal::WidgetFacet<TableWidget> {
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class internal::TableInfo;
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
   protected:
     size_t cur_row;      // Which row/col is currently active?
     size_t cur_col;
