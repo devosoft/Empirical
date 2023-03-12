@@ -334,6 +334,7 @@ namespace emp {
     inline String PopQuote(const Syntax & syntax=Syntax::Quotes());
     inline String PopParen(const Syntax & syntax=Syntax::Parens());
     inline size_t PopUInt();
+    char PopChar() { return PopFixed(1)[0]; }
 
     // ------ Insertions and Additions ------
     // Inherited functions from std::string:
