@@ -27,6 +27,7 @@ namespace emp {
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v, size_t max_count)
   {
+    emp_assert(max_count <= v.size());
     for (size_t i = 0; i < max_count; i++) {
       const size_t pos = random.GetUInt(i, v.size());
       if (pos == i) continue;
@@ -37,6 +38,17 @@ namespace emp {
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v) { Shuffle(random, v, v.size()); }
 
+  template <typename T>
+  inline void ShuffleRange(Random & random, emp::vector<T> & v, size_t first, size_t last)
+  {
+    emp_assert(first <= last);
+    emp_assert(last <= v.size());
+    for (size_t i = first; i < last; i++) {
+      const size_t pos = random.GetUInt(i, last);
+      if (pos == i) continue;
+      std::swap(v[i], v[pos]);
+    }
+  }
 
   /// Return an emp::vector<int> numbered 0 through size-1 in a random order.
 
