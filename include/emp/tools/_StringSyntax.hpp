@@ -58,10 +58,11 @@ namespace emp {
     std::string GetQuotes() const { std::string out; for (uint8_t i=0; i < 128; ++i) if (char_matches[i]==i) out+=(char)i; return out;}
 
     static StringSyntax None()   { return StringSyntax(); }
-    static StringSyntax Quotes() { return StringSyntax("\"'"); }
+    static StringSyntax Quotes() { return StringSyntax("\""); }
+    static StringSyntax AllQuotes() { return StringSyntax("\"'"); }
     static StringSyntax Parens() { return StringSyntax("",     "()[]{}"); }
     static StringSyntax RParens() { return StringSyntax("",    ")(][}{"); }
-    static StringSyntax Full()   { return StringSyntax("\"'",  "()[]{}"); }
+    static StringSyntax Full()   { return StringSyntax("\"",   "()[]{}"); }
     static StringSyntax Max()    { return StringSyntax("\"'`", "()[]{}<>"); }
   };
 
