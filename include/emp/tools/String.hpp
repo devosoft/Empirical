@@ -468,11 +468,11 @@ namespace emp {
     // data structure is provided and one where it must be generated.
 
     inline void Slice(emp::vector<String> & out_set, String delim=",",
-                      const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=true) const;
+                      const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=false) const;
 
     [[nodiscard]]
     inline emp::vector<String> Slice(String delim=",", const Syntax & syntax=Syntax::Quotes(),
-                                     bool trim_whitespace=true) const;
+                                     bool trim_whitespace=false) const;
 
     inline void ViewSlices(
       emp::vector<std::string_view> & out_set,
