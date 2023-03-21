@@ -392,7 +392,7 @@ namespace emp {
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
     String & ReplaceMacro(String start_str, String end_str, FUN_T && fun,
-                          const Syntax & syntax=Syntax::Full());
+                          const Syntax & syntax=Syntax{"\"", "()"});
 
 
     // ------ Searching ------
@@ -1141,6 +1141,7 @@ namespace emp {
   /// @param macro_fun Function to call with contents of macro.  Params are macro_args (string), line_num (size_t), and hit_num (size_t)
   /// @param syntax What values should we skip as quotes or parens?
   /// @return This string object, post processing.
+  /// @todo Separate syntax into find_start syntax and find_end (inside macro) syntax.
   template <typename FUN_T>
   String & String::ReplaceMacro(
     String start_str,
