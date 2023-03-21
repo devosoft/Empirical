@@ -165,6 +165,8 @@ namespace emp {
     //  char * data();
     //  const char * data() const;
     //  const char * c_str() const;
+    std::string & str() { return *this; }
+    const std::string & str() const { return *this; }
 
     [[nodiscard]] char & operator[](size_t pos)
       { _AssertPos(pos); return std::string::operator[](pos); }
@@ -363,7 +365,7 @@ namespace emp {
     }
 
     String & PadBack(char padding, size_t target_size) {
-      if (size() < target_size) *this = *this + std::string(target_size - size(), padding);
+      if (size() < target_size) *this += std::string(target_size - size(), padding);
       return *this;
     }
 
@@ -385,12 +387,12 @@ namespace emp {
     // Find any instances of ${X} and replace with dictionary lookup of X.
     template <typename MAP_T>
     String & ReplaceVars(const MAP_T & var_map, String symbol="$",
-                         const Syntax & syntax=Syntax::Quotes());
+                         const Syntax & syntax=Syntax::Full());
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
     String & ReplaceMacro(String start_str, String end_str, FUN_T && fun,
-                          const Syntax & syntax=Syntax::Quotes());
+                          const Syntax & syntax=Syntax::Full());
 
 
     // ------ Searching ------
@@ -506,6 +508,12 @@ namespace emp {
     //  bool operator>(const String & in) const
     //  bool operator>=(const String & in) const
     //  bool operator<=>(const String & in) const
+    String operator+(const std::string & in) const { return str() + in; }
+    String operator*(size_t count) const {
+      String out; out.reserve(size() * count);
+      for (size_t i = 0; i < count; ++i) out += *this;
+      return out;
+    }
     
 
     //  ------ FORMATTING ------
@@ -796,7 +804,7 @@ namespace emp {
         if (found_pos < scan_pos) found_pos = find(target, scan_pos);
       }
       else if (syntax.IsParen(Get(scan_pos))) {
-        scan_pos = FindParenMatch(scan_pos);
+        scan_pos = FindParenMatch(scan_pos, syntax);
         if (found_pos < scan_pos) found_pos = find(target, scan_pos);
       }
     }
