@@ -324,6 +324,24 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
 }
 
 
+TEST_CASE("Test Stirng assign and Macro functions", "[tools]")
+{  
+  emp::String test = "TIMES(abc,3) + TIMES(def,2) + TIMES(g, 8)";
+  test.ReplaceMacro("TIMES(", ")",
+    [](emp::String check_body, size_t, size_t) {
+      emp::String pattern = check_body.Pop(',');
+      size_t count = check_body.As<size_t>();
+      return pattern * count;
+    });
+
+  CHECK(test == "abcabcabc + defdef + gggggggg");
+
+  test = "MACRO(ABC);\n  MACRO(\"DEF\");\n MACRO( \"([{\");\n  and normal;";
+  test.ReplaceMacro("MACRO(", ")",
+    [](emp::String check_body, size_t, size_t) { return emp::MakeString("[[[", check_body, "]]]"); }
+  );
+  CHECK(test == "[[[ABC]]];\n  [[[\"DEF\"]]];\n [[[ \"([{\"]]];\n  and normal;");
+}
 
 /*
 TEST_CASE("Another Test string_utils", "[tools]")
