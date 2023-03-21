@@ -508,7 +508,7 @@ namespace emp {
     //  bool operator>(const String & in) const
     //  bool operator>=(const String & in) const
     //  bool operator<=>(const String & in) const
-    String operator+(const std::string & in) const { return str() + in; }
+    //  std::string operator+(const std::string & in) const
     String operator*(size_t count) const {
       String out; out.reserve(size() * count);
       for (size_t i = 0; i < count; ++i) out += *this;
