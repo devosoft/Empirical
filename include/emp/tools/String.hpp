@@ -45,6 +45,7 @@ namespace emp {
   template <typename... Ts> [[nodiscard]] inline String MakeString(Ts... args);
   [[nodiscard]] inline String MakeEscaped(char c);
   [[nodiscard]] inline String MakeEscaped(const String & in);
+  [[nodiscard]] inline String MakeCSVSafe(const String & in);
   [[nodiscard]] inline String MakeWebSafe(const String & in);
   [[nodiscard]] inline String MakeLiteral(char value);
   [[nodiscard]] inline String MakeLiteral(const std::string & value);
@@ -536,6 +537,11 @@ namespace emp {
     String & SetEscaped(const String & in) { *this = MakeEscaped(in); return *this; }
     String & SetEscaped() { *this = MakeEscaped(*this); return *this; }
     [[nodiscard]] String AsEscaped() const { return MakeEscaped(*this); }
+
+    String & AppendCSVSafe(String in) { *this+=MakeCSVSafe(in); return *this; }
+    String & SetCSVSafe(const String & in) { *this = MakeCSVSafe(in); return *this; }
+    String & SetCSVSafe() { *this = MakeCSVSafe(*this); return *this; }
+    [[nodiscard]] String AsCSVSafe() const { return MakeCSVSafe(*this); }
 
     String & AppendWebSafe(String in) { *this+=MakeWebSafe(in); return *this; }
     String & SetWebSafe(const String & in) { *this = MakeWebSafe(in); return *this; }
@@ -1297,6 +1303,23 @@ namespace emp {
   
   String MakeEscaped(const String & in) {
     return String(in, [](char c){ return MakeEscaped(c); });
+  }
+
+  String MakeCSVSafe(const String & in) {
+    bool needsEscape = in.find_first_of(",\"\n\r") != String::npos;
+    if (!needsEscape) return in;
+
+    String out;
+    out.reserve(in.size() + 2); // Reserve space for quotes and the string content
+
+    out.push_back('\"');
+    for (const char c : in) {
+      if (c == '\"') out.push_back('\"'); // Add a backslash before quotes.
+      out.push_back(c);
+    }
+    out.push_back('\"');
+
+    return out;
   }
 
   /// Take a string and replace reserved HTML characters with character entities
