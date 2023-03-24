@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2023.
  *
  *  @file Lexer.hpp
  *  @brief A general-purpose, fast lexer.
@@ -192,6 +192,13 @@ namespace emp {
 
     /// How many types of tokens can be identified in this Lexer?
     size_t GetNumTokens() const { return token_set.size(); }
+
+    void Reset() {
+      token_set.resize(0);
+      token_map.clear();
+      cur_token_id = MAX_ID;
+      generate_lexer = false;
+    }
 
     bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
