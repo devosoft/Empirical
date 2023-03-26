@@ -270,10 +270,23 @@ namespace emp {
       }
     ~TextEncoding() = default;
 
+    // Reset the current encoding to clear all tag knowledge for this encoding.
+    void Reset() {
+      tag_set.resize(1);           // Reduce down to just the default tag.
+      style_set.resize(0);         // Reduce down to just the default style.
+      char_tags.fill(0);           // Clear all character tags.
+      pattern_to_tag_id.clear();   // Remove all references to tags
+      token_to_tag_id.clear();
+      name_to_style_id.size();
+      active_styles.resize(0);     // All active styles turn off on changing encodings.
+      text_token = -1;             // Allow the lexer to reset.
+      lexer.Reset();
+    }
+
     // Add new text into this object, translated as needed
     void Append(const String & in) override {
       SetupLexer();
-      auto tokens = lexer.Tokenize(in.cpp_str());
+      auto tokens = lexer.Tokenize(in.str());
       String raw_text;  // Place to accumulate raw text.
       for (const auto & token : tokens) {        
         if (token.id == text_token) raw_text += token.lexeme;
