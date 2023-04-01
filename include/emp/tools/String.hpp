@@ -249,6 +249,8 @@ namespace emp {
     [[nodiscard]] bool HasPrefix(const String & prefix) const { return starts_with(prefix); }
     [[nodiscard]] bool HasSuffix(const String & suffix) const { return ends_with(suffix); }
 
+    size_t Hash() const noexcept { return std::hash<std::string>{}(*this); }
+
     // ------ Simple Analysis ------
 
     // Count the number of occurrences of a specific character.
@@ -1612,6 +1614,11 @@ namespace emp {
   }
 
 }
+
+template <>
+struct std::hash<emp::String> {
+  size_t operator()(const emp::String & str) const noexcept { return str.Hash(); }
+};
 
 
 #endif // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
