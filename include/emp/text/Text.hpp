@@ -59,28 +59,27 @@ namespace emp {
   class Text;
 
   // A base class for any special encodings that should work with Text objects.
-  class TextEncoding_Base {
+  class TextEncoding_Interface {
   protected:
     Text & text;  // The emp::Text this encoding is associated with.
-    String name;  // The name by which this encoding should be called.
+    using this_t = TextEncoding_Interface;
   public:
-    TextEncoding_Base(Text & _text, const String _name) : text(_text), name(_name) { }
-    virtual ~TextEncoding_Base() { }
+    TextEncoding_Interface(Text & _text) : text(_text) { }
+    virtual ~TextEncoding_Interface() { }
 
-    const String & GetName() const { return name; }
+    virtual void Append(const String & in) = 0;             // Add new text.
+    virtual String Encode() const = 0;                      // Produce text formatted in encoding.
+    virtual emp::Ptr<this_t> Clone(Text & _text) const = 0; // Copy encoding.
+    virtual void PrintDebug(std::ostream &) const = 0;
+  };
 
-    // By default, append text assuming that there is no special formatting in it.
-    virtual void Append(const String & in);
-
-    // By default, return text and ignore all formatting.
-    virtual String Encode() const;
-
-    // Make a copy of this TextEncoding, including proper derived class.
-    virtual emp::Ptr<TextEncoding_Base> Clone(Text & _text) const {
-      return emp::NewPtr<TextEncoding_Base>(_text, name);
-    }
-
-    virtual void PrintDebug(std::ostream &) const { };
+  class TextEncoding_None : public TextEncoding_Interface {
+  public:
+    TextEncoding_None(Text & _text) : TextEncoding_Interface(_text) { }
+    void Append(const String & in) override;
+    String Encode() const override;
+    emp::Ptr<TextEncoding_Interface> Clone(Text & _text) const override;
+    void PrintDebug(std::ostream & os) const override;
   };
 
   class Text {
@@ -94,8 +93,8 @@ namespace emp {
     std::unordered_map<String, BitVector> style_map;
 
     // A set of encodings that this Text object can handle.
-    std::map< String, emp::Ptr<TextEncoding_Base> > encodings;
-    emp::Ptr<TextEncoding_Base> encoding_ptr = nullptr;
+    std::map< String, emp::Ptr<TextEncoding_Interface> > encodings;
+    emp::Ptr<TextEncoding_Interface> encoding_ptr = nullptr;
 
     // Internal function to remove unused styles.
     void Cleanup() {
@@ -112,17 +111,17 @@ namespace emp {
 
   public:
     Text() {
-      encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
+      encodings["txt"] = NewPtr<TextEncoding_None>(*this);
       encoding_ptr = encodings["txt"];
     };
     Text(const Text & in) : text(in.text), style_map(in.style_map) {
       for (const auto & [e_name, ptr] : encodings) {
         encodings[e_name] = ptr->Clone(*this);
+        if (in.encoding_ptr == ptr) encoding_ptr = encodings[e_name];
       }
-      encoding_ptr = encodings[in.encoding_ptr->GetName()];
     }
     Text(const String & in) {      
-      encodings["txt"] = NewPtr<TextEncoding_Base>(*this, "txt");
+      encodings["txt"] = NewPtr<TextEncoding_None>(*this);
       encoding_ptr = encodings["txt"];
       Append(in);
     }
@@ -180,7 +179,12 @@ namespace emp {
 
     /// @brief Get the name of the current encoding being applied.
     /// @return Name of the current encoding.
-    const String & GetEncoding() const { return encoding_ptr->GetName(); }
+    String GetEncoding() const {
+      for (const auto & [e_name, ptr] : encodings) {
+        if (encoding_ptr == ptr) return e_name;
+      }
+      return "Unknown";
+    }
 
     /// @brief Change the current encoding being used to another known encoding type.
     /// @param name Name of the encoding type to be used.
@@ -206,7 +210,7 @@ namespace emp {
     template <typename ENCODING_T, typename... EXTRA_Ts>
     void AddEncoding(const String & name, EXTRA_Ts &&... args) {
       emp_assert(!HasEncoding(name), name, "Trying to add a TextEncoding that already exists. To replace, use RemoveEncoding() first.");
-      encoding_ptr = NewPtr<ENCODING_T>(*this, name, std::forward<EXTRA_Ts>(args)...);
+      encoding_ptr = NewPtr<ENCODING_T>(*this, std::forward<EXTRA_Ts>(args)...);
       encodings[name] = encoding_ptr;
     }
 
@@ -557,20 +561,14 @@ namespace emp {
     return *this;
   }
 
-
-  // ------- TextEncoding_Base --------
-
-    // By default, append text assuming that there is no special formatting in it.
-  void TextEncoding_Base::Append(const String & in) {
-    text.Append_Raw(in);
+  void TextEncoding_None::Append(const String & in) { text.Append_Raw(in); }
+  String TextEncoding_None::Encode() const { return text; };
+  emp::Ptr<TextEncoding_Interface> TextEncoding_None::Clone(Text & _text) const {
+    return emp::NewPtr<TextEncoding_None>(_text);
   }
-
-  // By default, return text and ignore all formatting.
-  String TextEncoding_Base::Encode() const {
-    return text;
-  }
-
-
+  void TextEncoding_None::PrintDebug(std::ostream & os) const {
+    os << "TextEncoding None.";
+  };
 }
 
 
