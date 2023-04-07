@@ -25,7 +25,7 @@
 
 namespace emp {
 
-  class TextEncoding : public emp::TextEncoding_Base {
+  class TextEncoding : public emp::TextEncoding_Interface {
   protected:
 
     // Tags have three possible things they can do:
@@ -254,8 +254,8 @@ namespace emp {
     }
 
   public:
-    TextEncoding(Text & _text, const String & _name="html")
-      : TextEncoding_Base(_text, _name) {
+    TextEncoding(Text & _text)
+      : TextEncoding_Interface(_text) {
         Tag default_tag;
         default_tag.name = "__default_tag__";
         default_tag.id = 0;
@@ -319,6 +319,10 @@ namespace emp {
       _EncodeTo(out_string, output_pos, text.size()); // Add final text after the last tag.
 
       return out_string;
+    }
+
+    virtual emp::Ptr<TextEncoding_Interface> Clone(Text & _text) const override {
+      return emp::NewPtr<TextEncoding>(_text);
     }
 
     void PrintDebug(std::ostream & os = std::cout) const override {
