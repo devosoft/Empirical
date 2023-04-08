@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022-23.
+ *  @date 2022-2023.
  *
  *  @file HTMLEncoding.hpp
  *  @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
@@ -15,9 +15,6 @@
 #include <set>
 #include <string>
 #include <unordered_map>
-
-#include "../base/assert.hpp"
-#include "../compiler/Lexer.hpp"
 
 #include "Text.hpp"
 #include "TextEncoding.hpp"
@@ -50,8 +47,8 @@ namespace emp {
 
 
   public:
-    HTMLEncoding(Text & _text, const std::string _name="html")
-      : TextEncoding(_text, _name) { SetupTags(); }
+    HTMLEncoding(Text & _text)
+      : TextEncoding(_text) { SetupTags(); }
     ~HTMLEncoding() = default;
 
   };
