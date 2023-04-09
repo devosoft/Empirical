@@ -21,7 +21,7 @@ namespace emp {
   public:
     /// @brief Create a new, default EmphaticText object.
     EmphaticText() {
-      encodings["emphatic"] = NewPtr<EmphaticEncoding>(*this, "emphatic");
+      encodings["emphatic"] = NewPtr<EmphaticEncoding>(*this);
       encoding_ptr = encodings["emphatic"];
     };
 

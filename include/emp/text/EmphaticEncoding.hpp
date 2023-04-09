@@ -62,8 +62,8 @@ namespace emp {
     }
 
   public:
-    EmphaticEncoding(Text & _text, const std::string _name="emphatic")
-      : TextEncoding(_text, _name) { SetupTags(); }
+    EmphaticEncoding(Text & _text)
+      : TextEncoding(_text) { SetupTags(); }
     ~EmphaticEncoding() = default;
  
   };
