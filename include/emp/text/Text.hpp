@@ -508,59 +508,6 @@ namespace emp {
     }
   };
 
-  // Set this character equal (with same inputs) as in parameter; don't change reference.
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<false> & in) {
-    text_ref.Set(pos, in);
-    return *this;
-  }
-
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(const TextCharRef<true> & in) {
-    static_assert(IS_CONST == false,
-      "Cannot assign a const TextCharRef to a mutatble version.");
-    text_ref.Set(pos, in);
-    return *this;
-  }
-
-  // Set just this character; don't change style.
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::operator=(char in) {
-    text_ref.Set(pos, in);
-    return *this;
-  }
-
-  // Convert to a normal C++ char.
-  template <bool IS_CONST>
-  char TextCharRef<IS_CONST>::AsChar() const {
-    return text_ref.GetChar(pos);
-  }
-
-  template <bool IS_CONST>
-  auto TextCharRef<IS_CONST>::operator<=>(const TextCharRef & in) const {
-    return text_ref.GetChar(pos) <=> in.text_ref.GetChar(in.pos);
-  }
-  template <bool IS_CONST>
-  auto TextCharRef<IS_CONST>::operator<=>(char in) const {
-    return text_ref.GetChar(pos) <=> in;
-  }
-
-  template <bool IS_CONST>
-  emp::vector<String> TextCharRef<IS_CONST>::GetStyles() const {
-    return text_ref.GetStyles(pos);
-  }
-
-  template <bool IS_CONST>
-  bool TextCharRef<IS_CONST>::HasStyle(const String & style) const {
-    return text_ref.HasStyle(style, pos);
-  }
-
-  template <bool IS_CONST>
-  TextCharRef<IS_CONST> & TextCharRef<IS_CONST>::SetStyle(const String & style) {
-    text_ref.HasStyle(style, pos);
-    return *this;
-  }
-
   void TextEncoding_None::Append(const String & in) { text.Append_Raw(in); }
   String TextEncoding_None::Encode() const { return text; };
   emp::Ptr<TextEncoding_Interface> TextEncoding_None::Clone(Text & _text) const {

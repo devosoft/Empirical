@@ -36,25 +36,33 @@ namespace emp {
     ~TextCharRef() = default;
 
     // Set this character equal (with same inputs) as in parameter; don't change reference.
-    TextCharRef & operator=(const TextCharRef<false> & in);
-    TextCharRef & operator=(const TextCharRef<true> & in);
+    TextCharRef & operator=(const TextCharRef<false> & in) { text_ref.Set(pos, in); return *this; }
+    TextCharRef & operator=(const TextCharRef<true> & in) {
+      static_assert(!IS_CONST, "Cannot assign a const TextCharRef to a mutatble version.");
+      text_ref.Set(pos, in);
+      return *this;
+    }
 
     // Set just this character; don't change style.
-    TextCharRef & operator=(char in);
+    TextCharRef & operator=(char in) { text_ref.Set(pos, in); return *this; }
 
     // Convert to a normal C++ char.
-    char AsChar() const;
+    char AsChar() const { return text_ref.GetChar(pos); }
     operator char() const { return AsChar(); }
 
     // Comparison operators
-    auto operator<=>(const TextCharRef & in) const;
-    auto operator<=>(char in) const;
+    auto operator<=>(const TextCharRef & in) const {
+      return text_ref.GetChar(pos) <=> in.text_ref.GetChar(in.pos);
+    }
+    auto operator<=>(char in) const {
+      return text_ref.GetChar(pos) <=> in;
+    }
 
     text_t & GetText() const { return text_ref; }
     size_t GetPos() const { return pos; }
-    emp::vector<String> GetStyles() const;
+    emp::vector<String> GetStyles() const { return text_ref.GetStyles(pos); }
 
-    bool HasStyle(const String & style) const;
+    bool HasStyle(const String & style) const { return text_ref.HasStyle(style, pos); }
     bool IsBold()        { return HasStyle("bold"); }
     bool IsCode()        { return HasStyle("code"); }
     bool IsItalic()      { return HasStyle("italic"); }
@@ -63,7 +71,10 @@ namespace emp {
     bool IsSuperscript() { return HasStyle("superscript"); }
     bool IsUnderline()   { return HasStyle("underline"); }
 
-    TextCharRef & SetStyle(const String & style);
+    TextCharRef & SetStyle(const String & style) {
+      text_ref.SetStyle(style, pos);
+      return *this;      
+    }
     TextCharRef & Bold()        { return SetStyle("bold"); }
     TextCharRef & Code()        { return SetStyle("code"); }
     TextCharRef & Italic()      { return SetStyle("italic"); }
