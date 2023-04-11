@@ -63,13 +63,13 @@ namespace emp {
     emp::vector<String> GetStyles() const { return text_ref.GetStyles(pos); }
 
     bool HasStyle(const String & style) const { return text_ref.HasStyle(style, pos); }
-    bool IsBold()        { return HasStyle("bold"); }
-    bool IsCode()        { return HasStyle("code"); }
-    bool IsItalic()      { return HasStyle("italic"); }
-    bool IsStrike()      { return HasStyle("strike"); }
-    bool IsSubscript()   { return HasStyle("subscript"); }
-    bool IsSuperscript() { return HasStyle("superscript"); }
-    bool IsUnderline()   { return HasStyle("underline"); }
+    bool IsBold()        const { return HasStyle("bold"); }
+    bool IsCode()        const { return HasStyle("code"); }
+    bool IsItalic()      const { return HasStyle("italic"); }
+    bool IsStrike()      const { return HasStyle("strike"); }
+    bool IsSubscript()   const { return HasStyle("subscript"); }
+    bool IsSuperscript() const { return HasStyle("superscript"); }
+    bool IsUnderline()   const { return HasStyle("underline"); }
 
     TextCharRef & SetStyle(const String & style) {
       text_ref.SetStyle(style, pos);
