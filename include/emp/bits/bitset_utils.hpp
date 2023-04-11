@@ -11,6 +11,7 @@
 #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
+#include <algorithm>
 #include <functional>
 #include <sstream>
 #include <string>
