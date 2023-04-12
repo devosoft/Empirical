@@ -59,26 +59,21 @@ namespace emp {
   class Text;
 
   // A base class for any special encodings that should work with Text objects.
-  class TextEncoding_Interface {
-  protected:
-    Text & text;  // The emp::Text this encoding is associated with.
-    using this_t = TextEncoding_Interface;
-  public:
-    TextEncoding_Interface(Text & _text) : text(_text) { }
+  struct TextEncoding_Interface {
     virtual ~TextEncoding_Interface() { }
 
-    virtual void Append(const String & in) = 0;             // Add new text.
-    virtual String Encode() const = 0;                      // Produce text formatted in encoding.
-    virtual emp::Ptr<this_t> Clone(Text & _text) const = 0; // Copy encoding.
+    virtual void Append(Text &, const String &) = 0;            // Add new text.
+    virtual String Encode(const Text &) const = 0;              // Output formatted text.
+    virtual emp::Ptr<TextEncoding_Interface> Clone() const = 0; // Copy encoding.
     virtual void PrintDebug(std::ostream &) const = 0;
   };
 
   class TextEncoding_None : public TextEncoding_Interface {
   public:
-    TextEncoding_None(Text & _text) : TextEncoding_Interface(_text) { }
-    void Append(const String & in) override;
-    String Encode() const override;
-    emp::Ptr<TextEncoding_Interface> Clone(Text & _text) const override;
+    TextEncoding_None() { }
+    void Append(Text & text, const String & in) override;
+    String Encode(const Text & text) const override;
+    emp::Ptr<TextEncoding_Interface> Clone() const override;
     void PrintDebug(std::ostream & os) const override;
   };
 
@@ -111,20 +106,16 @@ namespace emp {
 
   public:
     Text() {
-      encodings["txt"] = NewPtr<TextEncoding_None>(*this);
+      encodings["txt"] = NewPtr<TextEncoding_None>();
       encoding_ptr = encodings["txt"];
     };
     Text(const Text & in) : text(in.text), style_map(in.style_map) {
       for (const auto & [e_name, ptr] : encodings) {
-        encodings[e_name] = ptr->Clone(*this);
+        encodings[e_name] = ptr->Clone();
         if (in.encoding_ptr == ptr) encoding_ptr = encodings[e_name];
       }
     }
-    Text(const String & in) {      
-      encodings["txt"] = NewPtr<TextEncoding_None>(*this);
-      encoding_ptr = encodings["txt"];
-      Append(in);
-    }
+    Text(const String & in) : Text() { Append(in); }
     ~Text() {
       if (encoding_ptr != nullptr) {
         for (auto & [e_name, ptr] : encodings) {
@@ -210,7 +201,7 @@ namespace emp {
     template <typename ENCODING_T, typename... EXTRA_Ts>
     void AddEncoding(const String & name, EXTRA_Ts &&... args) {
       emp_assert(!HasEncoding(name), name, "Trying to add a TextEncoding that already exists. To replace, use RemoveEncoding() first.");
-      encoding_ptr = NewPtr<ENCODING_T>(*this, std::forward<EXTRA_Ts>(args)...);
+      encoding_ptr = NewPtr<ENCODING_T>(std::forward<EXTRA_Ts>(args)...);
       encodings[name] = encoding_ptr;
     }
 
@@ -236,7 +227,7 @@ namespace emp {
 
     /// Append potentially-formatted text through the current encoding.
     Text & Append(const String & in) {
-      encoding_ptr->Append(in);
+      encoding_ptr->Append(*this, in);
       return *this;
     }
 
@@ -268,7 +259,7 @@ namespace emp {
 
     /// @brief Convert text to a string using the current encoding.
     /// @return The resulting string.
-    String Encode() const { return encoding_ptr->Encode(); }
+    String Encode() const { return encoding_ptr->Encode(*this); }
 
     void Resize(size_t new_size) {
       text.resize(new_size);
@@ -395,17 +386,13 @@ namespace emp {
 
     /// Return the set of active styles in this text.
     /// @param pos optional position to specify only styles used at position.
-    emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) {
+    emp::vector<String> GetStyles(size_t pos=MAX_SIZE_T) const {
       emp::vector<String> styles;
-      emp::vector<String> to_clear;
       for (const auto & [name, bits] : style_map) {
-        if (bits.None()) to_clear.push_back(name);
-        else if (pos == MAX_SIZE_T || bits.Has(pos)) {
+        if (pos == MAX_SIZE_T || bits.Has(pos)) {
           styles.push_back(name);
         }
       }
-      for (const auto & name : to_clear) Clear(name);
-
       return styles;
     }
 
@@ -508,10 +495,10 @@ namespace emp {
     }
   };
 
-  void TextEncoding_None::Append(const String & in) { text.Append_Raw(in); }
-  String TextEncoding_None::Encode() const { return text; };
-  emp::Ptr<TextEncoding_Interface> TextEncoding_None::Clone(Text & _text) const {
-    return emp::NewPtr<TextEncoding_None>(_text);
+  void TextEncoding_None::Append(Text & text, const String & in) { text.Append_Raw(in); }
+  String TextEncoding_None::Encode(const Text & text) const { return text; };
+  emp::Ptr<TextEncoding_Interface> TextEncoding_None::Clone() const {
+    return emp::NewPtr<TextEncoding_None>();
   }
   void TextEncoding_None::PrintDebug(std::ostream & os) const {
     os << "TextEncoding None.";
