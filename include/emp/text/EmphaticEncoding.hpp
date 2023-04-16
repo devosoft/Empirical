@@ -62,10 +62,8 @@ namespace emp {
     }
 
   public:
-    EmphaticEncoding(Text & _text)
-      : TextEncoding(_text) { SetupTags(); }
-    ~EmphaticEncoding() = default;
- 
+    EmphaticEncoding() { SetupTags(); }
+    ~EmphaticEncoding() = default; 
   };
 
 }

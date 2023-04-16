@@ -47,8 +47,7 @@ namespace emp {
 
 
   public:
-    HTMLEncoding(Text & _text)
-      : TextEncoding(_text) { SetupTags(); }
+    HTMLEncoding() { SetupTags(); }
     ~HTMLEncoding() = default;
 
   };
