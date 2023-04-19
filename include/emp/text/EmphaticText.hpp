@@ -20,10 +20,7 @@ namespace emp {
   class EmphaticText : public emp::Text {
   public:
     /// @brief Create a new, default EmphaticText object.
-    EmphaticText() {
-      encodings["emphatic"] = NewPtr<EmphaticEncoding>(*this);
-      encoding_ptr = encodings["emphatic"];
-    };
+    EmphaticText() { AddEncoding<EmphaticEncoding>("emphatic"); }
 
     /// @brief Copy over another Text object, but make it use an Emphatic encoding.
     /// @param in Starting text to load in.
