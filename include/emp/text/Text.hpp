@@ -62,6 +62,7 @@ namespace emp {
   struct TextEncoding_Interface {
     virtual ~TextEncoding_Interface() { }
 
+    virtual String GetName() const = 0;                         // Return name of encoding.
     virtual void Append(Text &, const String &) = 0;            // Add new text.
     virtual String Encode(const Text &) const = 0;              // Output formatted text.
     virtual emp::Ptr<TextEncoding_Interface> Clone() const = 0; // Copy encoding.
@@ -71,6 +72,7 @@ namespace emp {
   class TextEncoding_None : public TextEncoding_Interface {
   public:
     TextEncoding_None() { }
+    String GetName() const override { return "text"; }
     void Append(Text & text, const String & in) override;
     String Encode(const Text & text) const override;
     emp::Ptr<TextEncoding_Interface> Clone() const override;
