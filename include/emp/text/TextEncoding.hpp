@@ -321,8 +321,6 @@ namespace emp {
       return out_string;
     }
 
-    emp::Ptr<TextEncoding_Interface> Clone() const override { return emp::NewPtr<TextEncoding>(); }
-
     void PrintDebug(std::ostream & os = std::cout) const override {
       os << "Tags:\n";
       for (const auto & tag : tag_set) {
