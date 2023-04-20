@@ -50,6 +50,10 @@ namespace emp {
     HTMLEncoding() { SetupTags(); }
     ~HTMLEncoding() = default;
 
+    String GetName() const override { return "html"; }
+    emp::Ptr<TextEncoding_Interface> Clone() const override {
+      return emp::NewPtr<HTMLEncoding>();
+    }
   };
 
 }
