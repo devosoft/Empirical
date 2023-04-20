@@ -64,6 +64,11 @@ namespace emp {
   public:
     EmphaticEncoding() { SetupTags(); }
     ~EmphaticEncoding() = default; 
+
+    String GetName() const override { return "emphatic"; }
+    emp::Ptr<TextEncoding_Interface> Clone() const override {
+      return emp::NewPtr<EmphaticEncoding>();
+    }
   };
 
 }
