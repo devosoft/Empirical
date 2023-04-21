@@ -1,17 +1,16 @@
 Supported text formats:
- TXT (plain text)
- HTML
+ TXT (plain text - working)
+ HTML (simple tags working)
  LATEX
  MARKDOWN
  RTF
  XML
+ Emphatic (custom markup language; simple tags working)
 
-+ Custom Empirical markup language, Emphatic
-
- * 
+Emphatic notes:
  *  Internal format is .emp, which uses just a backquote (`) as a special character.  It
- *  is otherwise heavily inspired from markdown, but makes special characters less tricky
- *  to use in your writing.
+ *  is otherwise inspired from markdown, but makes special characters easy to use.
+ *  The only other reserved special character is backslash (`\`), discussed below.
  *  
  *  The following tags toggle a formatting style.
  * 
@@ -24,12 +23,11 @@ Supported text formats:
  *  `~Strikethrough`~
  * 
  *  The following tags grab the rest of the line they are on.  These should generally
- *  be the first non-whitespace on a line, but if they are not a newline will be assumed
- *  to be before them.
+ *  be the first non-whitespace on a line, but not a newline will be assumed before them.
  * 
  *  `# Heading level 1
  *  `## Heading level 2
- *  `### etc.
+ *  `### etc. deeper headings.
  *  `" Blockquote
  *  `- Bulleted list entry
  *  `+ Numbered list entry
@@ -38,14 +36,14 @@ Supported text formats:
  * 
  *  `[Include a link name here](http://and.its.url.here)
  *  `<http://just.a.url.here>
- *  `![Link/to/image/here.jpg](with an optional URL link)
+ *  `![Link/to/image/here.jpg](http://optional.URL.link)
  * 
  *  Now for the crazy.  We can embed code as needed.
  * 
  *  `{variable = value || other_code}
  *  `$var_value_printed_here$
  * 
- *  Anything with four spaces at the beginning will be treated like indented code.
+ *  ?? Anything with four spaces at the beginning will be treated like indented code.
  *  Add a `= at the beginning of a line if you don't want special formatting.
  *   
  *  A single or double backtick indicates that everything in between is going to be inline
@@ -110,6 +108,7 @@ For style replacements:
       // name of the font.)
 
 And for converting a pattern to a normal regex:
+```cpp
       std::string AsRegEx() {
         std::string out;
         for (size_t i = 0; i < pattern.size(); ++i) {
@@ -146,3 +145,4 @@ And for converting a pattern to a normal regex:
         }
         return out;
       }
+```
