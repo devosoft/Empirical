@@ -4,7 +4,7 @@ module.exports = function(config) {
     // to enable commandline input
     client: {
       // args: config.name ? ["--name"] : [],
-      // note that this works only with `karma start`, not `karma run`
+      // note that the following only works only with `karma start` and not `karma run`
       filename: config.filename,
     },
 

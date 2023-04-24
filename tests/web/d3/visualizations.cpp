@@ -12,9 +12,9 @@
 #include <functional>
 #include <iostream>
 
-#include "emp/datastructs/tuple_struct.hpp"
-#include "emp/web/d3/visualizations.hpp"
-#include "emp/web/Document.hpp"
+#include "web/d3/visualizations.hpp"
+#include "datastructs/tuple_struct.hpp"
+#include "web/Document.hpp"
 
 struct LineageTreeDataNode{
         EMP_BUILD_INTROSPECTIVE_TUPLE(

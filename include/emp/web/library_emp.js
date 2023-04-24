@@ -32,6 +32,12 @@ mergeInto(LibraryManager.library, {
       return r.join(i + '\n');
     },
 
+    PassStringToCpp: function (text) {
+      var buffer = Module._malloc(text.length + 1);
+      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text) + 1);
+      emp_i.__outgoing_string = buffer;
+    },
+
     LoadFileEvent: function (files, callback_id) {
       var reader = new FileReader();            // Reader object
       reader.onload = function (e) {             // Fun to run when file loaded

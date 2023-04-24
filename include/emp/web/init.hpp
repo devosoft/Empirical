@@ -186,6 +186,7 @@ namespace emp {
 #else
 
 #define EM_ASM(...)
+#define EM_JS(...)
 #define EM_ASM_ARGS(...)
 #define MAIN_THREAD_EM_ASM(...)
 #define MAIN_THREAD_ASYNC_EM_ASM(...)

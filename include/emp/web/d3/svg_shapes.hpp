@@ -10,10 +10,11 @@
 #ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
 #define EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
 
+#include "../../base/assert.hpp"
 #include "../js_utils.hpp"
 
 #include "d3_init.hpp"
-#include "dataset.hpp"
+// #include "dataset.hpp"
 #include "scales.hpp"
 #include "selection.hpp"
 
@@ -36,20 +37,16 @@ namespace D3 {
     /// Generate the string describing the path associated with [data]
     /// Assumes [data] is an array of 2-element arrays describing (x,y) coordinates and makes
     /// the line that connects them
-    template <typename T, size_t SIZE>
-    std::string Generate(emp::array<emp::array<T, 2>, SIZE> & data){
+    template<typename C, class = typename C::value_type>
+    std::string Generate(const C & data){
       emp::pass_array_to_javascript(data);
 
-      char * buffer = (char *)EM_ASM_INT({
-        var result = js.objects[$0](emp_i.__incoming_array);
-        var buffer = Module._malloc(result.length+1);
-        Module.stringToUTF8(result, buffer, lengthBytesUTF8(result)+1);
-        return buffer;
+      MAIN_THREAD_EM_ASM({
+        var result = emp_d3.objects[$0](emp_i.__incoming_array);
+        emp.PassStringToCpp(result);
       }, this->id);
 
-      std::string result = std::string(buffer);
-      free(buffer);
-      return result;
+      return emp::pass_str_to_cpp();
     }
 
     /// Draws the path associated with [data] onto the [s] selection (must contain a single SVG)
@@ -67,7 +64,7 @@ namespace D3 {
       s = s.Append("path");
 
       MAIN_THREAD_EM_ASM({
-        var sel = js.objects[$0].attr("d", js.objects[$1](js.objects[$2]));
+        var sel = emp_d3.objects[$0].attr("d", emp_d3.objects[$1](emp_d3.objects[$2]));
       }, s.GetID(), this->id, data.GetID());
       return s;
     }
@@ -92,7 +89,7 @@ namespace D3 {
     SymbolGenerator() {
       MAIN_THREAD_EM_ASM({
         var new_line = d3.symbol();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -100,15 +97,17 @@ namespace D3 {
     /// a Javascript function (in the current window, d3, or emp namespaces), or a string
     /// specifying a type ("circle", "cross" "diamond", "square", "triangle-down", "triangle-up").
     void SetType(std::string type){
-      emp_assert (
-        EM_ASM_INT({
-          return d3.symbolTypes.includes(UTF8ToString($0)) ||
-          window[UTF8ToString($0)] === "function" ||
-          window["d3"][UTF8ToString($0)] === "function" ||
-          window["emp"][UTF8ToString($0)] === "function";
-        }, type.c_str())
-      );
-      D3_CALLBACK_METHOD_1_ARG(type, type.c_str())
+      emp_assert(MAIN_THREAD_EM_ASM_INT({
+        var func_string = UTF8ToString($0);
+        return emp_d3.is_function(func_string);
+      }, type.c_str()) && "String passed to SetType is not a Javascript function", type);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const type_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(type_str);
+        emp_d3.objects[id].type(sel);
+      }, this->id,  type.c_str());
     }
 
     /// @cond TEMPLATES
@@ -116,7 +115,17 @@ namespace D3 {
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetType(T type){
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(type, type)
+      const uint32_t func_id = emp::JSWrap(type);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].type(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
 
     /// @endcond
@@ -126,20 +135,35 @@ namespace D3 {
     //If size is a constant, it's in pixels, so an int is reasonable
     void SetSize(int size) {
       MAIN_THREAD_EM_ASM({
-        js.objects[$0].size($1);
+        emp_d3.objects[$0].size($1);
       }, this->id, size);
     }
 
     /// @cond TEMPLATES
     //Otherwise it's a function
     void SetSize(std::string size){
-      D3_CALLBACK_METHOD_1_ARG(size, size.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const size_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(size_str);
+        emp_d3.objects[id].size(sel);
+      }, this->id,  size.c_str());
     }
 
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetSize(T type){
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(size, type)
+      const uint32_t func_id = emp::JSWrap(type);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].size(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
     /// @endcond
 
@@ -157,28 +181,48 @@ namespace D3 {
     /// For allowed options, see the
     /// [d3 documntation](https://github.com/d3/d3-3.x-api-reference/blob/master/SVG-Shapes.md#line_interpolate)
     void SetCurve(std::string curve){
-      D3_CALLBACK_METHOD_1_ARG(curve,curve.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const curve_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(curve_str);
+        emp_d3.objects[id].curve(sel);
+      }, this->id,  curve.c_str());
     }
 
     /// If interpolation is "bundle", "cardinal", "cardinal-open", or "cardinal-closed", a tension
     /// parameter is used.
     void SetTension(float tension){
       MAIN_THREAD_EM_ASM({
-        js.objects[$0].tension($1);
+        emp_d3.objects[$0].tension($1);
       }, this->id, tension);
     }
 
     /// Set a function indicating where the line is defined (i.e. valid)
     /// Can be a C++ function or a string indicating a Javascript function
     void SetDefined(std::string defined){
-      D3_CALLBACK_METHOD_1_ARG(defined, defined.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const defined_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(defined_str);
+        emp_d3.objects[id].defined(sel);
+      }, this->id,  defined.c_str());
     }
 
     /// @cond TEMPLATES
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetDefined(T defined){
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(defined, defined)
+      const uint32_t func_id = emp::JSWrap(defined);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].defined(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
     /// @endcond
   };
@@ -189,7 +233,7 @@ namespace D3 {
     LineGenerator() {
       MAIN_THREAD_EM_ASM({
         var new_line = d3.line();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
@@ -201,11 +245,11 @@ namespace D3 {
     template <typename X_SCALE_TYPE>
     void AddXScale(X_SCALE_TYPE & scale){
       MAIN_THREAD_EM_ASM({
-        var scale = js.objects[$1];
-        var curr_x = js.objects[$0].x();
+        var scale = emp_d3.objects[$1];
+        var curr_x = emp_d3.objects[$0].x();
 
         //Apply scale to whatever the current x axis function is
-        js.objects[$0].x(function(d, i){return scale(curr_x(d, i));});
+        emp_d3.objects[$0].x(function(d, i){return scale(curr_x(d, i));});
       }, this->id, scale.GetID());
     }
 
@@ -217,11 +261,11 @@ namespace D3 {
     template <typename Y_SCALE_TYPE>
     void AddYScale(Y_SCALE_TYPE & scale){
       MAIN_THREAD_EM_ASM({
-        var scale = js.objects[$1];
-        var curr_y = js.objects[$0].y();
+        var scale = emp_d3.objects[$1];
+        var curr_y = emp_d3.objects[$0].y();
 
         //Apply scale on top of whatever the current y axis function is
-        js.objects[$0].y(function(d, i){return scale(curr_y(d, i));});
+        emp_d3.objects[$0].y(function(d, i){return scale(curr_y(d, i));});
       }, this->id, scale.GetID());
     }
 
@@ -252,7 +296,12 @@ namespace D3 {
     ///  };
     // Handles setting x accessor to a function or string
     void SetX(std::string x) {
-      D3_CALLBACK_METHOD_1_ARG(x, x.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const x_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(x_str);
+        emp_d3.objects[id].x(sel);
+      }, this->id,  x.c_str());
     }
 
     /// @cond TEMPLATES
@@ -260,14 +309,24 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetX(T x) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].x($1);}, this->id, x);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].x($1);}, this->id, x);
     }
 
     // handles C++ functions
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetX(T x) {
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(x, x);
+      const uint32_t func_id = emp::JSWrap(x);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].x(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
 
     /// @endcond
@@ -299,7 +358,12 @@ namespace D3 {
     ///  };
     //Handles setting x accessor to a function or string
     void SetY(std::string y) {
-      D3_CALLBACK_METHOD_1_ARG(y, y.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const y_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(y_str);
+        emp_d3.objects[id].y(sel);
+      }, this->id,  y.c_str());
     }
 
     /// @cond TEMPLATES
@@ -308,14 +372,24 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetY(T y) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].y($1);}, this->id, y);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].y($1);}, this->id, y);
     }
 
     // handles C++ functions
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetY(T y) {
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(y, y);
+      const uint32_t func_id = emp::JSWrap(y);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].y(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
 
     /// @endcond
@@ -326,18 +400,23 @@ namespace D3 {
   public:
     LinkGenerator(std::string type) {
         if (type == "vertical") {
-            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.linkVertical();}, this->id);
+            MAIN_THREAD_EM_ASM({emp_d3.objects[$0] = d3.linkVertical();}, this->id);
         } else if (type == "horizontal") {
-            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.linkHorizontal();}, this->id);
+            MAIN_THREAD_EM_ASM({emp_d3.objects[$0] = d3.linkHorizontal();}, this->id);
         } else {
             std::cout << "WARNING: Invalid link type" << std::endl;
-            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.linkVertical();}, this->id);
+            MAIN_THREAD_EM_ASM({emp_d3.objects[$0] = d3.linkVertical();}, this->id);
         }
     }
 
     // Handles setting source accessor to a function or string
     void SetSource(std::string source) {
-      D3_CALLBACK_METHOD_1_ARG(source, source.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const source_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(source_str);
+        emp_d3.objects[id].source(sel);
+      }, this->id,  source.c_str());      
     }
 
     /// @cond TEMPLATES
@@ -345,22 +424,65 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetSource(T source) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].source($1);}, this->id, source);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].source($1);}, this->id, source);
     }
 
     // handles C++ functions
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetSource(T source) {
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(source, source);
+      const uint32_t func_id = emp::JSWrap(source);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].source(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
 
     /// @endcond
 
     //Handles setting target accessor to a function or string
     void SetTarget(std::string target) {
-      D3_CALLBACK_METHOD_1_ARG(target, target.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const target_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(target_str);
+        emp_d3.objects[id].target(sel);
+      }, this->id, target.c_str());
     }
+
+    /// @cond TEMPLATES
+    // Handles setting source to a constant
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, void>::type
+    SetTarget(T target) {
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].target($1);}, this->id, target);
+    }
+
+    // handles C++ functions
+    template <typename T>
+    emp::sfinae_decoy<void, decltype(&T::operator())>
+    SetTarget(T target) {
+      const uint32_t func_id = emp::JSWrap(target);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].target(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
+    }
+
+    /// @endcond
+
 
     /// @cond TEMPLATES
 
@@ -368,14 +490,24 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetY(T target) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].target($1);}, this->id, target);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].target($1);}, this->id, target);
     }
 
     // handles C++ functions
     template <typename T>
     emp::sfinae_decoy<void, decltype(&T::operator())>
     SetY(T target) {
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(target, target);
+      const uint32_t func_id = emp::JSWrap(target);
+
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].target(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
     }
 
     /// @endcond
@@ -387,52 +519,72 @@ namespace D3 {
     AreaGenerator() {
       MAIN_THREAD_EM_ASM({
         var new_line = d3.area();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
     //Handles setting x0 accessor to a constant
     template <typename T>
     void SetX0(T x) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].x0($1);}, this->id, x);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].x0($1);}, this->id, x);
     }
 
     //Handles setting y0 accessor to a constant
     template <typename T>
     void SetY0(T y) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].y0($1);}, this->id, y);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].y0($1);}, this->id, y);
     }
 
     //Handles setting x0 accessor to a function or string
     void SetX0(std::string x) {
-      D3_CALLBACK_METHOD_1_ARG(x0, x.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const x_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(x_str);
+        emp_d3.objects[id].x0(sel);
+      }, this->id,  x.c_str());
     }
 
     //Handles setting y0 accessor to a function or string
     void SetY0(std::string y) {
-      D3_CALLBACK_METHOD_1_ARG(y0, y.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const y_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(y_str);
+        emp_d3.objects[id].y0(sel);
+      }, this->id,  y.c_str());
     }
 
     //Handles setting x1 accessor to a constant
     template <typename T>
     void SetX1(T x) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].x1($1);}, this->id, x);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].x1($1);}, this->id, x);
     }
 
     //Handles setting y1 accessor to a constant
     template <typename T>
     void SetY1(T y) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].y1($1);}, this->id, y);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].y1($1);}, this->id, y);
     }
 
     //Handles setting x1 accessor to a function or string
     void SetX1(std::string x) {
-      D3_CALLBACK_METHOD_1_ARG(x1, x.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const x_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(x_str);
+        emp_d3.objects[id].x1(sel);
+      }, this->id,  x.c_str());
     }
 
     //Handles setting y1 accessor to a function or string
     void SetY1(std::string y) {
-      D3_CALLBACK_METHOD_1_ARG(y1, y.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const y_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(y_str);
+        emp_d3.objects[id].y1(sel);
+      }, this->id,  y.c_str());
     }
   };
 
@@ -441,24 +593,34 @@ namespace D3 {
     RadialLineGenerator(){
       MAIN_THREAD_EM_ASM({
         var new_line = d3.radialLine();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
     void SetRadius(float radius) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].radius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].radius($1);}, this->id, radius);
     }
 
     void SetRadius(std::string radius) {
-      D3_CALLBACK_METHOD_1_ARG(radius, radius.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const radius_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(radius_str);
+        emp_d3.objects[id].radius(sel);
+      }, this->id,  radius.c_str());
     }
 
     void SetAngle(float angle) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].angle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].angle($1);}, this->id, angle);
     }
 
     void SetAngle(std::string angle) {
-      D3_CALLBACK_METHOD_1_ARG(angle, angle.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const angle_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(angle_str);
+        emp_d3.objects[id].angle(sel);
+      }, this->id,  angle.c_str());
     }
   };
 
@@ -467,40 +629,60 @@ namespace D3 {
     RadialAreaGenerator() {
       MAIN_THREAD_EM_ASM({
         var new_line = d3.radialArea();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
     void SetInnerRadius(float radius) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].innerRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].innerRadius($1);}, this->id, radius);
     }
 
     void SetInnerRadius(std::string radius) {
-      D3_CALLBACK_METHOD_1_ARG(innerRadius, radius.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const radius_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(radius_str);
+        emp_d3.objects[id].innerradius(sel);
+      }, this->id,  radius.c_str());
     }
 
     void SetOuterRadius(float radius) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].outerRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].outerRadius($1);}, this->id, radius);
     }
 
     void SetOuterRadius(std::string radius) {
-      D3_CALLBACK_METHOD_1_ARG(outerRadius, radius.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const radius_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(radius_str);
+        emp_d3.objects[id].outerradius(sel);
+      }, this->id,  radius.c_str());
     }
 
     void SetStartAngle(float angle) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].startAngle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].startAngle($1);}, this->id, angle);
     }
 
     void SetStartAngle(std::string angle) {
-      D3_CALLBACK_METHOD_1_ARG(startAngle, angle.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const angle_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(angle_str);
+        emp_d3.objects[id].startAngle(sel);
+      }, this->id,  angle.c_str());
     }
 
     void SetEndAngle(float angle) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].endAngle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].endAngle($1);}, this->id, angle);
     }
 
     void SetEndAngle(std::string angle) {
-      D3_CALLBACK_METHOD_1_ARG(endAngle, angle.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const angle_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(angle_str);
+        emp_d3.objects[id].endAngle(sel);
+      }, this->id,  angle.c_str());
     }
   };
 
@@ -509,26 +691,36 @@ namespace D3 {
     ChordGenerator()  {
       MAIN_THREAD_EM_ASM({
         var new_line = d3.ribbon();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
     template <typename T>
     void SetSource(T source) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].source($1);}, this->id, source);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].source($1);}, this->id, source);
     }
 
     void SetSource(std::string source) {
-      D3_CALLBACK_METHOD_1_ARG(source, source.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const source_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(source_str);
+        emp_d3.objects[id].source(sel);
+      }, this->id,  source.c_str());
     }
 
     template <typename T>
     void SetTarget(T target) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].target($1);}, this->id, target);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].target($1);}, this->id, target);
     }
 
     void SetTarget(std::string target) {
-      D3_CALLBACK_METHOD_1_ARG(target, target.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const target_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(target_str);
+        emp_d3.objects[id].target(sel);
+      }, this->id,  target.c_str());
     }
   };
 
@@ -537,32 +729,47 @@ namespace D3 {
     ArcGenerator()  {
       MAIN_THREAD_EM_ASM({
         var new_line = d3.arc();
-        js.objects[$0] = new_line;
+        emp_d3.objects[$0] = new_line;
       }, this->id);
     }
 
     void SetCornerRadius(float radius) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].cornerRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].cornerRadius($1);}, this->id, radius);
     }
 
     void SetCornerRadius(std::string radius) {
-      D3_CALLBACK_METHOD_1_ARG(cornerRadius, radius.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const radius_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(radius_str);
+        emp_d3.objects[id].cornerRadius(sel);
+      }, this->id,  radius.c_str());
     }
 
     void SetPadRadius(float radius) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].padRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].padRadius($1);}, this->id, radius);
     }
 
     void SetPadRadius(std::string radius) {
-      D3_CALLBACK_METHOD_1_ARG(padRadius, radius.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const radius_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(radius_str);
+        emp_d3.objects[id].padRadius(sel);
+      }, this->id,  radius.c_str());
     }
 
     void SetPadAngle(float angle) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].padAngle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({emp_d3.objects[$0].padAngle($1);}, this->id, angle);
     }
 
     void SetPadAngle(std::string angle) {
-      D3_CALLBACK_METHOD_1_ARG(padAngle, angle.c_str())
+      MAIN_THREAD_EM_ASM({
+        const id = $0;
+        const angle_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(angle_str);
+        emp_d3.objects[id].padAngle(sel);
+      }, this->id,  angle.c_str());
     }
 
     //TODO: Centroid (requires passing array back)

@@ -76,7 +76,7 @@ namespace emp {
 
   template<typename C, class = typename C::value_type>
   typename std::enable_if<std::is_pod<typename C::value_type>::value, void>::type
-  pass_array_to_javascript(C values, emp::vector<int> recursive_el)
+  pass_array_to_javascript(const C & values, emp::vector<int> recursive_el)
   {
     using T = typename C::value_type;
     //Figure out what string to use for the type we've been given
@@ -112,7 +112,7 @@ namespace emp {
   // Specialization for strings
   template<typename C, class = typename C::value_type>
   typename std::enable_if<std::is_same<typename C::value_type, std::string>::value, void>::type
-  pass_array_to_javascript(C values, emp::vector<int> recursive_el)
+  pass_array_to_javascript(const C & values, emp::vector<int> recursive_el)
   {
     // Clear array, if this isn't a recursive call
     if (recursive_el.size() == 0) {
@@ -145,7 +145,7 @@ namespace emp {
   // Handle user-defined JSON_TYPE
   template<typename C, class = typename C::value_type>
   typename std::enable_if<C::value_type::n_fields != -1, void>::type
-  pass_array_to_javascript(C values, emp::vector<int> recursive_el) {
+  pass_array_to_javascript(const C & values, emp::vector<int> recursive_el) {
 
     std::map<std::string, std::string> map_type_names = get_type_to_string_map();
     // Initialize array in Javascript
@@ -209,7 +209,7 @@ namespace emp {
 
   // This version of the function handles non-nested containers
   template<typename C, class = typename C::value_type>
-  void pass_array_to_javascript(C values) {
+  void pass_array_to_javascript(const C & values) {
     pass_array_to_javascript(values, emp::vector<int>(0));
   }
 
@@ -218,8 +218,10 @@ namespace emp {
   // This version of the function handles nested arrays with recursive calls
   // until a non-array type is found.
   template<std::size_t SIZE1, std::size_t SIZE2, typename T>
-  void pass_array_to_javascript(emp::array<emp::array<T, SIZE1>, SIZE2> values,
-        emp::vector<int> recursive_el = emp::vector<int>()) {
+  void pass_array_to_javascript(
+    const emp::array<emp::array<T, SIZE1>, SIZE2> & values,
+		emp::vector<int> recursive_el = emp::vector<int>()
+  ) {
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
@@ -252,8 +254,10 @@ namespace emp {
   // This version of the function handles nested vectors with recursive calls
   // until a non-array type is found.
   template<typename T>
-  void pass_array_to_javascript(emp::vector<emp::vector<T> > values,
-        emp::vector<int> recursive_el = emp::vector<int>()) {
+  void pass_array_to_javascript(
+    const emp::vector<emp::vector<T> > & values,
+		emp::vector<int> recursive_el = emp::vector<int>()
+  ) {
 
     // Initialize if this is the first call to this function
     if (recursive_el.size() == 0) {
@@ -671,6 +675,22 @@ namespace emp {
     });
   }
 
+  /// @endcond
+
+  std::string pass_str_to_cpp() {
+    #ifndef __EMSCRIPTEN__
+    return "";
+    #endif
+
+    char * buffer = (char *)MAIN_THREAD_EM_ASM_INT({
+      return emp_i.__outgoing_string;
+    });
+
+    std::string result(buffer);
+    free(buffer);
+    return result;
+
+  }
 
   /// This function can be called to pass two arrays of the same length into JavaScript (where a map is then created)
   /// One array should hold keys, and the other should hold values

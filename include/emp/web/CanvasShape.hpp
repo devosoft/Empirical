@@ -96,12 +96,12 @@ namespace web {
     double h;  ///< Rectangle height.
   public:
     CanvasRect(Point _p, double _w, double _h,
-               const std::string & fc="", const std::string & lc="")
-      : CanvasShape(_p, fc, lc), w(_w), h(_h) { ; }
+               const std::string & fc="", const std::string & lc="", double lw=1.0)
+      : CanvasShape(_p, fc, lc, lw), w(_w), h(_h) { ; }
 
     CanvasRect(double _x, double _y, double _w, double _h,
-               const std::string & fc="", const std::string & lc="")
-      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
+               const std::string & fc="", const std::string & lc="", double lw=1.0)
+      : CanvasShape(_x, _y, fc, lc, lw), w(_w), h(_h) { ; }
 
     void Apply() {
       EM_ASM({
