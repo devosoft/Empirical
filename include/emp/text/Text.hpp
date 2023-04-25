@@ -90,10 +90,11 @@ namespace emp {
     std::unordered_map<String, BitVector> style_map;
 
     // A set of encodings that this Text object can handle.
-    std::map< String, emp::Ptr<TextEncoding_Interface> > encodings;
-    emp::Ptr<TextEncoding_Interface> encoding_ptr = nullptr;
+    using encoding_ptr_t = emp::Ptr<TextEncoding_Interface>;
+    encoding_ptr_t encoding_ptr = nullptr;
+    std::map<String, encoding_ptr_t> encodings;
 
-    // Internal function to remove unused styles.
+    // Helper function to remove unused styles.
     void Cleanup() {
       // Scan for styles that are no longer unused.
       emp::vector<String> unused_styles;
@@ -106,25 +107,18 @@ namespace emp {
       }
     }
 
-  public:
-    Text() {
-      encodings["txt"] = NewPtr<TextEncoding_None>();
-      encoding_ptr = encodings["txt"];
-    };
-    Text(const Text & in) : text(in.text), style_map(in.style_map) {
-      for (const auto & [e_name, ptr] : encodings) {
+    void CloneEncodings(const Text & in) {
+      for (const auto & [e_name, ptr] : in.encodings) {
         encodings[e_name] = ptr->Clone();
         if (in.encoding_ptr == ptr) encoding_ptr = encodings[e_name];
       }
     }
+
+  public:
+    Text() { encoding_ptr = encodings["txt"] = NewPtr<TextEncoding_None>(); }
+    Text(const Text & in) : text(in.text), style_map(in.style_map) { CloneEncodings(in); }
     Text(const String & in) : Text() { Append(in); }
-    ~Text() {
-      if (encoding_ptr != nullptr) {
-        for (auto & [e_name, ptr] : encodings) {
-          ptr.Delete();
-        }
-      }
-    }
+    ~Text() { for (auto & [e_name, ptr] : encodings) ptr.Delete(); }
 
     Text & operator=(const Text & in) {
       Text new_text(in);
@@ -172,7 +166,7 @@ namespace emp {
 
     /// @brief Get the name of the current encoding being applied.
     /// @return Name of the current encoding.
-    String GetEncoding() const {
+    String GetEncodingName() const {
       for (const auto & [e_name, ptr] : encodings) {
         if (encoding_ptr == ptr) return e_name;
       }
@@ -198,17 +192,22 @@ namespace emp {
     /// @brief Add an encoding to this Text object; new encodings automatically become active.
     /// @tparam ENCODING_T The type of the new encoding to use
     /// @tparam ...EXTRA_Ts Automatically set by variadic arguments.
-    /// @param name Name to be used for this new encoding.
     /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
+    /// @return Name of the encoding that was created.
     template <typename ENCODING_T, typename... EXTRA_Ts>
-    void AddEncoding(const String & name, EXTRA_Ts &&... args) {
-      emp_assert(!HasEncoding(name), name, "Trying to add a TextEncoding that already exists. To replace, use RemoveEncoding() first.");
+    String AddEncoding(EXTRA_Ts &&... args) {
       encoding_ptr = NewPtr<ENCODING_T>(std::forward<EXTRA_Ts>(args)...);
-      encodings[name] = encoding_ptr;
+      String encoding_name = encoding_ptr->GetName();
+      emp_assert(!HasEncoding(encoding_name), encoding_name,
+                 "Adding TextEncoding that already exists. To replace, RemoveEncoding() first.");
+      encodings[encoding_name] = encoding_ptr;
+      return encoding_name;
     }
 
+    /// @brief Remove an encoding with a provided name.
+    /// @param name Name of the encoding to remove.
     void RemoveEncoding(const String & name) {
-      emp_assert(HasEncoding(name), name, "Trying to remove a TextEncoding that does not exist.");
+      emp_assert(HasEncoding(name), name, "Trying to remove TextEncoding that does not exist.");
       if (HasEncoding(name)) {
         if (encoding_ptr == encodings[name]) encoding_ptr = nullptr;
         encodings[name].Delete();
@@ -216,16 +215,23 @@ namespace emp {
       }
     }
 
-    /// ActivateEncoding will add an encoding if (and only if) it doesn't exist already.
+    /// @brief Set an encoding as active, creating it if needed.
+    /// @tparam ENCODING_T The type of the new encoding to use
+    /// @tparam ...EXTRA_Ts Automatically set by variadic arguments.
+    /// @param name Name of the encoding that we want activated / added
+    /// @param ...args Any extra arguments to configure this new encoding (passed to constructor)
+    /// @return Name of the encoding that was created.
     template <typename ENCODING_T, typename... EXTRA_Ts>
-    void ActivateEncoding(const String & name, EXTRA_Ts &&... args) {
-      if (!HasEncoding(name)) {
-        AddEncoding<ENCODING_T>(name, std::forward<EXTRA_Ts>(args)...);
-      } else {
-        SetEncoding(name);
+    String ActivateEncoding(const String & name, EXTRA_Ts &&... args) {
+      if (HasEncoding(name)) encoding_ptr = encodings[name];
+      else {
+        encoding_ptr = NewPtr<ENCODING_T>(std::forward<EXTRA_Ts>(args)...);
+        emp_assert(encoding_ptr->GetName() == name, encoding_ptr->GetName(), name,
+                   "ActivateEncoding name does not match provided type.");
+        encodings[name] = encoding_ptr;
       }
+      return name;
     }
-
 
     /// Append potentially-formatted text through the current encoding.
     Text & Append(const String & in) {
@@ -236,7 +242,8 @@ namespace emp {
     /// Specify the encoding of a value being appended.
     template <typename ENCODING_T, typename IN_T>
     Text & AppendAs(const String & encode_name, IN_T && in) {
-      ActivateEncoding<ENCODING_T>(encode_name);
+      if (!HasEncoding(encode_name)) AddEncoding<ENCODING_T>();
+      else SetEncoding(encode_name);
       Append(std::forward<IN_T>(in));
       return *this;
     }
@@ -504,8 +511,8 @@ namespace emp {
   }
   void TextEncoding_None::PrintDebug(std::ostream & os) const {
     os << "TextEncoding None.";
-  };
+  }
+  
 }
-
 
 #endif
