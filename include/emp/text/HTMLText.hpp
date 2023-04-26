@@ -19,7 +19,7 @@ namespace emp {
   class HTMLText : public emp::Text {
   public:
     /// @brief Create a new, default HTMLText object.
-    HTMLText() { AddEncoding<HTMLEncoding>("html"); };
+    HTMLText() { AddEncoding<HTMLEncoding>(); };
 
     /// @brief Copy over another Text object, but make it uses an HTML encoding.
     /// @param in Already formatted Text object to load in.
