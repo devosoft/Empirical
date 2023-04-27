@@ -234,8 +234,9 @@ namespace emp {
     }
 
     /// Append potentially-formatted text through the current encoding.
-    Text & Append(const String & in) {
-      encoding_ptr->Append(*this, in);
+    template <typename T>
+    Text & Append(T && in) {
+      encoding_ptr->Append(*this, emp::MakeString(std::forward<T>(in)));
       return *this;
     }
 
