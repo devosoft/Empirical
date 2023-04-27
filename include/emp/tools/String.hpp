@@ -42,7 +42,8 @@ namespace emp {
   class String;
 
   // Some stand-alone functions to generate String objects.
-  template <typename... Ts> [[nodiscard]] inline String MakeString(Ts... args);
+  template <typename... Ts> [[nodiscard]] inline String MakeString(Ts &&... args);
+  template <typename... Ts> [[nodiscard]] inline const String & MakeString(const String & in) { return in; };
   [[nodiscard]] inline String MakeEscaped(char c);
   [[nodiscard]] inline String MakeEscaped(const String & in);
   [[nodiscard]] inline String MakeCSVSafe(const String & in);
@@ -1253,7 +1254,7 @@ namespace emp {
 
 
   template <typename... Ts>
-  String MakeString(Ts... args) {
+  String MakeString(Ts &&... args) {
     return String::Make(std::forward<Ts>(args)...);
   }
 
