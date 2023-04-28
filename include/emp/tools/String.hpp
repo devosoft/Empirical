@@ -43,7 +43,7 @@ namespace emp {
 
   // Some stand-alone functions to generate String objects.
   template <typename... Ts> [[nodiscard]] inline String MakeString(Ts &&... args);
-  template <typename... Ts> [[nodiscard]] inline const String & MakeString(const String & in) { return in; };
+  [[nodiscard]] inline const String & MakeString(const String & in) { return in; };
   [[nodiscard]] inline String MakeEscaped(char c);
   [[nodiscard]] inline String MakeEscaped(const String & in);
   [[nodiscard]] inline String MakeCSVSafe(const String & in);
@@ -660,7 +660,7 @@ namespace emp {
       { *this = Join(container, delim, open, close); return *this;}
 
     template <typename... Ts>
-    static String Make(Ts... args) {
+    [[nodiscard]] static String Make(Ts... args) {
       std::stringstream ss;
       (ss << ... << String::_Convert(std::forward<Ts>(args), true));
       return ss.str();
