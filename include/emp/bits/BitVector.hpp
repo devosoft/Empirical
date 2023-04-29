@@ -45,7 +45,9 @@
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
 
-namespace emp {
+#include "Bits.hpp"  // New version of BitVector is in Bits.hpp
+
+namespace emp::old {
 
   /// @brief A drop-in replacement for std::vector<bool>, but with extra bitwise logic features.
   ///
@@ -914,7 +916,7 @@ namespace emp {
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
     }
     else if (NUM_FIELDS < 32) {  // For small BitVectors, shifting L/R and ORing is faster.
-      emp::BitVector dup(*this);
+      BitVector dup(*this);
       dup.ShiftLeft(shift_size);
       ShiftRight(num_bits - shift_size);
       OR_SELF(dup);
@@ -992,7 +994,7 @@ namespace emp {
 
     } else if (NUM_FIELDS < 32) {
       // for small BitVectors, shifting L/R and ORing is faster
-      emp::BitVector dup(*this);
+      BitVector dup(*this);
       dup.ShiftRight(shift_size);
       ShiftLeft(num_bits - shift_size);
       OR_SELF(dup);
@@ -2312,8 +2314,8 @@ namespace emp {
 namespace std {
   /// Hash function to allow BitVector to be used with maps and sets (must be in std).
   template <>
-  struct hash<emp::BitVector> {
-    std::size_t operator()(const emp::BitVector & bv) const {
+  struct hash<emp::old::BitVector> {
+    std::size_t operator()(const emp::old::BitVector & bv) const {
       return bv.Hash();
     }
   };
