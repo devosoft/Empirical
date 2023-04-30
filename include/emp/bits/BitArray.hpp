@@ -33,7 +33,9 @@
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
 
-namespace emp {
+#include "Bits.hpp"  // New version of BitArray is in Bits.hpp
+
+namespace emp::old {
 
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
@@ -2081,9 +2083,9 @@ namespace emp {
 namespace std
 {
     template <size_t N, bool ZERO_LEFT>
-    struct hash<emp::BitArray<N, ZERO_LEFT>>
+    struct hash<emp::old::BitArray<N, ZERO_LEFT>>
     {
-        size_t operator()( const emp::BitArray<N,ZERO_LEFT> & bs ) const noexcept
+        size_t operator()( const emp::old::BitArray<N,ZERO_LEFT> & bs ) const noexcept
         {
           return bs.Hash();
         }
