@@ -236,7 +236,22 @@ namespace emp {
     /// Append potentially-formatted text through the current encoding.
     template <typename T>
     Text & Append(T && in) {
-      encoding_ptr->Append(*this, emp::MakeString(std::forward<T>(in)));
+      // If we have a Text object being fed in, merge it in.
+      using CleanT = typename std::remove_const_t<typename std::remove_reference_t<T>>;
+      if constexpr (std::is_base_of_v<emp::Text, CleanT>) {
+        const size_t start_size = text.size();
+        text += in.text;
+        for (auto & [style_name, new_bits] : in.style_map) {
+          BitVector & cur_bits = style_map[style_name];
+          cur_bits.resize(start_size);
+          cur_bits += new_bits;
+        }
+      }
+
+      // Otherwise, convert the input to a string and add it on.
+      else {
+        encoding_ptr->Append(*this, emp::MakeString(std::forward<T>(in)));
+      }
       return *this;
     }
 
@@ -257,15 +272,8 @@ namespace emp {
     }
 
     // Stream operator.
-    template <typename T>
-    Text & operator<<(T && in) {
-      return Append(emp::MakeString(in));
-    }
-
-    template <typename T>
-    Text & operator+=(T && in) {
-      return Append(emp::MakeString(in));
-    }
+    template <typename T> Text & operator<<(T && in) { return Append(std::forward<T>(in)); }
+    template <typename T> Text & operator+=(T && in) { return Append(std::forward<T>(in)); }
 
     /// @brief Convert text to a string using the current encoding.
     /// @return The resulting string.
