@@ -23,6 +23,7 @@ namespace emp {
 
     /// @brief Copy over another Text object, but make it uses an HTML encoding.
     /// @param in Already formatted Text object to load in.
+    HTMLText(const HTMLText & in) = default;
     HTMLText(const Text & in) : Text(in) { ActivateEncoding<HTMLEncoding>("html"); }
 
     /// @brief Create a new HTMLText object and default it to the provided string.
