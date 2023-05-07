@@ -89,7 +89,7 @@ TEST_CASE("Testing HTMLText", "[text]") {
   emp::HTMLText part2 = "And now part 2 of text.";
   part1.Bold(5,6);
   part2.Bold(13,14);
-  part2.Italic(10,14);
+  part2.Italic(18,22);
 
   emp::Text merged(part1);
   merged << " " << part2;
