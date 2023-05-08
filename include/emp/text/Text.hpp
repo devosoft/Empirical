@@ -244,7 +244,7 @@ namespace emp {
         for (auto & [style_name, new_bits] : in.style_map) {
           BitVector & cur_bits = style_map[style_name];
           cur_bits.resize(start_size);
-          cur_bits += new_bits;
+          cur_bits.Append(new_bits);
         }
       }
 
