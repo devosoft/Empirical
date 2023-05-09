@@ -362,6 +362,14 @@ namespace emp {
     }
   };
 
+  template <typename ENCODING_T, typename... Ts>
+  emp::Text MakeEncodedText(Ts &&... args) {
+    Text out;                              // Create the text object
+    out.AddEncoding<ENCODING_T>();         // Setup the encoding
+    out.Append(std::forward<Ts>(args)...); // Append the inputs, if any
+    return out;                            // Return the finished product
+  }
+
 }
 
 #endif
