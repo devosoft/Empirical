@@ -117,7 +117,8 @@ namespace emp {
   public:
     Text() { encoding_ptr = encodings["txt"] = NewPtr<TextEncoding_None>(); }
     Text(const Text & in) : text(in.text), style_map(in.style_map) { CloneEncodings(in); }
-    Text(const String & in) : Text() { Append(in); }
+    template <typename... Ts>
+    Text(Ts &&... in) : Text() { Append(std::forward<Ts>(in)...); }
     ~Text() { for (auto & [e_name, ptr] : encodings) ptr.Delete(); }
 
     Text & operator=(const Text & in) {
@@ -234,17 +235,15 @@ namespace emp {
     }
 
     /// Append potentially-formatted text through the current encoding.
-    template <typename T>
-    Text & Append(T && in) {
+    template <typename T, typename... EXTRA_Ts>
+    Text & Append(T && in, EXTRA_Ts &&... in_extra) {
       // If we have a Text object being fed in, merge it in.
       using CleanT = typename std::remove_const_t<typename std::remove_reference_t<T>>;
       if constexpr (std::is_base_of_v<emp::Text, CleanT>) {
         const size_t start_size = text.size();
         text += in.text;
         for (auto & [style_name, new_bits] : in.style_map) {
-          BitVector & cur_bits = style_map[style_name];
-          cur_bits.resize(start_size);
-          cur_bits.Append(new_bits);
+          style_map[style_name].Resize(start_size).Append(new_bits);
         }
       }
 
@@ -252,6 +251,12 @@ namespace emp {
       else {
         encoding_ptr->Append(*this, emp::MakeString(std::forward<T>(in)));
       }
+
+      // If more than one argument was provided, process the remaining ones.
+      if constexpr (sizeof...(EXTRA_Ts) > 0) {
+        Append(std::forward<EXTRA_Ts>(in_extra)...);
+      }
+
       return *this;
     }
 
