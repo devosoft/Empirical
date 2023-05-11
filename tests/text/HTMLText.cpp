@@ -91,8 +91,7 @@ TEST_CASE("Testing HTMLText", "[text]") {
   part2.Bold(13,14);
   part2.Italic(18,22);
 
-  emp::Text merged(part1);
-  merged << " " << part2;
+  emp::Text merged = emp::MakeEncodedText<emp::HTMLEncoding> (part1, " ", part2);
   REQUIRE(merged.GetText() == "Part 1 of text; And now part 2 of text.");
   REQUIRE(merged.Encode() == "Part <b>1</b> of text; And now part <b>2</b> of <i>text</i>.");
 }
