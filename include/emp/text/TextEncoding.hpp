@@ -370,6 +370,29 @@ namespace emp {
     return out;                            // Return the finished product
   }
 
+  template <typename ENCODING_T>
+  class EncodedText : public emp::Text {
+  private:
+    using this_t = EncodedText<ENCODING_T>;
+  public:
+    /// @brief Create a new, default EncodedText object.
+    EncodedText() { AddEncoding<ENCODING_T>(); };
+    EncodedText(const this_t & in) = default;
+
+    template <typename... Ts>
+    EncodedText(Ts &&... in) : EncodedText() {
+      Append(std::forward<Ts>(in)...);
+    }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
+    template <typename T>
+    this_t & operator=(T && in) {
+      Text::operator=(std::forward<T>(in));
+      return *this;
+    };
+  };
+
 }
 
 #endif
