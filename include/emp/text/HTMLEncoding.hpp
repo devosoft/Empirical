@@ -56,6 +56,8 @@ namespace emp {
     }
   };
 
+  using HTMLText = EncodedText<HTMLEncoding>;
+
   template <typename... Ts>
   emp::Text MakeHTMLText(Ts &&... args) {
     return MakeEncodedText<HTMLEncoding>(std::forward<Ts>(args)...);
