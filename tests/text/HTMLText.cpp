@@ -11,7 +11,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/text/HTMLText.hpp"
+#include "emp/text/HTMLEncoding.hpp"
 
 TEST_CASE("Testing HTMLText", "[text]") {
   emp::HTMLText text("Test Text");
