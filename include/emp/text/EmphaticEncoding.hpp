@@ -71,6 +71,12 @@ namespace emp {
     }
   };
 
+  using EmphaticText = EncodedText<EmphaticEncoding>;
+
+  template <typename... Ts>
+  emp::Text MakeEmphaticText(Ts &&... args) {
+    return MakeEncodedText<EmphaticEncoding>(std::forward<Ts>(args)...);
+  }
 }
 
 #endif
