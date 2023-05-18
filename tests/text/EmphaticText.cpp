@@ -11,7 +11,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/text/EmphaticText.hpp"
+#include "emp/text/EmphaticEncoding.hpp"
 
 TEST_CASE("Testing EmphaticText", "[text]") {
   emp::EmphaticText text("Test Text");
