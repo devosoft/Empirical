@@ -52,7 +52,7 @@
 #include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 
-#include "TextCharRef.hpp"
+#include "_TextCharRef.hpp"
 
 namespace emp {
 
