@@ -96,7 +96,8 @@ namespace emp {
     File & Append(const String & line) { lines.emplace_back(line); return *this; }
 
     /// Append a vector of lines to the end of the file.
-    File & Append(const emp::vector<String> & in_lines) {
+    template <typename T>
+    File & Append(const emp::vector<T> & in_lines) {
       size_t start_size = lines.size();
       lines.resize(start_size + in_lines.size());
       for (size_t pos = 0; pos < in_lines.size(); pos++) {
@@ -120,9 +121,11 @@ namespace emp {
     }
 
     /// Extract first line from file
-    auto operator>>(String & out) {
-      out = size() ? front() : out;
-      lines.erase(begin());
+    auto operator>>(std::string & out) {
+      if (size()) {
+        out = front();
+        lines.erase(begin());
+      }
     }
 
     /// Test if two files are identical.
