@@ -377,7 +377,7 @@ namespace emp {
     }
 
     template <typename T>
-    emp::vector< emp::vector<T> > ToData(String delim=",") {
+    emp::vector< emp::vector<T> > ToData(String delim=",") const {
       emp::vector< emp::vector<T> > out_data(lines.size());
 
       for (size_t row_id = 0; row_id < lines.size(); row_id++) {
