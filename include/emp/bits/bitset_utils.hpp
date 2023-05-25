@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2023.
  *
  *  @file bitset_utils.hpp
  *  @brief A set of simple functions to manipulate bitsets.
@@ -11,6 +11,7 @@
 #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
+#include <algorithm>
 #include <string>
 #include <sstream>
 
