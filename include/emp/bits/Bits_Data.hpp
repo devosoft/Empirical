@@ -140,7 +140,7 @@ namespace emp {
         return NumFields() * sizeof(field_t);
       }
 
-      Bits_Data_Size_Fixed(size_t in_size=NUM_BITS) {
+      Bits_Data_Size_Fixed([[maybe_unused]] size_t in_size=NUM_BITS) {
         emp_assert(in_size <= NUM_BITS, in_size, NUM_BITS);
       }
       Bits_Data_Size_Fixed(const Bits_Data_Size_Fixed &) = default;
@@ -335,8 +335,8 @@ namespace emp {
       {
         field_capacity = base_t::NumFields();
       }
-      Bits_Data_Mem_Watermark(const this_t & in) { Copy(in); }
-      Bits_Data_Mem_Watermark(this_t && in) { Move(std::move(in)); }
+      Bits_Data_Mem_Watermark(const this_t & in) : base_t(0) { Copy(in); }
+      Bits_Data_Mem_Watermark(this_t && in) : base_t(0) { Move(std::move(in)); }
       ~Bits_Data_Mem_Watermark() { /* cleanup in base class */ }
 
       Bits_Data_Mem_Watermark & operator=(const this_t & in) { Copy(in); return *this; }
