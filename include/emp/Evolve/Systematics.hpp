@@ -1907,7 +1907,7 @@ namespace emp {
     } else{
 
       emp::File generation_percentiles(filename); //opens file
-      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
+      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(","); //turns file contents into vector
 
       for(int j = 0; j <= percentile_data[gen_value].size() - 2; j++){ //searches through vector for slot where phylo diversity fits
 
