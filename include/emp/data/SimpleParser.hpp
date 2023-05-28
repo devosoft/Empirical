@@ -209,12 +209,12 @@ namespace emp {
         token_symbol = AddToken("Symbol", ".|\"==\"|\"!=\"|\"<=\"|\">=\"|\"~==\"|\"~!=\"|\"~<\"|\"~>\"|\"~<=\"|\"~>=\"|\"&&\"|\"||\"|\"**\"|\"%%\"");
       }
 
-      bool IsID(const emp::Token & token) const noexcept { return token.token_id == token_identifier; }
-      bool IsNumber(const emp::Token & token) const noexcept { return token.token_id == token_number; }
-      bool IsString(const emp::Token & token) const noexcept { return token.token_id == token_string; }
-      bool IsChar(const emp::Token & token) const noexcept { return token.token_id == token_char; }
-      bool IsExternal(const emp::Token & token) const noexcept { return token.token_id == token_external; }
-      bool IsSymbol(const emp::Token & token) const noexcept { return token.token_id == token_symbol; }
+      bool IsID(const emp::Token & token) const noexcept { return token.id == token_identifier; }
+      bool IsNumber(const emp::Token & token) const noexcept { return token.id == token_number; }
+      bool IsString(const emp::Token & token) const noexcept { return token.id == token_string; }
+      bool IsChar(const emp::Token & token) const noexcept { return token.id == token_char; }
+      bool IsExternal(const emp::Token & token) const noexcept { return token.id == token_external; }
+      bool IsSymbol(const emp::Token & token) const noexcept { return token.id == token_symbol; }
     };
 
     struct BinaryOperator {
