@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
+ *  @date 2022-23.
  *
  *  @file Bits.hpp
  *  @brief A generic bit-handler to replace vector<bool>, etc +additional bitwise logic features.
@@ -807,7 +807,7 @@ namespace emp {
     const Bits & operator-=(const Bits & ar2) { return SUB_SELF(ar2); }
 
 
-    // =========  Cereal Compatability  ========= //
+    // =========  Cereal Compatibility  ========= //
 
     /// @brief Setup this bits object so that it can be stored in an archive and re-loaded.
     template <class Archive>
@@ -2257,10 +2257,10 @@ namespace emp {
 // ---------------------- Implementations to work with standard library ----------------------
 
 namespace std {
-  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
-  template <>
-  struct hash<emp::BitVector> {
-    std::size_t operator()(const emp::BitVector & bits) const {
+  /// Hash function to allow Bits objects to be used with maps and sets (must be in std).
+  template <typename DATA_T, bool ZERO_LEFT>
+  struct hash<emp::Bits<DATA_T,ZERO_LEFT>> {
+    std::size_t operator()(const emp::Bits<DATA_T,ZERO_LEFT> & bits) const {
       return bits.Hash();
     }
   };
