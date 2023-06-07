@@ -22,6 +22,8 @@
 #include <initializer_list>
 #include <iterator>
 
+#include "../../../third-party/cereal/include/cereal/cereal.hpp"
+
 #include "assert.hpp"
 
 #ifdef EMP_NDEBUG
@@ -193,6 +195,9 @@ namespace emp {
     void emplace_back(ARGS &&... /* args */) {
       emp_assert(false, "invalid operation for array!");
     }
+
+    template <class Archive>
+    void serialize( Archive & ar ) { ar(_data); }
   };
 
 
