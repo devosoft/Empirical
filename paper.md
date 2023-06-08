@@ -73,16 +73,16 @@ JOSS: "Begin your paper with a summary of the high-level functionality of your s
 i.e., What does this software do?
 -->
 
-Empirical is a C++ library designed to promote open science and facilitate the development of scientific software that is efficient, reliable, and broadly available.
-Specifically, we intend for both the library and the software built with it to meet the following goals:
+Empirical is a C++ library designed to promote open science and facilitate the development of scientific software that is efficient, reliable, and universal distributability to researchers and non-experts alike.
+Specifically, the library sets out to fulfill the following goals:
 
-1. **Utility:** Empirical features a wide selection of helper tools to streamline common scientific computing tasks such as configuration, data management, random number generation, mathematical manipulations, and a signal-action system.  We include examples, documentation , and project templates so that developers can quickly and easily build high quality scientific software.
-2. **Efficiency:** Empirical tools emphasize efficiency, with the recognition that scientific software can take hours, days, or even months to run.  Empirical tools are heavily optimized, often offloading computation to compile-time, and easily configured for varying use cases.
-3. **Reliability:** Correctness is critical to scientific software.  In addition to extensive testing on the library itself, Empirical provides a range of sophisticated debugging tools, all of which can be deactivated to maintain efficiency.  These include audited memory management, drop-in replacements for standard C++ containers with safety checking, and improved assert capabilities.
-4. **Availability:** Scientific software is most useful when it can be easily accessed by any researcher, student, or citizen scientist who wants to experiment, explore, or test the reproducibility of results.  As such, Empirical is highly portable, uses common data formats, flexible and intuitive configuration options, and tools to turn your software into a performant web app, without requiring a deep understanding of web development.
+1. **Utility:** Empirical features a wide selection of helper tools to streamline common scientific computing tasks such as configuration, data management, random number generation, mathematical manipulations, and a signal-action system. Examples, documentation, and project templates streamline developer orientation.
+2. **Efficiency:** Empirical tools emphasize efficiency to make make heavy scientific workloads tractable. Where possible, computation is moved to compile-time, heap allocation is avoided, and memory-locality is respected.
+3. **Reliability:** Scientific simulation and data analysis is meaningful insofar as it is correct. In conjunction with extensive unit testing, Empirical benefits from --- and provides --- sophisticated debug-mode instrumentation tools. These include audited memory management, drop-in replacements for standard C++ containers with safety checking, and self-documenting assertions.
+4. **Distributability:** Scientific software should be easily used by any researcher, student, or citizen scientist who wants to experiment, explore, or test the reproducibility of results. As such, Empirical is highly portable, uses common data formats, supports runtime reconfiguration, and provides tools to compile software as a performant web app without heavy web development workloads.
    <!-- Additionally, we strive for inclusivity in our own development practices and for our library to reduce barriers to entry for software developers and users.-->
 
-These core philosophies have guided Empirical's inception, design, and development in service of open science objectives.
+<!-- These core philosophies have guided Empirical's inception, design, and development in service of open science objectives. -->
 
 <!-- Empirical helps scientific software manifest open science objectives by providing tools to wrap existing software with an interactive in-browser web interface without compromising researchers' primary software objectives.
 Simultaneously, Empirical supports correctness and performance by providing drop-in debugging tools and efficient, elegant tools for common tasks such as configuration and data collection. -->
