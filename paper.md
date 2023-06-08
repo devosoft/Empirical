@@ -11,7 +11,7 @@ authors:
     affiliation: 4
   - name: Alexander Lalejini
     orcid: 0000-0003-0994-2718
-    affiliation: "1, 2, 3"
+    affiliation: 7
   - name: Charles Ofria
     orcid: 0000-0003-2924-1732
     affiliation: "1, 2, 3"
@@ -20,7 +20,7 @@ authors:
     affiliation: "1, 2, 3"
   - name: Matthew Andres Moreno
     orcid: 0000-0003-4726-4479
-    affiliation: "1, 2, 3"
+    affiliation: "4, 5"
 affiliations:
  - name: BEACON Center for the Study of Evolution in Action
    index: 1
@@ -30,6 +30,12 @@ affiliations:
    index: 3
  - name: Computer Science, Carleton College
    index: 4
+ - name: Ecology and Evolutionary Biology, University of Michigan
+   index: 5
+ - name: Center for the Study of Complex Systems, University of Michigan
+   index: 6
+ - name: Computer Science, Grand Valley State University
+   index: 7
 date: 30 July 2021
 bibliography: paper.bib
 breaks: false
