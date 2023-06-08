@@ -51,6 +51,9 @@ namespace emp {
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return num_bits; }
 
+      // Number of bits locked in at compile time.
+      [[nodiscard]] static constexpr size_t NumCTBits() noexcept { return 0; }
+
       /// Number of bits used in partial field at the end; 0 = perfect fit.
       [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
         return num_bits & (NUM_FIELD_BITS - 1);
@@ -106,6 +109,9 @@ namespace emp {
       }
 
       [[nodiscard]] constexpr size_t NumBits() const noexcept { return NUM_BITS; }
+
+      // Number of bits locked in at compile time.
+      [[nodiscard]] static constexpr size_t NumCTBits() noexcept { return NUM_BITS; }
 
       /// Number of bits used in partial field at the end; 0 if perfect fit.
       [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
