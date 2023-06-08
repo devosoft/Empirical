@@ -140,6 +140,16 @@ These safeguards can be fully disabled by a compiler flag in order to ensure max
 
 # Empirical Features
 
+The core Empirical support library comprises four major components:
+
+1. debug-instrumented fundamental type and STL container wrappers,
+2. implementations of general-purpose data structures and algorithms,
+3. integrated, end-to-end frameworks for data and configuration management, and
+4. object-oriented bindings for Emscripten/WebAssembly GUI elements.
+
+Several additional specialized tools are co-developed within the Empirical repository, notably including the next-generation Modular Agent Based Evolution Framework (MABE 2) and a digital phylogeny-tracking tool suite.
+Given their substantial scope, these projects merit separate consideration and fall outside the scope of present discussion of the core support library.
+
 ## Facilitating Better Code for Scientific Software
 
 Software produced by academics, especially for one-off use, is often cobbled together, foregoing better programming practices for the sake of expediency.
