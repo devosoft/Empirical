@@ -324,6 +324,7 @@ A live demo of more sophisticated Empirical prefabricated widgets, presented alo
 
 Empirical remains under active development.
 Current priorities include assembling compound, higher-level web widgets for common tasks, developing a comprehensive framework for digital evolution experiments, and adding more step-by-step tutorials to our documentation.
+Notably, preparations for a major v1.0 release integrating extensive feature development associated with the MABE2 project are nearing completion.
 
 However, we are committed to maintaining a stable interface for existing users.
 Last year, we took a major step towards this fulfilling this objective on an ongoing basis by completing a major reorganization informed by best practices to expose sustainable, consistent API to our end-users.
