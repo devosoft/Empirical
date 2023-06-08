@@ -1,5 +1,5 @@
 ---
-title: 'Empirical: A scientific software library for research, education, and public engagement'
+title: 'Empirical: A support library for scientific research, education, and public engagement'
 tags:
   - C++
   - Simulation
