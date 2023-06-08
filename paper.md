@@ -3,7 +3,7 @@ title: 'Empirical: A scientific software library for research, education, and pu
 tags:
   - C++
   - Simulation
-  - Agent-based modelling
+  - Agent-based modeling
   - Emscripten
 authors:
   - name: Anya Vostinar
@@ -103,13 +103,13 @@ JOSS reviewer checklist: "clearly state what problems the software is designed t
 <!--The philosophy of open science is-->
 The Open Science movement aims to put research "in the hands of as many as possible" [@world_academy_of_science_engineering_and_technology_2019].
 In practice, however, many scientific software applications are *inaccessible* because they are prohibitively difficult to obtain, install, use or understand.<!-- @CAO: We could also say something about specialized or high-end equipment often required to run it. -->
-Scientific software is is typrically developed by specialists who are incentivized to share their results, but not the tools that they crafted to obtain those results.
+Scientific software is typically developed by specialists who are incentivised to share their results, but not the tools that they crafted to obtain those results.
 Projects that are accessible to only a single author or small group can fundamentally undermine the credibility of scientific software, especially when testing and debugging protocols are unclear.
-Conversely, opening up these projects more broadly, will not only improve the reliability and utility of the underlying code, but also increase the quality of the science through broad replication and extension of studies, increased collective understanding, and accellerated rates of discovery.
+Conversely, opening up these projects more broadly, will not only improve the reliability and utility of the underlying code, but also increase the quality of the science through broad replication and extension of studies, increased collective understanding, and accelerated rates of discovery.
 <!-- Despite these challenges, scientific software has incredible potential to radically embody open science ideals due to the transparency of open-source code and the near-universal capacity (in principle) to reproduce aspects of computational science due to ubiquity of internet-connected consumer-grade hardware, including among laypeople. -->
 
 Many scientists do not know how to make web applications, especially with visualizations, and do not have the bandwidth to learn entirely new languages and frameworks.
-Such software improvments, however, help beyond accessibility of the software; for example adding an interactive GUI can help even the researcher who wrote the software, *e.g.,* by visually observing an experiment to gain "soft knowledge" of their system [@10.1145/3185517].
+Such software improvements, however, help beyond accessibility of the software; for example adding an interactive GUI can help even the researcher who wrote the software, *e.g.,* by visually observing an experiment to gain "soft knowledge" of their system [@10.1145/3185517].
 Empirical catalyzes progress toward this open science ideal by streamlining the development of efficient and reliable software that can be made accessible from a web browser using intuitive C++, and without requiring a substantial time investment.
 Beyond the improvements to reliability inherent from having more people using a piece of software, Empirical also provides a range of debugging tools to help ensure that common programming pitfalls are avoided.
 For efficiency Empricial provides a vast array of optimized tools commonly needed in scientific software, as well as the ability to toggle components that incur a performance cost such a the web GUI or debugging tools.
@@ -119,7 +119,7 @@ For efficiency Empricial provides a vast array of optimized tools commonly neede
 <!-- However, many scientists do not know how to create browser-based GUIs and lack the resources or incentives to adequately invest in learning.
 Empirical addresses these challenges by providing tools for implementing browser-based GUIs using intuitive C++, and without requiring a substantial time investment.
  -->
-<!-- @CAO: The below is is a critical point, but should probably going in the Availability section below OR in a future paper; I don't think it goes in statement of need. -->
+<!-- @CAO: The below is a critical point, but should probably going in the Availability section below OR in a future paper; I don't think it goes in statement of need. -->
 <!-- Even with GUI domain knowledge, maintaining a GUI-based, public-facing code base separately from a command-line, research code base is a burden that often leads to the GUI version lagging behind the research version.
 In this circumstance, the research version of the software is no longer truly available to the world.
 To avoid this pitfall, Empirical privides tools to implement GUI applications by _wrapping_ (instead of replicating) the research version of the software, making it easier for researchers to keep the most recent version of scientific software available widely.
@@ -142,7 +142,7 @@ These safeguards can be fully disabled by a compiler flag in order to ensure max
 
 ## Facilitating Better Code for Scientific Software
 
-Software produced by academics, especially for one-off use, is often cobbled together, foregoing better programming practaces for the sake of expediency.
+Software produced by academics, especially for one-off use, is often cobbled together, foregoing better programming practices for the sake of expediency.
 To some extent, this outcome seems inevitable given the typical conditions endemic to academic software development: one-and-done projects assembled under chafing time restrictions where the developer and consumer are one and the same, and often early-career with core domain expertise outside of software development.
 All the while, writing code can constitute a major time sink --- and a major source of frustration --- for academics.
 
@@ -188,16 +188,16 @@ The potential for near-native performance in browser from software compiled with
 For example, as accomplished by the Avida-ED web viewer at <https://avida-ed.msu.edu/>, simulating hundreds of thousands of generations of genetic program evaluations within the span of a class period.
 To successfully deliver such rich, intensive in-browser experiences via WebAssembly, the backing C++ source must also play a role in maximizing efficiency.
 
-Runtime efficiency is equally critical in the primary native use case targeted by Empirical: digital experiments and general scietific computing.
+Runtime efficiency is equally critical in the primary native use case targeted by Empirical: digital experiments and general scientific computing.
 In this context, replicate jobs running the native executable might occupy dozens or hundreds of compute cores around the clock.
 A 10 or 20% performance gain can save substantial hardware costs, meaningfully reduce net energy use, and shave days or even weeks off of time-to-result for long-running computations.
 Order-of-magnitude performance gains might shift some otherwise intractable experiments into the realm of practicality, broadening the scope of scientific questions that can be meaningfully investigated.
 
-Empirical facilates runtime efficiency in end-user code by supplying highly-optimized tools for performance-critical tasks.
+Empirical facilitates runtime efficiency in end-user code by supplying highly-optimized tools for performance-critical tasks.
 For example, `emp::BitSet` and `emp::BitVector` classes support manipulation of fixed- and variable-length bitstrings, making extensive use bit-level optimizations to yield order-of-magnitude speedups.
 Likewise,`emp::Random` wraps a cutting-edge high-performance pseudorandom number generator algorithm [@widynski2020squares].
 These tools were implemented with benchmark-informed development practices, guiding selection to ensure that optimizations successfully translate into practical performance enhancements.
-At a more fundamental level, the library's header-only design prioritizes runtime performance by trading longer compilation time for potential performance gains under optimizing compilation (as well as greater flexibiltiy and a simplified build process for the end user).
+At a more fundamental level, the library's header-only design prioritizes runtime performance by trading longer compilation time for potential performance gains under optimizing compilation (as well as greater flexibility and a simplified build process for the end user).
 
 
 ## Facilitating Debugging
@@ -218,7 +218,7 @@ Assert statements and other runtime safety checks are verified in debug mode and
 
 The C++ standard library provides an `assert` macro that includes the provided assertion in debug mode builds and eliminates it from production mode builds.
 Empirical provides a comparable `emp_assert` macro, differentiated primarily in terms of built-in support for the web runtime.
-This macro dipatches a UI alert when triggered, allows for users to write their own error messages, and enables registration of additional variables to be printed in any error message from that assert statement.
+This macro dispatches a UI alert when triggered, allows for users to write their own error messages, and enables registration of additional variables to be printed in any error message from that assert statement.
 These features help compensate the limited debugging tooling available in the web runtime.
 
 In addition to user-defined asserts, most programming languages provide built-in support to detect common runtime violations,
@@ -233,7 +233,7 @@ In addition, Empirical furnishes a safety-checked pointer wrapper, `emp::Ptr`, t
 
 <!-- todo add more explanation of emp::Ptr and its rationale -->
 
-Because of poor support for built-in runtime safety checks, C++ developers typicaly use an external toolchain to detect and diagnose runtime violations.
+Because of poor support for built-in runtime safety checks, C++ developers typically use an external toolchain to detect and diagnose runtime violations.
 Popular tools include Valgrind, GDB, and runtime sanitizers.
 <!-- (Perhaps, to some degree, this rich toolchain ecosystem enables the ongoing lack of support for such checks within the standard language.) -->
 Although this tooling is very mature and very powerful, there are fundamental limitations to the runtime violations it can detect.
@@ -247,7 +247,7 @@ As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/de
 
 Because of the ubiquitous availability of desktop computers and the ease of distributing software over the internet, scientific software has unique potential for low-barrier, hands-on outreach across broad educational and general audiences.
 Public-facing software also enables better science by making interactive demonstrations available to researchers outside a project's core development group.
-Additionally, public-facing softare exemplifies open science by proffering accessible windows into contemporary scientific work.
+Additionally, public-facing software exemplifies open science by proffering accessible windows into contemporary scientific work.
 
 However, research versions of software are typically specialized to run on high-performance computing environments, often require extensively involved install processes, and generally lack graphical interfaces.
 Effective public-facing software, on the other hand, requires compatibility with consumer-grade hardware, a streamlined install process, and an intuitive graphical user interface.
@@ -264,7 +264,7 @@ Well-constructed browser-based apps excellently fulfill the requirements for eff
 With Emscripten, a single core code base can serve double duty.
 
 Empirical amplifies the potential of Emscripten by fleshing out the rudimentary interface Emscripten exposes for interacting with browser elements.
-At the lowest level, Empirical provides tools that facilitate convenient data transfer back and forth between C++ code and the WebAssembly runtime.
+At the lowest level, Empirical provides tools that facilitate convenient data transfer back and forth between C++ code and the Web Assembly runtime.
 On top of this, Empirical provides an object-oriented framework that wraps DOM elements (_e.g.,_ `<button>`, `<div>`, `<canvas>`, etc.) to easily control them and react to their HTML events from within C++ code.
 This facility relieves users of bookkeeping for JavaScript resources or even writing any JavaScript by hand, which is particularly useful for those without web programming domain expertise.
 At a still higher level of abstraction, Empirical packages pre-configured, pre-styled collections of DOM elements as prefabricated widgets (configuration managers, collapsible read-outs, modal messages, etc.).
@@ -320,9 +320,9 @@ Last year, we took a major step towards this fulfilling this objective on an ong
 We maintain an extensive suite of unit tests and integration tests to ensure that continuing development retains full backwards compatibility.
 In addition, our software releases are archived on Zenodo in order to guarantee uninterrupted, perpetual access to our software for those who depend on it [@empirical_2020].
 
-Empirical has already been successfuly incorporated into major projects within our research group's primary domains: digital evolution, artificial life, and genetic programming.
-We aim for potential utility across a much broader swath of the scientific software ecosystem, however, particularly among projects that prioritize open science ojbectives.
-To this end, we look forward to supporting a wider of collection of end-users and establishing a wider network of collaborations.
+Empirical has already been successfully incorporated into major projects within our research group's primary domains: digital evolution, artificial life, and genetic programming.
+We aim for potential utility across a much broader swath of the scientific software ecosystem, however --- particularly among projects that prioritize open science objectives.
+To this end, we look forward to supporting a wider of collection of collaborators and end-users.
 
 # Related Software Packages
 
