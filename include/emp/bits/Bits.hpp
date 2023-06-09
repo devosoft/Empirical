@@ -284,6 +284,9 @@ namespace emp {
     /// @brief How many bits do we currently have?
     [[nodiscard]] constexpr auto GetSize() const { return _data.NumBits(); }
 
+    /// @brief How many bits are locked in a compile time?
+    [[nodiscard]] static constexpr auto GetCTSize() { return DATA_T::NumCTBits(); }
+
     /// @brief How many bytes are in this Bits? (includes empty field space)
     [[nodiscard]] constexpr auto GetNumBytes() const { return _data.NumBytes(); }
 
