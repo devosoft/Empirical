@@ -328,34 +328,36 @@ To this end, we look forward to supporting a wider of collection of collaborator
 <!-- JOSS: Do the authors describe how this software compares to other commonly-used packages?-->
 
 
-There are many existing software platforms that provide support for the different functionalities that Empirical also provides.
-However, most are not in C++, and there is value in this functionality being easily available to programers .
+There are many existing software platforms that provide functionalities overlapping with Empirical.
+However, most are not in C++, and there is value in this functionality being easily available to programmers.
 <!-- being easily available to programmers who are most comfortable in C++ -->
 <!-- TODO C++ as a high-efficiency language -->
-Therefore, here we focus only on software platforms that support development in C++.
-See the Non-C++ Comparable Software section for citations to software platforms that provide some of Empirical's functionality in a different language.
-
-
+<!-- Therefore, here we focus only on software platforms that support development in C++. -->
+See the Non-C++ Comparable Software section for citations to software platforms that provide some of Empirical's functionality in different languages.
 
 ### RepastHPC
 
-Repast for High Performance Computing is available at <https://repast.github.io/> and is a "C++ based modeling system that is designed for use on large computing clusters and supercomputers" [@collier2013parallel; @north2013complex].
-RepastHPC is part of a larger suite that includes Repast Simphony, which is a "Java-based modeling system" that includes support for interactive GUIs.
-This suite is a classic example of having two separate versions of software, one for research and one for visualization, that must be separately maintained.
+RepastHPC, accessible at <https://repast.github.io/>, is a C++ modeling framework targeted at large computing clusters and supercomputers[@collier2013parallel; @north2013complex].
+A Java-based counterpart, Repast Simphony, provides interactive GUI support.
+As such, simultaneous on-cluster and in-browser support requires maintenance of two separate code bases.
 
 ### Boost C++ Libraries
 
-Boost C++ Libraries is available at <https://www.boost.org/>.
-Boost libraries provide a wide range of tools that improve the writability and efficiency of C++ code.
+Boost C++ Libraries, available at <https://www.boost.org/>, provide an enormous range of software components.
 Several of the Boost libraries have been already incorporated into the C++ standard, and we build off of those with Empirical.
 However, Boost does not contain libraries for web-based GUI tools, configuration management, or data management specifically tailored to scientific software.
 
 ### Emscripten
 
 Emscripten is available at <https://emscripten.org/> [@zakai2011emscripten].
-It provides cross-compilation from C++ to Javascript and we use it in Empirical.
-However, we have added tools that provide more intuitive commands for C++ programmers creating visualizations of scientific software such as simulations.
+It provides cross-compilation from C++ to WebAssembly and we use it in Empirical.
+Empirical's tools build abstractions from Emscripten intrinsics tailored to visualization and interactive control of scientific simulations.
 
+
+### Cheerp
+
+Cheerp, another C++ to WebAssembly compiler, is available at <https://leaningtech.com/cheerp/>.
+Like Emscripten, Cheerp provides primariliy low-level APIs for interaction with browser GUI elements.
 
 ### Non-C++ Comparable Software
 
