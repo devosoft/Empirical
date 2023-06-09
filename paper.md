@@ -152,10 +152,10 @@ Writing code can constitute a major time sink --- and a major source of frustrat
 
 By furnishing prepackaged components that address common tasks for scientific software, the Empirical library helps end users to write better C++ code, faster.
 Utilities for common tasks empower users to craft more readable and maintainable code.
-Bugs can be avoided by replacing one-off implementations with Empirical components subjected to structured code review and coverage-instrumented unit testing.
+Bugs can be avoided by replacing one-off implementations with Empirical components subjected to structured code review, coverage-instrumented unit testing, and other modern software development practices detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html).
+
 Sustained effort invested into optimization of the library's utilities enables more efficient end-user software than might be possible otherwise.
 Finally, off-the-shelf solutions reduce barriers to performing computational research, especially for developers new to scientific software design patterns.
-
 
 To these ends, Empirical provides a comprehensive framework to manage runtime configuration and flexible tools for data aggregation and recording.
 For example, Empirical's configuration framework includes utilities to
@@ -202,29 +202,28 @@ At a more fundamental level, the library's header-only design prioritizes runtim
 ## Facilitating Debugging
 <!-- @MAM: help you make your own code reliable -->
 
-For any software development project, identifying and correcting incorrect program behavior consumes a large fraction of developer hours.
-Worse yet, software bugs that slip through into production can inflict even greater costs, especially in the context of scientific software where the validity of generated data and analyses is paramount.
+Identifying and correcting incorrect program behavior consumes a large fraction of developer hours for any software project.
+Software bugs that slip through into production can inflict even greater costs, especially in scientific contexts where the validity of generated data and analyses is paramount.
 
-In conjunction with unit tests and integration tests, runtime safety checks are commonly used to track down the root causes of known bugs and guard against undetected bugs.
+In conjunction with unit tests and integration tests, runtime safety checks are commonly used to flag potential bugs.
 Assert statements typify runtime safety checks.
 These statements abort program execution at the point of failure with a helpful error message if an expected runtime condition is not met.
 <!-- Users can write `assert` statements into their own code to ensure that program behavior matches expectations.
  -->
-Runtime safety checks like `assert` oblige a performance cost, however.
-Computing and testing the asserted runtime condition consumes CPU cycles.
-To ameliorate such costs, many programming languages support a distinction between production mode and debug mode.
+Runtime safety checks like `assert` oblige a performance cost, however: computing and testing the asserted runtime condition consumes CPU cycles.
+The common practice of distinguishing between production mode and debug mode can reduce or remove the overhead cost in performance-critical contexts.
 Assert statements and other runtime safety checks are verified in debug mode and ignored in production mode to maximize performance.
 
-The C++ standard library provides an `assert` macro that includes the provided assertion in debug mode builds and eliminates it from production mode builds.
-Empirical provides a comparable `emp_assert` macro, differentiated primarily in terms of built-in support for the web runtime.
+Indeed, the C++ standard library provides an `assert` macro that follows this paradigm.
+Empirical provides a comparable `emp_assert` macro, differentiated primarily in terms of self-documentation and built-in support for the web runtime.
 This macro dispatches a UI alert when triggered, allows for users to write their own error messages, and enables registration of additional variables to be printed in any error message from that assert statement.
-These features help compensate the limited debugging tooling available in the web runtime.
+<!-- These features help compensate for the limited tooling currently available in the Empirical web runtime. -->
 
-In addition to user-defined asserts, most programming languages provide built-in support to detect common runtime violations,
-such as out-of-bounds indexing into a collection or bad type conversions.
-These built-in protections against runtime violations are considered so critical that many programming languages --- such as Java, Python, and Ruby --- do not provide a mechanism to disable them for speedups in production code.
-C++ takes the opposite tack and does not provide any standard mechanisms for safety-checking library features.
-However, standard library vendors  --- like [GCC's `libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [Clang's `libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [Microsoft's `stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- provide some support for such safety checks.
+In addition to user-defined asserts, most programming languages (Java, Python, Ruby, Rust, etc.) provide built-in support to detect common runtime violations, such as out-of-bounds indexing into a collection or bad type conversions.
+<!-- These built-in protections against runtime violations are considered so critical that many programming languages do not provide a mechanism to disable them for speedups in production code. -->
+C++ does not.
+ <!-- provide any standard mechanisms for safety-checking library features. -->
+However, standard library vendors  --- like [GCC's `libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [Clang's `libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [Microsoft's `stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- do provide some proprietary support for such safety checks.
 This support, however, is limited and poorly documented.
 For example, neither GCC 10.3 nor Clang 12.0.0 detect `std::vector` iterator invalidation when appending to a `std::vector` happens to fall within existing allocated buffer space ([GCC live example](https://perma.cc/6WDU-3C8X); [Clang live example](https://perma.cc/6SU9-CUKY)).
 Empirical supplements vendors' runtime safety checking by providing drop-in replacements for `std::array`, `std::optional`, and `std::vector` with stronger runtime safety checks while in debug mode.
@@ -235,12 +234,10 @@ In addition, Empirical furnishes a safety-checked pointer wrapper, `emp::Ptr`, t
 Because of poor support for built-in runtime safety checks, C++ developers typically use an external toolchain to detect and diagnose runtime violations.
 Popular tools include Valgrind, GDB, and runtime sanitizers.
 <!-- (Perhaps, to some degree, this rich toolchain ecosystem enables the ongoing lack of support for such checks within the standard language.) -->
-Although this tooling is very mature and very powerful, there are fundamental limitations to the runtime violations it can detect.
+Although this tooling is very mature and quite powerful, there are fundamental limitations to the runtime violations it can detect.
 For example, Clang 12.0.0's sanitizers cannot detect the iterator invalidation described above ([live example](https://godbolt.org/z/z6ocqn87W)).
 Additionally, most of this tooling is not available when debugging WASM code compiled with Emscripten --- a core use case targeted by the Empirical library.
-Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), tooling limitations (such as the lack of a steppable debugger) make top-notch runtime safety checking particularly critical in this environment.
-
-As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html), we use modern development practices such as continuous integration, unit testing, and test coverage analysis in order to ensure that the library itself is reliable.
+Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), tooling limitations (such as the lack of a steppable debugger) make runtime safety checking particularly critical.
 
 ## Realizing the Promise of Emscripten-based Web UIs
 
