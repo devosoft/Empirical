@@ -101,20 +101,24 @@ JOSS reviewer checklist: "clearly state what problems the software is designed t
 <!-- TODO: Switch some sentences from new->old to old->new for smoothness -->
 
 <!--The philosophy of open science is-->
-The Open Science movement aims to put research "in the hands of as many as possible" [@world_academy_of_science_engineering_and_technology_2019].
-In practice, however, many scientific software applications are *inaccessible* because they are prohibitively difficult to obtain, install, use or understand.<!-- @CAO: We could also say something about specialized or high-end equipment often required to run it. -->
-Scientific software is typically developed by specialists who are incentivised to share their results, but not the tools that they crafted to obtain those results.
-Projects that are accessible to only a single author or small group can fundamentally undermine the credibility of scientific software, especially when testing and debugging protocols are unclear.
-Conversely, opening up these projects more broadly, will not only improve the reliability and utility of the underlying code, but also increase the quality of the science through broad replication and extension of studies, increased collective understanding, and accelerated rates of discovery.
+Modern open science practices and web-based computing interfaces give computational research unique potential to radically embody Open Science objectives of experimental transparency, methodological reusability, and broad hands-on accessibility [@world_academy_of_science_engineering_and_technology_2019].
+In practice, however, many scientific software applications are prohibitively difficult to obtain, install, use or understand.<!-- @CAO: We could also say something about specialized or high-end equipment often required to run it. -->
+<!-- Academic science incentivises sharing of results, typically much more strongly than sharing of tools built to obtain those results. -->
+Barring fundamental changes to existing expectation and incentive structures within academic science, reducing the burden of realizing Open Science objectives is the most promising path to their widespread achievement.
+
 <!-- Despite these challenges, scientific software has incredible potential to radically embody open science ideals due to the transparency of open-source code and the near-universal capacity (in principle) to reproduce aspects of computational science due to ubiquity of internet-connected consumer-grade hardware, including among laypeople. -->
 
-Many scientists do not know how to make web applications, especially with visualizations, and do not have the bandwidth to learn entirely new languages and frameworks.
-Such software improvements, however, help beyond accessibility of the software; for example adding an interactive GUI can help even the researcher who wrote the software, *e.g.,* by visually observing an experiment to gain "soft knowledge" of their system [@10.1145/3185517].
-Empirical catalyzes progress toward this open science ideal by streamlining the development of efficient and reliable software that can be made accessible from a web browser using intuitive C++, and without requiring a substantial time investment.
-Beyond the improvements to reliability inherent from having more people using a piece of software, Empirical also provides a range of debugging tools to help ensure that common programming pitfalls are avoided.
-For efficiency Empricial provides a vast array of optimized tools commonly needed in scientific software, as well as the ability to toggle components that incur a performance cost such a the web GUI or debugging tools.
+Tools that open up scientific software projects more broadly will not only improve the reliability and utility of underlying code, but also increase the quality of the science through broad replication and extension of studies, increased collective understanding, and accelerated rates of discovery.
+For instance, adding an interactive GUI can help even the researcher who wrote the software, *e.g.,* by visually observing an experiment to gain "soft knowledge" of their system [@10.1145/3185517].
+Recent developments in web technology such as WebAssembly enable compilation of native source code to browser-based interactive interfaces.
+However, many scientists lack web development training and do not have the bandwidth to learn entirely new languages and frameworks.
+Empirical catalyzes progress towards open science ideals by streamlining the development of in-browser software in C++.
 
-
+To be reuseable and extendable, software must operate robustly --- sometimes at scales and in contexts that weren't originally envisioned.
+Empirical seeks to make writing correct, efficient scientific software easier.
+Empirical's debugging suite helps protect against common C++ programming pitfalls such as iterator invalidation, memory leakage, and out-of-bounds indexing.
+Bundled algorithm and data structures provide optimized, well-tested drop-in implementations for common scientific computing tasks.
+Throughout, library design obviates trade-offs between performance and safety through compile-time switches to strip out checks for undefined and incorrect behavior in release mode.
 
 <!-- However, many scientists do not know how to create browser-based GUIs and lack the resources or incentives to adequately invest in learning.
 Empirical addresses these challenges by providing tools for implementing browser-based GUIs using intuitive C++, and without requiring a substantial time investment.
