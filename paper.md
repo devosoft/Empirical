@@ -147,60 +147,55 @@ These safeguards can be fully disabled by a compiler flag in order to ensure max
 ## Facilitating Better Code for Scientific Software
 
 Software produced by academics, especially for one-off use, is often cobbled together, foregoing better programming practices for the sake of expediency.
-To some extent, this outcome seems inevitable given the typical conditions endemic to academic software development: one-and-done projects assembled under chafing time restrictions where the developer and consumer are one and the same, and often early-career with core domain expertise outside of software development.
-All the while, writing code can constitute a major time sink --- and a major source of frustration --- for academics.
+<!-- To some extent, this outcome seems inevitable given the typical conditions endemic to academic software development: one-and-done projects assembled under chafing time restrictions where the developer and consumer are one and the same, and often early-career with core domain expertise outside of software development. -->
+Writing code can constitute a major time sink --- and a major source of frustration --- for academics.
 
-By furnishing prepackaged components that address common tasks for scientific software, the Empirical library helps end users to write better C++ code and to do so faster.
-Because the library provides utilities for common tasks that would otherwise require verbose inline implementations, users can better leverage abstraction to craft more readable and maintainable code.
-Because the library's utilities are more extensively vetted and tested than
-most code for one-off projects, users can increase software reliability by avoiding potential bugs in bespoke implementations.
-Additionally, more effort can be invested into optimizing the library's utilities for performance than would be reasonable for one-off implementations, paying off in more efficient software for the end-user.
-Finally, the library reduces barriers to entry for scientific software developers by providing off-the-shelf solutions for many of the common tasks new developers struggle through while coming up to speed on development patterns for scientific software.
+By furnishing prepackaged components that address common tasks for scientific software, the Empirical library helps end users to write better C++ code, faster.
+Utilities for common tasks empower users to craft more readable and maintainable code.
+Bugs can be avoided by replacing one-off implementations with Empirical components subjected to structured code review and coverage-instrumented unit testing.
+Sustained effort invested into optimization of the library's utilities enables more efficient end-user software than might be possible otherwise.
+Finally, off-the-shelf solutions reduce barriers to performing computational research, especially for developers new to scientific software design patterns.
 
-Empirical's tools specially target common scientific computing tasks.
-Empirical provides 1) a comprehensive framework to manage runtime configuration, 2) flexible tools for data aggregation and recording, and 3) prefabricated UI components for the web browser.
+
+To these ends, Empirical provides a comprehensive framework to manage runtime configuration and flexible tools for data aggregation and recording.
 For example, Empirical's configuration framework includes utilities to
 
 * define and document default configuration values,
 * accept configuration adjustments via the command line,
 * accept configuration adjustments via a configuration file,
 * dump configuration settings to a file,
-* perform on-the-fly configuration adjustments,
-* and leverage an object-oriented configuration packaging model to manage coexisting configuration tableaus.
+* perform on-the-fly configuration adjustments, and
+* leverage an object-oriented configuration packaging model to manage coexisting configuration tableaus.
 
 Where appropriate, Empirical's scientific software tools include features that integrate directly into the browser environment.
 The configuration framework, for example, accepts input via URL query parameters and ties in with a pre-built, in-browser GUI for setting-by-setting adjustments.
 
 In addition to the core C++ Empirical Library, we maintain a [template project](https://github.com/devosoft/cookiecutter-empirical-project) that streamlines the process of organizing a new project.
-The heavy lift of laying out nice boilerplate for projects using Emscripten, in particular, motivated us to put together this template.
-Our template leverages the [cookiecutter project](https://github.com/cookiecutter/cookiecutter) to automate template instantiation via a command-line wizard.
+The heavy lift of laying out boilerplate for projects using Emscripten, in particular, motivated us to leverage the [cookiecutter project](https://github.com/cookiecutter/cookiecutter), to automate creation instantiation via a command-line wizard.
 
-Finally, any effort to promote development of quality software cannot fully succeed without a thriving community of engineers.
+High-quality software cannot succeed without a thriving community of engineers.
 As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html), our development practices incorporate intentional action to support diversity, equity, and inclusion.
 
 ## Facilitating Runtime Efficiency
 
-WebAssembly's runtime efficiency drives much of the growing interest in using it (instead of traditional JavaScript) to program in the web browser.
-WebAssembly binaries compiled with Emscripten manifest significant performance gains over comparable vanilla JavaScript programs by eschewing overheads associated with the JavaScript language (safety checks, automatic garbage collection, runtime polymorphism, etc.).
-WebAssembly itself is simply an interpreted bytecode;
-under most cases, we would expect a several-fold slowdown compared to comparable machine code.
-In some cases, this expected slowdown due to the overhead of interpretation might constitute a full order of magnitude [@kazi2000techniques].
-However, browsers' just-in-time compilation engines allow critical sections of the WebAssembly bytecode to be translated into native machine code [@haas2017bringing].
+WebAssembly's runtime efficiency has become a major driver of its increasing popularity for web app development.
+<!-- WebAssembly binaries compiled with Emscripten manifest significant performance gains over comparable vanilla JavaScript programs by eschewing overheads associated with the JavaScript language (safety checks, automatic garbage collection, runtime polymorphism, etc.). -->
+Although WebAssembly itself is simply an interpreted bytecode, which would typically incur several-fold slowdown compared to machine code [@kazi2000techniques], browsers' just-in-time compilation engines allow critical sections of the WebAssembly bytecode to be translated into native machine code [@haas2017bringing].
 This just-in-time compilation model allows WebAssembly to achieve at least 50% --- and often closer to 90%  --- of native performance [@jangda2019not].
 
-The potential for near-native performance in browser from software compiled with Emscripten opens the door to entirely new possibilities for web-facing scientific computation.
-For example, as accomplished by the Avida-ED web viewer at <https://avida-ed.msu.edu/>, simulating hundreds of thousands of generations of genetic program evaluations within the span of a class period.
-To successfully deliver such rich, intensive in-browser experiences via WebAssembly, the backing C++ source must also play a role in maximizing efficiency.
+The potential for near-native in-broweser performance opens the door to entirely new possibilities for web-facing scientific computation.
+For example, the Avida-ED web viewer at <https://avida-ed.msu.edu/>, uses WebAssembly to simulate hundreds of thousands of generations of genetic program evaluations within the span of a class period.
+Such rich, intensive in-browser experiences necessitate efficient C++ source code.
 
-Runtime efficiency is equally critical in the primary native use case targeted by Empirical: digital experiments and general scientific computing.
+Runtime efficiency is also critical to on-cluster digital experiments and general scientific computing, a co-equal use case targeted by Empirical.
 In this context, replicate jobs running the native executable might occupy dozens or hundreds of compute cores around the clock.
 A 10 or 20% performance gain can save substantial hardware costs, meaningfully reduce net energy use, and shave days or even weeks off of time-to-result for long-running computations.
 Order-of-magnitude performance gains might shift some otherwise intractable experiments into the realm of practicality, broadening the scope of scientific questions that can be meaningfully investigated.
 
-Empirical facilitates runtime efficiency in end-user code by supplying highly-optimized tools for performance-critical tasks.
-For example, `emp::BitSet` and `emp::BitVector` classes support manipulation of fixed- and variable-length bitstrings, making extensive use bit-level optimizations to yield order-of-magnitude speedups.
+Empirical supports runtime efficiency by supplying highly-optimized tools for performance-critical tasks.
+For example, `emp::BitSet` and `emp::BitVector` classes support fast manipulation of fixed- and variable-length bitstrings by making extensive use bit-level optimizations to yield order-of-magnitude speedups.
 Likewise,`emp::Random` wraps a cutting-edge high-performance pseudorandom number generator algorithm [@widynski2020squares].
-These tools were implemented with benchmark-informed development practices, guiding selection to ensure that optimizations successfully translate into practical performance enhancements.
+These tools were implemented with benchmark-informed development practices, ensuring that optimizations successfully translate into practical performance enhancements.
 At a more fundamental level, the library's header-only design prioritizes runtime performance by trading longer compilation time for potential performance gains under optimizing compilation (as well as greater flexibility and a simplified build process for the end user).
 
 
