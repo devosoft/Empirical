@@ -176,6 +176,73 @@ The heavy lift of laying out boilerplate for projects using Emscripten, in parti
 High-quality software cannot succeed without a thriving community of engineers.
 As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html), our development practices incorporate intentional action to support diversity, equity, and inclusion.
 
+## Realizing the Promise of Emscripten-based Web UIs
+
+<!-- Because of the ubiquitous availability of desktop computers and the ease of distributing software over the internet, scientific software has unique potential for low-barrier, hands-on outreach across broad educational and general audiences.
+Public-facing software also enables better science by making interactive demonstrations available to researchers outside a project's core development group.
+Additionally, public-facing software exemplifies open science by proffering accessible windows into contemporary scientific work.
+
+However, research versions of software are typically specialized to run on high-performance computing environments, often require extensively involved install processes, and generally lack graphical interfaces.
+Effective public-facing software, on the other hand, requires compatibility with consumer-grade hardware, a streamlined install process, and an intuitive graphical user interface. -->
+
+Many scientific software projects have historically maintained separate code bases for research versus education and outreach.
+The Avida-ED project, for example, leveraged the existing Avida digital evolution model system for classroom activities [@pennock2007learning], but could not effectively leverage Avida's existing code base.
+Additionally, as was the case for the Avida-ED project, significant code duplication is often required to support the same education and outreach product across different operating systems.
+
+This source splintering phenomenon precludes projects with limited resources from offering an education and outreach product: lost potential for accessible windows into contemporary scientific work.
+In better-resourced projects, this splintering effect absorbs limited (and expensive) developer hours and often leads to one version of the code --- usually that for education/outreach --- falling into neglect and drifting out of sync with other versions.
+
+The Emscripten compiler promises to remedy this source splintering by enabling software compilation to serve double duty: targeting web browsers in addition to the traditional native runtime environment [@zakai2011emscripten].
+Browser-based approaches can yield particularly effective public-facing apps due to widespread cross-platform compatibility, no-install access, and rich graphical interfaces.
+
+Empirical amplifies the potential of Emscripten by fleshing out its rudimentary interface for interaction with browser elements.
+At the lowest level, Empirical provides tools for reciprocal data transfer between C++ code and the WebAssembly runtime.
+Built on top of this, is an object-oriented framework that wraps DOM elements (_e.g.,_ `<button>`, `<div>`, `<canvas>`, etc.) to easily control them and react to their HTML events from within C++ code.
+This facility relieves users of bookkeeping for JavaScript resources (particularly useful for those without web programming domain expertise).
+At a still higher level of abstraction, Empirical packages pre-configured, pre-styled collections of DOM elements as prefabricated widgets (configuration managers, collapsible read-outs, modal messages, etc.).
+Empirical's tools aim to make generating a mobile-friendly, web-based GUI for existing software so trivial that the practice becomes ubiquitous.
+<!-- In particular, we are focused on lowering the barrier to entry for developers without domain knowledge in HTML, CSS, and JavaScript by abstracting these matters away behind a C++ interface. -->
+
+Below, we give an example of Empirical's DOM interface in action.
+This example creates a button that increments an on-screen counter every time the button is clicked.
+You can view the resulting web page live at <https://devosoft.github.io/empirical-joss-demo/>.
+
+```c++
+#include "emp/web/web.hpp"
+
+emp::web::Document doc("target");
+
+int x = 5;
+int main() {
+  doc << "<h1>Hello World!</h1>";
+  doc << "Original x = " << x << ".<br>";
+  doc << "Current x = " << emp::web::Live(x) << ".<br>";
+
+  // Create a button to modify x.
+  emp::web::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!" );
+  doc << my_button;
+}
+```
+
+
+```html
+<body>
+  <div id="target"> </div>
+</body>
+
+<script src="https://code.jquery.com/jquery-1.11.2.min.js" integrity="sha256-Ls0pXSlb7AYs7evhd+VLnWsZ/AqEHcXBeMZUycz/CcA=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="main.js"></script>
+```
+
+<!-- @MAM: add a code snippet with a brief demo and a screenshot of  the resulting webpage -->
+
+A live demo of more sophisticated Empirical prefabricated widgets, presented alongside their source C++ code, is available on our [prefab demos page](https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo).
+
+<!-- # Empirical Development Practices -->
+<!-- @mmore500 moved to documentation -->
+<!-- @AML: talk here about testing/coverage setup, cookiecutter template, etc? maybe cookiecutter could go in re-invent wheel section? -->
+
+
 ## Facilitating Runtime Efficiency
 
 WebAssembly's runtime efficiency has become a major driver of its increasing popularity for web app development.
@@ -238,73 +305,6 @@ Although this tooling is very mature and quite powerful, there are fundamental l
 For example, Clang 12.0.0's sanitizers cannot detect the iterator invalidation described above ([live example](https://godbolt.org/z/z6ocqn87W)).
 Additionally, most of this tooling is not available when debugging WASM code compiled with Emscripten --- a core use case targeted by the Empirical library.
 Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), tooling limitations (such as the lack of a steppable debugger) make runtime safety checking particularly critical.
-
-## Realizing the Promise of Emscripten-based Web UIs
-
-Because of the ubiquitous availability of desktop computers and the ease of distributing software over the internet, scientific software has unique potential for low-barrier, hands-on outreach across broad educational and general audiences.
-Public-facing software also enables better science by making interactive demonstrations available to researchers outside a project's core development group.
-Additionally, public-facing software exemplifies open science by proffering accessible windows into contemporary scientific work.
-
-However, research versions of software are typically specialized to run on high-performance computing environments, often require extensively involved install processes, and generally lack graphical interfaces.
-Effective public-facing software, on the other hand, requires compatibility with consumer-grade hardware, a streamlined install process, and an intuitive graphical user interface.
-
-For these reasons, many scientific software projects have historically maintained separate code bases for research versus education and outreach.
-The Avida-ED project, for example, leveraged the existing Avida digital evolution model system for classroom activities [@pennock2007learning], but could not effectively leverage Avida's existing code base.
-Additionally, as was the case for the Avida-ED project, significant code duplication is often required to support the same education and outreach product across different operating systems.
-
-This source splintering phenomenon precludes projects with limited resources from offering an education and outreach product.
-In better-resourced projects, this splintering effect absorbs limited (and expensive) developer hours and often leads to one version of the code --- usually that for education/outreach --- falling into neglect and drifting out of sync with other versions.
-
-The Emscripten compiler promises to remedy source splintering by enabling software compilation to target web browsers in addition to the traditional native runtime environment [@zakai2011emscripten].
-Well-constructed browser-based apps excellently fulfill the requirements for effective public-facing software due to widespread cross-platform compatibility, no-install access, and rich graphical interfaces.
-With Emscripten, a single core code base can serve double duty.
-
-Empirical amplifies the potential of Emscripten by fleshing out the rudimentary interface Emscripten exposes for interacting with browser elements.
-At the lowest level, Empirical provides tools that facilitate convenient data transfer back and forth between C++ code and the Web Assembly runtime.
-On top of this, Empirical provides an object-oriented framework that wraps DOM elements (_e.g.,_ `<button>`, `<div>`, `<canvas>`, etc.) to easily control them and react to their HTML events from within C++ code.
-This facility relieves users of bookkeeping for JavaScript resources or even writing any JavaScript by hand, which is particularly useful for those without web programming domain expertise.
-At a still higher level of abstraction, Empirical packages pre-configured, pre-styled collections of DOM elements as prefabricated widgets (configuration managers, collapsible read-outs, modal messages, etc.).
-Our ultimate aspiration for Empirical is to make implementing a mobile-friendly, web-based GUI for existing software so trivial that the practice becomes ubiquitous.
-In particular, we are focused on lowering the barrier to entry for developers without domain knowledge in HTML, CSS, and JavaScript by abstracting these matters away behind a C++ interface.
-
-Below, we give an example of Empirical's DOM interface in action.
-This example creates a button that increments an on-screen counter every time the button is clicked.
-You can view the resulting web page live at <https://devosoft.github.io/empirical-joss-demo/>.
-
-```c++
-#include "emp/web/web.hpp"
-
-emp::web::Document doc("target");
-
-int x = 5;
-int main() {
-  doc << "<h1>Hello World!</h1>";
-  doc << "Original x = " << x << ".<br>";
-  doc << "Current x = " << emp::web::Live(x) << ".<br>";
-
-  // Create a button to modify x.
-  emp::web::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!" );
-  doc << my_button;
-}
-```
-
-
-```html
-<body>
-  <div id="target"> </div>
-</body>
-
-<script src="https://code.jquery.com/jquery-1.11.2.min.js" integrity="sha256-Ls0pXSlb7AYs7evhd+VLnWsZ/AqEHcXBeMZUycz/CcA=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="main.js"></script>
-```
-
-<!-- @MAM: add a code snippet with a brief demo and a screenshot of  the resulting webpage -->
-
-A live demo of more sophisticated Empirical prefabricated widgets, presented alongside their source C++ code, is available on our [prefab demos page](https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo).
-
-<!-- # Empirical Development Practices -->
-<!-- @mmore500 moved to documentation -->
-<!-- @AML: talk here about testing/coverage setup, cookiecutter template, etc? maybe cookiecutter could go in re-invent wheel section? -->
 
 # Outlook and Future Plans
 
