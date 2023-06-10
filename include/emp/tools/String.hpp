@@ -196,7 +196,7 @@ namespace emp {
     [[nodiscard]] std::string_view ViewBack(size_t out_size) const
       { emp_assert(out_size <= size()); return View(size()-out_size, out_size); }
     [[nodiscard]] std::string_view ViewRange(size_t start, size_t end) const {
-      emp_assert(start <= end && end <= size());
+      emp_assert(start <= end && end <= size(), start, end, size());
       return View(start, end - start);
     }
     [[nodiscard]] std::string_view ViewTo(CharSet stop_chars, size_t start=0,
@@ -1046,7 +1046,7 @@ namespace emp {
       start_pos = found_pos+delim.size();
       found_pos = Find(delim, found_pos+1, syntax);
     }
-    out_set.push_back( ViewRange(start_pos, found_pos) );
+    out_set.push_back( View(start_pos) );
   }
 
   /// @brief Generate vector of string_views based on the provided delimiter.
