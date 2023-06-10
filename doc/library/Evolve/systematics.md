@@ -92,7 +92,7 @@ Some useful terminology that might be useful in understanding the documentation 
 - **Bifurcation**: A node in a phylogeny that has exactly two child nodes.
 - **Non-branch node**: A node in a phylogeny with only one child node.
 - **Leaf node**: A node in a phylogeny with no children.
-- **Most Recent Common Ancestor (MRCA)**: The most recent node in a phylogeny that is a common ancestor of all nodes associated with extant taxa. If the phylogeny is pruned, there won't be any branch points before the MRCA (because any branches not leading to the MRCA would lead to taxa that are now extinct). 
+- **Most Recent Common Ancestor (MRCA)**: The most recent node in a phylogeny that is a common ancestor of all nodes associated with extant taxa. If the phylogeny is pruned, there won't be any branch points before the MRCA (because any branches not leading to the MRCA would lead to taxa that are now extinct).
 - **Coalescence events**: Occur when the most recent common ancestor changes (i.e. all descendants from one side of the deepest branch of the phylogeny have gone extinct). In the absence of diversity-preserving features coalescence events are expected to occur by chance with a frequency dependent on population size and spatial structure (but be careful of distributional assumptions). Observing coalescence less frequently than you would expect by chance can be an indication that ecological interactions are present (we have discussed this more [here](https://direct.mit.edu/artl/article/26/1/58/93272/Interpreting-the-Tape-of-Life-Ancestry-Based) and [here](https://direct.mit.edu/artl/article/25/1/50/2915/The-MODES-Toolbox-Measurements-of-Open-Ended)).
 
 ### Quickstart
@@ -185,7 +185,7 @@ An example of tracking positions is coming soon. For now, feel free to contact u
 
 #### Notifying the systematics object of deaths
 
-You must notify the systematics manager of deaths using the `remove_org` family of functions. 
+You must notify the systematics manager of deaths using the `remove_org` family of functions.
 
 As an example (again, building on the previous examples):
 
