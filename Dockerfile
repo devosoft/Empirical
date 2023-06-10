@@ -170,7 +170,7 @@ RUN \
     && \
   pip3 install wheel==0.30.0 \
     && \
-  pip3 install -r /opt/Empirical/doc/requirements.txt \
+  pip3 install --no-cache-dir -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
 
