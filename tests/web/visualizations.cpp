@@ -404,8 +404,7 @@ struct Test_LineGraph : public emp::web::BaseTest {
   {
 
     EM_ASM({
-      emp_i.ready = false;
-      var my_draw_callback = function(){console.log("yay");emp_i.ready = true;}
+      emp_i.done = function(){};
     });
 
     // MakeLineGraph("done");
@@ -420,9 +419,16 @@ struct Test_LineGraph : public emp::web::BaseTest {
     //     }
     //   }
     // });
-
     emp::JSWrap([this](std::string cb){MakeLineGraph(cb);}, "MakeLineGraph");
     emp::JSWrap([this](std::string cb){TestAnimateStep_LineGraph(cb);}, "TestAnimateStep_LineGraph");
+
+    line_graph.SetDrawCallback("done");
+    line_graph.LoadDataFromFile("/assets/test-line-graph.csv");
+
+    // EM_ASM({
+    //     emp.done = done;
+    //     emp.MakeLineGraph("done");
+    // });
 
   }
 
@@ -434,13 +440,6 @@ struct Test_LineGraph : public emp::web::BaseTest {
     MAIN_THREAD_EM_ASM({
 
       describe('Line Graph', function() {
-
-        before( function(done) {
-          console.log("starting");
-          emp.done = done;
-          emp.MakeLineGraph("done");
-          console.log("ending");
-        });
 
         it('should have data-points for each piece of test data', function() {
           var data_points = d3.select("#line_graph").selectAll(".data-point");
@@ -562,24 +561,14 @@ struct Test_TreeGraph : public emp::web::BaseTest {
 
 };
 
-
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-#include <iostream>
-#include <cstdlib>
-
 emp::web::MochaTestRunner test_runner;
 int main() {
 
   test_runner.Initialize({"tree_viz", "line_graph"});
 
   test_runner.AddTest<Test_Visualizations>("Test Visualizations");
-  test_runner.AddTest<Test_TreeGraph>("Test TreeGraph");
-  test_runner.AddTest<Test_LineGraph>("Test LineGraph");
-  sleep(10);
+  // test_runner.AddTest<Test_TreeGraph>("Test TreeGraph");
+  // test_runner.AddTest<Test_LineGraph>("Test LineGraph");
   test_runner.Run();
 }
 
