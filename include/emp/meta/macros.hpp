@@ -32,7 +32,7 @@
  *  EMP_SELECT_ARGS(PATTERN, ...) Uses the (repeating) patter to select arguments to keep.
  *    Pattern is an argument pack consisting of i (include) or x (exclude).
  *  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
- *  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
+ *  EMP_GET_EVEN_ARGS(...) will return all arguments at even positions (2,4,6,8, etc.)
  *  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
  *
  *  ===== Argument Manipulation and Formatting =====
