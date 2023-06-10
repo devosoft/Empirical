@@ -22,10 +22,10 @@ cd emsdk
 git pull
 
 # Download and install the latest SDK tools.
-./emsdk install 1.38.48
+./emsdk install 2.0.24
 
 # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-./emsdk activate 1.38.48
+./emsdk activate 2.0.24
 
 # Activate PATH and other environment variables in the current terminal
 source ./emsdk_env.sh
