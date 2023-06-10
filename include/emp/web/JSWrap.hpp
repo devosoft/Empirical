@@ -173,7 +173,8 @@ namespace emp {
       if (emp_i.curr_obj[UTF8ToString($0)] == null){
         emp_i.curr_obj[UTF8ToString($0)] = "undefined";
       }
-      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]), ALLOC_STACK);
+      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]),
+                   ALLOC_STACK);
     }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
