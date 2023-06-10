@@ -413,6 +413,14 @@ struct Test_LineGraph : public emp::web::BaseTest {
     // line_graph.SetDrawCallback("my_draw_callback");
     // line_graph.LoadDataFromFile("/assets/test-line-graph.csv");
 
+    // EM_ASM({
+    //   while (true) {
+    //     if (emp_i.ready) {
+    //       break;
+    //     }
+    //   }
+    // });
+
     emp::JSWrap([this](std::string cb){MakeLineGraph(cb);}, "MakeLineGraph");
     emp::JSWrap([this](std::string cb){TestAnimateStep_LineGraph(cb);}, "TestAnimateStep_LineGraph");
 
@@ -483,7 +491,6 @@ struct Test_LineGraph : public emp::web::BaseTest {
 struct Test_TreeGraph : public emp::web::BaseTest {
 
   void MakeTreeViz(std::string callback) {
-    tree_viz << tree;
     tree.SetDrawCallback(callback);
     tree.LoadDataFromFile("/assets/lineage-example.json");
   };
@@ -502,10 +509,11 @@ struct Test_TreeGraph : public emp::web::BaseTest {
 
   Test_TreeGraph()
   : BaseTest({"tree_viz"}), // we can tell BaseTest that we want to create a set of emp::web::Document objects for each given html element ids.
-     tree(500, 250),
-     tree_viz(Doc("tree_viz"))
-  {
+     tree_viz(Doc("tree_viz")),
+     tree(500, 250)
 
+  {
+    tree_viz << tree;
     emp::JSWrap([this](std::string cb){MakeTreeViz(cb);}, "MakeTreeViz");
     emp::JSWrap([this](std::string cb){TestAnimateStep_Tree(cb);}, "TestAnimateStep_Tree");
 
@@ -555,6 +563,14 @@ struct Test_TreeGraph : public emp::web::BaseTest {
 };
 
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+#include <iostream>
+#include <cstdlib>
+
 emp::web::MochaTestRunner test_runner;
 int main() {
 
@@ -563,6 +579,7 @@ int main() {
   test_runner.AddTest<Test_Visualizations>("Test Visualizations");
   test_runner.AddTest<Test_TreeGraph>("Test TreeGraph");
   test_runner.AddTest<Test_LineGraph>("Test LineGraph");
+  sleep(10);
   test_runner.Run();
 }
 
