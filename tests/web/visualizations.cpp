@@ -152,7 +152,7 @@ struct Test_Visualizations : public emp::web::BaseTest {
 
     emp::JSWrap([this](){return MakeSVG();}, "MakeSVG");
     emp::JSWrap([this](){return BindData();}, "BindData");
-    
+
     emp::JSWrap([this](){TestSetAttrString();}, "TestSetAttrString");
     emp::JSWrap([this](){TestSetAttrInt();}, "TestSetAttrInt");
     emp::JSWrap([this](){TestSetAttrFunc();}, "TestSetAttrFunc");
@@ -393,7 +393,7 @@ struct Test_LineGraph : public emp::web::BaseTest {
     line_graph.AddDataPoint({{6,12}});
   };
 
-  
+
   emp::web::Document& doc;
   emp::web::LineGraph<emp::array<double, 2> > line_graph;
 
@@ -599,4 +599,3 @@ int main() {
   //
   //   });
   // });
-
