@@ -165,7 +165,7 @@ namespace emp {
       size_t mask = emp::MaskLow<size_t>(K+1);
       for (size_t i = 0; i < N; i++) {
         const size_t cur_val = (genome >> i).GetUInt(0) & mask;
-	      const double cur_fit = GetFitness(i, cur_val);
+        const double cur_fit = GetFitness(i, cur_val);
         fits.push_back(cur_fit);
       }
       return fits;
