@@ -1,10 +1,6 @@
-sphinx==4.5.0
+sphinx
 exhale
 sphinx-rtd-theme
 coverxygen
 breathe
-myst-parser==0.18.1
-# @mmore500 2021-10
-# docutils 0.18.0 crashes docs build due to exception
-# AttributeError: 'Values' object has no attribute 'section_self_link'
-docutils
+myst-parser
