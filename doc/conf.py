@@ -22,6 +22,7 @@ import os
 import sphinx_rtd_theme
 import subprocess
 import sys
+import textwrap
 
 # -- General configuration ---------------------------------------------
 
@@ -60,7 +61,10 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../include"
+    "exhaleDoxygenStdin": textwrap.dedent("""
+        INPUT = ../include
+        EXCLUDE_SYMBOLS += internal
+    """)
 }
 
 # Tell sphinx what the primary language being documented is.
