@@ -8,6 +8,7 @@ SHELL ["/bin/bash", "-c"]
 # Prevent interactive time zone config.
 # adapted from https://askubuntu.com/a/1013396
 ENV DEBIAN_FRONTEND=noninteractive
+ENV SPHINXBUILD=python3.10 -m sphinx
 
 RUN \
   echo 'Acquire::http::Timeout "60";' >> "/etc/apt/apt.conf.d/99timeout" \
@@ -88,6 +89,13 @@ RUN \
     ssh-client \
     libasound2 \
     gpg-agent \
+    && \
+  add-apt-repository -y \
+    ppa:deadsnakes/ppa \
+    && \
+  apt-get install --no-install-recommends --allow-downgrades -y \
+    python3.10 \
+    python3.10-distutils \
     && \
   apt-get clean \
     && \
@@ -174,7 +182,11 @@ RUN \
     && \
   pip3 install wheel==0.30.0 \
     && \
-  pip3 install --no-cache-dir -r /opt/Empirical/doc/requirements.txt \
+  python3.10 -m pip install wheel==0.30.0 \
+    && \
+  pip3 install -r /opt/Empirical/doc/requirements.txt \
+    && \
+  python3.10 -m pip install -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
 
