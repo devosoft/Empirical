@@ -1,0 +1,138 @@
+name: CI
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches:
+      - '**'
+  schedule:
+    - cron: '0 0 * * 0'
+jobs:
+  tidy:
+    name: Enforce Tidyness
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq rename python3-sphinx
+      - run: ./ci/test_tidy.sh
+  test-macos-tidy:
+    name: Test Tidy Enforcement on macOS
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
+      # adapted from https://stackoverflow.com/a/42878119
+      - run: brew link sphinx-doc --force
+      - run: ./ci/test_tidy.sh
+  test:
+    name: Tests
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        cxx: [clang++, g++]
+        test-set:
+          - test-native-regular
+          - test-native-fulldebug
+          - test-native-opt
+          - test-examples
+          - test-demos
+          # - test-cookiecutter
+    env:
+      CXX: ${{ matrix.cxx }}
+      TEST_SET: ${{ matrix.test-set }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 11
+      - run: sudo apt-get update -qq
+      - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: git fetch origin master:refs/remotes/origin/master
+      - run: make install-test-dependencies
+      - run: ${CXX} --version
+      - run: |
+          source third-party/emsdk/emsdk_env.sh
+          make ${TEST_SET} CXX=${CXX}
+  test-web:
+    name: Web Tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 11
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: make install-test-dependencies
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: make test-web
+  test-coverage:
+    name: Measure Test Coverage
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip clang llvm-dev libclang-dev
+      - run: git fetch origin master:refs/remotes/origin/master
+      - run: make install-test-dependencies
+      - run: export CXX=clang++ && make install-coverage-dependencies
+      - run: export CXX=clang++ && make coverage
+      - run: curl -s https://codecov.io/bash | bash
+  test-documentation:
+    name: Test Documentation Build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - uses: mmore500/actions-setup-docker@94429ebc8d9edb4e8c8afb2667bce1e89435f74f
+      - run: docker build -t devosoft/empirical .
+      - run: docker ps -a
+      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
+      - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
+      - uses: sylvanld/action-storage@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          src: doc-coverage.json
+          dst: stats/doc-coverage.json
+  deploy-dockerhub:
+    name: Deploy to DockerHub
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/master'
+    needs:
+      - tidy
+      - test
+      - test-web
+      - test-coverage
+      - test-documentation
+      - test-macos-tidy
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          push: true
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: devosoft/empirical
+          tag_with_ref: true

@@ -59,4 +59,3 @@ class MyClassD {
 
   int mem_fun(int a, int b, int c) { return a+b+c; }
 };
-

@@ -1,4 +1,4 @@
-TEST_NAMES := base config constexpr data Evolve games geometry hardware meta scholar tools
+TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matching math meta scholar testing tools web
 
 CXX = clang++
 #CXX := g++
@@ -33,8 +33,8 @@ cranky-%:
 
 cranky: $(addprefix cranky-, $(TEST_NAMES))
 
-test-web:
-	  cd web && bash run_tests.sh
+test-web-js:
+	cd web && make test-web
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out

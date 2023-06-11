@@ -1,0 +1,10 @@
+When building a new hardware type that works with emp::InstSet, you must publicly define define:
+
+ id_t for the enumerated base type of each instruction.
+ arg_t for the types of each instruction argument (can be anything if not using args.)
+
+Further, the enumerated id_t must have an "Unknown" option for proper error management.
+
+
+
+When using InstLib, you must initialize all instructions and all arguments so that they can be loaded properly.

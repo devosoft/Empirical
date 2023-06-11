@@ -1,0 +1,200 @@
+/*
+ * These are the default styles for prefab elements. You can
+ * override any of these settings in your own CSS file as long
+ * as it's linked after the this default CSS file in the
+ * head of the HTML document.
+ *
+ * Using LESS CSS in this file. It uses syntax very similar to
+ * CSS, but allows us to reduce duplicate code by adding variables
+ * and compound classes (mixins). More cool features of LESS can
+ * be found here: http://lesscss.org/
+ *
+ * NOTE: If you modify this file, run the purge_script.sh script
+ * to see your changes take effect in the browser.
+ * (Empirical/include/emp/prefab/purge_script.sh)
+ */
+
+@CardHeaderTextColor: #3a3939;
+@CardHeaderHoverColor: #C0C0C0;
+@CommentBoxColor: #ede9e8;
+
+@BootstrapDeviceSmall:      576px;
+@BootstrapDeviceMedium:     768px;
+@BootstrapDeviceLarge:      992px;
+@BootstrapDeviceExtraLarge: 1200px;
+
+/* Glyphicon Toggle */
+.collapse_toggle[aria-expanded=true] .fa-angle-double-down {
+  display: none;
+}
+.collapse_toggle[aria-expanded=true] .fa-angle-double-right {
+  display: none;
+}
+.collapse_toggle[aria-expanded=false] .fa-angle-double-up {
+  display: none;
+}
+.toggle_icon_right_margin {
+  margin-right: 10px;
+}
+
+.collapse_toggle {
+  .fa:hover {
+    text-decoration: underline;
+  }
+}
+
+.toggle_glyph {
+  .collapse_toggle();
+  .setting_heading();
+  float: right;
+}
+
+/* Card */
+.card{
+  margin-bottom: 10px;
+}
+
+/* Card Header */
+.setting_heading{
+  color: @CardHeaderTextColor;
+}
+
+/* Change background of card header on hover to convey collapsibility */
+.collapse_toggle_card_header:hover {
+  background-color: @CardHeaderHoverColor;
+}
+
+/* Card Body */
+.card-body .btn {
+  text-align: left;
+}
+
+/* Comment Box */
+.commentbox_triangle {
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+
+  border-bottom: 12px solid @CommentBoxColor;
+  margin-left: 15px;
+}
+.commentbox_content {
+  padding: 10px;
+  background-color: @CommentBoxColor;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 95%;
+}
+.mobile_commentbox {
+  display: none;
+}
+
+/* Loading modal  */
+.bd-example-modal-lg .modal-dialog {
+  display: table;
+  position: relative;
+  margin: 0 auto;
+  top: calc(50% - 24px);
+}
+
+.bd-example-modal-lg .modal-dialog .modal-content {
+  background-color: transparent;
+  border: none;
+}
+
+/* Config Panel */
+.config_main {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.display_group, .settings_group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-auto-rows: auto;
+  grid-auto-flow: row dense;
+  align-items: center;
+  justify-items: stretch;
+}
+
+.config_controls {
+  order: 1;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
+}
+
+/* Mobile adjustments */
+
+// TODO: it would be much better to avoid media break points,
+// but need to solve the auto-flow dense/min-width issue (see .value_view).
+@media screen and (max-width: @BootstrapDeviceMedium) {
+  .settings_group {
+    grid-template-columns: auto;
+  }
+  .value_box {
+    grid-template-columns: auto;
+  }
+}
+
+/* Value Box, Control and Display */
+.value_box {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-auto-rows: auto;
+  grid-auto-flow: row dense;
+  align-items: center;
+  justify-items: stretch;
+}
+
+// Value boxes should relinquish their individual grid view to a
+// higher order component (e.g. a settings/display group) unless
+// they are being excluded from the config/readout.
+.settings_group .value_box:not(.excluded),
+.display_group .value_box:not(.excluded) {
+  display: contents;
+}
+
+.value_view {
+  padding: 6px 12px;
+  display: flex;
+  flex-flow: row nowrap;
+  grid-column-end: -1; // Spans to last column from wherever it is autoplaced
+
+  //min-width: 270px:
+  // BUG: Setting min-width ideally would result in auto-placement
+  // in a new row when the grid is too small to contain the view
+  // in the second column. However, instead it just forces the
+  // grid out of the viewport. Waiting on widespread subgrid support
+  // to fix, *sigh*.
+
+  // This just adds some spacing between components in the view
+  > :not(:last-child) {
+    margin-right: 12px;
+  }
+
+  // Determine which controls should grow in the value view
+  input {
+    &[type=range] {
+      flex: 1 1 auto;
+    }
+    &[type=number] {
+      flex: 0 1 100px;
+    }
+    &[type=text] {
+      flex: 1 1 auto;
+    }
+  }
+}
+
+// A value description should span from the first column
+// to the last (entire row)
+.value_description {
+  grid-column: 1 / -1;
+}
+
+// Use the class "exclude" to hide config groups or individuals settings
+.excluded {
+  display: none;
+}

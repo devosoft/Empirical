@@ -1,0 +1,30 @@
+All games should have common types and functions for easy use in templates:
+
+using move_t = MOVE_TYPE;
+     What type should be used for all moves?
+
+void Reset()
+     Restart the game (using the same settings)
+
+std::unordered_map<int, double> AsInput(size_t player_id) const
+     Store the current state of the game as a map for easy loading.
+
+bool DoMove(size_t player, move_t move)
+     Specify a move to be made by a player.
+     Return value indicates if player needs to make another decisions (or go again)
+
+bool IsDone()
+     Test: is the game finished?
+
+bool IsMoveValid(size_t player, move_t move)
+     Test: is a provided move legal?
+
+emp::vector<move_t> GetMoveOptions()
+     Return the available moves to choose from (needed to run a random player!)
+
+double GetScore(size_t player)
+     How is the specified player doing?
+     In a binary win/lose game, these scores will be 0/1 at the end of the game.
+
+void Print(std::ostream & os=std::cout)
+     Print out the current state of the game.

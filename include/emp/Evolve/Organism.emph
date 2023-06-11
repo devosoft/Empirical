@@ -1,0 +1,25 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file  Organism.hpp
+ *  @brief A wrapper for dealing with organisms is a generic manner.
+ *  @note Status: PLANNING
+ */
+
+#ifndef EMP_EVOLVE_ORGANISM_H
+#define EMP_EVOLVE_ORGANISM_H
+
+namespace emp {
+
+  concept OrganismWrapper : Organism {
+    operator double() const { emp_assert(false, "No default fitness conversion available."); return 0.0; }
+    double GetFitness() { return (double) *this; }
+    int DoMutations() { emp_assert(false, "No default DoMutations() available."); }
+    std::string ToString() { return emp::to_string(*this); }
+    auto GetGenome() { return *this; }
+  };
+
+}
+#endif
