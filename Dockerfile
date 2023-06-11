@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:bionic-20210416
+FROM ubuntu:focal-20230412
 
 COPY . /opt/Empirical
 
@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-c"]
 # Prevent interactive time zone config.
 # adapted from https://askubuntu.com/a/1013396
 ENV DEBIAN_FRONTEND=noninteractive
-ENV SPHINXBUILD=python3.10 -m sphinx
+ENV SPHINXBUILD="python3.10 -m sphinx"
 
 RUN \
   echo 'Acquire::http::Timeout "60";' >> "/etc/apt/apt.conf.d/99timeout" \
@@ -32,20 +32,21 @@ RUN \
     && \
   rm -rf /var/lib/apt/lists/* \
     && \
-  find /etc/apt -type f -name '*.list' -exec sed -i 's/\(^deb.*-backports.*\)/#\1/; s/\(^deb.*-updates.*\)/#\1/; s/\(^deb.*-proposed.*\)/#\1/; s/\(^deb.*-security.*\)/#\1/' {} + \
-    && \
   apt-get update -y \
     && \
-  apt-get install -y software-properties-common=0.96.24.32.1 \
+  apt-get install -y software-properties-common \
     && \
   add-apt-repository -y ppa:ubuntu-toolchain-r/test \
+    && \
+  add-apt-repository -y ppa:deadsnakes/ppa \
     && \
   apt-get update -y \
     && \
   apt-get install --no-install-recommends --allow-downgrades -y \
+    build-essential \
     dpkg-dev \
     g++-11 \
-    libc6=2.27-3ubuntu1 \
+    libc6 \
     xvfb \
     x11vnc \
     x11-xkb-utils \
@@ -60,13 +61,13 @@ RUN \
     lsb-release \
     xdg-utils \
     cmake \
-    python-virtualenv \
-    python-pip-whl \
-    python-pip \
-    python-setuptools \
+    python3-distutils \
     python3-setuptools \
     python3-virtualenv \
     python3-pip \
+    'python3\.10' \
+    'python3\.10-distutils' \
+    'python3\.10-venv' \
     nodejs \
     npm \
     tar \
@@ -76,7 +77,7 @@ RUN \
     doxygen \
     curl \
     perl \
-    perl-base=5.26.1-6 \
+    perl-base \
     git \
     htop \
     man \
@@ -89,13 +90,6 @@ RUN \
     ssh-client \
     libasound2 \
     gpg-agent \
-    && \
-  add-apt-repository -y \
-    ppa:deadsnakes/ppa \
-    && \
-  apt-get install --no-install-recommends --allow-downgrades -y \
-    python3.10 \
-    python3.10-distutils \
     && \
   apt-get clean \
     && \
@@ -167,6 +161,8 @@ RUN \
   && \
   n 14.17 \
   && \
+  hash -r \
+  && \
   export python="/usr/bin/python3" \
   && \
   npm install source-map \
@@ -174,15 +170,19 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
-  pip install --upgrade pip \
+  curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
     && \
-  pip3 install --upgrade pip \
+  pip install --upgrade --force-reinstall pip virtualenv \
     && \
-  pip install wheel==0.30.0 \
+  pip3 install --upgrade --force-reinstall pip virtualenv \
     && \
-  pip3 install wheel==0.30.0 \
+  python3.10 -m pip install --upgrade --force-reinstall pip virtualenv \
     && \
-  python3.10 -m pip install wheel==0.30.0 \
+  pip install wheel==0.30.0 six==1.16.0 \
+    && \
+  pip3 install wheel==0.30.0 six==1.16.0 \
+    && \
+  python3.10 -m pip install wheel==0.30.0 six==1.16.0 \
     && \
   pip3 install -r /opt/Empirical/doc/requirements.txt \
     && \
@@ -197,12 +197,18 @@ RUN \
     && \
   git submodule init \
     && \
-  git submodule update -f \
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf \
+    && \
+  n=0; until [ $n -ge 3 ]; do git submodule update -f && break || ((n++)); sleep 5; done; if [ $n -eq 3 ]; then echo "Update failed after 3 attempts."; else echo "Update successful!"; fi \
     && \
   echo "initialized submodules"
 
 RUN \
   cd /opt/Empirical \
+    && \
+  curl -sS https://bootstrap.pypa.io/get-pip.py | python3 \
+    && \
+  python3 -m pip install virtualenv \
     && \
   make install-test-dependencies \
     && \
