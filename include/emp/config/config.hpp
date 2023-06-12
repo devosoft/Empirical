@@ -402,7 +402,9 @@ namespace emp {
       for (auto & x : type_manager_map) delete x.second;
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class ConfigWebUI;
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
     ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }

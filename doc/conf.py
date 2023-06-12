@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Empirical documentation build configuration file, created by
@@ -22,6 +22,7 @@ import os
 import sphinx_rtd_theme
 import subprocess
 import sys
+import textwrap
 
 # -- General configuration ---------------------------------------------
 
@@ -60,7 +61,10 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../include"
+    "exhaleDoxygenStdin": textwrap.dedent("""
+        INPUT = ../include
+        EXCLUDE_SYMBOLS += internal __impl_* *impl *IMPL *_IMPL_* *Impl
+    """)
 }
 
 # Tell sphinx what the primary language being documented is.

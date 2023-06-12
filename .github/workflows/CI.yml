@@ -7,6 +7,7 @@ on:
       - '**'
   schedule:
     - cron: '0 0 * * 0'
+  workflow_dispatch:
 jobs:
   tidy:
     name: Enforce Tidyness
@@ -106,7 +107,7 @@ jobs:
       - uses: mmore500/actions-setup-docker@94429ebc8d9edb4e8c8afb2667bce1e89435f74f
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
-      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
+      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python3 /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
       - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
       - uses: sylvanld/action-storage@v1
         if: github.ref == 'refs/heads/master'
