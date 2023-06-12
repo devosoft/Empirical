@@ -64,18 +64,18 @@ trigger an assertion error and print the value of a.
 
 % ```{doxygendefine} emp_assert
 % :project: Empirical
-:no-link:% ```
+  :no-link:% ```
 
 ```{eval-rst}
 .. doxygendefine:: emp_assert
   :project: Empirical
-:no-link:   
+  :no-link:   
 ```
 
 ```{eval-rst}
 .. doxygendefine:: emp_emscripten_assert
   :project: Empirical
-:no-link:   
+  :no-link:   
 ```
 
 ## Empirical pointers

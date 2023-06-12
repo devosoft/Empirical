@@ -5,7 +5,7 @@
 ```{eval-rst}
 .. doxygenfile:: Evolve/World.hpp
   :project: Empirical
-:no-link:   
+  :no-link:   
 ```
 
 ## Phylotracklib (Systematics Manager)
@@ -16,7 +16,7 @@
 ```{eval-rst}
 .. doxygenfile:: Evolve/Systematics.hpp
   :project: Empirical
-:no-link:   
+  :no-link:   
 ```
 
 ## NK
@@ -24,7 +24,7 @@
 ```{eval-rst}
 .. doxygenfile:: Evolve/NK.hpp
   :project: Empirical
-:no-link:   
+  :no-link:   
 ```
 
 ## Selection
@@ -32,5 +32,5 @@
 ```{eval-rst}
 .. doxygenfile:: Evolve/World_select.hpp
   :project: Empirical
-:no-link:   
+  :no-link:   
 ```
