@@ -923,6 +923,8 @@ namespace emp {
       return {std::forward<T>(props)...};
     }
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
+
     namespace __impl_attrs_merge {
       constexpr struct {
         template <typename I, typename A>
@@ -935,7 +937,7 @@ namespace emp {
     /// Creates a new attribute pack which has all the attributes of this
     /// pack and another pack. Values will be taken from other other pack
     /// preferentially.
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS // Doxygen is getting tripped up by this
+    
     template <typename... U>
     constexpr auto Merge(U&&... packs)
       // This hint is required by some older compilers

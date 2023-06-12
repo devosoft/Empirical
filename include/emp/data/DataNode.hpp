@@ -65,6 +65,7 @@ namespace emp {
   };
 
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// A shortcut for converting DataNode mod ID's to ValPacks.
   template <emp::data... MODS> using ModPack = emp::ValPack<(int) MODS...>;
 
@@ -86,12 +87,13 @@ namespace emp {
     using type = typename next_type::template append<this_req>;
   };
 
-
   /// Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
   public:
     DataNodeModule() { emp_assert(false, "Unknown module used in DataNode!"); }
   };
+
+  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
   /// Base form of DataNodeModule (available in ALL data nodes.)
   template <typename VAL_TYPE>
@@ -650,6 +652,7 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     emp::FunctionSet<VAL_TYPE()> pull_funs;                   ///< Functions to pull data.
     emp::FunctionSet<emp::vector<VAL_TYPE>()> pull_set_funs;  ///< Functions to pull sets of data.
 
@@ -658,7 +661,8 @@ namespace emp {
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::in_vals;
-
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+    
     void PullData_impl() {
       in_vals = pull_funs.Run();
       const emp::vector< emp::vector<VAL_TYPE> > & pull_sets = pull_set_funs.Run();

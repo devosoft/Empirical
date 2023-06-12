@@ -21,6 +21,7 @@
 import os
 import sphinx_rtd_theme
 import subprocess
+import glob
 import sys
 import textwrap
 
@@ -39,9 +40,11 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx_rtd_theme',
     'breathe',
-    'exhale',
+    # 'exhale',
     'myst_parser',
 ]
+
+myst_heading_anchors = 4
 
 # Setup the breathe extension
 breathe_projects = {
@@ -49,23 +52,34 @@ breathe_projects = {
 }
 breathe_default_project = "Empirical"
 
-# Setup the exhale extension
-exhale_args = {
-    # These arguments are required
-    "containmentFolder":     "./api",
-    "rootFileName":          "library_root.rst",
-    "rootFileTitle":         "Library API",
-    "doxygenStripFromPath":  "..",
-    # Suggested optional arguments
-    "createTreeView":        True,
-    # TIP: if using the sphinx-bootstrap-theme, you need
-    # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin": textwrap.dedent("""
-        INPUT = ../include
-        EXCLUDE_SYMBOLS += internal __impl_* *impl *IMPL *_IMPL_* *Impl
-    """)
+breathe_projects_source = {
+    "Empirical" : (
+        "../include/emp", glob.glob("**/*.hpp")
+    )
 }
+
+# Setup the exhale extension
+# exhale_args = {
+#     # These arguments are required
+#     "containmentFolder":     "./api",
+#     "rootFileName":          "library_root.rst",
+#     "rootFileTitle":         "Library API",
+#     "doxygenStripFromPath":  "..",
+#     # Suggested optional arguments
+#     "createTreeView":        True,
+#     # TIP: if using the sphinx-bootstrap-theme, you need
+#     # "treeViewIsBootstrap": True,
+#     "exhaleExecutesDoxygen": True,
+#     "exhaleDoxygenStdin": textwrap.dedent("""
+#         INPUT = ../include
+#         EXCLUDE_SYMBOLS += internal __impl_* *impl *IMPL *_IMPL_* *Impl,
+#         XML_PROGRAMLISTING     = NO        
+#     """)
+# }
+
+breathe_doxygen_config_options = {'PREDEFINED': 'DOXYGEN_SHOULD_SKIP_THIS'}
+
+# cpp_index_common_prefix = ["emp::"]
 
 # Tell sphinx what the primary language being documented is.
 primary_domain = 'cpp'

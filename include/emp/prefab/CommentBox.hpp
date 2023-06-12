@@ -26,7 +26,7 @@ namespace prefab {
    * Optionally, it can contain text and other web elements.
    */
   class CommentBox: public web::Div {
-    friend prefab::ConfigPanel;
+    friend ConfigPanel;
     private:
       // ID for the comment box Div
       std::string box_base = this->GetID();

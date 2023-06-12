@@ -44,7 +44,7 @@
 #include <sstream>
 #include <string>
 
-/// If we are in emscripten, make sure to include the header.
+// If we are in emscripten, make sure to include the header.
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif

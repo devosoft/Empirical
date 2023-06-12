@@ -1711,11 +1711,11 @@ namespace emp {
     if (bit) SetRange(num_bits-num, num_bits);
   }
 
-  /// Insert bit(s) into any index of vector using bit magic.
-  /// Blog post on implementation reasoning: https://devolab.org/?p=2249
-  /// @param index location to insert bit(s).
-  /// @param val value of bit(s) to insert (default true)
-  /// @param num number of bits to insert, default 1.
+  // Insert bit(s) into any index of vector using bit magic.
+  // Blog post on implementation reasoning: https://devolab.org/?p=2249
+  // @param index location to insert bit(s).
+  // @param val value of bit(s) to insert (default true)
+  // @param num number of bits to insert, default 1.
   void BitVector::Insert(const size_t index, const bool val, const size_t num) {
     Resize(num_bits + num);                 // Adjust to new number of bits.
     BitVector low_bits(*this);              // Copy current bits
@@ -1727,9 +1727,9 @@ namespace emp {
   }
 
 
-  /// Delete bits from any index in a vector.
-  /// @param index location to delete bit(s).
-  /// @param num number of bits to delete, default 1.
+  // Delete bits from any index in a vector.
+  // @param index location to delete bit(s).
+  // @param num number of bits to delete, default 1.
   void BitVector::Delete(const size_t index, const size_t num) {
     emp_assert(index+num <= GetSize());   // Make sure bits to delete actually exist!
     RawCopy(index+num, num_bits, index);  // Shift positions AFTER delete into place.

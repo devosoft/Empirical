@@ -422,7 +422,7 @@
 /// @endcond
 
 
-// @cond MACROS
+/// @cond MACROS
 
 
 // **********************
@@ -441,7 +441,6 @@
 #define EMP_INTERNAL_CALL_BY_PACKS(C, F, ...)                                     \
   EMP_INTERNAL_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__, ~)
 
-/// @cond MACROS
 
 // Internal helpers...
 // P is the pack of call counts the still need to be done

@@ -233,12 +233,6 @@ namespace emp {
 
 #endif
 
-#else // Let doxygen document a non-confusing version of Live
-
-/// Take a function or variable and set it up so that it can update each time a text box is redrawn.
-template <typename T>
-std::function<std::string()> emp::Live(T && val) {;}
-
 #endif
 
 #endif // #ifndef EMP_WEB_INIT_HPP_INCLUDE

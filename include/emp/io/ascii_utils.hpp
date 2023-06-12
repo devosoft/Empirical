@@ -23,7 +23,7 @@ namespace emp {
 
   /// The following function prints an ascii bar graph on to the screen (or provided stream).
   template <typename T>
-  void AsciiBarGraph( emp::vector<T> data,
+  void AsciiBarGraph( emp::vector<T> data,          ///< Data to graph
                       size_t max_width=80,          ///< What's the widest bars allowed?
                       bool show_scale=true,         ///< Should we show the scale at bottom.
                       bool max_scale_1=true,        ///< Should we limit scaling to 1:1?
@@ -47,7 +47,7 @@ namespace emp {
 
   /// Take the input data, break it into bins, and print it as a bar graph.
   template <typename T>
-  void AsciiHistogram(emp::vector<T> data,
+  void AsciiHistogram(emp::vector<T> data,           ///< Data to graph
                       size_t num_bins=40,            ///< How many bins in histogram?
                       size_t max_width=80,           ///< What's the widest bars allowed?
                       bool show_scale=true,          ///< Should we show the scale at bottom?

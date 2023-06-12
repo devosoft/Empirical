@@ -295,6 +295,8 @@ namespace emp {
     static constexpr int Product() { return I; }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   //This bit of magic is from
   //http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html
   //and is useful for fixing lambda function woes
@@ -323,6 +325,8 @@ namespace emp {
   {
     return static_cast<typename function_traits<Function>::function>(lambda);
   }
+
+  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
   /// Determine the size of a built-in array.
   template <typename T, size_t N>

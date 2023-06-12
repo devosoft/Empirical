@@ -82,7 +82,9 @@ namespace web {
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
   protected:
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     using WidgetInfo = internal::WidgetInfo;
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
     WidgetInfo * info;                        ///< Information associated with this widget.
 
     /// If an Append doesn't work with current class, forward it to the parent and try there.

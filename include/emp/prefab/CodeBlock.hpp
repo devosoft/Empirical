@@ -35,6 +35,7 @@ namespace prefab {
        *
        * @param code_block string of the code to be placed in code block
        * @param lang programming language to base syntax highlighting
+       * @param id the id of the html element for this code block
        */
       CodeBlock(const std::string code_block, const std::string lang, const std::string & id="")
         : web::Element("pre", id) {

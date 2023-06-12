@@ -206,7 +206,7 @@ namespace emp::prefab {
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
-     * @param value the initial value
+     * @param is_checked is switch initially on?
      * @param onChange function to be called when the user changes this value
      * @param id user defined ID for BoolValueControl div (default is emscripten generated)
      */

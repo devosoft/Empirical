@@ -31,7 +31,9 @@ namespace prefab {
       public:
         /**
          * @param controller web element that cause target area(s) to expand/collapse when clicked
+         * @param controls_class CSS class for controls
          * @param expanded whether or not the target(s) are initially in an expanded/open state
+         * @param id HTML id of div for this controller
          */
         template <typename T>
         CollapseController(
@@ -190,7 +192,7 @@ namespace prefab {
       /**
        * Adds a target to the vector of targets for this CollapseCouple
        *
-       * @param widget new target to add to coupling is a string
+       * @param target new target to add to coupling is a string
        * @param expanded initial state of the target(s), is it expanded or not?
        */
 

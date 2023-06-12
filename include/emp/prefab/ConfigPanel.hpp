@@ -129,6 +129,8 @@ namespace prefab {
     public:
       /**
        * @param config config object used to construct this panel
+       * @param open Should card for displaying this config default to being open?
+       * @param div_name Name to use for html div id for this panel
        */
       ConfigPanel(
         Config & config,
@@ -310,6 +312,7 @@ namespace prefab {
       /**
        * Arranges config panel based configuration pass to constructor
        * @param config the config object used to create this panel
+       * @param open should the card for the panel start open?
        * @param id_prefix string appended to id for each setting (unusued)
        * @deprecated No longer necessary for config panel to function.
        * This function was a work around to fix a bug.
