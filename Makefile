@@ -45,6 +45,7 @@ test-cookiecutter: ../cookiecutter-empirical-project
 	cd ../cookiecutter-empirical-project && make clean && make test
 
 doc:
+	doxygen
 	cd doc && make html coverage
 
 coverage:
