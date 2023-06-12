@@ -19,6 +19,8 @@
 
 #include "_is_streamable.hpp"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 namespace emp {
 
   static int TripAssert() {
@@ -64,3 +66,4 @@ namespace emp {
 } // namespace emp
 
 #endif // #ifndef EMP_BASE__EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/

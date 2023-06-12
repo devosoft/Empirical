@@ -113,7 +113,7 @@ namespace prefab {
      * A protected constructor for a Card.
      * @param state indicate whether card should be STATIC, INIT_OPEN, or INIT_CLOSED (default STATIC)
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
-     * @param info_ref a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
+     * @param in_info a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
      * or a pointer to a derived info object (simulating inheritance)
      */
     Card(

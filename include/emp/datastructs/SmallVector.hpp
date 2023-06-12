@@ -363,6 +363,8 @@ public:
   void pop_back() { this->set_size(this->size() - 1); }
 };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 /// This class consists of common code factored out of the SmallVector class to
 /// reduce code duplication based on the SmallVector 'N' template parameter.
 template <typename T>
@@ -716,6 +718,8 @@ public:
                                         RHS.begin(), RHS.end());
   }
 };
+
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
 template <typename T>
 void SmallVectorImpl<T>::swap(SmallVectorImpl<T> &RHS) {

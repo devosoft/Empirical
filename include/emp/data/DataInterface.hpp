@@ -21,28 +21,63 @@ namespace emp {
   public:
     virtual ~DataInterface() { ; }
 
+    /// Returns the number values added to this node since the last reset.
     virtual size_t GetCount() const = 0;
+    
+    /// Returns the number of times this node has been reset.
     virtual size_t GetResetCount() const = 0;
 
+    /// Returns the sum of values added since the last reset.
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     virtual double GetTotal() const = 0;
+    /// Returns the mean of the values added since the last reset.
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     virtual double GetMean() const = 0;
+    /// Returns the minimum of the values added since the last reset.
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     virtual double GetMin() const = 0;
+    /// Returns the maximum of the values added since the last reset.
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     virtual double GetMax() const = 0;
 
+    /// Returns the variance of the values added since the last reset.
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     virtual double GetVariance() const = 0;
+    /// Returns the standard deviation of the values added since the last reset.
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     virtual double GetStandardDeviation() const = 0;
+    /// Returns the skewness of the values added since the last reset.
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     virtual double GetSkew() const = 0;
+    /// Returns the kurtosis of the values added since the last reset.
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     virtual double GetKurtosis() const = 0;
 
+    /// Runs the Pull function for this DataNode and records the resulting values.
+    /// Requires that the data::Pull module was added to this DataNode, and that a pull function
+    /// was specified.
     virtual void PullData() = 0;
+    /// Reset this node. The exact effects of this depend on the modules that this node has,
+    /// but in general it prepares the node to receive a new set of data.
     virtual void Reset() = 0;
+    /// Print debug information about this node to the provided stream
+    /// Useful for tracking which modifiers are included.
+    /// @param os The stream to print debug information to
     virtual void PrintDebug(std::ostream & os=std::cout) = 0;
 
+    /// Returns this node's name. Requires that the data::Info module was
+    /// added to this DataNode, and that a name was set.
     virtual void GetName() = 0;
+    /// Returns this node's description. Requires that the data::Info module was
+    /// added to this DataNode, and that a description was set.
     virtual void GetDescription() = 0;
+    /// Returns this node's keyword. Requires that the data::Info module was
+    /// added to this DataNode, and that a keyword was set.
     virtual void GetKeyword() = 0;
 
   };
+
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename VAL_TYPE, emp::data... EXTRA>
   class DataInterface_Impl : public DataInterface {
@@ -128,6 +163,7 @@ namespace emp {
 
   };
 
+  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
   template <typename VAL_TYPE, emp::data... EXTRA>
   DataInterface * MakeDataInterface() {

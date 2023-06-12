@@ -164,12 +164,12 @@ namespace emp::prefab {
     ValueControl(
       const std::string & label,
       const std::string & desc,
-      const std::string & inital_value,
+      const std::string & initial_value,
       web::Input input,
       const std::string & id=""
     ) : ValueBox(label, desc, id), mainCtrl(input) {
       view << mainCtrl;
-      mainCtrl.Value(inital_value);
+      mainCtrl.Value(initial_value);
     }
   };
 

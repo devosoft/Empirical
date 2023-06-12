@@ -150,7 +150,7 @@ namespace prefab {
        * Adds a controller to the vector of controllers for this CollapseCouple
        *
        * @param controller new controller to add to coupling is of type Widget
-       * @param expaned initial state of the target(s), is it expaned or not?
+       * @param expanded initial state of the target(s), is it expanded or not?
        */
       void AddController(web::Widget controller, const bool expanded) {
         internal::CollapseController controller_widget(controller, target_class, expanded);
@@ -160,7 +160,7 @@ namespace prefab {
       /** Adds a controller to the vector of controllers for this CollapseCouple.
        *
        * @param controller new controller to add to coupling is of type string
-       * @param expaned initial state of the target(s), is it expaned or not?
+       * @param expanded initial state of the target(s), is it expanded or not?
        */
 
       /*
@@ -175,7 +175,7 @@ namespace prefab {
        * Adds a target to the vector of targets for this CollapseCouple
        *
        *  @param widget new target to add to coupling is a web element
-       *  @param expaned initial state of the target(s), is it expaned or not?
+       *  @param expanded initial state of the target(s), is it expanded or not?
        */
       void AddTarget(web::internal::FacetedWidget widget, const bool expanded) {
         if (expanded) {
@@ -191,7 +191,7 @@ namespace prefab {
        * Adds a target to the vector of targets for this CollapseCouple
        *
        * @param widget new target to add to coupling is a string
-       * @param expaned initial state of the target(s), is it expaned or not?
+       * @param expanded initial state of the target(s), is it expanded or not?
        */
 
       /*
