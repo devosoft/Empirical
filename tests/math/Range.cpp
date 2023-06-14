@@ -35,7 +35,7 @@ TEST_CASE("Test Range", "[math]")
 
   // Valid Limit
   REQUIRE(!r1.Valid(0));
-  REQUIRE(r1.Limit(0) == 5);
+  REQUIRE(r1.LimitValue(0) == 5);
 
   // Spread
   emp::vector<int> s = r.Spread(6);
@@ -69,7 +69,7 @@ TEST_CASE("Test Range", "[math]")
   emp::Range<int> r3 = emp::IntRange(-5,5);
   REQUIRE(r3.GetLower() == -5);
   REQUIRE(r3.GetUpper() == 5);
-  REQUIRE(r3.Limit(100) == 5);
+  REQUIRE(r3.LimitValue(100) == 5);
 
   // DRange
   emp::Range<double> r4 = emp::DRange(0.1,23.5);
