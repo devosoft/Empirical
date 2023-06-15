@@ -73,11 +73,11 @@ JOSS: "Begin your paper with a summary of the high-level functionality of your s
 i.e., What does this software do?
 -->
 
-Empirical is a C++ library designed to promote open science and facilitate the development of scientific software that is efficient, reliable, and universal distributability to researchers and non-experts alike.
+Empirical is a C++ library designed to promote open science and facilitate the development of scientific software that is efficient, reliable, and easily distributable to researchers and non-experts alike.
 Specifically, the library sets out to fulfill the following goals:
 
 1. **Utility:** Empirical features a wide selection of helper tools to streamline common scientific computing tasks such as configuration, data management, random number generation, mathematical manipulations, and signal-action registration. Examples, documentation, and project templates streamline developer orientation.
-2. **Efficiency:** Empirical tools emphasize efficiency to make make heavy scientific workloads tractable. Where possible, computation is moved to compile-time, heap allocation is avoided, and memory-locality is respected.
+2. **Efficiency:** Empirical tools emphasize efficiency to make heavy scientific workloads tractable. Where possible, computation is moved to compile-time, heap allocation is avoided, and memory-locality is respected.
 3. **Reliability:** Scientific simulation and data analysis is meaningful insofar as it is correct. In conjunction with extensive unit testing, Empirical benefits from --- and provides --- sophisticated debug-mode instrumentation tools. These include audited memory management, drop-in replacements for standard C++ containers with safety checking, and self-documenting assertions.
 4. **Distributability:** Scientific software should be easily used by any researcher, student, or citizen scientist who wants to experiment, explore, or test the reproducibility of results. As such, Empirical is highly portable, uses common data formats, supports runtime reconfiguration, and provides tools to compile software as a performant web app without heavy web development workloads.
    <!-- Additionally, we strive for inclusivity in our own development practices and for our library to reduce barriers to entry for software developers and users.-->
@@ -329,7 +329,7 @@ To this end, we look forward to supporting a wider of collection of collaborator
 
 
 There are many existing software platforms that provide functionalities overlapping with Empirical.
-However, most are not in C++, and there is value in this functionality being easily available to programmers.
+However, most are not in C++, and there is value in this functionality being easily available to C++ programmers.
 <!-- being easily available to programmers who are most comfortable in C++ -->
 <!-- TODO C++ as a high-efficiency language -->
 <!-- Therefore, here we focus only on software platforms that support development in C++. -->
