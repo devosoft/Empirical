@@ -1,3 +1,5 @@
+Emphatic is an internal coding for Empirical that will try to support as many text encodings as reasonable, simplifying the conversion between them while being easy to write to in code (via the emp::Text object.)
+
 Supported text formats:
  TXT (plain text - working)
  HTML (simple tags working)
@@ -5,9 +7,9 @@ Supported text formats:
  MARKDOWN
  RTF
  XML
- Emphatic (custom markup language; simple tags working)
+ MarkBack (custom markup language; simple tags working)
 
-Emphatic notes:
+MarkBack notes:
  *  Internal format is .emp, which uses just a backquote (`) as a special character.  It
  *  is otherwise inspired from markdown, but makes special characters easy to use.
  *  The only other reserved special character is backslash (`\`), discussed below.
@@ -67,14 +69,14 @@ Some saved notes:
     //   HTML:      One word is <b>bold</b>.
     //   MarkDown:  One word is *bold*.
     //   LaTeX:     One word is \textbf{bold}.
-    //   Emphatic:  One word is `*bold`*
+    //   MarkBack:  One word is `*bold`*
     //
     // Some styles need to have arguments associated with them.  For example, a heading needs
     // to have a level.  A level 3 heading, for example, would be stored as style "heading:3".
     //   HTML:      <h3>A level 3 heading</h3>
     //   MarkDown:  ### A level 3 heading
     //   LaTeX:     \subsubsection{A level 3 heading}
-    //   Emphatic:  `### A level 3 heading
+    //   MarkBack:  `### A level 3 heading
     //
     // The patterns associated with these can either be broken up into multiple tags (for example,
     // in LaTeX it's easier to match a specific "\subsubsection{" open tag with "header:3" style),
@@ -86,7 +88,7 @@ Some saved notes:
     //   HTML:      This is <a href="http://www.exmaple.com/">linked</a> text.
     //   MarkDown:  This is [linked](http://www.exmaple.com/) text.
     //   LaTeX:     This is \href{http://www.exmaple.com/}{linked} text.
-    //   Emphatic:  This is `[linked](http://www.exmaple.com/) text.
+    //   MarkBack:  This is `[linked](http://www.exmaple.com/) text.
     //
     // For these patterns, HTML open would look like: <a href="%u">
     // And it would be set to the style: "link:$0".
