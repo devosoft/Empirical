@@ -45,8 +45,8 @@ MarkBack notes:
  *  `{variable = value || other_code}
  *  `$var_value_printed_here$
  * 
- *  ?? Anything with four spaces at the beginning will be treated like indented code.
- *  Add a `= at the beginning of a line if you don't want special formatting.
+ *  Anything with three backticks (```) before and after will be treated as code blocks.
+ *  Add a `= at the beginning of a line if you don't want any special formatting.
  *   
  *  A single or double backtick indicates that everything in between is going to be inline
  *  code.  A single backtick must be followed by an alphanumeric character or whitespace,
@@ -59,6 +59,8 @@ MarkBack notes:
  *  \\ is a regular backslash ('\')
  *  \` is a backtick in the actual string ('`')
  *  \  (backlash space) is a non-breaking space.
+ *  \123 (or any other number) is the associated unicode character.
+ *  \. is nothing. Use to separate other text (e.g., unicode followed by number)
  *  \n is a newline
  *  \t is a tab
 
