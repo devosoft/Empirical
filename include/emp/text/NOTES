@@ -9,8 +9,33 @@ Supported text formats:
  XML
  MarkBack (custom markup language; simple tags working)
 
+Internal encoding (Emphatic)
+ The Emphatic encoding maintains a string of characters, each associated with any number of styles.  The standard styles are:
+  bold
+  code
+  comment (text that should not be shown in final output)
+  italic
+  strike (for strikethrough)
+  subscript
+  superscript
+  underline
+
+ Some styles are only associated with individual special characters (usually matched with a space).  This are:
+  no_break - non-breaking space
+  bullet
+  ordered
+  indent
+  blockquote - Marks this line as being part of a blockquote.
+
+ Additional styles are followed by a colon and details must be provided.
+  header - followed by header level (e.g.: header:1)
+  link - text should redirect to provided URL (e.g.: link:https://google.com)
+  image - followed by location of image.
+  
+
+
 MarkBack notes:
- *  Internal format is .emp, which uses just a backquote (`) as a special character.  It
+ *  New format is .mback, which uses just a backquote (`) as a special character.  It
  *  is otherwise inspired from markdown, but makes special characters easy to use.
  *  The only other reserved special character is backslash (`\`), discussed below.
  *  
@@ -59,7 +84,7 @@ MarkBack notes:
  *  \\ is a regular backslash ('\')
  *  \` is a backtick in the actual string ('`')
  *  \  (backlash space) is a non-breaking space.
- *  \123 (or any other number) is the associated unicode character.
+ *  \123 (or any other number) converts to the associated unicode character.
  *  \. is nothing. Use to separate other text (e.g., unicode followed by number)
  *  \n is a newline
  *  \t is a tab
