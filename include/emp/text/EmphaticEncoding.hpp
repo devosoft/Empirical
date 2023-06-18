@@ -32,24 +32,25 @@ namespace emp {
       SetupStyleTags("subscript",   "~.", "~.");
       SetupStyleTags("superscript", "`^", "`^");
       SetupStyleTags("underline",   "`_", "`_");
-      SetupStyleTags("header1",     "`#", "`#");
-      SetupStyleTags("header2",     "`##", "`##");
-      SetupStyleTags("header3",     "`###", "`###");
-      SetupStyleTags("header4",     "`####", "`####");
-      SetupStyleTags("header5",     "`#####", "`#####");
-      SetupStyleTags("header6",     "`######", "`######");
+      SetupStyleTags("header:1",    "`#", "`#");
+      SetupStyleTags("header:2",    "`##", "`##");
+      SetupStyleTags("header:3",    "`###", "`###");
+      SetupStyleTags("header:4",    "`####", "`####");
+      SetupStyleTags("header:5",    "`#####", "`#####");
+      SetupStyleTags("header:6",    "`######", "`######");
 
       SetupReplaceTag("\\`",  '`');
       SetupReplaceTag("\\\\", '\\');
       SetupReplaceTag("\\ ",  ' ', "no_break");
 
-      // tag_map['-'] = "bullet";
-      // tag_map['+'] = "ordered";
-      // tag_map['>'] = "indent";
-      // tag_map['"'] = "blockquote";
+      SetupReplaceTag("`-",  ' ', "bullet");
+      SetupReplaceTag("`+",  ' ', "ordered");
+      SetupReplaceTag("`>",  ' ', "indent");
+      SetupReplaceTag("`\"",  ' ', "blockquote");
+
       // tag_map['|'] = "continue";  // Keep previous lines setup (for set of full-line tags)
 
-      // AVAILABLE TAGS: @&;:',?()]\
+      // AVAILABLE TAGS: @&;:',?()]
 
       // Start of more complex tags...
       // tag_map['%'] = "comment";   // `% Should be removed by the lexer.
