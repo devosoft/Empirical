@@ -96,9 +96,22 @@ namespace emp {
 
   /// Return the position of the first one bit
   template <typename T>
-  [[nodiscard]] inline constexpr size_t find_bit(T val) {
+  [[nodiscard]] inline constexpr size_t find_bit(const T val) {
     static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
     return count_bits( (~val) & (val-1) );
+  }
+
+  /// Return the position of the first one bit
+  template <typename T>
+  [[nodiscard]] inline constexpr size_t find_last_bit(T val) {
+    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    val |= val >> 1;
+    val |= val >> 2;
+    val |= val >> 4;
+    if constexpr (sizeof(T) > 1) val |= val >> 8;
+    if constexpr (sizeof(T) > 2) val |= val >> 16;
+    if constexpr (sizeof(T) > 4) val |= val >> 32;
+    return count_bits(val) - 1;
   }
 
   /// Return the position of the first one bit AND REMOVE IT.
