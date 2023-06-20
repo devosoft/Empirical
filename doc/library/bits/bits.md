@@ -4,16 +4,16 @@
 
 ```{eval-rst}
 .. doxygenfile:: emp/bits/BitMatrix.hpp
-  :project: Empirical
-  :no-link:   
+  :sections: briefdescription detaileddescription
+.. doxygenclass:: emp::BitMatrix
+  :members:
+  :undoc-members:
 ```
 
 ## BitSet
 
 ```{eval-rst}
-.. doxygenfile:: emp/bits/BitSet.hpp
-  :project: Empirical
-  :no-link:   
+.. doxygentypedef:: emp::BitSet
 ```
 
 ## BitSet Utilities
@@ -27,7 +27,7 @@
 ## BitVector
 
 ```{eval-rst}
-.. doxygenfile:: emp/bits/BitVector.hpp
-  :project: Empirical
-  :no-link:   
+.. doxygenclass:: emp::BitVector
+  :members:
+  :undoc-members:
 ```

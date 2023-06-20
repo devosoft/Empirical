@@ -40,7 +40,6 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx_rtd_theme',
     'breathe',
-    # 'exhale',
     'myst_parser',
 ]
 
@@ -58,28 +57,9 @@ breathe_projects_source = {
     )
 }
 
-# Setup the exhale extension
-# exhale_args = {
-#     # These arguments are required
-#     "containmentFolder":     "./api",
-#     "rootFileName":          "library_root.rst",
-#     "rootFileTitle":         "Library API",
-#     "doxygenStripFromPath":  "..",
-#     # Suggested optional arguments
-#     "createTreeView":        True,
-#     # TIP: if using the sphinx-bootstrap-theme, you need
-#     # "treeViewIsBootstrap": True,
-#     "exhaleExecutesDoxygen": True,
-#     "exhaleDoxygenStdin": textwrap.dedent("""
-#         INPUT = ../include
-#         EXCLUDE_SYMBOLS += internal __impl_* *impl *IMPL *_IMPL_* *Impl,
-#         XML_PROGRAMLISTING     = NO        
-#     """)
-# }
-
 breathe_doxygen_config_options = {'PREDEFINED': 'DOXYGEN_SHOULD_SKIP_THIS'}
 
-# cpp_index_common_prefix = ["emp::"]
+# cpp_index_common_prefix = ["emp", "emp::", "emp::web::", "web", "emp::web"]
 
 # Tell sphinx what the primary language being documented is.
 primary_domain = 'cpp'

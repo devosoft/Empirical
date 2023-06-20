@@ -62,10 +62,6 @@ trigger an assertion error and print the value of a.
 
 ### emp_assert API (base/assert.hpp)
 
-% ```{doxygendefine} emp_assert
-% :project: Empirical
-  :no-link:% ```
-
 ```{eval-rst}
 .. doxygendefine:: emp_assert
   :project: Empirical
