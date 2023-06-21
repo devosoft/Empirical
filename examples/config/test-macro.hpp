@@ -1,9 +1,9 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021
- *
- *  @file test-macro.hpp
+*/
+/**
  *  @brief This is an auto-generated file that defines a set of configuration options.
  *  To create a new config from scratch, the format is:
  *    EMP_BUILD_CONFIG( CLASS_NAME, OPTIONS... )

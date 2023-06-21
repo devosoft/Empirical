@@ -1,9 +1,9 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file memo_function.cpp
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
+/**
  *  @note doing any sort of copying of memo_functions seems to give my terminal a stack overflow error (using mingw on windows 10)
  *  @MAM not sure who left this comment about stack overflow on mingw...
  */

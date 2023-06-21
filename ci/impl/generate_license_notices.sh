@@ -26,11 +26,12 @@ for filename in $(find . -name '*.cpp' -type f ! -path "./third-party/*") $(find
   # and https://stackoverflow.com/a/12178023
   # and https://stackoverflow.com/a/9053163
   sed -i "/^ \*  date: /b; 4s/^.*\$/ *  date: $(date +'%Y')/" "${filename}"
-  sed -i '5s/^.*$/ */' "${filename}"
+  sed -i '5s|^.*$|*/|' "${filename}"
   # sed -i "6s/^.*\$/ *  @file $(basename "${filename}")/" "${filename}"
   # only match empty lines
   # add extra * to replace later with */ when constructing fresh
-  sed -i '6s/^$/ */' "${filename}"
+  # sed -i '6s/^$/ */' "${filename}"
+  sed -i '6s|^.*$|/**|' "${filename}"
 
   # close boilerplate file docstring
   # must accomodate possible additional content in docstring
