@@ -48,6 +48,11 @@ namespace emp {
 
     // --- Helper functions ---
 
+    /// Set an individual bit in a series of bit fields.
+    static void _SetBit(emp::Ptr<size_t> bits, size_t id) {
+      bits[id / NUM_FIELD_BITS] |= (1 << (id % NUM_FIELD_BITS));
+    }
+
     /// Convert the internal representation to use bits.
     void _ToBits() {
       emp_assert(type != index_t::NONE, "Cannot start IndexSet as type BITS");
@@ -60,29 +65,24 @@ namespace emp {
       emp::Ptr<size_t> bits = NewArrayPtr<size_t>(num_fields);
 
       switch (type) {
-        case index_t::VALS3: {
-            const size_t id3 = ids.vals.id3 - offset;
-            bits[id3 / NUM_FIELD_BITS] |= (1 << (id3 % NUM_FIELD_BITS));
-          } [[fallthrough]];
-        case index_t::VALS2: {
-            const size_t id2 = ids.vals.id2 - offset;
-            bits[id2 / NUM_FIELD_BITS] |= (1 << (id2 % NUM_FIELD_BITS));
-          } [[fallthrough]];
-        case index_t::VALS1: {
-            const size_t id1 = ids.vals.id1 - offset;
-            bits[id1 / NUM_FIELD_BITS] |= (1 << (id1 % NUM_FIELD_BITS));
-          }
+        case index_t::VALS3:
+          _SetBit(bits, ids.vals.id3 - offset);
+          [[fallthrough]];
+        case index_t::VALS2:
+          _SetBit(bits, ids.vals.id2 - offset);
+          [[fallthrough]];
+        case index_t::VALS1:
+          _SetBit(bits, ids.vals.id1 - offset);
           break;
         case index_t::RANGE:
           // @CAO For a large range being converted, this can be optimized.
           for (size_t id = ids.range.start; id < ids.range.end; ++id) {
-            bits[id / NUM_FIELD_BITS] |= (1 << (id % NUM_FIELD_BITS));
+            _SetBit(bits, id - offset);
           }
           break;
-        case index_t::VEC;
+        case index_t::VEC:
           for (size_t i = 0; i < num_ids; ++i) {
-            const size_t id = ids.vec.ids[i];
-            bits[id / NUM_FIELD_BITS] |= (1 << (id % NUM_FIELD_BITS));
+            _SetBit(bits, ids.vec.ids[i] - offset);
           }
       }
     }
