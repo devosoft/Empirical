@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
- *
- *  @file BitArray.hpp
+*/
+/**
  *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
  *  @note Status: RELEASE
  *

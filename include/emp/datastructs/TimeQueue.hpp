@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
- *
- *  @file TimeQueue.hpp
+*/
+/**
  *  @brief A priority queue for timings, always marching forward.
  *  @note Status: ALPHA
  *

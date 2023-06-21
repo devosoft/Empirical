@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
- *
- *  @file DataLog.hpp
+*/
+/**
  *  @brief Tools for processing a single set of data.
  *  @note  Status: ALPHA
  *

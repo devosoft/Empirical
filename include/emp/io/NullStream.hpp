@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- *
- *  @file NullStream.hpp
+*/
+/**
  *  @brief A handy no-operation output stream.
  *  @note Status: BETA
  */

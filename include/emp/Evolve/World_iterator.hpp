@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2021.
- *
- *  @file World_iterator.hpp
+*/
+/**
  *  @brief This file defines iterators for use with emp::World objects.
  *
  *  @note Originally called PopulationIterator.h

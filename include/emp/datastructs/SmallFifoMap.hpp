@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
- *
- *  @file SmallFifoMap.hpp
+*/
+/**
  *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
  *  value when full. Optimized for small N. Requires N < 256.
  *

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- *
- *  @file Trait.hpp
+*/
+/**
  *  @brief Directly measure a target quality about a type of object.
  *
  *  These objects are able to measure a specific trait on another object.  They

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
- *
- *  @file TextFeed.hpp
+*/
+/**
  *  @brief A representation of text on a web page optimized for rapid appends.
  *
  */

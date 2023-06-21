@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
- *
- *  @file SmallVector.hpp
+*/
+/**
  *  @brief A drop-in replacement for std::vector with optimization to handle
  *  small vector sizes without dynamic allocation. It contains some number of
  *  elements in-place, which allows it to avoid heap allocation when the actual

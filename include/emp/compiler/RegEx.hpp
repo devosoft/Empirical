@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
- *
- *  @file RegEx.hpp
+*/
+/**
  *  @brief Basic regular expression handler.
  *  @note Status: BETA
  *

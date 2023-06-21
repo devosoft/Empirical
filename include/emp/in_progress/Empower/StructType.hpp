@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- *
- *  @file StructType.hpp
+*/
+/**
  *  @brief StructType maps variables to a MemoryImage; Struct is an instance of StructType
  *
  *  @todo Immediately before setting a StructType to active, we can optimize variable ordering.

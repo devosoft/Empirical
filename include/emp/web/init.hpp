@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018.
- *
- *  @file init.hpp
+*/
+/**
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  *
  * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It

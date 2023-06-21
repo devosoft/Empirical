@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
- *
- *  @file Element.hpp
+*/
+/**
  *  @brief Element Widgets maintain an ordered collection of other widgets
  *  in a HTML element with any tag (e.g., div, footer, header, p, etc.)
  *

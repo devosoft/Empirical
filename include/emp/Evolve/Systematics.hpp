@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
- *
- *  @file Systematics.hpp
+*/
+/**
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
  *

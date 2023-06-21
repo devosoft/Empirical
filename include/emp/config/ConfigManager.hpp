@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016
- *
- *  @file ConfigManager.hpp
+*/
+/**
  *  @brief  The ConfigManager templated class handles the building and configuration of new objects
  *  of the target type.
  *

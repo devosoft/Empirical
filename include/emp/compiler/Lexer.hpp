@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
- *
- *  @file Lexer.hpp
+*/
+/**
  *  @brief A general-purpose, fast lexer.
  *  @note Status: ALPHA
  */

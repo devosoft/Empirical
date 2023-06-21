@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
- *
- *  @file macro_math.hpp
+*/
+/**
  *  @brief Macros to build a pre-processor calculator system.
  *  @note Status: RELEASE
  *

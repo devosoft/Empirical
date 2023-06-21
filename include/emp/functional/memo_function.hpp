@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019
- *
- *  @file memo_function.hpp
+*/
+/**
  *  @brief A function that memorizes previous results to speed up any repeated calls.
  *  @note Status: BETA
  */

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019-2020.
- *
- *  @file map.hpp
+*/
+/**
  *  @brief A drop-in wrapper for std::map and std:multimap; makes sure we create vars on access.
  *  @note Status: ALPHA
  *

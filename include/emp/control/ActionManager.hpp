@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
- *
- *  @file ActionManager.hpp
+*/
+/**
  *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
  *  @note Status: Beta
  */

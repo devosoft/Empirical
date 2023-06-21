@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021
- *
- *  @file struct.hpp
+*/
+/**
  *  @brief A re-engineering of tuple_struct.h, intended to be usable throughout Empirical.
  *
  *  The EMP_STRUCT macro builds an inexpensive struct that

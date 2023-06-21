@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
- *
- *  @file ConfigLexer.hpp
+*/
+/**
  *  @brief A simple lexer for the Empirical configuration language.
  *
  *  Development notes: Initially building the lexer to be language specific, but a

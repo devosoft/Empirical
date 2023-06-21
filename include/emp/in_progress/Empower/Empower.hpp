@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- *
- *  @file Empower.hpp
+*/
+/**
  *  @brief A scripting language built inside of C++
  *
  *  Empower is a scripting language built inside of Empirical to simplify and the use of fast

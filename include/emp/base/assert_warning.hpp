@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
- *
- *  @file assert_warning.hpp
+*/
+/**
  *  @brief A non-terminating replacement for standard library asserts.
  *
  *  A supplement for the system-level assert.h, called "emp_assert_warning"

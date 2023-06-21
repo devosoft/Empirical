@@ -13,7 +13,7 @@ for filename in $(cd include && find -- * -name '*.hpp' -type f); do
   done
 
   # stamp in expected boilerplate line-by-line
-  sed -i '1s|^.*$|/**|' "include/${filename}"
+  sed -i '1s|^.*$|/*|' "include/${filename}"
   sed -i '2s|^.*$| *  @note This file is part of Empirical, https://github.com/devosoft/Empirical|' "include/${filename}"
   sed -i '3s|^.*$| *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md|' "include/${filename}"
   # only match if a @date isn't currently in place
@@ -22,10 +22,11 @@ for filename in $(cd include && find -- * -name '*.hpp' -type f); do
   # and https://stackoverflow.com/a/12178023
   # and https://stackoverflow.com/a/9053163
   sed -i "/^ \*  @date /b; 4s/^.*\$/ *  @date $(date +'%Y')/" "include/${filename}"
-  sed -i '5s/^.*$/ */' "include/${filename}"
-  sed -i "6s/^.*\$/ *  @file $(basename "${filename}")/" "include/${filename}"
+  # sed -i '5s/^.*$/ */' "include/${filename}"
+  sed -i '5s|^.*$|*/|' "include/${filename}"
   # only match if a @brief isn't currently in place
   # adapted from https://stackoverflow.com/a/5334825
+  sed -i '6s|^.*$|/**|' "include/${filename}"
   sed -i "/^ \*  @brief /b; 7s/^.*\$/ *  @brief TODO./" "include/${filename}"
   # only match empty lines
   # add extra * to replace later with */ when constructing fresh

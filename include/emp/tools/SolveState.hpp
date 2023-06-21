@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021.
- *
- *  @file SolveState.hpp
+*/
+/**
  *  @brief Used as part of a branching solver to keep track of the current state.
  *  @note Status: BETA
  */

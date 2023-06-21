@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
- *
- *  @file ArgManager.hpp
+*/
+/**
  *  @brief A tool for sythesizing command-line arguments, URL query params, and config files.
  *  @note Status: BETA
  */

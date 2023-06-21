@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
- *
- *  @file World_structure.hpp
+*/
+/**
  *  @brief Functions for popular world structure methods.
  */
 

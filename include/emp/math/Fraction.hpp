@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
- *
- *  @file Fraction.hpp
+*/
+/**
  *  @brief Tools to maintain a more exact fraction (rather than lose precision as a double)
  *  @note Status: ALPHA
  */

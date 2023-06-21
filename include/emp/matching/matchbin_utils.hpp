@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
- *
- *  @file matchbin_utils.hpp
+*/
+/**
  *  @brief Metric, Selector, and Regulator structs
  *         that can be plugged into MatchBin.
  *

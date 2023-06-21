@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
- *
- *  @file js_utils.hpp
+*/
+/**
  *  @brief Tools for passing data between C++ and Javascript.
  */
 

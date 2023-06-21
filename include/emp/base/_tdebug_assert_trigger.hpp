@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
- *
- *  @file _tdebug_assert_trigger.hpp
+*/
+/**
  *  @brief Non-terminating assert trigger implementation for unit testing.
  *  @note For internal use.
  */

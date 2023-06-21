@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
- *
- *  @file emscripten_assert.hpp
+*/
+/**
  *  @brief Assert evaluated only in debug mode with Emscripten.
  */
 

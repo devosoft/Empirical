@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
- *
- *  @file FileInput.hpp
+*/
+/**
  *  @brief Specs for the FileInput widget (click on to upload a file)
  *
  *  @todo Setup FileInput to work outside of web mode as well.

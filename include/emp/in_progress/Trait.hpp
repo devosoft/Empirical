@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016
- *
- *  @file Trait.hpp
+*/
+/**
  *  @brief The TraitDef class maintains a category of measuments about another class.
  *
  *  Each trait is associated with a name, a description, and a type.  Instance of that

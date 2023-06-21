@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
- *
- *  @file Body2D.hpp
+*/
+/**
  *  @brief  This file defines classes to represent bodies that exist on a 2D surface.
  *
  *  Each class should be able to:

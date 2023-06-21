@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
- *
- *  @file utils.hpp
+*/
+/**
  *  @brief This file contains macros used to build Empirical's C++ wrapper for D3.
  */
 

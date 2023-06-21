@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- *
- *  @file valsort_map.hpp
+*/
+/**
  *  @brief This file defines a map that is sorted by value, not key.
  *  @note Status: ALPHA
  *

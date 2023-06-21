@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
- *
- *  @file Cache.hpp
+*/
+/**
  *  @brief similar to an std::unordered_map, but all lookups come with a function to generate the result should the lookup fail.
  *  @note Status: BETA
  */

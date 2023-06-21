@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2021.
- *
- *  @file serialize_macros.hpp
+*/
+/**
  *  @brief Macros for simplifying to serialization of objects.
  *  @note Status: ALPHA
  */

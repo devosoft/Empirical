@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016
- *
- *  @file ce_string.hpp
+*/
+/**
  *  @brief ce_string defines a limited string object for use within a constexpr class or function.
  *
  *  Status: DESIGN.

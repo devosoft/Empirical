@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
- *
- *  @file Animate.hpp
+*/
+/**
  *  @brief Manage animations on a web site.
  *
  *  To build an animation, you must provide a function to be run repeatedly.  When Start()

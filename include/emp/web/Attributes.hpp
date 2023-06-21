@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
- *
- *  @file Attributes.hpp
+*/
+/**
  *  @brief An Attributes class for tracking non-style features about HTML objects
  */
 

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
- *
- *  @file DynamicString.hpp
+*/
+/**
  *  @brief A string handler where sections update dynamically based on functions.
  *  @note Status: BETA
  */

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
- *
- *  @file EventLib.hpp
+*/
+/**
  *  @brief This file maintains information about events available in virtual hardware.
  *
  *  This file is largely based on InstLib.h.

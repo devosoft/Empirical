@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
- *
- *  @file errors.hpp
+*/
+/**
  *  @brief Tools to help manage various problems in command-line or Emscripten-based applications.
  *  @note Status: ALPHA
  *

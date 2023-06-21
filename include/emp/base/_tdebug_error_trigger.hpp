@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
- *
- *  @file _tdebug_error_trigger.hpp
+*/
+/**
  *  @brief Non-terminating error trigger implementation for unit testing.
  *  @note For internal use.
  */

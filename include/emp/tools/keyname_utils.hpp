@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
- *
- *  @file keyname_utils.hpp
+*/
+/**
  *  @brief Utility functions that support the keyname file naming convention.
  *
  *  Plays nice with the Python package keyname.

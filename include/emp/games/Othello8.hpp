@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- *
- *  @file Othello8.hpp
+*/
+/**
  *  @brief A simple Othello game state handler limited to an 8x8 board.
  *
  *  @todo Add Hash for boards to be able to cachce moves.

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
- *
- *  @file AvidaCPU_InstLib.hpp
+*/
+/**
  *  @brief A specialized version of InstLib to handle AvidaCPU Instructions.
  */
 

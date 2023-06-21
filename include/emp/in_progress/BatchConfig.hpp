@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
- *
- *  @file BatchConfig.hpp
+*/
+/**
  *  @brief A tool to control a series of runs and keep them updated.
  *
  *  Development notes: currently doesn't compile because of last line.

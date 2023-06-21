@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2021
- *
- *  @file TypeID.hpp
+*/
+/**
  *  @brief TypeID provides an easy way to convert types to strings.
  *
  *  Developer notes:

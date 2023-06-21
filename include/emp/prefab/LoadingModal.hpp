@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020-2021
- *
- *  @file LoadingModal.hpp
+*/
+/**
  *  @brief Wrapper for loading moadal
  *
  * To add a loading modal to your web page, you must

@@ -1,9 +1,9 @@
-/**
+/*
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
- *
- *  @file alert.hpp
+*/
+/**
  *  @brief Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
  *  @note Status: RELEASE
  */
