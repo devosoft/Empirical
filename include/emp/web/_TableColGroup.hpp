@@ -1,7 +1,7 @@
 /*
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018.
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018.
 */
 /**
  *  @brief The TableColGoup widget, which behaves like the Table widget, but focuses on a group of columns.

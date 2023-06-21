@@ -14,14 +14,14 @@ for filename in $(cd include && find -- * -name '*.hpp' -type f); do
 
   # stamp in expected boilerplate line-by-line
   sed -i '1s|^.*$|/*|' "include/${filename}"
-  sed -i '2s|^.*$| *  @note This file is part of Empirical, https://github.com/devosoft/Empirical|' "include/${filename}"
-  sed -i '3s|^.*$| *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md|' "include/${filename}"
-  # only match if a @date isn't currently in place
-  # if we see @date, "break" (b) sed script for that line
+  sed -i '2s|^.*$| *  This file is part of Empirical, https://github.com/devosoft/Empirical|' "include/${filename}"
+  sed -i '3s|^.*$| *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md|' "include/${filename}"
+  # only match if a date: isn't currently in place
+  # if we see date:, "break" (b) sed script for that line
   # adapted from https://stackoverflow.com/a/5334825
   # and https://stackoverflow.com/a/12178023
   # and https://stackoverflow.com/a/9053163
-  sed -i "/^ \*  @date /b; 4s/^.*\$/ *  @date $(date +'%Y')/" "include/${filename}"
+  sed -i "/^ \*  date: /b; 4s/^.*\$/ *  date: $(date +'%Y')/" "include/${filename}"
   # sed -i '5s/^.*$/ */' "include/${filename}"
   sed -i '5s|^.*$|*/|' "include/${filename}"
   # only match if a @brief isn't currently in place
