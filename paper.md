@@ -93,19 +93,19 @@ Modern web-based interfaces give computational research the unique potential to 
 <!-- [@world_academy_of_science_engineering_and_technology_2019] --> 
 In practice, however, many scientific software applications are difficult to obtain, install, or use, and produce data in propriatary formats.
 
-High quality open-science tools encourage researchers to follow these effective software development practices by simplifying development and helping them improve code quality, scientific rigor, and ease of replication or extension, resulting in broader confidence in and adoption of their software.
+High quality open-science tools encourage researchers to follow effective software development practices by simplifying development and helping them improve code quality, scientific rigor, and ease of replication or extension, resulting in broader confidence in and adoption of their software.
 In the process, researchers get more out of their own code.
 For example, an effective toolkit would allow a developer to easily add a GUI that would not only help other users of the software, but could also help the researcher themsleves gain "soft knowledge" of their system [@10.1145/3185517].
 
 Recent developments in web technology such as WebAssembly enable compilation of native source code to browser-based interactive interfaces.
-However, many scientists lack web development training and do not have the bandwidth to learn entirely new languages and frameworks.
-Empirical catalyzes progress towards open science ideals by streamlining the development of in-browser software in C++.
+However, many scientists lack web development training and do not have the bandwidth to learn new languages and frameworks.
+Empirical catalyzes progress toward open science ideals by streamlining the development of in-browser software in C++.
 
-To be reuseable and extendable, software must operate robustly --- sometimes at scales and in contexts that weren't originally envisioned.
+To be reuseable and extendable, software must remain robust at scales and in contexts that were not originally envisioned.
 Empirical seeks to make writing correct, efficient scientific software easier.
 Empirical's debugging suite helps protect against common C++ programming pitfalls such as iterator invalidation, memory leakage, and out-of-bounds indexing.
-Bundled algorithm and data structures provide optimized, well-tested drop-in implementations for common scientific computing tasks.
-Throughout, library design obviates trade-offs between performance and safety through compile-time switches to strip out checks for undefined and incorrect behavior in release mode.
+Bundled algorithms and data structures provide optimized, well-tested drop-in implementations for common scientific computing tasks.
+Throughout, library design obviates trade-offs between performance and safety; compile-time switches toggle safety checks for undefined or incorrect behavior.
 
 <!-- However, many scientists do not know how to create browser-based GUIs and lack the resources or incentives to adequately invest in learning.
 Empirical addresses these challenges by providing tools for implementing browser-based GUIs using intuitive C++, and without requiring a substantial time investment.
@@ -115,8 +115,7 @@ Empirical addresses these challenges by providing tools for implementing browser
 In this circumstance, the research version of the software is no longer truly available to the world.
 To avoid this pitfall, Empirical privides tools to implement GUI applications by _wrapping_ (instead of replicating) the research version of the software, making it easier for researchers to keep the most recent version of scientific software available widely.
  -->
-<!-- To conduct computationally expensive experiments, researchers often need to run scientific software without incurring overhead associated with GUI integration.
-In addition, the overhead associated with GUIs (particularly cross-platform or in-browser execution of core code components) must be minimized to be able to realize the full capabilities of scientific software. -->
+<!-- To conduct computationally expensive experiments, researchers often need to run scientific software without incurring overhead associated with GUI integration.In addition, the overhead associated with GUIs (particularly cross-platform or in-browser execution of core code components) must be minimized to be able to realize the full capabilities of scientific software. -->
 <!-- Empirical fulfills these requirements by:
 * allowing software to be compiled with or without the GUI,
 * building the GUI off of highly-efficient Web Assembly, and
@@ -133,49 +132,39 @@ These safeguards can be fully disabled by a compiler flag in order to ensure max
 
 ## Facilitating Better Code for Scientific Software
 
-Software produced by academics, especially for one-off use, is often cobbled together, foregoing better programming practices for the sake of expediency.
-<!-- To some extent, this outcome seems inevitable given the typical conditions endemic to academic software development: one-and-done projects assembled under chafing time restrictions where the developer and consumer are one and the same, and often early-career with core domain expertise outside of software development. -->
-Writing code can constitute a major time sink --- and a major source of frustration --- for academics.
-
-By furnishing prepackaged components that address common tasks for scientific software, the Empirical library helps end users to write better C++ code, faster.
+Software produced by academics, especially for one-off use often foregoes rigorous programming practices for the sake of expediency.
+By furnishing prepackaged components that address common tasks for scientific software, the Empirical library helps scientific developers efficiently write high quality C++ code.
 Utilities for common tasks empower users to craft more readable and maintainable code.
-Bugs can be avoided by replacing one-off implementations with Empirical components subjected to structured code review, coverage-instrumented unit testing, and other modern software development practices detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html).
-
-Sustained effort invested into optimization of the library's utilities enables more efficient end-user software than might be possible otherwise.
-Finally, off-the-shelf solutions reduce barriers to performing computational research, especially for developers new to scientific software design patterns.
+Bugs can be avoided by replacing one-off implementations with Empirical components subjected to structured code review, unit testing (with coverage tracking), and other modern software development practices detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html).
+Sustained effort invested into optimization of the library's utilities enables developers to produce efficient software at far less effort.
+Finally, off-the-shelf solutions reduce barriers to computational research, especially for developers new to scientific software design patterns.
 
 To these ends, Empirical provides a comprehensive framework to manage runtime configuration and flexible tools for data aggregation and recording.
 For example, Empirical's configuration framework includes utilities to
 
-* define and document default configuration values,
-* accept configuration adjustments via the command line,
-* accept configuration adjustments via a configuration file,
-* dump configuration settings to a file,
+* define and document default configuration values in a single line,
+* set configuration values via a combination of a configuration file or command line flags,
+* save configuration values to a file,
 * perform on-the-fly configuration adjustments, and
-* leverage an object-oriented configuration packaging model to manage coexisting configuration tableaus.
-
+* support multiple independent configuration subsystems.
+
 Where appropriate, Empirical's scientific software tools include features that integrate directly into the browser environment.
 The configuration framework, for example, accepts input via URL query parameters and ties in with a pre-built, in-browser GUI for setting-by-setting adjustments.
 
-In addition to the core C++ Empirical Library, we maintain a [template project](https://github.com/devosoft/cookiecutter-empirical-project) that streamlines the process of organizing a new project.
-The heavy lift of laying out boilerplate for projects using Emscripten, in particular, motivated us to leverage the [cookiecutter project](https://github.com/cookiecutter/cookiecutter), to automate creation instantiation via a command-line wizard.
+In addition to the core C++ Library, we maintain a [template project](https://github.com/devosoft/cookiecutter-empirical-project) that streamlines laying out crosscompilation boilerplate via a command-line wizard.
 
 High-quality software cannot succeed without a thriving community of engineers.
-As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html), our development practices incorporate intentional action to support diversity, equity, and inclusion.
+As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html), our development practices encourage the meaningful inclusion of all interested contributors, and emphasize the importance of diverse backgrounds and perspectives in the community.
 
 ## Realizing the Promise of Emscripten-based Web UIs
 
-<!-- Because of the ubiquitous availability of desktop computers and the ease of distributing software over the internet, scientific software has unique potential for low-barrier, hands-on outreach across broad educational and general audiences.
-Public-facing software also enables better science by making interactive demonstrations available to researchers outside a project's core development group.
-Additionally, public-facing software exemplifies open science by proffering accessible windows into contemporary scientific work.
-
-However, research versions of software are typically specialized to run on high-performance computing environments, often require extensively involved install processes, and generally lack graphical interfaces.
-Effective public-facing software, on the other hand, requires compatibility with consumer-grade hardware, a streamlined install process, and an intuitive graphical user interface. -->
-
-Many scientific software projects have historically maintained separate code bases for research versus education and outreach.
-The Avida-ED project, for example, leveraged the existing Avida digital evolution model system for classroom activities [@pennock2007learning], but could not effectively leverage Avida's existing code base.
-Additionally, as was the case for the Avida-ED project, significant code duplication is often required to support the same education and outreach product across different operating systems.
-
+Many scientific software projects with additionall education and outreach objectives have maintained separate code bases for the two.
+The Avida-ED project, which appliies the Avida digital evolution system as a tool for classroom laboratory activities, exemplifies this phenomenon [@pennock2007learning].
+Avida-ED forked the Avida's code base and could not bring in ongoing updates to the primary code base.[^1]
+Further, significant code duplication is often required to provide a crossplatform education and outreach product.
+
+[^1]: Upcoming Avida-ED releases built with Empirical will use the primary research code base.
+
 This source splintering phenomenon precludes projects with limited resources from offering an education and outreach product: lost potential for accessible windows into contemporary scientific work.
 In better-resourced projects, this splintering effect absorbs limited (and expensive) developer hours and often leads to one version of the code --- usually that for education/outreach --- falling into neglect and drifting out of sync with other versions.
 
