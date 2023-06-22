@@ -20,7 +20,7 @@ namespace emp {
   /// will be memory efficient, based on how many ids and how densely packed there are.
 
   // Assumptions that must be kept true internally:
-  //   For value and vector representations, indices must be kept sorted.
+  //   For value and array representations, indices must be kept sorted.
   //   For bits representation, the first field must always have at least one index.
 
   class IndexSet {
@@ -33,14 +33,14 @@ namespace emp {
 
     struct _Index_Vals { size_t id1; size_t id2; size_t id3; };  // Few values
     struct _Index_Range { size_t start; size_t end; };           // Contiguous values
-    struct _Index_Vec  { size_t num_ids; size_t capacity; emp::Ptr<size_t> ids; };   // Sparse
+    struct _Index_Array { size_t num_ids; size_t capacity; emp::Ptr<size_t> ids; };  // Sparse
     struct _Index_Bits { size_t num_fields; size_t offset; emp::Ptr<size_t> bits; }; // Dense
-    enum class index_t { NONE=0, VALS1, VALS2, VALS3, RANGE, VEC, BITS };
+    enum class index_t { NONE=0, VALS1, VALS2, VALS3, RANGE, ARRAY, BITS };
 
     union SetOptions {
       _Index_Vals vals;
       _Index_Range range;
-      _Index_Vec vec;
+      _Index_Array array;
       _Index_Bits bits;
       ~SetOptions() { }
     } ids;
@@ -80,11 +80,13 @@ namespace emp {
             _SetBit(bits, id - offset);
           }
           break;
-        case index_t::VEC:
+        case index_t::ARRAY:
           for (size_t i = 0; i < num_ids; ++i) {
-            _SetBit(bits, ids.vec.ids[i] - offset);
+            _SetBit(bits, ids.array.ids[i] - offset);
           }
       }
+
+      ids.bits = _Index_Bits{ num_fields, offset, bits }
     }
 
   public:
@@ -93,8 +95,8 @@ namespace emp {
     IndexSet() = default;
     ~IndexSet() {
       switch (type) {
-        case index_t::VEC:
-          ids.vec.ids.DeleteArray();
+        case index_t::ARRAY:
+          ids.array.ids.DeleteArray();
           break;
         case index_t::BITS:
           ids.bits.bits.DeleteArray();
@@ -109,7 +111,7 @@ namespace emp {
         case index_t::VALS2: return 2;
         case index_t::VALS3: return 3;
         case index_t::RANGE: return ids.range.end - ids.range.start;
-        case index_t::VEC: return ids.vec.num_ids;
+        case index_t::ARRAY: return ids.array.num_ids;
         case index_t::BITS:
           size_t count = 0;
           for (size_t i = 0; i < ids.bits.num_fields; ++i) {
@@ -126,7 +128,7 @@ namespace emp {
         case index_t::VALS2: return ids.vals.id1 == id || ids.vals.id2 == id;
         case index_t::VALS3: return ids.vals.id1 == id || ids.vals.id2 == id || ids.vals.id3 == id;
         case index_t::RANGE: return id >= ids.range.start && id < ids.range.end;
-        case index_t::VEC: return ids.vec.num_ids;
+        case index_t::ARRAY: return ids.array.num_ids;
         case index_t::BITS: {
           if (id < ids.bits.offset) return false;
           id = id - ids.bits.offset;
@@ -145,7 +147,7 @@ namespace emp {
         case index_t::VALS2: return ids.vals.id1;
         case index_t::VALS3: return ids.vals.id1;
         case index_t::RANGE: return ids.range.start;
-        case index_t::VEC: return ids.vec.ids[0];
+        case index_t::ARRAY: return ids.array.ids[0];
         case index_t::BITS:
           return emp::find_bit(ids.bits.bits[0]) + ids.bits.offset;
       }
@@ -158,7 +160,7 @@ namespace emp {
         case index_t::VALS2: return ids.vals.id2;
         case index_t::VALS3: return ids.vals.id3;
         case index_t::RANGE: return ids.range.end - 1;
-        case index_t::VEC: return ids.vec.ids[ids.vec.num_ids-1];
+        case index_t::ARRAY: return ids.array.ids[ids.array.num_ids-1];
         case index_t::BITS: {
           const size_t field_id = ids.bits.num_fields - 1;
           const size_t offset = field_id * NUM_FIELD_BITS + ids.bits.offset;
@@ -175,7 +177,7 @@ namespace emp {
         case index_t::VALS2: return ids.vals.id2 == ids.vals.id1+1;
         case index_t::VALS3: return ids.vals.id3 == ids.vals.id2+1 && ids.vals.id2 == ids.vals.id1+1;
         case index_t::RANGE: return true;
-        case index_t::VEC:
+        case index_t::ARRAY:
         case index_t::BITS:
           return GetSize() == GetMax() - GetMin() + 1;
       }
@@ -211,7 +213,7 @@ namespace emp {
             const size_t num_fields = (num_bits / NUM_FIELD_BITS + 1) * 2;
           }
         case index_t::RANGE: return ids.range.end - ids.range.start;
-        case index_t::VEC: return ids.vec.num_ids;
+        case index_t::ARRAY: return ids.array.num_ids;
         case index_t::BITS: return ids.bits.num_ids;
       }
     }
