@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Define simple shapes to draw on a canvas.
  *
  *  Canvas shapes can be definied in detail, describing how they modify a canvas.

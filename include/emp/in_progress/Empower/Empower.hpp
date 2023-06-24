@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A scripting language built inside of C++
  *
  *  Empower is a scripting language built inside of Empirical to simplify and the use of fast

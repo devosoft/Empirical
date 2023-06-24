@@ -4,6 +4,7 @@
  *  date: 2018-2020.
 */
 /**
+ *  @file
  *  @brief The File object maintains a simple, in-memory file.
  *  @note Status: BETA
  *

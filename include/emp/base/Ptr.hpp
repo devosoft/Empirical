@@ -4,6 +4,7 @@
  *  date: 2016-2020.
 */
 /**
+ *  @file
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
  *  @note Status: BETA
  *

@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief This file provides code to build NK-based algorithms.
  *
  *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for

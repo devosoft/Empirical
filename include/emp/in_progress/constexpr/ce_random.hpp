@@ -4,6 +4,7 @@
  *  date: 2016
 */
 /**
+ *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
  *
  *  Status: DESIGN

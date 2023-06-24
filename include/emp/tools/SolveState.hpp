@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief Used as part of a branching solver to keep track of the current state.
  *  @note Status: BETA
  */

@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief Basic information about an author.
  *
  *  Developer notes:

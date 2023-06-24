@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A handy no-operation output stream.
  *  @note Status: BETA
  */

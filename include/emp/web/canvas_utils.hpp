@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Various versions of the Draw() function to draw images onto a canvas.
  *
  *  Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,

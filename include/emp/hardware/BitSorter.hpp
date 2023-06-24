@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A quick series of comparisons intended for sorting bits.
  */
 

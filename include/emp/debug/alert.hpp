@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
  *  Status: RELEASE
  */

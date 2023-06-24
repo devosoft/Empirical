@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief A Deterministic Finite Automata simulator.
  *  @note Status: BETA
  */

@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief Helper functions for working with SignalGP virtual hardware/programs.
  *  @todo Mutator class
  *  @todo tests

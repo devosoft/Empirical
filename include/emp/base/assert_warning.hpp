@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief A non-terminating replacement for standard library asserts.
  *
  *  A supplement for the system-level assert.h, called "emp_assert_warning"

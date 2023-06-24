@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Useful for streaming data to contiguous memory.
  *  Status: RELEASE
  */

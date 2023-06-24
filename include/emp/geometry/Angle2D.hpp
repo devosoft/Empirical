@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief emp::Angle maintains an angle on a 2D surface.
  *
  *  The internal representation uses an int to represent angles.

@@ -4,6 +4,7 @@
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief A simple, fast class for managing verticies (nodes) and edges.
  *  @note Status: BETA
  */

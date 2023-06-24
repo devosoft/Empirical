@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief This file contains tools for dealing with command-line arguments (argv and argc).
  *
  *  Functions here include:

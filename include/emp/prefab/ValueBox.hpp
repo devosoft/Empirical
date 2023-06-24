@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief UI subcomponent for ConfigPanel and ReadoutPanel.
  */
 

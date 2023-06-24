@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Utility functions that support the keyname file naming convention.
  *
  *  Plays nice with the Python package keyname.

@@ -4,6 +4,7 @@
  *  date: 2018-2020.
 */
 /**
+ *  @file
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
  *

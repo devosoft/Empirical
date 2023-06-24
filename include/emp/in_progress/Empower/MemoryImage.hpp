@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A collection of arbitrary objects stored in a chunk of memory.
  */
 

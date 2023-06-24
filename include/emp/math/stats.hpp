@@ -4,6 +4,7 @@
  *  date: 2016-2019
 */
 /**
+ *  @file
  *  @brief Functions for calculating various statistics about an ensemble.
  *  @note Status: BETA
  */

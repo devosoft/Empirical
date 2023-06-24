@@ -4,6 +4,7 @@
  *  date: 2019-2021.
 */
 /**
+ *  @file
  *  @brief This file provides tools for hashing values and containers.
  *  @note Status: BETA
  */

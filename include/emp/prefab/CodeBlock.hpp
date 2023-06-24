@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Wraps a HighlightJS code block.
  */
 

@@ -4,6 +4,7 @@
  *  date: 2018-2021.
 */
 /**
+ *  @file
  *  @brief An std::unordered_map wrapper that deals smoothly with strings and fast compile-time optimizations.
  *  @note Status: ALPHA
  *

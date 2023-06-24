@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A class that will map types to values of a designated type.
  *  @note Status: BETA
  */

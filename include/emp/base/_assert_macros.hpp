@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Helper macros for building proper assert commands.
  *  Status: RELEASE
  *

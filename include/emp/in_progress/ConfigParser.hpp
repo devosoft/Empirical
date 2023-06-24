@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief A simple parser for the Empirical configuration language.
  *
  *  This parser is being implemented as a pushdown automata.

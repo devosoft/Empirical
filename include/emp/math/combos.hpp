@@ -4,6 +4,7 @@
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief Tools to step through combinations of items.
  *
  *  Step through all combinations of size K from a set of N values.  For ComboIDs just return the

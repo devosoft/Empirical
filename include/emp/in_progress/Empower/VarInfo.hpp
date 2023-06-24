@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief Generic info about a single variable (across MemoryImages)
  */
 

@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief Helper functions for emp::Random for common random tasks.
  *  Status: RELEASE
  */

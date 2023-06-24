@@ -4,6 +4,7 @@
  *  date: 2018-2021.
 */
 /**
+ *  @file
  *  @brief A DataMap links names to arbitrary object types.
  *  @note Status: ALPHA
  *

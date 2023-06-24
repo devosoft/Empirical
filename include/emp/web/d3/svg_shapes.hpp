@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Tools to build common SVG shapes.
  */
 

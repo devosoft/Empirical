@@ -4,6 +4,7 @@
  *  date: 2016
 */
 /**
+ *  @file
  *  @brief A re-engineering of tuple_struct.h, intended to be usable throughout Empirical.
  *
  *  The EMP_CLASS macro builds an inexpensive class that

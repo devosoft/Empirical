@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Regulator that modifies match distance through addition
  *  and decays to baseline with a countdown timer.
  *

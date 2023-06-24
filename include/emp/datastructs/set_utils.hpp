@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Tools to save and load data from classes.
  *  @note Status: ALPHA
  */

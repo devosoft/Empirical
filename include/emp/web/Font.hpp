@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Maintains basic information about a font to be used in HTML.
  */
 

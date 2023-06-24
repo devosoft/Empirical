@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief A class to manage circles in a 2D plane.
  */
 

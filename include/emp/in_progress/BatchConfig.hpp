@@ -4,6 +4,7 @@
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief A tool to control a series of runs and keep them updated.
  *
  *  Development notes: currently doesn't compile because of last line.

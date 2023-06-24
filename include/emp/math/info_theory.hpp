@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Tools to calculate Information Theory metrics.
  *  @note Status: ALPHA
  *

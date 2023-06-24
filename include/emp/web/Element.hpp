@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Element Widgets maintain an ordered collection of other widgets
  *  in a HTML element with any tag (e.g., div, footer, header, p, etc.)
  *

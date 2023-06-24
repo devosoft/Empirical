@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief A set of command-defining classes that can be fed into widgets using the << operator.
  */
 

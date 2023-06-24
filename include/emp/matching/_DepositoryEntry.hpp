@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Helper struct for MatchDepository.
  *
  */

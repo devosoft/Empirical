@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Tools for working with ascii output.
  *  @note  Status: ALPHA
  *

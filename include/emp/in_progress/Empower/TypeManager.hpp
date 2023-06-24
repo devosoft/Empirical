@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief Handles creation or retrieval of type objects.
  */
 

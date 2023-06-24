@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief A tool for exploring all parameter combinations
  *  @note Status: ALPHA
  */

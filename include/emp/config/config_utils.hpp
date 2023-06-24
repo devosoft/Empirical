@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Helper functions for working with emp::Config objects.
  *
  */

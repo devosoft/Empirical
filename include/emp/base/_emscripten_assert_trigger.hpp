@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief Assert trigger implementation.
  *  @note For internal use.
  */

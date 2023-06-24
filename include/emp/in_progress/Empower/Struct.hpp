@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief Struct is a set of active variables, grouped by name (organized by a specific StructType)
  */
 

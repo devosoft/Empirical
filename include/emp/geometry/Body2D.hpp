@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief  This file defines classes to represent bodies that exist on a 2D surface.
  *
  *  Each class should be able to:

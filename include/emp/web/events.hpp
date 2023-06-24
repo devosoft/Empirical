@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Event handlers that use JQuery.
  *
  *  @todo Events can be further sub-divided and built up (similar to DataNode objects) so that we

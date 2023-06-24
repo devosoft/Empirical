@@ -4,6 +4,7 @@
  *  date: 2015-2021.
 */
 /**
+ *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
  *  Status: RELEASE
  */

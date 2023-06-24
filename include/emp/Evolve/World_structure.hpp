@@ -4,6 +4,7 @@
  *  date: 2017-2018
 */
 /**
+ *  @file
  *  @brief Functions for popular world structure methods.
  */
 

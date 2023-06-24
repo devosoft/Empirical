@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Main file to include the entire Empirical web framework; for now, just an alias for Document.h
  *
  */

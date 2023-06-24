@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief A set of utilities to convert between NFAs and DFAs
  *  @note Status: BETA
  */

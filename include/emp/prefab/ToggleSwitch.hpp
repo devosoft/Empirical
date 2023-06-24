@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief Wraps Bootstrap's toggle switch.
  */
 

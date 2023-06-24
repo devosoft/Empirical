@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Handle the fundamental loading of an image (without Widget tracking)
  */
 

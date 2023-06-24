@@ -4,6 +4,7 @@
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief A specialized version of InstLib to handle AvidaCPU Instructions.
  */
 

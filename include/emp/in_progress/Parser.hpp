@@ -4,6 +4,7 @@
  *  date: 2016-2019.
 */
 /**
+ *  @file
  *  @brief A general-purpose, fast parser.
  *  @note Status: DEVELOPMENT
  *

@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief Assert evaluated only in debug mode with Emscripten.
  */
 

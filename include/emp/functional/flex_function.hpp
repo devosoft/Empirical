@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief Based on std::function, but holds default parameter values for calls with fewer args.
  *  @note Status: ALPHA
  */

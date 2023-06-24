@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief similar to an std::unordered_map, but all lookups come with a function to generate the result should the lookup fail.
  *  @note Status: BETA
  */

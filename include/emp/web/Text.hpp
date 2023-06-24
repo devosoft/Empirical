@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Specs for the Text widget.
  *
  *  A representation of text on a web page.  Text Widgets can be included inside of Divs or

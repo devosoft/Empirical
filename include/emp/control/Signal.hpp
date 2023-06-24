@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
  *  @note Status: Beta
  *

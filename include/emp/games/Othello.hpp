@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A simple Othello game state handler.
  *
  *  @todo Add Hash for boards to be able to cachce moves.

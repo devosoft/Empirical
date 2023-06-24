@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Error trigger implementation selector
  *  @note For internal use.
  */

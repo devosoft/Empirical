@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */

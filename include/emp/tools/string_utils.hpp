@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief Simple functions to manipulate strings.
  *  Status: RELEASE
  */

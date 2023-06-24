@@ -4,6 +4,7 @@
  *  date: 2016-2020.
 */
 /**
+ *  @file
  *  @brief A more dynamic replacement for standard library asserts.
  *  Status: RELEASE
  *

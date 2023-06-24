@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Tools to dynamically build (and cache) color maps.
  */
 

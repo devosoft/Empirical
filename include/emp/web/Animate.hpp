@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Manage animations on a web site.
  *
  *  To build an animation, you must provide a function to be run repeatedly.  When Start()

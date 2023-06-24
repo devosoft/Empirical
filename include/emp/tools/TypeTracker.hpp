@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Track class types abstractly to dynamically call correct function overloads.
  *  @note Status: BETA
  *

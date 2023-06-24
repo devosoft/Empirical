@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Generally useful macros that can perform cools tricks.
  *  Status: RELEASE
  *

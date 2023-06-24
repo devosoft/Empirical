@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief A Bloom filter implementation
  *
  *  @note This file is included in Empirical (https://github.com/devosoft/Empirical) for convenience.

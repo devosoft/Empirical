@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief A collection of information about a single, instantiated variable in Empower
  *
  *

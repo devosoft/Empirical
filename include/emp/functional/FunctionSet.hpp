@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief Setup a collection of functions, all with the same signature, that can be run as a group.
  *  @note Status: BETA
  */

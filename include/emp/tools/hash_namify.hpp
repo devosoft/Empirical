@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief A method for mapping hash values to intuitive names.
  */
 

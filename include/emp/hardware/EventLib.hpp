@@ -4,6 +4,7 @@
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief This file maintains information about events available in virtual hardware.
  *
  *  This file is largely based on InstLib.h.

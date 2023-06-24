@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Tools to help manage various problems in command-line or Emscripten-based applications.
  *  @note Status: ALPHA
  *

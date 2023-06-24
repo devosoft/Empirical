@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief A tool for collecting settings, including from files and the command line.
  *  @note Status: DEPRECATED!
  */

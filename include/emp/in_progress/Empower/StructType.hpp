@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief StructType maps variables to a MemoryImage; Struct is an instance of StructType
  *
  *  @todo Immediately before setting a StructType to active, we can optimize variable ordering.

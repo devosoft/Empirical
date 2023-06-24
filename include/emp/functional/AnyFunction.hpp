@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Based on std::function, but with a generic base class.
  *  @note Status: ALPHA
  *

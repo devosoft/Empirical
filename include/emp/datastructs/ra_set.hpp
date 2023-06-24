@@ -4,6 +4,7 @@
  *  date: 2017-2019
 */
 /**
+ *  @file
  *  @brief This file defines a Random Access Set template.
  *  @note Status: ALPHA
  */

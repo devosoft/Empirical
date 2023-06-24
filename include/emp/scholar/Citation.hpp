@@ -4,6 +4,7 @@
  *  date: 2016-2019
 */
 /**
+ *  @file
  *  @brief Information about a citation for a single paper / book / etc.
  */
 

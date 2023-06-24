@@ -4,6 +4,7 @@
  *  date: 2016
 */
 /**
+ *  @file
  *  @brief ce_array defines a limited array object for use within a constexpr class or function.
  *
  * STATUS: ALPHA

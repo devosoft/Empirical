@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief Non-terminating assert trigger implementation for unit testing.
  *  @note For internal use.
  */

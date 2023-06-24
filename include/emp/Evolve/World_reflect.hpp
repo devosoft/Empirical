@@ -4,6 +4,7 @@
  *  date: 2017-2018
 */
 /**
+ *  @file
  *  @brief Handle reflection on organisms to setup reasonable defaults in World.
  *
  *  @note None of the functions defined here should be called from outside the world object;

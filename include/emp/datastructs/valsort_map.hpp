@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief This file defines a map that is sorted by value, not key.
  *  @note Status: ALPHA
  *

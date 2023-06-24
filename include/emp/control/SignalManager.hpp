@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief This file defines the SignalManager class, which collects sets of Signals to be looked up
  * or manipulated later.
  */

@@ -4,6 +4,7 @@
  *  date: 2017-2018
 */
 /**
+ *  @file
  *  @brief Tools to build D3 visualizations.
  */
 

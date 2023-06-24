@@ -4,6 +4,7 @@
  *  date: 2016-2020.
 */
 /**
+ *  @file
  *  @brief Functions for analyzing with generic sequence types.
  *  @note Status: BETA
  *

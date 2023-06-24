@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief A Tween manages the gradual shift in properties of one or more widgets over time.
  *
  *  To create a Tween, a duration must be specified, along with an optional default

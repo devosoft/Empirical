@@ -4,6 +4,7 @@
  *  date: 2017-2018.
 */
 /**
+ *  @file
  *  @brief The TableColGoup widget, which behaves like the Table widget, but focuses on a group of columns.
  *
  *  DO NOT include this file directly.  All files begining with '_' are for internal use only.

@@ -4,6 +4,7 @@
  *  date: 2016-2020.
 */
 /**
+ *  @file
  *  @brief A set of simple functions to manipulate bitsets.
  *  @note Status: BETA
  */

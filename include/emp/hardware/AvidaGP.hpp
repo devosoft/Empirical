@@ -4,6 +4,7 @@
  *  date: 2017-2021.
 */
 /**
+ *  @file
  *  @brief This is a simple, efficient CPU for and applied version of Avida.
  *
  *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)

@@ -4,6 +4,7 @@
  *  date: 2017-2018.
 */
 /**
+ *  @file
  *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
  *
  *  State grids are a matrix of values, representing states of a 2D environment that an organism

@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief This file defines a templated class to represent a 2D suface capable of maintaining data
  *  about which 2D bodies are currently on that surface and rapidly identifying if they are
  *  overlapping.

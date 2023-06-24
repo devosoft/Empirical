@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
  *
  *  To wrap a function, call:

@@ -4,6 +4,7 @@
  *  date: 2016-2019
 */
 /**
+ *  @file
  *  @brief A simple way to track value ranges
  *  @note Status: BETA
  */

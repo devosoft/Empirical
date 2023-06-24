@@ -4,6 +4,7 @@
  *  date: 2015-2019
 */
 /**
+ *  @file
  *  @brief A set of macros to track how many instances of specific classes are made.
  *  @note Status: BETA
  *

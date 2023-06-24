@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief A string handler where sections update dynamically based on functions.
  *  @note Status: BETA
  */

@@ -4,6 +4,7 @@
  *  date: 2016-2021
 */
 /**
+ *  @file
  *  @brief A COL x ROW matrix of bits and provides easy indexing and manipulation
  *  @note Status: BETA
  */

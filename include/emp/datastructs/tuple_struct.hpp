@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief These macros will build a tuple and accessors to that tuple's members inside of a
  * class definintion.
  *

@@ -4,6 +4,7 @@
  *  date: 2017-2021.
 */
 /**
+ *  @file
  *  @brief Functions for popular selection methods applied to worlds.
  */
 

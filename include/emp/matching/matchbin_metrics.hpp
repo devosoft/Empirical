@@ -4,6 +4,7 @@
  *  date: 2019-2021.
 */
 /**
+ *  @file
  *  @brief Metric structs that can be plugged into MatchBin.
  *
  */

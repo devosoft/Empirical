@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Selector that picks the N best matches within a threshold.
  *
  */

@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief DataFile objects use DataNode objects to dynamically fill out file contents.
  */
 

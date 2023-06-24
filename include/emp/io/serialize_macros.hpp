@@ -4,6 +4,7 @@
  *  date: 2015-2021.
 */
 /**
+ *  @file
  *  @brief Macros for simplifying to serialization of objects.
  *  @note Status: ALPHA
  */

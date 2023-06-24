@@ -4,6 +4,7 @@
  *  date: 2019.
 */
 /**
+ *  @file
  *  @brief A mapping of names to variables stored in a MemoryImage.
  *  @note Status: ALPHA
  */

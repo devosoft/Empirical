@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief A bool representation that doesn't trip up std::vector
  *  @note Status: ALPHA
  *

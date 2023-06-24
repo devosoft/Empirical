@@ -4,6 +4,7 @@
  *  date: 2015
 */
 /**
+ *  @file
  *  @brief A comprehensive (ideally) fixed-point number representation.
  *
  *  Type-name: emp::fixed

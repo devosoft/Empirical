@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief VarMaps track arbitrary data by name (slow) or id (faster).
  *  @note Status: ALPHA
  */

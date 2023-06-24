@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Nearly-universal error, to use in place of emp_assert(false, ...).
  *  Aborts program in both debug and release mode, but does NOT terminate in TDEBUG for testing.
  */

@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Macros and template utilities to help determine details about unknown classes.
  */
 

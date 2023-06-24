@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief An internal Empirical class with tools to build collections of bits.
  */
 

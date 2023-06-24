@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Get an unordered_map containing url query key/value parameters.
  *
  */

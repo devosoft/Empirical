@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief Interfaces with emp::config objects to provide UI configuration.
  */
 

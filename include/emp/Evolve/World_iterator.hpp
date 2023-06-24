@@ -4,6 +4,7 @@
  *  date: 2017-2021.
 */
 /**
+ *  @file
  *  @brief This file defines iterators for use with emp::World objects.
  *
  *  @note Originally called PopulationIterator.h

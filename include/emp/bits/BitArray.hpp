@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
  *  Status: RELEASE
  *

@@ -4,6 +4,7 @@
  *  date: 2015-2021.
 */
 /**
+ *  @file
  *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
  *

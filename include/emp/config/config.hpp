@@ -4,6 +4,7 @@
  *  date: 2016-2019.
 */
 /**
+ *  @file
  *  @brief Maintains a set of configuration options.
  *
  *  This file defines a master configuration option Config, whose values can be loaded

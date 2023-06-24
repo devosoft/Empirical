@@ -4,6 +4,7 @@
  *  date: 2016
 */
 /**
+ *  @file
  *  @brief The TraitDef class maintains a category of measuments about another class.
  *
  *  Each trait is associated with a name, a description, and a type.  Instance of that

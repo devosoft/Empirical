@@ -4,6 +4,7 @@
  *  date: 2016-2019
 */
 /**
+ *  @file
  *  @brief A function that memorizes previous results to speed up any repeated calls.
  *  @note Status: BETA
  */

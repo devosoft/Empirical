@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Manage an entire document.
  *
  *  The Document class is built off of Div, but initializes the EMP web framework, if

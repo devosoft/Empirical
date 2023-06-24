@@ -4,6 +4,7 @@
  *  date: 2016-2021
 */
 /**
+ *  @file
  *  @brief A simple Malcala game state handler.
  */
 

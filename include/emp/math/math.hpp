@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief Useful mathematical functions (that are constexpr when possible.)
  *  @note Status: BETA (though new functions are added frequently)
  */

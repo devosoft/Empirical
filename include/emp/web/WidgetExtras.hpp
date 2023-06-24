@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief A collection of extra details about HTML Widgets (attributes, style, listerns)
  */
 

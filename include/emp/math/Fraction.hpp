@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Tools to maintain a more exact fraction (rather than lose precision as a double)
  *  @note Status: ALPHA
  */

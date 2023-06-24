@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief A mechanism to abstract functions from their underlying type and provide run-time names.
  *  @note Status: Beta
  *

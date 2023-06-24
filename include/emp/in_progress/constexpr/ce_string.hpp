@@ -4,6 +4,7 @@
  *  date: 2016
 */
 /**
+ *  @file
  *  @brief ce_string defines a limited string object for use within a constexpr class or function.
  *
  *  Status: DESIGN.

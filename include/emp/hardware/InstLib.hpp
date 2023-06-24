@@ -4,6 +4,7 @@
  *  date: 2017-2021.
 */
 /**
+ *  @file
  *  @brief This file maintains information about instructions availabel in virtual hardware.
  */
 

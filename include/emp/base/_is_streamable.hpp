@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief Test at compile time whether a type can be streamed.
  *  @note This header is for internal use to preserve levelization.
  *  Include meta/type_traits.hpp to use is_streamable.

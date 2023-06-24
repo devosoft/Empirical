@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
  *  @note Status: Beta
  */

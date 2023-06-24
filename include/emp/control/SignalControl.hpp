@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief The SignalControl class manages all of the signals and actions, linking them together
  *  upon request (by name, base class, or derived class).
  *

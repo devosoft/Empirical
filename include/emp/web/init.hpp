@@ -4,6 +4,7 @@
  *  date: 2015-2018.
 */
 /**
+ *  @file
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  *
  * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It

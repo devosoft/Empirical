@@ -4,6 +4,7 @@
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief This file provides a number of tools for manipulating graphs.
  *  @note Status: BETA
  */

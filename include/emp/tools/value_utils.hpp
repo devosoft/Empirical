@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Simple functions to manipulate values.
  *  @note Status: ALPHA
  */

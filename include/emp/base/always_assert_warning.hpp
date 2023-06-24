@@ -1,9 +1,10 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020.
+ *  date: 2023
 */
 /**
+ *  @file
  *  @brief A more dynamic replacement for standard library asserts.
  *  @note Status: RELEASE
  *

@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
  *
  *  Any built-in type can be added to ValPack to be manipulated at compile time.

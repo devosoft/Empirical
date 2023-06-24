@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Non-terminating error trigger implementation for unit testing.
  *  @note For internal use.
  */

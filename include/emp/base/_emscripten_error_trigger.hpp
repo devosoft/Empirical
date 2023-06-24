@@ -4,6 +4,7 @@
  *  date: 2021.
 */
 /**
+ *  @file
  *  @brief Terminating error trigger implementation.
  *  @note For internal use.
  *  @TODO Reflect error message to browser (e.g., as an alert)

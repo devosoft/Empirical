@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Div Widgets maintain an ordered collection of other widgets in an HTML div.
  *
  *  When printed to the web page, these internal widgets are presented in order.

@@ -4,6 +4,7 @@
  *  date: 2021
 */
 /**
+ *  @file
  *  @brief A simple class to track value pairs of any kind, optimized for points in 2D Space.
  *
  * @note For maximal efficiency, prefer SquareMagnitude() and SquareDistance()

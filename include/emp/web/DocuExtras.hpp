@@ -4,6 +4,7 @@
  *  date: 2015-2019
 */
 /**
+ *  @file
  *  @brief Control the styling and attributes of an existing div without nuking
 *   the content inside it.
  *

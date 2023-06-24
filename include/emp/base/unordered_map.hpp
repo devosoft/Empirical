@@ -4,6 +4,7 @@
  *  date: 2019-2020.
 */
 /**
+ *  @file
  *  @brief A drop-in wrapper for std::unordered_map and unordered_multi_map; makes sure we create vars on access.
  *  @note Status: ALPHA
  */

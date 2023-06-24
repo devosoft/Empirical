@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief A tool for sythesizing command-line arguments, URL query params, and config files.
  *  @note Status: BETA
  */

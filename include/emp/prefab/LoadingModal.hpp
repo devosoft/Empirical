@@ -4,6 +4,7 @@
  *  date: 2020-2021
 */
 /**
+ *  @file
  *  @brief Wrapper for loading moadal
  *
  * To add a loading modal to your web page, you must

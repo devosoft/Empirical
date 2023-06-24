@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief A representation of text on a web page optimized for rapid appends.
  *
  */

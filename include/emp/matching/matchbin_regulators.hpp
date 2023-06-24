@@ -4,6 +4,7 @@
  *  date: 2019-2020.
 */
 /**
+ *  @file
  *  @brief Regulator structs that can be plugged into MatchBin.
  *
  */

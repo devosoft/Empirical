@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief A managed set of Bytes to store any kind of data.
  *  @note Status: ALPHA
  *

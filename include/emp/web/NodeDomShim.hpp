@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Shim for Empirical compatibility with node.js. Mimicks the browser
  *  document object model (DOM).
  */

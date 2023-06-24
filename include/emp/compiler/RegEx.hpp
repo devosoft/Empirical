@@ -4,6 +4,7 @@
  *  date: 2016-2019.
 */
 /**
+ *  @file
  *  @brief Basic regular expression handler.
  *  @note Status: BETA
  *

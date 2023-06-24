@@ -4,6 +4,7 @@
  *  date: 2017-2018
 */
 /**
+ *  @file
  *  @brief DataManager handles a set of DataNode objects with the same tracking settings.
  */
 

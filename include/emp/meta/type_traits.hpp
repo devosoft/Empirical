@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
  */
 

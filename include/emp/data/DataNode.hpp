@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief DataNode objects track a specific type of data over the course of a run.
  *
  *  Collection: New data can be pushed or pulled.

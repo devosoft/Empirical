@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief Create/control an HTML input and call a specified function when it receives input.
  *
  *  Use example:

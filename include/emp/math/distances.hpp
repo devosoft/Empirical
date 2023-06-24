@@ -4,6 +4,7 @@
  *  date: 2017-2018
 */
 /**
+ *  @file
  *  @brief Library of commonly used distance functions
  *  @note Status: BETA
  */

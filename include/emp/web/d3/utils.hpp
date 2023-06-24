@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief This file contains macros used to build Empirical's C++ wrapper for D3.
  */
 

@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief A simple lexer for the Empirical configuration language.
  *
  *  Development notes: Initially building the lexer to be language specific, but a

@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
  *  value when full. Optimized for small N. Requires N < 256.
  *

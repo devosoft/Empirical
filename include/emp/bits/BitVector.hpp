@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  Status: RELEASE
  *

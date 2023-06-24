@@ -4,6 +4,7 @@
  *  date: 2015-2018.
 */
 /**
+ *  @file
  *  @brief Create/control an HTML button and call a specified function when that button is clicked.
  *
  *  Use example:

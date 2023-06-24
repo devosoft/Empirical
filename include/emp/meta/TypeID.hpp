@@ -4,6 +4,7 @@
  *  date: 2016-2021
 */
 /**
+ *  @file
  *  @brief TypeID provides an easy way to convert types to strings.
  *
  *  Developer notes:

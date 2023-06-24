@@ -4,6 +4,7 @@
  *  date: 2016
 */
 /**
+ *  @file
  *  @brief  The ConfigManager templated class handles the building and configuration of new objects
  *  of the target type.
  *

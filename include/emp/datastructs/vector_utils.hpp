@@ -4,6 +4,7 @@
  *  date: 2017-2021.
 */
 /**
+ *  @file
  *  @brief A set of simple functions to manipulate emp::vector
  *  @note Status: BETA
  *

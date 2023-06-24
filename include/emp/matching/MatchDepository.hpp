@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief A container for tag-based lookup, optimized for situations where
  *  tags are not removed from the lookup set.
  *

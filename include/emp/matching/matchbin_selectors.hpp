@@ -4,6 +4,7 @@
  *  date: 2019-2021.
 */
 /**
+ *  @file
  *  @brief Selector structs that can be plugged into MatchBin.
  *
  */

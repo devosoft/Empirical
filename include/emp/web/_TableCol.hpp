@@ -4,6 +4,7 @@
  *  date: 2017-2018.
 */
 /**
+ *  @file
  *  @brief The TableCol widget, which behaves like the Table widget, but focuses on a single column.
  *
  *  DO NOT include this file directly.  All files begining with '_' are for internal use only.

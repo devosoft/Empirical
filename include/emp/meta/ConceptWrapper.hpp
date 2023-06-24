@@ -4,6 +4,7 @@
  *  date: 2018-2021.
 */
 /**
+ *  @file
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
  *
  *  Starting in future versions of C++, a concept is a set of requirements for a class to be used

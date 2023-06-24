@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Specs for the Selector widget.
  *
  *  A Selector widget provides the user with a pull-down menu.  It can be

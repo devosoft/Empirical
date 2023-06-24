@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief An Attributes class for tracking non-style features about HTML objects
  */
 

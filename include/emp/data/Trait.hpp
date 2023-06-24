@@ -4,6 +4,7 @@
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief Directly measure a target quality about a type of object.
  *
  *  These objects are able to measure a specific trait on another object.  They

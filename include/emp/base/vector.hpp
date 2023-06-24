@@ -4,6 +4,7 @@
  *  date: 2016-2019.
 */
 /**
+ *  @file
  *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
  *  @note Status: BETA
  *

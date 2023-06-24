@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief KeypressManager is a tracker for keypresses in HTML5 pages.
  *
  *  When a KeypressManager is created, it can be given functions to run in response

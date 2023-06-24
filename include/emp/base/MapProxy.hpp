@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief A proxy for indecies returned from any map type to ensure they are initialized.
  *  @note Status: ALPHA
  */

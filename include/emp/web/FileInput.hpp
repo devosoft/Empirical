@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Specs for the FileInput widget (click on to upload a file)
  *
  *  @todo Setup FileInput to work outside of web mode as well.

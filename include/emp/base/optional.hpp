@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief Audited implementation of std::optional.
  *  Status: RELEASE
  *

@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief Basic tools for use in developing high-assurance code.
  *  @note Status: BETA
  */

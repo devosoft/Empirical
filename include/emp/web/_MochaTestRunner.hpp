@@ -4,6 +4,7 @@
  *  date: 2020
 */
 /**
+ *  @file
  *  @brief Utility class for managing software testing for Emscripten web code using the Karma + Mocha
  *         javascript testing framework.
  *

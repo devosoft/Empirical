@@ -4,6 +4,7 @@
  *  date: 2015-2018
 */
 /**
+ *  @file
  *  @brief Specs for the Table widget.
  *
  *  TableInfo is the core information for a table and has two helper classes:

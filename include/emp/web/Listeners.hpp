@@ -4,6 +4,7 @@
  *  date: 2015-2017
 */
 /**
+ *  @file
  *  @brief A class for tracking font event listeners for Widgets
  */
 

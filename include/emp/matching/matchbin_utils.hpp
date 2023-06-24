@@ -4,6 +4,7 @@
  *  date: 2019
 */
 /**
+ *  @file
  *  @brief Metric, Selector, and Regulator structs
  *         that can be plugged into MatchBin.
  *

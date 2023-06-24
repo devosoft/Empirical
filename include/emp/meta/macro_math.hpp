@@ -4,6 +4,7 @@
  *  date: 2016-2018
 */
 /**
+ *  @file
  *  @brief Macros to build a pre-processor calculator system.
  *  Status: RELEASE
  *

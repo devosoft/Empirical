@@ -4,6 +4,7 @@
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief A Non-deterministic Finite Automata simulator
  *  @note Status: BETA
  *

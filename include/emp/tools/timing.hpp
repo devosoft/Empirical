@@ -4,6 +4,7 @@
  *  date: 2020.
 */
 /**
+ *  @file
  *  @brief A collection of tools to help measure timing of code.
  *  @note Status: BETA
  */

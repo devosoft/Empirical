@@ -4,6 +4,7 @@
  *  date: 2016-2021.
 */
 /**
+ *  @file
  *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
  *  Status: RELEASE
  *
