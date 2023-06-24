@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Useful for streaming data from contiguous memory.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_IO_MEMORYISTREAM_HPP_INCLUDE

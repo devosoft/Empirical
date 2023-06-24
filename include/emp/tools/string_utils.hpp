@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Simple functions to manipulate strings.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE

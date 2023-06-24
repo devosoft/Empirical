@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Functions to simplify the use of std::tuple
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_DATASTRUCTS_TUPLE_UTILS_HPP_INCLUDE

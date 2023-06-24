@@ -5,7 +5,7 @@
 */
 /**
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features; aliases BitArray.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  */
 

@@ -21,13 +21,14 @@
 ```{eval-rst}
 .. doxygenfile:: emp/bits/bitset_utils.hpp
   :project: Empirical
-  :no-link:   
+  
 ```
 
 ## BitVector
 
 ```{eval-rst}
 .. doxygenclass:: emp::BitVector
+  :sections: briefdescription detaileddescription
   :members:
   :undoc-members:
 ```

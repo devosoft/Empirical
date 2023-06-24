@@ -5,7 +5,7 @@
 */
 /**
  *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  If EMP_NDEBUG is set, emp::array is just an alias for std::array.
  *  Otherwise, every time an array is accessed, tests are done to make sure that the

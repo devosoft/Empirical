@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Commonly used constant values.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_MATH_CONSTANTS_HPP_INCLUDE

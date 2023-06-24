@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  */
 
 #ifndef EMP_DEBUG_ALERT_HPP_INCLUDE

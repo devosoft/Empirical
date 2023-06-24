@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Audited implementation of std::optional.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  Drop-in replacements for std::optional.
  *  In debug mode, operator * and operator-> value accesses are checked for undefined behavior.

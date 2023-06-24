@@ -5,7 +5,7 @@
 */
 /**
  *  @brief Macros to build a pre-processor calculator system.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  Working macros include:
  *   EMP_INC(A)    : converts to result of A+1

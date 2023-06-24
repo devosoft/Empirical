@@ -5,7 +5,7 @@
 */
 /**
  *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
- *  @note Status: RELEASE
+ *  Status: RELEASE
  *
  *  @todo Some of the functions allow a start bit and end bit; each of these should be checked
  *        to make sure that they will work if the start and end are part of the same byte.  One
