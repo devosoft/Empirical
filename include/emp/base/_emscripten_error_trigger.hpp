@@ -7,7 +7,7 @@
  *  @file
  *  @brief Terminating error trigger implementation.
  *  @note For internal use.
- *  @TODO Reflect error message to browser (e.g., as an alert)
+ *  @todo Reflect error message to browser (e.g., as an alert)
  */
 
 #ifndef EMP_BASE__EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
