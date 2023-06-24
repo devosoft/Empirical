@@ -81,12 +81,52 @@ namespace emp {
           }
           break;
         case index_t::ARRAY:
-          for (size_t i = 0; i < num_ids; ++i) {
+          for (size_t i = 0; i < ids.array.num_ids; ++i) {
             _SetBit(bits, ids.array.ids[i] - offset);
           }
       }
 
-      ids.bits = _Index_Bits{ num_fields, offset, bits }
+      ids.bits = _Index_Bits{ num_fields, offset, bits };
+    }
+
+    /// Convert the internal representation to use an array.
+    void _ToArray() {
+      emp_assert(type != index_t::NONE, "Cannot start IndexSet as type ARRAY");
+      if (type == index_t::ARRAY) return; // Already array format!
+
+      const size_t num_vals = GetSize();
+      const size_t capacity = num_vals * 2;
+      emp::Ptr<size_t> array = emp::NewArrayPtr<size_t>(capacity);
+      size_t pos = 0;
+
+      switch (type) {
+        case index_t::VALS1:
+          array[pos++] = ids.vals.id1;
+          break;
+        case index_t::VALS2:
+          array[pos++] = ids.vals.id1;
+          array[pos++] = ids.vals.id2;
+          break;
+        case index_t::VALS3:
+          array[pos++] = ids.vals.id1;
+          array[pos++] = ids.vals.id2;
+          array[pos++] = ids.vals.id3;
+          break;
+        case index_t::RANGE:
+          for (size_t id = ids.range.start; id < ids.range.end; ++id) {
+            array[pos++] = id;
+          }
+          break;
+        case index_t::BITS:
+          for (size_t field_id = 0; field_id < ids.bits.num_fields; ++field_id) {
+            size_t field = ids.bits.bits[field_id];
+            const size_t offset = ids.bits.offset + field_id * emp::NUM_FIELD_BITS;
+            while (field) {
+              array[pos++] = emp::pop_bit(field) + offset;
+            }
+          }
+      }
+      ids.array = _Index_Array{num_vals, capacity, array};
     }
 
   public:
