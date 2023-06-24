@@ -16,6 +16,24 @@
 
 namespace emp {
 
+  /// Index range is a simple pair of values indicating the start and end of a series of indices.
+  struct IndexRange {
+    size_t start; // First value in this range.
+    size_t end;   // First value after start NOT in this range.
+
+    // Insert a value into a range if valid; return false if not.
+    bool Insert(size_t val) {
+
+    }
+  };
+
+  /// IndexRanges is a class to maintain a series of ranges of indexes.  Values are stored
+  /// in pairs with one value indicating the start of a range and the other indicating
+  /// the number of values in that range.
+  struct IndexRangeSet {
+    emp::vector<IndexRange> ranges;
+  };
+
   /// IndexSet maintains a collection of indices that can be easily manipulated.  Ideally it
   /// will be memory efficient, based on how many ids and how densely packed there are.
 
