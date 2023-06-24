@@ -1,9 +1,10 @@
-/**
+/*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2018
 */
 /**
+ *  @file
  *  @brief An example file for Trait and TraitSet classes.
  */
 

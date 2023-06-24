@@ -1,9 +1,10 @@
-/**
+/*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2016-2020
 */
 /**
+ *  @file
  *  @brief This file takes in one or more CSV files with values and, for each, calculates the mnimium,
  *  maximum, and average values found in each column.
  */

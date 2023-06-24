@@ -1,9 +1,10 @@
-/**
+/*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief Examples for DataNode demonstrating how to track different types of data.
  */
 

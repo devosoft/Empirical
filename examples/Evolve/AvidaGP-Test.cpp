@@ -1,9 +1,10 @@
-/**
+/*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2017
 */
 /**
+ *  @file
  *  @brief A simple test of AvidaGP with World for copies and mutations.
  *
  *  A few basic steps to examine AvidaGP organisms in a world.

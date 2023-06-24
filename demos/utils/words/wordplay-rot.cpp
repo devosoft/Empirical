@@ -1,9 +1,10 @@
-/**
+/*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2016-2017
 */
 /**
+ *  @file
  *  @brief Test the rotation of letters through an alphabet to see if new words are formed.
  *
  *  Build graphs of various types in the standard format.

@@ -17,7 +17,7 @@ for filename in $(find . -name '*.cpp' -type f ! -path "./third-party/*") $(find
   # stamp in expected boilerplate line-by-line
   # just like file docstrings, but don't require a brief
   # stamp in expected boilerplate line-by-line
-  sed -i '1s|^.*$|/**|' "${filename}"
+  sed -i '1s|^.*$|/*|' "${filename}"
   sed -i '2s|^.*$| *  This file is part of Empirical, https://github.com/devosoft/Empirical|' "${filename}"
   sed -i '3s|^.*$| *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md|' "${filename}"
   # only match if a @date isn't currently in place
@@ -32,6 +32,7 @@ for filename in $(find . -name '*.cpp' -type f ! -path "./third-party/*") $(find
   # add extra * to replace later with */ when constructing fresh
   # sed -i '6s/^$/ */' "${filename}"
   sed -i '6s|^.*$|/**|' "${filename}"
+  sed -i '7s|^.*$| *  @file|' "${filename}"
 
   # close boilerplate file docstring
   # must accomodate possible additional content in docstring

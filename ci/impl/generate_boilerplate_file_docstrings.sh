@@ -26,7 +26,8 @@ for filename in $(cd include && find -- * -name '*.hpp' -type f); do
   sed -i '5s|^.*$|*/|' "include/${filename}"
   # only match if a @brief isn't currently in place
   # adapted from https://stackoverflow.com/a/5334825
-  sed -i '6s|^.*$|/**\n *  @file|' "include/${filename}"
+  sed -i '6s|^.*$|/**|' "include/${filename}"
+  sed -i '7s|^.*$| *  @file|' "include/${filename}"
   sed -i "/^ \*  @brief /b; 8s/^.*\$/ *  @brief TODO./" "include/${filename}"
   # only match empty lines
   # add extra * to replace later with */ when constructing fresh
