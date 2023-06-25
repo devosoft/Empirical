@@ -13,25 +13,46 @@
 
 #include "../base/Ptr.hpp"
 #include "../bits/bitset_utils.hpp"
+#include "../math/constants.hpp"
 
 namespace emp {
 
   /// Index range is a simple pair of values indicating the start and end of a series of indices.
   struct IndexRange {
-    size_t start; // First value in this range.
-    size_t end;   // First value after start NOT in this range.
+    size_t start = 0; // First value in this range.
+    size_t end = 0;   // First value after start NOT in this range; zero for empty range.
 
-    // Insert a value into a range if valid; return false if not.
+    bool Has(size_t val) const { return val >= start && val < end; }
+
+    /// Insert a value into a range if valid; return false if not.
     bool Insert(size_t val) {
-
+      if (val == end) { end++; return true; }
+      if (val == start - 1) { start--; return true; }
+      return Has(val);
     }
   };
 
   /// IndexRanges is a class to maintain a series of ranges of indexes.  Values are stored
   /// in pairs with one value indicating the start of a range and the other indicating
-  /// the number of values in that range.
+  /// the number of values in that range; always sorted but may have empty ranges mixed in.
   struct IndexRangeSet {
-    emp::vector<IndexRange> ranges;
+    emp::vector<IndexRange> range_set;
+
+    // Helper function to find the id of an IndexRange that a value belongs in;
+    // returns next-higher index if none fit perfectly.
+    size_t _FindRange(size_t val, size_t min_id=0, size_t max_id=emp::MAX_SIZE_T) const {
+      if (range_set.size() == 0) return 0;
+      if (max_id > range_set.size()) max_id = range_set.size();
+      if (max_id == min_id) return range_set[max_id].start > val ? max_id : max_id+1;
+      size_t test_id = (min_id + max_id) / 2;
+
+      // If we found it, return the current ID.
+      if (range_set[test_id].Has(val)) return test_id;
+
+      // Otherwise search in the appropriate direction.
+      if (val < range_set[test_id].start) return _FindRange(val, min_id, test_id);
+      return _FindRange(val, test_id+1, max_id);
+    }
   };
 
   /// IndexSet maintains a collection of indices that can be easily manipulated.  Ideally it
