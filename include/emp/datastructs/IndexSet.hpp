@@ -53,6 +53,12 @@ namespace emp {
       if (val < range_set[test_id].start) return _FindRange(val, min_id, test_id);
       return _FindRange(val, test_id+1, max_id);
     }
+
+    bool Has(size_t val) const {
+      size_t id = _FindRange(val);
+      if (id >= range_set.size()) return false;
+      return range_set[id].Has(val);
+    }
   };
 
   /// IndexSet maintains a collection of indices that can be easily manipulated.  Ideally it
