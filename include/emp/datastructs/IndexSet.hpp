@@ -24,17 +24,34 @@ namespace emp {
 
     bool Has(size_t val) const { return val >= start && val < end; }
 
+    /// Will identify if two ranges are next to each other or overlapping.
+    bool IsConnected(const IndexRange & in) const {
+      return (in.start >= start && in.start <= end ||
+          start >= in.start && start <= in.end);
+    }
+
     /// Insert a value into a range if valid; return false if not.
     bool Insert(size_t val) {
       if (val == end) { end++; return true; }
       if (val == start - 1) { start--; return true; }
       return Has(val);
     }
+
+    /// Extend the current range with a new one.  Must be perfectly adjacent!
+    bool Append(const IndexRange & in) {
+      if (end == in.start) { end = in.end; return true; }
+      return false;
+    }
+
+    /// Insert and entire range into this one.
+    bool Insert(const IndexRange & in) {
+
+    }
   };
 
-  /// IndexRanges is a class to maintain a series of ranges of indexes.  Values are stored
-  /// in pairs with one value indicating the start of a range and the other indicating
-  /// the number of values in that range; always sorted but may have empty ranges mixed in.
+  /// IndexRanges is a class to maintain a series of ranges of indexes.  The ranges will
+  /// always be kept sorted and non-adjacent (i.e., there will always be at least one index
+  /// missing between two ranges), but empty ranges may be mixed in.
   struct IndexRangeSet {
     emp::vector<IndexRange> range_set;
 
