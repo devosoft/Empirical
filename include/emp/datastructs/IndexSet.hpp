@@ -18,9 +18,20 @@
 namespace emp {
 
   /// Index range is a simple pair of values indicating the start and end of a series of indices.
-  struct IndexRange {
+  class IndexRange {
     size_t start = 0; // First value in this range.
     size_t end = 0;   // First value after start NOT in this range; zero for empty range.
+
+  public:
+    IndexRange() = default;
+    IndexRange(size_t val) : start(val), end(val+1) { }
+    IndexRange(size_t _start, size_t _end) : start(_start), end(_end) { }
+
+    size_t GetStart() const { return start; }
+    size_t GetEnd() const { return end; }
+
+    void SetStart(size_t in) { start = in; }
+    void SetEnd(size_t in) { end = in; }
 
     bool Has(size_t val) const { return val >= start && val < end; }
 
@@ -42,16 +53,11 @@ namespace emp {
       if (end == in.start) { end = in.end; return true; }
       return false;
     }
-
-    /// Insert and entire range into this one.
-    bool Insert(const IndexRange & in) {
-
-    }
   };
 
   /// IndexRanges is a class to maintain a series of ranges of indexes.  The ranges will
   /// always be kept sorted and non-adjacent (i.e., there will always be at least one index
-  /// missing between two ranges), but empty ranges may be mixed in.
+  /// missing between two ranges).
   struct IndexRangeSet {
     emp::vector<IndexRange> range_set;
 
@@ -60,14 +66,14 @@ namespace emp {
     size_t _FindRange(size_t val, size_t min_id=0, size_t max_id=emp::MAX_SIZE_T) const {
       if (range_set.size() == 0) return 0;
       if (max_id > range_set.size()) max_id = range_set.size();
-      if (max_id == min_id) return range_set[max_id].start > val ? max_id : max_id+1;
+      if (max_id == min_id) return range_set[max_id].GetStart() > val ? max_id : max_id+1;
       size_t test_id = (min_id + max_id) / 2;
 
       // If we found it, return the current ID.
       if (range_set[test_id].Has(val)) return test_id;
 
       // Otherwise search in the appropriate direction.
-      if (val < range_set[test_id].start) return _FindRange(val, min_id, test_id);
+      if (val < range_set[test_id].GetStart()) return _FindRange(val, min_id, test_id);
       return _FindRange(val, test_id+1, max_id);
     }
 
@@ -75,6 +81,37 @@ namespace emp {
       size_t id = _FindRange(val);
       if (id >= range_set.size()) return false;
       return range_set[id].Has(val);
+    }
+
+    /// @brief Insert a value into this range set
+    /// @param val Value to insert.
+    /// @return Was there a change due to this insertion (or was it already there)
+    bool Insert(size_t val) {
+      size_t id = _FindRange(val);
+
+      // If we are inserting a new range onto the end, do so.
+      if (id == range_set.size()) {
+        range_set.emplace_back(val);
+        return true;
+      }
+
+      // If we already have the value, stop here.
+      if (range_set[id].Has(val)) return false;
+
+      // See if we are extending an existing range.
+      if (id && range_set[id-1].GetEnd() == val) {
+        range_set[id-1].Insert(val);
+        // See if we should merge with the next range.
+        if (range_set[id].GetStart() == val+1) {
+          range_set[id-1].SetEnd(range_set[id].GetEnd());
+          range_set.erase(id);
+        }
+      }
+
+      // Otherwise we are inserting an entirely new range.
+      else range_set.emplace(id, val);
+
+      return true;
     }
   };
 
