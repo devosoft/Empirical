@@ -26,6 +26,11 @@ namespace emp {
     IndexRange() = default;
     IndexRange(size_t val) : start(val), end(val+1) { }
     IndexRange(size_t _start, size_t _end) : start(_start), end(_end) { }
+    IndexRange(const IndexRange &) = default;
+
+    IndexRange & operator=(const IndexRange &) = default;
+
+    auto operator<=>(const IndexRange &) const = default;
 
     size_t GetStart() const { return start; }
     size_t GetEnd() const { return end; }
@@ -89,26 +94,25 @@ namespace emp {
     bool Insert(size_t val) {
       size_t id = _FindRange(val);
 
-      // If we are inserting a new range onto the end, do so.
-      if (id == range_set.size()) {
-        range_set.emplace_back(val);
-        return true;
-      }
+      // Are we inserting a new range onto the end?
+      if (id == range_set.size()) range_set.emplace_back(val);
 
-      // If we already have the value, stop here.
-      if (range_set[id].Has(val)) return false;
+      // Do we already have the value?
+      else if (range_set[id].Has(val)) return false;
 
-      // See if we are extending an existing range.
-      if (id && range_set[id-1].GetEnd() == val) {
+      // Are we extending the previous range?
+      else if (id && range_set[id-1].GetEnd() == val) {
         range_set[id-1].Insert(val);
-        // See if we should merge with the next range.
-        if (range_set[id].GetStart() == val+1) {
+        if (range_set[id].GetStart() == val+1) { // Merge with the next range?
           range_set[id-1].SetEnd(range_set[id].GetEnd());
           range_set.erase(id);
         }
       }
 
-      // Otherwise we are inserting an entirely new range.
+      // Are we extending just the next range?
+      else if (range_set[id].GetStart() == val+1) range_set[id].Insert(val);
+
+      // Otherwise we must insert an entirely new range.
       else range_set.emplace(id, val);
 
       return true;
