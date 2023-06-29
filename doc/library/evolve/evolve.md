@@ -1,6 +1,6 @@
 # Evolution tools
 
-<!-- ## World
+## World
 
 ```{eval-rst}
 .. doxygenfile:: Evolve/World.hpp
@@ -33,4 +33,4 @@
 .. doxygenfile:: Evolve/World_select.hpp
   :project: Empirical
   :no-link:   
-``` -->
+```

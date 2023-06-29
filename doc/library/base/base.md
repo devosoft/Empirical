@@ -36,8 +36,7 @@ emp::array<int, 3> array({1,2,3});
 // You can treat this just like an std::array<int, 3>
 ```
 
-Empirical asserts
------------------
+## Empirical asserts
 
 These asserts function similarly to normal asserts, with a few important
 additional features: - If compiled with Emscripten they will provide

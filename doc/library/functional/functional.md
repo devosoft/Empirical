@@ -3,7 +3,7 @@
 ## Flex Functions
 
 ```{eval-rst}
-.. doxygenfile:: tools/flex_function.hpp
+.. doxygenfile:: functional/flex_function.hpp
   :project: Empirical
   :no-link:   
 ```
@@ -19,7 +19,7 @@
 ## Generic Functions
 
 ```{eval-rst}
-.. doxygenfile:: emp/functional/GenericFunctions.hpp
+.. doxygenfile:: emp/functional/GenericFunction.hpp
   :project: Empirical
   :no-link:   
 ```
@@ -27,7 +27,7 @@
 ## Memoized Functions
 
 ```{eval-rst}
-.. doxygenfile:: emp/functional/memo_functions.hpp
+.. doxygenfile:: emp/functional/memo_function.hpp
   :project: Empirical
   :no-link:   
 ```
