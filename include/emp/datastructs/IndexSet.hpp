@@ -63,7 +63,7 @@ namespace emp {
   /// IndexRanges is a class to maintain a series of ranges of indexes.  The ranges will
   /// always be kept sorted and non-adjacent (i.e., there will always be at least one index
   /// missing between two ranges).
-  struct IndexRangeSet {
+  class IndexRangeSet {
     emp::vector<IndexRange> range_set;
 
     // Helper function to find the id of an IndexRange that a value belongs in;
@@ -81,6 +81,14 @@ namespace emp {
       if (val < range_set[test_id].GetStart()) return _FindRange(val, min_id, test_id);
       return _FindRange(val, test_id+1, max_id);
     }
+
+  public:
+    IndexRangeSet() = default;
+    IndexRangeSet(const IndexRangeSet &) = default;
+    IndexRangeSet(IndexRangeSet &&) = default;
+
+    IndexRangeSet & operator=(const IndexRangeSet &) = default;
+    IndexRangeSet & operator=(IndexRangeSet &&) = default;
 
     bool Has(size_t val) const {
       size_t id = _FindRange(val);
