@@ -1,7 +1,7 @@
 /**
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016
+ *  date: 2016
 */
 /**
  *  @brief This file provides an example of how to build a configuration class.
