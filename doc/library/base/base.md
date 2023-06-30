@@ -87,7 +87,7 @@ emp_assert_warning(a==5, a);
 
 // This will get printed because no assertion
 // error will be triggered
-std::cout << "Still running!" << std::endl; 
+std::cout << "Still running!" << std::endl;
 
 ```
 

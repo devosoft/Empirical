@@ -162,9 +162,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Current to the template arguments on your DataNode. Do not use the 
-  /// CurrentModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Current to the template arguments on your DataNode. Do not use the
+  /// CurrentModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class CurrentModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -197,9 +197,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Info, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Info to the template arguments on your DataNode. Do not use the 
-  /// InfoModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Info to the template arguments on your DataNode. Do not use the
+  /// InfoModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class InfoModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -247,9 +247,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Log to the template arguments on your DataNode. Do not use the 
-  /// LogModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Log to the template arguments on your DataNode. Do not use the
+  /// LogModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class LogModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -319,9 +319,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Archive to the template arguments on your DataNode. Do not use the 
-  /// ArchiveModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Archive to the template arguments on your DataNode. Do not use the
+  /// ArchiveModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class ArchiveModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -373,9 +373,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Range to the template arguments on your DataNode. Do not use the 
-  /// RangeModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Range to the template arguments on your DataNode. Do not use the
+  /// RangeModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class RangeModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -434,9 +434,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::FullRange, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Histogram to the template arguments on your DataNode. Do not use the 
-  /// FullRangeModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Histogram to the template arguments on your DataNode. Do not use the
+  /// FullRangeModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class FullRangeModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -513,9 +513,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Stats, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Stats to the template arguments on your DataNode. Do not use the 
-  /// StatsModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Stats to the template arguments on your DataNode. Do not use the
+  /// StatsModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class StatsModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -598,9 +598,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Histogram, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Histogram to the template arguments on your DataNode. Do not use the 
-  /// HistogramModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Histogram to the template arguments on your DataNode. Do not use the
+  /// HistogramModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class HistogramModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
 
@@ -710,9 +710,9 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   #else
-  /// To use this class, add data::Pull to the template arguments on your DataNode. Do not use the 
-  /// PullModule class directly - it is a simplification for documentation purposes and does not 
-  /// actually exist. 
+  /// To use this class, add data::Pull to the template arguments on your DataNode. Do not use the
+  /// PullModule class directly - it is a simplification for documentation purposes and does not
+  /// actually exist.
   class PullModule {
   #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
@@ -725,7 +725,7 @@ namespace emp {
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::in_vals;
-    
+
     void PullData_impl() {
       in_vals = pull_funs.Run();
       const emp::vector< emp::vector<VAL_TYPE> > & pull_sets = pull_set_funs.Run();
@@ -734,7 +734,7 @@ namespace emp {
       }
     }
     #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
-    
+
   public:
     DataNodeModule() : pull_funs(), pull_set_funs() { ; }
 

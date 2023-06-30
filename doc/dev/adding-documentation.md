@@ -98,7 +98,7 @@ like the following:
     ```{eval-rst}
     .. doxygenfile:: potato.h
        :project: Empirical
-       :no-link:   
+       :no-link:
     ```
 ```
 

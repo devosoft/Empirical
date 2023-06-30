@@ -24,7 +24,7 @@
 
 namespace emp {
 
-  /** \addtogroup <lexer_utilities> 
+  /** \addtogroup <lexer_utilities>
   *  @{
   */
 

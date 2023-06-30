@@ -938,7 +938,7 @@ namespace emp {
     /// Creates a new attribute pack which has all the attributes of this
     /// pack and another pack. Values will be taken from other other pack
     /// preferentially.
-    
+
     template <typename... U>
     constexpr auto Merge(U&&... packs)
       // This hint is required by some older compilers

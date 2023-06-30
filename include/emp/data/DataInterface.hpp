@@ -24,7 +24,7 @@ namespace emp {
 
     /// Returns the number values added to this node since the last reset.
     virtual size_t GetCount() const = 0;
-    
+
     /// Returns the number of times this node has been reset.
     virtual size_t GetResetCount() const = 0;
 

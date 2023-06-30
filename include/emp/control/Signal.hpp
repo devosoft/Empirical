@@ -82,7 +82,7 @@ namespace emp {
   class SignalManager;  // ...for setting up as friend.
 
   // Mechanisms for Signals to report to a manager.
-  
+
   namespace internal {
     struct SignalManager_Base {
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
