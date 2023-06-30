@@ -28,7 +28,6 @@ Contents:
 BuiltWithEmpiricalGallery/index
 QuickStartGuides/index
 library/index
-library/api_root
 
 ```
 
