@@ -2096,5 +2096,7 @@ namespace std
         }
     };
 }
+
 #endif // DOXYGEN_SHOULD_SKIP_THIS
+
 #endif // #ifndef EMP_BITS_BITARRAY_HPP_INCLUDE

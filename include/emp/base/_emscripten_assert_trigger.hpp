@@ -66,5 +66,6 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_BASE__EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE
 #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+
+#endif // #ifndef EMP_BASE__EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE
