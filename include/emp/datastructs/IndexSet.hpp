@@ -46,6 +46,9 @@ namespace emp {
           start >= in.start && start <= in.end);
     }
 
+    /// Grow this range (default, by one)
+    void Grow(size_t count=1) { end += count; }
+
     /// Insert a value into a range if valid; return false if not.
     bool Insert(size_t val) {
       if (val == end) { end++; return true; }
@@ -70,7 +73,7 @@ namespace emp {
     // returns next-higher index if none fit perfectly.
     size_t _FindRange(size_t val, size_t min_id=0, size_t max_id=emp::MAX_SIZE_T) const {
       if (range_set.size() == 0) return 0;
-      if (max_id > range_set.size()) max_id = range_set.size();
+      if (max_id > range_set.size()) max_id = range_set.size(); // Adjust max if defaulted.
       if (max_id == min_id) return range_set[max_id].GetStart() > val ? max_id : max_id+1;
       size_t test_id = (min_id + max_id) / 2;
 
@@ -80,6 +83,18 @@ namespace emp {
       // Otherwise search in the appropriate direction.
       if (val < range_set[test_id].GetStart()) return _FindRange(val, min_id, test_id);
       return _FindRange(val, test_id+1, max_id);
+    }
+
+    // Helper function to grow a range by one, possibly merging it with the next range.
+    void _GrowRange(size_t id) {
+      emp_assert(id < range_set.size());
+      range_set[id].Grow();
+
+      // Test if we need to merge with the next range.
+      if (id+1 < range_set.size() && range_set[id].GetEnd() == range_set[id+1].GetStart()) {
+        range_set[id].SetEnd(range_set[id+1].GetEnd());
+        range_set.erase(id+1);
+      }
     }
 
   public:
@@ -96,26 +111,32 @@ namespace emp {
       return range_set[id].Has(val);
     }
 
+    size_t GetEnd() const { return range_set.size() ? range_set.back().GetEnd() : 0; }
+
+    /// @brief  Add a new value that belongs at the end of the sets.
+    /// @param val Value to add
+    /// @return Did the append work?  If it's not at the end, returns false.
+    bool Append(size_t val) {
+      if (range_set.size() == 0 || val > GetEnd()) range_set.emplace_back(val); // New Range
+      else if (val == GetEnd()) range_set.back().SetEnd(val+1);                 // Extend range
+      else return false;                                                        // Not at end
+
+      return true;
+    }
+
     /// @brief Insert a value into this range set
     /// @param val Value to insert.
-    /// @return Was there a change due to this insertion (or was it already there)
+    /// @return Was there a change due to this insertion (or was it already there?)
     bool Insert(size_t val) {
-      size_t id = _FindRange(val);
-
       // Are we inserting a new range onto the end?
-      if (id == range_set.size()) range_set.emplace_back(val);
+      if (Append(val)) return true;
 
       // Do we already have the value?
-      else if (range_set[id].Has(val)) return false;
+      size_t id = _FindRange(val);
+      if (range_set[id].Has(val)) return false;
 
       // Are we extending the previous range?
-      else if (id && range_set[id-1].GetEnd() == val) {
-        range_set[id-1].Insert(val);
-        if (range_set[id].GetStart() == val+1) { // Merge with the next range?
-          range_set[id-1].SetEnd(range_set[id].GetEnd());
-          range_set.erase(id);
-        }
-      }
+      else if (id && range_set[id-1].GetEnd() == val) _GrowRange(id-1);
 
       // Are we extending just the next range?
       else if (range_set[id].GetStart() == val+1) range_set[id].Insert(val);
@@ -125,7 +146,18 @@ namespace emp {
 
       return true;
     }
+
+    /// @brief Insert a whole range into this set, merging other ranges as needed.
+    /// @param in New range to include.
+    /// @return Was there a change due to this insertion (or were they already there?)
+    bool Insert(IndexRange in) {
+      size_t new_start = in.GetStart();
+      size_t new_end = in.GetEnd();
+      size_t start_id = _FindRange(new_start);
+      size_t end_id = _FindRange(new_end);
+    }
   };
+
 
   /// IndexSet maintains a collection of indices that can be easily manipulated.  Ideally it
   /// will be memory efficient, based on how many ids and how densely packed there are.
