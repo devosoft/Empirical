@@ -34,7 +34,7 @@ for filename in $(find . -name '*.cpp' -type f ! -path "./third-party/*") $(find
   sed -i '6s|^.*$|/**|' "${filename}"
   sed -i '7s|^.*$| *  @file|' "${filename}"
   sed -i "/^ \*  @brief /b; 8s/^.*\$/ *  @brief TODO./" "${filename}"
-  
+
   # close boilerplate file docstring
   # must accomodate possible additional content in docstring
   # so, search backwards from first blank line to place close */
