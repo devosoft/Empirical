@@ -41,6 +41,7 @@ extensions = [
     'sphinx_rtd_theme',
     'breathe',
     'myst_parser',
+    'sphinx_tippy'
 ]
 
 myst_heading_anchors = 4

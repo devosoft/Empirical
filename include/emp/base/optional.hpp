@@ -100,6 +100,7 @@ namespace emp {
 
 } // namespace emp
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
 
   template <typename T>
@@ -110,7 +111,7 @@ namespace std {
   };
 
 } // namespace std
-
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 #endif
 
 #endif // #ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE

@@ -1,9 +1,12 @@
 # Testing
 
-## Unit Testing
+## API
 
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/testing/unit_tests.hpp
-  :project: Empirical
-  :no-link:   
+.. toctree::
+   :glob:
+
+   api/*
 ```

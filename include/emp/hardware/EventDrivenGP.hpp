@@ -819,7 +819,9 @@ namespace emp {
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
     MATCHBIN_T matchBin;
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     trait_printer_t fun_trait_print = [](std::ostream& os, TRAIT_T){os << "UNCONFIGURED TRAIT PRINT FUNCTION\n";};
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 

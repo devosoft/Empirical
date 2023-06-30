@@ -84,6 +84,7 @@ namespace emp {
     const fun_t & GetFunction() const { return fun; }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /////////////////////////////////////
   //  Member function implementaions.
 
@@ -117,7 +118,7 @@ namespace emp {
   template <typename T> bool GenericFunction::ConvertOK() {
     return dynamic_cast<Function<T> *>(this);
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE

@@ -3,22 +3,10 @@
 Contents:
 
 ```{toctree}
-:maxdepth: 1
+:maxdepth: 4
+:glob:
 
-base/base
-bits/bits
-compiler/compiler
-data/data
-datastructs/datastructs
-debug/debug
-evolve/evolve
-functional/functional
-io/io
-math/math
-prefab/prefab
-testing/testing
-tools/tools
-web/web
+*/[!_]*
 ```
 
 - {ref}`genindex`

@@ -32,11 +32,13 @@ namespace emp {
       std::set<std::string> exclude;
       std::map<std::string, web::Div> group_divs;
       std::map<std::string, web::Input> input_map;
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       std::function<void(const std::string & val)> on_change_fun = [](const std::string & val){;};
       std::function<std::string(std::string val)> format_label_fun = [](std::string name){
         emp::vector<std::string> sliced = slice(name, '_');
         return to_titlecase(join(sliced, " "));
       };
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
     public:
       ConfigWebUI(Config & c, const std::string & div_name = "settings_div")
         : config(c), settings_div(div_name) {;}

@@ -77,7 +77,7 @@ namespace prefab {
    * panel to your web app. Users can interact with the config panel
    * by updating values.
    *
-   * The ConfigPanel is constructed using subcomponents. Groups of
+   * The ConfigPanel is constructed using sub-components. Groups of
    * settings are placed in Cards, and individual settings are represented
    * by ValueControls.
    */
@@ -111,7 +111,7 @@ namespace prefab {
       }
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
-      // Helper function to get prety names from config values
+      // Helper function to get pretty names from config values
       inline static std::function<std::string(const std::string &)> format_label = [](
         const std::string & name
       ) {
@@ -314,7 +314,7 @@ namespace prefab {
        * Arranges config panel based configuration pass to constructor
        * @param config the config object used to create this panel
        * @param open should the card for the panel start open?
-       * @param id_prefix string appended to id for each setting (unusued)
+       * @param id_prefix string appended to id for each setting (unused)
        * @deprecated No longer necessary for config panel to function.
        * This function was a work around to fix a bug.
        */

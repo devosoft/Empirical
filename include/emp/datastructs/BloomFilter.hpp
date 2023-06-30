@@ -16,7 +16,7 @@
 #ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
 #define EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
 
-/*********************************************************************
+/*
  *                           Open Bloom Filter                       *
  *                                                                   *
  * Author: Arash Partow - 2000                                       *
@@ -54,6 +54,7 @@ static const unsigned char bit_mask[bits_per_char] = {
                                                        0x80   //10000000
                                                      };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 /// This class keeps track of the parameters for a Bloom filter
 class BloomParameters
 {
@@ -171,6 +172,8 @@ public:
    }
 
 };
+
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /// This class implements a Bloom filter, which is a
 /// memory-efficient data structure for identifying

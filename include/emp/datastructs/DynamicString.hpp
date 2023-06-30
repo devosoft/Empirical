@@ -32,7 +32,7 @@ namespace emp {
     DynamicString() { ; }
     DynamicString(const DynamicString &) = default;
 
-    /// How many string components (funcations or continuous substrings) are in this DynamicString?
+    /// How many string components (functions or continuous substrings) are in this DynamicString?
     size_t GetSize() const { return fun_set.size(); }
 
     /// Index in to a specific component (not a specific character, since size is variable)
@@ -84,6 +84,7 @@ namespace emp {
 
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   /// Make sure that DynamicString works with with std::ostream.
   std::ostream & operator<<( std::ostream & os, const emp::DynamicString & strings )
@@ -94,5 +95,6 @@ namespace std {
     return os;
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE

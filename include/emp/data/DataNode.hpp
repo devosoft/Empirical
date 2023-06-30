@@ -158,8 +158,15 @@ namespace emp {
 
   /// == data::Current ==
   /// This module lets you track the current (i.e. most recently added) value
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Current to the template arguments on your DataNode. Do not use the 
+  /// CurrentModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class CurrentModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     VAL_TYPE cur_val;  ///< Most recent value passed to this node.
 
@@ -186,8 +193,15 @@ namespace emp {
 
   /// == data::Info ==
   /// This module adds information such as a name, description, and keyword for this node.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Info, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Info to the template arguments on your DataNode. Do not use the 
+  /// InfoModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class InfoModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     std::string name;     ///< Name of this data category.
     std::string desc;     ///< Description of this type of data.
@@ -229,8 +243,15 @@ namespace emp {
 
   /// == data::Log ==
   /// This module lets you log all of the values that have been added since the last re-set
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Log to the template arguments on your DataNode. Do not use the 
+  /// LogModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class LogModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     emp::vector<VAL_TYPE> val_set;  ///< All values saved since last reset.
 
@@ -294,8 +315,15 @@ namespace emp {
   /// This module keeps track of historical values in addition to those added since the last re-set.
   /// Every time Reset() is called, all values that have been added since the previous time Reset()
   /// are stored in a vector in the archive.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Archive to the template arguments on your DataNode. Do not use the 
+  /// ArchiveModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class ArchiveModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     emp::vector<emp::vector<VAL_TYPE>> archive;  ///< Data archived from before most recent reset.
 
@@ -341,8 +369,15 @@ namespace emp {
   /// == data::Range ==
   /// This module allows this DataNode to store information (min, max, mean, count, and total) about
   /// the distribution of the values that have been added since the last call to Reset().
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Range to the template arguments on your DataNode. Do not use the 
+  /// RangeModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class RangeModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     double total;  ///< Total of all data since last reset.
     double min;    ///< Smallest value passed in since last reset.
@@ -395,8 +430,15 @@ namespace emp {
   /// This module makes the DataNode store a history of distributional information measured by
   /// data::Range between calls to Reset().  Series of historical values are stored in vectors
   /// (except mean, which is calculated from total and count).
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::FullRange, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Histogram to the template arguments on your DataNode. Do not use the 
+  /// FullRangeModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class FullRangeModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     emp::vector<double> total_vals;  ///< Totals from previous resets.
     emp::vector<size_t> num_vals;    ///< Value counts from previous resets.
@@ -467,9 +509,15 @@ namespace emp {
   ///
   /// Note 2: Kurtosis is calculated using Snedecor and Cochran (1967)'s formula. A perfect normal
   /// distribution has a kurtosis of 0.
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Stats, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Stats to the template arguments on your DataNode. Do not use the 
+  /// StatsModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class StatsModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     // Running variance, skew, and kurtosis calculations based off of this class:
     // https://www.johndcook.com/blog/skewness_kurtosis/
@@ -546,8 +594,16 @@ namespace emp {
 
   /// == data::Histogram ==
   /// Make the DataNode track a histogram of values observed since the last reset.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Histogram, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Histogram to the template arguments on your DataNode. Do not use the 
+  /// HistogramModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class HistogramModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
+
   protected:
     VAL_TYPE offset;              ///< Min value in first bin; others are offset by this much.
     VAL_TYPE width;               ///< How wide is the overall histogram?
@@ -586,7 +642,7 @@ namespace emp {
     /// upper bound on the histogram
     int GetOverflow() const {return overflow;}
 
-    /// Return the count of numbers added to this histogram that were belowed the
+    /// Return the count of numbers added to this histogram that were below the
     /// allowed lower bound
     int GetUnderflow() const {return underflow;}
 
@@ -631,7 +687,7 @@ namespace emp {
       parent_t::AddDatum(val);
     }
 
-    /// Reset the DataNode (empties the historgram)
+    /// Reset the DataNode (empties the histogram)
     void Reset() {
       for (size_t & x : counts) x = 0.0;
       parent_t::Reset();
@@ -650,8 +706,15 @@ namespace emp {
   /// new values or sets of values that it will then track. These functions are called every time
   /// the PullData method is called on this node, and the values they return are measured as
   /// specified by the other modules in this node.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  #else
+  /// To use this class, add data::Pull to the template arguments on your DataNode. Do not use the 
+  /// PullModule class directly - it is a simplification for documentation purposes and does not 
+  /// actually exist. 
+  class PullModule {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     emp::FunctionSet<VAL_TYPE()> pull_funs;                   ///< Functions to pull data.
@@ -662,7 +725,6 @@ namespace emp {
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::in_vals;
-    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
     
     void PullData_impl() {
       in_vals = pull_funs.Run();
@@ -671,7 +733,8 @@ namespace emp {
         in_vals.insert(in_vals.end(), x.begin(), x.end());
       }
     }
-
+    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+    
   public:
     DataNodeModule() : pull_funs(), pull_set_funs() { ; }
 
@@ -684,6 +747,8 @@ namespace emp {
     }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
   template <typename VAL_TYPE, typename MOD_PACK> class DataNode_Interface;
 
   /// Outermost interface to all DataNode modules.
@@ -693,7 +758,7 @@ namespace emp {
     using parent_t = DataNodeModule<VAL_TYPE, (emp::data) IMODS...>;
   };
 
-  /// A template that will determing requisites, sort, make unique the data mods provided.
+  /// A template that will determine requisites, sort, make unique the data mods provided.
   /// The final, sorted ValPack of the requisites plus originals is in 'sorted'.
   template<emp::data... MODS>
   struct FormatDataMods {
@@ -701,6 +766,7 @@ namespace emp {
     using full = typename ModPack<MODS...>::template append<reqs>;  ///< Requisites + originals
     using sorted = pack::RUsort<full>;                              ///< Unique and in order
   };
+  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNode : public DataNode_Interface< VAL_TYPE, typename FormatDataMods<MODS...>::sorted > {

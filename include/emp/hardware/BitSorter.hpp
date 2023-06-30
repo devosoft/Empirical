@@ -21,7 +21,7 @@ namespace emp {
 
   class BitSorter {
   public:
-    using bits_t = uint32_t;          ///< Type used to represent pairs if posisions as bit masks.
+    using bits_t = uint32_t;          ///< Type used to represent pairs if positions as bit masks.
   protected:
 
     emp::vector<bits_t> compare_set;  ///< Comparators, in order (pairs of 1's in bitstring)
@@ -184,6 +184,7 @@ namespace emp {
 
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
 
   /// operator<< to work with ostream (must be in std to work)
@@ -192,5 +193,6 @@ namespace std {
     return out;
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_HARDWARE_BITSORTER_HPP_INCLUDE

@@ -1408,6 +1408,7 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // =============================================================
   // ===                                                       ===
   // ===  Out-of-class member function definitions from above  ===
@@ -1835,6 +1836,8 @@ namespace emp {
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
+
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE

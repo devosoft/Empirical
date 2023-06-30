@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+
+import sys
+
+with open(sys.argv[1]) as infile:
+    open_braces = 0
+    namespace_removed = 0
+    for line in infile:
+        line = line.strip()
+        if line.startswith("namespace emp {") or \
+           line.startswith("namespace web {") or \
+           line.startswith("namespace prefab {") or \
+           line.startswith("namespace emp::prefab {") or \
+           line.startswith("namespace evo {"):
+            namespace_removed += 1
+            open_braces = 1
+            print()
+        elif namespace_removed and line == "}":
+            print()
+            namespace_removed -= 1
+        else:
+            if namespace_removed:
+                open_braces += line.count("{")
+                open_braces -= line.count("}")
+            line = line.replace("emp::", "")
+            line = line.replace("web::", "")
+            line = line.replace("prefab::", "")
+            print(line)

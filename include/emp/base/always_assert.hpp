@@ -22,7 +22,7 @@
  *     int a = 6;
  *     emp_always_assert(a==5, a);
  *
- *  Unlinke "emp_assert", "emp_always_assert" will trigger an assertion error
+ *  Unlike "emp_assert", "emp_always_assert" will trigger an assertion error
  *  whether compiled in debug mode or not.
  *
  */

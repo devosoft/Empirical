@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief A simple, fast class for managing verticies (nodes) and edges.
+ *  @brief A simple, fast class for managing vertices (nodes) and edges.
  *  @note Status: BETA
  */
 
@@ -23,6 +23,7 @@ namespace emp {
   /// A graph class that maintains a set of vertices (nodes) and edges (connecting pairs of nodes)
   class Graph {
   public:
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     /// Information about nodes within a graph.
     class Node {
     private:
@@ -75,6 +76,7 @@ namespace emp {
       }
 
     };
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   protected:
     emp::vector<Node> nodes;  ///< Set of vertices in this graph.
@@ -189,7 +191,7 @@ namespace emp {
       return nodes[from].HasEdge(to) && nodes[to].HasEdge(from);
     }
 
-    /// Add a pair of edges between two vertieces (in both directions)
+    /// Add a pair of edges between two vertices (in both directions)
     void AddEdgePair(size_t from, size_t to) {
       emp_assert(from < nodes.size() && to < nodes.size());
       nodes[from].AddEdge(to);

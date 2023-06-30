@@ -20,6 +20,9 @@
   /// emp_emscripten_assert() will not do anything.
   #define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
 #else
+  /// Require a specified condition to be true if this program was compiled to
+  /// Javascript with Emscripten. Note: If NDEBUG is defined,
+  /// emp_emscripten_assert() will not do anything.
   #define emp_emscripten_assert(...)
 #endif
 

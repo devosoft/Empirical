@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief UI subcomponent for ConfigPanel and ReadoutPanel.
+ *  @brief UI sub-component for ConfigPanel and ReadoutPanel.
  */
 
 #ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
@@ -237,6 +237,7 @@ namespace emp::prefab {
     )>;
 
     // Determine the default range by finding the next highest order of magnitude (base 10)
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     inline static range_setter_t applyDefaultRange = [](
       const std::string & value,
       const std::string & type,
@@ -260,6 +261,7 @@ namespace emp::prefab {
         in.Step(step);
       }
     };
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     public:
     /**

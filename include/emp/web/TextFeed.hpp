@@ -25,9 +25,11 @@ namespace web {
   /// A TextFeed widget handles putting text on a web page that can be controlled and modified.
 
   class TextFeed : public internal::WidgetFacet<TextFeed> {
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class TextFeedInfo;
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
   protected:
-    // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     class TextFeedInfo : public internal::WidgetInfo {
       friend TextFeed;
     protected:
@@ -57,9 +59,10 @@ namespace web {
       bool AppendOK() const override { return append_ok; }
       void PreventAppend() override { append_ok = false; }
 
+      /// Add new text to this string.
       Widget Append(const std::string & in_text) override;
 
-      // All derived widgets must suply a mechanism for providing associated HTML code.
+      // All derived widgets must supply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                         // Clear the current text.
         HTML << "<span id=\'" << id << "'>";  // Initial span tag to keep id.
@@ -73,7 +76,7 @@ namespace web {
     public:
       virtual std::string GetType() override { return "web::TextFeedInfo"; }
     };  // End of TextFeedInfo
-    // #endif // DOXYGEN_SHOULD_SKIP_THIS
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of info.
     TextFeedInfo * Info() { return (TextFeedInfo *) info; }
@@ -105,7 +108,8 @@ namespace web {
     TextFeed & PopBack() { Info()->strings.pop_back(); return *this; }
   };
 
-  /// Add new text to this string.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  // Add new text to this string.
   Widget TextFeed::TextFeedInfo::Append(const std::string & text) {
     // If text widget cannot append, forward to parent.
     if (!append_ok) return ForwardAppend(text);
@@ -140,7 +144,7 @@ namespace web {
     return web::TextFeed(this);
 
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 } // namespace web
 } // namespace emp
 

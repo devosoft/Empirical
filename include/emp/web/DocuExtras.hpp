@@ -28,9 +28,9 @@ namespace web {
   protected:
 
     class DocuExtrasInfo : public internal::WidgetInfo {
-
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend DocuExtras;
-
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
       protected:
 
       DocuExtrasInfo(const std::string & in_id)
@@ -62,7 +62,7 @@ namespace web {
 
     }; // end of InputInfo definition
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     DocuExtrasInfo * Info() { return (DocuExtrasInfo *) info; }
     const DocuExtrasInfo * Info() const { return (DocuExtrasInfo *) info; }
 

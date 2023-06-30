@@ -46,6 +46,7 @@ test-cookiecutter: ../cookiecutter-empirical-project
 
 doc:
 	doxygen
+	cd doc && python make_md.py
 	cd doc && make html coverage
 
 coverage:

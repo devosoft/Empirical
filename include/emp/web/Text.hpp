@@ -26,11 +26,15 @@ namespace web {
   /// A Text widget handles putting text on a web page that can be controlled and modified.
 
   class Text : public internal::WidgetFacet<Text> {
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class TextInfo;
+    #endif DOXYGEN_SHOULD_SKIP_THIS
   protected:
 
     class TextInfo : public internal::WidgetInfo {
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend Text;
+      #endif DOXYGEN_SHOULD_SKIP_THIS
     protected:
       DynamicString strings;    ///< All string (and functions returning strings) in Text widget.
       bool append_ok;           ///< Can this Text widget be extended?
@@ -45,10 +49,15 @@ namespace web {
       bool AppendOK() const override { return append_ok; }
       void PreventAppend() override { append_ok = false; }
 
+      /// Add new text to this string.
       Widget Append(const std::string & in_text) override;
+      /// Add a function that produces text to this widget.  Every time the widget is re-drawn, the
+      /// function will be re-run to get the latest version of the text.  When a Live() function
+      /// wraps a variable it simply makes sure that this version of Append is called so that the
+      /// value of the variable is kept live.
       Widget Append(const std::function<std::string()> & in_fun) override;
 
-      // All derived widgets must suply a mechanism for providing associated HTML code.
+      // All derived widgets must supply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                         // Clear the current text.
         HTML << "<span id=\'" << id << "'>"   // Initial span tag to keep id.
@@ -61,7 +70,7 @@ namespace web {
     };  // End of TextInfo
 
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     TextInfo * Info() { return (TextInfo *) info; }
     const TextInfo * Info() const { return (TextInfo *) info; }
 
@@ -84,7 +93,9 @@ namespace web {
     Text & Clear() { Info()->strings.Clear(); return *this; }
   };
 
-  /// Add new text to this string.
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+  // Add new text to this string.
   Widget Text::TextInfo::Append(const std::string & text) {
     if (!append_ok) return ForwardAppend(text);  // If text widget cannot append, forward to parent.
     strings.Append(text);                        // Record the new string being added.
@@ -92,10 +103,10 @@ namespace web {
     return web::Text(this);
   }
 
-  /// Add a function that produces text to this widget.  Every time the widget is re-drawn, the
-  /// function will be re-run to get the latest version of the text.  When a Live() function
-  /// wraps a variable it simply makes sure that this version of Append is called so that the
-  /// value of the variable is kept live.
+  // Add a function that produces text to this widget.  Every time the widget is re-drawn, the
+  // function will be re-run to get the latest version of the text.  When a Live() function
+  // wraps a variable it simply makes sure that this version of Append is called so that the
+  // value of the variable is kept live.
   Widget Text::TextInfo::Append(const std::function<std::string()> & fun) {
     if (!append_ok) return ForwardAppend(fun);   // If text widget cannot append, forward to parent.
     strings.Append(fun);                         // Record the new function being added.
@@ -103,6 +114,7 @@ namespace web {
     return web::Text(this);
   }
 
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 }
 

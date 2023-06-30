@@ -164,7 +164,7 @@ namespace emp {
     }
   };
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /////////////////////////////////////
   //  Member function implementaions.
 
@@ -198,6 +198,7 @@ namespace emp {
   template <typename T> bool BaseFunction::ConvertOK() {
     return dynamic_cast<DerivedFunction<T> *>(this);
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 

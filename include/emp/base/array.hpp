@@ -204,7 +204,7 @@ struct std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
 
 #endif // NDEBUG off
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   // A crude, generic printing function for arrays.
   template <typename T, size_t N>
@@ -218,7 +218,7 @@ namespace std {
     for (T & x : v) is >> x;
     return is;
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_BASE_ARRAY_HPP_INCLUDE

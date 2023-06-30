@@ -109,6 +109,7 @@ namespace emp {
 
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   // Overload ostream to work with points.
   template <typename TYPE> std::ostream & operator<<(std::ostream & os,
@@ -116,5 +117,6 @@ namespace std {
     return os << "(" << point.GetX() << "," << point.GetY() << ")";
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_GEOMETRY_POINT2D_HPP_INCLUDE

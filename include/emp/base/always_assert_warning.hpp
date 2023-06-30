@@ -21,7 +21,7 @@
  *     int a = 6;
  *     emp_always_assert(a==5, a);
  *
- *  Unlinke "emp_assert_warning", "emp_always_assert_warning" will trigger an
+ *  Unlike "emp_assert_warning", "emp_always_assert_warning" will trigger an
  *  assertion error whether compiled in debug mode or not.
  */
 

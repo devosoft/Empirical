@@ -39,13 +39,12 @@ emp::array<int, 3> array({1,2,3});
 ## Empirical asserts
 
 These asserts function similarly to normal asserts, with a few important
-additional features: - If compiled with Emscripten they will provide
-pop-up alerts when run in a web browser. - emp_assert can take
-additional arguments. If the assert is triggered, those extra arguments
-will be evaluated and printed. - if NDEBUG -or- EMP_NDEBUG is defined,
-the expression in emp_assert() is not evaluated. - if EMP_TDEBUG is
-defined, emp_assert() goes into test mode and records failures, but
-does not abort. (useful for unit tests of asserts)
+additional features:
+
+- If compiled with Emscripten they will provide pop-up alerts when run in a web browser.
+- emp_assert can take additional arguments. If the assert is triggered, those extra arguments will be evaluated and printed.
+- if NDEBUG **or** EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
+- if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but does not abort. (useful for unit tests of asserts)
 
 Example:
 
@@ -59,19 +58,40 @@ emp_assert(a==5, a);
 When compiled in debug mode (i.e. without the -DNDEBUG flag), this will
 trigger an assertion error and print the value of a.
 
-### emp_assert API (base/assert.hpp)
+Empirical also has an emscripten-specific assert, which will only trigger an error when the code was compiled with Emscripten:
 
-```{eval-rst}
-.. doxygendefine:: emp_assert
-  :project: Empirical
-  :no-link:   
+```cpp
+#include "Empirical/include/emp/base/emscripten_assert.hpp"
+
+int a = 6;
+// If compiled in with emscripten in debug mode,
+// this will print a warning and the value of a
+emp_emscripten_assert(a==5, a);
+
 ```
 
-```{eval-rst}
-.. doxygendefine:: emp_emscripten_assert
-  :project: Empirical
-  :no-link:   
+If you want your assert to be triggered outside of debug mode, you can use {c:func}`emp_always_assert`.
+
+## Empirical Warnings
+
+These work very similar to Empirical asserts, except they do not throw assertion errors. When compiled in debug mode, they will print a warning (and any desired additional information) on failure but program execution will continue. When compiled outside of debug mode they do nothing.
+
+```cpp
+#include "Empirical/include/emp/base/assert_warning.hpp"
+#include <iostream>
+
+int a = 6;
+// If compiled in debug mode, this will print a
+// warning and the value of a
+emp_assert_warning(a==5, a);
+
+// This will get printed because no assertion
+// error will be triggered
+std::cout << "Still running!" << std::endl; 
+
 ```
+
+If you want your warning to be triggered outside of debug mode, you can use {c:func}`emp_always_assert_warning`.
 
 ## Empirical pointers
 
@@ -94,4 +114,15 @@ emp::Ptr<int> int_ptr;
 int_ptr.New(123456); // Store the value 123456 in int_ptr.
 std::cout << "*int_ptr = " << *int_ptr << std::endl;
 int_ptr.Delete();
+```
+
+## API
+
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
+```{eval-rst}
+.. toctree::
+   :glob:
+
+   api/*
 ```

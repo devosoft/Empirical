@@ -10,7 +10,7 @@
  * TODO: When prefab tools for adding mobile only and desktop only
  * content are created, remove AddMobileContent(), desktop_content
  * and mobile_content divs, and ConfigPanel as a friend class.
- * AddConent() should stream into all_content div.
+ * AddContent() should stream into all_content div.
  */
 
 #ifndef EMP_PREFAB_COMMENTBOX_HPP_INCLUDE
@@ -27,7 +27,9 @@ namespace prefab {
    * Optionally, it can contain text and other web elements.
    */
   class CommentBox: public web::Div {
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend ConfigPanel;
+    #endif DOXYGEN_SHOULD_SKIP_THIS
     private:
       // ID for the comment box Div
       std::string box_base = this->GetID();

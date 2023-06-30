@@ -944,6 +944,7 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // =============================================================
   // ===                                                       ===
   // ===  Out-of-class member function definitions from above  ===
@@ -1735,7 +1736,7 @@ namespace emp {
       os << std::endl;
     }
   }
-
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

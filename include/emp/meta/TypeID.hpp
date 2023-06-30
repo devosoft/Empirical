@@ -464,7 +464,7 @@ namespace emp {
   }
 }
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   /// Hash function to allow TypeID to be used with maps and sets (must be in std).
   template <>
@@ -480,5 +480,6 @@ namespace std {
     return out;
   }
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_META_TYPEID_HPP_INCLUDE

@@ -1,25 +1,12 @@
 # IO
 
-## Inmemory Files
+## API
 
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/io/File.hpp
-  :project: Empirical
-  :no-link:   
-```
+.. toctree::
+   :glob:
 
-## Serialization Macros
-
-```{eval-rst}
-.. doxygenfile:: emp/io/serialize_macros.hpp
-  :project: Empirical
-  :no-link:   
-```
-
-## Serialization Tools
-
-```{eval-rst}
-.. doxygenfile:: emp/io/serialize.hpp
-  :project: Empirical
-  :no-link:   
+   api/*
 ```

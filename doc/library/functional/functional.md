@@ -1,33 +1,12 @@
 # Functional
 
-## Flex Functions
+## API
 
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: functional/flex_function.hpp
-  :project: Empirical
-  :no-link:   
-```
+.. toctree::
+   :glob:
 
-## Function Sets
-
-```{eval-rst}
-.. doxygenfile:: emp/functional/FunctionSet.hpp
-  :project: Empirical
-  :no-link:   
-```
-
-## Generic Functions
-
-```{eval-rst}
-.. doxygenfile:: emp/functional/GenericFunction.hpp
-  :project: Empirical
-  :no-link:   
-```
-
-## Memoized Functions
-
-```{eval-rst}
-.. doxygenfile:: emp/functional/memo_function.hpp
-  :project: Empirical
-  :no-link:   
+   api/*
 ```

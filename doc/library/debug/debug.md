@@ -1,33 +1,12 @@
 # Debug
 
-## Alert
+## API
 
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/debug/alert.hpp
-  :project: Empirical
-  :no-link:   
-```
+.. toctree::
+   :glob:
 
-## Debugging Tools
-
-```{eval-rst}
-.. doxygenfile:: emp/debug/debug.hpp
-  :project: Empirical
-  :no-link:   
-```
-
-## Errors
-
-```{eval-rst}
-.. doxygenfile:: emp/debug/errors.hpp
-  :project: Empirical
-  :no-link:   
-```
-
-## Memory Tracking
-
-```{eval-rst}
-.. doxygenfile:: emp/debug/mem_track.hpp
-  :project: Empirical
-  :no-link:   
+   api/*
 ```
