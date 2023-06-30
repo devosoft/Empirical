@@ -37,12 +37,12 @@ for h in header_files:
         os.makedirs(new_dir)
     toc_file_name = f"library/{just_dir}/{last_dir}.md"
     if not os.path.exists(toc_file_name):
-        toc_text = format_heading(1, last_dir)
+        toc_text = format_heading(1, last_dir.capitalize()) + toc_text
         with open(toc_file_name, "w") as target:
             target.write(toc_text)
-    # elif toc_text not in open(toc_file_name).read():
-    #     with open(toc_file_name, "a") as target:
-    #         target.write("\n" + toc_text)
+    elif "<!-- API TOC -->" not in open(toc_file_name).read():
+        with open(toc_file_name, "a") as target:
+            target.write("\n" + toc_text)
 
     text = format_heading(1, f"{just_file}")
     text += format_directive("emp/" + h)

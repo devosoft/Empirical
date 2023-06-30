@@ -76,12 +76,12 @@ namespace emp {
   template<typename T>
   struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Determine if a type has a FromString() member function.
   template <typename T, typename=void> struct HasFromString : std::false_type { };
   template<typename T>
   struct HasFromString<emp::decoy_t<T, decltype(std::declval<T>().FromString(""))>> : std::true_type{};
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Determine if a type has a FromDouble() member function.
   template <typename T, typename=void> struct HasFromDouble : std::false_type { };
   template<typename T>
