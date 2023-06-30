@@ -1,10 +1,10 @@
-/**
+/*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2018
 */
 /**
- *  @brief Defines the specialized world for the MAP-Elites app.
+ *  @file
  */
 
 #ifndef DEMOS_MAP_ELITES_ARM_SOURCE_ARMWORLD_HPP_INCLUDE

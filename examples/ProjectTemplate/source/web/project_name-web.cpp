@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *
+ *  @brief TODO.
  * WARNING: the Cookiecutter Empirical Project, which you can find at
  * https://github.com/devosoft/cookiecutter-empirical-project, should be
  * preferred over ProjectTemplate

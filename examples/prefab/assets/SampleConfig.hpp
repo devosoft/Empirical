@@ -4,8 +4,8 @@
  *  date: 2023
 */
 /**
- */
-
+ *  @file
+ *  @brief TODO.
  *  @note Adapted from Emily's memic_model project
  *  https://github.com/emilydolson/memic_model
  */

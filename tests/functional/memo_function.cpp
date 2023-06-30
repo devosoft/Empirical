@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @note doing any sort of copying of memo_functions seems to give my terminal a stack overflow error (using mingw on windows 10)
+ *  @brief TODO.
  *  @MAM not sure who left this comment about stack overflow on mingw...
  */
 
