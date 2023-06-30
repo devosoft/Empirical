@@ -18,10 +18,10 @@
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 #
+import glob
 import os
 import sphinx_rtd_theme
 import subprocess
-import glob
 import sys
 import textwrap
 
