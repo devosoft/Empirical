@@ -32,7 +32,7 @@ for h in header_files:
         continue
     new_dir = "library/" + just_dir + "/api"
     print(new_dir)
-    toc_text = format_heading(2, "API") + "```{eval-rst}\n.. toctree::\n   :glob:\n\n   api/*\n```\n"
+    toc_text = "<!-- API TOC -->\n<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->\n" + format_heading(2, "API") + "```{eval-rst}\n.. toctree::\n   :glob:\n\n   api/*\n```\n"
     if not os.path.exists(new_dir):
         os.makedirs(new_dir)
     toc_file_name = f"library/{just_dir}/{last_dir}.md"
