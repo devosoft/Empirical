@@ -105,7 +105,6 @@ jobs:
         with:
           submodules: 'recursive'
       - uses: mattnotmitt/doxygen-action@v1.9.5
-      - run: doxygen
       - run: cd doc && pip install -r requirements.txt
       - run: cd doc && make html coverage
       - run: cd doc && ./headtail.sh && python parse_documentation_coverage.py doc-coverage.json >> doc-coverage.json"
