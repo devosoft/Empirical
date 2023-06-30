@@ -1,11 +1,9 @@
-/*
+/**
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
+ *  @date 2019
 */
 /**
- */
-
  *  @brief This class maintains all of the fitness data for a population of organisms.
  */
 
