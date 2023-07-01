@@ -104,13 +104,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - uses: mattnotmitt/doxygen-action@v1.9.5
+      - uses: ssciwr/doxygen-install@v1
+      - run: doxygen
       - run: cd doc && pip install -r requirements.txt
       - run: cd doc && python make_md.py
-      - run: pwd
-      - run: ls
       - run: cd doc && make html coverage
-      - run: cd doc && ./headtail.sh && python parse_documentation_coverage.py doc-coverage.json >> doc-coverage.json
+      - run: cd doc && set -o pipefail && make html coverage | ./headtail.sh && python parse_documentation_coverage.py doc-coverage.json >> doc-coverage.json
       - uses: sylvanld/action-storage@v1
         # if: github.ref == 'refs/heads/master'
         with:
