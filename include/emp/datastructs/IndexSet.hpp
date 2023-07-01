@@ -124,6 +124,21 @@ namespace emp {
       return true;
     }
 
+    /// @brief  Add an entire range that belongs at the end of the sets.
+    /// @param val Range to add
+    /// @return Did the append work?  If it's not at the end, returns false.
+    bool Append(IndexRange in) {
+      if (range_set.size() == 0 || in.GetStart() > GetEnd()) {
+        range_set.emplace_back(in);
+      }
+      else if (range_set.back().Has(in.GetStart()) || in.GetStart() == GetEnd()) {
+        range_set.back().SetEnd(in.GetEnd()); // Extend range
+      }
+      else return false; // Not at end
+
+      return true;
+    }
+
     /// @brief Insert a value into this range set
     /// @param val Value to insert.
     /// @return Was there a change due to this insertion (or was it already there?)
@@ -135,10 +150,10 @@ namespace emp {
       size_t id = _FindRange(val);
       if (range_set[id].Has(val)) return false;
 
-      // Are we extending the previous range?
+      // Are we extending the previous range (and possibly merging)?
       else if (id && range_set[id-1].GetEnd() == val) _GrowRange(id-1);
 
-      // Are we extending just the next range?
+      // Are we extending the beginning of the next range?
       else if (range_set[id].GetStart() == val+1) range_set[id].Insert(val);
 
       // Otherwise we must insert an entirely new range.
@@ -151,10 +166,18 @@ namespace emp {
     /// @param in New range to include.
     /// @return Was there a change due to this insertion (or were they already there?)
     bool Insert(IndexRange in) {
+      if (range_set.size() == 0) {
+        range_set.emplace_back(in);
+        return true;
+      }
+
       size_t new_start = in.GetStart();
       size_t new_end = in.GetEnd();
       size_t start_id = _FindRange(new_start);
       size_t end_id = _FindRange(new_end);
+
+      // Determine the whole new range.
+      if (start_id < )
     }
   };
 
