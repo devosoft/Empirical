@@ -20,10 +20,14 @@
 
 namespace emp {
 
+  /// @returns the taxon with the highest fitness out of any active taxon
+  /// in the given systematics manager.
+  /// @param s the systematics manager to search in. Must have more than 0 active taxa.
   template<typename systematics_t>
   Ptr<typename systematics_t::taxon_t> FindDominant(systematics_t & s) {
-    double best = -999999;
-    Ptr<typename systematics_t::taxon_t> best_tax = nullptr;
+    emp_assert(s.GetNumActive() > 0 && "Trying to call FindDominant on empty population");
+    double best = (*(s.GetActive().begin()))->GetData().GetFitness();
+    Ptr<typename systematics_t::taxon_t> best_tax = (*(s.GetActive().begin()));
     for (Ptr<typename systematics_t::taxon_t> tax : s.GetActive()) {
       double f = tax->GetData().GetFitness();
       if (f > best) {
@@ -34,10 +38,9 @@ namespace emp {
     return best_tax;
   }
 
-  /// Returns the total number of times a mutation of type @param type
-  /// that along @param taxon 's lineage. (Different from CountMuts in
-  /// that CountMuts sums them whereas CountMutSteps would count two
-  /// simultaneous mutations of the same type as one event)
+  /// Returns the total number of ancestor taxa in \c taxon 's lineage.
+  /// Requires that taxon is a member of a systematics manager that
+  /// has ancestor storing turned on
   template <typename taxon_t>
   int LineageLength(Ptr<taxon_t> taxon) {
     int count = 0;
@@ -50,10 +53,16 @@ namespace emp {
     return count;
   }
 
-  /// Returns the total number of times a mutation of type @param type
-  /// that along @param taxon 's lineage. (Different from CountMuts in
+  /// Returns the total number of times a mutation of type \c type
+  /// occurred along \c taxon 's lineage. (Different from CountMuts in
   /// that CountMuts sums them whereas CountMutSteps would count two
   /// simultaneous mutations of the same type as one event)
+  /// @param type string corresponding to a type of mutation.
+  /// Must be in the mut_counts dictionary (i.e. the dictionary
+  /// passed in when \ref mut_landscape_info::RecordMutation was called)
+  /// @param taxon a pointer to a taxon to count mutation steps for.
+  /// Must have a DATA_TYPE that supports mutation tracking
+  /// (e.g. mut_landscape_info)
   template <typename taxon_t>
   int CountMutSteps(Ptr<taxon_t> taxon, std::string type="substitution") {
     int count = 0;
