@@ -108,11 +108,11 @@ jobs:
       - run: doxygen
       - run: cd doc && pip install -r requirements.txt
       - run: cd doc && python make_md.py
-      - run: cd doc && set -o pipefail && make html coverage | ./headtail.sh && python parse_documentation_coverage.py _build/doc-coverage.json >> _build/doc-coverage.json
+      - run: cd doc && set -o pipefail && make html coverage | ./headtail.sh && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
       - uses: sylvanld/action-storage@v1
         # if: github.ref == 'refs/heads/master'
         with:
-          src: doc/_build/doc-coverage.json
+          src: doc/doc-coverage.json
           dst: stats/doc-coverage.json
   deploy-dockerhub:
     name: Deploy to DockerHub
