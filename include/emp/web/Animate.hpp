@@ -83,6 +83,7 @@ namespace web {
 
     Button step_but;                    ///< A button to advance this animation one step.
 
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     void LoadTargets() { ; }
     template <typename... T>
     void LoadTargets(const web::Widget & target1, const T&... other_targets) {
@@ -109,6 +110,7 @@ namespace web {
 
       frame_count++;
     }
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// DoFrame() is called by default if no animation function is provided.  As such, an animation
     /// can be built by deriving a class from Animate and overriding this function.

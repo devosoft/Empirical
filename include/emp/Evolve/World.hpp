@@ -366,8 +366,8 @@ namespace emp {
       return *(pop[id]);
     }
 
-    /// Retrieve a const reference to the organsim as the specified x,y coordinates.
-    /// @CAO: Technically, we should set this up with any number of coordinates.
+    /// Retrieve a const reference to the organism as the specified x,y coordinates.
+    // @CAO: Technically, we should set this up with any number of coordinates.
     ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
     /// Retrive a pointer to the contents of a specified cell; will be nullptr if the cell is
@@ -942,7 +942,6 @@ namespace emp {
 
   };
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // =============================================================
   // ===                                                       ===
   // ===  Out-of-class member function definitions from above  ===
@@ -1736,7 +1735,6 @@ namespace emp {
       os << std::endl;
     }
   }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

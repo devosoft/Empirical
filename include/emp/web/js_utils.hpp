@@ -30,14 +30,18 @@ namespace emp {
   /// getValue() from within MAIN_THREAD_EM_ASM macros.
   ///
   ///  For example, say we have a templated function that takes a pointer to type
-  /// T. We find out the appropriate string for type T:
+  /// T. We find out the appropriate string for type T :
+  /// @code 
   /// std::map<const char*, std::string> type_map = GetTypeToStringMap();
   /// std::string type_string = type_map[typeid(T).name()];
+  /// @endcode
   ///
   /// Now we can pass type_string.c_str() into MAIN_THREAD_EM_ASM:
+  /// @code 
   /// `MAIN_THREAD_EM_ASM({
   ///    var value = getValue($0, $1);
-  /// }, pointer, type_string.c_str();`
+  ///  }, pointer, type_string.c_str();`
+  /// @endcode
 
   std::map<std::string, std::string> get_type_to_string_map() {
     // Using typeid().name() could create problems because it varies by

@@ -1,9 +1,10 @@
-/**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file Systematics.hpp
+/*
+ *  note: This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  copyright: Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2023
+ */
+ /**
+ *  @file
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
  *
@@ -80,13 +81,14 @@ namespace emp {
     /// Maps a string representing a type of mutation to a count representing
     /// the number of that type of mutation that occurred to bring about this taxon.
     template <typename PHEN_TYPE>
-    struct mut_landscape_info {
+    class mut_landscape_info {
       using phen_t = PHEN_TYPE;
       using has_phen_t = std::true_type;
       using has_mutations_t = std::true_type;
       using has_fitness_t = std::true_type;
       // using has_phenotype_t = true;
 
+      public:
       std::unordered_map<std::string, int> mut_counts = {}; /// The number of mutations of each type that occurred to make this taxon
       DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
       PHEN_TYPE phenotype; /// This taxon's phenotype (for assessing phenotypic change)
@@ -131,7 +133,7 @@ namespace emp {
   }
 
   /// @brief A Taxon represents a type of organism in a phylogeny.
-  /// @param ORG_INFO The information type associated with an organism, used to categorize it.
+  /// @tparam ORG_INFO The information type associated with an organism, used to categorize it.
   ///
   /// Genotypes are the most commonly used Taxon; in general taxa can be anything from a shared
   /// genome sequence, a phenotypic trait, or a even a position in the world (if you want to
@@ -384,7 +386,7 @@ namespace emp {
 
     /// Add a data node to this systematics manager
     /// @param name the name of the data node (so it can be found later)
-    /// @param pull_set_fun a function to run when the data node is requested to pull data (returns single value)
+    /// @param pull_fun a function to run when the data node is requested to pull data (returns single value)
     data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
@@ -561,6 +563,7 @@ namespace emp {
 
     /**
      * Contructor for Systematics; controls what information should be stored.
+     * @param calc_taxon       Function that should be run on organism to determine which taxon it belongs to
      * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
      * @param store_ancestors  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
      * @param store_all        Should all dead taxa be maintained? (typically no; it gets BIG!)
@@ -595,11 +598,13 @@ namespace emp {
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
-    /// return a pointer for the associated taxon.
-    /// @returns a pointer for the associated taxon.
-    /// @param org a reference to the organism being added
-    /// @param pos the position of the organism being added
-    /// @param parent a pointer to the org's parent
+    /// The new organism is always passed as a reference to the organism being added.
+    /// If positions are being tracked, the new organism's position in the world should
+    /// be passed as the second argument.
+    /// The parent can either be passed as a world position (if positions are being tracked),
+    /// or as a pointer to the organism's parent.
+    /// Versions of AddOrg that take a pointer to a parent return a pointer for the taxon associated
+    /// with the new organism.
     void AddOrg(ORG && org, WorldPosition pos);
     void AddOrg(ORG && org, WorldPosition pos, WorldPosition parent);
     Ptr<taxon_t> AddOrg(ORG && org, WorldPosition pos, Ptr<taxon_t> parent);
@@ -611,13 +616,12 @@ namespace emp {
     Ptr<taxon_t> AddOrg(ORG & org, Ptr<taxon_t> parent=nullptr);
     ///@}
 
-    ///@{
     /// Remove an instance of an organism; track when it's gone.
     /// @param pos the world position of the individual being removed
-    /// @param taxon a pointer to the taxon of the individual being removed
     bool RemoveOrg(WorldPosition pos);
+    /// Remove an instance of an organism; track when it's gone.
+    /// @param taxon a pointer to the taxon of the individual being removed
     bool RemoveOrg(Ptr<taxon_t> taxon);
-    ///@}
 
     ///@{
     /// Mark an instance of a taxon to be removed; track when it's gone.
@@ -628,8 +632,8 @@ namespace emp {
     /// mark the taxon as extinct when it is actually continuing.
     /// By using this method, the taxon won't be removed until after the
     /// next org is added or the next time an org is marked for removal.
-    /// @param pos the world position of the individual being removed
-    /// @param taxon a pointer to the taxon of the individual being removed
+    /// Individual can either be specified as the world position of the individual being removed
+    /// or as a pointer to the taxon of the individual being removed
     void RemoveOrgAfterRepro(WorldPosition pos);
     void RemoveOrgAfterRepro(Ptr<taxon_t> taxon);
     ///@}

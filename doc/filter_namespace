@@ -4,7 +4,7 @@ import sys
 
 with open(sys.argv[1]) as infile:
     open_braces = 0
-    namespace_removed = 0
+    bracket_counts = []
     for line in infile:
         line = line.strip()
         if line.startswith("namespace emp {") or \
@@ -12,14 +12,15 @@ with open(sys.argv[1]) as infile:
            line.startswith("namespace prefab {") or \
            line.startswith("namespace emp::prefab {") or \
            line.startswith("namespace evo {"):
-            namespace_removed += 1
-            open_braces = 1
+            open_braces += 1
+            bracket_counts.append(open_braces)
             print()
-        elif namespace_removed and line == "}":
+        elif bracket_counts and bracket_counts[-1] == open_braces and line == "}":
             print()
-            namespace_removed -= 1
+            open_braces -= 1
+            bracket_counts.pop()
         else:
-            if namespace_removed:
+            if bracket_counts:
                 open_braces += line.count("{")
                 open_braces -= line.count("}")
             line = line.replace("emp::", "")

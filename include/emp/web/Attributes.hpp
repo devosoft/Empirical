@@ -40,6 +40,7 @@ namespace web {
     /// Return a count of the number of attributes that have been set.
     int GetSize() const { return (int) settings.size(); }
 
+    /// Set the specified setting to the specified value
     Attributes & DoSet(const std::string & in_set, const std::string & in_val) {
       settings[in_set] = in_val;
       return *this;

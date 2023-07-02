@@ -50,8 +50,10 @@ namespace web {
     const std::string & GetStr() const { return str; }
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Pre-define emp::endl to insert a "<br>" and thus acting like a newline.
   static const PrintStr endl("<br>");
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 }
 }

@@ -382,7 +382,7 @@ namespace emp {
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurComboString(const std::string & separator=",",
+    std::string CurComboString(const std::string & separator=",", ///< Delimiter separating values in string
                                bool use_labels=false,   ///< Print name with each value?
                                bool multi_only=false    ///< Only print values that can change?
                               ) const {

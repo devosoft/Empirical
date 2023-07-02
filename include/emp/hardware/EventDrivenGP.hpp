@@ -392,7 +392,10 @@ namespace emp {
       Function(
         const affinity_t & _aff=affinity_t(),
         const inst_seq_t & _seq=inst_seq_t(),
-        std::function<void()> _fun_matchbin_refresh=[](){}
+        std::function<void()> _fun_matchbin_refresh
+        #ifndef DOXYGEN_SHOULD_SKIP_THIS
+        =[](){}
+        #endif // DOXYGEN_SHOULD_SKIP_THIS
       ) : affinity(_aff)
       , inst_seq(_seq)
       , fun_matchbin_refresh(_fun_matchbin_refresh)

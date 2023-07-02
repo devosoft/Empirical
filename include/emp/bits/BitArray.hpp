@@ -38,8 +38,8 @@ namespace emp {
 
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
-  ///  @param NUM_BITS is the fixed number of bits in this BitArray.
-  ///  @param ZERO_LEFT indicates the side that bit zero will be located.
+  ///  @tparam NUM_BITS is the fixed number of bits in this BitArray.
+  ///  @tparam ZERO_LEFT indicates the side that bit zero will be located.
   template <size_t NUM_BITS, bool ZERO_LEFT=true>
   class BitArray {
 

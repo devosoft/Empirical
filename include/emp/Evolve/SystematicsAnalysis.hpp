@@ -22,6 +22,7 @@ namespace emp {
 
   /// @returns the taxon with the highest fitness out of any active taxon
   /// in the given systematics manager.
+  /// @tparam systematics_t The type of the systematics manager containing the phylogeny to analyze.
   /// @param s the systematics manager to search in. Must have more than 0 active taxa.
   template<typename systematics_t>
   Ptr<typename systematics_t::taxon_t> FindDominant(systematics_t & s) {
@@ -59,7 +60,7 @@ namespace emp {
   /// simultaneous mutations of the same type as one event)
   /// @param type string corresponding to a type of mutation.
   /// Must be in the mut_counts dictionary (i.e. the dictionary
-  /// passed in when \ref mut_landscape_info::RecordMutation was called)
+  /// passed in when \ref datastruct::mut_landscape_info::RecordMutation was called)
   /// @param taxon a pointer to a taxon to count mutation steps for.
   /// Must have a DATA_TYPE that supports mutation tracking
   /// (e.g. mut_landscape_info)

@@ -111,12 +111,15 @@ namespace prefab {
       }
 
       inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
+      
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       // Helper function to get pretty names from config values
       inline static std::function<std::string(const std::string &)> format_label = [](
         const std::string & name
       ) {
         return to_titlecase(join(slice(name, '_'), " "));
       };
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
 
       /**
        * Get current on-update callback.

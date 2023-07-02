@@ -270,8 +270,13 @@ namespace emp {
   };
 
   /// Build a specialized debug wrapper for emp::vector<bool>
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename... Ts>
   class vector<bool, Ts...> : public std::vector<bool,Ts...> {
+  #else
+  template <typename t>
+  class vector<bool> {
+  #endif
   private:
     using this_t = emp::vector<bool,Ts...>;
     using stdv_t = std::vector<bool,Ts...>;

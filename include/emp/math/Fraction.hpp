@@ -35,11 +35,12 @@ namespace emp {
       denom /= gcd;
     }
   public:
-    Fraction(int64_t in_num=0, int64_t in_denom=1) : num=in_num, denom=in_denom { }
+    Fraction(int64_t in_num=0, int64_t in_denom=1) : num(in_num), denom(in_denom) { }
     Fraction(const Fraction &) = default;
 
     int64_t GetNumerator() const { return num; }
     int64_t GetDenomonator() const { return denom; }
   };
+}
 
 #endif // #ifndef EMP_MATH_FRACTION_HPP_INCLUDE

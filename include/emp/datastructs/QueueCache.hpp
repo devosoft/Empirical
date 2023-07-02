@@ -41,6 +41,7 @@
       // maximum number of elements the cache can hold
       size_t capacity;
 
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
       // Put the iterator at the beginning of the list, and returns its value
       // @param it Iterator to element to update
       // @return Reference to value of updated element
@@ -53,6 +54,7 @@
         );
         return it->second;
       }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
 
       // Shrink cache to its capacity by removing elements at the end of it
       void Shrink() {

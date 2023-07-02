@@ -12,7 +12,7 @@
  *  desginated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
  *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
  *
- *  @CO2:
+ *  \@CO2:
  *  StringMap = PAdictionary   (PA = Perfectly accurate)
  *  StringMap = HIDL (HIDL = having an identification of linking)
  *  SMID = String.Map…e112th][string (SMID = StringMap identification)

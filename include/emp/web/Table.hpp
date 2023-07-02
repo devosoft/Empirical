@@ -722,7 +722,8 @@ namespace web {
       return *this;
     }
 
-    /// Apply CSS to all rows.  (@CAO: Should we use fancier jquery here?)
+    /// Apply CSS to all rows.
+    // (@CAO: Should we use fancier jquery here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));

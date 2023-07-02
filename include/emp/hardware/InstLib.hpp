@@ -28,9 +28,9 @@ namespace emp {
   enum class ScopeType { NONE=0, ROOT, BASIC, LOOP, FUNCTION };
 
   /// @brief InstLib maintains a set of instructions for use in virtual hardware.
-  /// @param HARDWARE_T Type of the virtual hardware class to track instructions.
-  /// @param ARG_T What types of arguments are associated with instructions.
-  /// @param ARG_COUNT Max number of arguments on an instruction.
+  /// @tparam HARDWARE_T Type of the virtual hardware class to track instructions.
+  /// @tparam ARG_T What types of arguments are associated with instructions.
+  /// @tparam ARG_COUNT Max number of arguments on an instruction.
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   class InstLib {
   public:
@@ -109,6 +109,8 @@ namespace emp {
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
 
+    /// Returns boolean indicating whether the given
+    /// string is a valid instruction.
     bool IsInst(const std::string name) const {
       return Has(name_map, name);
     }

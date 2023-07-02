@@ -191,7 +191,11 @@ namespace emp::prefab {
       const std::string & label,
       const std::string & desc,
       const std::string & value,
-      const std::function<void(const std::string &)> & onChange = [](const std::string &) { ; },
+      const std::function<void(const std::string &)> & onChange 
+        #ifndef DOXYGEN_SHOULD_SKIP_THIS
+        = [](const std::string &) { ; }
+        #endif // DOXYGEN_SHOULD_SKIP_THIS
+        ,
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) {
       mainCtrl.AddAttr("class", "form-control");
@@ -215,7 +219,11 @@ namespace emp::prefab {
       const std::string & label,
       const std::string & desc,
       const bool is_checked,
-      const std::function<void(const std::string &)> & onChange = [](const std::string &) { ; },
+      const std::function<void(const std::string &)> & onChange
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      = [](const std::string & val) { ; }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
+      ,
       const std::string & id=""
     ) : ValueBox(label, desc, id) {
       prefab::ToggleSwitch toggle(onChange, "", is_checked);
@@ -277,7 +285,11 @@ namespace emp::prefab {
       const std::string & desc,
       const std::string & value,
       const std::string & type,
-      const std::function<void(const std::string & val)> & onChange = [](const std::string & val) { ; },
+      const std::function<void(const std::string & val)> & onChange
+      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      = [](const std::string & val) { ; }
+      #endif // DOXYGEN_SHOULD_SKIP_THIS
+      ,
       const std::string & id=""
     ) : ValueControl(label, desc, value, web::Input([](const std::string & val){ ; }, "range", ""), id) {
       mainCtrl.AddAttr("class", "form-range");

@@ -28,11 +28,13 @@
 
 namespace emp {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Base case for Append; we just have a single vector with nothing to append.
   template <typename T>
   emp::vector<T> & Append(emp::vector<T> & base) {
     return base;
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /// Append one or more vectors on to the end of an existing vector.
   template <typename T, typename V1, typename... Vs>
@@ -51,8 +53,7 @@ namespace emp {
     return Append(base, vs...);
   }
 
-
-  /// Concatonate two or more vectors together, creating a new vector.
+  /// Concatenate two or more vectors together, creating a new vector.
   template <typename T, typename... Vs>
   emp::vector<T> Concat(const emp::vector<T> & v1, const Vs &... vs) {
     emp::vector<T> out_v(v1);

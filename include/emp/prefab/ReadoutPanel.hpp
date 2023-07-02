@@ -20,6 +20,7 @@
 
 namespace emp::prefab {
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /**
      * Shared pointer held by instances of ReadoutPanel class representing
@@ -55,6 +56,8 @@ namespace emp::prefab {
 
     };
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  
   /**
    * Use a ReadoutPanel to display a collection of related live values
    * in a Card.
