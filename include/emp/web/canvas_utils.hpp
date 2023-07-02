@@ -37,10 +37,8 @@ namespace web {
             const std::string & fill="",
             const std::string & line="")
   {
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     canvas.Clear();
     canvas.Draw(circle, fill, line);
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
   }
 
   /// Draw a BitMatrix onto a canvas using black and white squares (can specify cell width and height)
@@ -49,14 +47,9 @@ namespace web {
   /// @param matrix The matrix to draw
   /// @param w The width of the matrix (number of columns)
   /// @param h The height of the matrix (number of rows)
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <size_t COLS, size_t ROWS>
   void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
-  #else
-  void Draw(Canvas canvas, const BitMatrix & matrix, double w, double h)
-  #endif
   {
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     canvas.Clear();
 
     double cell_w = w / (double) COLS;
@@ -69,10 +62,8 @@ namespace web {
         }
       }
     }
-    #endif
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Draw a Surface, specifying the full colormap to be used.  The surface has a range of circle
   /// bodies, each with a color id.
   /// @param canvas The Canvas to draw on.
@@ -268,7 +259,7 @@ namespace web {
       }
     }
   }
-  // #endif // DOXYGEN_SHOULD_SKIP_THIS
+
   /// Draw a state grid onto a canvas.
   /// @param canvas The Canvas to draw on.
   /// @param state_grid A StateGrid object.
@@ -312,7 +303,6 @@ namespace web {
         canvas.Rect({cur_x,cur_y}, cell_w, cell_h, cur_color, line_color);
       }
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
   }
 
   /// Draw a grid as the background of a canvas.
@@ -325,7 +315,6 @@ namespace web {
   void DrawGridBG(Canvas canvas, size_t rows, size_t cols,
                   const std::string & bg_color, const std::string & line_color) {
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     canvas.Clear(bg_color);
 
     const double canvas_x = (double) canvas.GetWidth();
@@ -341,7 +330,6 @@ namespace web {
       double y = cell_height * i;
       canvas.Line( {0,y}, {canvas_x,y}, line_color);
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
   }
 
   template <typename CONTAINER_T, typename POINT_FUN_T, typename COLOR_FUN_T>
@@ -349,14 +337,12 @@ namespace web {
                   POINT_FUN_T && point_fun, COLOR_FUN_T && color_fun,
                   const std::string & line_color="black")
   {
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // Draw all of the organisms
     for (auto obj : container) {
       const auto pos = point_fun(obj);
       const auto color = color_fun(obj);
       canvas.Circle(pos, radius, color, line_color);
     }
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
   }
 
 
