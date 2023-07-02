@@ -27,7 +27,7 @@
 namespace emp {
 namespace web {
 
-  
+
   /// Draw a Circle onto the canvas.
   /// @param canvas The Canvas to draw on.
   /// @param circle The circle to draw
@@ -42,7 +42,7 @@ namespace web {
     canvas.Draw(circle, fill, line);
     #endif // DOXYGEN_SHOULD_SKIP_THIS
   }
-  
+
   /// Draw a BitMatrix onto a canvas using black and white squares (can specify cell width and height)
   /// Draw a Circle onto the canvas.
   /// @param canvas The Canvas to draw on.
@@ -54,7 +54,7 @@ namespace web {
   void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   #else
   void Draw(Canvas canvas, const BitMatrix & matrix, double w, double h)
-  #endif 
+  #endif
   {
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     canvas.Clear();
@@ -324,7 +324,7 @@ namespace web {
   /// @param line_color The color of the liens on the grid.
   void DrawGridBG(Canvas canvas, size_t rows, size_t cols,
                   const std::string & bg_color, const std::string & line_color) {
-    
+
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     canvas.Clear(bg_color);
 

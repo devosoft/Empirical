@@ -191,7 +191,7 @@ namespace emp::prefab {
       const std::string & label,
       const std::string & desc,
       const std::string & value,
-      const std::function<void(const std::string &)> & onChange 
+      const std::function<void(const std::string &)> & onChange
         #ifndef DOXYGEN_SHOULD_SKIP_THIS
         = [](const std::string &) { ; }
         #endif // DOXYGEN_SHOULD_SKIP_THIS

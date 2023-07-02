@@ -31,13 +31,13 @@ namespace emp {
   ///
   ///  For example, say we have a templated function that takes a pointer to type
   /// T. We find out the appropriate string for type T :
-  /// @code 
+  /// @code
   /// std::map<const char*, std::string> type_map = GetTypeToStringMap();
   /// std::string type_string = type_map[typeid(T).name()];
   /// @endcode
   ///
   /// Now we can pass type_string.c_str() into MAIN_THREAD_EM_ASM:
-  /// @code 
+  /// @code
   /// `MAIN_THREAD_EM_ASM({
   ///    var value = getValue($0, $1);
   ///  }, pointer, type_string.c_str();`
