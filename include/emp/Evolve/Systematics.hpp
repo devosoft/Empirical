@@ -81,7 +81,7 @@ namespace emp {
     /// Maps a string representing a type of mutation to a count representing
     /// the number of that type of mutation that occurred to bring about this taxon.
     template <typename PHEN_TYPE>
-    class mut_landscape_info {
+    struct mut_landscape_info {
       using phen_t = PHEN_TYPE;
       using has_phen_t = std::true_type;
       using has_mutations_t = std::true_type;
