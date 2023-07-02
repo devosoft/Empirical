@@ -13,7 +13,7 @@ jobs:
     name: Enforce Tidyness
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -48,7 +48,7 @@ jobs:
       CXX: ${{ matrix.cxx }}
       TEST_SET: ${{ matrix.test-set }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -69,7 +69,7 @@ jobs:
     name: Web Tests
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -87,7 +87,7 @@ jobs:
     name: Measure Test Coverage
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -110,7 +110,7 @@ jobs:
       - run: cd doc && python make_md.py
       - run: cd doc && set -o pipefail && make html coverage | ./headtail.sh && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
       - uses: sylvanld/action-storage@v1
-        # if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         with:
           src: doc/doc-coverage.json
           dst: stats/doc-coverage.json
