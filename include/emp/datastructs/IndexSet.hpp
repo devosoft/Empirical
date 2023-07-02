@@ -128,12 +128,26 @@ namespace emp {
     /// @param val Range to add
     /// @return Did the append work?  If it's not at the end, returns false.
     bool Append(IndexRange in) {
+      // Are we adding on a new range?
       if (range_set.size() == 0 || in.GetStart() > GetEnd()) {
         range_set.emplace_back(in);
       }
-      else if (range_set.back().Has(in.GetStart()) || in.GetStart() == GetEnd()) {
-        range_set.back().SetEnd(in.GetEnd()); // Extend range
+
+      // Are we extending an existing range?
+      else if (in.GetEnd() > GetEnd()) {
+        // Are we encompassing ALL existing ranges?
+        if (in.GetStart() <= range_set[0].GetStart()) {
+          range_set.resize(1);
+          range_set[0] = in;
+        }
+
+        // Otherwise find the start and convert from there.
+        else {
+          const size_t start_id = _FindRange(in.GetStart());
+          range_set[start_id].SetEnd(in.GetEnd());
+        }
       }
+
       else return false; // Not at end
 
       return true;
@@ -166,10 +180,8 @@ namespace emp {
     /// @param in New range to include.
     /// @return Was there a change due to this insertion (or were they already there?)
     bool Insert(IndexRange in) {
-      if (range_set.size() == 0) {
-        range_set.emplace_back(in);
-        return true;
-      }
+      // If the new range goes past the end, Append will take care of it.
+      if (Append(in)) return true;
 
       size_t new_start = in.GetStart();
       size_t new_end = in.GetEnd();
