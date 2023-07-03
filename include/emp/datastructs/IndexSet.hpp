@@ -69,20 +69,14 @@ namespace emp {
   class IndexRangeSet {
     emp::vector<IndexRange> range_set;
 
-    // Helper function to find the id of an IndexRange that a value belongs in;
+    // Helper function to find the id of an IndexRange that a value belongs in or can extend;
     // returns next-higher index if none fit perfectly.
-    size_t _FindRange(size_t val, size_t min_id=0, size_t max_id=emp::MAX_SIZE_T) const {
-      if (range_set.size() == 0) return 0;
-      if (max_id > range_set.size()) max_id = range_set.size(); // Adjust max if defaulted.
-      if (max_id == min_id) return range_set[max_id].GetStart() > val ? max_id : max_id+1;
-      size_t test_id = (min_id + max_id) / 2;
-
-      // If we found it, return the current ID.
-      if (range_set[test_id].Has(val)) return test_id;
-
-      // Otherwise search in the appropriate direction.
-      if (val < range_set[test_id].GetStart()) return _FindRange(val, min_id, test_id);
-      return _FindRange(val, test_id+1, max_id);
+    // @CAO - consider doing a binary search.
+    size_t _FindRange(size_t val) const {
+      for (size_t id = 0; id < range_set.size(); ++id) {
+        if (id <= range_set[id].GetEnd()) return id;
+      }
+      return range_set.size();
     }
 
     // Helper function to grow a range by one, possibly merging it with the next range.
