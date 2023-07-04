@@ -22,12 +22,29 @@ Empirical library into their own projects.
 Contents:
 
 ```{toctree}
-:caption: Using Empirical
+:caption: Getting Started
 :maxdepth: 2
-
 BuiltWithEmpiricalGallery/index
 QuickStartGuides/index
-library/index
+```
+
+```{toctree}
+:caption: Using Empirical
+:maxdepth: 4
+:glob:
+
+library/*/[!_]*
+```
+
+- {ref}`genindex`
+- {ref}`search`
+
+
+```{toctree}
+:caption: Bibliography
+:maxdepth: 2
+
+bibliography
 
 ```
 

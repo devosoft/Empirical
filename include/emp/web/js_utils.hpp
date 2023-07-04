@@ -38,9 +38,9 @@ namespace emp {
   ///
   /// Now we can pass type_string.c_str() into MAIN_THREAD_EM_ASM:
   /// @code
-  /// `MAIN_THREAD_EM_ASM({
+  /// MAIN_THREAD_EM_ASM({
   ///    var value = getValue($0, $1);
-  ///  }, pointer, type_string.c_str();`
+  ///  }, pointer, type_string.c_str();
   /// @endcode
 
   std::map<std::string, std::string> get_type_to_string_map() {

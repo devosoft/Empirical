@@ -2273,14 +2273,20 @@ namespace emp {
 
 // ---------------------- Implementations to work with standard library ----------------------
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
-  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+  /// Hash function to allow BitVector to be used with maps and sets.
+  /// This is added to the std namespace so that BitVectors can be used
+  /// in data structures that require hashing (such as unordered_map)
   template <>
   struct hash<emp::BitVector> {
     std::size_t operator()(const emp::BitVector & bv) const {
       return bv.Hash();
     }
   };
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 }
+#endif
 
 #endif // #ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE

@@ -4,3 +4,4 @@ coverxygen
 breathe
 myst-parser
 sphinx-tippy
+sphinxcontrib-bibtex

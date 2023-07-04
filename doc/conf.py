@@ -40,10 +40,15 @@ extensions = [
     'sphinx_rtd_theme',
     'breathe',
     'myst_parser',
-    'sphinx_tippy'
+    'sphinx_tippy',
+    'sphinxcontrib.bibtex'
 ]
 
 myst_heading_anchors = 4
+
+bibtex_bibfiles = ['bibliography.bib']
+bibtex_reference_style = "author_year"
+bibtex_default_style = 'unsrt'
 
 # Setup the breathe extension
 breathe_projects = {
@@ -80,7 +85,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Empirical'
-copyright = u"2015, Charles Ofria"
+copyright = u"2015-2023, Charles Ofria"
 author = u"Charles Ofria"
 
 # The version info for the project you're documenting, acts as replacement
@@ -109,6 +114,14 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
+nitpick_ignore = [
+    ('c:identifier', 'int32_t'),
+    ('c:identifier', 'uint32_t'),
+    ('c:identifier', 'int64_t'),
+    ('c:identifier', 'uint64_t'),
+    ('c:identifier', 'size_t'),
+    ('c:identifier', 'bool'),
+]
 
 # -- Options for HTML output -------------------------------------------
 
@@ -128,7 +141,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 html_copy_source = False
 # -- Options for HTMLHelp output ---------------------------------------

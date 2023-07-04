@@ -8,15 +8,8 @@
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
  *
- *  @todo Technically, we don't need to keep the ancestors in a set in order to track a lineage...
- *        If we delete all of their descendants they should automaticaly be deleted.
- *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
- *        need to be kept in memory, especially if we're only doing post-analysis.
- *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
- *        Over time, this will probably become a maintainability problem. We could make the inheritance
- *        go away and just use signals, but then the World could not maintain systematics managers.
- * @todo This does not currently handle situations where organisms change locations during their
- *       lifetimes gracefully.
+ *  @todo It would theoretically be possible to 
+ *        achieve slight memory savings by not maintaining a set of pointers to ancestors 
  */
 
 #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
@@ -80,6 +73,7 @@ namespace emp {
     /// Track information related to the mutational landscape
     /// Maps a string representing a type of mutation to a count representing
     /// the number of that type of mutation that occurred to bring about this taxon.
+    /// @tparam PHEN_TYPE the type being used to represent the phenotype
     template <typename PHEN_TYPE>
     struct mut_landscape_info {
       using phen_t = PHEN_TYPE;
@@ -438,13 +432,17 @@ namespace emp {
   struct CollessStruct;
 
   /// @brief A tool to track phylogenetic relationships among organisms.
-  /// The systematics class tracks the relationships among all organisms based on the INFO_TYPE
-  /// provided.  If an offspring has the same value for INFO_TYPE as its parent, it is grouped into
+  /// The systematics class tracks the relationships among all organisms based on the ORG_INFO type
+  /// provided.  If an offspring has the same value for ORG_INFO type as its parent, it is grouped into
   /// the same taxon.  Otherwise a new Taxon is created and the old one is used as its parent in
-  /// the phylogeny.  If the provided INFO_TYPE is the organism's genome, a traditional phylogeny
+  /// the phylogeny.  If the provided ORG_INFO type is the organism's genome, a traditional phylogeny
   /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
   /// grouped by phenotypes.  If the organism's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
+  /// @tparam ORG The type of organisms in your world (i.e. the input to your taxon-calculation function)
+  /// @tparam ORG_INFO The type being used to represent the piece of information that defines taxa 
+  ///         (i.e. the output from your taxon-calculation function)
+  /// @tparam DATA_STRUCT (optional) The type being used to hold supplemental per-taxon data
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Systematics : public SystematicsBase<ORG> {
   private:
@@ -475,6 +473,7 @@ namespace emp {
 
 
   public:
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     using typename parent_t::data_ptr_t;
     using parent_t::GetNumActive;
     using parent_t::GetNumAncestors;
@@ -507,6 +506,7 @@ namespace emp {
     using parent_t::AddUniqueTaxaDataNode;
     using parent_t::AddMutationCountDataNode;
     using parent_t::GetMaxDepth;
+    #endif // DOXYGEN_SHOULD_SHIP_THIS
 
     /// Struct for keeping track of what information to print out in snapshot files
     struct SnapshotInfo {
@@ -594,7 +594,6 @@ namespace emp {
     /// and population positions in synchronous generation worlds.
     void Update();
 
-    ///@{
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
@@ -614,7 +613,6 @@ namespace emp {
     void AddOrg(ORG & org, WorldPosition pos, WorldPosition parent);
     Ptr<taxon_t> AddOrg(ORG & org, WorldPosition pos, Ptr<taxon_t> parent);
     Ptr<taxon_t> AddOrg(ORG & org, Ptr<taxon_t> parent=nullptr);
-    ///@}
 
     /// Remove an instance of an organism; track when it's gone.
     /// @param pos the world position of the individual being removed
@@ -623,23 +621,33 @@ namespace emp {
     /// @param taxon a pointer to the taxon of the individual being removed
     bool RemoveOrg(Ptr<taxon_t> taxon);
 
-    ///@{
     /// Mark an instance of a taxon to be removed; track when it's gone.
     /// This is a work-around to deal with steady state/non-synchronous
     /// populations in which an organism might die as its offspring is born
     /// (e.g. in a spatial world where the offspring replaces the parent).
     /// If the bookkeeping is not handled correctly, we could accidentally
-    /// mark the taxon as extinct when it is actually continuing.
+    /// mark the taxon as extinct when it is actually continuing to exist.
     /// By using this method, the taxon won't be removed until after the
     /// next org is added or the next time an org is marked for removal.
-    /// Individual can either be specified as the world position of the individual being removed
-    /// or as a pointer to the taxon of the individual being removed
+    /// Use this version of the function if you're tracking systematics based
+    /// on the positions of individuals in the population.
+    /// @param pos Specifies the location in the world of the individual to 
+    ///            be removed after the next reproduction event.
     void RemoveOrgAfterRepro(WorldPosition pos);
+    /// Mark an instance of a taxon to be removed; track when it's gone.
+    /// This is a work-around to deal with steady state/non-synchronous
+    /// populations in which an organism might die as its offspring is born
+    /// (e.g. in a spatial world where the offspring replaces the parent).
+    /// If the bookkeeping is not handled correctly, we could accidentally
+    /// mark the taxon as extinct when it is actually continuing to exist.
+    /// By using this method, the taxon won't be removed until after the
+    /// next org is added or the next time an org is marked for removal.
+    /// Use this version of the function if you aren't tracking the positions
+    /// of individuals in the population.
+    /// @param taxon The taxon of the individual to be removed after the
+    ///              the next reproduction event
     void RemoveOrgAfterRepro(Ptr<taxon_t> taxon);
-    ///@}
 
-
-    ///@{
     /// Tell systematics manager that the parent of the next taxon added
     /// will be the one specified by this function (either at the specified
     /// position or the one pointed to by the given pointer)
@@ -658,7 +666,6 @@ namespace emp {
     void SetNextParent(Ptr<taxon_t> p) {
       next_parent = p;
     }
-    ///@}
 
     /// Set function used to calculate taxons from organisms
     void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
@@ -881,7 +888,11 @@ namespace emp {
 
     // ===== Functions for calculating phylogeny topology metrics ====
 
-    /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is
+    /** From 
+     * @verbatim embed:rst:inline :cite:p:`faithConservationEvaluationPhylogenetic1992` @endverbatim
+     * , reviewed in 
+     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim 
+     * phylogenetic diversity is
      *  the sum of edges in the minimal spanning tree connected the taxa you're
      *  calculating diversity of.
      *
@@ -912,10 +923,18 @@ namespace emp {
 
     /** This is a metric of how distinct \c tax is from the rest of the population.
      *
-     * (From Vane-Wright et al., 1991; reviewed in Winter et al., 2013) */
+     * (From 
+     * @verbatim embed:rst:inline :cite:p:`wrightWhatProtectSystematics1991` @endverbatim
+     * ; reviewed in 
+     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim  
+     * */
     double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
 
-    /** This metric (from Isaac, 2007; reviewed in Winter et al., 2013) measures how
+    /** This metric (from 
+     * @verbatim embed:rst:inline :cite:p:`isaacMammalsEDGEConservation2007` @endverbatim 
+     * ; reviewed in 
+     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim 
+     * ) measures how
      * distinct \c tax is from the rest of the population, weighted for the amount of
      * unique evolutionary history that it represents.
      *
@@ -927,9 +946,14 @@ namespace emp {
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
     double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const;
 
-    /** Calculates mean pairwise distance between extant taxa (Webb and Losos, 2000).
-     * This measurement is also called Average Taxonomic Diversity (Warwick and Clark, 1998)
-     * (for demonstration of equivalence see Tucker et al, 2016). This measurement tells
+    /** Calculates mean pairwise distance between extant taxa 
+     * @verbatim embed:rst:inline :cite:p:`webbExploringPhylogeneticStructure2000` @endverbatim
+     * .
+     * This measurement is also called Average Taxonomic Diversity 
+     * @verbatim embed:rst:inline :cite:p:`warwickTaxonomicDistinctnessEnvironmental1998` @endverbatim
+     * (for demonstration of equivalence see 
+     * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim
+     * ). This measurement tells
      * you about the amount of distinctness in the community as a whole.
      *
      * This measurement assumes that the tree is fully connected. Will return -1
@@ -943,8 +967,9 @@ namespace emp {
       return (double)Sum(dists)/dists.size();
     }
 
-    /** Calculates summed pairwise distance between extant taxa. Tucker et al 2017 points
-     *  out that this is a measure of phylogenetic richness.
+    /** Calculates summed pairwise distance between extant taxa.
+     * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim
+     * points out that this is a measure of phylogenetic richness.
      *
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
@@ -957,8 +982,9 @@ namespace emp {
       return Sum(v);
     }
 
-    /** Calculates variance of pairwise distance between extant taxa. Tucker et al 2017 points
-     *  out that this is a measure of phylogenetic regularity.
+    /** Calculates variance of pairwise distance between extant taxa. 
+     * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim 
+     * points out that this is a measure of phylogenetic regularity.
      *
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
@@ -991,19 +1017,23 @@ namespace emp {
     std::set<Ptr<taxon_t>> GetCanopyExtantRoots(int time_point = 0) const;
 
 
-    /** Counts the total number of ancestors between @param tax and MRCA, if there is one. If
+    /** Counts the total number of ancestors between \c tax and MRCA, if there is one. If
      *  there is no common ancestor, distance to the root of this tree is calculated instead.*/
     int GetDistanceToRoot(Ptr<taxon_t> tax) const ;
 
     /** Counts the number of branching points leading to multiple extant taxa
-     * between @param tax and the most-recent common ancestor (or the root of its subtree,
+     * between \c tax and the most-recent common ancestor (or the root of its subtree,
      * if no MRCA exists). This is useful because a lot
      * of stats for phylogenies are designed for phylogenies reconstructed from extant taxa.
      * These phylogenies generally only contain branching points, rather than every ancestor
      * along the way to the current taxon.*/
     int GetBranchesToRoot(Ptr<taxon_t> tax) const;
 
-    /** Calculate Sackin Index of this tree (Sackin, 1972; reviewed in Shao, 1990).
+    /** Calculate Sackin Index of this tree (
+     * @verbatim embed:rst:inline :cite:p:`sackinGoodBadPhenograms1972` @endverbatim
+     * ; reviewed in 
+     * @verbatim embed:rst:inline :cite:p:`shaoTreeBalance1990` @endverbatim
+     * ).
      * Measures tree balance*/
     int SackinIndex() const {
       int sackin = 0;
@@ -1013,10 +1043,18 @@ namespace emp {
       return sackin;
     }
 
-    /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
+    /** Calculate Colless-Like Index of this tree (based on 
+     * @verbatim embed:rst:inline :cite:p:`collessReviewPhylogeneticsTheory1982` @endverbatim
+     * ; reviewed in 
+     * @verbatim embed:rst:inline :cite:p:`shaoTreeBalance1990` @endverbatim
+     * ; refined by
+     * @verbatim embed:rst:inline :cite:p:`mirSoundCollesslikeBalance2018` @endverbatim
+     * ).
+     * 
      * Measures tree balance. The standard Colless index only works for bifurcating trees,
-     * so this will be a Colless-like Index, as suggested in
-     * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)*/
+     * so this will be a Colless-like Index  
+     * @verbatim embed:rst:inline :cite:p:`mirSoundCollesslikeBalance2018` @endverbatim
+     * */
     double CollessLikeIndex() const {
       GetMRCA();
       return RecursiveCollessStep(mrca).total;

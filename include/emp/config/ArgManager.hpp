@@ -684,11 +684,17 @@ namespace emp {
 
   };
 
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace cl {
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     /// A simple class to manage command-line arguments that were passed in.
     /// Derived from emp::vector<std::string>, but with added functionality for argument handling.
-    class ArgManager : public emp::vector<std::string> {
+    class 
+    #ifdef DOXYGEN_SHOULD_SKIP_THIS
+    cl::
+    #endif
+    ArgManager : public emp::vector<std::string> {
     private:
       using parent_t = emp::vector<std::string>;
       emp::vector<std::string> arg_names;
@@ -796,8 +802,9 @@ namespace emp {
 
     };
 
-
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
   }
+  #endif // DOXYGEN_SHOULD_SKIP_THIS
 }
 
 #endif // #ifndef EMP_CONFIG_ARGMANAGER_HPP_INCLUDE

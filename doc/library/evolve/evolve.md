@@ -55,21 +55,21 @@ Phylogenies are very information-dense data structures, but it can sometimes be 
 Available statistics include:
 
 - Mean/max/min/sum/variance pairwise distance
-- Colless-like index (a variant of the Colless index adjusted for trees with multifurcations)
-- Sackin index
-- Phylogenetic diversity
+- Colless-like index (a variant of the Colless index adjusted for trees with multifurcations) {cite:p}`mirSoundCollesslikeBalance2018`
+- Sackin index {cite:p}`sackinGoodBadPhenograms1972`
+- Phylogenetic diversity {cite:p}`faithConservationEvaluationPhylogenetic1992`
 
 #### Efficiency
 
 Tracking phylogenies can be computationally expensive. We have sought to keep the computational overhead as low as possible.
 
-We also provide the option to remove all taxa that died before a certain time point (the `remove_before` method). Use this with caution, as it will inhibit the use of many phylogenetic topology metrics. In extreme cases it may be necessary to keep your memory footprint sufficiently low, though.
+We also provide the option to remove all taxa that died before a certain time point (the {cpp:func}`Systematics::RemoveBefore` method). Use this with caution, as it will inhibit the use of many phylogenetic topology metrics. In extreme cases it may be necessary to keep your memory footprint sufficiently low, though.
 
 If you need substantially higher efficiency (in terms of time or memory) or are working in a distributed computing environment (where having a centralized phylogeny tracker can pose a large bottleneck), check out the [hstrat library](https://github.com/mmore500/hstrat), which lets you sacrifice some precision to achieve lower computational overhead.
 
 #### Flexible output options
 
-At any time, you can tell the systematics manager to print out the full contents of its current phylogeny in a "snapshot" file. These files will be formatted according to the [Artificial Life Phylogeny Data Standard format](https://alife-data-standards.github.io/alife-data-standards/phylogeny.html). By default they will contain the following columns for each taxon: 1) unique ID, 2) ancestor list, 3) origin time, and 4) destruction time. However, you can add additional columns with the `add_snapshot_fun` method.
+At any time, you can tell the systematics manager to print out the full contents of its current phylogeny in a "snapshot" file. These files will be formatted according to the [Artificial Life Phylogeny Data Standard format](https://alife-data-standards.github.io/alife-data-standards/phylogeny.html). By default they will contain the following columns for each taxon: 1) unique ID, 2) ancestor list, 3) origin time, and 4) destruction time. However, you can add additional columns with the {cpp:func}`Systematics::AddSnapshotFun` method.
 
 You can also print information on a single lineage.
 
@@ -146,19 +146,19 @@ sys = emp::Systematics<MyOrg, std::string> sys([](const MyOrg & org){return org.
 
 There are a couple of other decisions that you also need to make at this point. The first is which set of taxa to store in the systematics manager. The defaults here are most likely what you want to use, but in case they aren't, the systematics manager can be told to store or not store the following sets of taxa:
 
-- **active**: the taxa that still currently have living members. You almost certainly want to store these (without them you don't really have a phylogeny), but can technically disable them by setting the `store_active` keyword argument in the constructor to false.
-- **ancestors**: the taxa that are ancestors of active taxa. You almost certainly want to store these too (without them you don't really have a phylogeny), but can technically disable them by setting the `store_ancestors` keyword argument in the constructor to false.
-- **outside**: the taxa that are not in either of the other two groups (i.e. taxa that have gone extinct and all of their ancestors have gone extinct). If you store these, your phylogeny will get very large very fast, so doing so is generally not recommended. It is occasionally useful, though, so you can enable storing these taxa by setting the `store_all` keyword argument in the constructor to true.
+- **active**: the taxa that still currently have living members. You almost certainly want to store these (without them you don't really have a phylogeny), but can technically disable them by setting the `store_active` argument in the constructor to false.
+- **ancestors**: the taxa that are ancestors of active taxa. You almost certainly want to store these too (without them you don't really have a phylogeny), but can technically disable them by setting the `store_ancestors` argument in the constructor to false.
+- **outside**: the taxa that are not in either of the other two groups (i.e. taxa that have gone extinct and all of their ancestors have gone extinct). If you store these, your phylogeny will get very large very fast, so doing so is generally not recommended. It is occasionally useful, though, so you can enable storing these taxa by setting the `store_all` argument in the constructor to true.
 
-The second decision is slightly trickier. Once you start adding organisms to the systematics manager, it will create `Taxon` objects associated with each one to keep track of which taxon it is part of. You will need to use these taxon objects when adding future organisms, to specify which taxon their parent was part of. If you have control over your organism class, it is likely that the easiest option is to add a `self.taxon` attribute and store the taxon there. However, if you cannot add arbitrary data to your organism class, keeping track of taxon objects can get annoying. For this reason, the systematics manager gives you the option of letting it manage them. To do so, it needs a way to map individuals to taxa (since its possible there are duplicate taxa, simply running the organism to taxon function again won't work). It achieves this mapping by keeping track of each organism's position in the population. Thus, to have the systematics manager keep track of taxon objects itself, you must set the `store_pos` keyword argument in the constructor to true. You must also use the position-based versions of add_org and remove_org, and make sure to notify the systematics manager if any organism ever changes position during its lifetime for any reason.
+The second decision is slightly trickier. Once you start adding organisms to the systematics manager, it will create {cpp:class}`Taxon` objects associated with each one to keep track of which taxon it is part of. You will need to use these taxon objects when adding future organisms, to specify which taxon their parent was part of. If you have control over your organism class, it is likely that the easiest option is to add a `taxon` member variable and store the taxon there. However, if you cannot add arbitrary data to your organism class, keeping track of taxon objects can get annoying. For this reason, the systematics manager gives you the option of letting it manage them. To do so, it needs a way to map individuals to taxa (since its possible there are duplicate taxa, simply running the organism to taxon function again won't work). It achieves this mapping by keeping track of each organism's position in the population. Thus, to have the systematics manager keep track of taxon objects itself, you must set the `store_pos` argument in the constructor to true. You must also use the position-based versions of add_org and remove_org, and make sure to notify the systematics manager if any organism ever changes position during its lifetime for any reason.
 
 Once you have created the systematics object, you just need to do two things: 1) notify it when something is born, and 2) notify it when something dies.
 
 ##### Notifying the systematics object of births
 
-You must notify the systematics manager of births using the `add_org` family of functions. These functions require that you provide the newly born organism as well as either the taxon object of its parent or the position of its parent (if the systematics manager is tracking positions).
+You must notify the systematics manager of births using the {cpp:func}`Systematics::AddOrg` family of functions. These functions require that you provide the newly born organism as well as either the taxon object of its parent or the position of its parent (if the systematics manager is tracking positions).
 
-Example of tracking taxa as object attributes (assume we're building on our example above, and already have created a systematics manager called `sys`):
+Example of tracking taxa as object attributes (assume we're building on our example above, and already have created a {cpp:class}`Systematics` manager called `sys`):
 
 ```cpp
 // Do whatever you would normally do to create your first organism
@@ -188,7 +188,7 @@ An example of tracking positions is coming soon. For now, feel free to contact u
 
 ##### Notifying the systematics object of deaths
 
-You must notify the systematics manager of deaths using the `remove_org` family of functions.
+You must notify the systematics manager of deaths using the {cpp:func}`Systematics::RemoveOrg` family of functions.
 
 As an example (again, building on the previous examples):
 
@@ -198,59 +198,59 @@ As an example (again, building on the previous examples):
 // We notify the systematics manager that this has happened by calling remove_org
 // Note that remove_org takes the taxon of the dead organism as an argument, not
 // the organism itself
-sys.remove_org(taxon)
+sys.RemoveOrg(taxon)
 
 ```
 
 ### Taxon properties
 
-Taxon objects maintain the following information:
+{cpp:class}`Taxon` objects maintain the following information:
 
-- taxon ID# ``GetID()``
-- details of organisms in the taxon ``GetInfo()``
-- pointer to the parent group (will return a null pointer if the species was injected)  ``GetParent()``
-- how many organisms currently exist in the group and how many total organisms have ever existed in the group ``GetNumOrgs()``   or ``GetTotOrgs()``
-- how many direct offspring groups exist from this group and how many total extant offspring that exist from this taxa ``GetTotalOffspring()``
-- how deep in the tree the node you are examining is ``GetDepth()``
-- when did this taxon first appear in the population ``GetOriginationTime()``
-- when did the taxon leave the population ``GetDestructionTime()``
+- taxon ID {cpp:func}`Taxon::GetID()`
+- details of organisms in the taxon {cpp:func}`Taxon::GetInfo()`
+- pointer to the parent group (will return a null pointer if the species was injected)  {cpp:func}`Taxon::GetParent()`
+- how many organisms currently exist in the group and how many total organisms have ever existed in the group {cpp:func}`Taxon::GetNumOrgs()` or {cpp:func}`Taxon::GetTotOrgs()`
+- how many direct offspring groups exist from this group and how many total extant offspring that exist from this taxa {cpp:func}`Taxon::GetTotalOffspring()`
+- how deep in the tree the node you are examining is {cpp:func}`Taxon::GetDepth()`
+- when did this taxon first appear in the population {cpp:func}`Taxon::GetOriginationTime()`
+- when did the taxon leave the population {cpp:func}`Taxon::GetDestructionTime()`
 
 ### Systematics manager properties
 
-A systematics manager object maintains the following information:
+A {cpp:class}`Systematics` manager object maintains the following information (plus the phylogeny itself):
 
-- Are we tracking a synchronous population? ``GetTrackSynchronous()``   ``SetTrackSynchronous()``
-- Are we storing all taxa that are still alive in the population? ``GetStoreActive()``   ``SetStoreActive()``
-- Are we storing all taxa that are ancestors of the living organisms in the population? ``GetStoreAncestors()``   ``SetStoreAncestors()``
-- Are we storing all taxa that have died out, as have all of their descendants? ``GetStoreOutside()``   ``SetStoreOutside()``
-- Are we storing any taxa types that have died out? ``GetArchive()``   ``SetArchive()``
-- Are we storing the positions of taxa? ``GetStorePosition()``   ``SetStorePosition()``
-- How many living organisms are currently being tracked? ``GetTotalOrgs()``
-- How many independent trees are being tracked? ``GetNumRoots()``
-- What ID will the next taxon have? ``GetNextID()``
-- What is the average phylogenetic depth of organisms in the population? ``GetAveDepth()``
-- To find the most recent common ancestor (MRCA)  use ``GetMRCA()``  or ``GetMRCADepth()``  to find the distance to the MRCA.
+- Are we tracking a synchronous population? {cpp:func}`SystematicsBase::GetTrackSynchronous` {cpp:func}`SystematicsBase::SetTrackSynchronous`
+- Are we storing all taxa that are still alive in the population? {cpp:func}`SystematicsBase::GetStoreActive` {cpp:func}`SystematicsBase::SetStoreActive`
+- Are we storing all taxa that are ancestors of the living organisms in the population? {cpp:func}`SystematicsBase::GetStoreAncestors()`   {cpp:func}`SystematicsBase::SetStoreAncestors()`
+- Are we storing all taxa that have died out, as have all of their descendants? {cpp:func}`SystematicsBase::GetStoreOutside()`   {cpp:func}`SystematicsBase::SetStoreOutside()`
+- Are we storing any taxa types that have died out? {cpp:func}`SystematicsBase::GetArchive()`   {cpp:func}`SystematicsBase::SetArchive()`
+- Are we storing the positions of taxa? {cpp:func}`SystematicsBase::GetStorePosition()`   {cpp:func}`SystematicsBase::SetStorePosition()`
+- How many living organisms are currently being tracked? {cpp:func}`SystematicsBase::GetTotalOrgs()`
+- How many independent trees are being tracked? {cpp:func}`SystematicsBase::GetNumRoots()`
+- What ID will the next taxon have? {cpp:func}`SystematicsBase::GetNextID()`
+- What is the average phylogenetic depth of organisms in the population? {cpp:func}`SystematicsBase::GetAveDepth()`
+- To find the most recent common ancestor (MRCA)  use {cpp:func}`SystematicsBase::GetMRCA()`  or {cpp:func}`SystematicsBase::GetMRCADepth()`  to find the distance to the MRCA.
 
 ### Phylogeny metrics
 
-Many different metrics can be used to quantify th topology of a phylogeny. For more information, see (Winters et al., 2013; Tucker et al. 2017).
+Many different metrics can be used to quantify th topology of a phylogeny. For more information, see {cite:p}`winterPhylogeneticDiversityNature2013,tuckerGuidePhylogeneticMetrics2017,dolsonInterpretingTapeLife2020`.
 
 The Empirical systematics manager can calculate
 
-- Phylogenetic diversity (Faith, 1992)
-- Taxon Distinctiveness (From Vane-Wright et al., 1991)
-- Evolutionary Distinctiveness (Isaac, 2007) (mean, sum, and variance)
-- Mean pairwise distance (Webb and Losos, 2000), which is equivalent to Average Taxonomic Diversity (Warwick and Clark, 1998, Tucker et al., 2016)
+- Phylogenetic diversity {cite:p}`faithConservationEvaluationPhylogenetic1992`
+- Taxon Distinctiveness {cite:p}`vane-wrightWhatProtectSystematics1991`
+- Evolutionary Distinctiveness {cite:p}`isaacMammalsEDGEConservation2007` (mean, sum, and variance)
+- Mean pairwise distance {cite:p}`webbExploringPhylogeneticStructure2000`, which is equivalent to Average Taxonomic Diversity {cite:p}`warwickTaxonomicDistinctnessEnvironmental1998,tuckerGuidePhylogeneticMetrics2017`
 - Sum pairwise distance
 - Variance pairwise distance
 - Out-degree distribution
 - Average origination time
-- Colless-like Index (Mir, 2018, PLoS One)
-- Sackin Index (Sackin, 1972; reviewed in Shao, 1990)
+- Colless-like Index {cite:p}`mirSoundCollesslikeBalance2018`
+- Sackin Index {cite:p}`sackinGoodBadPhenograms1972` (reviewed in {cite:p}`shaoTreeBalance1990`)
 - Depth of most recent common ancestor
-- Phenotypic volatility (Dolson et al., 2019)
-- Unique taxa on lineage (Dolson et al., 2019)
-- Mutation count along lineage (Dolson et al., 2019)
+- Phenotypic volatility {cite:p}`dolsonInterpretingTapeLife2020`
+- Unique taxa on lineage {cite:p}`dolsonInterpretingTapeLife2020`
+- Mutation count along lineage {cite:p}`dolsonInterpretingTapeLife2020`
 - Tree size
 - Maximum depth
 

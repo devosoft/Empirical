@@ -22,19 +22,25 @@ docutils==0.18.1
     # via
     #   breathe
     #   myst-parser
+    #   pybtex-docutils
     #   sphinx
     #   sphinx-rtd-theme
+    #   sphinxcontrib-bibtex
 idna==3.4
     # via requests
 imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.6.0
-    # via sphinx
+    # via
+    #   sphinx
+    #   sphinxcontrib-bibtex
 jinja2==3.1.2
     # via
     #   myst-parser
     #   sphinx
     #   sphinx-tippy
+latexcodec==2.0.1
+    # via pybtex
 markdown-it-py==2.2.0
     # via
     #   mdit-py-plugins
@@ -49,14 +55,26 @@ myst-parser==1.0.0
     # via -r requirements.in
 packaging==23.1
     # via sphinx
+pybtex==0.24.0
+    # via
+    #   pybtex-docutils
+    #   sphinxcontrib-bibtex
+pybtex-docutils==1.0.2
+    # via sphinxcontrib-bibtex
 pygments==2.15.1
     # via sphinx
 pyyaml==6.0
-    # via myst-parser
+    # via
+    #   myst-parser
+    #   pybtex
 requests==2.31.0
     # via
     #   sphinx
     #   sphinx-tippy
+six==1.16.0
+    # via
+    #   latexcodec
+    #   pybtex
 snowballstemmer==2.2.0
     # via sphinx
 soupsieve==2.4.1
@@ -68,6 +86,7 @@ sphinx==6.2.1
     #   myst-parser
     #   sphinx-rtd-theme
     #   sphinx-tippy
+    #   sphinxcontrib-bibtex
     #   sphinxcontrib-jquery
 sphinx-rtd-theme==1.2.2
     # via -r requirements.in
@@ -75,6 +94,8 @@ sphinx-tippy==0.4.1
     # via -r requirements.in
 sphinxcontrib-applehelp==1.0.4
     # via sphinx
+sphinxcontrib-bibtex==2.5.0
+    # via -r requirements.in
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
 sphinxcontrib-htmlhelp==2.0.1
