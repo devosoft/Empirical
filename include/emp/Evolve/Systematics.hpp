@@ -924,7 +924,7 @@ namespace emp {
     /** This is a metric of how distinct \c tax is from the rest of the population.
      *
      * (From
-     * @verbatim embed:rst:inline :cite:p:`wrightWhatProtectSystematics1991` @endverbatim
+     * @verbatim embed:rst:inline :cite:p:`vane-wrightWhatProtectSystematics1991` @endverbatim
      * ; reviewed in
      * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim
      * */

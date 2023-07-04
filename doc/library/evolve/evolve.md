@@ -195,7 +195,7 @@ As an example (again, building on the previous examples):
 ```cpp
 // Assume stuff happens that causes my_org to die
 
-// We notify the systematics manager that this has happened by calling remove_org
+// We notify the systematics manager that this has happened by calling RemoveOrg
 // Note that remove_org takes the taxon of the dead organism as an argument, not
 // the organism itself
 sys.RemoveOrg(taxon)
