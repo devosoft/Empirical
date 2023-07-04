@@ -948,8 +948,7 @@ namespace emp {
 
     /** Calculates mean pairwise distance between extant taxa 
      * @verbatim embed:rst:inline :cite:p:`webbExploringPhylogeneticStructure2000` @endverbatim
-     * .
-     * This measurement is also called Average Taxonomic Diversity 
+     * This measurement is also called Average Taxonomic Diversity
      * @verbatim embed:rst:inline :cite:p:`warwickTaxonomicDistinctnessEnvironmental1998` @endverbatim
      * (for demonstration of equivalence see 
      * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim
