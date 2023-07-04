@@ -39,9 +39,10 @@ namespace emp {
     void SetEnd(size_t in) { end = in; }
 
     bool Has(size_t val) const { return val >= start && val < end; }
+    bool Has(IndexRange in) const { return in.start >= start && in.end < end; }
 
     /// Will identify if two ranges are next to each other or overlapping.
-    bool IsConnected(const IndexRange & in) const {
+    bool IsConnected(IndexRange in) const {
       return (in.start >= start && in.start <= end ||
           start >= in.start && start <= in.end);
     }
@@ -57,9 +58,17 @@ namespace emp {
     }
 
     /// Extend the current range with a new one.  Must be perfectly adjacent!
-    bool Append(const IndexRange & in) {
+    bool Append(IndexRange in) {
       if (end == in.start) { end = in.end; return true; }
       return false;
+    }
+
+    /// Merge this range with another.  Must be adjacent or overlap!
+    bool Merge(IndexRange in) {
+      if (!IsConnected(in) || Has(in)) return false;
+      start = std::min(start, in.start);
+      end = std::max(end, in.end);
+      return true;
     }
   };
 
@@ -158,8 +167,8 @@ namespace emp {
       size_t id = _FindRange(val);
       if (range_set[id].Has(val)) return false;
 
-      // Are we extending the previous range (and possibly merging)?
-      else if (id && range_set[id-1].GetEnd() == val) _GrowRange(id-1);
+      // Are we extending the range (and possibly merging)?
+      else if (range_set[id].GetEnd() == val) _GrowRange(id);
 
       // Are we extending the beginning of the next range?
       else if (range_set[id].GetStart() == val+1) range_set[id].Insert(val);
@@ -177,13 +186,27 @@ namespace emp {
       // If the new range goes past the end, Append will take care of it.
       if (Append(in)) return true;
 
-      size_t new_start = in.GetStart();
-      size_t new_end = in.GetEnd();
-      size_t start_id = _FindRange(new_start);
-      size_t end_id = _FindRange(new_end);
+      size_t start_id = _FindRange(in.GetStart());
+      size_t end_id = _FindRange(in.GetEnd());
+      emp_assert(start_id <= end_id);
 
-      // Determine the whole new range.
-      if (start_id < )
+      // If both are in the same range id, either insert a new range or modify an existing one.
+      if (start_id == end_id) {
+        IndexRange & cur_range = range_set[start_id];
+
+        // If the end of the new range is before the start of the found range, insert the new one!
+        if (in.GetEnd() < cur_range.GetStart() - 1) range_set.insert(start_id, in);
+
+        // If it is entirely inside the existing one, insert makes no change.
+        else if (cur_range.GetStart() <= in.GetStart() &&
+                 cur_range.GetEnd() <= in.GetEnd()) return false;
+
+        // Otherwise expand the existing range, as needed.
+        else {
+          cur_range.SetStart( std::min(cur_range.GetStart(), in.GetStart()) );
+          cur_range.SetEnd( std::max(cur_range.GetEnd(), in.GetEnd()) );
+        }
+      }
     }
   };
 
