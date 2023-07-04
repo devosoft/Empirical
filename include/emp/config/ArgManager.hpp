@@ -690,7 +690,7 @@ namespace emp {
 
     /// A simple class to manage command-line arguments that were passed in.
     /// Derived from emp::vector<std::string>, but with added functionality for argument handling.
-    class 
+    class
     #ifdef DOXYGEN_SHOULD_SKIP_THIS
     cl::
     #endif

@@ -8,8 +8,8 @@
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
  *
- *  @todo It would theoretically be possible to 
- *        achieve slight memory savings by not maintaining a set of pointers to ancestors 
+ *  @todo It would theoretically be possible to
+ *        achieve slight memory savings by not maintaining a set of pointers to ancestors
  */
 
 #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
@@ -440,7 +440,7 @@ namespace emp {
   /// grouped by phenotypes.  If the organism's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
   /// @tparam ORG The type of organisms in your world (i.e. the input to your taxon-calculation function)
-  /// @tparam ORG_INFO The type being used to represent the piece of information that defines taxa 
+  /// @tparam ORG_INFO The type being used to represent the piece of information that defines taxa
   ///         (i.e. the output from your taxon-calculation function)
   /// @tparam DATA_STRUCT (optional) The type being used to hold supplemental per-taxon data
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
@@ -631,7 +631,7 @@ namespace emp {
     /// next org is added or the next time an org is marked for removal.
     /// Use this version of the function if you're tracking systematics based
     /// on the positions of individuals in the population.
-    /// @param pos Specifies the location in the world of the individual to 
+    /// @param pos Specifies the location in the world of the individual to
     ///            be removed after the next reproduction event.
     void RemoveOrgAfterRepro(WorldPosition pos);
     /// Mark an instance of a taxon to be removed; track when it's gone.
@@ -888,10 +888,10 @@ namespace emp {
 
     // ===== Functions for calculating phylogeny topology metrics ====
 
-    /** From 
+    /** From
      * @verbatim embed:rst:inline :cite:p:`faithConservationEvaluationPhylogenetic1992` @endverbatim
-     * , reviewed in 
-     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim 
+     * , reviewed in
+     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim
      * phylogenetic diversity is
      *  the sum of edges in the minimal spanning tree connected the taxa you're
      *  calculating diversity of.
@@ -923,17 +923,17 @@ namespace emp {
 
     /** This is a metric of how distinct \c tax is from the rest of the population.
      *
-     * (From 
+     * (From
      * @verbatim embed:rst:inline :cite:p:`wrightWhatProtectSystematics1991` @endverbatim
-     * ; reviewed in 
-     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim  
+     * ; reviewed in
+     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim
      * */
     double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
 
-    /** This metric (from 
-     * @verbatim embed:rst:inline :cite:p:`isaacMammalsEDGEConservation2007` @endverbatim 
-     * ; reviewed in 
-     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim 
+    /** This metric (from
+     * @verbatim embed:rst:inline :cite:p:`isaacMammalsEDGEConservation2007` @endverbatim
+     * ; reviewed in
+     * @verbatim embed:rst:inline :cite:p:`winterPhylogeneticDiversityNature2013` @endverbatim
      * ) measures how
      * distinct \c tax is from the rest of the population, weighted for the amount of
      * unique evolutionary history that it represents.
@@ -946,11 +946,11 @@ namespace emp {
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
     double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const;
 
-    /** Calculates mean pairwise distance between extant taxa 
+    /** Calculates mean pairwise distance between extant taxa
      * @verbatim embed:rst:inline :cite:p:`webbExploringPhylogeneticStructure2000` @endverbatim
      * This measurement is also called Average Taxonomic Diversity
      * @verbatim embed:rst:inline :cite:p:`warwickTaxonomicDistinctnessEnvironmental1998` @endverbatim
-     * (for demonstration of equivalence see 
+     * (for demonstration of equivalence see
      * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim
      * ). This measurement tells
      * you about the amount of distinctness in the community as a whole.
@@ -981,8 +981,8 @@ namespace emp {
       return Sum(v);
     }
 
-    /** Calculates variance of pairwise distance between extant taxa. 
-     * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim 
+    /** Calculates variance of pairwise distance between extant taxa.
+     * @verbatim embed:rst:inline :cite:p:`tuckerGuidePhylogeneticMetrics2017` @endverbatim
      * points out that this is a measure of phylogenetic regularity.
      *
      * This measurement assumes that the tree is fully connected. Will return -1
@@ -1030,7 +1030,7 @@ namespace emp {
 
     /** Calculate Sackin Index of this tree (
      * @verbatim embed:rst:inline :cite:p:`sackinGoodBadPhenograms1972` @endverbatim
-     * ; reviewed in 
+     * ; reviewed in
      * @verbatim embed:rst:inline :cite:p:`shaoTreeBalance1990` @endverbatim
      * ).
      * Measures tree balance*/
@@ -1042,16 +1042,16 @@ namespace emp {
       return sackin;
     }
 
-    /** Calculate Colless-Like Index of this tree (based on 
+    /** Calculate Colless-Like Index of this tree (based on
      * @verbatim embed:rst:inline :cite:p:`collessReviewPhylogeneticsTheory1982` @endverbatim
-     * ; reviewed in 
+     * ; reviewed in
      * @verbatim embed:rst:inline :cite:p:`shaoTreeBalance1990` @endverbatim
      * ; refined by
      * @verbatim embed:rst:inline :cite:p:`mirSoundCollesslikeBalance2018` @endverbatim
      * ).
-     * 
+     *
      * Measures tree balance. The standard Colless index only works for bifurcating trees,
-     * so this will be a Colless-like Index  
+     * so this will be a Colless-like Index
      * @verbatim embed:rst:inline :cite:p:`mirSoundCollesslikeBalance2018` @endverbatim
      * */
     double CollessLikeIndex() const {
