@@ -63,12 +63,29 @@ namespace emp {
       return false;
     }
 
+    /// @brief  Expand this range to encompass a provided value.
+    /// @param val Value to expand through.
+    /// @return Whether the range has changed due to this expansion.
+    bool Expand(size_t val) {
+      if (val < start) start = val;
+      else if (val > end) end = val;
+      else return false;
+      return true;
+    }
+
+    /// @brief Expand this range to encompass all provided values.
+    /// @param vals Values to expand through
+    /// @return Whether the range has changed due to this expansion.
+    template <typename... Ts>
+    bool Expand(size_t val1, size_t val2, Ts... args) {
+      return Expand(val1) + Expand(val2, args...);
+    }
+
+
     /// Merge this range with another.  Must be adjacent or overlap!
     bool Merge(IndexRange in) {
-      if (!IsConnected(in) || Has(in)) return false;
-      start = std::min(start, in.start);
-      end = std::max(end, in.end);
-      return true;
+      if (!IsConnected(in)) return false;
+      return Expand(in.start) + Expand(in.end);  // Use + to avoid short-circuiting.
     }
   };
 
@@ -96,7 +113,7 @@ namespace emp {
       // Test if we need to merge with the next range.
       if (id+1 < range_set.size() && range_set[id].GetEnd() == range_set[id+1].GetStart()) {
         range_set[id].SetEnd(range_set[id+1].GetEnd());
-        range_set.erase(id+1);
+        range_set.erase(range_set.begin()+id+1); // Delete next range (now merged in)
       }
     }
 
@@ -188,25 +205,27 @@ namespace emp {
 
       size_t start_id = _FindRange(in.GetStart());
       size_t end_id = _FindRange(in.GetEnd());
+      IndexRange & cur_range = range_set[start_id];
       emp_assert(start_id <= end_id);
 
       // If both are in the same range id, either insert a new range or modify an existing one.
       if (start_id == end_id) {
-        IndexRange & cur_range = range_set[start_id];
-
         // If the end of the new range is before the start of the found range, insert the new one!
         if (in.GetEnd() < cur_range.GetStart() - 1) range_set.insert(start_id, in);
 
-        // If it is entirely inside the existing one, insert makes no change.
-        else if (cur_range.GetStart() <= in.GetStart() &&
-                 cur_range.GetEnd() <= in.GetEnd()) return false;
-
-        // Otherwise expand the existing range, as needed.
-        else {
-          cur_range.SetStart( std::min(cur_range.GetStart(), in.GetStart()) );
-          cur_range.SetEnd( std::max(cur_range.GetEnd(), in.GetEnd()) );
-        }
+        // Otherwise try to merge it into the existing range (will return false if already there)
+        else return cur_range.Merge(in);
       }
+
+      // We are across multiple ranges.  Collapse into first!
+      else {
+        // If we are not including the current end_id, decrement it.
+        if (in.GetEnd()+1 < range_set[end_id].GetStart()) --end_id;
+        cur_range.Expand(in.GetStart(), in.GetEnd(), range_set[end_id].GetEnd());
+        range_set.erase(range_set.begin()+start_id+1, range_set.begin()+end_id+1);
+      }
+
+      return true;
     }
   };
 
