@@ -34,6 +34,7 @@ namespace emp {
 
     size_t GetStart() const { return start; }
     size_t GetEnd() const { return end; }
+    size_t GetSize() const { return end-start; }
 
     void SetStart(size_t in) { start = in; }
     void SetEnd(size_t in) { end = in; }
@@ -131,7 +132,21 @@ namespace emp {
       return range_set[id].Has(val);
     }
 
-    size_t GetEnd() const { return range_set.size() ? range_set.back().GetEnd() : 0; }
+    size_t GetStart() const {
+      return range_set.size() ? range_set[0].GetStart() : emp::MAX_SIZE_T;
+    }
+    size_t GetEnd() const {
+      return range_set.size() ? range_set.back().GetEnd() : 0;
+    }
+    
+    size_t GetNumRanges() const { return range_set.size(); }
+
+    /// @brief Calculate the total combined size of all ranges.
+    size_t GetSize() const {
+      size_t total = 0;
+      for (const auto & x : range_set) total += x.GetSize();
+      return total;
+    }
 
     /// @brief  Add a new value that belongs at the end of the sets.
     /// @param val Value to add
@@ -205,23 +220,21 @@ namespace emp {
 
       size_t start_id = _FindRange(in.GetStart());
       size_t end_id = _FindRange(in.GetEnd());
-      IndexRange & cur_range = range_set[start_id];
       emp_assert(start_id <= end_id);
 
       // If both are in the same range id, either insert a new range or modify an existing one.
       if (start_id == end_id) {
         // If the end of the new range is before the start of the found range, insert the new one!
-        if (in.GetEnd() < cur_range.GetStart() - 1) range_set.insert(start_id, in);
+        if (in.GetEnd() < range_set[start_id].GetStart() - 1) range_set.insert(start_id, in);
 
         // Otherwise try to merge it into the existing range (will return false if already there)
-        else return cur_range.Merge(in);
+        else return range_set[start_id].Merge(in);
       }
 
       // We are across multiple ranges.  Collapse into first!
       else {
-        // If we are not including the current end_id, decrement it.
-        if (in.GetEnd()+1 < range_set[end_id].GetStart()) --end_id;
-        cur_range.Expand(in.GetStart(), in.GetEnd(), range_set[end_id].GetEnd());
+        if (in.GetEnd()+1 < range_set[end_id].GetStart()) --end_id; // Don't include end id.
+        range_set[start_id].Expand(in.GetStart(), in.GetEnd(), range_set[end_id].GetEnd());
         range_set.erase(range_set.begin()+start_id+1, range_set.begin()+end_id+1);
       }
 
