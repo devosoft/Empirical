@@ -225,7 +225,9 @@ namespace emp {
       // If both are in the same range id, either insert a new range or modify an existing one.
       if (start_id == end_id) {
         // If the end of the new range is before the start of the found range, insert the new one!
-        if (in.GetEnd() < range_set[start_id].GetStart() - 1) range_set.insert(start_id, in);
+        if (in.GetEnd() < range_set[start_id].GetStart() - 1) {
+          range_set.insert(range_set.begin() + start_id, in);
+        }
 
         // Otherwise try to merge it into the existing range (will return false if already there)
         else return range_set[start_id].Merge(in);
@@ -239,6 +241,23 @@ namespace emp {
       }
 
       return true;
+    }
+
+    /// @brief  Remove a single value from this index range.
+    /// @param val Value to remove
+    /// @return Did the range change due to this removal?
+    bool Remove(size_t val) {
+      if (!Has(val)) return false;
+      size_t id = _FindRange(val);
+      IndexRange & cur_range = range_set[id];
+      if (cur_range.GetSize() == 1) range_set.erase(range_set.begin()+id);
+      else if (cur_range.GetStart() == val) cur_range.SetStart(cur_range.GetStart()+1);
+      else if (cur_range.GetEnd()-1 == val) cur_range.SetEnd(cur_range.GetEnd()-1);
+      else {
+        // Need to split the range.
+        range_set.insert(range_set.begin()+id+1, IndexRange{val+1,cur_range.GetEnd()});
+        cur_range.SetEnd(val);
+      }
     }
   };
 
