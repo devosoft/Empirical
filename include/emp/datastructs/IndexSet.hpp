@@ -12,7 +12,7 @@
 #define EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
 
 #include "../base/Ptr.hpp"
-#include "../bits/bitset_utils.hpp"
+#include "../bits/BitVector.hpp"
 #include "../math/constants.hpp"
 
 namespace emp {
@@ -261,43 +261,50 @@ namespace emp {
     }
   };
 
+  /// @brief  A class to maintain a set of indices with a bit vector to represent them.
+  class IndexBits {
+    emp::BitVector bits;
+    size_t offset = 0;
 
-  /// IndexSet maintains a collection of indices that can be easily manipulated.  Ideally it
-  /// will be memory efficient, based on how many ids and how densely packed there are.
+  public:
+    IndexBits() = default;
+    IndexBits(const IndexBits &) = default;
+    IndexBits(IndexBits &&) = default;
 
-  // Assumptions that must be kept true internally:
-  //   For value and array representations, indices must be kept sorted.
-  //   For bits representation, the first field must always have at least one index.
+    IndexBits & operator=(const IndexBits &) = default;
+    IndexBits & operator=(IndexBits &&) = default;
 
+    // bool Has(size_t val) const{ }
+    // size_t GetStart() const{ }
+    // size_t GetEnd() const{ }
+    // size_t GetNumRanges() const{ }
+    // size_t GetSize() const{ }
+    // bool Append(size_t val){ }
+    // bool Append(IndexRange in){ }
+    // bool Insert(size_t val){ }
+    // bool Insert(IndexRange in){ }
+    // bool Remove(size_t val){ }
+  };
+
+  /// @brief IndexSet maintains a collection of indices that can be easily manipulated.
+  /// It will try to adjust representation to maintain speed and memory efficiency
   class IndexSet {
   private:
-    // Various methods for holding values depending on how many values we have and how
-    // they are organized.  Sparse is slow, so triggers only if we have less than 1:128
-    // indices in set.  Revert back to dense if more than 1:64 indics in set.
-    static constexpr size_t SPARSE_THRESHOLD = 128;
-    static constexpr size_t DENSE_THRESHOLD = 64;
-
+    // For zero to three entries, it will maintain values directly.
+    // For more than four entries it will use either bits or ranges based on how
+    // packed the values are into ranges.
+    enum class index_t { NONE=0, VALS1, VALS2, VALS3, RANGES, BITS };
     struct _Index_Vals { size_t id1; size_t id2; size_t id3; };  // Few values
-    struct _Index_Range { size_t start; size_t end; };           // Contiguous values
-    struct _Index_Array { size_t num_ids; size_t capacity; emp::Ptr<size_t> ids; };  // Sparse
-    struct _Index_Bits { size_t num_fields; size_t offset; emp::Ptr<size_t> bits; }; // Dense
-    enum class index_t { NONE=0, VALS1, VALS2, VALS3, RANGE, ARRAY, BITS };
+    struct _Index_Bits { emp::BitVector vals; size_t offset=0; };  // Few values
 
     union SetOptions {
       _Index_Vals vals;
-      _Index_Range range;
-      _Index_Array array;
+      IndexRangeSet ranges;
       _Index_Bits bits;
-      ~SetOptions() { }
     } ids;
     index_t type = index_t::NONE;
 
     // --- Helper functions ---
-
-    /// Set an individual bit in a series of bit fields.
-    static void _SetBit(emp::Ptr<size_t> bits, size_t id) {
-      bits[id / NUM_FIELD_BITS] |= (1 << (id % NUM_FIELD_BITS));
-    }
 
     /// Convert the internal representation to use bits.
     void _ToBits() {
