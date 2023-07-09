@@ -274,16 +274,16 @@ namespace emp {
     IndexBits & operator=(const IndexBits &) = default;
     IndexBits & operator=(IndexBits &&) = default;
 
-    // bool Has(size_t val) const{ }
-    // size_t GetStart() const{ }
-    // size_t GetEnd() const{ }
-    // size_t GetNumRanges() const{ }
-    // size_t GetSize() const{ }
-    // bool Append(size_t val){ }
-    // bool Append(IndexRange in){ }
-    // bool Insert(size_t val){ }
-    // bool Insert(IndexRange in){ }
-    // bool Remove(size_t val){ }
+    bool Has(size_t val) const { return (val < offset) ? false : bits[val-offset]; }
+    size_t GetStart() const { return static_cast<size_t>(bits.FindOne()) + offset; }
+    size_t GetEnd() const { return static_cast<size_t>(bits.FindMaxOne()) + offset; }
+    // size_t GetNumRanges() const { }
+    // size_t GetSize() const { }
+    // bool Append(size_t val) { }
+    // bool Append(IndexRange in) { }
+    // bool Insert(size_t val) { }
+    // bool Insert(IndexRange in) { }
+    // bool Remove(size_t val) { }
   };
 
   /// @brief IndexSet maintains a collection of indices that can be easily manipulated.
