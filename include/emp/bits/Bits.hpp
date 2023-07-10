@@ -561,6 +561,11 @@ namespace emp {
     /// @param num number of bits to be pushed.
     void PushBack(const bool bit=true, const size_t num=1);
 
+    /// @brief Push given bit(s) onto the front of a vector.
+    /// @param bit value of bit to be pushed.
+    /// @param num number of bits to be pushed.
+    void PushFront(const bool bit=true, const size_t num=1);
+
     /// @brief Insert bit(s) into any index of vector using bit magic.
     /// Blog post on implementation reasoning: https://devolab.org/?p=2249
     /// @param index location to insert bit(s).
@@ -1798,6 +1803,16 @@ namespace emp {
     if (bit) SetRange(GetSize()-num, GetSize());
   }
 
+  /// Push given bit(s) onto the front of a vector.
+  /// @param bit value of bit to be pushed.
+  /// @param num number of bits to be pushed.
+  template <typename DATA_T, bool ZERO_LEFT>
+  void Bits<DATA_T,ZERO_LEFT>::PushFront(const bool bit, const size_t num) {
+    Resize(GetSize() + num);
+    SHIFT_SELF(num);
+    if (bit) SetRange(0, num);
+  }
+
   /// Insert bit(s) into any index of vector using bit magic.
   /// Blog post on implementation reasoning: https://devolab.org/?p=2249
   /// @param index location to insert bit(s).
@@ -1805,11 +1820,11 @@ namespace emp {
   /// @param num number of bits to insert, default 1.
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T,ZERO_LEFT>::Insert(const size_t index, const bool val, const size_t num) {
-    Resize(GetSize() + num);                 // Adjust to new number of bits.
-    Bits<DATA_T,ZERO_LEFT> low_bits(*this);              // Copy current bits
+    Resize(GetSize() + num);                // Adjust to new number of bits.
+    Bits<DATA_T,ZERO_LEFT> low_bits(*this); // Copy current bits
     SHIFT_SELF(-(int)num);                  // Shift the high bits into place.
     Clear(0, index+num);                    // Reduce current to just high bits.
-    low_bits.Clear(index, GetSize());        // Reduce copy to just low bits.
+    low_bits.Clear(index, GetSize());       // Reduce copy to just low bits.
     if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
     OR_SELF(low_bits);                      // Put the low bits back in place.
   }
