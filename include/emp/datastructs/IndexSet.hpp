@@ -264,8 +264,12 @@ namespace emp {
   /// @brief  A class to maintain a set of indices with a bit vector to represent them.
   class IndexBits {
     emp::BitVector bits;
-    size_t offset = 0;
+    size_t offset = 0;   // Always a multiple of 64.
 
+    // Figure out the best offset for a given value.
+    size_t _CalcOffset(size_t val) const {
+      return (val >> 6) << 6;
+    }
   public:
     IndexBits() = default;
     IndexBits(const IndexBits &) = default;
@@ -277,11 +281,26 @@ namespace emp {
     bool Has(size_t val) const { return (val < offset) ? false : bits[val-offset]; }
     size_t GetStart() const { return static_cast<size_t>(bits.FindOne()) + offset; }
     size_t GetEnd() const { return static_cast<size_t>(bits.FindMaxOne()) + offset; }
-    // size_t GetNumRanges() const { }
-    // size_t GetSize() const { }
-    // bool Append(size_t val) { }
-    // bool Append(IndexRange in) { }
-    // bool Insert(size_t val) { }
+    size_t GetNumRanges() const {
+      return (bits & ~(bits >> 1)).CountOnes();
+    }
+    size_t GetSize() const { return bits.CountOnes(); }
+    bool Insert(size_t val) {
+      // Make sure there is room for the new value.
+      if (bits.GetSize() == 0) {                       // Must setup bits
+        offset = _CalcOffset(val);
+        bits.Resize(64);
+      }
+      else if (val < offset) {                         // Value is before offset...
+        const size_t new_offset = _CalcOffset(val);
+        bits.PushFront(offset - new_offset);
+        offset = new_offset;
+      }
+      else if (bits.GetSize() <= val-offset) {         // Value is out of range...
+        bits.Resize(_CalcOffset(val) + 64 - offset);
+      }
+      bits.Set(val-offset);
+    }
     // bool Insert(IndexRange in) { }
     // bool Remove(size_t val) { }
   };
