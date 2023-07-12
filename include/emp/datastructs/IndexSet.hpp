@@ -270,6 +270,23 @@ namespace emp {
     size_t _CalcOffset(size_t val) const {
       return (val >> 6) << 6;
     }
+
+    /// @brief Increase the range of valid values
+    /// @param val Value to make sure can be set.
+    void _ExpandRange(size_t val) {
+      if (bits.GetSize() == 0) {                       // Must setup bits
+        offset = _CalcOffset(val);
+        bits.Resize(64);
+      }
+      else if (val < offset) {                         // Value is before offset...
+        const size_t new_offset = _CalcOffset(val);
+        bits.PushFront(offset - new_offset);
+        offset = new_offset;
+      }
+      else if (bits.GetSize() <= val-offset) {         // Value is out of range...
+        bits.Resize(_CalcOffset(val) + 64 - offset);
+      }
+    }
   public:
     IndexBits() = default;
     IndexBits(const IndexBits &) = default;
@@ -286,23 +303,17 @@ namespace emp {
     }
     size_t GetSize() const { return bits.CountOnes(); }
     bool Insert(size_t val) {
-      // Make sure there is room for the new value.
-      if (bits.GetSize() == 0) {                       // Must setup bits
-        offset = _CalcOffset(val);
-        bits.Resize(64);
-      }
-      else if (val < offset) {                         // Value is before offset...
-        const size_t new_offset = _CalcOffset(val);
-        bits.PushFront(offset - new_offset);
-        offset = new_offset;
-      }
-      else if (bits.GetSize() <= val-offset) {         // Value is out of range...
-        bits.Resize(_CalcOffset(val) + 64 - offset);
-      }
+      _ExpandRange(val); // Make sure there is room for the new value.
       bits.Set(val-offset);
     }
-    // bool Insert(IndexRange in) { }
-    // bool Remove(size_t val) { }
+    bool Insert(IndexRange in) {
+      _ExpandRange(in.GetStart());
+      _ExpandRange(in.GetEnd());
+      bits.SetRange(in.GetStart()-offset, in.GetEnd()-offset);
+    }
+    bool Remove(size_t val) {
+      bits.Clear(val - offset);
+    }
   };
 
   /// @brief IndexSet maintains a collection of indices that can be easily manipulated.
