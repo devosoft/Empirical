@@ -148,6 +148,9 @@ namespace emp {
       return total;
     }
 
+    // Return all of the internal ranges.
+    const emp::vector<IndexRange> & GetRanges() & { return range_set; }
+
     /// @brief  Add a new value that belongs at the end of the sets.
     /// @param val Value to add
     /// @return Did the append work?  If it's not at the end, returns false.
@@ -291,6 +294,9 @@ namespace emp {
     IndexBits() = default;
     IndexBits(const IndexBits &) = default;
     IndexBits(IndexBits &&) = default;
+    IndexBits(size_t min_val, size_t max_val) : offset(_CalcOffset(min_val)) {
+      bits.Resize(_CalcOffset(max_val) + 64 - offset);
+    }
 
     IndexBits & operator=(const IndexBits &) = default;
     IndexBits & operator=(IndexBits &&) = default;
@@ -325,51 +331,43 @@ namespace emp {
     // packed the values are into ranges.
     enum class index_t { NONE=0, VALS1, VALS2, VALS3, RANGES, BITS };
     struct _Index_Vals { size_t id1; size_t id2; size_t id3; };  // Few values
-    struct _Index_Bits { emp::BitVector vals; size_t offset=0; };  // Few values
 
-    union SetOptions {
+    union {
       _Index_Vals vals;
       IndexRangeSet ranges;
-      _Index_Bits bits;
-    } ids;
+      IndexBits bits;
+    };
     index_t type = index_t::NONE;
 
     // --- Helper functions ---
+
+    /// Free whatever type we currently have.
+    void _ReleaseUnion() {
+      if (type == index_t::BITS) bits.~IndexBits();
+      else if (type == index_t::RANGES) ranges.~IndexRangeSet();
+    }
 
     /// Convert the internal representation to use bits.
     void _ToBits() {
       emp_assert(type != index_t::NONE, "Cannot start IndexSet as type BITS");
       if (type == index_t::BITS) return; // Already bits!
 
-      const size_t offset = GetMin();
-      const size_t num_bits = GetMax() - offset + 1;
-      // Make twice as many fields as we need to support growth.
-      const size_t num_fields = (num_bits / NUM_FIELD_BITS + 1) * 2;
-      emp::Ptr<size_t> bits = NewArrayPtr<size_t>(num_fields);
+      IndexBits new_bits(GetMin(), GetMax());
 
       switch (type) {
-        case index_t::VALS3:
-          _SetBit(bits, ids.vals.id3 - offset);
-          [[fallthrough]];
-        case index_t::VALS2:
-          _SetBit(bits, ids.vals.id2 - offset);
-          [[fallthrough]];
-        case index_t::VALS1:
-          _SetBit(bits, ids.vals.id1 - offset);
+        case index_t::VALS3:  new_bits.Insert(vals.id3);  [[fallthrough]];
+        case index_t::VALS2:  new_bits.Insert(vals.id2);  [[fallthrough]];
+        case index_t::VALS1:  new_bits.Insert(vals.id1);
           break;
-        case index_t::RANGE:
-          // @CAO For a large range being converted, this can be optimized.
-          for (size_t id = ids.range.start; id < ids.range.end; ++id) {
-            _SetBit(bits, id - offset);
+        case index_t::RANGES:
+          for (const auto & range : ranges.GetRanges()) {
+            new_bits.Insert(range);
           }
           break;
-        case index_t::ARRAY:
-          for (size_t i = 0; i < ids.array.num_ids; ++i) {
-            _SetBit(bits, ids.array.ids[i] - offset);
-          }
       }
 
-      ids.bits = _Index_Bits{ num_fields, offset, bits };
+      _ReleaseUnion();
+      new (&bits) IndexBits(std::move(new_bits));
     }
 
     /// Convert the internal representation to use an array.
