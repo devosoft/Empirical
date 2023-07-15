@@ -46,7 +46,7 @@
  *       to be stored elsewhere (presumably in the memory image, but possibly in the layout.)
  *    5. The memory is a LOG of values, not a single value.  This allows for quick identification
  *       of when something special needs to be done.
- *    6-8. Limited type information (8 types that can be handled more effectively?)
+ *    6-8. Limited type information (7 types that can be handled more effectively?)
  *
  *  - We should be able to keep a series of values, not just a single one.  This can be done with
  *    a series of new functions:
@@ -56,7 +56,7 @@
  *      Add GetAve() function for logs as well as GetLog() for the full series (as std::span?).
  *
  *  - Settings for all entries should have more information on how they are dealt with, such as if
- *    they should be included in output an how.  Perhaps a system of tags for dynamic use?
+ *    they should be included in output and how.  Perhaps a system of tags for dynamic use?
  *
  *  - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
  *    compile time, providing more localized memory.  Otherwise DataMap as a whole can be built
@@ -73,8 +73,9 @@
  *    to allow for multiple parents...
  *
  *  - An OptimizeLayout() function that can reorder entries so that they are somehow more sensible?
+ *    Does DataMap need to worry about memory alignment?
  *
- *  - A MemoryImage factory to speed up allocation, deallocation if we're using the same size
+ *  - A MemoryImage factory to speed up allocation and deallocation if we're using the same size
  *    images repeatedly.
  *
  *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
