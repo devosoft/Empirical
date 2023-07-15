@@ -210,7 +210,7 @@ namespace emp {
     size_t bit_count
   ) {
     static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
-    constexpr size_t FIELD_BITS = sizeof(T) * 8;
+    [[maybe_unused]] constexpr size_t FIELD_BITS = sizeof(T) * 8;
     emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
     rotate_size %= bit_count; // Make sure rotate is in range.
     const T out = (in << rotate_size) | (in >> (bit_count - rotate_size));
@@ -238,7 +238,7 @@ namespace emp {
     size_t bit_count
   ) {
     static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
-    constexpr size_t FIELD_BITS = sizeof(T) * 8;
+    [[maybe_unused]] constexpr size_t FIELD_BITS = sizeof(T) * 8;
     emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
     rotate_size %= bit_count; // Make sure rotate is in range.
     const T out = (in >> rotate_size) | (in << (bit_count - rotate_size));
