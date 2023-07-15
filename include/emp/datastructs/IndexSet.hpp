@@ -370,44 +370,28 @@ namespace emp {
       new (&bits) IndexBits(std::move(new_bits));
     }
 
-    /// Convert the internal representation to use an array.
-    void _ToArray() {
-      emp_assert(type != index_t::NONE, "Cannot start IndexSet as type ARRAY");
-      if (type == index_t::ARRAY) return; // Already array format!
+    /// Convert the internal representation to use a ranges.
+    void _ToRanges() {
+      emp_assert(type != index_t::NONE, "Cannot start IndexSet as type RANGES");
+      if (type == index_t::RANGES) return; // Already ranges format!
 
-      const size_t num_vals = GetSize();
-      const size_t capacity = num_vals * 2;
-      emp::Ptr<size_t> array = emp::NewArrayPtr<size_t>(capacity);
-      size_t pos = 0;
+      IndexRangeSet new_ranges;
 
       switch (type) {
-        case index_t::VALS1:
-          array[pos++] = ids.vals.id1;
-          break;
-        case index_t::VALS2:
-          array[pos++] = ids.vals.id1;
-          array[pos++] = ids.vals.id2;
-          break;
-        case index_t::VALS3:
-          array[pos++] = ids.vals.id1;
-          array[pos++] = ids.vals.id2;
-          array[pos++] = ids.vals.id3;
-          break;
-        case index_t::RANGE:
-          for (size_t id = ids.range.start; id < ids.range.end; ++id) {
-            array[pos++] = id;
-          }
+        case index_t::VALS3:  new_ranges.Insert(vals.id3);  [[fallthrough]];
+        case index_t::VALS2:  new_ranges.Insert(vals.id2);  [[fallthrough]];
+        case index_t::VALS1:  new_ranges.Insert(vals.id1);
           break;
         case index_t::BITS:
-          for (size_t field_id = 0; field_id < ids.bits.num_fields; ++field_id) {
-            size_t field = ids.bits.bits[field_id];
-            const size_t offset = ids.bits.offset + field_id * emp::NUM_FIELD_BITS;
-            while (field) {
-              array[pos++] = emp::pop_bit(field) + offset;
-            }
+          for (const auto & range : ranges.GetRanges()) {
+            new_ranges.Insert(range);
           }
+          break;
       }
-      ids.array = _Index_Array{num_vals, capacity, array};
+
+      _ReleaseUnion();
+      new (&bits) IndexBits(std::move(new_bits));
+
     }
 
   public:
