@@ -64,6 +64,7 @@
 #include "../math/constants.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
+#include "../math/Range.hpp"
 #include "../meta/type_traits.hpp"
 
 #include "_bitset_helpers.hpp"
@@ -582,6 +583,10 @@ namespace emp {
     /// @brief Return the position of the first one; return -1 if no ones in vector.
     [[nodiscard]] int FindOne() const;
 
+    /// @brief Return the position of the first zero; return -1 if no zeroes in vector.
+    [[nodiscard]] int FindZero() const;
+
+
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
     [[deprecated("Renamed to more accurate FindOne()")]]
     [[nodiscard]] int FindBit() const { return FindOne(); }
@@ -590,12 +595,24 @@ namespace emp {
     /// You can loop through all 1-bit positions of Bits object "bits" with:
     ///
     ///   for (int pos = bits.FindOne(); pos >= 0; pos = bits.FindOne(pos+1)) { ... }
-    ///
+
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
-    /// @brief Special version of FindOne takes int; most common way to call.
+    /// @brief Return the position of the first zero after start_pos (or -1 if none)
+    /// You can loop through all 0-bit positions of Bits object "bits" with:
+    ///
+    ///   for (int pos = bits.FindZero(); pos >= 0; pos = bits.FindZero(pos+1)) { ... }
+
+    [[nodiscard]] int FindZero(const size_t start_pos) const;
+
+    /// @brief Special version of FindOne takes int; common way to call.
     [[nodiscard]] int FindOne(int start_pos) const {
       return FindOne(static_cast<size_t>(start_pos));
+    }
+
+    /// @brief Special version of FindZero takes int; common way to call.
+    [[nodiscard]] int FindZero(int start_pos) const {
+      return FindZero(static_cast<size_t>(start_pos));
     }
 
     /// Deprecated version of FindOne().
@@ -621,6 +638,10 @@ namespace emp {
 
     /// @brief Find the length of the longest continuous series of ones.
     [[nodiscard]] size_t LongestSegmentOnes() const;
+
+    /// @brief Find ids of all groups of ones.
+    /// @return A vector of ranges that identify all ids of ones.
+    [[nodiscard]] emp::vector<emp::Range<size_t>> GetRanges() const;
 
     /// @brief Return true if any ones are in common with another Bits.
     [[nodiscard]] bool HasOverlap(const Bits & in) const;
@@ -1850,6 +1871,16 @@ namespace emp {
       (int) (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
   }
 
+  /// Return the position of the first zero; return -1 if no zeros in vector.
+  template <typename DATA_T, bool ZERO_LEFT>
+  int Bits<DATA_T,ZERO_LEFT>::FindZero() const {
+    const size_t NUM_FIELDS = _data.NumFields();
+    size_t field_id = 0;
+    while (field_id < NUM_FIELDS && _data.bits[field_id]==FIELD_ALL) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
+  }
+
   /// Return the position of the first one after start_pos; return -1 if no ones in vector.
   /// You can loop through all 1-bit positions in "bits" with:
   ///
@@ -1857,9 +1888,9 @@ namespace emp {
 
   template <typename DATA_T, bool ZERO_LEFT>
   int Bits<DATA_T,ZERO_LEFT>::FindOne(const size_t start_pos) const {
-    if (start_pos >= GetSize()) return -1;            // If we're past the end, return fail.
-    size_t field_id  = FieldID(start_pos);           // What field do we start in?
-    const size_t field_pos = FieldPos(start_pos);    // What position in that field?
+    if (start_pos >= GetSize()) return -1;          // If we are past the end, return fail.
+    size_t field_id = FieldID(start_pos);           // What field do we start in?
+    const size_t field_pos = FieldPos(start_pos);   // What position in that field?
 
     // If there's a hit in a partial first field, return it.
     if (field_pos && (_data.bits[field_id] & ~(MaskField(field_pos)))) {
@@ -1873,6 +1904,31 @@ namespace emp {
     while (field_id < NUM_FIELDS && _data.bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
       (int) (find_bit(_data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+  }
+
+  /// Return the position of the first zero after start_pos; return -1 if no zeroes in vector.
+  /// You can loop through all 0-bit positions in "bits" with:
+  ///
+  ///   for (int pos = bits.FindZero(); pos >= 0; pos = bits.FindZero(pos+1)) { ... }
+
+  template <typename DATA_T, bool ZERO_LEFT>
+  int Bits<DATA_T,ZERO_LEFT>::FindZero(const size_t start_pos) const {
+    if (start_pos >= GetSize()) return -1;          // If we are past the end, return fail.
+    size_t field_id = FieldID(start_pos);           // What field do we start in?
+    const size_t field_pos = FieldPos(start_pos);   // What position in that field?
+
+    // If there's a hit in a partial first field, return it.
+    if (field_pos && (~_data.bits[field_id] & ~(MaskField(field_pos)))) {
+      return (int) (~find_bit(_data.bits[field_id] & ~(MaskField(field_pos))) +
+                    field_id * FIELD_BITS);
+    }
+
+    // Search other fields...
+    const size_t NUM_FIELDS = _data.NumFields();
+    if (field_pos) field_id++;
+    while (field_id < NUM_FIELDS && _data.bits[field_id]==FIELD_ALL) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS)) : -1;
   }
 
   /// Find the most-significant set-bit.
