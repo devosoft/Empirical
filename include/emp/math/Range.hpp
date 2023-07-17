@@ -12,6 +12,7 @@
 #define EMP_MATH_RANGE_HPP_INCLUDE
 
 #include <limits>
+#include <type_traits>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
@@ -26,13 +27,15 @@ namespace emp {
     T upper = std::numeric_limits<T>::max();     ///< End of range, (included if INCLUDE_UPPER)
 
   public:
+    static constexpr bool is_integral = std::is_integral<T>();
+
     Range() = default;
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l <= _u, _l, _u); }
     Range(const Range &) = default;
 
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
-    T GetSize() const { return upper - lower + INCLUDE_UPPER; }
+    T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
 
     Range & operator=(const Range&) = default;
     bool operator==(const Range& _in) const = default;
@@ -62,7 +65,8 @@ namespace emp {
       if constexpr (INCLUDE_UPPER) {
         return (_in < lower) ? lower : ((_in > upper) ? upper : _in);
       } else {
-        return (_in < lower) ? lower : ((_in > upper) ? (upper) : _in);
+        return (_in < lower) ? lower :
+          ((_in > upper) ? (upper - std::numeric_limits<T>::epsilon()) : _in);
       }
     }
     double ToFraction(T _in) const {
