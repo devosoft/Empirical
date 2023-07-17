@@ -23,6 +23,12 @@ TEST_CASE("Test Range", "[math]")
   REQUIRE(r.GetLower() == 0);
   REQUIRE(r.GetUpper() == 10);
   REQUIRE(r.GetSize() == 11); // 0 through 10 inclusive.
+  REQUIRE(r.Valid(0) == true);
+  REQUIRE(r.Valid(10) == true);
+  REQUIRE(r.Valid(5) == true);
+  REQUIRE(r.Valid(-1) == false);
+  REQUIRE(r.Valid(11) == false);
+  REQUIRE(r.Valid(100000) == false);
 
   // CalcBin
   REQUIRE(r.CalcBin(5,10) == 5);
@@ -66,6 +72,12 @@ TEST_CASE("Test Range", "[math]")
   REQUIRE(r2.GetUpper() == 'z');
   REQUIRE(r2.GetSize() == 26);
   REQUIRE(r2.CalcBin('g',26) == 6);
+  REQUIRE(r2.Valid('a') == true);
+  REQUIRE(r2.Valid('j') == true);
+  REQUIRE(r2.Valid('z') == true);
+  REQUIRE(r2.Valid('A') == false);
+  REQUIRE(r2.Valid('-') == false);
+  REQUIRE(r2.Valid('\n') == false);
 
   // IntRange
   emp::Range<int> r3 = emp::IntRange(-5,5);
@@ -82,6 +94,12 @@ TEST_CASE("Test Range", "[math]")
   REQUIRE(!r4.Valid(0.0));
   REQUIRE(r4.CalcBin(4.7,5) == 0);
   REQUIRE(r4.CalcBin(4.8,5) == 1);
+  REQUIRE(r4.Valid(0.1) == true);
+  REQUIRE(r4.Valid(23.5) == true);
+  REQUIRE(r4.Valid(10.0) == true);
+  REQUIRE(r4.Valid(0.09) == false);
+  REQUIRE(r4.Valid(23.6) == false);
+  REQUIRE(r4.Valid(0.000000001) == false);
 }
 
 TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
@@ -94,6 +112,12 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
   REQUIRE(r.GetLower() == 0);
   REQUIRE(r.GetUpper() == 10);
   REQUIRE(r.GetSize() == 10); // 0 through 10 exclusive.
+  REQUIRE(r.Valid(0) == true);
+  REQUIRE(r.Valid(10) == false);
+  REQUIRE(r.Valid(5) == true);
+  REQUIRE(r.Valid(-1) == false);
+  REQUIRE(r.Valid(11) == false);
+  REQUIRE(r.Valid(100000) == false);
 
   // CalcBin
   REQUIRE(r.CalcBin(5,10) == 5);
@@ -137,6 +161,12 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
   REQUIRE(r2.GetUpper() == 'z');
   REQUIRE(r2.GetSize() == 25);   // 'z' is excluded.
   REQUIRE(r2.CalcBin('g',26) == 6);
+  REQUIRE(r2.Valid('a') == true);
+  REQUIRE(r2.Valid('j') == true);
+  REQUIRE(r2.Valid('z') == false);
+  REQUIRE(r2.Valid('A') == false);
+  REQUIRE(r2.Valid('-') == false);
+  REQUIRE(r2.Valid('\n') == false);
 
   // IntRange
   emp::Range<int, false> r3 = emp::IntRange<false>(-5,5);
@@ -153,4 +183,10 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
   REQUIRE(!r4.Valid(0.0));
   REQUIRE(r4.CalcBin(4.7,5) == 0);
   REQUIRE(r4.CalcBin(4.8,5) == 1);
+  REQUIRE(r4.Valid(0.1) == true);
+  REQUIRE(r4.Valid(23.5) == false);
+  REQUIRE(r4.Valid(10.0) == true);
+  REQUIRE(r4.Valid(0.09) == false);
+  REQUIRE(r4.Valid(23.6) == false);
+  REQUIRE(r4.Valid(0.000000001) == false);
 }
