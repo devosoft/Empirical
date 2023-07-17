@@ -35,6 +35,15 @@ namespace emp {
 
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
+    T GetEpsilon() const {
+      if constexpr (is_integral) return 1;
+      else return std::numeric_limits<T>::epsilon();
+    }
+    T GetMaxValue() const { // What is the maximum included value?
+      if constexpr (INCLUDE_UPPER) return upper;
+      else if constexpr (is_integral) return upper -1;
+      else return upper * (1.0 - GetEpsilon());
+    }
     T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
 
     Range & operator=(const Range&) = default;
@@ -45,7 +54,7 @@ namespace emp {
     void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
 
-    void SetMaxLower() { lower = std::numeric_limits<T>::min(); }
+    void SetMinLower() { lower = std::numeric_limits<T>::min(); }
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
 
     // Flexible lower/upper accessor that can get and set.
@@ -61,14 +70,11 @@ namespace emp {
     }
 
     /// Force a value into range
-    T LimitValue(T _in) const {
-      if constexpr (INCLUDE_UPPER) {
-        return (_in < lower) ? lower : ((_in > upper) ? upper : _in);
-      } else {
-        return (_in < lower) ? lower :
-          ((_in > upper) ? (upper - std::numeric_limits<T>::epsilon()) : _in);
-      }
+    T Clamp(T _in) const {
+      return (_in < lower) ? lower : ((_in >= upper) ? GetMaxValue() : _in);
     }
+    T LimitValue(T _in) const { return Clamp(_in); }
+
     double ToFraction(T _in) const {
       emp_assert(GetSize() != 0);
       return static_cast<double>(_in - lower) / static_cast<double>(GetSize());
