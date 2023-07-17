@@ -42,7 +42,7 @@ TEST_CASE("Test Range", "[math]")
 
   // Valid Limit
   REQUIRE(!r1.Valid(0));
-  REQUIRE(r1.LimitValue(0) == 5);
+  REQUIRE(r1.Clamp(0) == 5);
 
   // Spread
   emp::vector<int> s = r.Spread(6);
@@ -60,8 +60,8 @@ TEST_CASE("Test Range", "[math]")
   REQUIRE(r.GetLower() == 0);
   REQUIRE(r.GetUpper() == 15);
 
-  // SetMaxLower SetMaxUpper
-  r.SetMaxLower();
+  // SetMinLower SetMaxUpper
+  r.SetMinLower();
   r.SetMaxUpper();
   REQUIRE(r.GetLower() == -2147483648);
   REQUIRE(r.GetUpper() == 2147483647);
@@ -84,7 +84,7 @@ TEST_CASE("Test Range", "[math]")
   REQUIRE(r3.GetLower() == -5);
   REQUIRE(r3.GetUpper() == 5);
   REQUIRE(r3.GetSize() == 11);
-  REQUIRE(r3.LimitValue(100) == 5);
+  REQUIRE(r3.Clamp(100) == 5);
 
   // DRange
   emp::Range<double> r4 = emp::DRange(0.1,23.5);
@@ -100,6 +100,7 @@ TEST_CASE("Test Range", "[math]")
   REQUIRE(r4.Valid(0.09) == false);
   REQUIRE(r4.Valid(23.6) == false);
   REQUIRE(r4.Valid(0.000000001) == false);
+  REQUIRE(r4.Clamp(23.6) == 23.5);
 }
 
 TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
@@ -131,7 +132,7 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
 
   // Valid Limit
   REQUIRE(!r1.Valid(0));
-  REQUIRE(r1.LimitValue(0) == 5);
+  REQUIRE(r1.Clamp(0) == 5);
 
   // Spread
   emp::vector<int> s = r.Spread(6);
@@ -149,8 +150,8 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
   REQUIRE(r.GetLower() == 0);
   REQUIRE(r.GetUpper() == 15);
 
-  // SetMaxLower SetMaxUpper
-  r.SetMaxLower();
+  // SetMinLower SetMaxUpper
+  r.SetMinLower();
   r.SetMaxUpper();
   REQUIRE(r.GetLower() == -2147483648);
   REQUIRE(r.GetUpper() == 2147483647);
@@ -173,7 +174,7 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
   REQUIRE(r3.GetLower() == -5);
   REQUIRE(r3.GetUpper() == 5);
   REQUIRE(r3.GetSize() == 10);
-  REQUIRE(r3.LimitValue(100) == 5);
+  REQUIRE(r3.Clamp(100) == 4);
 
   // DRange
   emp::Range<double, false> r4 = emp::DRange<false>(0.1,23.5);
@@ -189,4 +190,5 @@ TEST_CASE("Test Range with non-inclusive endpoint", "[math]")
   REQUIRE(r4.Valid(0.09) == false);
   REQUIRE(r4.Valid(23.6) == false);
   REQUIRE(r4.Valid(0.000000001) == false);
+  REQUIRE(r4.Clamp(23.6) < 23.5);
 }
