@@ -96,13 +96,22 @@ namespace emp {
   };
 
   /// Build a new range with auto-detected type.
-  template <typename T> Range<T> MakeRange(T _l, T _u) { return Range<T>(_l,_u); }
+  template <typename T, bool INCLUDE_UPPER=true>
+  Range<T, INCLUDE_UPPER> MakeRange(T _l, T _u) {
+    return Range<T, INCLUDE_UPPER>(_l,_u);
+  }
 
   /// Build a new range of type int.
-  inline Range<int> IntRange(int _l, int _u) { return Range<int>(_l,_u); }
+  template <bool INCLUDE_UPPER=true>
+  inline Range<int, INCLUDE_UPPER> IntRange(int _l, int _u) {
+    return Range<int, INCLUDE_UPPER>(_l,_u);
+  }
 
   /// Build a new range of type double.
-  inline Range<double> DRange(double _l, double _u) { return Range<double>(_l,_u); }
+  template <bool INCLUDE_UPPER=true>
+  inline Range<double, INCLUDE_UPPER> DRange(double _l, double _u) {
+    return Range<double, INCLUDE_UPPER>(_l,_u);
+  }
 }
 
 #endif // #ifndef EMP_MATH_RANGE_HPP_INCLUDE
