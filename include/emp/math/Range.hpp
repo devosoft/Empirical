@@ -19,11 +19,11 @@
 namespace emp {
 
   /// A range of values from a lower limit to and upper limit, of any provided type.
-  template <typename T>
+  template <typename T, bool INCLUDE_UPPER=true>
   class Range {
   private:
     T lower = std::numeric_limits<T>::lowest();  ///< Beginning of range, inclusive.
-    T upper = std::numeric_limits<T>::max();     ///< End of range, inclusive.
+    T upper = std::numeric_limits<T>::max();     ///< End of range, (included if INCLUDE_UPPER)
 
   public:
     Range() = default;
@@ -32,7 +32,7 @@ namespace emp {
 
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
-    T GetSize() const { return upper - lower; }
+    T GetSize() const { return upper - lower + INCLUDE_UPPER; }
 
     Range & operator=(const Range&) = default;
     bool operator==(const Range& _in) const = default;
@@ -53,10 +53,18 @@ namespace emp {
     const T & Upper() const noexcept { return upper; }
 
     /// Determine if a provided value is in the range INCLUSIVE of the endpoints.
-    bool Valid(T value) const { return value >= lower && value <= upper; }
+    bool Valid(T value) const {
+      return (value >= lower && value < upper) || (INCLUDE_UPPER && value == upper);
+    }
 
     /// Force a value into range
-    T LimitValue(T _in) const { return (_in < lower) ? lower : ((_in > upper) ? upper : _in); }
+    T LimitValue(T _in) const {
+      if constexpr (INCLUDE_UPPER) {
+        return (_in < lower) ? lower : ((_in > upper) ? upper : _in);
+      } else {
+        return (_in < lower) ? lower : ((_in > upper) ? (upper) : _in);
+      }
+    }
     double ToFraction(T _in) const {
       emp_assert(GetSize() != 0);
       return static_cast<double>(_in - lower) / static_cast<double>(GetSize());
