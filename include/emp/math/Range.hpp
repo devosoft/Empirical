@@ -26,10 +26,14 @@ namespace emp {
     T lower = std::numeric_limits<T>::lowest();  ///< Beginning of range, inclusive.
     T upper = std::numeric_limits<T>::max();     ///< End of range, (included if INCLUDE_UPPER)
 
+    using this_t = Range<T, INCLUDE_UPPER>;
   public:
     static constexpr bool is_integral = std::is_integral<T>();
 
     Range() = default;
+    Range(T val) : lower(val), upper(val) {
+      if constexpr (!INCLUDE_UPPER) upper += GetEpsilon();
+    }
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l <= _u, _l, _u); }
     Range(const Range &) = default;
 
@@ -37,12 +41,11 @@ namespace emp {
     T GetUpper() const { return upper; }
     T GetEpsilon() const {
       if constexpr (is_integral) return 1;
-      else return std::numeric_limits<T>::epsilon();
+      else return upper * std::numeric_limits<T>::epsilon();
     }
     T GetMaxValue() const { // What is the maximum included value?
       if constexpr (INCLUDE_UPPER) return upper;
-      else if constexpr (is_integral) return upper -1;
-      else return upper * (1.0 - GetEpsilon());
+      else return upper - GetEpsilon();
     }
     T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
 
@@ -57,6 +60,11 @@ namespace emp {
     void SetMinLower() { lower = std::numeric_limits<T>::min(); }
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
 
+    void Grow(T amount=1) {
+      if (amount > 0) upper += amount;
+      else lower += amount;
+    }
+
     // Flexible lower/upper accessor that can get and set.
     T & Lower() { return lower; }
     T & Upper() { return upper; }
@@ -65,14 +73,54 @@ namespace emp {
     const T & Upper() const noexcept { return upper; }
 
     /// Determine if a provided value is in the range INCLUSIVE of the endpoints.
-    bool Valid(T value) const {
+    bool Has(T value) const {
       return (value >= lower && value < upper) || (INCLUDE_UPPER && value == upper);
     }
+    [[deprecated("Renamed to Has()")]]
+    bool Valid(T value) const { return Has(value); }
+
+    bool HasRange(this_t in_range) { 
+      return Has(in_range.lower) && Has(in_range.upper);
+    }
+
+    /// Will identify if two ranges are next to each other or overlapping.
+    bool IsConnected(this_t in) const {
+      return (in.lower >= lower && in.lower <= upper) ||
+             (lower >= in.lower && lower <= in.upper);
+    }
+
+    /// @brief  Expand this range to encompass a provided value.
+    /// @param val Value to expand through.
+    /// @return Whether the range has changed due to this expansion.
+    bool Expand(size_t val) {
+      if (val < lower) lower = val;
+      else if (val > upper) {
+        upper = val;
+        if constexpr (INCLUDE_UPPER) val += GetEpsilon();
+      } else return false;
+      return true;
+    }
+
+    /// @brief Expand this range to encompass all provided values.
+    /// @return Whether the range has changed due to this expansion.
+    template <typename... Ts>
+    bool Expand(size_t val1, size_t val2, Ts... args) {
+      return Expand(val1) + Expand(val2, args...);
+    }
+
+
+    /// Merge this range with another.  Must be adjacent or overlap!
+    bool Merge(this_t in) {
+      if (!IsConnected(in)) return false;
+      return Expand(in.start) + Expand(in.end);  // Use + to avoid short-circuiting.
+    }
+
 
     /// Force a value into range
     T Clamp(T _in) const {
       return (_in < lower) ? lower : ((_in >= upper) ? GetMaxValue() : _in);
     }
+    [[deprecated("Renamed to Clamp()")]]
     T LimitValue(T _in) const { return Clamp(_in); }
 
     double ToFraction(T _in) const {
