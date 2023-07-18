@@ -79,7 +79,7 @@ namespace emp {
     [[deprecated("Renamed to Has()")]]
     bool Valid(T value) const { return Has(value); }
 
-    bool HasRange(this_t in_range) { 
+    bool HasRange(this_t in_range) {
       return Has(in_range.lower) && Has(in_range.upper);
     }
 
@@ -92,7 +92,7 @@ namespace emp {
     /// @brief  Expand this range to encompass a provided value.
     /// @param val Value to expand through.
     /// @return Whether the range has changed due to this expansion.
-    bool Expand(size_t val) {
+    bool Expand(T val) {
       if (val < lower) lower = val;
       else if (val > upper) {
         upper = val;
@@ -104,10 +104,9 @@ namespace emp {
     /// @brief Expand this range to encompass all provided values.
     /// @return Whether the range has changed due to this expansion.
     template <typename... Ts>
-    bool Expand(size_t val1, size_t val2, Ts... args) {
+    bool Expand(T val1, T val2, Ts... args) {
       return Expand(val1) + Expand(val2, args...);
     }
-
 
     /// Merge this range with another.  Must be adjacent or overlap!
     bool Merge(this_t in) {
@@ -115,6 +114,13 @@ namespace emp {
       return Expand(in.start) + Expand(in.end);  // Use + to avoid short-circuiting.
     }
 
+    /// Add a specified value to the end of a range (or return false if failed).
+    bool Append(T val) {
+      emp_assert(is_integral, "Only integral ranges can call Append() with a single value.");
+      if (val != upper + INCLUDE_UPPER) return false;
+      upper++;
+      return true;
+    }
 
     /// Force a value into range
     T Clamp(T _in) const {
