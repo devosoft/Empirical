@@ -108,10 +108,10 @@ namespace emp {
       return Expand(val1) + Expand(val2, args...);
     }
 
-    /// Merge this range with another.  Must be adjacent or overlap!
+    /// Merge this range with another.  Must be adjacent or overlap (return false if not!)
     bool Merge(this_t in) {
       if (!IsConnected(in)) return false;
-      return Expand(in.start) + Expand(in.end);  // Use + to avoid short-circuiting.
+      return Expand(in.lower) + Expand(in.upper);  // Use + to avoid short-circuiting.
     }
 
     /// Add a specified value to the end of a range (or return false if failed).
