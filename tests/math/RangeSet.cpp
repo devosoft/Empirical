@@ -20,6 +20,8 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs1.Has(27) == false);
   CHECK(rs1.Has(-1003) == false);
   CHECK(rs1.Has(0) == false);
+  CHECK(rs1.GetNumRanges() == 0);
+  CHECK(rs1.GetSize() == 0);
 
   rs1.Insert(27);
 
@@ -28,6 +30,10 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs1.Has(28) == false);
   CHECK(rs1.Has(-1003) == false);
   CHECK(rs1.Has(0) == false);
+  CHECK(rs1.GetStart() == 27);
+  CHECK(rs1.GetEnd() == 28);
+  CHECK(rs1.GetNumRanges() == 1);
+  CHECK(rs1.GetSize() == 1);
 
   rs1.Insert(28);
 
@@ -37,6 +43,10 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs1.Has(29) == false);
   CHECK(rs1.Has(-1003) == false);
   CHECK(rs1.Has(0) == false);
+  CHECK(rs1.GetStart() == 27);
+  CHECK(rs1.GetEnd() == 29);
+  CHECK(rs1.GetNumRanges() == 1);
+  CHECK(rs1.GetSize() == 2);
 
   rs1.Insert(26);
 
@@ -47,10 +57,43 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs1.Has(29) == false);
   CHECK(rs1.Has(-1003) == false);
   CHECK(rs1.Has(0) == false);
+  CHECK(rs1.GetStart() == 26);
+  CHECK(rs1.GetEnd() == 29);
+  CHECK(rs1.GetNumRanges() == 1);
+  CHECK(rs1.GetSize() == 3);
 
   rs1.Insert(emp::Range<int,false>(23,26));
 
   // Make sure RangeSets are identified as equal, even if constructed differently.
   emp::RangeSet<int> rs2(emp::Range<int,false>{23,29});
   CHECK(rs1 == rs2);
+  CHECK(rs1.GetStart() == 23);
+  CHECK(rs1.GetEnd() == 29);
+  CHECK(rs1.GetNumRanges() == 1);
+  CHECK(rs1.GetSize() == 6);
+
+  // Make sure Remove works...
+  CHECK(rs1.Has(26) == true);
+  rs1.Remove(26);
+  CHECK(rs1.Has(23) == true);
+  CHECK(rs1.Has(24) == true);
+  CHECK(rs1.Has(25) == true);
+  CHECK(rs1.Has(26) == false);
+  CHECK(rs1.Has(27) == true);
+  CHECK(rs1.Has(28) == true);
+  CHECK(rs1.Has(29) == false);
+  CHECK(rs1.Has(-1003) == false);
+  CHECK(rs1.Has(0) == false);
+  CHECK(rs1 != rs2);
+  CHECK(rs1.GetStart() == 23);
+  CHECK(rs1.GetEnd() == 29);
+  CHECK(rs1.GetNumRanges() == 2);
+  CHECK(rs1.GetSize() == 5);
+
+  // And the re-Insertion and merging.
+  rs1.Insert(26);
+  CHECK(rs1 == rs2);
+  CHECK(rs1.GetNumRanges() == 1);
+  CHECK(rs1.GetSize() == 6);
+
 }
