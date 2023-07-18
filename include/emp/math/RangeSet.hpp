@@ -165,15 +165,17 @@ namespace emp {
 
       if (!Has(val)) return false;
       const size_t id = _FindRange(val);
+      emp_assert(id < range_set.size(), id, range_set.size());
       range_t & cur_range = range_set[id];
       if (cur_range.GetSize() == 1) range_set.erase(range_set.begin()+id);
-      else if (cur_range.GetLower() == val) cur_range.SetStart(cur_range.GetLower()+1);
-      else if (cur_range.GetUpper()-1 == val) cur_range.SetEnd(cur_range.GetUpper()-1);
+      else if (cur_range.GetLower() == val) cur_range.Lower()++;
+      else if (cur_range.GetUpper()-1 == val) cur_range.Upper()--;
       else {
         // Need to split the range.
         range_set.insert(range_set.begin()+id+1, range_t{val+1,cur_range.GetUpper()});
-        cur_range.SetEnd(val);
+        range_set[id].SetUpper(val);
       }
+      return true;
     }
   };
 
