@@ -8,8 +8,8 @@
  *  @note Status: BETA
  */
 
-#ifndef EMP_MATH_RANGE_HPP_INCLUDE
-#define EMP_MATH_RANGE_HPP_INCLUDE
+#ifndef EMP_MATH_RANGE_SET_HPP_INCLUDE
+#define EMP_MATH_RANGE_SET_HPP_INCLUDE
 
 #include <algorithm>
 
@@ -23,8 +23,10 @@ namespace emp {
   /// and kept sorted and non-adjacent (i.e., there is a gap between successive ranges).
   template <typename T>
   class RangeSet {
+  public:
     using range_t = emp::Range<T, false>;
 
+  private:
     emp::vector<range_t> range_set;
 
     // Helper function to find the id of an Range that a value belongs in or can extend;
@@ -35,12 +37,13 @@ namespace emp {
     //   }
     //   return range_set.size();
     // }
-    size_t _FindRange(T value) {
+    size_t _FindRange(T value) const {
       auto it = std::lower_bound(
         range_set.begin(), 
         range_set.end(), 
         value,
-        [](const range_t & range, T value) { return range.GetUpper() <= value; }
+        [](const range_t & range, T value) { return range.GetUpper() < value; }
+      );
       return it - range_set.begin();
     };
 
@@ -55,11 +58,14 @@ namespace emp {
     static constexpr bool is_integral = std::is_integral<T>();
 
     RangeSet() = default;
+    RangeSet(range_t start_range) { Insert(start_range); }
     RangeSet(const RangeSet &) = default;
     RangeSet(RangeSet &&) = default;
 
     RangeSet & operator=(const RangeSet &) = default;
     RangeSet & operator=(RangeSet &&) = default;
+
+    bool operator<=>(const RangeSet &) const = default;
 
     bool Has(T val) const {
       const size_t id = _FindRange(val);
@@ -68,12 +74,12 @@ namespace emp {
 
     /// @return Overall start of all ranges (or max value if no ranges exist.)
     T GetStart() const {
-      return range_set.size() ? range_set[0].GetStart() : std::numeric_limits<T>::max();
+      return range_set.size() ? range_set[0].GetLower() : std::numeric_limits<T>::max();
     }
 
     /// @return Overall end of all ranges (or min value if no ranges exist.)
     T GetEnd() const {
-      return range_set.size() ? range_set.back().GetEnd() : std::numeric_limits<T>::lowest();
+      return range_set.size() ? range_set.back().GetUpper() : std::numeric_limits<T>::lowest();
     }
     
     size_t GetNumRanges() const { return range_set.size(); }
@@ -101,6 +107,7 @@ namespace emp {
       }
 
       const size_t id = _FindRange(val);
+      emp_assert(id < range_set.size(), id, range_set.size());
       range_t & cur_range = range_set[id];
 
       // Do we already have the value?
@@ -114,10 +121,10 @@ namespace emp {
       }
 
       // Are we extending the beginning of the next range?
-      else if (cur_range.GetStart() == val+1) cur_range.Insert(val);
+      else if (cur_range.GetLower() == val+1) cur_range.Lower()--;
 
       // Otherwise we must insert an entirely new range.
-      else range_set.emplace(id, val);
+      else range_set.emplace(range_set.begin()+id, val);
 
       return true;
     }
@@ -127,12 +134,12 @@ namespace emp {
     /// @return Was there a change due to this insertion?
     bool Insert(range_t in) {
       // Are we adding a whole new range to the end?
-      if (range_set.size() == 0 || in.GetStart() > GetEnd()) {
+      if (range_set.size() == 0 || in.GetLower() > GetEnd()) {
         range_set.emplace_back(in);
         return true;
       }
 
-      const size_t start_id = _FindRange(in.GetStart());
+      const size_t start_id = _FindRange(in.GetLower());
       range_t & start_range = range_set[start_id];
 
       if (start_range.HasRange(in)) return false; // Already has range!
@@ -157,14 +164,14 @@ namespace emp {
       emp_assert(is_integral, "Only integral ranges can call Remove() with a single value.");
 
       if (!Has(val)) return false;
-      size_t id = _FindRange(val);
+      const size_t id = _FindRange(val);
       range_t & cur_range = range_set[id];
       if (cur_range.GetSize() == 1) range_set.erase(range_set.begin()+id);
-      else if (cur_range.GetStart() == val) cur_range.SetStart(cur_range.GetStart()+1);
-      else if (cur_range.GetEnd()-1 == val) cur_range.SetEnd(cur_range.GetEnd()-1);
+      else if (cur_range.GetLower() == val) cur_range.SetStart(cur_range.GetLower()+1);
+      else if (cur_range.GetUpper()-1 == val) cur_range.SetEnd(cur_range.GetUpper()-1);
       else {
         // Need to split the range.
-        range_set.insert(range_set.begin()+id+1, range_t{val+1,cur_range.GetEnd()});
+        range_set.insert(range_set.begin()+id+1, range_t{val+1,cur_range.GetUpper()});
         cur_range.SetEnd(val);
       }
     }
