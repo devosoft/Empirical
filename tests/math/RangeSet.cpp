@@ -96,4 +96,12 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs1.GetNumRanges() == 1);
   CHECK(rs1.GetSize() == 6);
 
+  rs2.Insert(-1);
+  rs2.Insert(1000);
+  CHECK(rs1 != rs2);
+  CHECK(rs1.GetNumRanges() == 1);
+  CHECK(rs2.GetNumRanges() == 3);
+  CHECK(rs1.GetSize() == 6);
+  CHECK(rs2.GetSize() == 8);
+
 }
