@@ -14,6 +14,7 @@
 #include <algorithm>
 
 #include "../base/vector.hpp"
+#include "../datastructs/vector_utils.hpp"
 
 #include "Range.hpp"
 
@@ -25,6 +26,7 @@ namespace emp {
   class RangeSet {
   public:
     using range_t = emp::Range<T, false>;
+    using this_t = RangeSet<T>;
 
   private:
     emp::vector<range_t> range_set;
@@ -50,7 +52,7 @@ namespace emp {
     // Helper function to increase the side of a range, possibly merging it with the next range.
     void _CleanupMerge(size_t id) {
       while (id+1 < range_set.size() && range_set[id].Merge(range_set[id+1])) {
-        range_set.erase(range_set.begin()+id+1); // Delete current range (merged in to previous)
+        emp::RemoveAt(range_set, id+1);  // Delete current range (merged in to previous)
       }
     }
 
@@ -71,16 +73,15 @@ namespace emp {
       const size_t id = _FindRange(val);
       return (id < range_set.size()) ? range_set[id].Has(val) : false;
     }
+    bool IsEmpty() const { return !range_set.size(); }
+    static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
+    static constexpr T MinLimit() { return std::numeric_limits<T>::lowest(); }
 
     /// @return Overall start of all ranges (or max value if no ranges exist.)
-    T GetStart() const {
-      return range_set.size() ? range_set[0].GetLower() : std::numeric_limits<T>::max();
-    }
+    T GetStart() const { return IsEmpty() ? MaxLimit() : range_set[0].Lower(); }
 
     /// @return Overall end of all ranges (or min value if no ranges exist.)
-    T GetEnd() const {
-      return range_set.size() ? range_set.back().GetUpper() : std::numeric_limits<T>::lowest();
-    }
+    T GetEnd() const { return IsEmpty() ? MinLimit() : range_set.back().Upper(); }
     
     size_t GetNumRanges() const { return range_set.size(); }
 
@@ -110,21 +111,10 @@ namespace emp {
       emp_assert(id < range_set.size(), id, range_set.size());
       range_t & cur_range = range_set[id];
 
-      // Do we already have the value?
-      if (cur_range.Has(val)) return false;
-
-      // Are we extending a range (and possibly merging)?
-      else if (cur_range.Append(val)) {
-        if (id+1 < range_set.size() && cur_range.Merge(range_set[id+1])) {
-          range_set.erase(range_set.begin()+id+1); // Delete next range (merged in to current)
-        }
-      }
-
-      // Are we extending the beginning of the next range?
-      else if (cur_range.GetLower() == val+1) cur_range.Lower()--;
-
-      // Otherwise we must insert an entirely new range.
-      else range_set.emplace(range_set.begin()+id, val);
+      if (cur_range.Has(val)) return false;                        // Don't have the value!
+      else if (cur_range.Append(val)) _CleanupMerge(id);           // Extending 'upper' on range
+      else if (cur_range.GetLower() == val+1) cur_range.Lower()--; // Extending 'lower' on range
+      else range_set.emplace(range_set.begin()+id, val);           // Inserting NEW range.
 
       return true;
     }
@@ -133,26 +123,22 @@ namespace emp {
     /// @param in New range to include.
     /// @return Was there a change due to this insertion?
     bool Insert(range_t in) {
-      // Are we adding a whole new range to the end?
-      if (range_set.size() == 0 || in.GetLower() > GetEnd()) {
-        range_set.emplace_back(in);
-        return true;
-      }
-
       const size_t start_id = _FindRange(in.GetLower());
-      range_t & start_range = range_set[start_id];
 
-      if (start_range.HasRange(in)) return false; // Already has range!
+      // Are we adding a whole new range to the end?
+      if (start_id == range_set.size()) range_set.push_back(in);
 
-      // Do we have a new range to insert here?
-      if (!start_range.IsConnected(in)) {
-        range_set.insert(range_set.begin() + start_id, in);
-        return true;        
+      // Is it already included in the found range?
+      else if (range_set[start_id].HasRange(in)) return false;
+
+      // Should we merge in with an existing range?
+      else if (range_set[start_id].IsConnected(in)) {
+        range_set[start_id].Merge(in);
+        _CleanupMerge(start_id);
       }
 
-      // Otherwise merge with the existing range and cleanup if needed.
-      start_range.Merge(in);
-      _CleanupMerge(start_id);
+      // Otherwise insert as a new range.
+      else emp::InsertAt(range_set, start_id, in);  
 
       return true;
     }
@@ -163,16 +149,15 @@ namespace emp {
     bool Remove(T val) {
       emp_assert(is_integral, "Only integral ranges can call Remove() with a single value.");
 
-      if (!Has(val)) return false;
+      if (!Has(val)) return false;  // Not included!
+
       const size_t id = _FindRange(val);
-      emp_assert(id < range_set.size(), id, range_set.size());
       range_t & cur_range = range_set[id];
-      if (cur_range.GetSize() == 1) range_set.erase(range_set.begin()+id);
-      else if (cur_range.GetLower() == val) cur_range.Lower()++;
-      else if (cur_range.GetUpper()-1 == val) cur_range.Upper()--;
-      else {
-        // Need to split the range.
-        range_set.insert(range_set.begin()+id+1, range_t{val+1,cur_range.GetUpper()});
+      if (cur_range.GetSize() == 1) emp::RemoveAt(range_set, id);            // Remove whole range
+      else if (cur_range.GetLower() == val) cur_range.Lower()++;             // Inc lower end
+      else if (cur_range.GetUpper()-1 == val) cur_range.Upper()--;           // Dec upper end
+      else {                                                                 // Split a range!
+        emp::InsertAt(range_set, id+1, range_t{val+1,cur_range.GetUpper()});
         range_set[id].SetUpper(val);
       }
       return true;
