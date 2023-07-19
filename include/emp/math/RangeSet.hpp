@@ -49,10 +49,14 @@ namespace emp {
       return it - range_set.begin();
     };
 
+    void _InsertRange(size_t id, range_t range) { emp::InsertAt(range_set, id, range); }
+    void _RemoveRange(size_t id) { emp::RemoveAt(range_set, id); }
+    void _RemoveRanges(size_t id, size_t count) {  emp::RemoveAt(range_set, id, count); }
+
     // Helper function to increase the side of a range, possibly merging it with the next range.
     void _CleanupMerge(size_t id) {
       while (id+1 < range_set.size() && range_set[id].Merge(range_set[id+1])) {
-        emp::RemoveAt(range_set, id+1);  // Delete current range (merged in to previous)
+        _RemoveRange(id+1);  // Delete current range (merged in to previous)
       }
     }
 
@@ -72,6 +76,10 @@ namespace emp {
     bool Has(T val) const {
       const size_t id = _FindRange(val);
       return (id < range_set.size()) ? range_set[id].Has(val) : false;
+    }
+    bool HasRange(range_t range) const {
+      const size_t id = _FindRange(range.Lower());
+      return (id < range_set.size()) ? range_set[id].HasRange(range) : false;
     }
     bool IsEmpty() const { return !range_set.size(); }
     static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
@@ -138,12 +146,12 @@ namespace emp {
       }
 
       // Otherwise insert as a new range.
-      else emp::InsertAt(range_set, start_id, in);  
+      else _InsertRange(start_id, in);  
 
       return true;
     }
 
-    /// @brief  Remove a single value from this index range.
+    /// @brief  Remove a single value from this RangeSet.
     /// @param val Value to remove
     /// @return Did the range change due to this removal?
     bool Remove(T val) {
@@ -153,13 +161,72 @@ namespace emp {
 
       const size_t id = _FindRange(val);
       range_t & cur_range = range_set[id];
-      if (cur_range.GetSize() == 1) emp::RemoveAt(range_set, id);            // Remove whole range
+      if (cur_range.GetSize() == 1) _RemoveRange(id);            // Remove whole range
       else if (cur_range.GetLower() == val) cur_range.Lower()++;             // Inc lower end
       else if (cur_range.GetUpper()-1 == val) cur_range.Upper()--;           // Dec upper end
       else {                                                                 // Split a range!
-        emp::InsertAt(range_set, id+1, range_t{val+1,cur_range.GetUpper()});
+        _InsertRange(id+1, range_t{val+1,cur_range.GetUpper()});
         range_set[id].SetUpper(val);
       }
+      return true;
+    }
+
+    /// @brief  Remove all ranges (or partial range) less than a target value.
+    /// @param val New floor for ranges.
+    /// @return Did the range change due to this removal?
+    bool RemoveTo(T val) {
+      if (val <= GetStart()) return false;  // Nothing to remove.
+      size_t id = _FindRange(val);
+      if (val == range_set[id].GetUpper()) ++id;
+      _RemoveRanges(0, id);  // Remove everything before the new start.
+      if (range_set.size() && range_set[0].Lower() < val) range_set[0].SetLower(val);
+      return true;
+    }
+
+    /// @brief  Remove all ranges (or partial range) greater than a target value.
+    /// @param val New cap for ranges.
+    /// @return Did the range change due to this removal?
+    bool RemoveFrom(T val) {
+      if (val >= GetEnd()) return false;        // Nothing to remove.
+      size_t id = _FindRange(val);
+      if (val > range_set[id].GetLower()) ++id; // Include current range if needed.
+      range_set.resize(id);                     // Remove everything past new end.
+      if (GetEnd() > val) range_set.back.SetUpper(val);
+      return true;
+    }
+
+    /// @brief  Remove a whole Range from this RangeSet.
+    /// @param rm_range Range to remove
+    /// @return Did the this RangeSet change due to this removal?
+    bool Remove(range_t rm_range) {
+      if (rm_range.Lower() <= GetStart()) return RemoveTo(rm_range.Upper());
+      if (rm_range.Upper() >= GetEnd()) return RemoveFrom(rm_range.Lower());
+
+      // Must be removing from the middle.
+      size_t start_id = _FindRange(rm_range.Lower());
+      range_t & start_range = range_set[start_id];
+
+      // Inside of a single Range?
+      if (start_range.Lower() < rm_range.Lower() && start_range.Upper() > rm_range.Upper()) {
+        _InsertRange(start_id+1, range_t{rm_range.Upper(), start_range.Lower()});
+        range_set[start_id].SetUpper(rm_range.Lower());
+        return true;
+      }
+      
+      // Deal with beginning of removal.
+      if (rm_range.Lower() >= start_range.Lower()) {
+        start_range.Upper() = rm_range.Lower();
+        ++start_id;
+      }
+
+      // Deal with end of removal.
+      size_t end_id = _FindRange(rm_range.Upper());
+      if (rm_range.Upper() >= range_set[end_id].Upper()) end_id++;
+      else range_set[end_id].Lower() = std::max(range_set[end_id].Lower(), rm_range.Upper());
+
+      // Remove middle.
+      _RemoveRanges(start_id, end_id - start_id);
+
       return true;
     }
   };
