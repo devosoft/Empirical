@@ -27,13 +27,19 @@
 
 namespace emp {
 
-  // Remove and return the first element of a vector.
+  /// Remove and return the first element of a vector.
   template <typename T>
   T PopFront(emp::vector<T> & v) {
     emp_assert(v.size());
     T out = v[0];
     v.erase(v.begin());
     return out;
+  }
+
+  /// Insert a value at a specified position in a vector.
+  template <typename T>
+  void InsertAt(emp::vector<T> & v, size_t id, T value) {
+    v.insert(v.begin()+id, value);
   }
 
   /// Base case for Append; we just have a single vector with nothing to append.
@@ -140,6 +146,29 @@ namespace emp {
     if (pos == -1) return false;
     v.erase(v.begin() + pos);
     return true;
+  }
+
+  /// Remove value at an index.
+  template <typename T>
+  void RemoveAt(emp::vector<T> & v, size_t id) {
+    v.erase(v.begin() + id);
+  }
+
+  /// Remove values starting at an index.
+  template <typename T>
+  void RemoveAt(emp::vector<T> & v, size_t id, size_t count) {
+    if (!count) return;
+    v.erase(v.begin() + id, v.begin() + id + count);
+  }
+
+  /// Return a new vector containing the same elements as @param v
+  /// with any duplicate elements removed.
+  /// Not guaranteed to preserve order
+  template <typename T>
+  emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {
+    std::set<T> temp_set(v.begin(), v.end());
+    emp::vector<T> new_vec(temp_set.begin(), temp_set.end());
+    return new_vec;
   }
 
   /// Return whether a value exists in a vector
@@ -311,16 +340,6 @@ namespace emp {
       emp::vector<T> numbers(N2-N1);
       std::iota(numbers.begin(), numbers.end(), N1);
       return numbers;
-  }
-
-  /// Return a new vector containing the same elements as @param v
-  /// with any duplicate elements removed.
-  /// Not guaranteed to preserve order
-  template <typename T>
-  emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {
-    std::set<T> temp_set(v.begin(), v.end());
-    emp::vector<T> new_vec(temp_set.begin(), temp_set.end());
-    return new_vec;
   }
 
   /// Build a vector with a range of values from min to max at the provided step size.
