@@ -100,8 +100,20 @@ namespace emp {
       return total;
     }
 
-    // Return all of the internal ranges.
-    const emp::vector<range_t> & GetRanges() & { return range_set; }
+    // Return all of the internal ranges (can only be called on l-values)
+    const emp::vector<range_t> & GetRanges() const & { return range_set; }
+
+    // Calculate the size of the overlap with a provided range.
+    T CalcOverlap(range_t range) const {
+      size_t low_id = _FindRange(range.GetLower());
+      size_t up_id = _FindRange(range.GetUpper());
+      T result = range_set[low_id].CalcOverlap(range);
+      if (low_id < up_id) {
+        for (size_t id=low_id+1; id < up_id; id++) result += range_set[id].GetSize();
+        result += range_set[up_id].CalcOverlap(range);
+      }
+      return result;
+    }
 
     /// @brief Insert a value into this range set
     /// @param val Value to insert.
@@ -151,6 +163,12 @@ namespace emp {
       return true;
     }
 
+    /// @brief Insert a range into this set, specifying the start and end points.
+    /// @param start Beginning of new range to include.
+    /// @param stop Ending of new range to include (range is not inclusive of stop)
+    /// @return Was there a change due to this insertion?
+    bool InsertRange(T start, T stop) { return Insert(range_t{start, stop}); }
+
     /// @brief  Remove a single value from this RangeSet.
     /// @param val Value to remove
     /// @return Did the range change due to this removal?
@@ -191,7 +209,7 @@ namespace emp {
       size_t id = _FindRange(val);
       if (val > range_set[id].GetLower()) ++id; // Include current range if needed.
       range_set.resize(id);                     // Remove everything past new end.
-      if (GetEnd() > val) range_set.back.SetUpper(val);
+      if (GetEnd() > val) range_set.back().SetUpper(val);
       return true;
     }
 
@@ -201,6 +219,7 @@ namespace emp {
     bool Remove(range_t rm_range) {
       if (rm_range.Lower() <= GetStart()) return RemoveTo(rm_range.Upper());
       if (rm_range.Upper() >= GetEnd()) return RemoveFrom(rm_range.Lower());
+      if (CalcOverlap(rm_range) == 0.0) return false;
 
       // Must be removing from the middle.
       size_t start_id = _FindRange(rm_range.Lower());
@@ -208,7 +227,7 @@ namespace emp {
 
       // Inside of a single Range?
       if (start_range.Lower() < rm_range.Lower() && start_range.Upper() > rm_range.Upper()) {
-        _InsertRange(start_id+1, range_t{rm_range.Upper(), start_range.Lower()});
+        _InsertRange(start_id+1, range_t{rm_range.Upper(), start_range.Upper()});
         range_set[start_id].SetUpper(rm_range.Lower());
         return true;
       }
