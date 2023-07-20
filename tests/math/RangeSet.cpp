@@ -103,5 +103,18 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs2.GetNumRanges() == 3);
   CHECK(rs1.GetSize() == 6);
   CHECK(rs2.GetSize() == 8);
+}
 
+TEST_CASE("Test continuous RangeSets", "[math]")
+{
+  emp::RangeSet<double> rs1;
+  emp::RangeSet<double>::range_t range(0.4, 0.9);
+
+  rs1.InsertRange(0.0, 100.0);
+  CHECK(rs1.GetSize() == Approx(100.0));
+
+  CHECK(rs1.Remove(range) == true);
+  CHECK(rs1.GetSize() == Approx(99.5));
+  CHECK(rs1.Remove(range) == false);
+  CHECK(rs1.GetSize() == Approx(99.5));
 }
