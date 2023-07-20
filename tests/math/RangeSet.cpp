@@ -117,4 +117,49 @@ TEST_CASE("Test continuous RangeSets", "[math]")
   CHECK(rs1.GetSize() == Approx(99.5));
   CHECK(rs1.Remove(range) == false);
   CHECK(rs1.GetSize() == Approx(99.5));
+
+  for (size_t i = 0; i < 100; ++i) {
+    range.Shift(1.0);
+    rs1.Remove(range);  // Only the first 99 should matter -- then we're out of range.)
+  }
+  // From 0.0 to 100.0 we should have gaps from every *.4 to *.9
+
+  CHECK(rs1.GetSize() == Approx(50.0));
+  CHECK(rs1.GetNumRanges() == 101);
+
+  // Remove exact range.
+  CHECK(rs1.RemoveRange(1.9, 2.4) == true);
+  CHECK(rs1.GetSize() == Approx(49.5));
+  CHECK(rs1.GetNumRanges() == 100);
+
+  // Remove range + gap before
+  CHECK(rs1.RemoveRange(3.4, 4.4) == true);
+  CHECK(rs1.GetSize() == Approx(49.0));
+  CHECK(rs1.GetNumRanges() == 99);
+
+  // Remove range + gap after
+  CHECK(rs1.RemoveRange(5.9, 6.9) == true);
+  CHECK(rs1.GetSize() == Approx(48.5));
+  CHECK(rs1.GetNumRanges() == 98);
+
+  // Remove range + both gaps
+  CHECK(rs1.RemoveRange(7.4, 8.9) == true);
+  CHECK(rs1.GetSize() == Approx(48.0));
+  CHECK(rs1.GetNumRanges() == 97);
+
+  // Remove range + to middle of both gaps
+  CHECK(rs1.RemoveRange(10.6, 11.7) == true);
+  CHECK(rs1.GetSize() == Approx(47.5));
+  CHECK(rs1.GetNumRanges() == 96);
+
+  // Remove middle of one range through middle of next.
+  // Remove middle of one range through end of next.
+  // Remove beginning of one range through middle of next.
+  // Remove beginning of one range through end of next.
+
+  // Remove middle section of one range only
+  
+  // Remove middle of one range through middle of two later.
+  // Remove middle of one range through middle of three later.
+
 }
