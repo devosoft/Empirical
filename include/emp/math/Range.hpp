@@ -16,6 +16,7 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
+#include "../tools/String.hpp"
 
 namespace emp {
 
@@ -37,6 +38,10 @@ namespace emp {
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l <= _u, _l, _u); }
     Range(const Range &) = default;
 
+    Range & operator=(const Range&) = default;
+    bool operator==(const Range& _in) const = default;
+    bool operator!=(const Range& _in) const = default;
+
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
     T GetEpsilon() const {
@@ -49,9 +54,13 @@ namespace emp {
     }
     T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
 
-    Range & operator=(const Range&) = default;
-    bool operator==(const Range& _in) const = default;
-    bool operator!=(const Range& _in) const = default;
+    emp::String ToString() const {
+      if constexpr (INCLUDE_UPPER) {
+        return emp::MakeString('[', lower, '-', upper, ']');
+      } else {
+        return emp::MakeString('[', lower, '-', upper, ')');
+      }
+    }
 
     void SetLower(T l) { lower = l; }
     void SetUpper(T u) { upper = u; }
@@ -88,6 +97,13 @@ namespace emp {
     bool IsConnected(this_t in) const {
       return (in.lower >= lower && in.lower <= upper) ||
              (lower >= in.lower && lower <= in.upper);
+    }
+
+    /// Determine if there is overlap between two range.
+    /// Similar to IsConnected, but cannot be merely adjacent.
+    bool HasOverlap(this_t in) const {
+      return (in.lower >= lower && in.lower < upper) ||
+             (lower >= in.lower && lower < in.upper);
     }
 
     /// Determine the amount of overlap between two range.
