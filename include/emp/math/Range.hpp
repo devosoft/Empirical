@@ -56,6 +56,7 @@ namespace emp {
     void SetLower(T l) { lower = l; }
     void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
+    void Shift(T shift) { lower += shift; upper += shift; }
 
     void SetMinLower() { lower = std::numeric_limits<T>::min(); }
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
@@ -87,6 +88,13 @@ namespace emp {
     bool IsConnected(this_t in) const {
       return (in.lower >= lower && in.lower <= upper) ||
              (lower >= in.lower && lower <= in.upper);
+    }
+
+    /// Determine the amount of overlap between two range.
+    T CalcOverlap(this_t in) const {
+      const T combo_upper = std::min(upper, in.upper);
+      const T combo_lower = std::max(lower, in.lower);
+      return (combo_upper > combo_lower) ? (combo_upper - combo_lower) : T{};
     }
 
     /// @brief  Expand this range to encompass a provided value.
