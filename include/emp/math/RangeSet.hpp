@@ -100,8 +100,26 @@ namespace emp {
       return total;
     }
 
+    /// Present this set of ranges as a string.
+    emp::String ToString() const {
+      emp::String out;
+      for (size_t i = 0; i < range_set.size(); ++i) {
+        if (i) out += ',';
+        out += range_set[i].ToString();
+      }
+      return out;
+    }
+
     // Return all of the internal ranges (can only be called on l-values)
     const emp::vector<range_t> & GetRanges() const & { return range_set; }
+
+    // Calculate the size of the overlap with a provided range.
+    bool HasOverlap(range_t range) const {
+      size_t low_id = _FindRange(range.GetLower());
+      if (low_id >= range_set.size()) return false;          // Entirely after ranges.
+      if (range_set[low_id].HasOverlap(range)) return true;  // Overlaps at beginning.
+      return low_id+1 < range_set.size() && range_set[low_id+1].HasOverlap(range);
+    }
 
     // Calculate the size of the overlap with a provided range.
     T CalcOverlap(range_t range) const {
@@ -217,23 +235,23 @@ namespace emp {
     /// @param rm_range Range to remove
     /// @return Did the this RangeSet change due to this removal?
     bool Remove(range_t rm_range) {
+      if (!HasOverlap(rm_range)) return false;
       if (rm_range.Lower() <= GetStart()) return RemoveTo(rm_range.Upper());
       if (rm_range.Upper() >= GetEnd()) return RemoveFrom(rm_range.Lower());
-      if (CalcOverlap(rm_range) == 0.0) return false;
 
       // Must be removing from the middle.
       size_t start_id = _FindRange(rm_range.Lower());
       range_t & start_range = range_set[start_id];
 
-      // Inside of a single Range?
+      // Fully internal to a single Range?  Split it!
       if (start_range.Lower() < rm_range.Lower() && start_range.Upper() > rm_range.Upper()) {
         _InsertRange(start_id+1, range_t{rm_range.Upper(), start_range.Upper()});
         range_set[start_id].SetUpper(rm_range.Lower());
         return true;
       }
       
-      // Deal with beginning of removal.
-      if (rm_range.Lower() >= start_range.Lower()) {
+      // Deal with beginning of removal - cut it down if needed, and move on to next range.
+      if (rm_range.Lower() > start_range.Lower()) {
         start_range.Upper() = rm_range.Lower();
         ++start_id;
       }
@@ -248,6 +266,8 @@ namespace emp {
 
       return true;
     }
+
+    bool RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
   };
 
 }
