@@ -152,14 +152,48 @@ TEST_CASE("Test continuous RangeSets", "[math]")
   CHECK(rs1.GetSize() == Approx(47.5));
   CHECK(rs1.GetNumRanges() == 96);
 
+  // Try a bunch of failed removals.
+  CHECK(rs1.RemoveRange(13.4, 13.9) == false);  // Remove full gap.
+  CHECK(rs1.RemoveRange(13.7, 13.9) == false);  // Remove middle to end of gap.
+  CHECK(rs1.RemoveRange(13.4, 13.6) == false);  // Remove beginning to middle of gap.
+  CHECK(rs1.RemoveRange(13.5, 13.8) == false);  // Remove chunk in middle of gap.
+
+  CHECK(rs1.GetSize() == Approx(47.5));
+  CHECK(rs1.GetNumRanges() == 96);
+
   // Remove middle of one range through middle of next.
+  CHECK(rs1.RemoveRange(14.15,15.15) == true);
+  CHECK(rs1.GetSize() == Approx(47.0));
+  CHECK(rs1.GetNumRanges() == 96);
+
   // Remove middle of one range through end of next.
+  CHECK(rs1.RemoveRange(16.15,17.4) == true);
+  CHECK(rs1.GetSize() == Approx(46.25));
+  CHECK(rs1.GetNumRanges() == 95);
+
   // Remove beginning of one range through middle of next.
+  CHECK(rs1.RemoveRange(18.9,20.15) == true);
+  CHECK(rs1.GetSize() == Approx(45.5));
+  CHECK(rs1.GetNumRanges() == 94);
+
   // Remove beginning of one range through end of next.
+  CHECK(rs1.RemoveRange(21.9,23.4) == true);
+  CHECK(rs1.GetSize() == Approx(44.5));
+  CHECK(rs1.GetNumRanges() == 92);
 
   // Remove middle section of one range only
+  CHECK(rs1.RemoveRange(26.0,26.25) == true);
+  CHECK(rs1.GetSize() == Approx(44.25));
+  CHECK(rs1.GetNumRanges() == 93);
   
   // Remove middle of one range through middle of two later.
-  // Remove middle of one range through middle of three later.
+  CHECK(rs1.RemoveRange(29.0,31.0) == true);
+  CHECK(rs1.GetSize() == Approx(43.25));
+  CHECK(rs1.GetNumRanges() == 92);
+
+  // Remove middle of one range through middle of four later.
+  CHECK(rs1.RemoveRange(34.0,38.0) == true);
+  CHECK(rs1.GetSize() == Approx(41.25));
+  CHECK(rs1.GetNumRanges() == 89);
 
 }
