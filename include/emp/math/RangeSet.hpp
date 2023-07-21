@@ -65,6 +65,7 @@ namespace emp {
 
     RangeSet() = default;
     RangeSet(range_t start_range) { Insert(start_range); }
+    RangeSet(T start, T end) { InsertRange(start, end); }
     RangeSet(const RangeSet &) = default;
     RangeSet(RangeSet &&) = default;
 
@@ -268,6 +269,26 @@ namespace emp {
     }
 
     bool RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
+
+
+    // Some more advanced functions.
+
+    /// @brief  Calculate the inverted range set, swapping included and excluded values.
+    /// @return The inverted RangeSet.
+    this_t CalcInverse() const {
+      const bool add_begin = (GetStart() != MinLimit());
+      const bool add_end = (GetEnd() != MaxLimit());
+      this_t out_ranges;
+      out_ranges.range_set.reserve(range_set.size() + add_begin + add_end - 1);
+      if (add_begin) out_ranges.range_set.emplace_back(MinLimit(),GetStart());
+      for (size_t i = 1; i < range_set.size(); ++i) {
+        out_ranges.range_set.emplace_back(range_set[i-1].Upper(), range_set[i].Lower());
+      }
+      if (add_end) out_ranges.range_set.emplace_back(GetEnd(), MaxLimit());
+      return out_ranges;
+    }
+
+    void Invert() { *this = CalcInverse(); }
   };
 
 }
