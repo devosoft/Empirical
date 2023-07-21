@@ -72,37 +72,37 @@ namespace emp {
     RangeSet & operator=(const RangeSet &) = default;
     RangeSet & operator=(RangeSet &&) = default;
 
-    bool operator<=>(const RangeSet &) const = default;
+    [[nodiscard]] bool operator<=>(const RangeSet &) const = default;
 
-    bool Has(T val) const {
+    [[nodiscard]] bool Has(T val) const {
       const size_t id = _FindRange(val);
       return (id < range_set.size()) ? range_set[id].Has(val) : false;
     }
-    bool HasRange(range_t range) const {
+    [[nodiscard]] bool HasRange(range_t range) const {
       const size_t id = _FindRange(range.Lower());
       return (id < range_set.size()) ? range_set[id].HasRange(range) : false;
     }
-    bool IsEmpty() const { return !range_set.size(); }
-    static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
-    static constexpr T MinLimit() { return std::numeric_limits<T>::lowest(); }
+    [[nodiscard]] bool IsEmpty() const { return !range_set.size(); }
+    [[nodiscard]] static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
+    [[nodiscard]] static constexpr T MinLimit() { return std::numeric_limits<T>::lowest(); }
 
     /// @return Overall start of all ranges (or max value if no ranges exist.)
-    T GetStart() const { return IsEmpty() ? MaxLimit() : range_set[0].Lower(); }
+    [[nodiscard]] T GetStart() const { return IsEmpty() ? MaxLimit() : range_set[0].Lower(); }
 
     /// @return Overall end of all ranges (or min value if no ranges exist.)
-    T GetEnd() const { return IsEmpty() ? MinLimit() : range_set.back().Upper(); }
+    [[nodiscard]] T GetEnd() const { return IsEmpty() ? MinLimit() : range_set.back().Upper(); }
     
-    size_t GetNumRanges() const { return range_set.size(); }
+    [[nodiscard]] size_t GetNumRanges() const { return range_set.size(); }
 
     /// @brief Calculate the total combined size of all ranges.
-    T GetSize() const {
+    [[nodiscard]] T GetSize() const {
       T total = 0;
       for (const auto & x : range_set) total += x.GetSize();
       return total;
     }
 
     /// Present this set of ranges as a string.
-    emp::String ToString() const {
+    [[nodiscard]] emp::String ToString() const {
       emp::String out;
       for (size_t i = 0; i < range_set.size(); ++i) {
         if (i) out += ',';
@@ -112,10 +112,10 @@ namespace emp {
     }
 
     // Return all of the internal ranges (can only be called on l-values)
-    const emp::vector<range_t> & GetRanges() const & { return range_set; }
+    [[nodiscard]] const emp::vector<range_t> & GetRanges() const & { return range_set; }
 
     // Calculate the size of the overlap with a provided range.
-    bool HasOverlap(range_t range) const {
+    [[nodiscard]] bool HasOverlap(range_t range) const {
       size_t low_id = _FindRange(range.GetLower());
       if (low_id >= range_set.size()) return false;          // Entirely after ranges.
       if (range_set[low_id].HasOverlap(range)) return true;  // Overlaps at beginning.
@@ -123,7 +123,7 @@ namespace emp {
     }
 
     // Calculate the size of the overlap with a provided range.
-    T CalcOverlap(range_t range) const {
+    [[nodiscard]] T CalcOverlap(range_t range) const {
       size_t low_id = _FindRange(range.GetLower());
       size_t up_id = _FindRange(range.GetUpper());
       T result = range_set[low_id].CalcOverlap(range);
@@ -132,6 +132,18 @@ namespace emp {
         result += range_set[up_id].CalcOverlap(range);
       }
       return result;
+    }
+
+    /// @brief Shift all ranges by a fixed amount.
+    /// @param shift 
+    void Shift(T shift) {
+      for (auto & range : range_set) range.Shift(shift);
+    }
+
+    [[nodiscard]] this_t CalcShift(T shift) {
+      this_t out(*this);
+      out.Shift(shift);
+      return out;
     }
 
     /// @brief Insert a value into this range set
@@ -180,6 +192,18 @@ namespace emp {
       else _InsertRange(start_id, in);  
 
       return true;
+    }
+
+    /// @brief Merge an entire range set into this one.
+    /// @param in_set Range set to add in.
+    /// @return Did this RangeSet change?
+    /// @note Can be optimized to handle big sets more efficiently!
+    bool Insert(const this_t & in_set) {
+      bool result = false;
+      for (const range_t & range : in_set.GetRanges()) {
+        result |= Insert(range);
+      }
+      return result;
     }
 
     /// @brief Insert a range into this set, specifying the start and end points.
@@ -268,6 +292,19 @@ namespace emp {
       return true;
     }
 
+    /// @brief Remove all ranges in an entire range set from this one.
+    /// @param in_set Range set to remove.
+    /// @return Did this RangeSet change?
+    /// @note Can be optimized to handle big sets more efficiently!
+    bool Remove(const this_t & in_set) {
+      bool result = false;
+      for (const range_t & range : in_set.GetRanges()) {
+        result |= Remove(range);
+      }
+      return result;
+    }
+
+
     bool RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
 
 
@@ -275,7 +312,7 @@ namespace emp {
 
     /// @brief  Calculate the inverted range set, swapping included and excluded values.
     /// @return The inverted RangeSet.
-    this_t CalcInverse() const {
+    [[nodiscard]] this_t CalcInverse() const {
       const bool add_begin = (GetStart() != MinLimit());
       const bool add_end = (GetEnd() != MaxLimit());
       this_t out_ranges;
@@ -288,7 +325,40 @@ namespace emp {
       return out_ranges;
     }
 
-    void Invert() { *this = CalcInverse(); }
+    this_t & Invert() { *this = CalcInverse(); return *this; }
+
+    // Simple operators:
+    [[nodiscard]] this_t operator~() const { return CalcInverse(); }
+    [[nodiscard]] this_t operator|(const this_t & in) const {
+      this_t out(*this);
+      out.Insert(in);
+      return out;
+    }
+    [[nodiscard]] this_t operator&(const this_t & in) const {
+      this_t out(*this);
+      out.Remove(~in);
+      return out;
+    }
+    [[nodiscard]] this_t operator^(const this_t & in) {
+      return (*this | in) & ~(this & in);
+    }
+    [[nodiscard]] this_t operator<<(const T shift) const { return CalcShift(shift); }
+    [[nodiscard]] this_t operator>>(const T shift) const { return CalcShift(-shift); }
+    [[nodiscard]] bool operator[](T val) const { return Has(val); }
+
+    this_t & operator|=(const this_t & in) const { Insert(in); return *this; }
+    this_t & operator&=(const this_t & in) const { Remove(~in); return *this; }
+    this_t & operator<<=(const T shift) const { Shift(shift); return *this; }
+    this_t & operator>>=(const T shift) const { Shift(-shift); return *this; }
+
+    explicit operator bool() const { return range_set.size(); }
+
+
+    /// @brief Overload ostream operator to return Print.
+    friend std::ostream& operator<<(std::ostream &out, const this_t & range) {
+      out << range.ToString();
+      return out;
+    }
   };
 
 }
