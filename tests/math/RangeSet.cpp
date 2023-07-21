@@ -197,3 +197,58 @@ TEST_CASE("Test continuous RangeSets", "[math]")
   CHECK(rs1.GetNumRanges() == 89);
 
 }
+
+TEST_CASE("Test RangeSet calculations", "[math]")
+{
+  emp::RangeSet<double> rsd(10.5, 20.5);
+
+  CHECK(rsd.GetNumRanges() == 1);
+  CHECK(rsd.Has(std::numeric_limits<double>::lowest()) == false);
+  CHECK(rsd.Has(0.0) == false);
+  CHECK(rsd.Has(10.0) == false);
+  CHECK(rsd.Has(10.5) == true);
+  CHECK(rsd.Has(15.0) == true);
+  CHECK(rsd.Has(20.0) == true);
+  CHECK(rsd.Has(20.5) == false);
+  CHECK(rsd.Has(100.0) == false);
+  CHECK(rsd.Has(150.0) == false);
+  CHECK(rsd.Has(1000.0) == false);
+
+  rsd.Invert();
+
+  CHECK(rsd.GetNumRanges() == 2);
+  CHECK(rsd.Has(std::numeric_limits<double>::lowest()) == true);
+  CHECK(rsd.Has(0.0) == true);
+  CHECK(rsd.Has(10.0) == true);
+  CHECK(rsd.Has(10.5) == false);
+  CHECK(rsd.Has(15.0) == false);
+  CHECK(rsd.Has(20.0) == false);
+  CHECK(rsd.Has(20.5) == true);
+  CHECK(rsd.Has(100.0) == true);
+  CHECK(rsd.Has(150.0) == true);
+  CHECK(rsd.Has(1000.0) == true);
+
+  rsd.RemoveRange(100.5, 200.5);
+  CHECK(rsd.GetNumRanges() == 3);
+  CHECK(rsd.Has(0.0) == true);
+  CHECK(rsd.Has(10.0) == true);
+  CHECK(rsd.Has(10.5) == false);
+  CHECK(rsd.Has(15.0) == false);
+  CHECK(rsd.Has(20.0) == false);
+  CHECK(rsd.Has(20.5) == true);
+  CHECK(rsd.Has(100.0) == true);
+  CHECK(rsd.Has(150.0) == false);
+  CHECK(rsd.Has(1000.0) == true);
+
+  rsd.Invert();
+  CHECK(rsd.GetNumRanges() == 2);
+  CHECK(rsd.Has(0.0) == false);
+  CHECK(rsd.Has(10.0) == false);
+  CHECK(rsd.Has(10.5) == true);
+  CHECK(rsd.Has(15.0) == true);
+  CHECK(rsd.Has(20.0) == true);
+  CHECK(rsd.Has(20.5) == false);
+  CHECK(rsd.Has(100.0) == false);
+  CHECK(rsd.Has(150.0) == true);
+  CHECK(rsd.Has(1000.0) == false);
+}
