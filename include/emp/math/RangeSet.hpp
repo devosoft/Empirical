@@ -64,13 +64,27 @@ namespace emp {
     static constexpr bool is_integral = std::is_integral<T>();
 
     RangeSet() = default;
-    RangeSet(range_t start_range) { Insert(start_range); }
+    explicit RangeSet( range_t start_range) { Insert(start_range); }
     RangeSet(T start, T end) { InsertRange(start, end); }
     RangeSet(const RangeSet &) = default;
     RangeSet(RangeSet &&) = default;
+    RangeSet(const std::string & bitstring) {
+      emp_assert(is_integral, "RangeSets can be represented as strings only if they are integral.");
+      for (size_t i=0; i < bitstring.size(); ++i) {
+        if (bitstring[i] == '1') Insert((T)i);
+      }
+    }
 
     RangeSet & operator=(const RangeSet &) = default;
     RangeSet & operator=(RangeSet &&) = default;
+    RangeSet & operator=(const std::string & bitstring) {
+      emp_assert(is_integral, "RangeSets can be represented as strings only if they are integral.");
+      Clear();
+      for (size_t i=0; i < bitstring.size(); ++i) {
+        if (bitstring[i] == '1') Insert((T)i);
+      }
+      return *this;
+    }
 
     [[nodiscard]] bool operator<=>(const RangeSet &) const = default;
 
@@ -134,13 +148,19 @@ namespace emp {
       return result;
     }
 
+    /// @brief Remove all ranges in the set.
+    void Clear() { range_set.resize(0); }
+
+    /// @brief Set a single range that includes all value.
+    void SetAll() { InsertRange(MinLimit(), MaxLimit()); }
+
     /// @brief Shift all ranges by a fixed amount.
     /// @param shift 
     void Shift(T shift) {
       for (auto & range : range_set) range.Shift(shift);
     }
 
-    [[nodiscard]] this_t CalcShift(T shift) {
+    [[nodiscard]] this_t CalcShift(T shift) const {
       this_t out(*this);
       out.Shift(shift);
       return out;
@@ -340,16 +360,17 @@ namespace emp {
       return out;
     }
     [[nodiscard]] this_t operator^(const this_t & in) {
-      return (*this | in) & ~(this & in);
+      return (*this | in) & ~(*this & in);
     }
     [[nodiscard]] this_t operator<<(const T shift) const { return CalcShift(shift); }
     [[nodiscard]] this_t operator>>(const T shift) const { return CalcShift(-shift); }
     [[nodiscard]] bool operator[](T val) const { return Has(val); }
 
-    this_t & operator|=(const this_t & in) const { Insert(in); return *this; }
-    this_t & operator&=(const this_t & in) const { Remove(~in); return *this; }
-    this_t & operator<<=(const T shift) const { Shift(shift); return *this; }
-    this_t & operator>>=(const T shift) const { Shift(-shift); return *this; }
+    this_t & operator|=(const this_t & in) { Insert(in); return *this; }
+    this_t & operator&=(const this_t & in) { Remove(~in); return *this; }
+    this_t & operator^=(const this_t & in) { *this = *this^in; return *this; }
+    this_t & operator<<=(const T shift) { Shift(shift); return *this; }
+    this_t & operator>>=(const T shift) { Shift(-shift); return *this; }
 
     explicit operator bool() const { return range_set.size(); }
 
