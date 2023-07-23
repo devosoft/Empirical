@@ -53,7 +53,7 @@ namespace emp {
   template <typename T> [[nodiscard]] inline String MakeLiteral(const T & value);
   [[nodiscard]] inline char MakeFromLiteral_Char(const String & value);
   [[nodiscard]] inline String MakeFromLiteral_String(const String & value);
-  [[nodiscard]] inline String MakeFromLiteral(const String & value);
+  template <typename T> [[nodiscard]] inline T MakeFromLiteral(const String & value);
   [[nodiscard]] inline String MakeUpper(const String & in);
   [[nodiscard]] inline String MakeLower(const String & in);
   [[nodiscard]] inline String MakeTitleCase(String in);
@@ -1424,12 +1424,19 @@ namespace emp {
     return out_string;
   }
 
-  [[nodiscard]] String MakeFromLiteral(const String & value) {
-    if (value.size() == 0) return "";
-    if (value[0] == '\'') return MakeString(MakeFromLiteral_Char(value));
-    if (value[0] == '"') return MakeFromLiteral_String(value);
-    // @CAO Add conversion from numerical literals, and especially octal (0-), binary (0b-), and hex (0x-)
-    return value;
+  template <typename T> 
+  [[nodiscard]] T MakeFromLiteral(const String & value) {
+    if (value.size() == 0) return T{};
+
+    if constexpr (std::is_same_v<char, T>) return MakeFromLiteral_Char(value);
+    else if constexpr (std::is_base_of_v<std::string, T>) return MakeFromLiteral_String(value);
+    else if constexpr (std::is_floating_point_v<T>) return static_cast<T>(std::stold(value));
+    else if constexpr (std::is_unsigned_v<T>) return static_cast<T>(std::stoull(value));
+    else if constexpr (std::is_signed_v<T>) return static_cast<T>(std::stoll(value));
+    else {
+      static_assert(emp::dependent_false<T>(), "Invalid conversion for MakeFromLiteral()");
+      return T{};
+    }
   }
 
   /// Convert a string to all uppercase.
