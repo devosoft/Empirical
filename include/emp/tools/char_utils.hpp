@@ -173,9 +173,9 @@ namespace emp {
     }
 
     /// Count the number of matches that occur at the beginning of a string.
-    size_t CountFrontMatches(const std::string & str) const {
+    size_t CountFrontMatches(const std::string & str, size_t start=0) const {
       size_t count = 0;
-      while (count < str.size() && Has(str[count])) count++;
+      while (count+start < str.size() && Has(str[count+start])) count++;
       return count;
     }
 
