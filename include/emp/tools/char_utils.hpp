@@ -161,7 +161,14 @@ namespace emp {
     /// Count the number of matches that occur in a string.
     size_t CountMatches(const std::string & str) const {
       size_t count = 0;
-      for (char c : str) if (Has(c)) count++;
+      for (char c : str) if (Has(c)) ++count;
+      return count;
+    }
+
+    /// Count the number of matches that occur in a sub-string.
+    size_t CountMatches(const std::string & str, size_t start, size_t end) const {
+      size_t count = 0;
+      for (size_t i = start; i < end; ++i) if (Has(str[i])) ++count;
       return count;
     }
 
