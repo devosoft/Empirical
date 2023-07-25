@@ -1,0 +1,11 @@
+Next time we do a full pass through files, we should:
+
+* Use notify for proper error tracking.  Bias toward exceptions so developers can choose individualized responses to errors.
+* Change member functions (and variables?) to begin with _
+* Cleanup Doxygen?
+* Move std::string to emp::String, where possible.
+* Cleanup any SFINEA or other template tricks and use constexpr instead.
+
+
+And if implemented
+* Simplify emp_asserts to assume that will disentangle tests and print values of components.
