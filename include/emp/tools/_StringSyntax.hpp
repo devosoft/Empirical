@@ -59,6 +59,7 @@ namespace emp {
 
     static StringSyntax None()   { return StringSyntax(); }
     static StringSyntax Quotes() { return StringSyntax("\""); }
+    static StringSyntax CharQuotes() { return StringSyntax("'"); }
     static StringSyntax AllQuotes() { return StringSyntax("\"'"); }
     static StringSyntax Parens() { return StringSyntax("",     "()[]{}"); }
     static StringSyntax RParens() { return StringSyntax("",    ")(][}{"); }
