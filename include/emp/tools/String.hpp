@@ -82,18 +82,25 @@ namespace emp {
   private:
     using Syntax = StringSyntax;
 
-    // ToString specializations
-    static const String & ToString(const String & in) { return in; }
-    template <typename T>
-    static String ToString(const std::vector<T> & in) { return String("{") + Join(in, ",") + '}'; }
-    template <typename T>
-    static String ToString(T && in) { std::stringstream ss; ss << std::forward<T>(in); return ss.str(); }
+    // _ToString specializations
+    [[nodiscard]] static const String & _ToString(const String & in) { return in; }
+    template <typename T> [[nodiscard]] static String _ToString(const std::vector<T> & in)
+      { return String("{") + Join(in, ",") + '}'; }
+    template <typename T> [[nodiscard]] static String _ToString(T && in)
+      { std::stringstream ss; ss << std::forward<T>(in); return ss.str(); }
 
     // Convert objects into a streamable type using _Convert(obj)
-    template <typename T> static decltype(std::declval<T>().ToString()) _Convert(const T & in, bool) { return in.ToString(); }
-    template <typename T> static auto _Convert(const T & in, int) -> decltype(ToString(in)) { return ToString(in); }
+    template <typename T> static decltype(std::declval<T>()._ToString()) _Convert(const T & in, bool) { return in._ToString(); }
+    template <typename T> static auto _Convert(const T & in, int) -> decltype(_ToString(in)) { return _ToString(in); }
 
+    // Quick check to ensure a position is legal.
     void _AssertPos([[maybe_unused]] size_t pos) const { emp_assert(pos < size(), pos, size()); }
+
+    // Helper function for scanning.
+    [[nodiscard]] std::string_view _ProcessScan(size_t & pos, size_t new_pos) const {
+      const size_t start = pos;
+      return ViewRange(start, pos=new_pos);
+    }
 
   public:
     using std::string::value_type;
@@ -329,18 +336,32 @@ namespace emp {
     String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
+    // Return string_view starting at a specified position, and advance that position
+    std::string_view ScanWord(size_t & pos) const { return _ProcessScan(pos, FindWhitespace(pos)); }
+    std::string_view ScanWhitespace(size_t & pos) const { return _ProcessScan(pos, FindNonWhitespace(pos)); }
+
     inline bool PopIf(char c);
     inline bool PopIf(String in);
     inline String PopAll();
     inline String PopFixed(std::size_t end_pos, size_t delim_size=0);
     inline String Pop(CharSet chars=" \n\t\r", const Syntax & syntax=Syntax::None());
     inline String PopTo(String delim, const Syntax & syntax=Syntax::None());
-    inline String PopWord(const Syntax & syntax=Syntax::None());
-    inline String PopLine(const Syntax & syntax=Syntax::None());
+    String PopWord(const Syntax & syntax=Syntax::None()) { return Pop(" \n\t\r", syntax); }
+    String PopLine(const Syntax & syntax=Syntax::None()) { return Pop("\n", syntax); }
     inline String PopQuote(const Syntax & syntax=Syntax::Quotes());
     inline String PopParen(const Syntax & syntax=Syntax::Parens());
-    inline size_t PopUInt();
+    inline String PopLiteralSigned();
+    long long PopSigned() { return std::stoll(PopLiteralSigned()); }
+    inline String PopLiteralUnsigned();
+    unsigned long long PopUnsigned() { return std::stoull(PopLiteralUnsigned()); }
+    inline String PopLiteralFloat();
+    double PopFloat() { return std::stod(PopLiteralFloat()); }
+    String PopLiteralChar(const Syntax & syntax=Syntax::CharQuotes()) { return PopQuote(syntax); }
     char PopChar() { return PopFixed(1)[0]; }
+
+    template <typename T> inline String PopLiteral(const Syntax & syntax=Syntax::Quotes());
+    template <typename T> inline T PopFromLiteral(const Syntax & syntax=Syntax::Quotes());
+
 
     // ------ Insertions and Additions ------
     // Inherited functions from std::string:
@@ -676,7 +697,7 @@ namespace emp {
   
   /// Determine if this string represents a proper number.
   bool String::IsNumber() const {
-    if (!size()) return false;           // If string is empty, not a number!
+    if (!size()) return false;               // If string is empty, not a number!
     size_t pos = 0;
     if (HasOneOfAt("+-", pos)) ++pos;        // Allow leading +/-
     while (HasDigitAt(pos)) ++pos;           // Any number of digits (none is okay)
@@ -973,9 +994,6 @@ namespace emp {
     return PopFixed(Find(delim, 0, syntax), delim.size());
   }
 
-  String String::PopWord(const Syntax & syntax) { return Pop(" \n\t\r", syntax); }
-  String String::PopLine(const Syntax & syntax) { return Pop("\n", syntax); }
-
   String String::PopQuote(const Syntax & syntax) {
     if (!syntax.IsQuote(Get(0))) return String();
     const size_t end_pos = FindQuoteMatch(0);
@@ -987,11 +1005,53 @@ namespace emp {
     return (end_pos==std::string::npos) ? "" : PopFixed(end_pos+1);
   }
 
-  size_t String::PopUInt() {
+  String String::PopLiteralSigned() {
+    size_t int_size = 0;
+    if (HasCharAt(int_size, '-') || HasCharAt(int_size, '+')) int_size++;
+    while (int_size < size() && isdigit(Get(int_size))) ++int_size;
+    return PopFixed(int_size);
+  }
+
+  String String::PopLiteralUnsigned() {
     size_t uint_size = 0;
     while (uint_size < size() && isdigit(Get(uint_size))) ++uint_size;
-    String out_uint = PopFixed(uint_size);
-    return std::stoull(out_uint);
+    return PopFixed(uint_size);
+  }
+
+  String String::PopLiteralFloat() {
+    if (!size()) return "";                  // If string is empty, not a number!
+    size_t pos = 0;
+    if (HasOneOfAt("+-", pos)) ++pos;        // Allow leading +/-
+    while (HasDigitAt(pos)) ++pos;           // Any number of digits (none is okay)
+    if (HasCharAt('.', pos)) {               // If there's a DECIMAL PLACE, look for more digits.
+      ++pos;                                 // Skip over the dot.
+      if (!HasDigitAt(pos++)) return "";     // Must have at least one digit after '.'
+      while (HasDigitAt(pos)) ++pos;         // Any number of digits is okay.
+    }
+    if (HasOneOfAt("eE", pos)) {             // If there's an e... SCIENTIFIC NOTATION!
+      ++pos;                                 // Skip over the e.
+      if (HasOneOfAt("+-", pos)) ++pos;      // skip leading +/-
+      if (!HasDigitAt(pos++)) return "";     // Must have at least one digit after 'e'
+      while (HasDigitAt(pos)) ++pos;         // Allow for MORE digits.
+    }
+    return PopFixed(pos);
+  }
+
+  template <typename T>
+  String String::PopLiteral(const Syntax & syntax) {
+    if constexpr (std::is_same_v<char, T>) return PopLiteralChar(syntax);
+    else if constexpr (std::is_base_of_v<std::string, T>) PopQuote(syntax);
+    else if constexpr (std::is_floating_point_v<T>) return PopLiteralFloat();
+    else if constexpr (std::is_unsigned_v<T>) return PopLiteralUnsigned();
+    else if constexpr (std::is_signed_v<T>) return PopLiteralSigned();
+    else static_assert(emp::dependent_false<T>(), "Invalid conversion for PopLiteral()");
+
+    return "";
+  }
+
+  template <typename T>
+  T String::PopFromLiteral(const Syntax & syntax) {
+    return MakeFromLiteral<T>(PopLiteral<T>(syntax));    
   }
 
   /// @brief Cut up a string based on the provided delimiter; fill them in to the provided vector.
