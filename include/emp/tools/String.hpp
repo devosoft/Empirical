@@ -82,6 +82,8 @@ namespace emp {
   private:
     using Syntax = StringSyntax;
 
+    static char no_char;
+
     // _ToString specializations
     [[nodiscard]] static const String & _ToString(const String & in) { return in; }
     template <typename T> [[nodiscard]] static String _ToString(const std::vector<T> & in)
@@ -95,12 +97,6 @@ namespace emp {
 
     // Quick check to ensure a position is legal.
     void _AssertPos([[maybe_unused]] size_t pos) const { emp_assert(pos < size(), pos, size()); }
-
-    // Helper function for scanning.
-    [[nodiscard]] std::string_view _ProcessScan(size_t & pos, size_t new_pos) const {
-      const size_t start = pos;
-      return ViewRange(start, pos=new_pos);
-    }
 
   public:
     using std::string::value_type;
@@ -185,8 +181,8 @@ namespace emp {
     [[nodiscard]] char front() const { _AssertPos(0); return std::string::front(); }
     [[nodiscard]] char & back() { _AssertPos(0); return std::string::back(); }
     [[nodiscard]] char back() const { _AssertPos(0); return std::string::back(); }
-    [[nodiscard]] char & Get(size_t pos) { return operator[](pos); }
-    [[nodiscard]] char Get(size_t pos) const { return operator[](pos); }
+    [[nodiscard]] char & Get(size_t pos) { return (pos < size()) ? operator[](pos) : (no_char='\0'); }
+    [[nodiscard]] char Get(size_t pos) const { return (pos < size()) ? operator[](pos) : '\0'; }
 
     [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
       { _AssertPos(pos); return std::string::substr(pos, count); }
@@ -337,8 +333,17 @@ namespace emp {
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
     // Return string_view starting at a specified position, and advance that position
-    std::string_view ScanWord(size_t & pos) const { return _ProcessScan(pos, FindWhitespace(pos)); }
-    std::string_view ScanWhitespace(size_t & pos) const { return _ProcessScan(pos, FindNonWhitespace(pos)); }
+    // Helper function for scanning.
+    std::string_view ScanTo(size_t & pos, size_t stop_pos) const
+      { const size_t start = pos; return ViewRange(start, pos=std::min(stop_pos, size())); }
+    std::string_view ScanWhile(size_t & pos, std::function<bool(char)> test_fun) {
+      const size_t start = pos;
+      while (pos < size() && test_fun(Get(pos))) ++pos;
+      return ViewRange(start, pos);
+    }
+    std::string_view ScanWord(size_t & pos) const { return ScanTo(pos, FindWhitespace(pos)); }
+    char ScanChar(size_t & pos) const { return Get(pos++); }
+    std::string_view ScanWhitespace(size_t & pos) const { return ScanTo(pos, FindNonWhitespace(pos)); }
 
     inline bool PopIf(char c);
     inline bool PopIf(String in);
