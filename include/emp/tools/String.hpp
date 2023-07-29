@@ -336,14 +336,19 @@ namespace emp {
     // Helper function for scanning.
     std::string_view ScanTo(size_t & pos, size_t stop_pos) const
       { const size_t start = pos; return ViewRange(start, pos=std::min(stop_pos, size())); }
-    std::string_view ScanWhile(size_t & pos, std::function<bool(char)> test_fun) {
+    std::string_view ScanWhile(size_t & pos, CharSet chars) const {
       const size_t start = pos;
-      while (pos < size() && test_fun(Get(pos))) ++pos;
+      while (pos < size() && chars.Has(Get(pos))) ++pos;
       return ViewRange(start, pos);
     }
     std::string_view ScanWord(size_t & pos) const { return ScanTo(pos, FindWhitespace(pos)); }
     char ScanChar(size_t & pos) const { return Get(pos++); }
-    std::string_view ScanWhitespace(size_t & pos) const { return ScanTo(pos, FindNonWhitespace(pos)); }
+    std::string_view ScanWhitespace(size_t & pos) const { return ScanWhile(pos, WhitespaceCharSet()); }
+    std::string_view ScanUpper(size_t & pos) const { return ScanWhile(pos, UpperCharSet()); }
+    std::string_view ScanLower(size_t & pos) const { return ScanWhile(pos, LowerCharSet()); }
+    std::string_view ScanLetter(size_t & pos) const { return ScanWhile(pos, LetterCharSet()); }
+    std::string_view ScanDigit(size_t & pos) const { return ScanWhile(pos, DigitCharSet()); }
+    std::string_view ScanAlphanumeric(size_t & pos) const { return ScanWhile(pos, AlphanumericCharSet()); }
 
     inline bool PopIf(char c);
     inline bool PopIf(String in);
