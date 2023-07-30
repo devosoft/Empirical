@@ -332,24 +332,6 @@ namespace emp {
     String & RemoveDigits()      { return RemoveChars(DigitCharSet()); }
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
-    // Return string_view starting at a specified position, and advance that position
-    // Helper function for scanning.
-    std::string_view ScanTo(size_t & pos, size_t stop_pos) const
-      { const size_t start = pos; return ViewRange(start, pos=std::min(stop_pos, size())); }
-    std::string_view ScanWhile(size_t & pos, CharSet chars) const {
-      const size_t start = pos;
-      while (pos < size() && chars.Has(Get(pos))) ++pos;
-      return ViewRange(start, pos);
-    }
-    std::string_view ScanWord(size_t & pos) const { return ScanTo(pos, FindWhitespace(pos)); }
-    char ScanChar(size_t & pos) const { return Get(pos++); }
-    std::string_view ScanWhitespace(size_t & pos) const { return ScanWhile(pos, WhitespaceCharSet()); }
-    std::string_view ScanUpper(size_t & pos) const { return ScanWhile(pos, UpperCharSet()); }
-    std::string_view ScanLower(size_t & pos) const { return ScanWhile(pos, LowerCharSet()); }
-    std::string_view ScanLetter(size_t & pos) const { return ScanWhile(pos, LetterCharSet()); }
-    std::string_view ScanDigit(size_t & pos) const { return ScanWhile(pos, DigitCharSet()); }
-    std::string_view ScanAlphanumeric(size_t & pos) const { return ScanWhile(pos, AlphanumericCharSet()); }
-
     inline bool PopIf(char c);
     inline bool PopIf(String in);
     inline String PopAll();
@@ -498,6 +480,29 @@ namespace emp {
       { return ViewRange(start+1, FindParenMatch(start, syntax) - 1); }
     [[nodiscard]] std::string_view ViewQuote(size_t start=0, const Syntax & syntax=Syntax::Quotes()) const
       { return ViewRange(start, syntax.IsQuote(Get(start)) ? FindQuoteMatch(start) : start); }
+
+    // Return string_view starting at a specified position, and advance that position
+    // Helper function for scanning.
+    std::string_view ScanTo(size_t & pos, size_t stop_pos) const
+      { const size_t start = pos; return ViewRange(start, pos=std::min(stop_pos, size())); }
+    std::string_view ScanWhile(size_t & pos, CharSet chars) const {
+      const size_t start = pos;
+      while (pos < size() && chars.Has(Get(pos))) ++pos;
+      return ViewRange(start, pos);
+    }
+    std::string_view ScanView(std::function<std::string_view(size_t pos)> fun, size_t & pos) const {
+      auto out = fun(pos); pos += out.size(); return out;
+    }
+    std::string_view ScanWord(size_t & pos) const { return ScanTo(pos, FindWhitespace(pos)); }
+    char ScanChar(size_t & pos) const { return Get(pos++); }
+    std::string_view ScanWhitespace(size_t & pos) const { return ScanWhile(pos, WhitespaceCharSet()); }
+    std::string_view ScanUpper(size_t & pos) const { return ScanWhile(pos, UpperCharSet()); }
+    std::string_view ScanLower(size_t & pos) const { return ScanWhile(pos, LowerCharSet()); }
+    std::string_view ScanLetters(size_t & pos) const { return ScanWhile(pos, LetterCharSet()); }
+    std::string_view ScanDigits(size_t & pos) const { return ScanWhile(pos, DigitCharSet()); }
+    std::string_view ScanAlphanumeric(size_t & pos) const { return ScanWhile(pos, AlphanumericCharSet()); }
+    std::string_view ScanNestedBlock(size_t & pos) const { auto out=ViewNestedBlock(pos); pos+=out.size(); return out; }
+    std::string_view ScanQuote(size_t & pos) const { auto out=ViewQuote(pos); pos+=out.size(); return out; }
 
 
     // ------ Transformations into non-Strings ------
