@@ -85,6 +85,10 @@ namespace emp {
 
       weyl_state *= 2;  // Make sure starting state is even.
 
+      // Reset other internal state
+      value = 0;
+      expRV = 0.0;
+
       Get(); // Prime the new sequence by skipping the first number.
     }
 
