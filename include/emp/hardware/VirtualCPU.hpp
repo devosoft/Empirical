@@ -51,7 +51,7 @@ namespace emp{
       struct Instruction;
 
       using derived_t = DERIVED;
-      using data_t = uint32_t;
+      using data_t = int32_t;
       using inst_t = Instruction;
       using inst_lib_t = VirtualCPU_InstLib<derived_t, data_t, 0>;
       using genome_t = Genome<Instruction, inst_lib_t>;
@@ -126,6 +126,8 @@ namespace emp{
                                                ///< copy next
       size_t write_head;                       ///< Write head, signals where to copy next
                                                ///< instruction
+      size_t cooldown_timer = 0;               ///< Do not process inst if value > 0.
+                                               ///< Decrease this value instead 
       //////// HELPER CONSTRUCTS
       emp::unordered_map<size_t, size_t> nop_id_map;/**< NOP inst id -> Nop index
                                                          (e.g., NopA -> 0, NopB -> 1,
@@ -229,9 +231,28 @@ namespace emp{
         return false;
       }
 
+      /// Load genome from a string of characters
+      bool LoadFromChars(const std::string & new_genome){
+        ClearGenome();
+        for(size_t idx = 0; idx < new_genome.size(); ++idx){
+          PushInst(new_genome[idx]);
+        }
+        nops_need_curated = true;
+        return true;
+      }
+
       /// Add a new instruction to the end of the genome, by index in the instruction library
       void PushInst(size_t idx) {
         const size_t id = GetInstLib()->GetID(idx);
+        genome.emplace_back(idx, id);
+        genome_working.emplace_back(idx, id);
+        nops_need_curated = true;
+      }
+
+      /// Add a new instruction to the end of the genome, by the instruction's symbol/char 
+      void PushInst(char c){
+        const size_t id = GetInstLib()->GetIDFromSymbol(c);
+        const size_t idx = GetInstLib()->GetIndex(id);
         genome.emplace_back(idx, id);
         genome_working.emplace_back(idx, id);
         nops_need_curated = true;
@@ -317,6 +338,19 @@ namespace emp{
         genome.erase(genome.begin() + idx);
         genome_working.erase(genome_working.begin() + idx);
         nops_need_curated = true;
+      }
+      /// Increase the cooldown by some value, so instructions cannot be processed for longer
+      void IncreaseCooldown(size_t val){
+        cooldown_timer += val;
+      }
+      /// Decrease the cooldown by some value, so instructions can be processed sooner
+      void DecreaseCooldown(size_t val){
+        if(cooldown_timer >= val) cooldown_timer -= val;
+        else cooldown_timer = 0;
+      }
+      /// Reset the cooldown timer
+      void ResetCooldown(){
+        cooldown_timer = 0;
       }
 
 
@@ -419,6 +453,7 @@ namespace emp{
         ResetRH();
         ResetWH();
         ResetFH();
+        ResetCooldown();
       }
       /// Reset all inputs and outputs
       void ResetIO() {
@@ -729,17 +764,23 @@ namespace emp{
       //////// PROCESSING
       /// Process the next instruction pointed to be the instruction pointer
       void SingleProcess(bool verbose = true) {
-        emp_assert(genome_working.GetSize() > 0);  // A genome must exist to be processed.
-        if (!are_regs_expanded) ExpandRegisters();
-        if (nops_need_curated) CurateNops();
-        if (verbose) {
-          GetInstLib()->GetName(genome_working[inst_ptr].idx);
-          PrintDetails();
+        if(cooldown_timer > 0){
+          DecreaseCooldown(1);
+          num_insts_executed++;
         }
-        genome_working[inst_ptr].has_been_executed = true;
-        GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
-        AdvanceIP();
-        num_insts_executed++;
+        else{
+          emp_assert(genome_working.GetSize() > 0);  // A genome must exist to be processed.
+          if(!are_regs_expanded) ExpandRegisters();
+          if(nops_need_curated) CurateNops();
+          if(verbose){
+            GetInstLib()->GetName(genome_working[inst_ptr].idx);
+            PrintDetails();
+          }
+          genome_working[inst_ptr].has_been_executed = true;
+          GetInstLib()->ProcessInst(ToPtr(this), genome_working[inst_ptr]);
+          AdvanceIP();
+          num_insts_executed++;
+        }
       }
       /// Process the next SERIES of instructions, directed by the instruction pointer.
       void Process(size_t num_inst = 1, bool verbose = true) {
@@ -772,6 +813,19 @@ namespace emp{
         for (size_t idx = 0; idx < genome.size(); idx++) {
           unsigned char c = 'a' + genome[idx].id;
           if (genome[idx].id > 25) c = 'A' + genome[idx].id - 26;
+          sstr << c;
+        }
+        return sstr.str();
+      }
+      /// Return the original genome in string form, without the genome length.
+      ///
+      /// Each instruction is represented by a single character, dictated by the
+      /// instruction's ID.
+      std::string GetRawGenomeString() const{
+        std::stringstream sstr;
+        for(size_t idx = 0; idx < genome.size(); idx++){
+          unsigned char c = 'a' + genome[idx].id;
+          if(genome[idx].id > 25) c = 'A' + genome[idx].id - 26;
           sstr << c;
         }
         return sstr.str();
