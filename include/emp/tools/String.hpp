@@ -1406,11 +1406,11 @@ namespace emp {
     out.reserve(in.size());
     for (char c : in) {
       switch (c) {
-      case '&': out += "&amp"; break;
-      case '<': out += "&lt"; break;
-      case '>': out += "&gt"; break;
-      case '\'': out += "&apos"; break;
-      case '"': out += "&quot"; break;
+      case '&': out += "&amp;"; break;
+      case '<': out += "&lt;"; break;
+      case '>': out += "&gt;"; break;
+      case '\'': out += "&apos;"; break;
+      case '"': out += "&quot;"; break;
       default: out += c;
       }
     }
