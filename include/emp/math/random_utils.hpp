@@ -20,6 +20,12 @@
 
 namespace emp {
 
+  /// Choose a random element from an indexable container.
+  template <typename T>
+  inline auto SelectRandom(Random & random, const T & container) {
+    return container[random.GetUInt(container.size())];
+  }
+
   /// Randomly reorder all of the elements in a vector.
   /// If max_count is provided, just make sure that the first max_count entries are randomly
   /// drawn from entire vector.
