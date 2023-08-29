@@ -60,6 +60,40 @@ namespace emp {
       }
     }
 
+    // Helper function to convert a string into a RangeSet.
+    // Two formats are available
+    //   bitstring:  010001110101111
+    //   RangeSet:   [1,2),[5,8),[9,10),[11,15)
+    // In the bitstring format, if the final character is '+', all additional positions are
+    // assumed to be 1.  In the RangeSet format, if the first or last element is a '*', it is
+    // assumed to be the limit for the type; also commas are optional.
+    // A star by itself is a full RangeSet.
+    void _FromString(emp::String in) {
+      if (in.size() == 0) { Clear(); }
+      else if (in[0] == '*') {
+        emp::notify::TestError(in.size() > 1, "Star indicates a full range, but must be by itself.");
+        SetAll();
+      }
+      else if (in[0] == '0' || in[0] == '1') {
+        Clear();
+        for (size_t i=0; i < in.size(); ++i) {
+          if (in[i] != '0') Insert((T)i);
+        }
+      }
+      else if (in[0] == '[') {
+        while (in.size()) {
+          emp::String segment = in.Pop(')');
+          segment.PopIf(',');
+          emp::notify::TestError(!segment.PopIf('['), "Each segment of a RangeSet must begin with '['");
+          T start = segment.PopIf('*') ? MinLimit() : segment.PopLiteral<T>();
+          emp::notify::TestError(!segment.PopIf(',') && !segment.PopIf('-'),
+            "Each segment of a RangeSet must be separated by ',' or '-'");
+          T end = segment.PopIf('*') ? MaxLimit() : segment.PopLiteral<T>();
+          InsertRange(start, end);
+        }
+      }
+    }
+
   public:
     static constexpr bool is_integral = std::is_integral<T>();
 
