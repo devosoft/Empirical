@@ -8,4 +8,6 @@ Next time we do a full pass through files, we should:
 
 
 And if implemented
-* Simplify emp_asserts to assume that will disentangle tests and print values of components.
+* Simplify emp_asserts to assume that will disentangle tests and print values of components?
+* Add in the ability to turn on "EMP_THREADED" options?
+* Add in serialization capabilities?
