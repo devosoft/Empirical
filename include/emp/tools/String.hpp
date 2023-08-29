@@ -82,7 +82,7 @@ namespace emp {
   private:
     using Syntax = StringSyntax;
 
-    static char no_char;
+    static char & NoChar() { static char no_char = '\0'; return no_char; }
 
     // _ToString specializations
     [[nodiscard]] static const String & _ToString(const String & in) { return in; }
@@ -181,7 +181,7 @@ namespace emp {
     [[nodiscard]] char front() const { _AssertPos(0); return std::string::front(); }
     [[nodiscard]] char & back() { _AssertPos(0); return std::string::back(); }
     [[nodiscard]] char back() const { _AssertPos(0); return std::string::back(); }
-    [[nodiscard]] char & Get(size_t pos) { return (pos < size()) ? operator[](pos) : (no_char='\0'); }
+    [[nodiscard]] char & Get(size_t pos) { return (pos < size()) ? operator[](pos) : NoChar(); }
     [[nodiscard]] char Get(size_t pos) const { return (pos < size()) ? operator[](pos) : '\0'; }
 
     [[nodiscard]] String substr(size_t pos=0, size_t count=npos ) const
