@@ -144,10 +144,10 @@ For example, Empirical's configuration framework includes utilities to
 
 * define and document default configuration values in a single line,
 * set configuration values via a combination of a configuration file or command line flags,
-* save configuration values to a file,
+* save configuration values to a file,
 * perform on-the-fly configuration adjustments, and
-* support multiple independent configuration subsystems.
-
+* support multiple independent configuration subsystems.
+
 Where appropriate, Empirical's scientific software tools include features that integrate directly into the browser environment.
 The configuration framework, for example, accepts input via URL query parameters and ties in with a pre-built, in-browser GUI for setting-by-setting adjustments.
 
@@ -158,24 +158,22 @@ As detailed [in our documentation](https://empirical.readthedocs.io/en/latest/de
 
 ## Realizing the Promise of Emscripten-based Web UIs
 
-Many scientific software projects with additionall education and outreach objectives have maintained separate code bases for the two.
-The Avida-ED project, which appliies the Avida digital evolution system as a tool for classroom laboratory activities, exemplifies this phenomenon [@pennock2007learning].
-Avida-ED forked the Avida's code base and could not bring in ongoing updates to the primary code base.[^1]
-Further, significant code duplication is often required to provide a crossplatform education and outreach product.
-
-[^1]: Upcoming Avida-ED releases built with Empirical will use the primary research code base.
-
-This source splintering phenomenon precludes projects with limited resources from offering an education and outreach product: lost potential for accessible windows into contemporary scientific work.
-In better-resourced projects, this splintering effect absorbs limited (and expensive) developer hours and often leads to one version of the code --- usually that for education/outreach --- falling into neglect and drifting out of sync with other versions.
+Educational or outreach versions of scientific software can provide accessible windows into contemporary scientific work, promoting classroom learning, social media engagement, and citizen science.
+Scientific software projects that want to reach these additional audiences must typically maintain multiple codebases.
+As the codebases diverge, it becomes time consuming to synchronize changes across them, a problem that is only compounded when also maintiaining crossplatform interfaces.
+These development costs preclude many scientific projects from providing easy access to the public.
+Even in better-resourced projects, this splintering effect absorbs limited developer hours and often leads to some versions of the code falling into neglect and drifting out of sync.
 
-The Emscripten compiler promises to remedy this source splintering by enabling software compilation to serve double duty: targeting web browsers in addition to the traditional native runtime environment [@zakai2011emscripten].
-Browser-based approaches can yield particularly effective public-facing apps due to widespread cross-platform compatibility, no-install access, and rich graphical interfaces.
+The Emscripten compiler promises to remedy this source splintering by enabling a single codebase to target web browsers alongside traditional native runtime environments [@zakai2011emscripten].
+Browser-based delivery can yield particularly effective public-facing apps due to widespread cross-platform compatibility, no-install access, and rich graphical interfaces.
+Native compilations are still required by most scientific applications, however, due to greater speeds and compatibility with high-performance computing environments.
 
 Empirical amplifies the potential of Emscripten by fleshing out its rudimentary interface for interaction with browser elements.
-At the lowest level, Empirical provides tools for reciprocal data transfer between C++ code and the WebAssembly runtime.
-Built on top of this, is an object-oriented framework that wraps DOM elements (_e.g.,_ `<button>`, `<div>`, `<canvas>`, etc.) to easily control them and react to their HTML events from within C++ code.
-This facility relieves users of bookkeeping for JavaScript resources (particularly useful for those without web programming domain expertise).
-At a still higher level of abstraction, Empirical packages pre-configured, pre-styled collections of DOM elements as prefabricated widgets (configuration managers, collapsible read-outs, modal messages, etc.).
+At the lowest level, Empirical provides tools for reciprocal data transfer between C++ code and the browser.
+DOM elements (such as `<button>`, `<div>`, and `<canvas>`) are given corresponding C++ objects (`emp::Button`, `emp::Div`, and `emp::Canvas`) and can be easily used from within C++ code.
+With these tools, users no longer need to manage JavaScript resources, and thus need much less preexisting web-programing knowledge.
+<!-- This facility relieves users of bookkeeping for JavaScript resources (particularly useful for those without web programming domain expertise). -->
+At a higher level of abstraction, Empirical packages pre-configured, pre-styled collections of DOM elements as prefabricated widgets (e.g., configuration managers, collapsible read-outs, modal messages, etc.).
 Empirical's tools aim to make generating a mobile-friendly, web-based GUI for existing software so trivial that the practice becomes ubiquitous.
 <!-- In particular, we are focused on lowering the barrier to entry for developers without domain knowledge in HTML, CSS, and JavaScript by abstracting these matters away behind a C++ interface. -->
 
@@ -183,6 +181,7 @@ Below, we give an example of Empirical's DOM interface in action.
 This example creates a button that increments an on-screen counter every time the button is clicked.
 You can view the resulting web page live at <https://devosoft.github.io/empirical-joss-demo/>.
 
+C++ source:
 ```c++
 #include "emp/web/web.hpp"
 
@@ -200,7 +199,7 @@ int main() {
 }
 ```
 
-
+HTML source:
 ```html
 <body>
   <div id="target"> </div>
@@ -212,7 +211,7 @@ int main() {
 
 <!-- @MAM: add a code snippet with a brief demo and a screenshot of  the resulting webpage -->
 
-A live demo of more sophisticated Empirical prefabricated widgets, presented alongside their source C++ code, is available on our [prefab demos page](https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo).
+A live demo of more sophisticated Empirical widgets, presented alongside their source C++ code, is available on our [prefab demos page](https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo).
 
 <!-- # Empirical Development Practices -->
 <!-- @mmore500 moved to documentation -->
