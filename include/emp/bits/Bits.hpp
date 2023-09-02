@@ -1999,6 +1999,17 @@ namespace emp {
     return length;
   }
 
+  template <typename DATA_T, bool ZERO_LEFT>
+  emp::vector<emp::Range<size_t>> Bits<DATA_T,ZERO_LEFT>::GetRanges() const {
+    emp::vector<emp::Range<size_t>> out_ranges;
+    for (int start_pos = FindOne(); start_pos >= 0; start_pos = FindOne(start_pos+1)) {
+      int end_pos = FindZero(start_pos);
+      end_pos = (end_pos == -1) ? GetSize() - 1 : end_pos - 1;
+      out_ranges.emplace_back(start_pos, end_pos);
+    }
+    return out_ranges;
+  }
+
   /// Return true if any ones are in common with another Bits object.
   template <typename DATA_T, bool ZERO_LEFT>
   bool Bits<DATA_T,ZERO_LEFT>::HasOverlap(const Bits<DATA_T,ZERO_LEFT> & in) const {
