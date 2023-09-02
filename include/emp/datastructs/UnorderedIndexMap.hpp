@@ -65,11 +65,21 @@ namespace emp {
     }
 
   public:
-    /// Construct an UnorderedIndexMap where num_items is the maximum number of items that can be placed
-    /// into the data structure.  All item weights default to zero.
+    /// Construct an UnorderedIndexMap where num_items is the maximum number of items that
+    /// can be placed into the data structure.  All item weights default to zero.
     UnorderedIndexMap(size_t _items=0, double init_weight=0.0)
-      : num_items(_items), num_nodes(_items-1), needs_refresh(_items && (init_weight > 0.0)), weights(0)
+      : num_items(_items), num_nodes(_items-1),
+        needs_refresh(_items && (init_weight > 0.0)), weights(0)
       { if (_items > 0) weights.resize(_items*2-1, init_weight); }
+    /// Construct an UnorderedIndexMap with a specified initial set of weights.
+    UnorderedIndexMap(const emp::vector<double> & in_weights)
+      : num_items(in_weights.size()), num_nodes(num_items-1), needs_refresh(true)
+      , weights(num_items*2 - 1)
+    {
+      emp_assert(num_items > 0, "UnorderedIndexMaps should not be initialized with empty weights");
+      for (size_t i = 0; i < num_items; i++) weights[i + num_nodes] = in_weights[i];
+    }
+    
     UnorderedIndexMap(const UnorderedIndexMap &) = default;
     UnorderedIndexMap(UnorderedIndexMap &&) = default;
     ~UnorderedIndexMap() = default;
@@ -153,7 +163,7 @@ namespace emp {
 
     void Adjust(size_t id, const double new_weight) { RawAdjust(id + num_nodes, new_weight); }
 
-    /// Adjust all index weights to the set provided.
+    /// Adjust all index <weights to the set provided.
     void Adjust(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
       num_nodes = num_items - 1;
@@ -164,7 +174,7 @@ namespace emp {
       needs_refresh = true;
     }
 
-    /// Adjust all index weights to the set provided.
+    /// Adjust all index weights to the single weight provided.
     void AdjustAll(double new_weight) {
       for (size_t i = 0; i < num_items; i++) weights[i + num_nodes] = new_weight;
       needs_refresh = true;
@@ -214,7 +224,7 @@ namespace emp {
     }
 
     /// Indicate that we need to adjust weights before relying on them in the future; this will
-    /// prevent refreshes from occuring immediately and is useful when many updates to weights are
+    /// prevent refreshes from occurring immediately and is useful when many updates to weights are
     /// likely to be done before any are accessed again.
     void DeferRefresh() {
       needs_refresh = true;
