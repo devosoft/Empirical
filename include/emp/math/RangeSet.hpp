@@ -361,6 +361,17 @@ namespace emp {
 
     bool RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
 
+    /// @brief Remove everything outside of the provided range.
+    bool KeepOnly(T start, T stop) { return RemoveTo(start) + RemoveFrom(stop); }
+
+    /// @brief Remove everything outside of the provided range.
+    bool KeepOnly(range_t keep_range) {
+      return KeepOnly(keep_range.GetLower(), keep_range.GetUpper());
+    }
+
+    /// @brief Remove everything outside of the provided set of ranges.
+    bool KeepOnly(const this_t & in_set) { return Remove(~in_set); }
+
 
     // Some more advanced functions.
 
