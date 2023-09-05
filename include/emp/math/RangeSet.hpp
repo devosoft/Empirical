@@ -183,15 +183,16 @@ namespace emp {
     }
 
     /// @brief Remove all ranges in the set.
-    void Clear() { range_set.resize(0); }
+    RangeSet & Clear() { range_set.resize(0); return *this; }
 
     /// @brief Set a single range that includes all value.
-    void SetAll() { InsertRange(MinLimit(), MaxLimit()); }
+    RangeSet & SetAll() { InsertRange(MinLimit(), MaxLimit()); return *this; }
 
     /// @brief Shift all ranges by a fixed amount.
     /// @param shift 
-    void Shift(T shift) {
+    RangeSet & Shift(T shift) {
       for (auto & range : range_set) range.Shift(shift);
+      return *this;
     }
 
     [[nodiscard]] this_t CalcShift(T shift) const {
