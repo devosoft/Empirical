@@ -203,39 +203,40 @@ namespace emp {
 
     /// @brief Insert a value into this range set
     /// @param val Value to insert.
-    /// @return Was there a change due to this insertion (or was it already there?)
-    bool Insert(T val) {
+    /// @return This range after insertion.
+    RangeSet & Insert(T val) {
       emp_assert(is_integral, "Only integral ranges can call Insert() with a single value.");
 
       // If empty or beyond the end, append a new range.
       if (range_set.size() == 0 || val > GetEnd()) {
         range_set.emplace_back(val);
-        return true;
       }
 
-      const size_t id = _FindRange(val);
-      emp_assert(id < range_set.size(), id, range_set.size());
-      range_t & cur_range = range_set[id];
+      else {
+        const size_t id = _FindRange(val);
+        emp_assert(id < range_set.size(), id, range_set.size());
+        range_t & range = range_set[id];
 
-      if (cur_range.Has(val)) return false;                        // Don't have the value!
-      else if (cur_range.Append(val)) _CleanupMerge(id);           // Extending 'upper' on range
-      else if (cur_range.GetLower() == val+1) cur_range.Lower()--; // Extending 'lower' on range
-      else range_set.emplace(range_set.begin()+id, val);           // Inserting NEW range.
+        if (range.Has(val)) return *this;                     // Already has the value!
+        else if (range.Append(val)) _CleanupMerge(id);        // Extending 'upper' on range
+        else if (range.GetLower() == val+1) range.Lower()--;  // Extending 'lower' on range
+        else range_set.emplace(range_set.begin()+id, val);    // Inserting NEW range.
+      }
 
-      return true;
+      return *this;
     }
 
     /// @brief Insert a whole range into this set, merging other ranges if needed.
     /// @param in New range to include.
-    /// @return Was there a change due to this insertion?
-    bool Insert(range_t in) {
+    /// @return This range after insertion.
+    RangeSet & Insert(range_t in) {
       const size_t start_id = _FindRange(in.GetLower());
 
       // Are we adding a whole new range to the end?
       if (start_id == range_set.size()) range_set.push_back(in);
 
-      // Is it already included in the found range?
-      else if (range_set[start_id].HasRange(in)) return false;
+      // Is it already included in the found range?  No change!
+      else if (range_set[start_id].HasRange(in)) return *this;
 
       // Should we merge in with an existing range?
       else if (range_set[start_id].IsConnected(in)) {
@@ -246,26 +247,23 @@ namespace emp {
       // Otherwise insert as a new range.
       else _InsertRange(start_id, in);  
 
-      return true;
+      return *this;
     }
 
     /// @brief Merge an entire range set into this one.
     /// @param in_set Range set to add in.
-    /// @return Did this RangeSet change?
-    /// @note Can be optimized to handle big sets more efficiently!
-    bool Insert(const this_t & in_set) {
-      bool result = false;
-      for (const range_t & range : in_set.GetRanges()) {
-        result |= Insert(range);
-      }
-      return result;
+    /// @return This range after insertion.
+    /// @note Can be optimized to handle big set mergers more efficiently!
+    RangeSet & Insert(const this_t & in_set) {
+      for (const range_t & range : in_set.GetRanges()) Insert(range);
+      return *this;
     }
 
     /// @brief Insert a range into this set, specifying the start and end points.
     /// @param start Beginning of new range to include.
     /// @param stop Ending of new range to include (range is not inclusive of stop)
-    /// @return Was there a change due to this insertion?
-    bool InsertRange(T start, T stop) { return Insert(range_t{start, stop}); }
+    /// @return This range after insertion.
+    RangeSet & InsertRange(T start, T stop) { return Insert(range_t{start, stop}); }
 
     /// @brief  Remove a single value from this RangeSet.
     /// @param val Value to remove
@@ -397,8 +395,7 @@ namespace emp {
     [[nodiscard]] this_t operator~() const { return CalcInverse(); }
     [[nodiscard]] this_t operator|(const this_t & in) const {
       this_t out(*this);
-      out.Insert(in);
-      return out;
+      return out.Insert(in);
     }
     [[nodiscard]] this_t operator&(const this_t & in) const {
       this_t out(*this);
