@@ -220,26 +220,22 @@ A live demo of more sophisticated Empirical widgets, presented alongside their s
 
 ## Facilitating Runtime Efficiency
 
-WebAssembly's runtime efficiency has become a major driver of its increasing popularity for web app development.
-<!-- WebAssembly binaries compiled with Emscripten manifest significant performance gains over comparable vanilla JavaScript programs by eschewing overheads associated with the JavaScript language (safety checks, automatic garbage collection, runtime polymorphism, etc.). -->
-Although WebAssembly itself is simply an interpreted bytecode, which would typically incur several-fold slowdown compared to machine code [@kazi2000techniques], browsers' just-in-time compilation engines allow critical sections of the WebAssembly bytecode to be translated into native machine code [@haas2017bringing].
-This just-in-time compilation model allows WebAssembly to achieve at least 50% --- and often closer to 90%  --- of native performance [@jangda2019not].
+WebAssembly's runtime efficiency is a major driver of its increasing popularity for web app development.
+WebAssembly is a virtual bytecode, but just-in-time compilation engines translate critical sections into native machine code [@haas2017bringing].
+This compilation model allows WebAssembly to achieve at least 50% --- and at times closer to 90% --- of native performance, providing an order of magnitude speed increase over JavaScript alone [@jangda2019not].
+These performance improvements open the door to entirely new possibilities for browser-based scientific computation.
+For example, the Avida-ED web viewer at <https://avida-ed.msu.edu/>, uses WebAssembly to simulate hundreds of thousands of generations of digital organisms within the span of a class period.
+Such rich, intensive in-browser experiences necessitate efficient source code.
 
-The potential for near-native in-broweser performance opens the door to entirely new possibilities for web-facing scientific computation.
-For example, the Avida-ED web viewer at <https://avida-ed.msu.edu/>, uses WebAssembly to simulate hundreds of thousands of generations of genetic program evaluations within the span of a class period.
-Such rich, intensive in-browser experiences necessitate efficient C++ source code.
+More broadly, Empirical caters to the necessity for runtime efficiency across all scientific computing, including in-browser applications, local runs, or high-performance computing (HPC) cluster deployments.
+In some contexts, even modest performance gains can save substantial hardware costs, meaningfully reduce energy use, and shave days or even weeks off run times.
+Order-of-magnitude performance gains can meaningfully broaden the scope of scientific questions that are tractable.
 
-Runtime efficiency is also critical to on-cluster digital experiments and general scientific computing, a co-equal use case targeted by Empirical.
-In this context, replicate jobs running the native executable might occupy dozens or hundreds of compute cores around the clock.
-A 10 or 20% performance gain can save substantial hardware costs, meaningfully reduce net energy use, and shave days or even weeks off of time-to-result for long-running computations.
-Order-of-magnitude performance gains might shift some otherwise intractable experiments into the realm of practicality, broadening the scope of scientific questions that can be meaningfully investigated.
-
-Empirical supports runtime efficiency by supplying highly-optimized tools for performance-critical tasks.
-For example, `emp::BitSet` and `emp::BitVector` classes support fast manipulation of fixed- and variable-length bitstrings by making extensive use bit-level optimizations to yield order-of-magnitude speedups.
+Empirical supports runtime efficiency in scientific computing by providing optimized tools for performance-critical tasks.
+For example, `emp::BitSet` and `emp::BitVector` classes are faster drop in replacements for their standard library equivilents (`std::bitset` and `std::vector<bool>`) while providing extensive additional functionality for rapid bit manipulations.
 Likewise,`emp::Random` wraps a cutting-edge high-performance pseudorandom number generator algorithm [@widynski2020squares].
-These tools were implemented with benchmark-informed development practices, ensuring that optimizations successfully translate into practical performance enhancements.
-At a more fundamental level, the library's header-only design prioritizes runtime performance by trading longer compilation time for potential performance gains under optimizing compilation (as well as greater flexibility and a simplified build process for the end user).
-
+Benchmark-informed development practices ensure that optimizations translate into consistent performance enhancements.
+At a more fundamental level, Empirical's header-only design prioritizes ease of use and runtime performance at the cost of somewhat longer compilation times.
 
 ## Facilitating Debugging
 <!-- @MAM: help you make your own code reliable -->
