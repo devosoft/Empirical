@@ -203,7 +203,7 @@ namespace emp {
 
     /// @brief Insert a value into this range set
     /// @param val Value to insert.
-    /// @return This range after insertion.
+    /// @return This RangeSet after insertion.
     RangeSet & Insert(T val) {
       emp_assert(is_integral, "Only integral ranges can call Insert() with a single value.");
 
@@ -228,7 +228,7 @@ namespace emp {
 
     /// @brief Insert a whole range into this set, merging other ranges if needed.
     /// @param in New range to include.
-    /// @return This range after insertion.
+    /// @return This RangeSet after insertion.
     RangeSet & Insert(range_t in) {
       const size_t start_id = _FindRange(in.GetLower());
 
@@ -252,7 +252,7 @@ namespace emp {
 
     /// @brief Merge an entire range set into this one.
     /// @param in_set Range set to add in.
-    /// @return This range after insertion.
+    /// @return This RangeSet after insertion.
     /// @note Can be optimized to handle big set mergers more efficiently!
     RangeSet & Insert(const this_t & in_set) {
       for (const range_t & range : in_set.GetRanges()) Insert(range);
@@ -262,58 +262,58 @@ namespace emp {
     /// @brief Insert a range into this set, specifying the start and end points.
     /// @param start Beginning of new range to include.
     /// @param stop Ending of new range to include (range is not inclusive of stop)
-    /// @return This range after insertion.
+    /// @return This RangeSet after insertion.
     RangeSet & InsertRange(T start, T stop) { return Insert(range_t{start, stop}); }
 
     /// @brief  Remove a single value from this RangeSet.
     /// @param val Value to remove
-    /// @return Did the range change due to this removal?
-    bool Remove(T val) {
+    /// @return This RangeSet after removal.
+    RangeSet & Remove(T val) {
       emp_assert(is_integral, "Only integral ranges can call Remove() with a single value.");
 
-      if (!Has(val)) return false;  // Not included!
+      if (!Has(val)) return *this;  // Nothing to remove.
 
       const size_t id = _FindRange(val);
-      range_t & cur_range = range_set[id];
-      if (cur_range.GetSize() == 1) _RemoveRange(id);            // Remove whole range
-      else if (cur_range.GetLower() == val) cur_range.Lower()++;             // Inc lower end
-      else if (cur_range.GetUpper()-1 == val) cur_range.Upper()--;           // Dec upper end
-      else {                                                                 // Split a range!
-        _InsertRange(id+1, range_t{val+1,cur_range.GetUpper()});
+      range_t & range = range_set[id];
+      if (range.GetSize() == 1) _RemoveRange(id);             // Remove whole range
+      else if (range.GetLower() == val) range.Lower()++;      // Inc lower end
+      else if (range.GetUpper()-1 == val) range.Upper()--;    // Dec upper end
+      else {                                                  // Split a range!
+        _InsertRange(id+1, range_t{val+1,range.GetUpper()});
         range_set[id].SetUpper(val);
       }
-      return true;
+      return *this;
     }
 
     /// @brief  Remove all ranges (or partial range) less than a target value.
     /// @param val New floor for ranges.
-    /// @return Did the range change due to this removal?
-    bool RemoveTo(T val) {
-      if (val <= GetStart()) return false;  // Nothing to remove.
+    /// @return This RangeSet after removal.
+    RangeSet & RemoveTo(T val) {
+      if (val <= GetStart()) return *this;  // Nothing to remove.
       size_t id = _FindRange(val);
       if (val == range_set[id].GetUpper()) ++id;
       _RemoveRanges(0, id);  // Remove everything before the new start.
       if (range_set.size() && range_set[0].Lower() < val) range_set[0].SetLower(val);
-      return true;
+      return *this;
     }
 
     /// @brief  Remove all ranges (or partial range) greater than a target value.
     /// @param val New cap for ranges.
-    /// @return Did the range change due to this removal?
-    bool RemoveFrom(T val) {
-      if (val >= GetEnd()) return false;        // Nothing to remove.
+    /// @return This RangeSet after removal.
+    RangeSet & RemoveFrom(T val) {
+      if (val >= GetEnd()) return *this;        // Nothing to remove.
       size_t id = _FindRange(val);
       if (val > range_set[id].GetLower()) ++id; // Include current range if needed.
       range_set.resize(id);                     // Remove everything past new end.
       if (GetEnd() > val) range_set.back().SetUpper(val);
-      return true;
+      return *this;
     }
 
     /// @brief  Remove a whole Range from this RangeSet.
     /// @param rm_range Range to remove
-    /// @return Did the this RangeSet change due to this removal?
-    bool Remove(range_t rm_range) {
-      if (!HasOverlap(rm_range)) return false;
+    /// @return This RangeSet after removal.
+    RangeSet & Remove(range_t rm_range) {
+      if (!HasOverlap(rm_range)) return *this;
       if (rm_range.Lower() <= GetStart()) return RemoveTo(rm_range.Upper());
       if (rm_range.Upper() >= GetEnd()) return RemoveFrom(rm_range.Lower());
 
@@ -325,7 +325,7 @@ namespace emp {
       if (start_range.Lower() < rm_range.Lower() && start_range.Upper() > rm_range.Upper()) {
         _InsertRange(start_id+1, range_t{rm_range.Upper(), start_range.Upper()});
         range_set[start_id].SetUpper(rm_range.Lower());
-        return true;
+        return *this;
       }
       
       // Deal with beginning of removal - cut it down if needed, and move on to next range.
@@ -342,34 +342,31 @@ namespace emp {
       // Remove middle.
       _RemoveRanges(start_id, end_id - start_id);
 
-      return true;
+      return *this;
     }
 
     /// @brief Remove all ranges in an entire range set from this one.
     /// @param in_set Range set to remove.
-    /// @return Did this RangeSet change?
+    /// @return This RangeSet after removal.
     /// @note Can be optimized to handle big sets more efficiently!
-    bool Remove(const this_t & in_set) {
-      bool result = false;
-      for (const range_t & range : in_set.GetRanges()) {
-        result |= Remove(range);
-      }
-      return result;
+    RangeSet & Remove(const this_t & in_set) {
+      for (const range_t & range : in_set.GetRanges()) Remove(range);
+      return *this;
     }
 
 
-    bool RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
+    RangeSet & RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
 
     /// @brief Remove everything outside of the provided range.
-    bool KeepOnly(T start, T stop) { return RemoveTo(start) + RemoveFrom(stop); }
+    RangeSet & KeepOnly(T start, T stop) { return RemoveTo(start) + RemoveFrom(stop); }
 
     /// @brief Remove everything outside of the provided range.
-    bool KeepOnly(range_t keep_range) {
+    RangeSet & KeepOnly(range_t keep_range) {
       return KeepOnly(keep_range.GetLower(), keep_range.GetUpper());
     }
 
     /// @brief Remove everything outside of the provided set of ranges.
-    bool KeepOnly(const this_t & in_set) { return Remove(~in_set); }
+    RangeSet & KeepOnly(const this_t & in_set) { return Remove(~in_set); }
 
 
     // Some more advanced functions.
