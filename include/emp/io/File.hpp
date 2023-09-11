@@ -243,14 +243,14 @@ namespace emp {
     /// Keep only strings that contain a specific substring.
     File & KeepIfBegins(const String & prefix) {
       return KeepIf(
-        [&prefix](const String & line){ return line.find(prefix) != String::npos; }
+        [&prefix](const String & line){ return line.find(prefix) == 0; }
       );
     }
 
     /// Remove all strings that contain a specific substring.
     File & RemoveIfBegins(const String & prefix) {
       return KeepIf(
-        [&prefix](const String & line){ return line.Find(prefix) == String::npos; }
+        [&prefix](const String & line){ return line.Find(prefix) != 0; }
       );
     }
 
