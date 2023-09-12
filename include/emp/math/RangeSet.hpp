@@ -358,7 +358,7 @@ namespace emp {
     RangeSet & RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
 
     /// @brief Remove everything outside of the provided range.
-    RangeSet & KeepOnly(T start, T stop) { return RemoveTo(start) + RemoveFrom(stop); }
+    RangeSet & KeepOnly(T start, T stop) { RemoveTo(start); return RemoveFrom(stop); }
 
     /// @brief Remove everything outside of the provided range.
     RangeSet & KeepOnly(range_t keep_range) {
@@ -419,6 +419,26 @@ namespace emp {
     friend std::ostream& operator<<(std::ostream &out, const this_t & range) {
       out << range.ToString();
       return out;
+    }
+
+    /// @brief Check for internal errors in this RangeSet. 
+    bool OK() {
+      // Check each range individually.
+      for (const auto & range : range_set) {
+        if (range.GetUpper() > range.GetLower()) {
+          emp_assert(false, range.GetLower(), range.GetUpper());
+          return false;
+        }
+      }
+
+      // Make sure ranges are in order and have gaps between them.
+      for (size_t i = 1; i < range_set.size(); ++i) {
+        if (range_set[i-1].GetUpper() >= range_set[i].GetLower()) {
+          emp_assert(false, i, range_set[i-1].GetUpper(), range_set[i].GetLower());
+          return false;
+        }
+      }
+      return true;
     }
   };
 
