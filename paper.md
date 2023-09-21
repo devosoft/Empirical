@@ -248,24 +248,22 @@ Assert statements typify runtime safety checks.
 These statements abort program execution at the point of failure with a helpful error message if an expected runtime condition is not met.
 <!-- Users can write `assert` statements into their own code to ensure that program behavior matches expectations.
  -->
-Runtime safety checks like `assert` oblige a performance cost, however: computing and testing the asserted runtime condition consumes CPU cycles.
-The common practice of distinguishing between production mode and debug mode can reduce or remove the overhead cost in performance-critical contexts.
-Assert statements and other runtime safety checks are verified in debug mode and ignored in production mode to maximize performance.
+Runtime safety checks like `assert` don't necessarily oblige a performance cost to compute the asserted runtime condition; these checks can be verified only in debug mode and ignored in production mode to maximize performance.
 
-Indeed, the C++ standard library provides an `assert` macro that follows this paradigm.
-Empirical provides a comparable `emp_assert` macro, differentiated primarily in terms of self-documentation and built-in support for the web runtime.
-This macro dispatches a UI alert when triggered, allows for users to write their own error messages, and enables registration of additional variables to be printed in any error message from that assert statement.
+Indeed, the C++ standard library's `assert` macro follows this paradigm.
+Empirical provides an extended `emp_assert` macro that prints custom error messages with current values of specified expressions, and dispatches a UI alert when triggered in a web environment.
 <!-- These features help compensate for the limited tooling currently available in the Empirical web runtime. -->
 
-In addition to user-defined asserts, most programming languages (Java, Python, Ruby, Rust, etc.) provide built-in support to detect common runtime violations, such as out-of-bounds indexing into a collection or bad type conversions.
+In addition to user-defined asserts, most programming languages (Java, Python, Ruby, Rust, etc.) provide built-in support to detect common runtime violations, such as out-of-bounds indexing or bad type conversions.
 <!-- These built-in protections against runtime violations are considered so critical that many programming languages do not provide a mechanism to disable them for speedups in production code. -->
-C++ does not.
+C++ does not in an effort to maximize performance.
  <!-- provide any standard mechanisms for safety-checking library features. -->
 However, standard library vendors  --- like [GCC's `libstdc++`](https://web.archive.org/web/20210118212109/https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html), [Clang's `libc++`](https://web.archive.org/web/20210414014331/https://libcxx.llvm.org/docs/DesignDocs/DebugMode.html), and [Microsoft's `stl`](https://web.archive.org/web/20210121201948/https://docs.microsoft.com/en-us/cpp/standard-library/checked-iterators?view=msvc-160) --- do provide some proprietary support for such safety checks.
-This support, however, is limited and poorly documented.
-For example, neither GCC 10.3 nor Clang 12.0.0 detect `std::vector` iterator invalidation when appending to a `std::vector` happens to fall within existing allocated buffer space ([GCC live example](https://perma.cc/6WDU-3C8X); [Clang live example](https://perma.cc/6SU9-CUKY)).
-Empirical supplements vendors' runtime safety checking by providing drop-in replacements for `std::array`, `std::optional`, and `std::vector` with stronger runtime safety checks while in debug mode.
-In addition, Empirical furnishes a safety-checked pointer wrapper, `emp::Ptr`, that detects memory leaks and invalid memory access in debug mode while retaining the full speed of raw pointers in release mode.
+This support, however, is limited and poorly documented[^1].
+Empirical supplements vendors' runtime safety checking by providing drop-in replacements for `std::array`, `std::optional`, and `std::vector` with stronger runtime safety checks, but only while in debug mode.
+In addition, Empirical furnishes a safety-checked pointer wrapper, `emp::Ptr`, that identifies memory leaks and invalid memory access in debug mode while retaining the full speed of raw pointers in release mode.
+
+[^1]: For example, neither GCC 10.3 nor Clang 12.0.0 detect `std::vector` iterator invalidation when appending to a `std::vector` happens to fall within existing allocated buffer space ([GCC live example](https://perma.cc/6WDU-3C8X); [Clang live example](https://perma.cc/6SU9-CUKY)).
 
 <!-- todo add more explanation of emp::Ptr and its rationale -->
 
