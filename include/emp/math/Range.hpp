@@ -56,9 +56,9 @@ namespace emp {
 
     emp::String ToString() const {
       if constexpr (INCLUDE_UPPER) {
-        return emp::MakeString('[', lower, '-', upper, ']');
+        return emp::MakeString('[', lower, ',', upper, ']');
       } else {
-        return emp::MakeString('[', lower, '-', upper, ')');
+        return emp::MakeString('[', lower, ',', upper, ')');
       }
     }
 
@@ -120,7 +120,7 @@ namespace emp {
       if (val < lower) lower = val;
       else if (val > upper) {
         upper = val;
-        if constexpr (INCLUDE_UPPER) val += GetEpsilon();
+        if constexpr (INCLUDE_UPPER) upper += GetEpsilon();
       } else return false;
       return true;
     }
@@ -129,13 +129,14 @@ namespace emp {
     /// @return Whether the range has changed due to this expansion.
     template <typename... Ts>
     bool Expand(T val1, T val2, Ts... args) {
-      return Expand(val1) + Expand(val2, args...);
+      return Expand(val1) + Expand(val2, args...); // Use + to avoid short-circuiting.
     }
 
     /// Merge this range with another.  Must be adjacent or overlap (return false if not!)
     bool Merge(this_t in) {
       if (!IsConnected(in)) return false;
-      return Expand(in.lower) + Expand(in.upper);  // Use + to avoid short-circuiting.
+      Expand(in.lower, in.upper);
+      return true;
     }
 
     /// Add a specified value to the end of a range (or return false if failed).
