@@ -56,8 +56,9 @@ namespace emp {
     // Helper function to increase the side of a range, possibly merging it with the next range.
     void _CleanupMerge(size_t id) {
       while (id+1 < range_set.size() && range_set[id].Merge(range_set[id+1])) {
-        _RemoveRange(id+1);  // Delete current range (merged in to previous)
+        _RemoveRange(id+1);  // Delete next range (merged in to current)
       }
+      emp_assert(OK());
     }
 
     // Helper function to convert a string into a RangeSet.
@@ -358,7 +359,11 @@ namespace emp {
     RangeSet & RemoveRange(T start, T stop) { return Remove(range_t{start, stop}); }
 
     /// @brief Remove everything outside of the provided range.
-    RangeSet & KeepOnly(T start, T stop) { RemoveTo(start); return RemoveFrom(stop); }
+    RangeSet & KeepOnly(T start, T stop) {
+      emp_assert(start < stop);
+      RemoveTo(start);
+      return RemoveFrom(stop);
+    }
 
     /// @brief Remove everything outside of the provided range.
     RangeSet & KeepOnly(range_t keep_range) {
@@ -374,6 +379,7 @@ namespace emp {
     /// @brief  Calculate the inverted range set, swapping included and excluded values.
     /// @return The inverted RangeSet.
     [[nodiscard]] this_t CalcInverse() const {
+      emp_assert(OK());
       const bool add_begin = (GetStart() != MinLimit());
       const bool add_end = (GetEnd() != MaxLimit());
       this_t out_ranges;
@@ -422,10 +428,10 @@ namespace emp {
     }
 
     /// @brief Check for internal errors in this RangeSet. 
-    bool OK() {
+    bool OK() const {
       // Check each range individually.
       for (const auto & range : range_set) {
-        if (range.GetUpper() > range.GetLower()) {
+        if (range.GetLower() > range.GetUpper()) {
           emp_assert(false, range.GetLower(), range.GetUpper());
           return false;
         }
@@ -434,7 +440,11 @@ namespace emp {
       // Make sure ranges are in order and have gaps between them.
       for (size_t i = 1; i < range_set.size(); ++i) {
         if (range_set[i-1].GetUpper() >= range_set[i].GetLower()) {
-          emp_assert(false, i, range_set[i-1].GetUpper(), range_set[i].GetLower());
+          emp::notify::Message("RangeSet::OK() Failed.  Ranges are: ");
+          for (const auto & range : range_set) {
+            emp::notify::Message('[', range.GetLower(), ',', range.GetUpper(), ')');
+          }
+          emp_assert(false, i, range_set.size(), range_set[i-1].GetUpper(), range_set[i].GetLower());
           return false;
         }
       }
