@@ -103,6 +103,9 @@ TEST_CASE("Test integral RangeSets", "[math]")
   CHECK(rs2.GetNumRanges() == 3);
   CHECK(rs1.GetSize() == 6);
   CHECK(rs2.GetSize() == 8);
+
+  CHECK(rs1.OK() == true);
+  CHECK(rs2.OK() == true);
 }
 
 TEST_CASE("Test continuous RangeSets", "[math]")
@@ -226,6 +229,7 @@ TEST_CASE("Test continuous RangeSets", "[math]")
   CHECK(rs1.GetSize() == Approx(41.25));
   CHECK(rs1.GetNumRanges() == 89);
 
+  CHECK(rs1.OK() == true);
 }
 
 TEST_CASE("Test RangeSet Inversion calculations", "[math]")
@@ -281,6 +285,8 @@ TEST_CASE("Test RangeSet Inversion calculations", "[math]")
   CHECK(rsd.Has(100.0) == false);
   CHECK(rsd.Has(150.0) == true);
   CHECK(rsd.Has(1000.0) == false);
+
+  CHECK(rsd.OK() == true);
 }
 
 TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
@@ -292,7 +298,9 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
 
   // Test *_SELF() Boolean Logic functions.
   set_t bv;      CHECK(bv.KeepOnly(0,8) == set_t("00000000"));
+  CHECK(bv.OK() == true);
   bv.Invert();      CHECK(bv.KeepOnly(0,8) == set_t("11111111"));
+  CHECK(bv.OK() == true);
   bv &= input1;     CHECK(bv.KeepOnly(0,8) == set_t("00001111"));
   bv &= input1;     CHECK(bv.KeepOnly(0,8) == set_t("00001111"));
   bv &= input2;     CHECK(bv.KeepOnly(0,8) == set_t("00000011"));
@@ -308,7 +316,12 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
   bv &= input2; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("11001100"));
   bv &= input3; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("10111011"));
 
-  bv |= input1; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("01000000"));
+  CHECK(bv.OK());
+  CHECK(input1.OK());
+  bv |= input1;
+  CHECK(bv.OK());
+  bv.Invert(); 
+  CHECK(bv.KeepOnly(0,8) == set_t("01000000"));
   bv |= input1; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("10110000"));
   bv |= input2; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("01001100"));
   bv |= input3; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("10100010"));
@@ -323,7 +336,9 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
   bv ^= input2; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("00001000"));
   bv ^= input3; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("10100010"));
 
+  CHECK(bv.OK() == true);
   bv.Invert();                CHECK(bv.KeepOnly(0,8) == set_t("01011101"));
+  CHECK(bv.OK() == true);
 
   // Test regular Boolean Logic functions.
   bv.Clear();                 CHECK(bv.KeepOnly(0,8) == set_t("00000000"));
@@ -398,6 +413,10 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
 
   bv = ~bv4;                CHECK(bv.KeepOnly(0,8) == set_t("01011101"));
 
+  CHECK(bv1.OK() == true);
+  CHECK(bv2.OK() == true);
+  CHECK(bv3.OK() == true);
+  CHECK(bv4.OK() == true);
 
   // Test COMPOUND Boolean Logic operators.
   bv = std::string("11111111");    CHECK(bv.KeepOnly(0,8) == set_t("11111111"));
@@ -428,6 +447,8 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
   CHECK( (bv >> 3) == set_t("11001000"));
   CHECK( (bv >> 4) == set_t("10010000"));
 
+  CHECK(bv.OK() == true);
+
   // Now some tests with bitvectors longer than one field.
   const set_t bvl80("00110111000101110001011100010111000101110001011100010111000101110001011100010111");
   CHECK( bvl80.GetSize() == 41 );
@@ -456,4 +477,6 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
   CHECK( bvl80 >> 63 ==
            set_t("10001011100010111000000000000000000000000000000000000000000000000000000000000000")
          );
+
+  CHECK(bvl80.OK() == true);
 }
