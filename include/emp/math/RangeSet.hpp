@@ -380,16 +380,21 @@ namespace emp {
     /// @return The inverted RangeSet.
     [[nodiscard]] this_t CalcInverse() const {
       emp_assert(OK());
+      // If this is an empty set, return a full set.
+      if (range_set.size() == 0) return this_t(MinLimit(), MaxLimit());
+
+      // Determine if we need to extend the the limits on each side.
       const bool add_begin = (GetStart() != MinLimit());
       const bool add_end = (GetEnd() != MaxLimit());
-      this_t out_ranges;
-      out_ranges.range_set.reserve(range_set.size() + add_begin + add_end - 1);
-      if (add_begin) out_ranges.range_set.emplace_back(MinLimit(),GetStart());
+      this_t out;
+      out.range_set.reserve(range_set.size() + add_begin + add_end - 1);
+      if (add_begin) out.range_set.emplace_back(MinLimit(),GetStart());
       for (size_t i = 1; i < range_set.size(); ++i) {
-        out_ranges.range_set.emplace_back(range_set[i-1].Upper(), range_set[i].Lower());
+        out.range_set.emplace_back(range_set[i-1].Upper(), range_set[i].Lower());
       }
-      if (add_end) out_ranges.range_set.emplace_back(GetEnd(), MaxLimit());
-      return out_ranges;
+      if (add_end) out.range_set.emplace_back(GetEnd(), MaxLimit());
+      emp_assert(out.OK());
+      return out;
     }
 
     this_t & Invert() { *this = CalcInverse(); return *this; }
@@ -397,15 +402,17 @@ namespace emp {
     // Simple operators:
     [[nodiscard]] this_t operator~() const { return CalcInverse(); }
     [[nodiscard]] this_t operator|(const this_t & in) const {
+      emp_assert(in.OK());
       this_t out(*this);
       return out.Insert(in);
     }
     [[nodiscard]] this_t operator&(const this_t & in) const {
+      emp_assert(in.OK());
       this_t out(*this);
-      out.Remove(~in);
-      return out;
+      return out.Remove(~in);
     }
     [[nodiscard]] this_t operator^(const this_t & in) {
+      emp_assert(in.OK());
       return (*this | in) & ~(*this & in);
     }
     [[nodiscard]] this_t operator<<(const T shift) const { return CalcShift(shift); }
@@ -414,7 +421,7 @@ namespace emp {
 
     this_t & operator|=(const this_t & in) { Insert(in); return *this; }
     this_t & operator&=(const this_t & in) { Remove(~in); return *this; }
-    this_t & operator^=(const this_t & in) { *this = *this^in; return *this; }
+    this_t & operator^=(const this_t & in) { emp_assert(in.OK()); *this = *this^in; return *this; }
     this_t & operator<<=(const T shift) { Shift(shift); return *this; }
     this_t & operator>>=(const T shift) { Shift(-shift); return *this; }
 
