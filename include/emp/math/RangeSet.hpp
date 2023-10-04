@@ -192,14 +192,15 @@ namespace emp {
     /// @brief Shift all ranges by a fixed amount.
     /// @param shift 
     RangeSet & Shift(T shift) {
+      emp_assert(OK());
       for (auto & range : range_set) range.Shift(shift);
+      emp_assert(OK());
       return *this;
     }
 
     [[nodiscard]] this_t CalcShift(T shift) const {
       this_t out(*this);
-      out.Shift(shift);
-      return out;
+      return out.Shift(shift);
     }
 
     /// @brief Insert a value into this range set
@@ -439,7 +440,7 @@ namespace emp {
       // Check each range individually.
       for (const auto & range : range_set) {
         if (range.GetLower() > range.GetUpper()) {
-          emp_assert(false, range.GetLower(), range.GetUpper());
+          emp::notify::Message("RangeSet::OK() Failed due to invalid range: ", range.ToString());
           return false;
         }
       }
@@ -447,11 +448,8 @@ namespace emp {
       // Make sure ranges are in order and have gaps between them.
       for (size_t i = 1; i < range_set.size(); ++i) {
         if (range_set[i-1].GetUpper() >= range_set[i].GetLower()) {
-          emp::notify::Message("RangeSet::OK() Failed.  Ranges are: ");
-          for (const auto & range : range_set) {
-            emp::notify::Message('[', range.GetLower(), ',', range.GetUpper(), ')');
-          }
-          emp_assert(false, i, range_set.size(), range_set[i-1].GetUpper(), range_set[i].GetLower());
+          emp::notify::Message("RangeSet::OK() Failed at range ", i, " of ", range_set.size(),
+                               ".  Ranges are: ", ToString());
           return false;
         }
       }
