@@ -278,16 +278,16 @@ Although Emscripten provides some [sanitizer support](https://web.archive.org/we
 # Outlook and Future Plans
 
 Empirical remains under active development.
-Current priorities include assembling compound, higher-level web widgets for common tasks and adding more step-by-step tutorials to our documentation.
+Current priorities include assembling higher-level web widgets for common tasks, making existing classes more web-friendly (such as file management and rich text handling), and adding more step-by-step tutorials to our documentation.
 
-However, we are committed to maintaining a stable interface for existing users.
-Last year, we took a major step towards this fulfilling this objective on an ongoing basis by completing a major reorganization informed by best practices to expose sustainable, consistent API to our end-users.
-We maintain an extensive suite of unit tests and integration tests to ensure that continuing development retains full backwards compatibility.
+We are committed to maintaining a stable interface for existing users.
+Last year, we took a major step towards fulfilling this objective on an ongoing basis by completing a major reorganization informed by best practices to expose sustainable, consistent API to our end-users.
+We maintain an extensive suite of unit tests and integration tests to ensure that continuing development retains backward compatibility.
 In addition, our software releases are archived on Zenodo in order to guarantee uninterrupted, perpetual access to our software for those who depend on it [@empirical_2020].
 
 Empirical has already been successfully incorporated into major projects within our research group's primary domains: digital evolution, artificial life, and genetic programming.
-We aim for potential utility across a much broader swath of the scientific software ecosystem, however --- particularly among projects that prioritize open science objectives.
-To this end, we look forward to supporting a wider of collection of collaborators and end-users.
+We aim for potential utility across a much broader swath of the scientific software ecosystem, particularly among projects that prioritize open science objectives.
+To this end, we look forward to welcoming new collaborations and supporting a wider collection of end-users.
 
 # Related Software Packages
 
