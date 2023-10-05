@@ -41,7 +41,7 @@ bibliography: paper.bib
 breaks: false
 ---
 
-[Scraps document here](https://hackmd.io/@DSAbJHksRtqYhjQ4NWzmGA/S1z3oQDWv)
+<!-- [Scraps document here](https://hackmd.io/@DSAbJHksRtqYhjQ4NWzmGA/S1z3oQDWv) -->
 <!--  @AML (2021-06-12): Doing a comment clean up, moving important ones (e.g., old meeting notes) into the scraps document. -->
 
 <!-- INSTRUCTIONS
