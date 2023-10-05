@@ -90,7 +90,7 @@ JOSS reviewer checklist: "clearly state what problems the software is designed t
 -->
 
 Modern web-based interfaces give computational research the unique potential to embody open science objectives of making the scientific process more transparent with auditable and exensible code, clear and replicable methodologies, and production of accessible results [CITE osf.io].
-<!-- [@world_academy_of_science_engineering_and_technology_2019] --> 
+<!-- [@world_academy_of_science_engineering_and_technology_2019] -->
 In practice, however, many scientific software applications are difficult to obtain, install, or use, and produce data in propriatary formats.
 
 High quality open-science tools encourage researchers to follow effective software development practices by simplifying development and helping them improve code quality, scientific rigor, and ease of replication or extension, resulting in broader confidence in and adoption of their software.
