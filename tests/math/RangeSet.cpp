@@ -342,74 +342,74 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
 
   // Test regular Boolean Logic functions.
   bv.Clear();                 CHECK(bv.KeepOnly(0,8) == set_t("00000000"));
-  set_t bv1 = ~bv;            CHECK(bv1 == set_t("11111111"));
+  set_t bv1 = ~bv;            CHECK(bv1.KeepOnly(0,8) == set_t("11111111"));
 
-  bv1 = bv1 & input1;         CHECK(bv1 == set_t("00001111"));
-  set_t bv2 = bv1 & input1;   CHECK(bv2 == set_t("00001111"));
-  set_t bv3 = bv2 & input2;   CHECK(bv3 == set_t("00000011"));
-  set_t bv4 = bv3 & input3;   CHECK(bv4 == set_t("00000001"));
+  bv1 = bv1 & input1;         CHECK(bv1.KeepOnly(0,8) == set_t("00001111"));
+  set_t bv2 = bv1 & input1;   CHECK(bv2.KeepOnly(0,8) == set_t("00001111"));
+  set_t bv3 = bv2 & input2;   CHECK(bv3.KeepOnly(0,8) == set_t("00000011"));
+  set_t bv4 = bv3 & input3;   CHECK(bv4.KeepOnly(0,8) == set_t("00000001"));
 
-  bv1 = bv4 | input1;         CHECK(bv1 == set_t("00001111"));
-  bv2 = bv1 | input1;         CHECK(bv2 == set_t("00001111"));
-  bv3 = bv2 | input3;         CHECK(bv3 == set_t("01011111"));
-  bv4 = bv3 | input2;         CHECK(bv4 == set_t("01111111"));
+  bv1 = bv4 | input1;         CHECK(bv1.KeepOnly(0,8) == set_t("00001111"));
+  bv2 = bv1 | input1;         CHECK(bv2.KeepOnly(0,8) == set_t("00001111"));
+  bv3 = bv2 | input3;         CHECK(bv3.KeepOnly(0,8) == set_t("01011111"));
+  bv4 = bv3 | input2;         CHECK(bv4.KeepOnly(0,8) == set_t("01111111"));
 
-  bv1 = bv4 & input1; bv1.Invert();   CHECK(bv1 == set_t("11110000"));
-  bv2 = bv1 & input1; bv2.Invert();   CHECK(bv2 == set_t("11111111"));
-  bv3 = bv2 & input2; bv3.Invert();   CHECK(bv3 == set_t("11001100"));
-  bv4 = bv3 & input3; bv4.Invert();   CHECK(bv4 == set_t("10111011"));
+  bv1 = bv4 & input1; bv1.Invert();   CHECK(bv1.KeepOnly(0,8) == set_t("11110000"));
+  bv2 = bv1 & input1; bv2.Invert();   CHECK(bv2.KeepOnly(0,8) == set_t("11111111"));
+  bv3 = bv2 & input2; bv3.Invert();   CHECK(bv3.KeepOnly(0,8) == set_t("11001100"));
+  bv4 = bv3 & input3; bv4.Invert();   CHECK(bv4.KeepOnly(0,8) == set_t("10111011"));
 
-  bv1 = bv4 | input1; bv1.Invert();   CHECK(bv1 == set_t("01000000"));
-  bv2 = bv1 | input1; bv2.Invert();   CHECK(bv2 == set_t("10110000"));
-  bv3 = bv2 | input2; bv3.Invert();   CHECK(bv3 == set_t("01001100"));
-  bv4 = bv3 | input3; bv4.Invert();   CHECK(bv4 == set_t("10100010"));
+  bv1 = bv4 | input1; bv1.Invert();   CHECK(bv1.KeepOnly(0,8) == set_t("01000000"));
+  bv2 = bv1 | input1; bv2.Invert();   CHECK(bv2.KeepOnly(0,8) == set_t("10110000"));
+  bv3 = bv2 | input2; bv3.Invert();   CHECK(bv3.KeepOnly(0,8) == set_t("01001100"));
+  bv4 = bv3 | input3; bv4.Invert();   CHECK(bv4.KeepOnly(0,8) == set_t("10100010"));
 
-  bv1 = bv4 ^ input1;                 CHECK(bv1 == set_t("10101101"));
-  bv2 = bv1 ^ input1;                 CHECK(bv2 == set_t("10100010"));
-  bv3 = bv2 ^ input2;                 CHECK(bv3 == set_t("10010001"));
-  bv4 = bv3 ^ input3;                 CHECK(bv4 == set_t("11000100"));
+  bv1 = bv4 ^ input1;                 CHECK(bv1.KeepOnly(0,8) == set_t("10101101"));
+  bv2 = bv1 ^ input1;                 CHECK(bv2.KeepOnly(0,8) == set_t("10100010"));
+  bv3 = bv2 ^ input2;                 CHECK(bv3.KeepOnly(0,8) == set_t("10010001"));
+  bv4 = bv3 ^ input3;                 CHECK(bv4.KeepOnly(0,8) == set_t("11000100"));
 
-  bv1 = bv4 ^ input1; bv1.Invert();   CHECK(bv1 == set_t("00110100"));
-  bv2 = bv1 ^ input1; bv2.Invert();   CHECK(bv2 == set_t("11000100"));
-  bv3 = bv2 ^ input2; bv3.Invert();   CHECK(bv3 == set_t("00001000"));
-  bv4 = bv3 ^ input3; bv4.Invert();   CHECK(bv4 == set_t("10100010"));
+  bv1 = bv4 ^ input1; bv1.Invert();   CHECK(bv1.KeepOnly(0,8) == set_t("00110100"));
+  bv2 = bv1 ^ input1; bv2.Invert();   CHECK(bv2.KeepOnly(0,8) == set_t("11000100"));
+  bv3 = bv2 ^ input2; bv3.Invert();   CHECK(bv3.KeepOnly(0,8) == set_t("00001000"));
+  bv4 = bv3 ^ input3; bv4.Invert();   CHECK(bv4.KeepOnly(0,8) == set_t("10100010"));
 
   bv = ~bv4;                          CHECK(bv.KeepOnly(0,8) == set_t("01011101"));
 
 
   // Test Boolean Logic operators.
   bv.Clear();               CHECK(bv.KeepOnly(0,8) == set_t("00000000"));
-  bv1 = ~bv;                CHECK(bv1 == set_t("11111111"));
+  bv1 = ~bv;                CHECK(bv1.KeepOnly(0,8) == set_t("11111111"));
 
-  bv1 = bv1 & input1;       CHECK(bv1 == set_t("00001111"));
-  bv2 = bv1 & input1;       CHECK(bv2 == set_t("00001111"));
-  bv3 = bv2 & input2;       CHECK(bv3 == set_t("00000011"));
-  bv4 = bv3 & input3;       CHECK(bv4 == set_t("00000001"));
+  bv1 = bv1 & input1;       CHECK(bv1.KeepOnly(0,8) == set_t("00001111"));
+  bv2 = bv1 & input1;       CHECK(bv2.KeepOnly(0,8) == set_t("00001111"));
+  bv3 = bv2 & input2;       CHECK(bv3.KeepOnly(0,8) == set_t("00000011"));
+  bv4 = bv3 & input3;       CHECK(bv4.KeepOnly(0,8) == set_t("00000001"));
 
-  bv1 = bv4 | input1;       CHECK(bv1 == set_t("00001111"));
-  bv2 = bv1 | input1;       CHECK(bv2 == set_t("00001111"));
-  bv3 = bv2 | input3;       CHECK(bv3 == set_t("01011111"));
-  bv4 = bv3 | input2;       CHECK(bv4 == set_t("01111111"));
+  bv1 = bv4 | input1;       CHECK(bv1.KeepOnly(0,8) == set_t("00001111"));
+  bv2 = bv1 | input1;       CHECK(bv2.KeepOnly(0,8) == set_t("00001111"));
+  bv3 = bv2 | input3;       CHECK(bv3.KeepOnly(0,8) == set_t("01011111"));
+  bv4 = bv3 | input2;       CHECK(bv4.KeepOnly(0,8) == set_t("01111111"));
 
-  bv1 = ~(bv4 & input1);    CHECK(bv1 == set_t("11110000"));
-  bv2 = ~(bv1 & input1);    CHECK(bv2 == set_t("11111111"));
-  bv3 = ~(bv2 & input2);    CHECK(bv3 == set_t("11001100"));
-  bv4 = ~(bv3 & input3);    CHECK(bv4 == set_t("10111011"));
+  bv1 = ~(bv4 & input1);    CHECK(bv1.KeepOnly(0,8) == set_t("11110000"));
+  bv2 = ~(bv1 & input1);    CHECK(bv2.KeepOnly(0,8) == set_t("11111111"));
+  bv3 = ~(bv2 & input2);    CHECK(bv3.KeepOnly(0,8) == set_t("11001100"));
+  bv4 = ~(bv3 & input3);    CHECK(bv4.KeepOnly(0,8) == set_t("10111011"));
 
-  bv1 = ~(bv4 | input1);    CHECK(bv1 == set_t("01000000"));
-  bv2 = ~(bv1 | input1);    CHECK(bv2 == set_t("10110000"));
-  bv3 = ~(bv2 | input2);    CHECK(bv3 == set_t("01001100"));
-  bv4 = ~(bv3 | input3);    CHECK(bv4 == set_t("10100010"));
+  bv1 = ~(bv4 | input1);    CHECK(bv1.KeepOnly(0,8) == set_t("01000000"));
+  bv2 = ~(bv1 | input1);    CHECK(bv2.KeepOnly(0,8) == set_t("10110000"));
+  bv3 = ~(bv2 | input2);    CHECK(bv3.KeepOnly(0,8) == set_t("01001100"));
+  bv4 = ~(bv3 | input3);    CHECK(bv4.KeepOnly(0,8) == set_t("10100010"));
 
-  bv1 = bv4 ^ input1;       CHECK(bv1 == set_t("10101101"));
-  bv2 = bv1 ^ input1;       CHECK(bv2 == set_t("10100010"));
-  bv3 = bv2 ^ input2;       CHECK(bv3 == set_t("10010001"));
-  bv4 = bv3 ^ input3;       CHECK(bv4 == set_t("11000100"));
+  bv1 = bv4 ^ input1;       CHECK(bv1.KeepOnly(0,8) == set_t("10101101"));
+  bv2 = bv1 ^ input1;       CHECK(bv2.KeepOnly(0,8) == set_t("10100010"));
+  bv3 = bv2 ^ input2;       CHECK(bv3.KeepOnly(0,8) == set_t("10010001"));
+  bv4 = bv3 ^ input3;       CHECK(bv4.KeepOnly(0,8) == set_t("11000100"));
 
-  bv1 = ~(bv4 ^ input1);    CHECK(bv1 == set_t("00110100"));
-  bv2 = ~(bv1 ^ input1);    CHECK(bv2 == set_t("11000100"));
-  bv3 = ~(bv2 ^ input2);    CHECK(bv3 == set_t("00001000"));
-  bv4 = ~(bv3 ^ input3);    CHECK(bv4 == set_t("10100010"));
+  bv1 = ~(bv4 ^ input1);    CHECK(bv1.KeepOnly(0,8) == set_t("00110100"));
+  bv2 = ~(bv1 ^ input1);    CHECK(bv2.KeepOnly(0,8) == set_t("11000100"));
+  bv3 = ~(bv2 ^ input2);    CHECK(bv3.KeepOnly(0,8) == set_t("00001000"));
+  bv4 = ~(bv3 ^ input3);    CHECK(bv4.KeepOnly(0,8) == set_t("10100010"));
 
   bv = ~bv4;                CHECK(bv.KeepOnly(0,8) == set_t("01011101"));
 
@@ -437,15 +437,18 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
   bv ^= input3;       CHECK(bv.KeepOnly(0,8) == set_t("00011001"));
 
   // Shifting tests.
-  CHECK( (bv << 1) == set_t("00001100"));
-  CHECK( (bv << 2) == set_t("00000110"));
-  CHECK( (bv << 3) == set_t("00000011"));
-  CHECK( (bv << 4) == set_t("00000001"));
+  CHECK( (bv << 1).KeepOnly(0,8) == set_t("00001100"));
+  CHECK( (bv << 2).KeepOnly(0,8) == set_t("00000110"));
+  CHECK( (bv << 3).KeepOnly(0,8) == set_t("00000011"));
+  CHECK( (bv << 4).KeepOnly(0,8) == set_t("00000001"));
 
-  CHECK( (bv >> 1) == set_t("00110010"));
-  CHECK( (bv >> 2) == set_t("01100100"));
-  CHECK( (bv >> 3) == set_t("11001000"));
-  CHECK( (bv >> 4) == set_t("10010000"));
+  CHECK( (bv >> 1).KeepOnly(0,8) == set_t("00110010"));
+  CHECK( (bv >> 2).KeepOnly(0,8) == set_t("01100100"));
+  CHECK( (bv >> 3).KeepOnly(0,8) == set_t("11001000"));
+  CHECK(bv.OK());
+  CHECK((bv >> 4).OK());
+  CHECK((bv >> 4).KeepOnly(0,8).OK());
+  CHECK( (bv >> 4).KeepOnly(0,8) == set_t("10010000"));
 
   CHECK(bv.OK() == true);
 
