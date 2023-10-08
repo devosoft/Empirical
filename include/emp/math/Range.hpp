@@ -53,6 +53,8 @@ namespace emp {
       else return upper - GetEpsilon();
     }
     T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
+    [[nodiscard]] static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
+    [[nodiscard]] static constexpr T MinLimit() { return std::numeric_limits<T>::lowest(); }
 
     emp::String ToString() const {
       if constexpr (INCLUDE_UPPER) {
@@ -65,7 +67,24 @@ namespace emp {
     void SetLower(T l) { lower = l; }
     void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
-    void Shift(T shift) { lower += shift; upper += shift; }
+    void ShiftDown(T shift) {
+      emp_assert(shift > 0);
+      emp_assert(lower <= upper, lower, upper);
+      // Guard against underflow
+      upper = (MinLimit() + shift < upper) ? (upper - shift) : MinLimit();
+      lower = (MinLimit() + shift < lower) ? (lower - shift) : MinLimit();
+    }
+    void ShiftUp(T shift) {
+      emp_assert(shift > 0);
+      emp_assert(lower <= upper, lower, upper);
+      // Guard against overflow
+      upper = (MaxLimit() - shift > upper) ? (upper + shift) : MaxLimit();
+      lower = (MaxLimit() - shift > lower) ? (lower + shift) : MaxLimit();
+    }
+    void Shift(T shift) {
+      if (shift > 0) ShiftUp(shift); 
+      else ShiftDown(-shift);
+    }
 
     void SetMinLower() { lower = std::numeric_limits<T>::min(); }
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
