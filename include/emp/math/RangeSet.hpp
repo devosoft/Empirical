@@ -53,6 +53,21 @@ namespace emp {
     void _RemoveRange(size_t id) { emp::RemoveAt(range_set, id); }
     void _RemoveRanges(size_t id, size_t count) {  emp::RemoveAt(range_set, id, count); }
 
+    // Helper function to remove empty ranges at the beginning.
+    void _PruneEmptyFront() {
+      size_t count = 0;
+      while (count < range_set.size() && range_set[count].GetSize() == 0) ++count;
+      if (count) _RemoveRanges(0, count);
+    }
+
+    // Helper function to remove empty ranges at the end.
+    void _PruneEmptyBack() {
+      size_t count = 0;
+      while (count < range_set.size() &&
+             range_set[range_set.size()-count-1].GetSize() == 0) ++count;
+      if (count) range_set.resize(range_set.size() - count);
+    }
+
     // Helper function to increase the side of a range, possibly merging it with the next range.
     void _CleanupMerge(size_t id) {
       while (id+1 < range_set.size() && range_set[id].Merge(range_set[id+1])) {
@@ -190,17 +205,39 @@ namespace emp {
     RangeSet & SetAll() { InsertRange(MinLimit(), MaxLimit()); return *this; }
 
     /// @brief Shift all ranges by a fixed amount.
-    /// @param shift 
+    /// @param shift How much should the range be shifted by?
     RangeSet & Shift(T shift) {
-      emp_assert(OK());
-      for (auto & range : range_set) range.Shift(shift);
-      emp_assert(OK());
+      if (shift > 0) ShiftUp(shift);
+      else if (shift < 0) ShiftDown(shift);
       return *this;
     }
+
+    RangeSet & ShiftUp(T shift) {
+      for (auto & range : range_set) range.ShiftUp(shift);
+      _PruneEmptyBack();
+      return *this;
+    }
+
+    RangeSet & ShiftDown(T shift) {
+      for (auto & range : range_set) range.ShiftDown(shift);
+      _PruneEmptyFront();
+      return *this;
+    }
+
 
     [[nodiscard]] this_t CalcShift(T shift) const {
       this_t out(*this);
       return out.Shift(shift);
+    }
+
+    [[nodiscard]] this_t CalcShiftDown(T shift) const {
+      this_t out(*this);
+      return out.ShiftDown(shift);
+    }
+
+    [[nodiscard]] this_t CalcShiftUp(T shift) const {
+      this_t out(*this);
+      return out.ShiftUp(shift);
     }
 
     /// @brief Insert a value into this range set
@@ -416,15 +453,15 @@ namespace emp {
       emp_assert(in.OK());
       return (*this | in) & ~(*this & in);
     }
-    [[nodiscard]] this_t operator<<(const T shift) const { return CalcShift(shift); }
-    [[nodiscard]] this_t operator>>(const T shift) const { return CalcShift(-shift); }
+    [[nodiscard]] this_t operator<<(const T shift) const { return CalcShiftUp(shift); }
+    [[nodiscard]] this_t operator>>(const T shift) const { return CalcShiftDown(shift); }
     [[nodiscard]] bool operator[](T val) const { return Has(val); }
 
     this_t & operator|=(const this_t & in) { Insert(in); return *this; }
     this_t & operator&=(const this_t & in) { Remove(~in); return *this; }
     this_t & operator^=(const this_t & in) { emp_assert(in.OK()); *this = *this^in; return *this; }
-    this_t & operator<<=(const T shift) { Shift(shift); return *this; }
-    this_t & operator>>=(const T shift) { Shift(-shift); return *this; }
+    this_t & operator<<=(const T shift) { ShiftUp(shift); return *this; }
+    this_t & operator>>=(const T shift) { ShiftDown(shift); return *this; }
 
     explicit operator bool() const { return range_set.size(); }
 
