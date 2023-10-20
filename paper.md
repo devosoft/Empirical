@@ -65,7 +65,6 @@ Paper should include:
 
 -->
 
-# Summary
 <!-- SUMMARY
 
 JOSS: "Begin your paper with a summary of the high-level functionality of your software for a non-specialist reader. Avoid jargon in this section."
@@ -89,13 +88,13 @@ JOSS: illustrates the research purpose of the software.
 JOSS reviewer checklist: "clearly state what problems the software is designed to solve and who the target audience is"
 -->
 
-Modern web-based interfaces give computational research the unique potential to embody open science objectives of making the scientific process more transparent with auditable and exensible code, clear and replicable methodologies, and production of accessible results [CITE osf.io].
+Modern web-based interfaces give computational research the unique potential to embody open science objectives: they can make the scientific process more transparent with auditable and extensible code, clear and replicable methodologies, and production of accessible results [CITE osf.io].
 <!-- [@world_academy_of_science_engineering_and_technology_2019] -->
-In practice, however, many scientific software applications are difficult to obtain, install, or use, and produce data in propriatary formats.
+In practice, however, many scientific software applications are difficult to obtain, install, or use, and produce data in proprietary formats.
 
-High quality open-science tools encourage researchers to follow effective software development practices by simplifying development and helping them improve code quality, scientific rigor, and ease of replication or extension, resulting in broader confidence in and adoption of their software.
+High quality open-science tools encourage researchers to follow effective software development practices by simplifying development and helping them improve code quality, scientific rigor, and ease of replication or extension.
 In the process, researchers get more out of their own code.
-For example, an effective toolkit would allow a developer to easily add a GUI that would not only help other users of the software, but could also help the researcher themsleves gain "soft knowledge" of their system [@10.1145/3185517].
+For example, adding a GUI not only helps other users of the software, but could also help the researcher themselves gain "soft knowledge" of their system [@10.1145/3185517].
 
 Recent developments in web technology such as WebAssembly enable compilation of native source code to browser-based interactive interfaces.
 However, many scientists lack web development training and do not have the bandwidth to learn new languages and frameworks.
@@ -132,7 +131,7 @@ These safeguards can be fully disabled by a compiler flag in order to ensure max
 
 ## Facilitating Better Code for Scientific Software
 
-Software produced by academics, especially for one-off use often foregoes rigorous programming practices for the sake of expediency.
+Software produced by academics, especially for one-off use, often foregoes rigorous programming practices for the sake of expediency.
 By furnishing prepackaged components that address common tasks for scientific software, the Empirical library helps scientific developers efficiently write high quality C++ code.
 Utilities for common tasks empower users to craft more readable and maintainable code.
 Bugs can be avoided by replacing one-off implementations with Empirical components subjected to structured code review, unit testing (with coverage tracking), and other modern software development practices detailed [in our documentation](https://empirical.readthedocs.io/en/latest/dev/empirical-development-practices.html).
@@ -359,7 +358,6 @@ these are more agent-based simulations which aren't the focus of this paper
   * Interactive exploration of interaction networks in evolutionary computation under different selection schemes.
 * [Symbulation](https://anyaevostinar.github.io/SymbulationEmp/web/symbulation.html) [@vostinar2017suicide]
   * An interactive artificial life model focused on the evolution of symbiosis between parasitism to mutualism.
-    Also features a game to recreate major results from published work.
 * [SignalGP](https://github.com/amlalejini/signalgp) [@Lalejini2018-GECCO]
   * SignalGP is a new GP technique designed to give evolution direct access to the event-driven programming paradigm where computations are triggered response to signals from the environment, from other agents, or that are internally generated.
 * [Model of cancer evolution on an oxygen gradient](http://emilydolson.github.io/memic_model/web/memic_model.html)
