@@ -82,6 +82,12 @@ Specifically, the library sets out to fulfill the following goals:
 3. **Reliability:** Scientific simulation and data analysis is meaningful insofar as it is correct. In conjunction with extensive unit testing, Empirical benefits from --- and provides --- sophisticated debug-mode instrumentation tools. These include audited memory management, drop-in replacements for standard C++ containers with safety checking, and self-documenting assertions.
 4. **Distributability:** Scientific software should be easily used by any researcher, student, or citizen scientist who wants to experiment, explore, or replicate studies. As such, Empirical is highly portable, uses common data formats, facilitates flexible runtime configuration, and simplifies compilation to a performant web app.
 
+In addition to many helpful utilities to improve the scientific programming experience, the core Empirical support library comprises four major features:
+
+ 1. debug-instrumented fundamental type and C++ standard library container wrappers,
+ 2. implementations of general-purpose data structures and algorithms,
+ 3. integrated, end-to-end frameworks for data and configuration management, and
+ 4. object-oriented bindings for Emscripten/WebAssembly GUI elements.
 # Statement of Need
 <!-- STATEMENT OF NEED
 JOSS: illustrates the research purpose of the software.
