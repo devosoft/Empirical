@@ -201,7 +201,7 @@ In addition, Empirical furnishes a safety-checked pointer wrapper, `emp::Ptr`, t
 Because of poor support for built-in runtime safety checks, C++ developers typically use an external toolchain to detect and diagnose runtime violations.
 Popular tools include Valgrind, GDB, and runtime sanitizers.
 Although this tooling is very mature and quite powerful, there are fundamental limitations to the runtime violations it can detect.
-For example, Clang 12.0.0's sanitizers cannot detect the iterator invalidation described above ([live example](https://godbolt.org/z/z6ocqn87W)).
+For example, Clang 12.0.0's sanitizers cannot detect the iterator invalidation described above ([live example](https://perma.cc/4ECQ-D5LG)).
 Additionally, most of this tooling is not available when debugging WASM code compiled with Emscripten --- a core use case targeted by the Empirical library.
 Although Emscripten provides some [sanitizer support](https://web.archive.org/web/20210513071104/https://emscripten.org/docs/debugging/Sanitizers.html) and [other debugging features](https://web.archive.org/web/20210513070806/https://emscripten.org/docs/porting/Debugging.html), tooling limitations (such as the lack of a steppable debugger) make runtime safety checking particularly critical.
 
