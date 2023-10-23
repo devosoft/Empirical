@@ -33,7 +33,10 @@ Internal encoding (Emphatic)
   image - followed by location of image.
   
 
+
 ---------------------------------------
+
+
 MarkBack notes:
   New format is .mback, which is inspired by markdown, but uses just two types of special characters for formatting:
      Backquotes (`) indicate a change in text STYLE
@@ -90,6 +93,7 @@ MarkBack notes:
    \#{Heading}
    \##{Heading level 2}
    \### etc. deeper headings.
+   \| is the beginning of a table line (rest of line is markdown format...?)
    \_ is a non-breaking space.
    \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
    \- is a horizontal rule
@@ -98,9 +102,10 @@ MarkBack notes:
    \+ is a consecutive number bullet, incrementing if in a list
    \={123} (or any other numbers or letters) is a specified value for a bullet (a subsequent \+, \a, or \R will continue from it)
    \a is an alphabetic bullet, incrementing if in a list
-   \n is a newline
+   \b is a page break
+   \n is a line break (newline)
+   \p is a paragraph break
    \t is a tab
-   \p is a page break
    \R is a roman numeral bullet, incrementing if in a list
    \(123) (or any other number) converts to the associated unicode character.
    \<URL> or \<hashtag> will place a link this point WITH itself as the text
@@ -108,8 +113,9 @@ MarkBack notes:
    \:name: will place the emoji associated with 'name'
    \&name; insert a character by a given name
    \{var_value_printed_here} - see below
+   \?{TEST}{Optional text} - insert only if TEST is true.
 
-  Unused symbols for insertions: ~!@$%;'",?/|
+  Unused symbols for insertions: ~!@$%;'",/ plus lots of letters
   ALSO technically unused, but less useful: ]>})
 
 
@@ -117,6 +123,8 @@ MarkBack notes:
   
    `{var name=value or other_code}
    \{var_value_printed_here}
+   `?{TEST}Optional formatting  -- e.g., ?{has_error}[red] or ?{important}*
+   \?{TEST}{Optional text} - insert only if TEST is true.
 
 
 
