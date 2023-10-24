@@ -371,9 +371,17 @@ namespace emp {
       emp::vector<T> out_row(sv_row.size());
       for (size_t i=0; i < sv_row.size(); i++) out_row[i] = from_string<T>(sv_row[i]);
 
-      // Remove the row to be extrated and return the result.
+      // Remove the row to be extracted and return the result.
       lines.erase(begin());
       return out_row;
+    }
+
+    emp::vector< emp::vector<emp::String> > ToCSV(String delim=",") const {
+      emp::vector< emp::vector<emp::String> > out_csv(lines.size());
+      for (size_t row_id = 0; row_id < lines.size(); row_id++) {
+        out_csv[row_id] = lines[row_id].Slice(delim);
+      }
+      return out_csv;
     }
 
     template <typename T>
@@ -390,6 +398,7 @@ namespace emp {
 
       return out_data;
     }
+
 
     // A File::Scan object allows a user to easily step through a File.
     class Scan {
