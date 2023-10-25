@@ -51,9 +51,9 @@ namespace emp {
       : StringSyntax(std::string(quotes), std::string(parens)) { }
     StringSyntax & operator=(const StringSyntax &) = default;
     StringSyntax & operator=(StringSyntax &&) = default;
-    bool IsQuote(char c) const { return c && char_matches[c] && (char_matches[c] == c); }
-    bool IsParen(char c) const { return c && char_matches[c] && (char_matches[c] != c); }
-    char GetMatch(char c) const { return char_matches[c]; }
+    bool IsQuote(char c) const { return (c > 0) && char_matches[c] && (char_matches[c] == c); }
+    bool IsParen(char c) const { return (c > 0) && char_matches[c] && (char_matches[c] != c); }
+    char GetMatch(char c) const { return (c >= 0) && char_matches[c]; }
     uint8_t GetCount() const { return count; }
     std::string GetQuotes() const { std::string out; for (uint8_t i=0; i < 128; ++i) if (char_matches[i]==i) out+=(char)i; return out;}
 
