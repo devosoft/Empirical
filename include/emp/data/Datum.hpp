@@ -140,6 +140,22 @@ namespace emp {
     template<typename T> bool operator> (const T & rhs) const { return Compare(rhs) == 1; }
     template<typename T> bool operator<=(const T & rhs) const { return Compare(rhs) != 1; }
 
+    Datum operator+(double in) const {
+      if (IsDouble()) return NativeDouble() + in;
+      return NativeString() + std::to_string(in);
+    }
+    Datum operator*(double in) const {
+      if (IsDouble()) return NativeDouble() * in;
+      std::string out_string;
+      const size_t count = static_cast<size_t>(in);
+      out_string.reserve(NativeString().size() * count);
+      for (size_t i = 0; i < count; ++i) out_string += NativeString();
+      return out_string;
+    }
+    Datum operator-(double in) const { return AsDouble() - in; }
+    Datum operator/(double in) const { return AsDouble() / in; }
+    Datum operator%(double in) const { return emp::Mod(AsDouble(), in); }
+
     Datum operator+(const Datum & in) const {
       if (IsDouble()) return NativeDouble() + in.AsDouble();
       return NativeString() + in.AsString();
@@ -155,7 +171,6 @@ namespace emp {
     Datum operator-(const Datum & in) const { return AsDouble() - in.AsDouble(); }
     Datum operator/(const Datum & in) const { return AsDouble() / in.AsDouble(); }
     Datum operator%(const Datum & in) const { return emp::Mod(AsDouble(), in.AsDouble()); }
-
   };
 
   std::ostream & operator<<(std::ostream & out, const emp::Datum & d) {
