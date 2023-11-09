@@ -146,4 +146,13 @@ TEST_CASE("Test Datum Math", "[data]")
 
   CHECK(d2 / 2.0 == 1.0);
   CHECK(d3 / 2.0 == 1.5);
+
+  CHECK(d3 % 2.0 == 1.0);
+
+  CHECK(1.0 + d2 == d3);
+  CHECK(3.0 + d3 == 6.0);
+  CHECK(2.0 * d2 == 4.0);
+  CHECK(5.0 - d2 == 3.0);
+  CHECK(12.0 / d3 == 4.0);
+  CHECK(13.0 % d3 == 1.0);
 }
