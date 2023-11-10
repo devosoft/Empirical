@@ -180,4 +180,8 @@ namespace emp {
 
 }
 
+emp::Datum operator%(double value1, emp::Datum value2) {
+  return emp::Mod(value1, value2.AsDouble());
+}
+
 #endif // #ifndef EMP_DATA_DATUM_HPP_INCLUDE
