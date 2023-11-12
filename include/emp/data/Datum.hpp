@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021-2022.
+ *  @date 2021-2023.
  *
  *  @file Datum.hpp
  *  @brief A single piece of data, either a value or a string.
@@ -171,6 +171,17 @@ namespace emp {
     Datum operator-(const Datum & in) const { return AsDouble() - in.AsDouble(); }
     Datum operator/(const Datum & in) const { return AsDouble() / in.AsDouble(); }
     Datum operator%(const Datum & in) const { return emp::Mod(AsDouble(), in.AsDouble()); }
+
+    template <typename T>
+    Datum operator+=(T && in) { return *this = operator+(std::forward<T>(in)); }
+    template <typename T>
+    Datum operator-=(T && in) { return *this = operator-(std::forward<T>(in)); }
+    template <typename T>
+    Datum operator*=(T && in) { return *this = operator*(std::forward<T>(in)); }
+    template <typename T>
+    Datum operator/=(T && in) { return *this = operator/(std::forward<T>(in)); }
+    template <typename T>
+    Datum operator%=(T && in) { return *this = operator%(std::forward<T>(in)); }
   };
 
   std::ostream & operator<<(std::ostream & out, const emp::Datum & d) {
