@@ -75,8 +75,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
     {"_", "multiple/=s/file=biz=blah+ext=.pdf"}
   }));
 
-  // test pack
-  // reorderings
+  // test pack reorderings
   REQUIRE( (emp::keyname::pack({
      {"seed", "100"},
      {"foobar", "20"},

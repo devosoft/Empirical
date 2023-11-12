@@ -4,7 +4,7 @@
  *  @date 2021.
  *
  *  @file AnnotatedType.hpp
- *  @brief A base class to provide a DataMap and accessors to another class.
+ *  @brief A base class to provide a DataMap and accessors to derived classes.
  *  @note Status: ALPHA
  *
  */
@@ -84,7 +84,6 @@ namespace emp {
       return data_map.GetAsString(trait_id, type_id, count);
     }
   };
-
 
 }
 

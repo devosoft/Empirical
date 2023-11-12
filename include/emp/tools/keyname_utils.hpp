@@ -74,9 +74,7 @@ namespace emp::keyname {
   }
 
   inline unpack_t unpack(const std::string & filename) {
-
     unpack_t res;
-
     const auto kv_strs = emp::slice(
 #ifndef __EMSCRIPTEN__
       std::filesystem::path(filename).filename().string(), // get basename
