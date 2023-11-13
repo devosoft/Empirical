@@ -155,4 +155,20 @@ TEST_CASE("Test Datum Math", "[data]")
   CHECK(5.0 - d2 == 3.0);
   CHECK(12.0 / d3 == 4.0);
   CHECK(13.0 % d3 == 1.0);
+
+  d2 += d3;
+  CHECK(d2 == 5.0);
+  d2 += 2.0;
+  CHECK(d2 == 7.0);
+  d2 -= 4.0;
+  CHECK(d2 == 3.0);
+  d2 *= 10.0;
+  CHECK(d2 == 30.0);
+  d2 /= 6.0;
+  CHECK(d2 == 5.0);
+  d2 %= 3.0;
+  CHECK(d2 == 2.0);
+
+  ds += "string";
+  CHECK(ds == "Num:string");
 }
