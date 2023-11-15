@@ -139,6 +139,15 @@ namespace emp {
     template<typename T> bool operator> (const T & rhs) const { return Compare(rhs) == 1; }
     template<typename T> bool operator<=(const T & rhs) const { return Compare(rhs) != 1; }
 
+    // Unary Operators
+
+    Datum operator+() const { return AsDouble(); }
+    Datum operator-() const { return -AsDouble(); }
+    Datum operator!() const { return (AsDouble() == 0.0); }
+    
+
+    // Binary Operators
+
     Datum operator+(double in) const {
       if (IsDouble()) return NativeDouble() + in;
       return NativeString() + std::to_string(in);
