@@ -31,20 +31,25 @@ namespace emp {
     };
     bool is_num = true;
 
-    void InitString() { new (&str) std::string; }
-    void InitString(const std::string & in) { new (&str) auto(in); }
-    void FreeString() { str.~basic_string(); }
+    void InitString() { new (&str) std::string; is_num = false; }
+    template <typename T>
+    void InitString(T && in) { new (&str) std::string(std::forward<T>(in)); is_num = false; }
+    void FreeString() { if (!is_num) str.~basic_string(); }
   public:
     Datum() : num(0.0), is_num(true) { }
     Datum(double in) : num(in), is_num(true) { }
-    Datum(const std::string & in) : is_num(false) { InitString(in); }
-    Datum(const char * in) : is_num(false) { InitString(in); }
+    Datum(const std::string & in) { InitString(in); }
+    Datum(std::string && in) { InitString(in); }
+    Datum(const char * in) { InitString(in); }
     Datum(const Datum & in) {
-      is_num = in.is_num;
-      if (is_num) num = in.num;
+      if (in.is_num) num = in.num;
       else InitString(in.str);
     }
-    ~Datum() { if (!is_num) FreeString(); }
+    Datum(Datum && in) {
+      if (in.is_num) num = in.num;
+      else InitString(std::move(in.str));
+    }
+    ~Datum() { FreeString(); }
 
     bool IsDouble() const { return is_num; }   ///< Is this natively stored as a double?
     bool IsString() const { return !is_num; }  ///< Is this natively stored as a string?
@@ -78,25 +83,19 @@ namespace emp {
       //return std::to_string(num);
     }
 
-//    operator bool() const { return AsDouble() != 0.0; }
     operator double() const { return AsDouble(); }
     operator std::string() const { return AsString(); }
 
     Datum & SetDouble(double in) {  // If this were previously a string, clean it up!
-      if (!is_num) {
-        FreeString();
-        is_num = true;
-      }
+      FreeString();  // If there was previously a string, make sure to free it.
+      is_num = true;
       num = in;
       return *this;
     }
 
     Datum & SetString(const std::string & in) {
-      if (is_num) {        // If this were previously a num, change to string.
-        InitString(in);
-        is_num = false;
-      }
-      else str = in;       // Already a string; just change its value.
+      if (is_num) InitString(in);  // Convert to string.
+      else str = in;               // Already a string.
       return *this;
     }
 
