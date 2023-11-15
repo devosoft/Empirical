@@ -110,10 +110,11 @@ namespace emp {
     Datum & operator=(const Datum & in) { return Set(in); }
 
     // Unary operators
+    Datum operator+() const { return AsDouble(); }
     Datum operator-() const { return -AsDouble(); }
     Datum operator!() const { return AsDouble() == 0.0; }
 
-    // Binary operators
+    // Comparison operators
     int CompareNumber(double rhs) const {
       const double val = AsDouble();
       return (val == rhs) ? 0 : ((val < rhs) ? -1 : 1);
@@ -138,13 +139,6 @@ namespace emp {
     template<typename T> bool operator>=(const T & rhs) const { return Compare(rhs) != -1; }
     template<typename T> bool operator> (const T & rhs) const { return Compare(rhs) == 1; }
     template<typename T> bool operator<=(const T & rhs) const { return Compare(rhs) != 1; }
-
-    // Unary Operators
-
-    Datum operator+() const { return AsDouble(); }
-    Datum operator-() const { return -AsDouble(); }
-    Datum operator!() const { return (AsDouble() == 0.0); }
-    
 
     // Binary Operators
 
