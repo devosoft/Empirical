@@ -169,6 +169,15 @@ TEST_CASE("Test Datum Math", "[data]")
   d2 %= 3.0;
   CHECK(d2 == 2.0);
 
+  CHECK(+d2 == 2.0);
+  CHECK(-d2 == -2.0);
+  CHECK(!d2 == false);
+
   ds += "string";
   CHECK(ds == "Num:string");
+
+  double dval = d2;
+  std::string sval = ds;
+  CHECK(dval == 2.0);
+  CHECK(sval == "Num:string");
 }
