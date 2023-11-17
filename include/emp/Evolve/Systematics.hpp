@@ -26,6 +26,7 @@
 #include <string>
 #include <unordered_set>
 
+#include "../base/optional_throw.hpp"
 #include "../base/Ptr.hpp"
 #include "../control/Signal.hpp"
 #include "../data/DataFile.hpp"
@@ -249,7 +250,7 @@ namespace emp {
     /// Remove an organism from this Taxon (after it dies).
     /// Removals must return true if the taxon needs to continue; false if it should deactivate.
     bool RemoveOrg() {
-      emp_assert(num_orgs > 0, num_orgs);
+      emp_optional_throw(num_orgs > 0, num_orgs);
       --num_orgs;
 
       // If we are out of BOTH organisms and offspring, this Taxon should deactivate.
@@ -263,7 +264,7 @@ namespace emp {
 
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
     bool RemoveOffspring(Ptr<this_t> offspring_tax) {
-      emp_assert(num_offspring > 0, num_offspring, id);
+      emp_optional_throw(num_offspring > 0, num_offspring, id);
       --num_offspring;
       RemoveFromOffspring(offspring_tax);
 
@@ -374,7 +375,7 @@ namespace emp {
     /// Add a data node to this systematics manager
     /// @param name the name of the data node (so it can be found later)
     data_ptr_t AddDataNode(const std::string & name) {
-      emp_assert(!data_nodes.HasNode(name));
+      emp_optional_throw(!data_nodes.HasNode(name));
       return &(data_nodes.New(name));
     }
 
@@ -382,7 +383,7 @@ namespace emp {
     /// @param name the name of the data node (so it can be found later)
     /// @param pull_set_fun a function to run when the data node is requested to pull data (returns vector of values)
     data_ptr_t AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
-      emp_assert(!data_nodes.HasNode(name));
+      emp_optional_throw(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
       node->AddPullSet(pull_set_fun);
       return node;
@@ -392,7 +393,7 @@ namespace emp {
     /// @param name the name of the data node (so it can be found later)
     /// @param pull_fun a function to run when the data node is requested to pull data (returns single value)
     data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
-      emp_assert(!data_nodes.HasNode(name));
+      emp_optional_throw(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
       node->AddPull(pull_fun);
       return node;
@@ -658,7 +659,7 @@ namespace emp {
     /// update.
     /// Will be set to null after being assigned as the parent of a taxon
     void SetNextParent(WorldPosition pos) {
-      emp_assert(pos.IsActive() || !pos.IsValid());
+      emp_optional_throw(pos.IsActive() || !pos.IsValid());
       if (!pos.IsValid()) {
         next_parent = nullptr;
       } else {
@@ -826,15 +827,15 @@ namespace emp {
 
     /// @returns true if there is a taxon at specified location
     bool IsTaxonAt(WorldPosition id) {
-      emp_assert(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
-      emp_assert(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
+      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
+      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
       return taxon_locations[id.GetPopID()][id.GetIndex()] != nullptr;
     }
 
     /// @returns pointer to taxon at specified location
     Ptr<taxon_t> GetTaxonAt(WorldPosition id) {
-      emp_assert(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
-      emp_assert(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
+      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
+      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
       return taxon_locations[id.GetPopID()][id.GetIndex()];
     }
 
@@ -901,7 +902,7 @@ namespace emp {
       auto node = AddDataNode(name);
 
       if constexpr (!DATA_STRUCT::has_fitness_t::value) {
-        emp_assert(false &&
+        emp_optional_throw(false &&
           "Error: Trying to track deleterious steps in Systematics manager that doesn't track fitness" &&
           "Please use a DATA_STRUCT type that supports fitness tracking.");
       } else {
@@ -924,7 +925,7 @@ namespace emp {
       auto node = AddDataNode(name);
 
       if constexpr (!DATA_STRUCT::has_phen_t::value) {
-        emp_assert(false &&
+        emp_optional_throw(false &&
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track fitness" &&
           "Please use a DATA_STRUCT type that supports phenotype tracking.");
       } else {
@@ -947,7 +948,7 @@ namespace emp {
       auto node = AddDataNode(name);
 
       if constexpr (!DATA_STRUCT::has_phen_t::value) {
-        emp_assert(false &&
+        emp_optional_throw(false &&
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track fitness" &&
           "Please use a DATA_STRUCT type that supports phenotype tracking.");
       } else {
@@ -972,7 +973,7 @@ namespace emp {
       auto node = AddDataNode(name);
 
       if constexpr (!DATA_STRUCT::has_mutations_t::value) {
-        emp_assert(false &&
+        emp_optional_throw(false &&
           "Error: Trying to track phenotypic volatility in Systematics manager that doesn't track mutations" &&
           "Please use a DATA_STRUCT type that supports mutation tracking.");
       } else {
@@ -1363,8 +1364,8 @@ namespace emp {
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
-    emp_assert(taxon);
-    emp_assert(taxon->GetNumOrgs() == 0);
+    emp_optional_throw(taxon);
+    emp_optional_throw(taxon->GetNumOrgs() == 0);
 
     // Track destruction time
     taxon->SetDestructionTime(curr_update);
@@ -1411,8 +1412,8 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos) {
-    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
+    emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
+    // emp_optional_throw(next_parent, "Adding organism with no parent specified and no next_parent set");
     AddOrg(org, pos, next_parent);
     next_parent = nullptr;
   }
@@ -1422,8 +1423,8 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos) {
-    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
+    emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
+    // emp_optional_throw(next_parent, "Adding organism with no parent specified and no next_parent set");
     AddOrg(org, pos, next_parent);
     next_parent = nullptr;
   }
@@ -1433,7 +1434,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, WorldPosition pos, WorldPosition parent) {
-    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+    emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
     AddOrg(org, pos, taxon_locations[parent.GetPopID()][parent.GetIndex()]);
   }
 
@@ -1442,7 +1443,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) {
-    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+    emp_optional_throw(store_position, "Trying to pass position to a systematics manager that can't use it");
     AddOrg(org, pos, taxon_locations[parent.GetPopID()][parent.GetIndex()]);
   }
 
@@ -1451,7 +1452,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, Ptr<taxon_t> parent) {
-    emp_assert(!store_position &&
+    emp_optional_throw(!store_position &&
               "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.", store_position);
     return AddOrg(org, WorldPosition::invalid_id, parent);
   }
@@ -1460,7 +1461,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, Ptr<taxon_t> parent) {
-    emp_assert(!store_position &&
+    emp_optional_throw(!store_position &&
               "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.", store_position);
     return AddOrg(org, WorldPosition::invalid_id, parent);
   }
@@ -1526,7 +1527,7 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(WorldPosition pos) {
-    emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    emp_optional_throw(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
 
     if (pos.GetPopID() >= taxon_locations.size() ||
         pos.GetIndex() >= taxon_locations[pos.GetPopID()].size() ||
@@ -1554,9 +1555,9 @@ namespace emp {
   // Remove an instance of a taxon; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(WorldPosition pos) {
-    emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
-    emp_assert(pos.GetPopID() < taxon_locations.size(), "Invalid population requested for removal", pos.GetPopID(), taxon_locations.size());
-    emp_assert(pos.GetIndex() < taxon_locations[pos.GetPopID()].size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations[pos.GetPopID()].size());
+    emp_optional_throw(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    emp_optional_throw(pos.GetPopID() < taxon_locations.size(), "Invalid population requested for removal", pos.GetPopID(), taxon_locations.size());
+    emp_optional_throw(pos.GetIndex() < taxon_locations[pos.GetPopID()].size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations[pos.GetPopID()].size());
 
     bool active = false;
     if (taxon_locations[pos.GetPopID()][pos.GetIndex()]) {
@@ -1571,13 +1572,13 @@ namespace emp {
   // @param taxon the taxon of which one instance is being removed
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon) {
-    emp_assert(taxon);
+    emp_optional_throw(taxon);
 
     // Update stats
     org_count--;
     total_depth -= taxon->GetDepth();
 
-    // emp_assert(Has(active_taxa, taxon));
+    // emp_optional_throw(Has(active_taxa, taxon));
     const bool active = taxon->RemoveOrg();
     if (!active) MarkExtinct(taxon);
 
@@ -1633,8 +1634,8 @@ namespace emp {
   // @returns a pointer to the parent of a given taxon
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::Parent(Ptr<taxon_t> taxon) const {
-    emp_assert(taxon);
-    emp_assert(Has(active_taxa, taxon));
+    emp_optional_throw(taxon);
+    // emp_optional_throw(Has(active_taxa, taxon));
     return taxon->GetParent();
   }
 
@@ -1784,7 +1785,7 @@ namespace emp {
   // @returns the genetic diversity of the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
-    emp_assert(!num_orgs_wrong && "Error: calculating diversity from phylogeny missing org counts");
+    emp_optional_throw(!num_orgs_wrong && "Error: calculating diversity from phylogeny missing org counts");
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
 
@@ -1996,7 +1997,7 @@ namespace emp {
 
     // If we loaded this phylogeny from a file without calculating total offspring,
     // we need to actually calculate it here
-    emp_assert(!total_offspring_wrong && "To calculate evolutionary distinctiveness on phylogeny loaded from file you must calculate total offspring.");
+    emp_optional_throw(!total_offspring_wrong && "To calculate evolutionary distinctiveness on phylogeny loaded from file you must calculate total offspring.");
 
     double depth = 0; // Length (in time units) of section we're currently exploring
     double total = 0; // Count up scores for each section of tree
@@ -2013,8 +2014,8 @@ namespace emp {
 
     Ptr<taxon_t> test_taxon = tax->GetParent();
 
-    emp_assert(time != -1 && "Invalid time - are you passing time to rg?", time);
-    emp_assert(time >= tax->GetOriginationTime()
+    emp_optional_throw(time != -1 && "Invalid time - are you passing time to rg?", time);
+    emp_optional_throw(time >= tax->GetOriginationTime()
                 && "GetEvolutionaryDistinctiveness received a time that is earlier than the taxon's origination time.", tax->GetOriginationTime(), time);
 
     while (test_taxon) {
@@ -2159,7 +2160,7 @@ namespace emp {
     // converted to this systematics object's ORG_INFO type (if you
     // have a complex type, you can just use a string representation)
     if constexpr (!emp::is_streamable<std::stringstream, ORG_INFO>::value) {
-      emp_assert(false && "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
+      emp_optional_throw(false && "Failed to load phylogeny from file. ORG_INFO template type cannot be created from string");
       return;
     }
 
@@ -2169,13 +2170,13 @@ namespace emp {
 
     // Find column ids
     auto id_pos_it = std::find(header.begin(), header.end(), "id");
-    emp_assert(id_pos_it != header.end() &&
+    emp_optional_throw(id_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "id column is missing");
     size_t id_pos = std::distance(header.begin(), id_pos_it);
 
     auto anc_pos_it = std::find(header.begin(), header.end(), "ancestor_list");
-    emp_assert(anc_pos_it != header.end() &&
+    emp_optional_throw(anc_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "ancestor_list column is missing");
     size_t anc_pos = std::distance(header.begin(), anc_pos_it);
@@ -2205,7 +2206,7 @@ namespace emp {
     }
 
     auto info_pos_it = std::find(header.begin(), header.end(), info_col);
-    emp_assert(info_pos_it != header.end() &&
+    emp_optional_throw(info_pos_it != header.end() &&
       "Input phylogeny file must be in ALife Phylogeny Data Standards format" &&
       "info column name supplied is not in file.");
     size_t info_pos = std::distance(header.begin(), info_pos_it);
