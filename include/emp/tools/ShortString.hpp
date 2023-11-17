@@ -1,10 +1,10 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2022.
+ *  @date 2022-2023.
  *
  *  @file ShortString.hpp
- *  @brief String substitute with a max of 31 characters and always in place.
+ *  @brief String substitute with a (default) max of 31 characters and always in place.
  *  @note Status: ALPHA
  * 
  *  A fixed number of chars are reserved for the string; errors will trigger for longer attempts.
@@ -25,42 +25,43 @@
 
 namespace emp {
 
-  template <size_t NUM_BYTES, typename CHAR_T=char>
+  template <size_t NUM_CHARS, typename CHAR_T=char>
   class StaticString {
   private:
-    static_assert(NUM_BYTES <= 256, "Static String currently limited to 256 bytes (255 chars).");
-    static constexpr const size_t MAX_CHARS = NUM_BYTES - 1;
-    static constexpr const size_t SIZE_POS = NUM_BYTES - 1;  // Size info stored in the last byte.
+    static_assert(NUM_CHARS > 0, "StaticString must have at least one char available");
+    static_assert(NUM_CHARS <= 65536, "StaticString size limited to 2 bytes (65536 chars).");
+    static constexpr const size_t MAX_CHARS = NUM_CHARS - 1; // Save space for final '\0'
 
-    emp::array<CHAR_T, NUM_BYTES> string;
-
-    CHAR_T & SizeByte() { return string[SIZE_POS]; }
-    CHAR_T SizeByte() const { return string[SIZE_POS]; }
+    emp::array<CHAR_T, NUM_CHARS> string;
+    using ss_size_t = std::conditional_t<(NUM_CHARS <= 256), uint8_t, uint16_t>;
+    ss_size_t str_size = 0;
 
     StaticString & CopyFrom(const CHAR_T * in, size_t len) {
+      emp_assert(len <= MAX_CHARS, len, MAX_CHARS);
       resize(len);
       memcpy(string.data(), in, len);
+      string[len] = '\0';
       return *this;
     }
 
     // Compare this string to another.
     // -1 means this is less, 0 means they are the same, +1 means this is greater.
     int Compare(const CHAR_T * in, size_t len) const {
-      size_t min_len = std::min(len, size());
+      size_t min_len = std::min<size_t>(len, str_size);
       for (size_t i = 0; i < min_len; ++i) {
         if (string[i] != in[i]) {
           if (string[i] < in[i]) return -1;
           return 1;
         }
       }
-      if (size() != len) {
-        if (size() < len) return -1;
+      if (str_size != len) {
+        if (str_size < len) return -1;
         return 1;
       }
       return 0;
     }
   public:
-    StaticString() { string[0] = '\0'; SizeByte() = MAX_CHARS; }
+    StaticString() : str_size(0) { string[0] = '\0'; }
     StaticString(const StaticString &) = default;
     StaticString(const std::string & in) { CopyFrom(in.data(), in.size()); }
     StaticString(CHAR_T const * in) { CopyFrom(in, strlen(in)); }
@@ -74,20 +75,20 @@ namespace emp {
     CHAR_T * data() { return string.data(); }
     const CHAR_T * data() const { return string.data(); }
 
-    size_t size() const { return MAX_CHARS - SizeByte(); }
+    size_t size() const { return str_size; }
 
     void resize(size_t new_size) {
       emp_assert(new_size <= MAX_CHARS);
-      SizeByte() = MAX_CHARS - new_size;
+      str_size = new_size;
       string[new_size] = '\0';
     }
 
     CHAR_T & operator[](size_t id) {
-      emp_assert(id < size());
+      emp_assert(id < str_size);
       return string[id];
     }
     CHAR_T operator[](size_t id) const {
-      emp_assert(id < size());
+      emp_assert(id < str_size);
       return string[id];
     }
 
@@ -113,7 +114,7 @@ namespace emp {
     std::string AsString() const { return string.data(); }
   };
 
-  using ShortString = emp::StaticString<32>;
+  using ShortString = emp::StaticString<31>;
 }
 
 
