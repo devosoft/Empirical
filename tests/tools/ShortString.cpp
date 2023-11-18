@@ -10,7 +10,7 @@
 
 #include "emp/tools/ShortString.hpp"
 
-TEST_CASE("Test ShortString", "[tools]")
+TEST_CASE("ShortString comparisons", "[tools]")
 {
   emp::ShortString str1 = "ABC";
   CHECK( str1.size() == 3 );
@@ -43,4 +43,18 @@ TEST_CASE("Test ShortString", "[tools]")
   CHECK( str1 == str2 );
   CHECK( str1 <= str2);
   CHECK( str1 >= str2);
+}
+
+TEST_CASE("ShortString manipulations", "[tools]")
+{
+  emp::ShortString str1 = "ABC";
+  CHECK(str1 == "ABC");
+  str1[0] = 'D';
+  CHECK(str1 == "DBC");
+  str1[1] = 'E';
+  CHECK(str1 == "DEC");
+  str1[2] = 'F';
+  CHECK(str1 == "DEF");
+
+  // str1.push_back('G');
 }
