@@ -23,10 +23,6 @@
 
   #define emp_optional_throw(...)
 
-  namespace emp {
-    static constexpr bool is_debug_mode = false;
-  }
-
 #elif defined(IN_PYTHON)
 
   #define emp_optional_throw(...)                                     \
@@ -46,10 +42,6 @@
   /// emp_assert() will not do anything. Due to macro parsing limitations, extra
   /// information will not be printed when compiling with MSVC.
   #define emp_optional_throw(...) emp_assert(__VA_ARGS__)
-
-  namespace emp {
-    static constexpr bool is_debug_mode = true;
-  }
 
 #endif
 
