@@ -19,11 +19,8 @@
 #define EMP_NDEBUG
 #endif
 
-#if defined( EMP_NDEBUG )
 
-  #define emp_optional_throw(...)
-
-#elif defined(IN_PYTHON)
+#if defined( IN_PYTHON )
 
   #define emp_optional_throw(...)                                     \
     do {                                                                  \
@@ -34,6 +31,10 @@
         emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
       }                                                                   \
     } while(0)
+
+#elif defined( EMP_NDEBUG )
+
+  #define emp_optional_throw(...)
 
 #else
   /// Require a specified condition to be true. If it is false, immediately

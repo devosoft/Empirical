@@ -1043,7 +1043,9 @@ namespace emp {
     emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) const {
       emp::vector<double> eds;
       for (emp::Ptr<taxon_t> tax : active_taxa) {
-        eds.push_back(GetEvolutionaryDistinctiveness(tax, time));
+        if (tax->GetOriginationTime() <= time) {
+          eds.push_back(GetEvolutionaryDistinctiveness(tax, time));
+        }
       }
       return eds;
     }
