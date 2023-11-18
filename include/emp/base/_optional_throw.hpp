@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2023.
  *
- *  @file _python_throw.hpp
+ *  @file _optional_throw.hpp
  *  @brief Variant of asserts that throws exception
  *  @note This is useful for writing code that gets wrapped in Python via pybind11
  */
 
-#ifndef EMP_BASE__PYTHON_THROW_TRIGGER_HPP_INCLUDE
-#define EMP_BASE__PYTHON_THROW_TRIGGER_HPP_INCLUDE
+#ifndef EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE
+#define EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE
 
 #include <sstream>
 #include <string>
@@ -39,4 +39,4 @@ namespace emp {
     }
 }
 
-#endif // #ifndef EMP_BASE__PYTHON_THROW_TRIGGER_HPP_INCLUDE
+#endif // #ifndef EMP_BASE__OPTIONAL_THROW_TRIGGER_HPP_INCLUDE

@@ -33,7 +33,7 @@
 
 #include "_assert_macros.hpp"
 #include "_assert_trigger.hpp"
-#include "_python_throw.hpp"
+#include "_optional_throw.hpp"
 
 #if defined( __EMSCRIPTEN__ )
 

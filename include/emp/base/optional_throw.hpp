@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2023.
  *
- *  @file python_throw.hpp
+ *  @file optional_throw.hpp
  *  @brief Like emp_assert, but throws an exception if in Python
  *  @note Status: RELEASE
  *
  */
 
-#ifndef EMP_BASE_PYTHON_THROW_HPP_INCLUDE
-#define EMP_BASE_PYTHON_THROW_HPP_INCLUDE
+#ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
+#define EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
 
 #include "assert.hpp"
 
@@ -54,4 +54,4 @@
 #endif
 
 
-#endif // #ifndef EMP_BASE_ASSERT_HPP_INCLUDE
+#endif // #ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
