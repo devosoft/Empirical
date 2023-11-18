@@ -35,7 +35,7 @@ namespace emp {
         std::stringstream ss;
         ss << "Internal Error (in " << filename << " line " << line << "): " << expr << '\n';
         assert_print(ss, std::forward<EXTRA>(extra)...);
-        throw(ss.str());
+        throw(std::runtime_error(ss.str()));
     }
 }
 

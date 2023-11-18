@@ -147,10 +147,10 @@ namespace emp {
     const info_t info;        ///<  Details for the organisms associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
-    size_t num_orgs;          ///<  How many organisms currently exist of this group?
-    size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
-    size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
-    size_t total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
+    int num_orgs;          ///<  How many organisms currently exist of this group?
+    int tot_orgs;          ///<  How many organisms have ever existed of this group?
+    int num_offspring;     ///<  How many direct offspring groups exist from this one.
+    int total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
