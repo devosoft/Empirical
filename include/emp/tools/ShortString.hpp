@@ -92,6 +92,7 @@ namespace emp {
       return string[id];
     }
 
+    // Comparisons
 
     template <typename T> bool operator==(const T & in) const { return Compare(in.data(), in.size()) == 0; }
     template <typename T> bool operator!=(const T & in) const { return Compare(in.data(), in.size()) != 0; }
@@ -107,11 +108,20 @@ namespace emp {
     bool operator> (CHAR_T const * in) const { return Compare(in, strlen(in)) > 0; }
     bool operator>=(CHAR_T const * in) const { return Compare(in, strlen(in)) >= 0; }
 
+    // Type conversions
     operator CHAR_T *() { return string.data(); }
     operator const CHAR_T *() const { return string.data(); }
     operator std::string() const { return std::string(string.data()); }
 
     std::string AsString() const { return string.data(); }
+
+    // Manipulations
+    StaticString & push_back(CHAR_T c) {
+      assert(str_size < MAX_CHARS);
+      string[str_size++] = c;
+      string[str_size] = '\0';
+      return *this;
+    }
   };
 
   using ShortString = emp::StaticString<31>;
