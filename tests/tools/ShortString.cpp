@@ -56,5 +56,20 @@ TEST_CASE("ShortString manipulations", "[tools]")
   str1[2] = 'F';
   CHECK(str1 == "DEF");
 
-  // str1.push_back('G');
+  str1.push_back('G');
+  CHECK(str1 == "DEFG");
+  str1.push_back('H').push_back('I');
+  CHECK(str1 == "DEFGHI");
+
+  str1 = "test:";
+  str1.append("123");
+  CHECK(str1 == "test:123");
+  
+  std::string str456 = "456";
+  str1.append(str456);
+  CHECK(str1 == "test:123456");
+
+  emp::ShortString str789 = "789";
+  str1.append(str789);
+  CHECK(str1 == "test:123456789");
 }
