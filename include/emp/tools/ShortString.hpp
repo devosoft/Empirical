@@ -83,6 +83,12 @@ namespace emp {
       string[new_size] = '\0';
     }
 
+    void resize(size_t new_size, CHAR_T filler) {
+      emp_assert(new_size <= MAX_CHARS);
+      for (size_t i = str_size; i < new_size; ++i) string[i] = filler;
+      resize(new_size);
+    }
+
     CHAR_T & operator[](size_t id) {
       emp_assert(id < str_size);
       return string[id];
@@ -122,6 +128,30 @@ namespace emp {
       string[str_size] = '\0';
       return *this;
     }
+
+    StaticString & append(const CHAR_T * in_str, size_t len) {
+      assert(str_size + len <= MAX_CHARS);
+      memcpy(string.data()+str_size, in_str, len);
+      str_size += len;  // Update the string size.
+      string[str_size] = '\0';    // Make sure ends in '\0'
+
+      return *this;
+    }
+
+    StaticString & append(const std::string & in_str) {
+      return append(in_str.data(), in_str.size());
+    }
+
+    template <size_t SIZE>
+    StaticString & append(CHAR_T in_str[SIZE]) {
+      return append(in_str, SIZE);
+    }
+
+    template <size_t NUM_CHARS2>
+    StaticString & append(StaticString<NUM_CHARS2, CHAR_T> in_str) {
+      return append(in_str.data(), in_str.size());
+    }
+
   };
 
   using ShortString = emp::StaticString<31>;
