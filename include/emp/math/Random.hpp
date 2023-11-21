@@ -88,6 +88,10 @@ namespace emp {
 
       weyl_state *= 2;  // Make sure starting state is even.
 
+      // Reset other internal state
+      value = 0;
+      expRV = 0.0;
+
       Get(); // Prime the new sequence by skipping the first number.
     }
 
@@ -108,7 +112,14 @@ namespace emp {
     /// @return A pseudo-random double in the provided range.
     inline double GetDouble(const Range<double> range) noexcept {
       return GetDouble(range.GetLower(), range.GetUpper());
-     }
+    }
+
+    /// @return A pseudo-random double value between (0.0, 1.0]
+    inline double GetDoubleNonZero() noexcept {
+      double d = Get() / (double) RAND_CAP;
+      while(d == 0.0) {d = Get() / (double) RAND_CAP;}
+      return d;
+    }
 
 
     /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
@@ -385,10 +396,10 @@ namespace emp {
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
       while (1) {
-        expRV2 = -log(GetDouble());
+        expRV2 = -log(GetDoubleNonZero());
         expRV -= (expRV2-1)*(expRV2-1)/2;
         if (expRV > 0) break;
-        expRV = -log(GetDouble());
+        expRV = -log(GetDoubleNonZero());
       }
       if (P(.5)) return expRV2;
       return -expRV2;

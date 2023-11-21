@@ -44,6 +44,7 @@ EMP_BUILD_CONFIG( MyConfig,
   VALUE(TEST_STRING_QUOTE, std::string, "\"Quote\"andonemore\"soit'sodd", "This is a string with quote marks."),
   //VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate.", MUT_RATE),
   VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate."),
+  ALIAS(MUTATION_RATE_ALIAS),
 )
 
 #endif // #ifndef TESTS_CONFIG_ASSETS_CONFIG_SETUP_HPP_INCLUDE
