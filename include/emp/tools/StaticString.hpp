@@ -3,8 +3,8 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2022-2023.
  *
- *  @file ShortString.hpp
- *  @brief String substitute with a (default) max of 31 characters and always in place.
+ *  @file StaticString.hpp
+ *  @brief String substitute with a fixed max character count and always in place.
  *  @note Status: ALPHA
  * 
  *  A fixed number of chars are reserved for the string; errors will trigger for longer attempts.
@@ -13,8 +13,8 @@
  * 
  */
 
-#ifndef EMP_TOOLS_SHORTSTRING_HPP_INCLUDE
-#define EMP_TOOLS_SHORTSTRING_HPP_INCLUDE
+#ifndef EMP_TOOLS_STATICSTRING_HPP_INCLUDE
+#define EMP_TOOLS_STATICSTRING_HPP_INCLUDE
 
 #include <algorithm>
 #include <string>

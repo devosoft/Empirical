@@ -8,7 +8,7 @@
 
 #include "../third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/tools/ShortString.hpp"
+#include "emp/tools/StaticString.hpp"
 
 TEST_CASE("ShortString comparisons", "[tools]")
 {
