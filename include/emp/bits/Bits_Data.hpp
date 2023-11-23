@@ -152,7 +152,7 @@ namespace emp {
       Bits_Data_Size_Fixed(const Bits_Data_Size_Fixed &) = default;
 
       template <class Archive>
-      void serialize(Archive & ar) { /* Nothing to do here. */ }
+      void serialize(Archive & /* ar */) { /* Nothing to do here. */ }
 
       [[nodiscard]] constexpr bool OK() const { return true; } // Nothing to check yet.
     };
