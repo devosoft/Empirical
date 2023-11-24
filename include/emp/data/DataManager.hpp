@@ -80,6 +80,7 @@ namespace emp {
     /// @param name the name of the DataNode
     node_t & Get(const std::string & name) {
       emp_assert(Has(node_map, name), name);
+      emp_assert(node_map[name] != nullptr);
       return *(node_map[name]);
     }
 
