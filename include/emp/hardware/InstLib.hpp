@@ -145,10 +145,15 @@ namespace emp {
       emp_assert(Has(name_map, name), name);
       return Find(name_map, name, (size_t) -1);
     }
-    /// Return the ID of the instruction that has the specified name.
+    /// Return the ID of the instruction that has the specified id.
     size_t GetIndex(const size_t id) const {
       emp_assert(Has(id_map, id), id);
       return Find(id_map, id, (size_t) -1);
+    }
+
+    size_t GetIndexFromSymbol(char symbol) const {
+      size_t id = GetIDFromSymbol(symbol);
+      return GetIndex(id);
     }
 
     /// Return the argument value associated with the provided keyword.
