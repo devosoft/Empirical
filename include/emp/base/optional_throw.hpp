@@ -24,16 +24,18 @@
 
   #if defined (_MSC_VER )
 
-  #define emp_optional_throw(TEST, MESSAGE)                                     \
+  #define emp_optional_throw_mscv_impl(TEST, MESSAGE)                                     \
     do {                                                                  \
       if (!(TEST)) {                                                      \
         emp::assert_throw(__FILE__, __LINE__, #TEST, #MESSAGE, 0);                \
       }                                                                   \
     } while(0)
 
+  #define emp_optional_throw_impl(TEST, MESSAGE) emp_optional_throw_mscv_impl(TEST, MESSAGE)
+
   #else
 
-  #define emp_optional_throw(...)                                     \
+  #define emp_optional_throw_impl(...)                                     \
     do {                                                                  \
       if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
         emp::assert_throw(                                             \
@@ -45,6 +47,8 @@
     } while(0)
 
     #endif
+
+    #define emp_optional_throw(...) emp_optional_throw_impl(__VA_ARGS__)
 
 #elif defined( EMP_NDEBUG )
 
