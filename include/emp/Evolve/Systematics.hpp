@@ -375,7 +375,7 @@ namespace emp {
     /// Add a data node to this systematics manager
     /// @param name the name of the data node (so it can be found later)
     data_ptr_t AddDataNode(const std::string & name) {
-      emp_optional_throw(!(bool)data_nodes.HasNode(name), "Invalid node name, already exists", name);
+      emp_optional_throw(data_nodes.HasNoNode(name), "Invalid node name, already exists", name);
       return &(data_nodes.New(name));
     }
 
@@ -383,7 +383,7 @@ namespace emp {
     /// @param name the name of the data node (so it can be found later)
     /// @param pull_set_fun a function to run when the data node is requested to pull data (returns vector of values)
     data_ptr_t AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
-      emp_optional_throw(!(bool)data_nodes.HasNode(name), "Invalid node name, already exists", name);
+      emp_optional_throw(data_nodes.HasNoNode(name), "Invalid node name, already exists", name);
       auto node = AddDataNode(name);
       node->AddPullSet(pull_set_fun);
       return node;
@@ -393,7 +393,7 @@ namespace emp {
     /// @param name the name of the data node (so it can be found later)
     /// @param pull_fun a function to run when the data node is requested to pull data (returns single value)
     data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
-      emp_optional_throw(!(bool)data_nodes.HasNode(name), "Invalid node name, already exists", name);
+      emp_optional_throw(data_nodes.HasNoNode(name), "Invalid node name, already exists", name);
       auto node = AddDataNode(name);
       node->AddPull(pull_fun);
       return node;
