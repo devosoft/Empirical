@@ -250,7 +250,7 @@ namespace emp {
     /// Remove an organism from this Taxon (after it dies).
     /// Removals must return true if the taxon needs to continue; false if it should deactivate.
     bool RemoveOrg() {
-      emp_optional_throw(num_orgs > 0, "Removing org from extinct taxon", num_orgs);
+      emp_optional_throw(num_orgs > 0, "Removing org from extinct taxon");
       --num_orgs;
 
       // If we are out of BOTH organisms and offspring, this Taxon should deactivate.
@@ -264,7 +264,7 @@ namespace emp {
 
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
     bool RemoveOffspring(Ptr<this_t> offspring_tax) {
-      emp_optional_throw(num_offspring > 0, "Removing more offspring than exist", num_offspring, id);
+      emp_optional_throw(num_offspring > 0, "Removing more offspring than exist");
       --num_offspring;
       RemoveFromOffspring(offspring_tax);
 
@@ -659,7 +659,7 @@ namespace emp {
     /// update.
     /// Will be set to null after being assigned as the parent of a taxon
     void SetNextParent(WorldPosition pos) {
-      emp_optional_throw(pos.IsActive() || !pos.IsValid(), "Invalid position", pos.GetIndex(), pos.GetPopID());
+      emp_optional_throw(pos.IsActive() || !pos.IsValid(), "Invalid position");
       if (!pos.IsValid()) {
         next_parent = nullptr;
       } else {
@@ -827,15 +827,15 @@ namespace emp {
 
     /// @returns true if there is a taxon at specified location
     bool IsTaxonAt(WorldPosition id) {
-      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
-      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
+      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id");
+      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location");
       return taxon_locations[id.GetPopID()][id.GetIndex()] != nullptr;
     }
 
     /// @returns pointer to taxon at specified location
     Ptr<taxon_t> GetTaxonAt(WorldPosition id) {
-      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id", id, taxon_locations.size());
-      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location", id, taxon_locations[id.GetPopID()].size());
+      emp_optional_throw(id.GetPopID() < taxon_locations.size(), "Invalid population id");
+      emp_optional_throw(id.GetIndex() < taxon_locations[id.GetPopID()].size(), "Invalid taxon location");
       return taxon_locations[id.GetPopID()][id.GetIndex()];
     }
 
@@ -1552,8 +1552,8 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(WorldPosition pos) {
     emp_optional_throw(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
-    emp_optional_throw(pos.GetPopID() < taxon_locations.size(), "Invalid population requested for removal", pos.GetPopID(), taxon_locations.size());
-    emp_optional_throw(pos.GetIndex() < taxon_locations[pos.GetPopID()].size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations[pos.GetPopID()].size());
+    emp_optional_throw(pos.GetPopID() < taxon_locations.size(), "Invalid population requested for removal");
+    emp_optional_throw(pos.GetIndex() < taxon_locations[pos.GetPopID()].size(), "Invalid position requested for removal");
 
     bool active = false;
     if (taxon_locations[pos.GetPopID()][pos.GetIndex()]) {
@@ -2010,9 +2010,9 @@ namespace emp {
 
     Ptr<taxon_t> test_taxon = tax->GetParent();
 
-    emp_optional_throw(time != -1, "Invalid time - are you passing time to rg?", time);
+    emp_optional_throw(time != -1, "Invalid time - are you passing time to rg?");
     emp_optional_throw(time >= tax->GetOriginationTime(),
-                  "GetEvolutionaryDistinctiveness received a time that is earlier than the taxon's origination time.", tax->GetOriginationTime(), time);
+                  "GetEvolutionaryDistinctiveness received a time that is earlier than the taxon's origination time.");
 
     while (test_taxon) {
 
