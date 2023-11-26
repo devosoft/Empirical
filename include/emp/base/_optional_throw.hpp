@@ -46,6 +46,8 @@ namespace emp {
         assert_print_second(ss, std::forward<EXTRA>(extra)...);
     }
 
+    void assert_print_first(std::stringstream & ss, int placeholder) {;}
+
     template <typename... EXTRA>
     void assert_throw(std::string filename, size_t line, std::string expr, std::string message, EXTRA &&... extra) {
         std::stringstream ss;
