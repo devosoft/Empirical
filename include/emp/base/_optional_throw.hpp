@@ -51,7 +51,7 @@ namespace emp {
     template <typename... EXTRA>
     void assert_throw(std::string filename, size_t line, std::string expr, std::string message, EXTRA &&... extra) {
         std::stringstream ss;
-        ss << "Internal Error (in " << filename << " line " << line << "): " << expr << ".\n\n Message: " << message << "\nn";
+        ss << "Internal Error (in " << filename << " line " << line << "): " << expr << ".\n\n Message: " << message << "\n\n";
         assert_print_first(ss, std::forward<EXTRA>(extra)...);
         throw(std::runtime_error(ss.str()));
     }

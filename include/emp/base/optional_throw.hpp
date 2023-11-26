@@ -22,33 +22,33 @@
 
 #if defined( IN_PYTHON )
 
-  #if defined (_MSC_VER )
+  // #if defined (_MSC_VER )
 
-  #define emp_optional_throw_mscv_impl(TEST, MESSAGE)                                     \
+  #define emp_optional_throw(TEST, MESSAGE)                                     \
     do {                                                                  \
       if (!(TEST)) {                                                      \
         emp::assert_throw(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
       }                                                                   \
     } while(0)
 
-  #define emp_optional_throw_impl(TEST, MESSAGE) emp_optional_throw_mscv_impl(TEST, MESSAGE)
+  // #define emp_optional_throw_impl(TEST, MESSAGE) emp_optional_throw_mscv_impl(TEST, MESSAGE)
 
-  #else
+  // #else
 
-  #define emp_optional_throw_impl(...)                                     \
-    do {                                                                  \
-      if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
-        emp::assert_throw(                                             \
-        __FILE__, __LINE__,                                               \
-        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
-        emp_assert_STRINGIFY( emp_assert_GET_ARG_2(__VA_ARGS__, ~),  ),   \
-        emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
-      }                                                                   \
-    } while(0)
+  // #define emp_optional_throw_impl(...)                                     \
+  //   do {                                                                  \
+  //     if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
+  //       emp::assert_throw(                                             \
+  //       __FILE__, __LINE__,                                               \
+  //       emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
+  //       emp_assert_STRINGIFY( emp_assert_GET_ARG_2(__VA_ARGS__, ~),  ),   \
+  //       emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
+  //     }                                                                   \
+  //   } while(0)
 
-    #endif
+  //   #endif
 
-    #define emp_optional_throw(...) emp_optional_throw_impl(__VA_ARGS__)
+    // #define emp_optional_throw(...) emp_optional_throw_impl(__VA_ARGS__)
 
 #elif defined( EMP_NDEBUG )
 
