@@ -27,7 +27,7 @@
   #define emp_optional_throw_mscv_impl(TEST, MESSAGE)                                     \
     do {                                                                  \
       if (!(TEST)) {                                                      \
-        emp::assert_throw(__FILE__, __LINE__, #TEST, MESSAGE, TEST);                \
+        emp::assert_throw(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
       }                                                                   \
     } while(0)
 

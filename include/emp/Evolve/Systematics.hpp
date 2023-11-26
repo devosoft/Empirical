@@ -1450,7 +1450,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, Ptr<taxon_t> parent) {
-    emp_optional_throw(!store_position, "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.", store_position);
+    emp_optional_throw(!store_position, "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.");
     return AddOrg(org, WorldPosition::invalid_id, parent);
   }
 
@@ -1458,7 +1458,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, Ptr<taxon_t> parent) {
-    emp_optional_throw(!store_position, "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.", store_position);
+    emp_optional_throw(!store_position, "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.");
     return AddOrg(org, WorldPosition::invalid_id, parent);
   }
 
