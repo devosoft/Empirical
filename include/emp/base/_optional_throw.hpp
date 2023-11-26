@@ -30,11 +30,24 @@ namespace emp {
         assert_print(ss, std::forward<EXTRA>(extra)...);
     }
 
-    template <typename... EXTRA>
-    void assert_throw(std::string filename, size_t line, std::string expr, EXTRA &&... extra) {
-        std::stringstream ss;
-        ss << "Internal Error (in " << filename << " line " << line << "): " << expr << '\n';
+    template <typename T, typename... EXTRA>
+    void assert_print_second(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
         assert_print(ss, std::forward<EXTRA>(extra)...);
+    }
+
+    template <typename T, typename... EXTRA>
+    void assert_print_first(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
+        if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
+        ss << name << ": [" << val << "]" << std::endl;
+        } else ss << name << ": (non-streamable type)" << std::endl;
+        assert_print_second(ss, std::forward<EXTRA>(extra)...);
+    }
+
+    template <typename... EXTRA>
+    void assert_throw(std::string filename, size_t line, std::string expr, std::string message, EXTRA &&... extra) {
+        std::stringstream ss;
+        ss << "Internal Error (in " << filename << " line " << line << "): " << expr << ".\n\n Message: " << message << "\nn";
+        assert_print_first(ss, std::forward<EXTRA>(extra)...);
         throw(std::runtime_error(ss.str()));
     }
 }

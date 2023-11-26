@@ -22,15 +22,29 @@
 
 #if defined( IN_PYTHON )
 
+  #if defined (_MSC_VER )
+
+  #define emp_optional_throw(TEST, MESSAGE)                                     \
+    do {                                                                  \
+      if (!(TEST)) {                                                      \
+        emp::assert_throw(__FILE__, __LINE__, #TEST, #MESSAGE, 0);                \
+      }                                                                   \
+    } while(0)
+
+  #else
+
   #define emp_optional_throw(...)                                     \
     do {                                                                  \
       if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
         emp::assert_throw(                                             \
         __FILE__, __LINE__,                                               \
         emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
+        emp_assert_STRINGIFY( emp_assert_GET_ARG_2(__VA_ARGS__, ~),  ),   \
         emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
       }                                                                   \
     } while(0)
+
+    #endif
 
 #elif defined( EMP_NDEBUG )
 
