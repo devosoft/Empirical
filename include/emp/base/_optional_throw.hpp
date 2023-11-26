@@ -35,6 +35,9 @@ namespace emp {
         assert_print(ss, std::forward<EXTRA>(extra)...);
     }
 
+    template <typename T>
+    void assert_print_second(std::stringstream & ss, std::string name, T && val) {;}
+
     template <typename T, typename... EXTRA>
     void assert_print_first(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
         if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
