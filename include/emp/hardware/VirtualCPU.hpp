@@ -249,14 +249,11 @@ namespace emp{
         nops_need_curated = true;
       }
 
+      /// Redirect literal ints to PushInst(size_t) overload.
+      void PushInst(int idx) { PushInst(static_cast<size_t>(idx)); }
+
       /// Add a new instruction to the end of the genome, by the instruction's symbol/char 
-      void PushInst(char c){
-        const size_t id = GetInstLib()->GetIDFromSymbol(c);
-        const size_t idx = GetInstLib()->GetIndex(id);
-        genome.emplace_back(idx, id);
-        genome_working.emplace_back(idx, id);
-        nops_need_curated = true;
-      }
+      void PushInst(char c) { PushInst( GetInstLib()->GetIndexFromSymbol(c) ); }
 
       /// Add a new instruction to the end of the genome, by name
       void PushInst(const std::string & name) {
