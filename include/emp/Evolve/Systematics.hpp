@@ -522,9 +522,10 @@ namespace emp {
 
     emp::vector<SnapshotInfo> user_snapshot_funs; ///< Collection of all desired snapshot file columns
 
-    std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
-    std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
-    std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
+    using taxa_set_t = std::unordered_set< Ptr<taxon_t>, hash_t >;
+    taxa_set_t active_taxa;   ///< A set of all living taxa.
+    taxa_set_t ancestor_taxa; ///< A set of all dead, ancestral taxa.
+    taxa_set_t outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
     emp::WorldPosition removal_pos = {0, 0};   ///< Position of taxon to next be removed
@@ -669,13 +670,13 @@ namespace emp {
     // ===== Functions for querying phylogeny/systematics manager internal state ====
 
     // Currently using raw pointer because of a weird bug in emp::Ptr. Should switch when fixed.
-    std::unordered_set< Ptr<taxon_t>, hash_t > * GetActivePtr() { return &active_taxa; }
+    taxa_set_t * GetActivePtr() { return &active_taxa; }
     /// @returns set of active (extant/living) taxa0
-    const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
+    const taxa_set_t & GetActive() const { return active_taxa; }
     /// @returns set of ancestor taxa (extinct, but have active descendants)
-    const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
+    const taxa_set_t & GetAncestors() const { return ancestor_taxa; }
     /// @returns set of outside taxa (extinct, with no active descendants)
-    const std::unordered_set< Ptr<taxon_t>, hash_t > & GetOutside() const { return outside_taxa; }
+    const taxa_set_t & GetOutside() const { return outside_taxa; }
 
     /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
@@ -788,8 +789,8 @@ namespace emp {
       auto node = AddDataNode(name);
 
       if constexpr (!DATA_STRUCT::has_fitness_t::value) {
-        emp_assert(false &&
-          "Error: Trying to track deleterious steps in Systematics manager that doesn't track fitness" &&
+        emp_assert(false,
+          "Trying to track deleterious steps in Systematics manager that doesn't track fitness",
           "Please use a DATA_STRUCT type that supports fitness tracking.");
       } else {
         node->AddPullSet([this](){
