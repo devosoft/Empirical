@@ -18,6 +18,7 @@
 #define EMP_TOOLS_STRING_SYNTAX_HPP_INCLUDE
 
 
+#include <sstream>
 #include <string>
 
 #include "../base/array.hpp"
@@ -53,9 +54,21 @@ namespace emp {
     StringSyntax & operator=(StringSyntax &&) = default;
     bool IsQuote(char c) const { return (c > 0) && char_matches[c] && (char_matches[c] == c); }
     bool IsParen(char c) const { return (c > 0) && char_matches[c] && (char_matches[c] != c); }
-    char GetMatch(char c) const { return (c >= 0) && char_matches[c]; }
+    char GetMatch(char c) const { return (c >= 0) ? char_matches[c] : 0; }
     uint8_t GetCount() const { return count; }
     std::string GetQuotes() const { std::string out; for (uint8_t i=0; i < 128; ++i) if (char_matches[i]==i) out+=(char)i; return out;}
+
+    std::string AsString() const {
+      std::stringstream ss;
+      for (char c = 0; c < 127; ++c) {
+        size_t index = static_cast<size_t>(c);
+        emp_assert(index < 128, (int) c, index);
+        if (char_matches[index]) {
+          ss << "['" << c << "'->'" << char_matches[c] << "']";
+        }
+      }
+      return ss.str();
+    }
 
     static StringSyntax None()   { return StringSyntax(); }
     static StringSyntax Quotes() { return StringSyntax("\""); }
