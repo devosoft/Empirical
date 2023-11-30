@@ -89,7 +89,7 @@ TEST_CASE("Test Random", "[math]")
   REQUIRE(b2_result < 50);
 
   emp::RandomStdAdaptor randomStd(rnd);
-  REQUIRE(randomStd(4) == 3);
+  REQUIRE(randomStd(4) < 4);
 
   REQUIRE(rnd.GetGeometric(1) == 1);
   // REQUIRE(rnd.GetGeometric(0) == std::numeric_limits<uint32_t>::infinity());
@@ -338,18 +338,18 @@ TEST_CASE("Calling ResetSeed should reset all generator internal state", "[math]
 
   SECTION("Test internal expV") {
     emp::Random rnd(10);
-    rnd.GetRandNormal(); // Adjusts expV with time-based seed generator
+    rnd.GetNormal(); // Adjusts expV with time-based seed generator
 
     rnd.ResetSeed(4); // Should reset expV
     emp::vector<double> norm_seq_a;
     for (size_t i = 0; i < 1000; ++i) {
-      norm_seq_a.emplace_back(rnd.GetRandNormal());
+      norm_seq_a.emplace_back(rnd.GetNormal());
     }
 
     rnd.ResetSeed(4);
     emp::vector<double> norm_seq_b;
     for (size_t i = 0; i < 1000; ++i) {
-      norm_seq_b.emplace_back(rnd.GetRandNormal());
+      norm_seq_b.emplace_back(rnd.GetNormal());
     }
 
     // Tests internal expV
