@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2022.
+ *  @date 2016-2023.
  *
  *  @file map_utils.hpp
  *  @brief A set of simple functions to manipulate maps.
@@ -13,12 +13,26 @@
 
 #include <algorithm>
 #include <map>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 
 namespace emp {
+
+  template <typename MAP_T>
+  std::string MapToString(const MAP_T & in_map) {
+    std::stringstream ss;
+    bool use_comma = false;
+    for (const auto & [key, value] : in_map) {
+      if (use_comma) ss << ",";
+      ss << "{" << key << ":" << value << "}";
+      use_comma = true;
+    }
+    return ss.str();
+  }
 
   /// Take any map type, and run find to determine if a key is present.
   template <class MAP_T, class KEY_T>
