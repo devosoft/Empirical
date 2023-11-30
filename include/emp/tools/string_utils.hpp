@@ -1898,13 +1898,48 @@ namespace emp {
     return out.str();
   }
 
+  /// Advance a position in a string, respecting quotes, parens, braces, and brackets as indicated
+  /// @param in_string string being stepped through
+  /// @param pos Position to advance from
+  /// @param keep_quotes Should quoted text be treated as a unit?
+  /// @param keep_parens Should parens be treated as a unit?
+  /// @param keep_braces Should braces be treated as a unit?
+  /// @param keep_brackets Should brackets be treated as a unit?
+  static inline size_t next_pos(
+    std::string_view in_string, size_t pos,
+    bool keep_quotes=false, bool keep_parens=false,
+    bool keep_braces=false, bool keep_brackets=false)
+  {
+    // See if we need to skip a whole segment
+    const char c = in_string[pos];
+    switch (c) {
+    case '"': case '\'':
+      if (keep_quotes) pos = find_quote_match(in_string, pos, c);
+      break;
+    case '(':
+      if (keep_parens) pos = find_paren_match(in_string, pos, c, ')', keep_quotes);
+      break;
+    case '[':
+      if (keep_brackets) pos = find_paren_match(in_string, pos, c, ']', keep_quotes);
+      break;
+    case '{':
+      if (keep_braces) pos = find_paren_match(in_string, pos, c, '}', keep_quotes);
+      break;
+    }
+
+    return pos + 1;
+  }
+  
   /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param in_string string to be sliced
   /// @param out_set destination
   /// @param delim delimiter to split on
   /// @param max_split defines the maximum number of splits
-  /// @param keep_quotes Should quoted text be kept together?
-  static inline void slice (
+  /// @param keep_quotes Should quoted text be treated as a unit?
+  /// @param keep_parens Should parens be treated as a unit?
+  /// @param keep_braces Should braces be treated as a unit?
+  /// @param keep_brackets Should brackets be treated as a unit?
+  static inline void slice(
     const std::string_view & in_string,
     emp::vector<std::string> & out_set,
     const char delim,
@@ -1914,45 +1949,27 @@ namespace emp {
     const bool keep_braces,
     const bool keep_brackets
   ) {
-    const size_t test_size = in_string.size();
-    if (test_size == 0) return; // Nothing to set!
+    out_set.resize(0);
+    if (in_string.empty() || max_split == 0) return; // Nothing to set!
 
-    // Count produced strings
-    size_t out_count = 0;
-    size_t pos = 0;
-    size_t start_pos = 0;
-    while (pos < test_size && out_count <= max_split) {
+    size_t pos = 0;           // Position currently being scanned.
+    size_t start_pos = 0;     // Start position for the next segment.
+    while (pos < in_string.size() && out_set.size()+1 < max_split) {
       // Find the end of the current segment.
-      while (pos < test_size && in_string[pos] != delim) {
-        if (keep_quotes && (in_string[pos] == '"' || in_string[pos] == '\'')) {
-          pos = find_quote_match(in_string, pos, in_string[pos]);
-        }
-        else if (keep_parens && in_string[pos] == '(') {
-          pos = find_paren_match(in_string, pos, '(', ')', keep_quotes);
-        }
-        else if (keep_braces && in_string[pos] == '{') {
-          pos = find_paren_match(in_string, pos, '{', '}', keep_quotes);
-        }
-        else if (keep_brackets && in_string[pos] == '[') {
-          pos = find_paren_match(in_string, pos, '[', ']', keep_quotes);
-        }
-        pos++;
+      while (pos < in_string.size() && in_string[pos] != delim) {
+        pos = next_pos(in_string, pos, keep_quotes, keep_parens, keep_braces, keep_brackets);
       }
 
       // Record the current segment.
-      if (out_count >= out_set.size()) {
-        out_set.emplace_back( in_string.substr(start_pos, pos-start_pos) );
-      } else {
-        out_set[out_count] = in_string.substr(start_pos, pos-start_pos);
-      }
+      out_set.emplace_back( in_string.substr(start_pos, pos-start_pos) );
 
-      // Move on to the next segment.
-      pos++;              // Skip deliminator
-      start_pos = pos;    // Record start of segment.
-      out_count++;        // Keep count of segments.
+      start_pos = ++pos;  // Skip deliminator and record next start.
     }
 
-    out_set.resize(out_count); // Shrink out_set if needed.
+    // If there are any segments left, put them all at the end.
+    if (start_pos < in_string.size()) {
+      out_set.emplace_back( in_string.substr(start_pos, in_string.size()-start_pos) );
+    }
   }
 
 }
