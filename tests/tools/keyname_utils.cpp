@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
+ *  @date 2021-2023
  *
  *  @file keyname_utils.cpp
  */
@@ -30,53 +30,53 @@ TEST_CASE("Test keyname_utils", "[tools]")
 
   name = "seed=100+foobar=20+_hash=asdf+ext=.txt";
   goal["_"] = name;
-  REQUIRE( emp::keyname::unpack(name) == goal );
+  CHECK( emp::keyname::unpack(name) == goal );
 
 
   // reorderings
   name = "foobar=20+seed=100+_hash=asdf+ext=.txt";
   goal["_"] = name;
-  REQUIRE( emp::keyname::unpack(name) == goal );
+  CHECK( emp::keyname::unpack(name) == goal );
 
 
   name = "_hash=asdf+foobar=20+seed=100+ext=.txt";
   goal["_"] = name;
-  REQUIRE( emp::keyname::unpack(name) == goal );
+  CHECK( emp::keyname::unpack(name) == goal );
 
 
   // should ignore path
   name = "path/seed=100+foobar=20+_hash=asdf+ext=.txt";
   goal["_"] = name;
-  REQUIRE( emp::keyname::unpack(name) == goal );
+  CHECK( emp::keyname::unpack(name) == goal );
 
 
   name = "~/more=path/+blah/seed=100+foobar=20+_hash=asdf+ext=.txt";
   goal["_"] = name;
-  REQUIRE( emp::keyname::unpack(name) == goal );
+  CHECK( emp::keyname::unpack(name) == goal );
 
 
   name = "just/a/regular/file.pdf";
-  REQUIRE( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
+  CHECK( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
     {"file.pdf", ""},
     {"_", "just/a/regular/file.pdf"}
   }));
 
   name = "key/with/no+=value/file+ext=.pdf";
-  REQUIRE( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
+  CHECK( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
     {"file", ""},
     {"ext", ".pdf"},
     {"_", "key/with/no+=value/file+ext=.pdf"}
   }));
 
   name = "multiple/=s/file=biz=blah+ext=.pdf";
-  REQUIRE( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
+  CHECK( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
     {"file", "biz=blah"},
     {"ext", ".pdf"},
     {"_", "multiple/=s/file=biz=blah+ext=.pdf"}
   }));
 
   // test pack reorderings
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
      {"seed", "100"},
      {"foobar", "20"},
      {"_hash", "asdf"},
@@ -84,7 +84,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
     })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
    );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"_hash", "asdf"},
       {"seed", "100"},
       {"foobar", "20"},
@@ -92,7 +92,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
    })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
   );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"_hash", "asdf"},
       {"foobar", "20"},
       {"ext", ".txt"},
@@ -101,7 +101,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
   );
 
   // different values
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"seed", "100"},
       {"foobar", "blip"},
       {"_hash", "asdf"},
@@ -109,7 +109,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
    })) == "foobar=blip+seed=100+_hash=asdf+ext=.txt"
   );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"seed", "a100"},
       {"foobar", "blip"},
       {"_hash", "asdf"},
@@ -117,7 +117,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
    })) == "foobar=blip+seed=a100+_hash=asdf+ext=.txt"
   );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"aseed", "a100"},
       {"foobar", "blip"},
       {"_hash", "asdf"},
@@ -126,7 +126,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
   );
 
   // should ignore "_" key
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"seed", "100"},
       {"foobar", "20"},
       {"_hash", "asdf"},
@@ -135,7 +135,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
    })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
   );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"seed", "100"},
       {"foobar", "20"},
       {"_hash", "asdf"},
@@ -144,7 +144,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
    })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
   );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"seed", "100"},
       {"foobar", "20"},
       {"_hash", "asdf"},
@@ -153,7 +153,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
    })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
   );
 
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"seed", "100"},
       {"foobar", "20"},
       {"_hash", "asdf"},
@@ -163,7 +163,7 @@ TEST_CASE("Test keyname_utils", "[tools]")
   );
 
   // missing extension
-  REQUIRE( (emp::keyname::pack({
+  CHECK( (emp::keyname::pack({
       {"_hash", "asdf"},
       {"foobar", "20"},
       {"seed", "100"}
