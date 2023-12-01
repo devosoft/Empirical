@@ -98,6 +98,12 @@ namespace emp {
     // Quick check to ensure a position is legal.
     void _AssertPos([[maybe_unused]] size_t pos) const { emp_assert(pos < size(), pos, size()); }
 
+    // Retrieve an iterator for a given position.
+    auto _Iterator(size_t pos) const {
+      _AssertPos(pos);
+      return begin() + static_cast<int>(pos);
+    }
+
   public:
     using std::string::value_type;
     using std::string::allocator_type;
@@ -259,11 +265,11 @@ namespace emp {
 
     // Count the number of occurrences of a specific character.
     [[nodiscard]] size_t Count(char c, size_t start=0) const
-      { return (size_t) std::count(begin()+start, end(), c); }
+      { return (size_t) std::count(_Iterator(start), end(), c); }
 
     // Count the number of occurrences of a specific character within a range.
     [[nodiscard]] size_t Count(char c, size_t start, size_t end) const
-      { return (size_t) std::count(begin()+start, begin()+end, c); }
+      { return (size_t) std::count(_Iterator(start), _Iterator(end), c); }
 
     /// Test if an string is formatted as a literal character.
     [[nodiscard]] inline bool IsLiteralChar() const;
@@ -508,6 +514,30 @@ namespace emp {
     // ------ Transformations into non-Strings ------
     // Note: For efficiency there are two versions of most of these: one where the output
     // data structure is provided and one where it must be generated.
+
+    template <typename T>
+    T ConvertTo() {
+      // Is it already a string?
+      if constexpr (std::is_same<T, std::string>() || std::is_same<T, emp::String>()) return *this;
+
+      else if constexpr (std::is_same<T, int>()) return std::stoi(*this);
+      else if constexpr (std::is_same<T, long>()) return std::stol(*this);
+      else if constexpr (std::is_same<T, long long>()) return std::stoll(*this);
+      else if constexpr (std::is_same<T, unsigned long>()) return std::stoul(*this);
+      else if constexpr (std::is_same<T, unsigned long long>()) return std::stoull(*this);
+      else if constexpr (std::is_same<T, float>()) return std::stof(*this);
+      else if constexpr (std::is_same<T, double>()) return std::stod(*this);
+      else if constexpr (std::is_same<T, long double>()) return std::stold(*this);
+
+      // All other printable cases:
+      else {
+        std::stringstream ss;
+        ss << *this;
+        T out_val;
+        ss >> out_val;
+        return out_val;
+      }
+    }
 
     inline void Slice(emp::vector<String> & out_set, String delim=",",
                       const Syntax & syntax=Syntax::Quotes(), bool trim_whitespace=false) const;
@@ -1022,7 +1052,7 @@ namespace emp {
 
   String String::PopLiteralSigned() {
     size_t int_size = 0;
-    if (HasCharAt(int_size, '-') || HasCharAt(int_size, '+')) int_size++;
+    if (HasCharAt(0, '-') || HasCharAt(0, '+')) ++int_size;
     while (int_size < size() && isdigit(Get(int_size))) ++int_size;
     return PopFixed(int_size);
   }
