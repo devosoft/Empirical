@@ -10,6 +10,7 @@
 #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
 #define EMP_DATA_DATAFILE_HPP_INCLUDE
 
+#include <cstdint>
 #include <fstream>
 #include <functional>
 #include <iostream>
