@@ -11,7 +11,7 @@
 
 int main() {
 
-  [[maybe_unused]]] int x{ 42 };
+  [[maybe_unused]] int x{ 42 };
 
   emp_assert(x > 1, "This assert passes in debug mode!", x);
 
