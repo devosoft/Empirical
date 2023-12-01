@@ -24,6 +24,7 @@
 #include "../base/vector.hpp"
 #include "../meta/FunInfo.hpp"
 #include "../tools/String.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 
@@ -310,7 +311,9 @@ namespace emp {
     /// Get a series of lines.
     emp::vector<String> Read(size_t start, size_t end) const {
       if (end > lines.size()) end = lines.size();
-      return emp::vector<String>(lines.begin()+start, lines.begin()+end);
+      auto start_it = lines.begin()+static_cast<int>(start);
+      auto end_it = lines.begin()+static_cast<int>(end);
+      return emp::vector<String>(start_it, end_it);
     }
 
     /// Get a series of lines until a line meets a certain condition.
@@ -365,7 +368,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> ExtractRowAs(String delim=",") {
       // Identify the data as string_views
-      auto sv_row = ViewRowSlices(0, delim);
+      emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim);
 
       // Build the array to return and copy strings into it.
       emp::vector<T> out_row(sv_row.size());

@@ -247,10 +247,12 @@ namespace emp {
 
   /// Count the number of bits ('0' or '1') found in a string.
   static size_t CountBits(const std::string & bitstring) {
-    return std::count_if(
-      bitstring.begin(),
-      bitstring.end(),
-      [](char i) { return i == '0' || i == '1'; }
+    return static_cast<size_t>(
+      std::count_if(
+        bitstring.begin(),
+        bitstring.end(),
+        [](char i) { return i == '0' || i == '1'; }
+      )
     );
   }
 

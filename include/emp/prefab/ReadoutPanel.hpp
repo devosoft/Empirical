@@ -136,7 +136,7 @@ namespace emp::prefab {
       auto & live_divs = Info()->GetLiveDivs();
       // Animation is referenced by this component's ID
       AddAnimation(GetID(), [
-        elapsed_milliseconds = 0, refresh_milliseconds, &live_divs
+        elapsed_milliseconds = 0.0, refresh_milliseconds, &live_divs
       ](double stepTime) mutable {
         // Accumulate steps, then redraw after enough time has elapsed
         elapsed_milliseconds += stepTime;
