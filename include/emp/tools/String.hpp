@@ -21,7 +21,6 @@
 
 #include <algorithm>              // std::count
 #include <cctype>                 // std::toupper and std::tolower
-#include <cstdint>                // uint8_t, uint16_t, etc.
 #include <functional>             // std::function
 #include <initializer_list>
 #include <map>

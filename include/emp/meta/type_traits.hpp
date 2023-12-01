@@ -11,6 +11,7 @@
 #define EMP_META_TYPE_TRAITS_HPP_INCLUDE
 
 
+#include <cstdint>       // uint8_t, uint16_t, etc.
 #include <functional>
 #include <span>
 #include <tuple>
