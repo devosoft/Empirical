@@ -12,6 +12,7 @@
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
 #include <algorithm>
+#include <cstdint>       // uint8_t, uint16_t, etc.
 #include <string>
 #include <sstream>
 
