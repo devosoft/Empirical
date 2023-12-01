@@ -36,48 +36,57 @@ namespace emp {
     StringSyntax() { char_matches.fill('\0'); }
     StringSyntax(std::string quotes, std::string parens="") : StringSyntax() {
       emp_assert(parens.size() % 2 == 0, "String::StringSyntax must have odd number of paren chars.");
-      for (char c : quotes) char_matches[c] = c;
-      for (size_t i=0; i < parens.size(); i+=2) char_matches[parens[i]] = parens[i+1];
+      for (char c : quotes) GetMatch(c) = c;
+      for (size_t i=0; i < parens.size(); i+=2) GetMatch(parens[i]) = parens[i+1];
       count = static_cast<uint8_t>(quotes.size() + parens.size()/2);
     }
     StringSyntax(bool match_quotes, bool match_parens=false) : StringSyntax() {
-      if (match_quotes) char_matches['"'] = '"';
+      if (match_quotes) GetMatch('"') = '"';
       if (match_parens) {
-        char_matches['('] = ')';
-        char_matches['['] = ']';
-        char_matches['{'] = '}';
+        GetMatch('(') = ')';
+        GetMatch('[') = ']';
+        GetMatch('{') = '}';
       }
     }
     StringSyntax(const char * quotes, const char * parens="")
       : StringSyntax(std::string(quotes), std::string(parens)) { }
+
     StringSyntax & operator=(const StringSyntax &) = default;
     StringSyntax & operator=(StringSyntax &&) = default;
-    bool IsQuote(char c) const { return (c > 0) && char_matches[c] && (char_matches[c] == c); }
-    bool IsParen(char c) const { return (c > 0) && char_matches[c] && (char_matches[c] != c); }
-    char GetMatch(char c) const { return (c >= 0) ? char_matches[c] : 0; }
+
+    char & GetMatch(char c) { emp_assert(c >= 0); return char_matches[static_cast<size_t>(c)]; }
+    char GetMatch(char c) const { return (c >= 0) ? char_matches[static_cast<size_t>(c)] : 0; }
+    bool IsQuote(char c) const { return (c > 0) && GetMatch(c) && (GetMatch(c) == c); }
+    bool IsParen(char c) const { return (c > 0) && GetMatch(c) && (GetMatch(c) != c); }
     uint8_t GetCount() const { return count; }
-    std::string GetQuotes() const { std::string out; for (uint8_t i=0; i < 128; ++i) if (char_matches[i]==i) out+=(char)i; return out;}
+
+    std::string GetQuotes() const {
+      std::string out;
+      for (char i = 0; i < 127; ++i) {
+        if (GetMatch(i) == i) out+= static_cast<char>(i);
+      }
+      return out;
+    }
 
     std::string AsString() const {
       std::stringstream ss;
       for (char c = 0; c < 127; ++c) {
-        size_t index = static_cast<size_t>(c);
-        emp_assert(index < 128, (int) c, index);
-        if (char_matches[index]) {
-          ss << "['" << c << "'->'" << char_matches[c] << "']";
+        emp_assert(static_cast<size_t>(c) < 128, (int) c, static_cast<size_t>(c));
+        if (GetMatch(c)) {
+          ss << "['" << c << "'->'" << GetMatch(c) << "']";
         }
       }
       return ss.str();
     }
 
-    static StringSyntax None()   { return StringSyntax(); }
-    static StringSyntax Quotes() { return StringSyntax("\""); }
+    static StringSyntax None()       { return StringSyntax(); }
+    static StringSyntax Quotes()     { return StringSyntax("\""); }
     static StringSyntax CharQuotes() { return StringSyntax("'"); }
-    static StringSyntax AllQuotes() { return StringSyntax("\"'"); }
-    static StringSyntax Parens() { return StringSyntax("",     "()[]{}"); }
-    static StringSyntax RParens() { return StringSyntax("",    ")(][}{"); }
-    static StringSyntax Full()   { return StringSyntax("\"",   "()[]{}"); }
-    static StringSyntax Max()    { return StringSyntax("\"'`", "()[]{}<>"); }
+    static StringSyntax AllQuotes()  { return StringSyntax("\"'"); }
+    static StringSyntax Parens()     { return StringSyntax("",     "()[]{}"); }
+    static StringSyntax RParens()    { return StringSyntax("",    ")(][}{"); }
+    static StringSyntax Full()       { return StringSyntax("\"",   "()[]{}"); }
+    static StringSyntax Max()        { return StringSyntax("\"'`", "()[]{}<>"); }
   };
 
 }
