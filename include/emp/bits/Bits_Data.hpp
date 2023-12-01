@@ -196,8 +196,8 @@ namespace emp {
         }
       }
 
-      [[nodiscard]] auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data()); }
-      [[nodiscard]] auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data()); }
+      [[nodiscard]] auto AsSpan() { return std::span<field_t,MAX_FIELDS>(bits.data(), MAX_FIELDS); }
+      [[nodiscard]] auto AsSpan() const { return std::span<const field_t,MAX_FIELDS>(bits.data(), MAX_FIELDS); }
 
       [[nodiscard]] bool OK() const { return true; } // Nothing to check yet.
 
