@@ -46,6 +46,13 @@ namespace emp {
     using this_t = array_iterator<ITERATOR_T, ARRAY_T>;
     using array_t = ARRAY_T;
 
+    // Iterator traits
+    using iterator_category = typename std::iterator_traits<ITERATOR_T>::iterator_category;
+    using value_type = typename std::iterator_traits<ITERATOR_T>::value_type;
+    using difference_type = typename std::iterator_traits<ITERATOR_T>::difference_type;
+    using pointer = typename std::iterator_traits<ITERATOR_T>::pointer;
+    using reference = typename std::iterator_traits<ITERATOR_T>::reference;
+
     ITERATOR_T it;
     const array_t * arr_ptr { nullptr }; // Which array was iterator created from?
 
