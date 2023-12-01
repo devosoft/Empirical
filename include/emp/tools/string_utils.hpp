@@ -1035,22 +1035,23 @@ namespace emp {
     return end_pos ? string_pop_fixed(in_string, end_pos+1) : "";
   }
 
-  inline size_t string_pop_uint(std::string & in_string) {
+  inline size_t string_uint_size(const std::string & in_string) {
     size_t uint_size = 0;
     for (char c : in_string) {
       if (is_digit(c)) uint_size++;
       else break;
     }
+    return uint_size;
+  }
+
+  inline unsigned long long string_pop_uint(std::string & in_string) {
+    const size_t uint_size = string_uint_size(in_string);
     std::string out_uint = string_pop_fixed(in_string, uint_size);
     return std::stoull(out_uint);
   }
 
-  inline size_t string_get_uint(const std::string & in_string) {
-    size_t uint_size = 0;
-    for (char c : in_string) {
-      if (is_digit(c)) uint_size++;
-      else break;
-    }
+  inline unsigned long long string_get_uint(const std::string & in_string) {
+    const size_t uint_size = string_uint_size(in_string);
     std::string out_uint = string_get_range(in_string, 0, uint_size);
     return std::stoull(out_uint);
   }
