@@ -2438,7 +2438,7 @@ void do_byte_test() {
 // unpack the integer sequence of bits to test
 // and then call the actual testing function with each as a template arg
 template <typename T, T... Bits>
-void do_byte_tests(const std::integer_sequence<T, Bits...>& sequence) {
+void do_byte_tests(const std::integer_sequence<T, Bits...>& /* sequence */) {
   ((do_byte_test<Bits>()),...);
 }
 // function that holds what number of bits to test, and then calls

@@ -8,7 +8,7 @@
  *  @note Status: Beta
  *
  *  @todo Create an ActionDefaults class that can take fewer args than expected and fill in rest.
- *  @todo Allow for named arguments to facilite intepreted functions.
+ *  @todo Allow for named arguments to facilitate interpreted functions.
  */
 
 #ifndef EMP_CONTROL_ACTION_HPP_INCLUDE
@@ -22,8 +22,7 @@ namespace emp {
   /// BaseActions abstract functions and allow for signals to be setup at runtime; they can be
   /// called with types specified in the call.
   ///
-  /// Actions can be a bit heavyweight, but can easily be converted to more lightweight
-  /// std:function objects.
+  /// Actions can be a bit heavyweight, but can easily be converted to std::function objects.
 
   class ActionBase {
   protected:
@@ -59,11 +58,11 @@ namespace emp {
     size_t GetArgCount() const { return ARG_COUNT; }
   };
 
-  /// The declaration for Action has any template types; the only definined specilizations require
+  /// The declaration for Action has any template types; the only defined specializations require
   /// a function type to be specified (with void and non-void return type variants.)
   template <typename... ARGS> class Action;
 
-  /// This Action class specialization takes a function with a void return tyime and builds it off
+  /// This Action class specialization takes a function with a void return type and builds it off
   /// of the action base classes.
   template <typename... ARGS>
   class Action<void(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
@@ -95,7 +94,7 @@ namespace emp {
   };
 
 
-  /// This Action class specialization takes a function with any non-void return tyime and builds it
+  /// This Action class specialization takes a function with any non-void return type and builds it
   /// off of the action base classes.
   template <typename RETURN, typename... ARGS>
   class Action<RETURN(ARGS...)> : public ActionSize<sizeof...(ARGS)> {

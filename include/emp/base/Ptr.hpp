@@ -607,8 +607,8 @@ namespace emp {
 
     /// Delete this pointer to an array (must be an array).
     void DeleteArray() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(ptr, "Trying to delete null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not responsible for.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
       emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
