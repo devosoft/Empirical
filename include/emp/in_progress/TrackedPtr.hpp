@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef EMP_BASE_TRACKED_PTR_HPP_INCLUDE
-#define EMP_BASE_TRACKED_PTR_HPP_INCLUDE
+#ifndef EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
+#define EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
 
 #include "Ptr.hpp"
 
@@ -53,4 +53,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE

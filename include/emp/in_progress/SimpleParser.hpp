@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  SimpleParser.hpp
+ *  @file SimpleParser.hpp
  *  @brief Common praser functionality with custom plugins for variables and functions.
  *  @note Status: ALPHA
  * 
@@ -15,8 +15,8 @@
  *  - Add in a type system (String, double, vectors, etc.)
  */
 
-#ifndef EMP_SIMPLE_PARSER_HPP
-#define EMP_SIMPLE_PARSER_HPP
+#ifndef EMP_IN_PROGRESS_SIMPLEPARSER_HPP_INCLUDE
+#define EMP_IN_PROGRESS_SIMPLEPARSER_HPP_INCLUDE
 
 #include <cmath>
 #include <string>
@@ -349,4 +349,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_SIMPLEPARSER_HPP_INCLUDE

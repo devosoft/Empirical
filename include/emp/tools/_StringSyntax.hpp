@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2023.
  *
- *  @file StringSyntax.hpp
+ *  @file _StringSyntax.hpp
  *  @brief String helper class to specify syntax for quotes and paren.
  *  @note Status: ALPHA
  *
@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef EMP_TOOLS_STRING_SYNTAX_HPP_INCLUDE
-#define EMP_TOOLS_STRING_SYNTAX_HPP_INCLUDE
+#ifndef EMP_TOOLS__STRINGSYNTAX_HPP_INCLUDE
+#define EMP_TOOLS__STRINGSYNTAX_HPP_INCLUDE
 
 
 #include <sstream>
@@ -92,4 +92,4 @@ namespace emp {
 }
 
 
-#endif // #ifndef EMP_TOOLS_STRING_SYNTAX_HPP_INCLUDE
+#endif // #ifndef EMP_TOOLS__STRINGSYNTAX_HPP_INCLUDE

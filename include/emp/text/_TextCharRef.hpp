@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2023.
  *
- *  @file TextCharRef.hpp
+ *  @file _TextCharRef.hpp
  *  @brief Handles a single, potentially formatted character from emp::Text.
  *  @note Status: ALPHA
  * 
  */
 
-#ifndef EMP_TOOLS_TEXT_CHAR_REF_HPP_INCLUDE
-#define EMP_TOOLS_TEXT_CHAR_REF_HPP_INCLUDE
+#ifndef EMP_TEXT__TEXTCHARREF_HPP_INCLUDE
+#define EMP_TEXT__TEXTCHARREF_HPP_INCLUDE
 
 #include <type_traits>  // std::conditional
 
@@ -85,4 +85,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_TEXT__TEXTCHARREF_HPP_INCLUDE

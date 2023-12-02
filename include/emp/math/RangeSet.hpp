@@ -8,8 +8,8 @@
  *  @note Status: BETA
  */
 
-#ifndef EMP_MATH_RANGE_SET_HPP_INCLUDE
-#define EMP_MATH_RANGE_SET_HPP_INCLUDE
+#ifndef EMP_MATH_RANGESET_HPP_INCLUDE
+#define EMP_MATH_RANGESET_HPP_INCLUDE
 
 #include <algorithm>
 
@@ -496,4 +496,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // #ifndef EMP_MATH_RANGESET_HPP_INCLUDE

@@ -456,4 +456,4 @@ namespace emp {
   using Bits_StaticData    = internal::Bits_Data< internal::Bits_Data_Mem_Static<MAX_BITS> >;
 }
 
-#endif
+#endif // #ifndef EMP_BITS_BITS_DATA_HPP_INCLUDE

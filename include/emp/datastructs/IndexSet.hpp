@@ -8,8 +8,8 @@
  *  @note Status: ALPHA
  */
 
-#ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
+#ifndef EMP_DATASTRUCTS_INDEXSET_HPP_INCLUDE
+#define EMP_DATASTRUCTS_INDEXSET_HPP_INCLUDE
 
 #include "../base/Ptr.hpp"
 #include "../bits/BitVector.hpp"
@@ -525,4 +525,4 @@ namespace emp {
   };
 }
 
-#endif // #ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
+#endif // #ifndef EMP_DATASTRUCTS_INDEXSET_HPP_INCLUDE

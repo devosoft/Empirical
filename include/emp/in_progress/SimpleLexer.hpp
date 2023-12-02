@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  SimpleLexer.hpp
+ *  @file SimpleLexer.hpp
  *  @brief Lexer with common functionality already filled in.
  *  @note  Status: ALPHA
  */
 
-#ifndef EMP_SIMPLE_LEXER_HPP
-#define EMP_SIMPLE_LEXER_HPP
+#ifndef EMP_IN_PROGRESS_SIMPLELEXER_HPP_INCLUDE
+#define EMP_IN_PROGRESS_SIMPLELEXER_HPP_INCLUDE
 
 #include <cmath>
 #include <string>
@@ -84,4 +84,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_SIMPLELEXER_HPP_INCLUDE

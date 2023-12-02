@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2022.
  *
- *  @file Ptr.hpp
+ *  @file Ptr-overload-fix.hpp
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
  *  @note Status: BETA
  *
@@ -27,8 +27,8 @@
  *  @todo Get working with threads
  */
 
-#ifndef EMP_BASE_PTR_HPP_INCLUDE
-#define EMP_BASE_PTR_HPP_INCLUDE
+#ifndef EMP_IN_PROGRESS_PTR_OVERLOAD_FIX_HPP_INCLUDE
+#define EMP_IN_PROGRESS_PTR_OVERLOAD_FIX_HPP_INCLUDE
 
 #include <cstring>
 #include <unordered_map>
@@ -1064,4 +1064,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_BASE_PTR_HPP_INCLUDE
+#endif // #ifndef EMP_IN_PROGRESS_PTR_OVERLOAD_FIX_HPP_INCLUDE

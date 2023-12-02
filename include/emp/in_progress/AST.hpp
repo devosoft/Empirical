@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2021.
  *
- *  @file  AST.hpp
+ *  @file AST.hpp
  *  @brief Tools to build an Abstract Syntax Tree.
  *  @note  Status: ALPHA
  */
 
-#ifndef EMP_AST_HPP
-#define EMP_AST_HPP
+#ifndef EMP_IN_PROGRESS_AST_HPP_INCLUDE
+#define EMP_IN_PROGRESS_AST_HPP_INCLUDE
 
 #include <string>
 
@@ -56,4 +56,4 @@ namespace emp {
   };
 }
 
-#endif
+#endif // #ifndef EMP_IN_PROGRESS_AST_HPP_INCLUDE

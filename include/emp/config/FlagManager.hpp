@@ -27,8 +27,8 @@
  *  @todo: Make variable numbers of flag arguments work.
  */
 
-#ifndef EMP_CONFIG_FLAG_MANAGER_HPP_INCLUDE
-#define EMP_CONFIG_FLAG_MANAGER_HPP_INCLUDE
+#ifndef EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
+#define EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
 
 #include <functional>
 #include <iostream>
@@ -169,4 +169,4 @@ namespace emp {
 
 }
 
-#endif // #ifndef EMP_CONFIG_FLAG_MANAGER_HPP_INCLUDE
+#endif // #ifndef EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE

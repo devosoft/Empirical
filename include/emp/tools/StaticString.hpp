@@ -158,4 +158,4 @@ namespace emp {
 }
 
 
-#endif // #ifndef EMP_TOOLS_SHORTSTRING_HPP_INCLUDE
+#endif // #ifndef EMP_TOOLS_STATICSTRING_HPP_INCLUDE
