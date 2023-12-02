@@ -1124,6 +1124,8 @@ namespace emp {
     emp::vector<double> GetPairwiseDistances(bool branch_only=false) const;
 
 
+    double GetPairwiseDistance(Ptr<taxon_t> t1, Ptr<taxon_t> t2, bool branch_only=false) const;
+
     /**
      * Returns a vector containing all taxa that were extant at \c time_point and
      * were at that time the most recent ancestors of taxa that are now extant
@@ -1986,6 +1988,47 @@ namespace emp {
 
     return dists;
 
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPairwiseDistance(Ptr<taxon_t> t1, Ptr<taxon_t> t2, bool branch_only) const {
+    // Same taxon
+    if (t1 == t2) {
+      return 0;
+    }
+
+    // If not same, we have to actually do work
+    emp::vector<Ptr<taxon_t> > lineage1 = GetLineageToMRCA(t1);
+    emp::vector<Ptr<taxon_t> > lineage2 = GetLineageToMRCA(t2);
+
+    size_t l1 = lineage1.size() - 1;
+    size_t l2 = lineage2.size() - 1;
+
+    emp_optional_throw(lineage1[l1] == lineage2[l2],
+        "Both lineages should start with MRCA");
+
+    while (lineage1[l1] == lineage2[l2]) {
+      l1--;
+      l2--;
+    }
+
+    double count = l1 + l2 + 2;
+
+    if (branch_only) {
+      for (size_t i = l1; i > 0; i--) {
+        if (lineage1[i]->GetNumOff() == 1) {
+          count--;
+        }
+      }
+
+      for (size_t i = l2; i > 0; i--) {
+        if (lineage2[i]->GetNumOff() == 1) {
+          count--;
+        }
+      }
+    }
+
+    return count;
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
