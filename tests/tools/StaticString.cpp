@@ -64,7 +64,7 @@ TEST_CASE("ShortString manipulations", "[tools]")
   str1 = "test:";
   str1.append("123");
   CHECK(str1 == "test:123");
-  
+
   std::string str456 = "456";
   str1.append(str456);
   CHECK(str1 == "test:123456");

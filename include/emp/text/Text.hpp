@@ -6,11 +6,11 @@
  *  @file Text.hpp
  *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
  *  @note Status: ALPHA
- * 
+ *
  *  Text should be functionally interchangable with string, but can easily convert to
  *  HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
  *  etc.
- * 
+ *
  *  The main Text class tracks a string of text (called simply "text") and any special styles
  *  associated with each text position (in "style_map").  The current TextEncoding class helps
  *  guide the conversion from one text encoding to another.
@@ -28,7 +28,7 @@
  *     "color:NAME"
  *     "font:NAME"
  *     "size:POINT_SIZE"
- * 
+ *
  *    STRUCTURAL :
  *     "heading:1" through "heading:6" different levels of headings.
  *     "blockquote"
@@ -317,7 +317,7 @@ namespace emp {
         SetStyle(style, pos);
       }
       return *this;
-    }    
+    }
 
     TextCharRef<false> operator[](size_t pos) {
       emp_assert(pos < GetSize(), pos, GetSize());
@@ -469,7 +469,7 @@ namespace emp {
     Text & ClearSubscript() { return Clear("subscript"); }
     Text & ClearSuperscript() { return Clear("superscript"); }
     Text & ClearUnderline() { return Clear("underline"); }
-    
+
     // Simple formatting: clear a single character from a specified format.
     Text & Clear(const String & style, size_t pos) {
       auto it = style_map.find(style);
@@ -526,7 +526,7 @@ namespace emp {
   void TextEncoding_None::PrintDebug(std::ostream & os) const {
     os << "TextEncoding None.";
   }
-  
+
 }
 
 #endif // #ifndef EMP_TEXT_TEXT_HPP_INCLUDE

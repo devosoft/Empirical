@@ -6,7 +6,7 @@
  *  @file _TextCharRef.hpp
  *  @brief Handles a single, potentially formatted character from emp::Text.
  *  @note Status: ALPHA
- * 
+ *
  */
 
 #ifndef EMP_TEXT__TEXTCHARREF_HPP_INCLUDE
@@ -73,7 +73,7 @@ namespace emp {
 
     TextCharRef & SetStyle(const String & style) {
       text_ref.SetStyle(style, pos);
-      return *this;      
+      return *this;
     }
     TextCharRef & Bold()        { return SetStyle("bold"); }
     TextCharRef & Code()        { return SetStyle("code"); }

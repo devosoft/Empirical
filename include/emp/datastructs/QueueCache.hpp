@@ -126,7 +126,7 @@
         if (found != cache_map.end()) {
           Delete(found);
         }
-        
+
         cache_list.emplace_front(key, val);         // Put element into the cache
         cache_map.emplace(key, cache_list.begin()); // Add element pointer to map
         Shrink();                                   // Reduce if we are over capacity

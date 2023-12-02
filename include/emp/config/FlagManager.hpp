@@ -6,24 +6,24 @@
  *  @file FlagManager.hpp
  *  @brief This file contains tools for dealing with command-line flags (from argv and argc).
  *  @note Status: ALPHA
- * 
+ *
  *  The FlagManager class will take command line arguments (either in its constructor or with
  *  the AddFlags() function) and process them appropriately.
- * 
+ *
  *  For setup, the user must run AddOption with the function to call.  Functions to call can take
  *  zero, one, or two Strings as arguments OR they can take a vector of Strings and the range of
  *  allowed arguments should be specified.  When Process() is run, the appropriate function will
  *  be called on each and any invalid arguments will trigger an error.
- * 
+ *
  *  Flags are expected to begin with a '-' and non-flags are expected to NOT begin with a '-'.
- * 
+ *
  *  If a single dash is followed by multiple characters, each will be processed independently.
  *  So, "-abc" will be the same as "-a -b -c".
- * 
+ *
  *  Extra command line arguments will be saves as a vector of strings called "extras" and must
  *  be processed manually.  They can be retrieved with GetExtras().
- * 
- * 
+ *
+ *
  *  @todo: Make variable numbers of flag arguments work.
  */
 

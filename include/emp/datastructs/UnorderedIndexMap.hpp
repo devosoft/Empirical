@@ -79,7 +79,7 @@ namespace emp {
       emp_assert(num_items > 0, "UnorderedIndexMaps should not be initialized with empty weights");
       for (size_t i = 0; i < num_items; i++) weights[i + num_nodes] = in_weights[i];
     }
-    
+
     UnorderedIndexMap(const UnorderedIndexMap &) = default;
     UnorderedIndexMap(UnorderedIndexMap &&) = default;
     ~UnorderedIndexMap() = default;

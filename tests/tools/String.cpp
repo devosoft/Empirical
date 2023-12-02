@@ -102,7 +102,7 @@ TEST_CASE("Test String Composition-ID Functions", "[tools]")
   CHECK(!emp::String("'\\'").IsLiteralChar());
   CHECK(emp::MakeFromLiteral_Char("'f'") == 'f');
   CHECK(emp::MakeFromLiteral_Char("'\n'") == '\n');
-  
+
   CHECK(emp::String("\"He llo!\"").IsLiteralString());
   CHECK(!emp::String("\"\\\\He\"llo!\"").IsLiteralString());
   CHECK(emp::String("\"Hel\n\t\r\\\'lo!\"").IsLiteralString());
@@ -120,7 +120,7 @@ TEST_CASE("Test String Composition-ID Functions", "[tools]")
   CHECK(special_string.CountDigits() == 3);
   CHECK(special_string.CountAlphanumeric() == 25);
   CHECK(special_string.CountNonwhitespace() == 30);
-  
+
   /*
   CHECK(emp::is_valid("aaaaaaaaa", [](char x) { return (x == 'a'); } ));
   CHECK( !(emp::is_valid("aaaabaaaa", [](char x) { return (x == 'a'); })) );
@@ -325,7 +325,7 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
 
 
 TEST_CASE("Test Stirng assign and Macro functions", "[tools]")
-{  
+{
   emp::String test = "TIMES(abc,3) + TIMES(def,2) + TIMES(g, 8)";
   test.ReplaceMacro("TIMES(", ")",
     [](emp::String check_body, size_t, size_t) {

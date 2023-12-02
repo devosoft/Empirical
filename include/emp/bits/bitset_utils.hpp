@@ -44,7 +44,7 @@ namespace emp {
   [[nodiscard]] static std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
     std::stringstream ss;
     for (size_t i = 0; i < count; ++i) {
-      if (i) ss << ' ';            
+      if (i) ss << ' ';
       ss << BitFieldToString(bits[i]);
     }
     return ss.str();

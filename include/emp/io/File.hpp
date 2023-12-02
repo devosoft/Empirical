@@ -211,7 +211,7 @@ namespace emp {
         if constexpr ( std::is_same<return_t, String>() ) {
           cur_line = fun(cur_line);
         } else {
-          fun(cur_line);          
+          fun(cur_line);
         }
       }
       return *this;

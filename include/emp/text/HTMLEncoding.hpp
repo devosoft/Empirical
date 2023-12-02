@@ -6,7 +6,7 @@
  *  @file HTMLEncoding.hpp
  *  @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
  *  @note Status: ALPHA
- * 
+ *
  */
 
 #ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE

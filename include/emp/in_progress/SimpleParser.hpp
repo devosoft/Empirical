@@ -6,7 +6,7 @@
  *  @file SimpleParser.hpp
  *  @brief Common praser functionality with custom plugins for variables and functions.
  *  @note Status: ALPHA
- * 
+ *
  *  Developer TODO:
  *  - Make ${ ... } actually work
  *  - Setup operator RegEx to be built dynamically
@@ -234,7 +234,7 @@ namespace emp {
           if (pos->lexeme == ",") ++pos;
         }
         ++pos;
-        
+
         // Now build the function based on its argument count.
         value_fun_t out_fun;
         switch (args.size()) {

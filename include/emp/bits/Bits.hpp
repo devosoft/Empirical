@@ -9,7 +9,7 @@
  *
  *  The Bits template allows the user to recreate the functionality of std::vector<bool>,
  *  array<bool>, std::bitset, and other such bit-handling classes.
- * 
+ *
  *  This class stores an arbitrary number of bits in a set of "fields" (typically 32 bits or 64
  *  bits per field, depending on which should be faster.)  Individual bits can be extracted,
  *  -or- bitwise logic (including more complex bit magic) can be used on the groups of bits.
@@ -25,13 +25,13 @@
  *    StaticBitValue  : Like BitValue, but max size and fixed memory.
  *    BitArray        : A replacement for std::array<bool> (index 0 is on left)
  *    BitSet          : A replacement for std::bitset (index 0 is on right)
- * 
+ *
  *  In the case of replacements, the aim was for identical functionality, but many additional
  *  features, especially associated with bitwise logic operations.
- * 
+ *
  *  @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
- * 
+ *
  *  @todo Most of the operators don't check to make sure that both Bit groups are the same size.
  *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
@@ -76,7 +76,7 @@ namespace emp {
 
   /// @brief A flexible base template to handle BitVector, BitArray, BitSet, & other combinations.
   /// @tparam DATA_T How is this Bits object allowed to change size?
-  /// @tparam ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false) 
+  /// @tparam ZERO_LEFT Should the index of zero be the left-most bit? (right-most if false)
   template <typename DATA_T, bool ZERO_LEFT>
   class Bits {
     using this_t = Bits<DATA_T, ZERO_LEFT>;
@@ -160,7 +160,7 @@ namespace emp {
 
   public:
     /// @brief Default constructor; will build the default number of bits (often 0, but not always)
-    /// @param init_val Initial value of all default bits. 
+    /// @param init_val Initial value of all default bits.
     Bits(bool init_val=0) { if (init_val) SetAll(); else Clear(); }
 
     /// @brief Build a new Bits with specified bit count and initialization (default 0)

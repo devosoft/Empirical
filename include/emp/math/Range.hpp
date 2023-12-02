@@ -82,7 +82,7 @@ namespace emp {
       lower = (MaxLimit() - shift > lower) ? (lower + shift) : MaxLimit();
     }
     void Shift(T shift) {
-      if (shift > 0) ShiftUp(shift); 
+      if (shift > 0) ShiftUp(shift);
       else ShiftDown(-shift);
     }
 

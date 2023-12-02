@@ -138,7 +138,7 @@ namespace emp {
     size_t GetEnd() const {
       return range_set.size() ? range_set.back().GetEnd() : 0;
     }
-    
+
     size_t GetNumRanges() const { return range_set.size(); }
 
     /// @brief Calculate the total combined size of all ranges.

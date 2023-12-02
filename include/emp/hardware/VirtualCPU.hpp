@@ -127,7 +127,7 @@ namespace emp{
       size_t write_head;                       ///< Write head, signals where to copy next
                                                ///< instruction
       size_t cooldown_timer = 0;               ///< Do not process inst if value > 0.
-                                               ///< Decrease this value instead 
+                                               ///< Decrease this value instead
       //////// HELPER CONSTRUCTS
       emp::unordered_map<size_t, size_t> nop_id_map;/**< NOP inst id -> Nop index
                                                          (e.g., NopA -> 0, NopB -> 1,
@@ -252,7 +252,7 @@ namespace emp{
       /// Redirect literal ints to PushInst(size_t) overload.
       void PushInst(int idx) { PushInst(static_cast<size_t>(idx)); }
 
-      /// Add a new instruction to the end of the genome, by the instruction's symbol/char 
+      /// Add a new instruction to the end of the genome, by the instruction's symbol/char
       void PushInst(char c) { PushInst( GetInstLib()->GetIndexFromSymbol(c) ); }
 
       /// Add a new instruction to the end of the genome, by name
@@ -353,7 +353,7 @@ namespace emp{
 
 
       //////// HEAD MANIPULATION
-      
+
       void ResetIP() { inst_ptr = 0; }   ///< Move instruction pointer to beginning of the genome.
       void ResetRH() { read_head = 0; }  ///< Move read head to beginning of the genome.
       void ResetWH() { write_head = 0; } ///< Move write head to beginning of the genome.

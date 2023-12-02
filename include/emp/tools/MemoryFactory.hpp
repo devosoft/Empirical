@@ -71,7 +71,7 @@ namespace emp {
         pool_size = chunk_size * pool_count;
         pool.NewArray(pool_size);
         free_ids.resize(pool_count);
-        std::iota(free_ids.begin(), free_ids.end(), 0);        
+        std::iota(free_ids.begin(), free_ids.end(), 0);
       }
       void Initialize(size_t _mem_count, size_t _pool_count) {
         emp_assert(mem_count == 0, "Cannot (currently) re-initialize a memory factory.");
@@ -168,7 +168,7 @@ namespace emp {
         emp_assert(it != data.free_ids.begin()+free_count);   // Make sure it's there!
         *it = data.free_ids.back();                           // Move last ID into its position.
         free_count--;                                         // Eliminate old final ID (now moved).
-        
+
         const size_t id_pos = id * data.mem_size;
         if constexpr (!is_trivial || sizeof...(ARGS) > 0) {
           for (size_t i = 0; i < data.mem_count; ++i) {
@@ -202,7 +202,7 @@ namespace emp {
             return;
           }
         }
-        
+
         const size_t id = ToID(in);
         emp_assert(!IsFreeID(id), "Trying to release ID that is already free.", id);
         emp_assert(IsValidID(id), "Trying to release invalid ID", id);

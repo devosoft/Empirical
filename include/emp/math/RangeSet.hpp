@@ -41,8 +41,8 @@ namespace emp {
     // }
     size_t _FindRange(T value) const {
       auto it = std::lower_bound(
-        range_set.begin(), 
-        range_set.end(), 
+        range_set.begin(),
+        range_set.end(),
         value,
         [](const range_t & range, T value) { return range.GetUpper() < value; }
       );
@@ -155,7 +155,7 @@ namespace emp {
 
     /// @return Overall end of all ranges (or min value if no ranges exist.)
     [[nodiscard]] T GetEnd() const { return IsEmpty() ? MinLimit() : range_set.back().Upper(); }
-    
+
     [[nodiscard]] size_t GetNumRanges() const { return range_set.size(); }
 
     /// @brief Calculate the total combined size of all ranges.
@@ -284,7 +284,7 @@ namespace emp {
       }
 
       // Otherwise insert as a new range.
-      else _InsertRange(start_id, in);  
+      else _InsertRange(start_id, in);
 
       return *this;
     }
@@ -366,7 +366,7 @@ namespace emp {
         range_set[start_id].SetUpper(rm_range.Lower());
         return *this;
       }
-      
+
       // Deal with beginning of removal - cut it down if needed, and move on to next range.
       if (rm_range.Lower() > start_range.Lower()) {
         start_range.Upper() = rm_range.Lower();
@@ -472,7 +472,7 @@ namespace emp {
       return out;
     }
 
-    /// @brief Check for internal errors in this RangeSet. 
+    /// @brief Check for internal errors in this RangeSet.
     bool OK() const {
       // Check each range individually.
       for (const auto & range : range_set) {

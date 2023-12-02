@@ -6,7 +6,7 @@
  *  @file EmphaticEncoding.hpp
  *  @brief Plugs into emp::Text, setting up inputs and output to be Emphatic encoded.
  *  @note Status: ALPHA
- * 
+ *
  */
 
 #ifndef EMP_TEXT_EMPHATICENCODING_HPP_INCLUDE
@@ -64,7 +64,7 @@ namespace emp {
 
   public:
     EmphaticEncoding() { SetupTags(); }
-    ~EmphaticEncoding() = default; 
+    ~EmphaticEncoding() = default;
 
     String GetName() const override { return "emphatic"; }
     emp::Ptr<TextEncoding_Interface> Clone() const override {

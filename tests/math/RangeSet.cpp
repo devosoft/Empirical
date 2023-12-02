@@ -214,7 +214,7 @@ TEST_CASE("Test continuous RangeSets", "[math]")
   CHECK(rs1.HasOverlap(range_t(26.0,26.25)) == false);
   CHECK(rs1.GetSize() == Approx(44.25));
   CHECK(rs1.GetNumRanges() == 93);
-  
+
   // Remove middle of one range through middle of two later.
   CHECK(rs1.HasOverlap(range_t(29.0,31.0)) == true);
   rs1.RemoveRange(29.0,31.0);
@@ -320,7 +320,7 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
   CHECK(input1.OK());
   bv |= input1;
   CHECK(bv.OK());
-  bv.Invert(); 
+  bv.Invert();
   CHECK(bv.KeepOnly(0,8) == set_t("01000000"));
   bv |= input1; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("10110000"));
   bv |= input2; bv.Invert();  CHECK(bv.KeepOnly(0,8) == set_t("01001100"));

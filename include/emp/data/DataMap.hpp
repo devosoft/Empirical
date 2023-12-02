@@ -402,7 +402,7 @@ namespace emp {
 
     /// Return a function that takes in a data map and (efficiently) returns a Datum using the
     /// specified name.
-    static auto MakeDatumAccessor(const emp::DataLayout & layout, const std::string & name) { 
+    static auto MakeDatumAccessor(const emp::DataLayout & layout, const std::string & name) {
       emp_assert(layout.HasName(name), "DatumAccessor not pointing to valid name", name);
       return MakeDatumAccessor(layout, layout.GetID(name));
     }

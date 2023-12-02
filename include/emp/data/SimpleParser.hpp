@@ -12,7 +12,7 @@
  *  Allowed map types include std::map<std::string,T>, std::unordered_map<std::string,T>,
  *  emp::DataMap, and (soon) derivations from emp::AnnotatedType.  For standard maps, T must be
  *  convertable to emp::Datum.
- * 
+ *
  *  Developer TODO:
  *  - Setup operator RegEx to be built dynamically
  *  - Setup LVALUES as a type, and allow assignment
