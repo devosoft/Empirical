@@ -68,7 +68,7 @@ namespace emp {
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
       bool operator<(const Instruction & in) const {
-          return std::tie(id, args) < std::tie(in.id, in.args);
+        return (id == in.id) ? (args < in.args) : (id < in.id);
       }
       bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
       bool operator!=(const Instruction & in) const { return !(*this == in); }
