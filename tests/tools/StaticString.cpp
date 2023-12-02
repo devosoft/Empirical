@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2022.
  *
- *  @file ShortString.cpp
+ *  @file StaticString.cpp
  */
 
 #include "../third-party/Catch/single_include/catch2/catch.hpp"
