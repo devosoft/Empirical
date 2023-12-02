@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "../base/assert.hpp"
+
 #include "map_utils.hpp"
 
  namespace emp {
