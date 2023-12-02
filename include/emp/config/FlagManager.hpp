@@ -32,8 +32,8 @@
 
 #include <functional>
 #include <iostream>
-#include <string>
 #include <map>
+#include <string>
 
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"

@@ -33,8 +33,8 @@
 #include "../base/vector.hpp"
 #include "../meta/type_traits.hpp"  // emp::IsIterable()
 
-#include "_StringSyntax.hpp"
 #include "char_utils.hpp"           // emp::CharSet (+ functions)
+#include "_StringSyntax.hpp"
 
 
 namespace emp {

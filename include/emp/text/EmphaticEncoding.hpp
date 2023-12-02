@@ -16,8 +16,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "Text.hpp"
 #include "TextEncoding.hpp"
+#include "Text.hpp"
 
 namespace emp {
 

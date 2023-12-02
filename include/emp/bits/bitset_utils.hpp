@@ -13,8 +13,8 @@
 
 #include <algorithm>
 #include <cstdint>       // uint8_t, uint16_t, etc.
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "../base/Ptr.hpp"
 
