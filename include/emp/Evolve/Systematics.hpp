@@ -2385,7 +2385,9 @@ namespace emp {
     // Adjust total offspring
     if (adjust_total_offspring) {
       for (auto tax : active_taxa) {
-        tax->parent->AddTotalOffspring();
+        if (tax->parent) {
+          tax->parent->AddTotalOffspring();
+        }
       }
     } else {
       total_offspring_wrong = true;
