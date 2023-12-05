@@ -97,7 +97,7 @@ MarkBack notes:
    \_ is a non-breaking space.
    \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
    \- is a horizontal rule
-   \^{note} creates an footnote.  This is a superscript value with the contents included at the end of the page (or end of document if no pagebreaks)
+   \^{note} creates an footnote.  This is a superscript value with the contents included at the end of the page (or end of document if no page breaks)
    \* is a bullet which will start a list entry
    \+ is a consecutive number bullet, incrementing if in a list
    \={123} (or any other numbers or letters) is a specified value for a bullet (a subsequent \+, \a, or \R will continue from it)
@@ -115,6 +115,9 @@ MarkBack notes:
    \&name; or \&{name} insert a character by a given name
    \${var_value_printed_here} - see below
    \?{TEST}{Optional text} - insert only if TEST is true.
+
+  Note that bullets can be repeated any number of times for deeper indentation.
+  For example \*** or \++
 
   Unused symbols for insertions: ~!@%;'",/ plus lots of letters
   ALSO technically unused, but less useful: ]>})
