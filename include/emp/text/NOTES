@@ -38,9 +38,10 @@ Internal encoding (Emphatic)
 
 
 MarkBack notes:
-  New format is .mback, which is inspired by markdown, but uses just two types of special characters for formatting:
+  New format is .mback, which is inspired by markdown, but uses just two types of special characters for formatting control:
      Backquotes (`) indicate a change in text STYLE
      Backslashes (\) indicate a special CHARACTER
+  Everything else is direct text, so you should never have surprises in the final formatting.
 
   The following tags toggle a formatting STYLE.
 
@@ -51,10 +52,14 @@ MarkBack notes:
    `^Superscript`^
    `.Subscript`.
    `~Strikethrough`~
-   `<{URL}Linked-text goes here`>
+   `@{URL}Linked-text goes here`@
    `#{hashtag}Tagged text`#
+   `<Left Justified`<
+   `>Right Justified`>
+   `<Fully Justified`>
+   `|Centered`| -or- `>Centered`<
 
-  Color changes are placed in brackets.
+  Color changes or other special types are placed in brackets.
 
    `[blue]This text would be blue
    `[#FF00FF]This text would be magenta
@@ -70,7 +75,7 @@ MarkBack notes:
 
    `" Blockquote
    `% Comment that will be removed.
-   `| Continues the previous line for other tags in this group.
+   `: Continues the previous line for other tags in this group.
 
    Anything with three backticks (```) before and after will be treated as code blocks.
    Add a `= at the beginning of a line if you don't want any special formatting on that line.
@@ -83,8 +88,8 @@ MarkBack notes:
    ``{This would also be code, _with_ the braces appearing}``
 
 
-  Unused symbols for style: @$&()-=+;:',
-  ALSO unused, but less useful: ]}
+  Unused symbols for style: $&()-=+;',
+  ALSO technically unused, but less useful: ]}
 
   The following tags handle special CHARACTERS:
 
@@ -93,7 +98,7 @@ MarkBack notes:
    \#{Heading}
    \##{Heading level 2}
    \### etc. deeper headings.
-   \| is the beginning of a table line (rest of line is markdown format...?)
+   \| is the beginning of a line for creating a table (rest of line is markdown format...?)
    \_ is a non-breaking space.
    \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
    \- is a horizontal rule
@@ -105,18 +110,19 @@ MarkBack notes:
    \b is a page break
    \d{name} creates a division with a specified name
    \n is a line break (newline)
+   \o task-list bullet (i.e., a checkbox)
    \p is a paragraph break
    \t is a tab
    \R is a roman numeral bullet, incrementing if in a list
    \(123) (or any other number) converts to the associated unicode character.
    \<URL> or \<#hashtag> will place a link this point WITH itself as the text
-   \[URL] will RESOLVE a URL to an image (or somethign else?) and place it here
-   \:name: por \:{name} will place the emoji associated with 'name'
+   \[URL|width=100,height=200,alt="my image!"] will RESOLVE a URL to an image and place it here
+   \:name: or \:{name} will place the emoji associated with 'name'
    \&name; or \&{name} insert a character by a given name
    \${var_value_printed_here} - see below
    \?{TEST}{Optional text} - insert only if TEST is true.
 
-  Note that bullets can be repeated any number of times for deeper indentation.
+  Note that bullets can be repeated any number of times for deeper indentation and nested lists.
   For example \*** or \++
 
   Unused symbols for insertions: ~!@%;'",/ plus lots of letters
