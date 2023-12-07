@@ -23,9 +23,8 @@ namespace emp {
   /// @param s the systematics manager to search in. Must have more than 0 active taxa.
   template<typename systematics_t>
   Ptr<typename systematics_t::taxon_t> FindDominant(systematics_t & s) {
-    emp_assert(s.GetNumActive() > 0 && "Trying to call FindDominant on empty population");
-    double best = (*(s.GetActive().begin()))->GetData().GetFitness();
-    Ptr<typename systematics_t::taxon_t> best_tax = (*(s.GetActive().begin()));
+    double best = -999999;
+    Ptr<typename systematics_t::taxon_t> best_tax = nullptr;
     for (Ptr<typename systematics_t::taxon_t> tax : s.GetActive()) {
       double f = tax->GetData().GetFitness();
       if (f > best) {
