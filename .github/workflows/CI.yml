@@ -99,6 +99,8 @@ jobs:
   build-docker:
     name: Build Docker Image
     runs-on: ubuntu-22.04
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v2
         with:
