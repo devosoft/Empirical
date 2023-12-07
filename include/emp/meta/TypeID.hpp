@@ -17,6 +17,7 @@
 #define EMP_META_TYPEID_HPP_INCLUDE
 
 #include <cmath>
+#include <cstdint>
 #include <sstream>
 #include <string>
 

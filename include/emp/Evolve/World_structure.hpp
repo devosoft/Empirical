@@ -10,6 +10,7 @@
 #ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 
+#include <cstdint>
 #include <set>
 
 #include "../base/array.hpp"

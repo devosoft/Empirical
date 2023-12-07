@@ -13,6 +13,7 @@
 #define EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 
 #include <algorithm>
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <unordered_set>

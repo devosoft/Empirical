@@ -43,6 +43,7 @@
 // #include <algorithm>
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <ctime>
 #include <iterator>
 #include <unistd.h>

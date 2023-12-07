@@ -12,6 +12,7 @@
 #ifndef EMP_WEB_FILEINPUT_HPP_INCLUDE
 #define EMP_WEB_FILEINPUT_HPP_INCLUDE
 
+#include <cstdint>
 #include <functional>
 #include <string>
 

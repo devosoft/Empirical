@@ -23,6 +23,8 @@
 #ifndef EMP_GEOMETRY_BODY2D_HPP_INCLUDE
 #define EMP_GEOMETRY_BODY2D_HPP_INCLUDE
 
+#include <cstdint>
+
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

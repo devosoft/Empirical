@@ -10,6 +10,7 @@
 #ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE
 #define EMP_WEB_D3_DATASET_HPP_INCLUDE
 
+#include <cstdint>
 #include <functional>
 
 #include "d3_init.hpp"

@@ -11,6 +11,7 @@
 #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
 #define EMP_COMPILER_LEXER_HPP_INCLUDE
 
+#include <cstdint>
 #include <map>
 #include <string>
 

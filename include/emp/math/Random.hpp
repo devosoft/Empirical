@@ -13,6 +13,7 @@
 
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <iterator>

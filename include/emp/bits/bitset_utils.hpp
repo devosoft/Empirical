@@ -11,6 +11,8 @@
 #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
+#include <cstdint>
+
 namespace emp {
 
   /// Create a series of a specified number of ones (at compile time) in a uint.

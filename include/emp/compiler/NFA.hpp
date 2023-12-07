@@ -23,6 +23,7 @@
 #define EMP_COMPILER_NFA_HPP_INCLUDE
 
 
+#include <cstdint>
 #include <map>
 #include <set>
 
