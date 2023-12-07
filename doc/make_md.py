@@ -27,7 +27,7 @@ def format_heading(level, text):
     return symbol + text + "\n\n"
 
 
-header_files = glob.glob("../include/emp/**/*.hpp")
+header_files = glob.glob("../include/emp/**/*.hpp", recursive=True)
 
 for h in header_files:
     print(h)
