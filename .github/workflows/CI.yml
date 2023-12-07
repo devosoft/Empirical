@@ -96,27 +96,38 @@ jobs:
       - run: export CXX=clang++ && make install-coverage-dependencies
       - run: export CXX=clang++ && make coverage
       - run: curl -s https://codecov.io/bash | bash
+  # adapted from https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#publishing-a-package-using-an-action
   build-docker:
     name: Build Docker Image
     runs-on: ubuntu-22.04
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
     permissions:
+      contents: read
       packages: write
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push to GHCR
-        uses: docker/build-push-action@v1
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Push to GHCR
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
           push: true
           tags: ACTIONS_BUILD_${{ github.run_id }}
-          labels: ghcr.io/devosoft/Empirical
+          labels: ${{ steps.meta.outputs.labels }}
   test-documentation:
     name: Test Documentation Build
     runs-on: ubuntu-22.04
