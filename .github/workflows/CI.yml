@@ -142,7 +142,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - uses: ssciwr/doxygen-install@v1
       - run: doxygen
       - run: cd doc && python make_md.py
       - run: cd doc && set -o pipefail && make html coverage | ./headtail.sh && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json

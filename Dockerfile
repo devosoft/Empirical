@@ -86,6 +86,7 @@ RUN \
     ssh-client \
     libasound2 \
     gpg-agent \
+    doxygen \
     && \
   apt-get clean \
     && \
