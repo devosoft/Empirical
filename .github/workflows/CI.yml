@@ -103,7 +103,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - uses: mmore500/actions-setup-docker@94429ebc8d9edb4e8c8afb2667bce1e89435f74f
+      - uses: docker-practice/actions-setup-docker@v1
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
       - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
