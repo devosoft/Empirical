@@ -98,7 +98,7 @@ jobs:
       - run: curl -s https://codecov.io/bash | bash
   test-documentation:
     name: Test Documentation Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
