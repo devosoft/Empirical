@@ -93,6 +93,12 @@ RUN \
     && \
   echo "installed apt packages"
 
+# Set Python 3.10 as the default version of Python 3
+RUN \
+  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 \
+  && \
+  update-alternatives --set python3 /usr/bin/python3.10
+
 RUN \
   echo $' \n\
 XVFB=/usr/bin/Xvfb \n\
