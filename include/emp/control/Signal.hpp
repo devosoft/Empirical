@@ -15,6 +15,7 @@
 #define EMP_CONTROL_SIGNAL_HPP_INCLUDE
 
 
+#include <cstdint>
 #include <map>
 #include <string>
 
