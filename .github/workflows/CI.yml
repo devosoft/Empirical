@@ -97,7 +97,7 @@ jobs:
       - run: export CXX=clang++ && make coverage
       - run: curl -s https://codecov.io/bash | bash
   build-docker:
-    name: Deploy to GHCR
+    name: Build Docker Image
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
