@@ -972,7 +972,7 @@ namespace emp {
 
     // Track the new systematics info
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, pos);
+      s->AddOrg(*new_org, pos, (int) update);
     }
 
     SetupOrg(*new_org, pos, *random_ptr);
@@ -996,7 +996,7 @@ namespace emp {
     }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->RemoveOrgAfterRepro(pos);                   // Notify systematics about organism removal
+      s->RemoveOrgAfterRepro(pos, update);          // Notify systematics about organism removal
     }
 
   }
@@ -1489,13 +1489,6 @@ namespace emp {
       pop.resize(0);
       std::swap(pops[0], pops[1]);            // Move next pop into place.
 
-      // Tell systematics manager to swap next population and population
-      // Needs to happen here so that you can refer to systematics in
-      // OnPlacement functions
-      for (Ptr<SystematicsBase<ORG>> s : systematics) {
-        s->Update();
-      }
-
       // Update the active population.
       num_orgs = 0;
       for (size_t i = 0; i < pop.size(); i++) {
@@ -1505,7 +1498,12 @@ namespace emp {
       }
     }
 
-    // 3. Handle any data files that need to be printed this update.
+    // 3. Handle systematics and any data files that need to be printed this update.
+
+    // Tell systematics manager to swap next population and population
+    for (Ptr<SystematicsBase<ORG>> s : systematics) {
+      s->Update();
+    }
 
     for (auto file : files) file->Update(update);
 
