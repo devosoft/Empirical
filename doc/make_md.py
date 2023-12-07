@@ -24,11 +24,13 @@ for h in header_files:
     just_dir = "/".join(h.split("/")[:-1]).lower()
     last_dir = just_dir.split("/")[-1]
     just_file = h.split("/")[-1]
-    if just_file.startswith("_"):
-        continue
-    if just_dir.startswith("in_progress"):
-        continue
-    if just_dir.startswith("polyfill"):
+
+    excluded_prefixes = [
+        "_",
+        "in_progress",
+        "polyfill",
+    ]
+    if any(just_file.startswith(prefix) for prefix in excluded_prefixes):
         continue
     new_dir = "library/" + just_dir + "/api"
     print(new_dir)
