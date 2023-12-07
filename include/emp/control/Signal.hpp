@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <map>
+#include <stddef.h>
 #include <string>
 
 #include "../datastructs/map_utils.hpp"

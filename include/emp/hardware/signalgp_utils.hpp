@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <functional>
+#include <stddef.h>
 #include <string>
 #include <unordered_set>
 

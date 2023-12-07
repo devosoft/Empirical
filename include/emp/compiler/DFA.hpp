@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <stddef.h>
 #include <string>
 
 #include "../base/array.hpp"

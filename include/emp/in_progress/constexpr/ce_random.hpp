@@ -46,6 +46,7 @@
 #include <cstdint>
 #include <ctime>
 #include <iterator>
+#include <stddef.h>
 #include <unistd.h>
 
 #include "../math/math.hpp"

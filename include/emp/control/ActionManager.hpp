@@ -11,6 +11,7 @@
 #ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
 #define EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

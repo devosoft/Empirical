@@ -11,6 +11,7 @@
 #ifndef EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_INCLUDE
 #define EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/assert.hpp"

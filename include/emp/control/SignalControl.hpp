@@ -18,6 +18,7 @@
 #define EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
 
 #include <cstdint>
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

@@ -12,6 +12,8 @@
 #ifndef EMP_EVOLVE_WORLD_OUTPUT_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_OUTPUT_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 #include "../data/DataFile.hpp"   // Helper to determine when specific events should occur.
 #include "../tools/string_utils.hpp"

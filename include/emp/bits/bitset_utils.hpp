@@ -12,6 +12,7 @@
 #define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
 
 #include <cstdint>
+#include <stddef.h>
 
 namespace emp {
 

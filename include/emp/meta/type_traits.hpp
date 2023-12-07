@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>

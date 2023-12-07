@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <stddef.h>
 
 #include "d3_init.hpp"
 

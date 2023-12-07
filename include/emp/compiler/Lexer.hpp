@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <map>
+#include <stddef.h>
 #include <string>
 
 #include "../base/map.hpp"

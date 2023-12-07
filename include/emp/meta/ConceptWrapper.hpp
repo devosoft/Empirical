@@ -97,6 +97,7 @@
 #ifndef EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
 #define EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 #include <utility>
 

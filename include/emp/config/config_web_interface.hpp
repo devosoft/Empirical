@@ -12,6 +12,7 @@
 
 #include <map>
 #include <set>
+#include <stddef.h>
 
 #include "../datastructs/set_utils.hpp"
 #include "../tools/string_utils.hpp"

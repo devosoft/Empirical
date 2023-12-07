@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <set>
+#include <stddef.h>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"

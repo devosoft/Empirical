@@ -28,6 +28,7 @@
 
 #include <functional>
 #include <map>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/Ptr.hpp"

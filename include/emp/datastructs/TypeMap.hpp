@@ -11,6 +11,7 @@
 #ifndef EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_TYPEMAP_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../meta/TypeID.hpp"

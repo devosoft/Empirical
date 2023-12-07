@@ -12,6 +12,7 @@
 #define EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <unordered_set>
 
 #include "../base/Ptr.hpp"

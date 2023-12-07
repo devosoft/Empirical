@@ -11,6 +11,7 @@
 #define EMP_HARDWARE_BITSORTER_HPP_INCLUDE
 
 #include <cstdint>
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"

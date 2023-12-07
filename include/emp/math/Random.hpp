@@ -17,6 +17,7 @@
 #include <cstring>
 #include <ctime>
 #include <iterator>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"

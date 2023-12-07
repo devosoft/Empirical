@@ -14,6 +14,8 @@
 #ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
 #define EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 
 #include "math.hpp"

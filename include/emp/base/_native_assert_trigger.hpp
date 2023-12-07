@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "_is_streamable.hpp"

@@ -12,6 +12,7 @@
 #define EMP_CONTROL_SIGNALMANAGER_HPP_INCLUDE
 
 #include <cstdint>
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

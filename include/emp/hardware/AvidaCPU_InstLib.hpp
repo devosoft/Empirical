@@ -10,6 +10,8 @@
 #ifndef EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
 #define EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../math/math.hpp"
 
 #include "InstLib.hpp"

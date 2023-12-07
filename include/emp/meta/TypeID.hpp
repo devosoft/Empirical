@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstdint>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/Ptr.hpp"

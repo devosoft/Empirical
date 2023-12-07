@@ -33,6 +33,7 @@
 #define EMP_WEB_WIDGET_HPP_INCLUDE
 
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/errors.hpp"

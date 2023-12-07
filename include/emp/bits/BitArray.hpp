@@ -21,6 +21,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <iostream>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"

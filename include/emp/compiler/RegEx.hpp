@@ -39,6 +39,7 @@
 
 #include <ostream>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/Ptr.hpp"

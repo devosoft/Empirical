@@ -49,6 +49,7 @@
 
 #include <limits>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"
