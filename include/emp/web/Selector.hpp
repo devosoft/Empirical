@@ -24,6 +24,7 @@
 #ifndef EMP_WEB_SELECTOR_HPP_INCLUDE
 #define EMP_WEB_SELECTOR_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

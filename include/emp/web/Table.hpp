@@ -27,6 +27,8 @@
 #ifndef EMP_WEB_TABLE_HPP_INCLUDE
 #define EMP_WEB_TABLE_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 
 #include "Div.hpp"

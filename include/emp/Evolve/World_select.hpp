@@ -12,6 +12,7 @@
 
 #include <functional>
 #include <map>
+#include <stddef.h>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"

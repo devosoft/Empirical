@@ -15,7 +15,9 @@
 #define EMP_CONTROL_SIGNAL_HPP_INCLUDE
 
 
+#include <cstdint>
 #include <map>
+#include <stddef.h>
 #include <string>
 
 #include "../datastructs/map_utils.hpp"

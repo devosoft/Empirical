@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <stddef.h>
 
 #include "../base/Ptr.hpp"
 #include "../datastructs/vector_utils.hpp"

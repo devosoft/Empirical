@@ -12,6 +12,7 @@
 #define EMP_BASE_UNORDERED_MAP_HPP_INCLUDE
 
 #include <initializer_list>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "assert.hpp"

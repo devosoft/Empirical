@@ -18,6 +18,7 @@
 #ifndef EMP_WEB_EVENTS_HPP_INCLUDE
 #define EMP_WEB_EVENTS_HPP_INCLUDE
 
+#include <stddef.h>
 #include <utility>
 
 #include "JSWrap.hpp"

@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

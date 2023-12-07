@@ -12,6 +12,7 @@
 #define EMP_MATH_RANDOM_UTILS_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"

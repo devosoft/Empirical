@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <stddef.h>
 
 #include "../config/command_line.hpp"
 #include "../meta/macros.hpp"

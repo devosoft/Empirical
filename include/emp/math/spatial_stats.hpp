@@ -12,6 +12,7 @@
 #define EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
 
 #include <algorithm>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../Evolve/World.hpp"

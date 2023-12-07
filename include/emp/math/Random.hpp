@@ -13,9 +13,11 @@
 
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <iterator>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -87,6 +89,10 @@ namespace emp {
       original_seed = weyl_state;
 
       weyl_state *= 2;  // Make sure starting state is even.
+
+      // Reset other internal state
+      value = 0;
+      expRV = 0.0;
 
       Get(); // Prime the new sequence by skipping the first number.
     }
