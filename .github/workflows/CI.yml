@@ -96,18 +96,38 @@ jobs:
       - run: export CXX=clang++ && make install-coverage-dependencies
       - run: export CXX=clang++ && make coverage
       - run: curl -s https://codecov.io/bash | bash
-  test-documentation:
-    name: Test Documentation Build
-    runs-on: ubuntu-20.04
+  build-docker:
+    name: Deploy to GHCR
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - uses: docker-practice/actions-setup-docker@v1
-      - run: docker build -t devosoft/empirical .
-      - run: docker ps -a
-      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
-      - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push to GHCR
+        uses: docker/build-push-action@v1
+        with:
+          push: true
+          tags: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_id }}
+  test-documentation:
+    name: Test Documentation Build
+    runs-on: ubuntu-22.04
+    needs: build-docker
+    container:
+      image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: |
+          set -o pipefail
+          make -C doc html coverage | ./headtail.sh
+          python doc/parse_documentation_coverage.py doc/_build/doc-coverage.json >> doc-coverage.json
       - uses: sylvanld/action-storage@v1
         if: github.ref == 'refs/heads/master'
         with:
