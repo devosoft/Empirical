@@ -1,6 +1,17 @@
 import glob
 import os
 
+# This script performs preprocessing for the Empirical documentation
+# build process, manually filling in the folder tree `library` with stub
+# markdown files for the documentation of Empirical header files to be built
+# onto.
+#
+# The script scans the "../include/emp" directory for all ".hpp" files (with
+# several explicit exclusions). For each header `emp/subname/filename.hpp`
+# it creates a stub `library/subname/api/file.md`. Note that the `library`
+# folder already contains skeleton content (i.e., stub pages for each of
+# Emprical's subdirectories. Note also that some Empirical subdirectories
+# not intended for external use are explicitly excluded.
 
 def format_directive(filename):
     """Create the breathe directive and add the options."""
