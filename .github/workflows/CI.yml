@@ -121,7 +121,7 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: type=raw,value=ACTIONS_BUILD_${{ github.run_id }}
+          tags: type=raw,value=ACTIONS_BUILD_${{ github.run_number }}
       - name: Push to GHCR
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
@@ -134,7 +134,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build-docker
     container:
-      image: ghcr.io/devosoft/Empirical:ACTIONS_BUILD_${{ github.run_id }}
+      image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_number }}
     steps:
       - uses: actions/checkout@v2
         with:
