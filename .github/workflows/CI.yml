@@ -142,7 +142,7 @@ jobs:
         with:
           submodules: 'recursive'
       - run: |
-          make -C doc html coverage | ./headtail.sh
+          make -C doc html coverage | ./doc/headtail.sh
           python doc/parse_documentation_coverage.py doc/_build/doc-coverage.json >> doc-coverage.json
       - uses: sylvanld/action-storage@v1
         if: github.ref == 'refs/heads/master'
