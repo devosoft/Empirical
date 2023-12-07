@@ -15,6 +15,7 @@
 #include "utils.hpp"
 
 #include <array>
+#include <cstdint>
 #include <iostream>
 #include <map>
 #include <string>

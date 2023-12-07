@@ -10,6 +10,7 @@
 #ifndef EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
 #define EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
 
+#include <cstdint>
 #include <functional>
 
 #include "../debug/alert.hpp"

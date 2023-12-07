@@ -20,6 +20,7 @@
 
 #include <map>
 #include <set>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

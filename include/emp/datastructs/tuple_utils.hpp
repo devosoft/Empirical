@@ -12,6 +12,7 @@
 #define EMP_DATASTRUCTS_TUPLE_UTILS_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 
 #include "../meta/ValPack.hpp"

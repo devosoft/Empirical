@@ -30,6 +30,7 @@
 #ifndef EMP_WEB_INPUT_HPP_INCLUDE
 #define EMP_WEB_INPUT_HPP_INCLUDE
 
+#include <cstdint>
 
 #include "Widget.hpp"
 

@@ -11,6 +11,7 @@
 #define EMP_DATA_DATAMANAGER_HPP_INCLUDE
 
 #include <map>
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

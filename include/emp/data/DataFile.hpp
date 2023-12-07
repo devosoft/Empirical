@@ -13,6 +13,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

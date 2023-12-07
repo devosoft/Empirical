@@ -20,6 +20,7 @@
 
 #include <array>
 #include <initializer_list>
+#include <stddef.h>
 #include <vector>
 
 #include "assert.hpp"

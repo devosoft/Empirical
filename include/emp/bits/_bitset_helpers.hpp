@@ -10,6 +10,7 @@
 #ifndef EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
 #define EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
 
+#include <stddef.h>
 
 namespace emp {
 

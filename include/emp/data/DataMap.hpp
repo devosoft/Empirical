@@ -86,6 +86,7 @@
 #define EMP_DATA_DATAMAP_HPP_INCLUDE
 
 #include <cstring>        // For std::memcpy
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

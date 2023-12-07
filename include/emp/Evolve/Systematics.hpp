@@ -26,6 +26,7 @@
 #include <map>
 #include <ostream>
 #include <set>
+#include <stddef.h>
 #include <unordered_set>
 
 #include "../base/Ptr.hpp"

@@ -12,11 +12,12 @@
 #ifndef EMP_META_VALPACK_HPP_INCLUDE
 #define EMP_META_VALPACK_HPP_INCLUDE
 
+#include <iostream>
+#include <stddef.h>
+#include <string>
 
 #include "meta.hpp"
 
-#include <iostream>
-#include <string>
 
 namespace emp {
 

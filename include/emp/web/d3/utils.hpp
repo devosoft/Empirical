@@ -10,6 +10,7 @@
 #ifndef EMP_WEB_D3_UTILS_HPP_INCLUDE
 #define EMP_WEB_D3_UTILS_HPP_INCLUDE
 
+#include <cstdint>
 #include <map>
 #include <string>
 

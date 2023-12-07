@@ -12,6 +12,7 @@
 #define EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

@@ -14,6 +14,8 @@
 #ifndef EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 
 namespace emp {
