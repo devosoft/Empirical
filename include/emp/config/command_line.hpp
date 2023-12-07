@@ -35,6 +35,7 @@
 #ifndef EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
 #define EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"

@@ -11,6 +11,8 @@
 #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
 #define EMP_WEB_D3_AXIS_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../../tools/string_utils.hpp"
 
 #include "../js_utils.hpp"

@@ -21,6 +21,7 @@
 #include <functional>
 #include <iostream>
 #include <set>
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"

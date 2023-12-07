@@ -11,6 +11,8 @@
 #ifndef EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE
 #define EMP_WEB_D3_HISTOGRAM_HPP_INCLUDE
 
+#include <cstdint>
+
 #include "../../base/vector.hpp"
 #include "d3_init.hpp"
 #include "dataset.hpp"

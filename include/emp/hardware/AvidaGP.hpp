@@ -23,6 +23,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <stddef.h>
 
 #include "../base/array.hpp"
 #include "../base/Ptr.hpp"

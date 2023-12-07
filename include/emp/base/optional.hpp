@@ -16,6 +16,7 @@
 #define EMP_BASE_OPTIONAL_HPP_INCLUDE
 
 #include <optional>
+#include <stddef.h>
 #include <type_traits>
 #include <utility>
 

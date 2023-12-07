@@ -70,6 +70,8 @@
 #ifndef EMP_META_TYPEPACK_HPP_INCLUDE
 #define EMP_META_TYPEPACK_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "meta.hpp"
 
 namespace emp {

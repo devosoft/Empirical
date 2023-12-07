@@ -14,6 +14,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <stddef.h>
 #include <type_traits>
 
 #include "../base/assert.hpp"

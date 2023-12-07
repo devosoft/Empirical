@@ -14,6 +14,7 @@
 #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_ARRAY_HPP_INCLUDE
 #define EMP_IN_PROGRESS_CONSTEXPR_CE_ARRAY_HPP_INCLUDE
 
+#include <stddef.h>
 #include <type_traits>
 
 #include "../base/assert.hpp"

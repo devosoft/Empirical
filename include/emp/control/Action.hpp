@@ -16,6 +16,7 @@
 #define EMP_CONTROL_ACTION_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <string>
 
 namespace emp {

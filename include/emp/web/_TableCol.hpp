@@ -13,6 +13,8 @@
 #ifndef EMP_WEB__TABLECOL_HPP_INCLUDE
 #define EMP_WEB__TABLECOL_HPP_INCLUDE
 
+#include <stddef.h>
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 namespace emp {

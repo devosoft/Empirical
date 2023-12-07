@@ -13,6 +13,7 @@
 #define EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

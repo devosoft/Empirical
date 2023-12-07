@@ -44,6 +44,7 @@
 #ifndef EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
 #define EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
 
+#include <cstdint>
 #include <functional>
 #include <locale>
 #include <map>

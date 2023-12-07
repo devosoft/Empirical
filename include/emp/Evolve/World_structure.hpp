@@ -11,7 +11,9 @@
 #ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
 
+#include <cstdint>
 #include <set>
+#include <stddef.h>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"

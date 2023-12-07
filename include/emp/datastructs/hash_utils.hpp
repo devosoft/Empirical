@@ -13,6 +13,7 @@
 #define EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
 
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <numeric>
 #include <stdint.h>

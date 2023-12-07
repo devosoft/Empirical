@@ -20,6 +20,7 @@
 #include "../tools/string_utils.hpp"
 
 #include <map>
+#include <stddef.h>
 #include <string>
 
 namespace emp {

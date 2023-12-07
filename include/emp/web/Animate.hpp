@@ -16,8 +16,8 @@
 #ifndef EMP_WEB_ANIMATE_HPP_INCLUDE
 #define EMP_WEB_ANIMATE_HPP_INCLUDE
 
-
 #include <functional>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

@@ -14,6 +14,7 @@
 #define EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
 
 #include <algorithm>
+#include <stddef.h>
 #include <utility>
 
 #include "../base/array.hpp"

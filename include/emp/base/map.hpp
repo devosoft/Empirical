@@ -20,6 +20,7 @@
 
 #include <initializer_list>
 #include <map>
+#include <stddef.h>
 
 #include "assert.hpp"
 #include "MapProxy.hpp"

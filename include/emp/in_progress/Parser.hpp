@@ -28,6 +28,7 @@
 #define EMP_IN_PROGRESS_PARSER_HPP_INCLUDE
 
 #include <set>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"

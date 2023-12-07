@@ -14,6 +14,7 @@
 #define EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

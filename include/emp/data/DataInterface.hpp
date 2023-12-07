@@ -11,6 +11,7 @@
 #ifndef EMP_DATA_DATAINTERFACE_HPP_INCLUDE
 #define EMP_DATA_DATAINTERFACE_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "DataNode.hpp"
 

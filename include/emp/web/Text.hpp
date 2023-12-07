@@ -16,6 +16,8 @@
 #ifndef EMP_WEB_TEXT_HPP_INCLUDE
 #define EMP_WEB_TEXT_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../datastructs/DynamicString.hpp"
 
 #include "Widget.hpp"

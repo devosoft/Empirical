@@ -43,6 +43,7 @@
 #include <functional>
 #include <ostream>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 #include <unordered_set>
 

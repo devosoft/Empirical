@@ -12,6 +12,7 @@
 #ifndef EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE
 #define EMP_BASE__TDEBUG_ASSERT_TRIGGER_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 namespace emp {

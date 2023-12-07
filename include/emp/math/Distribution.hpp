@@ -28,6 +28,8 @@
 #ifndef EMP_MATH_DISTRIBUTION_HPP_INCLUDE
 #define EMP_MATH_DISTRIBUTION_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../datastructs/UnorderedIndexMap.hpp"
 
 #include "Random.hpp"

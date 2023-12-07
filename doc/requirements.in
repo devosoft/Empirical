@@ -1,7 +1,7 @@
-sphinx
-sphinx-rtd-theme>=1.0.0
-coverxygen
-breathe
-myst-parser
-sphinx-tippy
-sphinxcontrib-bibtex
+sphinx==7.2.6
+sphinx-rtd-theme==2.0.0
+coverxygen==1.8.1
+breathe==4.35.0
+myst-parser==2.0.0
+sphinx-tippy==0.4.1
+sphinxcontrib-bibtex==2.6.1

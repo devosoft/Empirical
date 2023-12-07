@@ -13,6 +13,7 @@
 #define EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
 
 #include <map>
+#include <stddef.h>
 
 #include "../base/map.hpp"
 #include "../base/vector.hpp"

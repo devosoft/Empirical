@@ -22,6 +22,7 @@
 #include <map>
 #include <numeric>
 #include <set>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../tools/string_utils.hpp"

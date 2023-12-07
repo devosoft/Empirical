@@ -13,6 +13,7 @@
 #define EMP_MATH_RANGE_HPP_INCLUDE
 
 #include <limits>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

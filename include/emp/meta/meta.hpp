@@ -17,6 +17,7 @@
 #define EMP_META_META_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 #include <utility>
 

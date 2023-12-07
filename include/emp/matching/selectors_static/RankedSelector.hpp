@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <numeric>
 #include <ratio>
+#include <stddef.h>
 
 #include "../../base/vector.hpp"
 #include "../../datastructs/SmallVector.hpp"

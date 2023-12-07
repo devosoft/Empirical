@@ -14,6 +14,7 @@
 
 
 #include <map>
+#include <stddef.h>
 #include <utility> // std::pair
 
 #include "../base/vector.hpp"

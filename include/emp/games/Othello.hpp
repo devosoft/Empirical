@@ -17,6 +17,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"

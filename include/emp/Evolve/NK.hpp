@@ -20,6 +20,7 @@
 #define EMP_EVOLVE_NK_HPP_INCLUDE
 
 #include <array>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"

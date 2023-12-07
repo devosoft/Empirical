@@ -14,6 +14,8 @@
 #ifndef EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
 #define EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/vector.hpp"
 #include "../bits/BitMatrix.hpp"
 #include "../Evolve/StateGrid.hpp"

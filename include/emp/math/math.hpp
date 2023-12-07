@@ -15,8 +15,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <initializer_list>
 #include <numeric>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../meta/reflection.hpp"

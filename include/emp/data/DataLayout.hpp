@@ -12,6 +12,7 @@
 #ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
 #define EMP_DATA_DATALAYOUT_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

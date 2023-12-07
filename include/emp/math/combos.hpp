@@ -22,6 +22,7 @@
 #define EMP_MATH_COMBOS_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

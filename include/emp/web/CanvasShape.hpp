@@ -17,7 +17,7 @@
 #ifndef EMP_WEB_CANVASSHAPE_HPP_INCLUDE
 #define EMP_WEB_CANVASSHAPE_HPP_INCLUDE
 
-
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"

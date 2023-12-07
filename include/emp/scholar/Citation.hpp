@@ -13,6 +13,7 @@
 
 #include <ostream>
 #include <set>
+#include <stddef.h>
 #include <string>
 
 #include "../base/map.hpp"

@@ -11,6 +11,8 @@
 #ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
 #define EMP_WEB_D3_SCALES_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "d3_init.hpp"
 #include "utils.hpp"
 

@@ -12,6 +12,7 @@
 #define EMP_WEB_JS_UTILS_HPP_INCLUDE
 
 #include <map>
+#include <stddef.h>
 #include <string>
 #include <typeinfo>
 

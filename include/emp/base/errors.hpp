@@ -43,6 +43,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 // If we are in emscripten, make sure to include the header.

@@ -13,6 +13,7 @@
 #define EMP_IO_MEMORYISTREAM_HPP_INCLUDE
 
 #include <istream>
+#include <stddef.h>
 #include <streambuf>
 
 namespace emp {

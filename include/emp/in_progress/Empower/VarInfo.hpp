@@ -11,6 +11,8 @@
 #ifndef EMP_IN_PROGRESS_EMPOWER_VARINFO_HPP_INCLUDE
 #define EMP_IN_PROGRESS_EMPOWER_VARINFO_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 

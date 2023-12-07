@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"

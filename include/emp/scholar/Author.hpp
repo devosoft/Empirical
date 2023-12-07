@@ -17,6 +17,7 @@
 #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
 #define EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../compiler/Lexer.hpp"

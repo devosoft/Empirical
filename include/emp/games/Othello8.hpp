@@ -14,9 +14,11 @@
 #ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE
 #define EMP_GAMES_OTHELLO8_HPP_INCLUDE
 
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"

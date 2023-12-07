@@ -12,10 +12,10 @@
 #ifndef EMP_HARDWARE_GENOME_HPP_INCLUDE
 #define EMP_HARDWARE_GENOME_HPP_INCLUDE
 
-#include "../base/Ptr.hpp"
-
+#include <stddef.h>
 
 #include "../base/array.hpp"
+#include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../io/File.hpp"

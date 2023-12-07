@@ -14,6 +14,7 @@
 
 
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 
 #include "../base/assert.hpp"

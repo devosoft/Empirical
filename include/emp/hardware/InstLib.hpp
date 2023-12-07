@@ -12,6 +12,7 @@
 #define EMP_HARDWARE_INSTLIB_HPP_INCLUDE
 
 #include <map>
+#include <stddef.h>
 #include <string>
 #include <unordered_set>
 

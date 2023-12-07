@@ -12,6 +12,8 @@
 #ifndef EMP_MATH_FRACTION_HPP_INCLUDE
 #define EMP_MATH_FRACTION_HPP_INCLUDE
 
+#include <cstdint>
+
 #include "math.hpp"
 
 namespace emp {

@@ -12,6 +12,8 @@
 #ifndef EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
 #define EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 

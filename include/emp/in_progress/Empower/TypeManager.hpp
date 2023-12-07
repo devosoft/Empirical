@@ -12,6 +12,7 @@
 #define EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 #include <string>
 #include <unordered_map>
 

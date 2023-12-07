@@ -13,6 +13,7 @@
 #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE
 #define EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 #include <type_traits>
 

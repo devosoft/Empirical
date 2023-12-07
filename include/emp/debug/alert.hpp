@@ -12,6 +12,8 @@
 #ifndef EMP_DEBUG_ALERT_HPP_INCLUDE
 #define EMP_DEBUG_ALERT_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../tools/string_utils.hpp"
 
 // If we are in emscripten, make sure to include the header.

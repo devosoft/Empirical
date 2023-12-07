@@ -29,6 +29,7 @@
 #define EMP_BASE_PTR_HPP_INCLUDE
 
 #include <cstring>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "assert.hpp"

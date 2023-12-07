@@ -19,6 +19,7 @@
 #ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
 #define EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

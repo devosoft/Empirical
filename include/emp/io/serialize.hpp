@@ -53,6 +53,7 @@
 #ifndef EMP_IO_SERIALIZE_HPP_INCLUDE
 #define EMP_IO_SERIALIZE_HPP_INCLUDE
 
+#include <cstdint>
 #include <iostream>
 
 #include "../base/Ptr.hpp"

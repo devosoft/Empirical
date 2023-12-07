@@ -22,6 +22,7 @@
 #ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
 #define EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"

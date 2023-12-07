@@ -12,6 +12,7 @@
 #ifndef EMP_GAMES_PAYOFFMATRIX_HPP_INCLUDE
 #define EMP_GAMES_PAYOFFMATRIX_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"

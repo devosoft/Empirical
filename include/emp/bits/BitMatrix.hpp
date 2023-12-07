@@ -13,6 +13,7 @@
 #define EMP_BITS_BITMATRIX_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 #include <typeinfo>
 
 

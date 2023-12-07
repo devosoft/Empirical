@@ -13,6 +13,7 @@
 #define EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
 
 #include <sstream>
+#include <stddef.h>
 #include <string>
 #include <string_view>
 #include <unordered_map>

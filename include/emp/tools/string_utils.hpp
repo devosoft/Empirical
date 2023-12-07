@@ -26,6 +26,7 @@
 #include <numeric>
 #include <regex>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 #include <string_view>
 #include <unordered_set>

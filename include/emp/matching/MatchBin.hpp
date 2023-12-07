@@ -27,6 +27,7 @@
 #include <mutex>
 #include <ratio>
 #include <shared_mutex>
+#include <stddef.h>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>

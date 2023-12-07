@@ -12,6 +12,7 @@
 #define EMP_EVOLVE_OEE_HPP_INCLUDE
 
 #include <deque>
+#include <stddef.h>
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

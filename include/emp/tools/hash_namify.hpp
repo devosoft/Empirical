@@ -11,6 +11,7 @@
 #ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
 #define EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
 
+#include <stddef.h>
 #include <string>
 
 #include "../base/vector.hpp"
