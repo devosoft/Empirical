@@ -28,6 +28,9 @@ def format_heading(level, text):
     ]
     return symbol + text + "\n\n"
 
+# Ensure execution inside of doc/
+script_directory = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_directory)
 
 header_files = glob.glob("../include/emp/**/*.hpp", recursive=True)
 
