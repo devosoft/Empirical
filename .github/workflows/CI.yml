@@ -135,6 +135,8 @@ jobs:
     needs: build-container
     container:
       image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_number }}
+      # github actions requires root to access mounted volumes
+      options: --user root
     steps:
       - uses: actions/checkout@v2
         with:
