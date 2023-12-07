@@ -51,11 +51,11 @@ namespace emp {
       constexpr Index(size_t x, size_t y) : pos() { Set(x,y); }
       constexpr Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
-      operator size_t() const { return pos; }
-      size_t x() const { return pos & 7; }
-      size_t y() const { return pos >> 3; }
-      void Set(size_t x, size_t y) { pos = (x<BOARD_SIZE && y<BOARD_SIZE) ? (x+(y<<3)) : NUM_CELLS; }
-      bool IsValid() const { return pos < NUM_CELLS; }
+      constexpr operator size_t() const { return pos; }
+      constexpr size_t x() const { return pos & 7; }
+      constexpr size_t y() const { return pos >> 3; }
+      constexpr void Set(size_t x, size_t y) { pos = (x<BOARD_SIZE && y<BOARD_SIZE) ? (x+(y<<3)) : NUM_CELLS; }
+      constexpr bool IsValid() const { return pos < NUM_CELLS; }
 
       Index CalcNeighbor(Facing dir) {
         Index faced_id;

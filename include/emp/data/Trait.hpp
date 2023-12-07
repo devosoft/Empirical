@@ -84,7 +84,7 @@ namespace emp {
     void SetMax(value_t max) { range.SetUpper(max); }
 
     value_t Eval(target_t & target) const { return fun(target); }
-    value_t EvalLimit(target_t & target) const { return range.Limit(fun(target)); }
+    value_t EvalLimit(target_t & target) const { return range.Clamp(fun(target)); }
     std::string EvalString(target_t & target) const { return std::to_string(EvalLimit(target)); }
     double EvalValue(target_t & target) const { return (double) EvalLimit(target); }
 

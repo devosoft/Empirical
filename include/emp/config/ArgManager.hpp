@@ -4,7 +4,7 @@
  *  @date 2019
  *
  *  @file ArgManager.hpp
- *  @brief A tool for sythesizing command-line arguments, URL query params, and config files.
+ *  @brief A tool for parsing command-line arguments, URL query params, and config files.
  *  @note Status: BETA
  */
 
@@ -188,8 +188,8 @@ namespace emp {
           } else if (args[i].size() == 2) {
             // in POSIX, -- means treat subsequent words as literals
             // so we remove the -- and stop deflagging subsequent words
-            res.erase(std::next(std::begin(res),i));
-            args.erase(std::next(std::begin(args),i));
+            res.erase(std::next(std::begin(res),(int) i));
+            args.erase(std::next(std::begin(args),(int) i));
             break;
           }
           // " ", -, ---, ----, etc. left in place and treated as non-flags
@@ -301,17 +301,14 @@ namespace emp {
           );
 
           // store the argument pack
+          bool is_special = command == "_positional"
+                          || command == "_unknown"
+                          || command == "_invalid";
           res.insert({
               command,
               pack_t(
-                std::next(
-                  std::begin(args),
-                  command == "_positional"
-                    || command == "_unknown"
-                    || command == "_invalid"
-                  ? i : i+1
-                ),
-                j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
+                std::next( std::begin(args), (int) (is_special ? i : i+1) ),
+                j+1 < args.size() ? std::next(std::begin(args), (int) j+1) : std::end(args)
               )
           });
           i = j;

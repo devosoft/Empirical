@@ -18,7 +18,7 @@ int main()
   std::cout << "Upper = " << range.GetUpper() << std::endl;
 
   for (int i = 10; i < 40; i += 5) {
-    std::cout << "Value " << i << " valid = " << range.Valid(i) << std::endl;
+    std::cout << "Value " << i << " valid = " << range.Has(i) << std::endl;
   }
 
   for (size_t s = 4; s <= 8; s++) {

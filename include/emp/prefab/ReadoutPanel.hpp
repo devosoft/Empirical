@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
+ *  @date 2021-2022.
  *
  *  @file ReadoutPanel.hpp
  *  @brief UI framework for live statistic readouts.
@@ -83,7 +83,7 @@ namespace emp::prefab {
     /**
      * @param group_name name for this collection of values, displayed in card header
      * @param refresh_time the time in milliseconds between refreshes to the live values
-     * @param state initial state of the card, one of STAITC, INIT_OPEN, or INIT_CLOSED
+     * @param state initial state of the card, one of STATIC, INIT_OPEN, or INIT_CLOSED
      * @param show_glyphs whether the underlying card should show toggle icons in card header
      * @param id a user defined ID for ReadoutPanel div (default is emscripten generated)
      */
@@ -113,7 +113,7 @@ namespace emp::prefab {
      * header
      * @param refresh_milliseconds the minimum time in milliseconds between
      * refreshes to the live values
-     * @param state initial state of the card, one of STAITC, INIT_OPEN, or
+     * @param state initial state of the card, one of STATIC, INIT_OPEN, or
      * INIT_CLOSED
      * @param show_glyphs whether the underlying card should show toggle icons
      * in card header
@@ -136,7 +136,7 @@ namespace emp::prefab {
       auto & live_divs = Info()->GetLiveDivs();
       // Animation is referenced by this component's ID
       AddAnimation(GetID(), [
-        elapsed_milliseconds = 0, refresh_milliseconds, &live_divs
+        elapsed_milliseconds = 0.0, refresh_milliseconds, &live_divs
       ](double stepTime) mutable {
         // Accumulate steps, then redraw after enough time has elapsed
         elapsed_milliseconds += stepTime;
@@ -147,7 +147,7 @@ namespace emp::prefab {
           }
         }
         // Might not be necessary, but if elapsed time got to 2x
-        // the refresh period, redraws are being severly delayed by
+        // the refresh period, redraws are being severely delayed by
         // something. Setting to zero in this case has the effect of
         // dropping frames to prevent choking execution with redraws.
         if (elapsed_milliseconds > refresh_milliseconds) {
@@ -166,7 +166,7 @@ namespace emp::prefab {
 
     }
 
-    /// A helper function to formate IDs generated for subcomponents
+    /// A helper function to formate IDs generated for sub-components
     inline static std::string FormatName(const std::string & name) {
       return to_lower(join(slice(name, ' '), "_"));
     }

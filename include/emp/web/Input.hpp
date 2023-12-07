@@ -64,7 +64,7 @@ namespace web {
 
       InputInfo(const std::string & in_id="")
       : internal::WidgetInfo(in_id)
-      , checker([](std::string in){ return true; })
+      , checker([](std::string /*in*/){ return true; })
       { ; }
       InputInfo(const InputInfo &) = delete;               // No copies of INFO allowed
       InputInfo & operator=(const InputInfo &) = delete;   // No copies of INFO allowed

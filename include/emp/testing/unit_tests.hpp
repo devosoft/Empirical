@@ -5,13 +5,13 @@
  *
  *  @file unit_tests.hpp
  *  @brief Macros to facilitate unit testing.
- *  @note Status: RESURGENT (Was depricated; now back to ALPHA)
+ *  @note Status: RESURGENT (Was deprecated; now back to ALPHA)
  *
- *  @todo Setup proper command line color handline (probably in its own file.)
- *  @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensurge that a
+ *  @todo Setup proper command line color handling (probably in its own file.)
+ *  @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensure that a
  *        value is in a certain range.
  *  @todo Consider adding EMP_TEST_ASSERT to ensure that the contained value is true.
- *  @todo Consider adding EMP_TEST_APPROX to compare within a tollerance level.
+ *  @todo Consider adding EMP_TEST_APPROX to compare within a tolerance level.
  */
 
 #ifndef EMP_TESTING_UNIT_TESTS_HPP_INCLUDE
@@ -91,7 +91,7 @@ namespace emp {
 
 
 ///  Take in an expression and a string representing the expected result; verify that the
-///  stringifyied result is the expected string AND print this info if -v flag is set.
+///  stringified result is the expected string AND print this info if -v flag is set.
 ///     Input:  An expression and an expected evaluation.
 ///     Output: Code to evaluate the expression and optionally print it (if either in verbose mode
 ///             or the macro does not produce the expected result).

@@ -21,6 +21,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <iostream>
+#include <span>
 #include <stddef.h>
 
 #include "../base/assert.hpp"
@@ -30,12 +31,13 @@
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../meta/type_traits.hpp"
-#include "../polyfill/span.hpp"
 
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
 
-namespace emp {
+#include "Bits.hpp"  // New version of BitArray is in Bits.hpp
+
+namespace emp::old {
 
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
@@ -169,17 +171,17 @@ namespace emp {
     /// Destructor.
     ~BitArray() = default;
 
-    /// Assignment operator (no separate move opperator since no resources to move...)
-    BitArray & operator=(const this_t & in_bits) noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
+    /// Assignment operator (no separate move operator since no resources to move...)
+    BitArray & operator=(const this_t & in_bits) & noexcept { return Copy<NUM_FIELDS>(in_bits.bits); }
 
     /// Assignment operator from a std::bitset.
-    BitArray & operator=(const std::bitset<NUM_BITS> & bitset);
+    BitArray & operator=(const std::bitset<NUM_BITS> & bitset) &;
 
     /// Assignment operator from a string of '0's and '1's.
-    BitArray & operator=(const std::string & bitstring);
+    BitArray & operator=(const std::string & bitstring) &;
 
     /// Assignment operator from a literal string of '0's and '1's.
-    BitArray & operator=(const char * bitstring) { return operator=(std::string(bitstring)); }
+    BitArray & operator=(const char * bitstring) & { return operator=(std::string(bitstring)); }
 
     /// Assignment from another BitArray of a different size.
     template <size_t FROM_BITS, bool FROM_LEFT>
@@ -189,7 +191,7 @@ namespace emp {
     template <size_t TO_BITS, bool TO_LEFT=ZERO_LEFT>
     BitArray<TO_BITS,TO_LEFT> Export(size_t start_bit=0) const;
 
-    /// For debugging: make sure that there are no obvous problems with a BitArray object.
+    /// For debugging: make sure that there are no obvious problems with a BitArray object.
     bool OK() const;
 
     /// How many bits are in this BitArray?
@@ -316,7 +318,7 @@ namespace emp {
 
     // =========  Access Groups of bits  ========= //
 
-    /// Retrive the byte at the specified byte index.
+    /// Retrieve the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
 
     /// Get a read-only view into the internal array used by BitArray.
@@ -430,7 +432,7 @@ namespace emp {
     [[nodiscard]] int FindOne() const;
 
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
-    [[deprecated("Renamed to more acurate FindOne()")]]
+    [[deprecated("Renamed to more accurate FindOne()")]]
     [[nodiscard]] int FindBit() const { return FindOne(); }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
@@ -441,7 +443,7 @@ namespace emp {
     [[nodiscard]] int FindOne(const size_t start_pos) const;
 
     /// Deprecated version of FindOne().
-    [[deprecated("Renamed to more acurate FindOne(start_pos)")]]
+    [[deprecated("Renamed to more accurate FindOne(start_pos)")]]
     [[nodiscard]] int FindBit(const size_t start_pos) const;
 
     /// Find the most-significant set-bit.
@@ -451,7 +453,7 @@ namespace emp {
     int PopOne();
 
     /// Deprecated version of PopOne().
-    [[deprecated("Renamed to more acurate PopOne()")]]
+    [[deprecated("Renamed to more accurate PopOne()")]]
     int PopBit() { return PopOne(); }
 
     /// Return positions of all ones.
@@ -646,7 +648,7 @@ namespace emp {
     /// Compound operator plus...
     const BitArray & operator+=(const BitArray & ar2) { return ADD_SELF(ar2); }
 
-    /// Compoount operator minus...
+    /// Compound operator minus...
     const BitArray & operator-=(const BitArray & ar2) { return SUB_SELF(ar2); }
 
     /// STL COMPATABILITY
@@ -686,7 +688,7 @@ namespace emp {
 
     const size_t start_pos = FieldPos(start);          // Identify the start position WITHIN a bit field.
     const size_t stop_pos = FieldPos(stop);            // Identify the stop position WITHIN a bit field.
-    size_t start_field = FieldID(start);               // Ideftify WHICH bit field we're starting in.
+    size_t start_field = FieldID(start);               // Identify WHICH bit field we're starting in.
     const size_t stop_field = FieldID(stop-1);         // Identify the last field where we actually make a change.
 
     // If the start field and stop field are the same, mask off the middle.
@@ -814,7 +816,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
 
@@ -825,7 +827,7 @@ namespace emp {
       ShiftRight(NUM_BITS - shift_size);
       OR_SELF(dup);
     } else {
-      // for big BitArrays, manual rotating is fater
+      // for big BitArrays, manual rotating is faster
 
       // note that we already modded shift_size by NUM_BITS
       // so there's no need to mod by FIELD_SIZE here
@@ -900,7 +902,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
 
@@ -911,7 +913,7 @@ namespace emp {
       ShiftLeft(NUM_BITS - shift_size);
       OR_SELF(dup);
     } else {
-      // for big BitArrays, manual rotating is fater
+      // for big BitArrays, manual rotating is faster
 
       const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
       const int bit_shift = shift_size % FIELD_BITS;
@@ -999,7 +1001,7 @@ namespace emp {
     /// Assignment operator from a std::bitset.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> &
-  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) {
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::bitset<NUM_BITS> & bitset) & {
     for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     return *this;
   }
@@ -1007,7 +1009,7 @@ namespace emp {
   /// Assignment operator from a string of '0's and '1's.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> &
-  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) {
+  BitArray<NUM_BITS,ZERO_LEFT>::operator=(const std::string & bitstring) & {
     emp_assert(bitstring.size() <= NUM_BITS);
     Clear();
     if constexpr (ZERO_LEFT) {
@@ -1028,7 +1030,7 @@ namespace emp {
     const size_t from_bit
   ) {
     // Only check for same-ness if the two types are the same.
-    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_array != this);
+    if constexpr (FROM_BITS == NUM_BITS) { emp_assert(&from_array != this); }
 
     emp_assert(from_bit < FROM_BITS);
 
@@ -1076,7 +1078,7 @@ namespace emp {
     return out_bits;
   }
 
-    /// For debugging: make sure that there are no obvous problems with a BitArray object.
+    /// For debugging: make sure that there are no obvious problems with a BitArray object.
   template <size_t NUM_BITS, bool ZERO_LEFT>
   bool BitArray<NUM_BITS,ZERO_LEFT>::OK() const {
     // Make sure final bits are zeroed out.
@@ -1091,7 +1093,7 @@ namespace emp {
 
   template <size_t NUM_BITS, bool ZERO_LEFT>
   bool BitArray<NUM_BITS,ZERO_LEFT>::Get(size_t index) const {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     return (bits[field_id] & (((field_t)1U) << pos_id)) != 0;
@@ -1123,7 +1125,7 @@ namespace emp {
   /// Flip a single bit
   template <size_t NUM_BITS, bool ZERO_LEFT>
   BitArray<NUM_BITS,ZERO_LEFT> & BitArray<NUM_BITS,ZERO_LEFT>::Toggle(size_t index) {
-    emp_assert(index >= 0 && index < NUM_BITS);
+    emp_assert(index < NUM_BITS);
     const size_t field_id = FieldID(index);
     const size_t pos_id = FieldPos(index);
     const field_t pos_mask = FIELD_1 << pos_id;
@@ -1848,7 +1850,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
 
@@ -1930,7 +1932,7 @@ namespace emp {
       field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // mask necessary to surpress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
       n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
 
@@ -2083,9 +2085,9 @@ namespace emp {
 namespace std
 {
     template <size_t N, bool ZERO_LEFT>
-    struct hash<emp::BitArray<N, ZERO_LEFT>>
+    struct hash<emp::old::BitArray<N, ZERO_LEFT>>
     {
-        size_t operator()( const emp::BitArray<N,ZERO_LEFT> & bs ) const noexcept
+        size_t operator()( const emp::old::BitArray<N,ZERO_LEFT> & bs ) const noexcept
         {
           return bs.Hash();
         }

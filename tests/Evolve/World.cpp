@@ -19,7 +19,7 @@
 #include "emp/math/Random.hpp"
 #include "emp/tools/string_utils.hpp"
 
-constexpr size_t K = 3;
+// constexpr size_t K = 3;
 constexpr size_t N = 40;
 
 using BitOrg = emp::BitSet<N>;

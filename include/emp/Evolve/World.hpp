@@ -14,8 +14,6 @@
  *        whether or not they also affect injected organisms.  (Right now they always do!!)
  *  @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
  *        delegation to facilitate demes, pools, islands, etc.
- *  @todo We should be able to have any number of systematics managers, based on various type_trait
- *        information a that we want to track.
  *  @todo Add a signal for DoBirth() for when a birth fails.
  *  @todo Add a signal for population Reset() (and possibly Clear?)
  *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
@@ -973,7 +971,7 @@ namespace emp {
 
     // Track the new systematics info
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, pos, (int) update);
+      s->AddOrg(*new_org, pos);
     }
 
     SetupOrg(*new_org, pos, *random_ptr);
@@ -997,7 +995,7 @@ namespace emp {
     }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->RemoveOrgAfterRepro(pos, update);          // Notify systematics about organism removal
+      s->RemoveOrgAfterRepro(pos);                   // Notify systematics about organism removal
     }
 
   }
@@ -1021,7 +1019,7 @@ namespace emp {
 
     // Since neighbors are anywhere in the same population, all organisms in the same
     // population are neighbors.
-    fun_is_neighbor = [](WorldPosition pos1, WorldPosition pos2) { return true;};
+    fun_is_neighbor = [](WorldPosition /* pos1 */, WorldPosition /* pos2 */) { return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1034,7 +1032,7 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition /* parent_pos */) {
         emp_assert(new_org);      // New organism must exist.
         return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
@@ -1042,7 +1040,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always append to current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition /* parent_pos */) {
         return WorldPosition(pop.size());
       };
       SetAttribute("SynchronousGen", "False");
@@ -1070,7 +1068,7 @@ namespace emp {
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     // Neighbors are anywhere in same population, so all organisms are neighbors.
-    fun_is_neighbor = [](WorldPosition pos1, WorldPosition pos2) { return true; };
+    fun_is_neighbor = [](WorldPosition /* pos1 */, WorldPosition /* pos2 */) { return true; };
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1081,15 +1079,15 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
-        emp_assert(new_org);                        // New organism must exist.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition /* parent_id */) {
+        emp_assert(new_org);                       // New organism must exist.
         return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
+      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition parent_id) {
         return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -1202,7 +1200,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition parent_pos) {
         return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -1374,7 +1372,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this](Ptr<ORG> /* new_org */, WorldPosition parent_pos) {
         return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -1490,6 +1488,13 @@ namespace emp {
       pop.resize(0);
       std::swap(pops[0], pops[1]);            // Move next pop into place.
 
+      // Tell systematics manager to swap next population and population
+      // Needs to happen here so that you can refer to systematics in
+      // OnPlacement functions
+      for (Ptr<SystematicsBase<ORG>> s : systematics) {
+        s->Update();
+      }
+
       // Update the active population.
       num_orgs = 0;
       for (size_t i = 0; i < pop.size(); i++) {
@@ -1499,12 +1504,7 @@ namespace emp {
       }
     }
 
-    // 3. Handle systematics and any data files that need to be printed this update.
-
-    // Tell systematics manager to swap next population and population
-    for (Ptr<SystematicsBase<ORG>> s : systematics) {
-      s->Update();
-    }
+    // 3. Handle any data files that need to be printed this update.
 
     for (auto file : files) file->Update(update);
 

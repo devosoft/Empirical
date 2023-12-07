@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
+ *  @date 2021-2022.
  *
  *  @file StreamManager.cpp
  */
@@ -26,4 +26,6 @@ TEST_CASE("Test StreamManager", "[io]")
   test_stream_orig >> out_str;
   REQUIRE( out_str == "abc123def" );
 
+  std::istream & in_stream = sm.AddInputStream("in_stream");
+  std::ostream & out_stream = sm.AddOutputStream("out_stream");
 }

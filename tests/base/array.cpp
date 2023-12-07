@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2022
  *
  *  @file array.cpp
  */
@@ -22,7 +22,7 @@ TEST_CASE("Test array", "[base]")
   emp::array<int, SIZE> arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
   REQUIRE(arr[5] == 5);
 #ifndef NDEBUG
-  emp::array<int, SIZE> arr2(arr.begin(), arr.end());
+  emp::array<int, SIZE> arr2(arr);
   REQUIRE(arr == arr2);
   std::array<int, SIZE> s_arr = (std::array<int,SIZE>) arr2;
   REQUIRE(s_arr[8] == arr2[8]);

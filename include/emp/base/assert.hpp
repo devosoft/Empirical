@@ -43,6 +43,10 @@
   // #define emp_assert(EXPR) ((void) sizeof(EXPR) )
   // #define emp_assert(EXPR, ...) { constexpr bool __emp_assert_tmp = false && (EXPR); (void) __emp_assert_tmp; }
 
+  namespace emp {
+    static constexpr bool is_debug_mode = false;
+  }
+
 #else
   /// Require a specified condition to be true. If it is false, immediately
   /// halt execution. Print also extra information on any variables or
@@ -50,6 +54,10 @@
   /// emp_assert() will not do anything. Due to macro parsing limitations, extra
   /// information will not be printed when compiling with MSVC.
   #define emp_assert(...) emp_always_assert(__VA_ARGS__)
+
+  namespace emp {
+    static constexpr bool is_debug_mode = true;
+  }
 
 #endif
 

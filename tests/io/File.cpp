@@ -97,7 +97,7 @@ TEST_CASE("Test File", "[io]")
   fp2 << "Line3";
   fp2 << "Line3";
   fp2 << "Line3";
-  std::set<std::string> setOfLines = fp2.AsSet();
+  std::set<emp::String> setOfLines = fp2.AsSet();
   REQUIRE(setOfLines.size() == 3);
   REQUIRE(fp2.GetNumLines() == 9);
 
@@ -143,14 +143,14 @@ TEST_CASE("Test File", "[io]")
   REQUIRE(fp3.back() == "int x = 13;");
 
   // Process
-  std::function<std::string(std::string&)> fun = [](std::string& s)-> std::string { return (s+"2");};
-  emp::vector<std::string> v = fp2.Process(fun);
+  std::function<emp::String(emp::String&)> fun = [](emp::String& s)-> emp::String { return (s+"2");};
+  emp::vector<emp::String> v = fp2.Process(fun);
 
   // ExtractCol
   fp3 >> line; //clear fp3
   fp3 << "red,1,1990";
   fp3 << "green,2,1995";
-  emp::vector<std::string> column = fp3.ExtractCol();
+  emp::vector<emp::String> column = fp3.ExtractCol();
   REQUIRE(column[0] == "red");
   REQUIRE(column[1] == "green");
 

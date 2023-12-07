@@ -1,14 +1,65 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021
+ *  @date 2016-2022.
  *
  *  @file TypeID.hpp
  *  @brief TypeID provides an easy way to convert types to strings.
  *
+ *  TypeID provides an easy way to compare types, analyze them, and convert to strings.
+ *  All TypeID objects are consistent within a type, and are ordinal and hashable.
+ *
+ *  To get the unique type information for type T use:
+ *    TypeID t = emp::GetTypeID<T>();
+ *
+ *  To make TypeID work more effectively with your custom class, implement the static member
+ *  function EMPGetTypeName() which returns a string with its full name (including namespace).
+ *    static std::string EMPGetTypeName() { return "myns::MyClass"; }
+ *
+ *  MEMBER FUNCTIONS:
+ *
+ *    std::string GetName() - Return a human readable (ideally) version of type's name.
+ *    void SetName(in_name) - Set the name that should be used henceforth for this type.
+ *    size_t GetSize()      - Return number of bytes used by this type.
+ *
+ *    -- TYPE TESTS --
+ *    bool IsAbstract()     - Is this type a pure-virtual class?
+ *    bool IsArithmetic()   - Is this type numeric?
+ *    bool IsArray()        - Does this type represent a sequence of objects in memory?
+ *    bool IsClass()        - Is this type a non-union class?
+ *    bool IsConst()        - Is this contents of this type prevented from changing?
+ *    bool IsEmpty()        - Does type type have no contents?
+ *    bool IsObject()       - Is this type ANY object type?
+ *    bool IsPointer()      - Is this type a pointer?
+ *    bool IsReference()    - Is this type a reference?
+ *    bool IsTrivial()      - Is this type trivial?
+ *    bool IsVoid()         - Is this the type "void"?
+ *    bool IsVolatile()     - Is this type volatile qualified?
+ *    bool IsTypePack()     - Is this type an emp::TypePack?
+ *
+ *    -- COMPARISON TESTS --
+ *    bool IsType<T>()           - Is this type the specified type T?
+ *    bool IsTypeIn<T1,T2,...>() - Is this type one of the listed types?
+ *
+ *    -- TYPE CONVERSIONS --
+ *    TypeID GetDecayTypeID()            - Remove all qualifications (const, reference, etc.)
+ *    TypeID GetElementTypeID()          - Return type that makes up this type (i.e. for arrays)
+ *    TypeID GetRemoveConstTypeID()      - Remove const-ness of this type, if any.
+ *    TypeID GetRemoveCVTypeID()         - Remove constness and volatility of this type.
+ *    TypeID GetRemoveExtentTypeID()     - Flatten one level of a multi-dimensional array.
+ *    TypeID GetRemoveAllExtentsTypeID() - Flatten multi-dimensional arrays.
+ *    TypeID GetRemovePointerTypeID()    - If this is a pointer, change to type pointed to.
+ *    TypeID GetRemoveReferenceTypeID()  - If this is a reference, change to type referred to.
+ *    TypeID GetRemoveVolatileTypeID()   - Remove volatility of this type, if any
+ *
+ *    -- VALUE CONVERSIONS --
+ *    double ToDouble(pointer)           - Convert pointed-to object (of this type) to a double.
+ *    std::string ToString(pointer)      - Convert pointed-to object (of this type) to a std::string.
+ *    bool FromDouble(value, pointer)    - Use double value to set pointed-to object (of this type)
+ *    bool FromString(string, pointer)   - Use string value to set pointed-to object (of this type)
+ *
  *  Developer notes:
  *  * Fill out defaults for remaining standard library classes (as possible)
- *  * If a class has a static TypeID_GetName() defined, use that for the name.
  *  * If a type is a template, give access to parameter types.
  *  * If a type is a function, give access to parameter types.
  */
@@ -70,6 +121,7 @@ namespace emp {
       virtual bool IsTrivial() const { return false; }
       virtual bool IsVoid() const { return false; }
       virtual bool IsVolatile() const { return false; }
+      virtual bool IsFunction() const { return false; }
 
       virtual bool IsTypePack() const { return false; }
 
@@ -121,6 +173,7 @@ namespace emp {
       bool IsTrivial() const override { return std::is_trivial<T>(); }
       bool IsVoid() const override { return std::is_same<T,void>(); }
       bool IsVolatile() const override { return std::is_volatile<T>(); }
+      bool IsFunction() const override { return std::is_function<T>(); }
 
       bool IsTypePack() const override { return emp::is_TypePack<T>(); }
 
@@ -172,6 +225,7 @@ namespace emp {
 
       size_t GetSize() const override {
         if constexpr (std::is_void<T>()) return 0;
+        else if constexpr (std::is_function<T>()) return 0;
         else return sizeof(T);
       }
 
@@ -183,9 +237,9 @@ namespace emp {
           return ptr.ReinterpretCast<const base_t>()->ToDouble();
         }
 
-        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // If this type is convertible to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
-        if constexpr (std::is_convertible<T, double>::value) {
+        else if constexpr (std::is_convertible<T, double>::value) {
           return (double) *ptr.ReinterpretCast<const base_t>();
         }
         else return std::nan("");
@@ -222,7 +276,8 @@ namespace emp {
         return "[N/A]";
       }
 
-      bool FromDouble(double value, const emp::Ptr<void> ptr) const override {
+      bool FromDouble([[maybe_unused]] double value,
+                      [[maybe_unused]] const emp::Ptr<void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in FromDouble() trait, use it!
@@ -230,7 +285,7 @@ namespace emp {
           return ptr.ReinterpretCast<base_t>()->FromDouble(value);
         }
 
-        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // If this type is convertible to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<double, T>::value) {
           *ptr.ReinterpretCast<base_t>() = (base_t) value;
@@ -386,6 +441,11 @@ namespace emp {
     return internal::TypePackIDs_impl<T>::GetIDs();
   }
 
+  // Determine if a type has a static EMPGetTypeName() member function.
+  template <typename T, typename=void> struct HasEMPGetTypeName : std::false_type { };
+  template<typename T>
+  struct HasEMPGetTypeName<emp::decoy_t<T, decltype(T::EMPGetTypeName())>> : std::true_type{};
+
   /// Build the information for a single TypeID.
   template <typename T>
   static emp::Ptr<TypeID::Info> BuildInfo() {
@@ -394,7 +454,12 @@ namespace emp {
       TypeID type_id(&info);
 
       info.init = true;
-      info.name = typeid(T).name();
+
+      if constexpr (HasEMPGetTypeName<T>()) {
+        info.name = T::EMPGetTypeName();
+      } else {
+        info.name = typeid(T).name();
+      }
 
       // Now, fix the name if we can be more precise about it.
       if constexpr (std::is_const<T>()) {
@@ -437,10 +502,16 @@ namespace emp {
 
   /// Setup a bunch of standard type names to be more readable.
   void SetupTypeNames() {
-
-    // Built-in types.
     GetTypeID<void>().SetName("void");
 
+    // Probably replaced later, but good to have for systems where it's not.
+    GetTypeID<size_t>().SetName("size_t");
+    GetTypeID<long>().SetName("long");
+    GetTypeID<long long>().SetName("long long");
+    GetTypeID<unsigned long>().SetName("unsigned long");
+    GetTypeID<unsigned long long>().SetName("unsigned long long");
+
+    // Main built-in types.
     GetTypeID<bool>().SetName("bool");
     GetTypeID<double>().SetName("double");
     GetTypeID<float>().SetName("float");

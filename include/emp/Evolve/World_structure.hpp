@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2022.
  *
  *  @file World_structure.hpp
  *  @brief Functions for popular world structure methods.
@@ -47,13 +47,15 @@ namespace emp {
     }
     WorldPosition(const WorldPosition &) = default;
 
+    WorldPosition & operator=(const WorldPosition &) = default;
+
     uint32_t GetIndex() const { return index; }
     uint32_t GetPopID() const { return pop_id; }
 
     bool IsActive() const { return pop_id == 0; }
     bool IsValid() const { return index != invalid_id; }
 
-    WorldPosition & SetActive(bool _active=true) { pop_id = 0; return *this; }
+    WorldPosition & SetActive(bool /*_active*/=true) { pop_id = 0; return *this; }
     WorldPosition & SetPopID(size_t _id) { emp_assert(_id <= invalid_id); pop_id = (uint32_t) _id; return *this; }
     WorldPosition & SetIndex(size_t _id) { emp_assert(_id <= invalid_id); index = (uint32_t) _id; return *this; }
     WorldPosition & MarkInvalid() { index = invalid_id; pop_id = invalid_id; return *this; }
@@ -96,7 +98,7 @@ namespace emp {
   };
 
   /// Set the population to be a set of pools that are individually well mixed, but with limited
-  /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
+  /// migration.  Arguments are the number of pools, the size of each pool, and whether the
   /// generations should be synchronous (true) or not (false, default).
   template <typename ORG>
   void SetPools(World<ORG> & world, size_t num_pools,
@@ -107,7 +109,7 @@ namespace emp {
 
     // -- Setup functions --
     // Inject in an empty pool -or- randomly if none empty
-    world.SetAddInjectFun( [&world,pool_size](Ptr<ORG> new_org) {
+    world.SetAddInjectFun( [&world,pool_size](Ptr<ORG> /*new_org*/) {
       for (size_t id = 0; id < world.GetSize(); id += pool_size) {
         if (world.IsOccupied(id) == false) return WorldPosition(id);
       }
@@ -128,7 +130,7 @@ namespace emp {
 
     if (synchronous_gen) {
       // Place births in the next open spot in the new pool (or randomly if full!)
-      world.SetAddBirthFun( [&world,pool_size](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      world.SetAddBirthFun( [&world,pool_size]([[maybe_unused]] Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);                                  // New organism must exist.
         const size_t parent_id = parent_pos.GetIndex();
         const size_t pool_id = parent_id / pool_size;
@@ -144,7 +146,7 @@ namespace emp {
       world.SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      world.SetAddBirthFun( [&world](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      world.SetAddBirthFun( [&world]([[maybe_unused]] Ptr<ORG> new_org, WorldPosition parent_pos) {
         auto pos = world.GetRandomNeighborPos(parent_pos);
         return pos; // Place org in existing population.
       });
@@ -174,7 +176,7 @@ namespace emp {
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
     // -- Setup functions --
-    // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
+    // Inject into the appropriate position based on phenotype.  Note that an inject will fail
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
     world.SetAddInjectFun( [&world,traits,trait_counts](Ptr<ORG> new_org) {
@@ -272,7 +274,7 @@ namespace emp {
     emp::vector<double> distance;    ///< And what is their distance?
 
     World<ORG> & world;              ///< World object being tracked.
-    TraitSet<ORG> traits;            ///< Traits we are tryng to spread
+    TraitSet<ORG> traits;            ///< Traits we are trying to spread
     emp::vector<double> min_vals;    ///< Smallest value found for each trait.
     emp::vector<double> max_vals;    ///< Largest value found for each trait.
     emp::vector<double> bin_width;   ///< Largest value found for each trait.
@@ -325,10 +327,10 @@ namespace emp {
       size_t bin_id = org_bins[refresh_id];
       Refresh_AgainstBin(refresh_id, bin_id);
 
-      // Then check all neighbor bins.  Ignoring diagnols for now since they could be expensive...
+      // Then check all neighbor bins.  Ignoring diagonals for now since they could be expensive...
       // (though technically we need them...)
       size_t trait_offset = 1;
-      for (size_t trait_id = 0; trait_id < traits.GetSize(); trait_id++) {
+      for (size_t trait_id = start_id; trait_id < traits.GetSize(); trait_id++) {
         size_t prev_bin_id = bin_id - trait_offset;
         if (prev_bin_id < num_total_bins) {
           Refresh_AgainstBin(refresh_id, prev_bin_id);
@@ -398,7 +400,7 @@ namespace emp {
       is_setup = false;
     }
 
-    /// Find the best organism to kill in the popualtion.  In this case, find the two closest organisms
+    /// Find the best organism to kill in the population.  In this case, find the two closest organisms
     /// and kill the one with the lower fitness.
     size_t FindKill() {
       if (!is_setup) Setup();  // The first time we run out of space and need to kill, setup structure!
@@ -487,7 +489,7 @@ namespace emp {
           emp_assert(org_bins[i] < num_total_bins, i, org_bins[i], num_total_bins,
                      world.GetNumOrgs());
         }
-        size_t org_count = 0;
+        [[maybe_unused]] size_t org_count = 0;
         for (size_t i = 0; i < num_total_bins; i++) {
           org_count += bin_ids[i].size();
           for (size_t org_id : bin_ids[i]) {
@@ -516,10 +518,10 @@ namespace emp {
     world.OnPlacement( [info_ptr](size_t pos) mutable { info_ptr->Update(pos); } );
 
     // -- Setup functions --
-    // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
+    // Inject into the appropriate position based on phenotype.  Note that an inject will fail
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
-    world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
+    world.SetAddInjectFun( [/*&world, traits,*/ world_size, info_ptr]([[maybe_unused]] Ptr<ORG> new_org) {
       size_t pos = info_ptr->GetBirthPos(world_size);
       return WorldPosition(pos);
     });
@@ -529,7 +531,7 @@ namespace emp {
     world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
 
     // Find the two closest organisms and kill the lower fit one.  (Killing sparsely...)
-    // Must unsetup population for next birth to work.
+    // Must un-setup population for next birth to work.
     world.SetKillOrgFun( [&world, info_ptr](){
       const size_t last_id = world.GetSize() - 1;
       world.Swap(info_ptr->FindKill(), last_id);
@@ -540,7 +542,7 @@ namespace emp {
     });
 
     // Birth is effectively the same as inject.
-    world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, WorldPosition parent_pos) {
+    world.SetAddBirthFun( [/*&world, traits,*/ world_size, info_ptr]([[maybe_unused]] Ptr<ORG> new_org, WorldPosition parent_pos) {
       (void) parent_pos;
       size_t pos = info_ptr->GetBirthPos(world_size);
       return WorldPosition(pos);

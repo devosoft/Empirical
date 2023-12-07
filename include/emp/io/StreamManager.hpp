@@ -36,7 +36,7 @@ namespace emp {
 
   protected:
 
-    // Helper under error conditions.
+    // Helper, especially under error conditions.
     static std::iostream & GetDefaultStream() {
       static std::stringstream default_stream;
       return default_stream;
@@ -136,6 +136,7 @@ namespace emp {
           if constexpr (ACCESS == Access::INPUT)       ptr = NewPtr<std::ifstream>(name);
           else if constexpr (ACCESS == Access::OUTPUT) ptr = NewPtr<std::ofstream>(name);
           else if constexpr (ACCESS == Access::IO)     ptr = NewPtr<std::fstream>(name);
+          else emp_error("Unknown access type for file creation in StreamManager.");
         }
 
         // Build string streams.
@@ -305,12 +306,18 @@ namespace emp {
 
 
     std::istream & GetInputStream(const std::string & name) {
-      if (!HasInputStream(name)) return AddInputStream(name);
+      if (!HasInputStream(name)) {      // If we don't have this input stream, add it!
+        emp_assert(!Has(name));         // Make sure we don't have this stream at all!
+        return AddInputStream(name);
+      }
       return streams[name]->GetInputStream();
     }
 
     std::ostream & GetOutputStream(const std::string & name) {
-      if (!HasOutputStream(name)) return AddOutputStream(name);
+      if (!HasOutputStream(name)) {     // If we don't have this output stream, add it!
+        emp_assert(!Has(name));         // Make sure we don't have this stream at all!
+        return AddOutputStream(name);
+      }
       return streams[name]->GetOutputStream();
     }
 
