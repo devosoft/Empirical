@@ -14,6 +14,7 @@
 #define EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"

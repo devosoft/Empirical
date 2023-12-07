@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <stddef.h>
 
 #include "../datastructs/SmallFifoMap.hpp"
 #include "../datastructs/SmallVector.hpp"

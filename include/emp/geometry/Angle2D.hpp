@@ -15,6 +15,7 @@
 #define EMP_GEOMETRY_ANGLE2D_HPP_INCLUDE
 
 #include <cmath>
+#include <cstdint>
 
 #include "../math/constants.hpp"
 

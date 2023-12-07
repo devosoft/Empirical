@@ -11,7 +11,9 @@
 #ifndef EMP_COMPILER_DFA_HPP_INCLUDE
 #define EMP_COMPILER_DFA_HPP_INCLUDE
 
+#include <cstdint>
 #include <limits>
+#include <stddef.h>
 #include <string>
 
 #include "../base/array.hpp"

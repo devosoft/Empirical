@@ -14,6 +14,7 @@
 #define EMP_EVOLVE_NK_CONST_HPP_INCLUDE
 
 #include <array>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../bits/BitSet.hpp"

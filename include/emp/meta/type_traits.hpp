@@ -14,6 +14,7 @@
 #include <cstdint>       // uint8_t, uint16_t, etc.
 #include <functional>
 #include <span>
+#include <stddef.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>

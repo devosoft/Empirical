@@ -15,6 +15,7 @@
 #ifndef EMP_EVOLVE_RESOURCE_HPP_INCLUDE
 #define EMP_EVOLVE_RESOURCE_HPP_INCLUDE
 
+#include <stddef.h>
 
 #include "World.hpp"
 

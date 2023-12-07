@@ -15,6 +15,8 @@
 #ifndef EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
 #define EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
 
+#include <stddef.h>
+
 #include "../base/Ptr.hpp"
 
 namespace emp {

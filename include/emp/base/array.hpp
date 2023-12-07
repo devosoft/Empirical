@@ -21,6 +21,8 @@
 #include <array>
 #include <initializer_list>
 #include <iterator>
+#include <stddef.h>
+#include <vector>
 
 #include "../../../third-party/cereal/include/cereal/cereal.hpp"
 

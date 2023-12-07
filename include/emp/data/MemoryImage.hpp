@@ -15,6 +15,7 @@
 #include <cstring>        // For std::memcpy
 #include <new>            // For placement new
 #include <span>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
