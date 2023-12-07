@@ -97,7 +97,7 @@ jobs:
       - run: export CXX=clang++ && make coverage
       - run: curl -s https://codecov.io/bash | bash
   # adapted from https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#publishing-a-package-using-an-action
-  build-docker:
+  build-container:
     name: Build Docker Image
     runs-on: ubuntu-22.04
     env:
@@ -132,7 +132,7 @@ jobs:
   test-documentation:
     name: Test Documentation Build
     runs-on: ubuntu-22.04
-    needs: build-docker
+    needs: build-container
     container:
       image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_number }}
     steps:
@@ -148,8 +148,8 @@ jobs:
         with:
           src: doc-coverage.json
           dst: stats/doc-coverage.json
-  deploy-dockerhub:
-    name: Deploy to DockerHub
+  deploy-container:
+    name: Deploy to DockerHub and ghcr.io
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     needs:
@@ -169,5 +169,14 @@ jobs:
           push: true
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: devosoft/empirical
+          tag_with_ref: true
+      - name: Push to GHCR
+        uses: docker/build-push-action@v1
+        with:
+          context: .
+          push: true
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           repository: devosoft/empirical
           tag_with_ref: true
