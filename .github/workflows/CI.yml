@@ -113,13 +113,14 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           push: true
-          tags: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_id }}
+          tags: ACTIONS_BUILD_${{ github.run_id }}
+          labels: ghcr.io/devosoft/Empirical
   test-documentation:
     name: Test Documentation Build
     runs-on: ubuntu-22.04
     needs: build-docker
     container:
-      image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_id }}
+      image: ghcr.io/devosoft/Empirical:ACTIONS_BUILD_${{ github.run_id }}
     steps:
       - uses: actions/checkout@v2
         with:
