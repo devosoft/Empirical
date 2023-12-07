@@ -61,10 +61,6 @@ RUN \
     lsb-release \
     xdg-utils \
     cmake \
-    python3-distutils \
-    python3-setuptools \
-    python3-virtualenv \
-    python3-pip \
     'python3\.10' \
     'python3\.10-distutils' \
     'python3\.10-venv' \
@@ -170,31 +166,17 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
-  curl -sS https://bootstrap.pypa.io/get-pip.py | python3 \
+  python3.10 --version \
+    && \
+  python3 --version \
     && \
   curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
     && \
-  pip install --upgrade --force-reinstall pip virtualenv \
-    && \
-  pip3 install --upgrade --force-reinstall pip virtualenv \
-    && \
   python3.10 -m pip install --upgrade --force-reinstall pip virtualenv \
-    && \
-  python3 -m pip install --upgrade --force-reinstall pip virtualenv \
-    && \
-  pip install wheel==0.30.0 six==1.16.0 \
-    && \
-  pip3 install wheel==0.30.0 six==1.16.0 \
     && \
   python3.10 -m pip install wheel==0.30.0 six==1.16.0 \
     && \
-  python3 -m pip install wheel==0.30.0 six==1.16.0 \
-    && \
-  pip3 install -r /opt/Empirical/doc/requirements.txt \
-    && \
   python3.10 -m pip install -r /opt/Empirical/doc/requirements.txt \
-    && \
-  python3 -m pip install -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
 
