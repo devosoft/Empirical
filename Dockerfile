@@ -26,7 +26,7 @@ RUN \
 RUN \
   for n in $(seq 1 5); do apt-get update -y && sleep 5 && break; done \
     && \
-  apt-get install --no-install-recommends libxxhash0 software-properties-common \
+  apt-get install --no-install-recommends -y libxxhash0 software-properties-common \
     && \
   for n in $(seq 1 5); do add-apt-repository -y ppa:ubuntu-toolchain-r/test && sleep 5 && break; done \
     && \
