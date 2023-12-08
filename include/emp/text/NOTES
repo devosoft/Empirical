@@ -52,15 +52,15 @@ MarkBack notes:
    `^Superscript`^
    `.Subscript`.
    `~Strikethrough`~
-   `@{URL}Linked-text goes here`@
-   `#{hashtag}Tagged text`#
    `<Left Justified`<
    `>Right Justified`>
-   `<Fully Justified`>
-   `|Centered`| -or- `>Centered`<
+   `|Fully Justified`|
+   `=Centered`=
 
-  Color changes or other special types are placed in brackets.
+  Some types require extra details:
 
+   `@{URL}Linked-text goes here`@
+   `#{hashtag}Tagged text`#
    `[blue]This text would be blue
    `[#FF00FF]This text would be magenta
    `[]This text would be back to default color.
@@ -88,7 +88,7 @@ MarkBack notes:
    ``{This would also be code, _with_ the braces appearing}``
 
 
-  Unused symbols for style: $&()-=+;',
+  Unused symbols for style: $&()-+;',
   ALSO technically unused, but less useful: ]}
 
   The following tags handle special CHARACTERS:
@@ -106,14 +106,15 @@ MarkBack notes:
    \* is a bullet which will start a list entry
    \+ is a consecutive number bullet, incrementing if in a list
    \={123} (or any other numbers or letters) is a specified value for a bullet (a subsequent \+, \a, or \R will continue from it)
-   \a is an alphabetic bullet, incrementing if in a list
+   \a is a lowercase alphabetic bullet, incrementing if in a list
+   \A is an uppercase alphabetic bullet, incrementing if in a list
    \b is a page break
    \d{name} creates a division with a specified name
    \n is a line break (newline)
    \o task-list bullet (i.e., a checkbox)
    \p is a paragraph break
-   \t is a tab
    \R is a roman numeral bullet, incrementing if in a list
+   \t is a tab
    \(123) (or any other number) converts to the associated unicode character.
    \<URL> or \<#hashtag> will place a link this point WITH itself as the text
    \[URL|width=100,height=200,alt="my image!"] will RESOLVE a URL to an image and place it here
@@ -137,7 +138,15 @@ MarkBack notes:
    \?{TEST}{Optional text} - insert only if TEST is true.
 
 
-
+MARKBACK CODE:
+Can view context?
+- Line it is at
+- File it is in
+- Rendered to format???
+- Time / Date?
+- Hashtags??
+- Current Div?
+- #include ?
 
 
 
