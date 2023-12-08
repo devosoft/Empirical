@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file JSWrap.hpp
+ *  @file
  *  @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
  *
  *  To wrap a function, call:
@@ -40,7 +41,9 @@
 #define EMP_WEB_JSWRAP_HPP_INCLUDE
 
 #include <array>
+#include <cstdint>
 #include <functional>
+#include <stddef.h>
 #include <tuple>
 #include <type_traits>
 
@@ -173,8 +176,7 @@ namespace emp {
       if (emp_i.curr_obj[UTF8ToString($0)] == null){
         emp_i.curr_obj[UTF8ToString($0)] = "undefined";
       }
-      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]),
-                   ALLOC_STACK);
+      return allocate(intArrayFromString(emp_i.curr_obj[UTF8ToString($0)]), ALLOC_STACK);
     }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
@@ -204,7 +206,7 @@ namespace emp {
 
   template <typename JSON_TYPE, int ARG_ID>
   struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
-    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+    static void LoadJSDataArg(JSON_TYPE & /*arg_var*/) {
         MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };
@@ -304,7 +306,7 @@ namespace emp {
 
   template <typename JSON_TYPE>
   struct StoreTuple<JSON_TYPE, 0> {
-    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+    static void StoreJSDataArg(const JSON_TYPE & /*ret_var*/) {
       MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };

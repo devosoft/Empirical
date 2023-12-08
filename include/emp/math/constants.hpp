@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
- *
- *  @file constants.hpp
+ *  @file
  *  @brief Commonly used constant values.
  *  @note Status: RELEASE
  */
@@ -28,6 +29,8 @@ namespace emp {
   constexpr const uint32_t MAX_4BYTE = 4294967295;    ///< (2^32 - 1)
 
   constexpr const int32_t MIN_INT = -2147483648;      ///< (- 2^31)
+
+  constexpr const size_t MAX_SIZE_T = static_cast<size_t>(-1);
 
   /// Determine the maximum value for any type.
   // @CAO: Prevent inf to get more realistic numbers for double/float?

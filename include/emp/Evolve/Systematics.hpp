@@ -1,11 +1,11 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file Systematics.hpp
+ *  @file
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
- *
  *
  *  @todo Technically, we don't need to keep the ancestors in a set in order to track a lineage...
  *        If we delete all of their descendants they should automaticaly be deleted.

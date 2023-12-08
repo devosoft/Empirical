@@ -1,12 +1,13 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016
- *
- *  @file ce_random.hpp
+ *  @file
  *  @brief A versatile and non-patterned pseudo-random-number generator.
  *
- *  Status: DESIGN
+ *  @note Status: DESIGN
  *
  *  Constructor:
  *    Random(int _seed=-1)
@@ -43,8 +44,10 @@
 // #include <algorithm>
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <ctime>
 #include <iterator>
+#include <stddef.h>
 #include <unistd.h>
 
 #include "../math/math.hpp"

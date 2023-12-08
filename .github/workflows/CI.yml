@@ -7,12 +7,13 @@ on:
       - '**'
   schedule:
     - cron: '0 0 * * 0'
+  workflow_dispatch:
 jobs:
   tidy:
     name: Enforce Tidyness
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -47,13 +48,17 @@ jobs:
       CXX: ${{ matrix.cxx }}
       TEST_SET: ${{ matrix.test-set }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
           version: 11
+      - name: Set up clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: 15
       - run: sudo apt-get update -qq
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - run: sudo apt-get update -qq
@@ -68,7 +73,7 @@ jobs:
     name: Web Tests
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -86,7 +91,11 @@ jobs:
     name: Measure Test Coverage
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Set up clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: 15
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -96,25 +105,77 @@ jobs:
       - run: export CXX=clang++ && make install-coverage-dependencies
       - run: export CXX=clang++ && make coverage
       - run: curl -s https://codecov.io/bash | bash
-  test-documentation:
-    name: Test Documentation Build
+  # adapted from https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#publishing-a-package-using-an-action
+  build-container:
+    name: Build Docker Image
     runs-on: ubuntu-22.04
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - uses: mmore500/actions-setup-docker@94429ebc8d9edb4e8c8afb2667bce1e89435f74f
-      - run: docker build -t devosoft/empirical .
-      - run: docker ps -a
-      - run: sudo docker run --name empirical devosoft/empirical /bin/bash -c "set -o pipefail && cd /opt/Empirical/doc && make html coverage | ./headtail.sh && python /opt/Empirical/doc/parse_documentation_coverage.py /opt/Empirical/doc/_build/doc-coverage.json >> /opt/Empirical/doc-coverage.json"
-      - run: sudo docker cp empirical:/opt/Empirical/doc-coverage.json .
-      - uses: sylvanld/action-storage@v1
-        if: github.ref == 'refs/heads/master'
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          src: doc-coverage.json
-          dst: stats/doc-coverage.json
-  deploy-dockerhub:
-    name: Deploy to DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=raw,value=ACTIONS_BUILD_${{ github.run_number }}
+      - name: Push to GHCR
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  test-documentation:
+    name: Test Documentation Build
+    runs-on: ubuntu-22.04
+    needs: build-container
+    container:
+      image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_number }}
+      # github actions requires root to access mounted volumes
+      options: --user root
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - run: doxygen
+      - run: cd doc && python make_md.py
+      - run: cd doc && make html | ./headtail.sh
+      - run: cd doc && make coverage
+      - run: ls doc/ && ls doc/_build
+      - run: cd doc && python parse_documentation_coverage.py _build/doc-coverage.json >> doc-coverage.json
+      - uses: actions/upload-artifact@v2
+        with:
+          name: doc-coverage
+          path: doc/doc-coverage.json
+  deploy-documentation-coverage:
+    name: Deploy Documentation Coverage
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/master'
+    needs: test-documentation
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: doc-coverage
+          path: data
+      - uses: sylvanld/action-storage@v1
+        with:
+          src: data/doc-coverage.json
+          dst: data/doc-coverage.json
+  deploy-container:
+    name: Deploy to DockerHub and ghcr.io
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     needs:
@@ -134,5 +195,14 @@ jobs:
           push: true
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: devosoft/empirical
+          tag_with_ref: true
+      - name: Push to GHCR
+        uses: docker/build-push-action@v1
+        with:
+          context: .
+          push: true
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           repository: devosoft/empirical
           tag_with_ref: true

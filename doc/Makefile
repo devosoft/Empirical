@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    =
+SPHINXOPTS    = -W --keep-going
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
@@ -177,10 +177,10 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 coverage:
-	$(SPHINXBUILD) -b coverage $(ALLSPHINXOPTS) $(BUILDDIR)/coverage
-	python3 -m coverxygen --xml-dir doxyoutput/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
+	mkdir -p $(BUILDDIR)
+	python3 -m coverxygen --xml-dir doxy*/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
 	@echo "Testing of coverage in the sources finished, look at the " \
-	      "results in $(BUILDDIR)/doc-coverage.json."
+	          "results in $(BUILDDIR)/doc-coverage.json."
 
 xml:
 	$(SPHINXBUILD) -b xml $(ALLSPHINXOPTS) $(BUILDDIR)/xml
@@ -195,5 +195,5 @@ pseudoxml:
 .PHONY: help Makefile clean
 
 clean:
-	rm -rf doxyoutput/ api/
+	rm -rf doxygen/ api/
 	@$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

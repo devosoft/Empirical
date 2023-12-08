@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2023
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020.
- *
- *  @file always_assert_warning.hpp
+ *  @file
  *  @brief A more dynamic replacement for standard library asserts.
  *  @note Status: RELEASE
  *
@@ -20,7 +21,7 @@
  *     int a = 6;
  *     emp_always_assert(a==5, a);
  *
- *  Unlinke "emp_assert_warning", "emp_always_assert_warning" will trigger an
+ *  Unlike "emp_assert_warning", "emp_always_assert_warning" will trigger an
  *  assertion error whether compiled in debug mode or not.
  */
 

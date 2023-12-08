@@ -1,9 +1,8 @@
-Using Empirical\'s D3.js Wrapper
-================================
+# Using Empirica's D3.js Wrapper
 
-If you\'re writing scientific code that runs on the web, you\'ll
+If you're writing scientific code that runs on the web, you'll
 probably want to visualize the results (either as your program runs or
-after it\'s done). To make this as easy as possible, Empirical includes
+after it's done). To make this as easy as possible, Empirical includes
 a C++ wrapper for d3.js, a wildly popular and powerful Javascript data
 visualization library. Using the wrapper, you can create visualizations
 directly from C++.
@@ -19,8 +18,7 @@ pre-built graph objects in an effort to help those new to Javascript
 visualization get started fast. This is an ongoing process and we\'re
 always open to suggestions!
 
-A Minimal Example
-=================
+## A Minimal Example
 
 D3 visualizations run in web browsers. That means that to use this
 wrapper, you need to compile your C++ code to Javascript, using
@@ -38,8 +36,7 @@ easiest way to make a visualization is to use one of the pre-built
 visualizations. Later we\'ll get into writing your own. Either way,
 you\'ll need:
 
-C++ File
---------
+### C++ File
 
 The C++ file that you\'ll compile to Javascript. For this example,
 we\'ll use the Empirical web module to build the whole web page:
@@ -94,8 +91,7 @@ emcc my_program.cc -o my_program.js \ #.js extension tells Emscripten to compile
                   #once you're done debugging)
 ```
 
-HTML File
----------
+### HTML File
 
 To tell the browser what to do with your Javascript, you need an html
 file:
@@ -135,8 +131,7 @@ file:
 </html>
 ```
 
-CSS File
---------
+### CSS File
 
 Optionally, a CSS file can be used to make elements look the way you
 want them to. Here\'s one that includes the necessary styles to make
@@ -174,8 +169,7 @@ style\_sheet.css, and is in the same directory as the html file):
 }
 ```
 
-Running your visualization
---------------------------
+### Running your visualization
 
 Now to open up the page in a browser! Some browsers will let you open
 the page up directly, but some will complain about the fact that you\'re
@@ -199,30 +193,29 @@ python -m http.server
 ![Using SimpleHTTPServer with Python3](../../images/python3HTTPserver.png){.align-center}
 
 You can now open a browser to the server (<http://localhost:8000>,
-replacing 8000 with whatever number was after \"port\" in the output
+replacing 8000 with whatever number was after "port" in the output
 from the command). You should see a list of file names in the directory
 your terminal was open to when you ran the HTTP Server command (unless
-you happen to have a file named index.html, in which case you\'ll see
+you happen to have a file named index.html, in which case you'll see
 the contents of that file). Assuming you ran this command from the
-\"example\" directory in the directory structure shown above, you should
+"example" directory in the directory structure shown above, you should
 see \"my\_html.html\" (or whatever you called your html file) on the
 list. Click on it.
 
-Ta-da! There\'s your visualization.
+Ta-da! There's your visualization.
 
-It\'s convenient to have a visualization of data you\'ve already
+It's convenient to have a visualization of data you've already
 generated, but the real power of D3 visualization objects is that they
-can update in real time while your code runs. Here\'s an example C++
+can update in real time while your code runs. Here's an example C++
 file that does that:
 
 > Example here
 
-So that\'s how you use out-of-the-box D3 visualizations in Empirical.
+So that's how you use out-of-the-box D3 visualizations in Empirical.
 Sometimes, though, you want to do something new and exciting. Which
-brings us to the next section\...
+brings us to the next section...
 
-Writing Your Own Visualization
-==============================
+## Writing Your Own Visualization
 
 To build your own visualization, you need to understand a bit about how
 D3 works. Which means you need to understand a bit about how Javascript
@@ -262,8 +255,8 @@ D3 C++ wrapper, you\'re doing the same thing, but from C++.
 
 Let\'s take a tour of the main components of D3:
 
-Selections
-----------
+### Selections
+
 
 `Selections <Selections_and_Transitions_API>`{.interpreted-text
 role="ref"} are a way to work with groups of DOM elements. For instance,
@@ -343,8 +336,7 @@ D3::Selection graph_circles = svg.SelectAll("circle");
 Advanced note: You can also make selections based on classes with
 [D3::Select(.classname)]{.title-ref}.
 
-Binding Data
-------------
+### Binding Data
 
 In D3, you bind data to selections. Usually, you are binding that data
 because you to visualize it with SVG elements. So, usually the selection
@@ -541,8 +533,7 @@ update.EnterAppend("circle")
 update.ExitRemove();
 ```
 
-Changing Elements\' Traits
---------------------------
+### Changing Elements\' Traits
 
 There are three types of traits that a DOM element might have:
 attributes, styles, and properties. For the most part, attributes are
@@ -643,8 +634,7 @@ also select transitions, allowing you to choose to have their effects be
 animated, rather than occuring instantaneously (which can look choppy in
 many visualizations).
 
-Scales and Axes
----------------
+### Scales and Axes
 
 Usually your data is not in units that you can directly draw on the
 screen. For instance, if you want to plot a variable on the Y axis that
@@ -832,8 +822,7 @@ emp::JSWrap(times_two, "times_two");
 s.SetAttr("r", "times_two");
 ```
 
--   Advanced users may also wish to write functions directly in
-    Javascript, which is possible using Emscripten\'s macros.
+- Advanced users may also wish to write functions directly in Javascript, which is possible using Emscripten's macros.
 
 ``` cpp
 // Put the function in global scope by adding it
@@ -876,8 +865,7 @@ int get_x(JSONData d, int i, int j) {return d.x();};
 s.SetAttr("cx", get_x);
 ```
 
-Under the Hood (for the curious, developers, and people trying to do weird stuff)
-=================================================================================
+## Under the Hood (for the curious, developers, and people trying to do weird stuff)
 
 For the most part, Empirical\'s d3 wrapper isn\'t that complicated under
 the hood. All C++ objects in the d3 module have a unique integer id.
@@ -907,17 +895,7 @@ have not been conducted.
 
 Things to watch out for:
 
--   D3 object creation order - be careful of the order your constructors
-    for d3 objects get called in. It\'s hard to make this happen, but if
-    you\'re constructing objects in the constructors for other objects,
-    it\'s possible for the ids to get mixed up.
--   Errors in Javascript usually won\'t show up on compilation - you
-    need to actually run the code.
--   Main is a function that gets run like any other. When main finishes
-    running, its local variables will go out of scope. This means that
-    everything needed for an ongoing animation needs to live in global
-    scope.
--   Javascript is designed to work asynchronously in a lot of contexts
-    (especially when loading outside resources or updating the graphics
-    on the screen). This can change the way you need to structure your
-    code.
+- D3 object creation order - be careful of the order your constructors for d3 objects get called in. It's hard to make this happen, but if you're constructing objects in the constructors for other objects, it's possible for the ids to get mixed up.
+- Errors in Javascript usually won't show up on compilation - you need to actually run the code.
+- Main is a function that gets run like any other. When main finishes running, its local variables will go out of scope. This means that everything needed for an ongoing animation needs to live in global scope.
+- Javascript is designed to work asynchronously in a lot of contexts (especially when loading outside resources or updating the graphics on the screen). This can change the way you need to structure your code.

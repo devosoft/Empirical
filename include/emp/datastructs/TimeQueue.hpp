@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file TimeQueue.hpp
+ *  @file
  *  @brief A priority queue for timings, always marching forward.
  *  @note Status: ALPHA
  *
@@ -49,6 +50,7 @@
 
 #include <limits>
 #include <sstream>
+#include <stddef.h>
 #include <string>
 
 #include "../base/assert.hpp"

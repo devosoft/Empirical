@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file EventDrivenGP.hpp
+ *  @file
  *  @brief TODO.
  */
 
@@ -14,6 +15,7 @@
 #include <deque>
 #include <functional>
 #include <ratio>
+#include <stddef.h>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -363,6 +365,7 @@ namespace emp {
           CEREAL_NVP(id)
         );
       }
+      size_t GetIndex() const{ return id; }
 
     };
 
@@ -391,7 +394,10 @@ namespace emp {
       Function(
         const affinity_t & _aff=affinity_t(),
         const inst_seq_t & _seq=inst_seq_t(),
-        std::function<void()> _fun_matchbin_refresh=[](){}
+        std::function<void()> _fun_matchbin_refresh
+        #ifndef DOXYGEN_SHOULD_SKIP_THIS
+        =[](){}
+        #endif // DOXYGEN_SHOULD_SKIP_THIS
       ) : affinity(_aff)
       , inst_seq(_seq)
       , fun_matchbin_refresh(_fun_matchbin_refresh)
@@ -818,7 +824,9 @@ namespace emp {
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
     MATCHBIN_T matchBin;
+    #ifndef DOXYGEN_SHOULD_SKIP_THIS
     trait_printer_t fun_trait_print = [](std::ostream& os, TRAIT_T){os << "UNCONFIGURED TRAIT PRINT FUNCTION\n";};
+    #endif // DOXYGEN_SHOULD_SKIP_THIS
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 

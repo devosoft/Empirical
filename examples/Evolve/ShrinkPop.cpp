@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file ShrinkPop.cpp
+ *  @file
  *  @brief This file explores the grid options for emp::World.hpp
  */
 
@@ -16,7 +17,7 @@
 int main()
 {
   constexpr size_t POP_SIZE = 3600;
-  constexpr size_t GENS = 10000;
+  // constexpr size_t GENS = 10000;
   const size_t POP_SIDE = (size_t) std::sqrt(POP_SIZE);
 
   emp::Random random;

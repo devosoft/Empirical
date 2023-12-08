@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
- *
- *  @file KeypressManager.hpp
+ *  @file
  *  @brief KeypressManager is a tracker for keypresses in HTML5 pages.
  *
  *  When a KeypressManager is created, it can be given functions to run in response
@@ -43,6 +44,7 @@
 #ifndef EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
 #define EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
 
+#include <cstdint>
 #include <functional>
 #include <locale>
 #include <map>
@@ -127,7 +129,7 @@ namespace web {
         "To specify uppercase, you'll need to monitor for the shift modifier associated with a KeypressEvent."
       );
 
-      key = std::toupper(key);
+      key = static_cast<char>(std::toupper(key));
 
       fun_map[order] =
         [key, cb_fun](const KeyboardEvent & evt)

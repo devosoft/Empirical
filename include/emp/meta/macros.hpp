@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file macros.hpp
+ *  @file
  *  @brief Generally useful macros that can perform cools tricks.
  *  @note Status: RELEASE
  *
@@ -89,7 +90,7 @@
 
 /// The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
 /// If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
-/// else similarly, it wil NOT triggera a conversion (and stay a single argument)
+/// else similarly, it wil NOT trigger a conversion (and stay a single argument)
 #define EMP_CONVERT_ARG_EMP_FAKE_ARG(A) A
 #define EMP_CONVERT_ARG_EMP_FAKE_2ARG(A) ~, A
 
@@ -203,7 +204,7 @@
 /// @cond MACROS
 // S = Size of each pack
 // N = Number of packs
-// P = Pack representatio of number of packs
+// P = Pack representation of number of packs
 #define EMP_ARGS_TO_PACKS_impl(S, N, ...) EMP_ARGS_TO_PACKS_implB(S, EMP_DEC_TO_PACK(N), __VA_ARGS)
 #define EMP_ARGS_TO_PACKS_implB(S, P, ...) @CAO
 
@@ -422,7 +423,7 @@
 /// @endcond
 
 
-// @cond MACROS
+/// @cond MACROS
 
 
 // **********************
@@ -441,7 +442,6 @@
 #define EMP_INTERNAL_CALL_BY_PACKS(C, F, ...)                                     \
   EMP_INTERNAL_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__, ~)
 
-/// @cond MACROS
 
 // Internal helpers...
 // P is the pack of call counts the still need to be done

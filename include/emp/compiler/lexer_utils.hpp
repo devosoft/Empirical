@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file lexer_utils.hpp
+ *  @file
  *  @brief A set of utilities to convert between NFAs and DFAs
  *  @note Status: BETA
  */
@@ -13,6 +14,7 @@
 
 
 #include <map>
+#include <stddef.h>
 #include <utility> // std::pair
 
 #include "../base/vector.hpp"
@@ -22,6 +24,10 @@
 #include "NFA.hpp"
 
 namespace emp {
+
+  /** \addtogroup <lexer_utilities>
+  *  @{
+  */
 
   /// Converting DFA to DFA -- no change needed.
   static inline const DFA & to_DFA(const DFA & dfa) { return dfa; }
@@ -52,7 +58,7 @@ namespace emp {
         std::set<size_t> next_state = nfa.GetNext(sym, cur_state);
         if (next_state.size() == 0 && !keep_invalid) continue;  // Discard invalid transitions.
 
-        // Remove NFA states with ONLY free transisions (they will all have been taken already)
+        // Remove NFA states with ONLY free transitions (they will all have been taken already)
         // @CAO do more elegantly!
         emp::vector<size_t> remove_set;
         for (auto x : next_state) if (nfa.IsEmpty(x)) remove_set.push_back(x);
@@ -91,7 +97,7 @@ namespace emp {
   }
 
 
-  /// Merge multiple automata into one NFA (base case, single converstion)
+  /// Merge multiple automata into one NFA (base case, single conversion)
   template <typename T1>
   static NFA MergeNFA(T1 && in) {
     return to_NFA(std::forward<T1>(in));
@@ -143,6 +149,9 @@ namespace emp {
 
     return "";
   }
+
+  // Close Doxygen group
+  /** @}*/
 }
 
 #endif // #ifndef EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE

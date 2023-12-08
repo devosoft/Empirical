@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file MemoryImage.hpp
+ *  @file
  *  @brief A managed set of Bytes to store any kind of data.
  *  @note Status: ALPHA
  *
@@ -14,6 +15,8 @@
 
 #include <cstring>        // For std::memcpy
 #include <new>            // For placement new
+#include <span>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
@@ -27,7 +30,7 @@ namespace emp {
   private:
     emp::Ptr<std::byte> image = nullptr;   ///< Current memory image.
     size_t size = 0;                       ///< Size of current image.
-    size_t init_to = 0;                    ///< How far if the current image initialized?
+    size_t init_to = 0;                    ///< How far of the current image is initialized?
 
     // Setup all of the uninitialized memory to be non-zero.
     void Fuzz() {
@@ -76,6 +79,16 @@ namespace emp {
       return *GetPtr<T>(pos);
     }
 
+    /// Get proper spans to sets of same-type objects represented in this image.
+    template <typename T> std::span<T> Get(size_t pos, size_t count) {
+      emp_assert(pos < GetInitSize(), "Only get a span from initialized memory.");
+      return std::span<T>( GetPtr<T>(pos).Raw(), count );
+    }
+    template <typename T> std::span<const T> Get(size_t pos, size_t count) const {
+      emp_assert(pos < GetInitSize(), "Only get a span from initialized memory.");
+      return std::span<const T>( GetPtr<T>(pos).Raw(), count );
+    }
+
     /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
     void RawResize(size_t new_size) {
       // If the size is already good, stop here.
@@ -91,7 +104,7 @@ namespace emp {
     }
 
     /// Copy all of the bytes directly from another memory image.  Size manipulation must be
-    /// done beforehand to ensure sufficient space is availabe.
+    /// done beforehand to ensure sufficient space is available.
     void RawCopy(const MemoryImage & from_memory) {
       emp_assert(GetSize() >= from_memory.GetSize());
       if (from_memory.GetSize() == 0) return; // Nothing to copy!

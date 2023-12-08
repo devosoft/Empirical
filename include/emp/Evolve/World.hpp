@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2017-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
- *
- *  @file World.hpp
+ *  @file
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
  *
  *  A definition of the emp::World template, linking in specialized file handling, iterators,
@@ -1734,7 +1735,6 @@ namespace emp {
       os << std::endl;
     }
   }
-
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE

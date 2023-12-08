@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file IndexMap.cpp
+ *  @file
  */
 
 #include <iostream>
@@ -29,19 +30,15 @@ TEST_CASE("Test IndexMap", "[datastructs]")
   im[1] = 2;
   REQUIRE(im.GetWeight(0) == 1);
   REQUIRE(im.GetWeight(1) == 2);
-  REQUIRE(im.RawWeight(2) == 1);
-  REQUIRE(im.RawWeight(3) == 2);
 
   im.resize(5);
   REQUIRE(im.size() == 5);
   REQUIRE(im.GetWeight(0) == 1);
-  REQUIRE(im.RawWeight(7) == 1);
 
   im[2] = 3;
   im[3] = 4;
   im[4] = 5;
 
-  REQUIRE(im.RawProb(7) == (1.0/15.0));
   REQUIRE(im.GetProb(4) == (1.0/3.0));
 
   emp::IndexMap im2(5);

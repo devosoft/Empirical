@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021.
- *
- *  @file DFA.hpp
+ *  @file
  *  @brief A Deterministic Finite Automata simulator.
  *  @note Status: BETA
  */
@@ -11,7 +12,9 @@
 #ifndef EMP_COMPILER_DFA_HPP_INCLUDE
 #define EMP_COMPILER_DFA_HPP_INCLUDE
 
+#include <cstdint>
 #include <limits>
+#include <stddef.h>
 #include <string>
 
 #include "../base/array.hpp"
@@ -26,13 +29,17 @@ namespace emp {
   private:
     emp::vector< emp::array<int, NUM_SYMBOLS> > transitions;
     emp::vector< STOP_TYPE > is_stop;  // 0=not stop; other values for STOP return value.
+
+    using this_t = tDFA<NUM_SYMBOLS, STOP_TYPE>;
   public:
     tDFA(size_t num_states=0) : transitions(num_states), is_stop(num_states, 0) {
       for (auto & t : transitions) t.fill(-1);
     }
-    tDFA(const tDFA<NUM_SYMBOLS, STOP_TYPE> &) = default;
+    tDFA(const this_t &) = default;
+    tDFA(this_t &&) = default;
     ~tDFA() { ; }
-    tDFA<NUM_SYMBOLS, STOP_TYPE> & operator=(const tDFA<NUM_SYMBOLS, STOP_TYPE> &) = default;
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
 
     using stop_t = STOP_TYPE;
 

@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021.
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021.
- *
- *  @file _native_error_trigger.hpp
+ *  @file
  *  @brief Terminating error trigger implementation.
  *  @note For internal use.
  */
@@ -12,6 +13,7 @@
 #define EMP_BASE__NATIVE_ERROR_TRIGGER_HPP_INCLUDE
 
 
+#include <stddef.h>
 #include <string>
 
 namespace emp {

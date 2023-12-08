@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file bitset_utils.cpp
+ *  @file
  */
 
 #include <sstream>
@@ -31,8 +32,8 @@ TEST_CASE("Test bitset_utils", "[bits]")
   REQUIRE(emp::pop_bit(four) == 2);
   REQUIRE(emp::count_bits(four) == 0);
 
-  REQUIRE(emp::MaskUsed<int>(5) == 7);
-  REQUIRE(emp::MaskUsed<int>(15) == 15);
+  REQUIRE(emp::MaskUsed<size_t>(5) == 7);
+  REQUIRE(emp::MaskUsed<size_t>(15) == 15);
   REQUIRE(emp::MaskUsed<uint32_t>(30000) == 32767);
   REQUIRE(emp::MaskUsed<uint64_t>(40000000000) == 0xfffffffff);
   REQUIRE(emp::MaskUsed<uint64_t>(5000000000000) == 0x7ffffffffff);

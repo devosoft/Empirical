@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file Collapse.hpp
+ *  @file
  *  @brief Sets up a collapsable DOM element.
  */
 
@@ -31,7 +32,9 @@ namespace prefab {
       public:
         /**
          * @param controller web element that cause target area(s) to expand/collapse when clicked
+         * @param controls_class CSS class for controls
          * @param expanded whether or not the target(s) are initially in an expanded/open state
+         * @param id HTML id of div for this controller
          */
         template <typename T>
         CollapseController(
@@ -150,7 +153,7 @@ namespace prefab {
        * Adds a controller to the vector of controllers for this CollapseCouple
        *
        * @param controller new controller to add to coupling is of type Widget
-       * @param expaned initial state of the target(s), is it expaned or not?
+       * @param expanded initial state of the target(s), is it expanded or not?
        */
       void AddController(web::Widget controller, const bool expanded) {
         internal::CollapseController controller_widget(controller, target_class, expanded);
@@ -160,7 +163,7 @@ namespace prefab {
       /** Adds a controller to the vector of controllers for this CollapseCouple.
        *
        * @param controller new controller to add to coupling is of type string
-       * @param expaned initial state of the target(s), is it expaned or not?
+       * @param expanded initial state of the target(s), is it expanded or not?
        */
 
       /*
@@ -175,7 +178,7 @@ namespace prefab {
        * Adds a target to the vector of targets for this CollapseCouple
        *
        *  @param widget new target to add to coupling is a web element
-       *  @param expaned initial state of the target(s), is it expaned or not?
+       *  @param expanded initial state of the target(s), is it expanded or not?
        */
       void AddTarget(web::internal::FacetedWidget widget, const bool expanded) {
         if (expanded) {
@@ -190,8 +193,8 @@ namespace prefab {
       /**
        * Adds a target to the vector of targets for this CollapseCouple
        *
-       * @param widget new target to add to coupling is a string
-       * @param expaned initial state of the target(s), is it expaned or not?
+       * @param target new target to add to coupling is a string
+       * @param expanded initial state of the target(s), is it expanded or not?
        */
 
       /*
@@ -216,13 +219,13 @@ namespace prefab {
       emp::vector<web::Widget> & GetControllerDivs() { return controllers; }
 
       /// Returns the controller at the given index
-      web::Widget & GetControllerDiv(const int index=0) { return controllers[index]; }
+      web::Widget & GetControllerDiv(const size_t index=0) { return controllers[index]; }
 
       /// Returns the vector of all targets associated with this CollapseCouple
       emp::vector<web::Widget> & GetTargetDivs() { return targets; }
 
       /// Returns the target at the given index
-      web::Widget & GetTargetDiv(const int index=0) { return targets[index]; }
+      web::Widget & GetTargetDiv(const size_t index=0) { return targets[index]; }
   };
 }
 }

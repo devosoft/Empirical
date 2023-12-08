@@ -7,7 +7,7 @@
 #    WebAssembly.
 
 # Flags to use regardless of compiler
-CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -I../../include/
+CFLAGS_all := -std=c++20 -Wall -Wno-unused-function -I../../include/
 
 # Emscripten compiler information
 CXX_web := emcc

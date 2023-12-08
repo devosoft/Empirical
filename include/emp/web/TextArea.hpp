@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file TextArea.hpp
+ *  @file
  *  @brief Specs for the TextArea widget.
  *
  *
@@ -12,6 +13,8 @@
 
 #ifndef EMP_WEB_TEXTAREA_HPP_INCLUDE
 #define EMP_WEB_TEXTAREA_HPP_INCLUDE
+
+#include <cstdint>
 
 #include "Widget.hpp"
 

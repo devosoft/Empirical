@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2020
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020
- *
- *  @file MemoryIStream.hpp
+ *  @file
  *  @brief Useful for streaming data from contiguous memory.
  *  @note Status: RELEASE
  */
@@ -12,6 +13,7 @@
 #define EMP_IO_MEMORYISTREAM_HPP_INCLUDE
 
 #include <istream>
+#include <stddef.h>
 #include <streambuf>
 
 namespace emp {

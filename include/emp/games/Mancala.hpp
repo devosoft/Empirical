@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2021
- *
- *  @file Mancala.hpp
+ *  @file
  *  @brief A simple Malcala game state handler.
  */
 
@@ -13,6 +14,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"
@@ -28,8 +30,9 @@ namespace emp {
 
     side_t boardA;        // Current board state for side A.
     side_t boardB;        // Current board state for side B.
+    size_t turn_count;    // How many turns has this game been played?
     bool over = false;    // Has the game ended?
-    size_t is_A_turn;     // Which player goes next?
+    bool is_A_turn;       // Which player goes next?
 
     void TestOver() {
       bool side_A_empty = true;
@@ -46,7 +49,7 @@ namespace emp {
   public:
     using move_t = size_t;
 
-    Mancala(bool A_first=true) : boardA(), boardB(), over(false), is_A_turn(true) {
+    Mancala(bool A_first=true) : boardA(), boardB(), turn_count(0), over(false), is_A_turn(true) {
       Reset(A_first);
     }
     ~Mancala() { ; }
@@ -54,6 +57,7 @@ namespace emp {
     void Reset(bool A_first=true) {
       for (size_t i = 0; i < 6; i++) { boardA[i] = 4; boardB[i] = 4; }
       boardA[6] = boardB[6] = 0;
+      turn_count = 0;
       over = false;
       is_A_turn = A_first;
     }
@@ -94,12 +98,14 @@ namespace emp {
 
     // Returns bool indicating whether player can go again
     bool DoMove(move_t cell) {
-      emp_assert(cell < 6);                // You cannot choose a cell out of bounds.
+      emp_assert(cell < 6);                    // Make sure move is not out of bounds.
 
-      side_t & cur_board   = GetCurSide();
+      turn_count++;                            // Maintain count of moves.
+
+      side_t & cur_board   = GetCurSide();     // Load in board view based on current player.
       side_t & other_board = GetOtherSide();
 
-      emp_assert(cur_board[cell] != 0);        // You cannot choose an empty cell.
+      emp_assert(cur_board[cell] != 0);        // Make sure move is not an empty pit.
 
       size_t stone_count = cur_board[cell];
       size_t cur_cell = cell;

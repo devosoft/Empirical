@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file random_utils.hpp
+ *  @file
  *  @brief Helper functions for emp::Random for common random tasks.
  *  @note Status: RELEASE
  */
@@ -12,6 +13,7 @@
 #define EMP_MATH_RANDOM_UTILS_HPP_INCLUDE
 
 #include <functional>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
@@ -20,6 +22,12 @@
 
 namespace emp {
 
+  /// Choose a random element from an indexable container.
+  template <typename T>
+  inline auto SelectRandom(Random & random, const T & container) {
+    return container[random.GetUInt(container.size())];
+  }
+
   /// Randomly reorder all of the elements in a vector.
   /// If max_count is provided, just make sure that the first max_count entries are randomly
   /// drawn from entire vector.
@@ -27,6 +35,7 @@ namespace emp {
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v, size_t max_count)
   {
+    emp_assert(max_count <= v.size());
     for (size_t i = 0; i < max_count; i++) {
       const size_t pos = random.GetUInt(i, v.size());
       if (pos == i) continue;
@@ -37,6 +46,17 @@ namespace emp {
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v) { Shuffle(random, v, v.size()); }
 
+  template <typename T>
+  inline void ShuffleRange(Random & random, emp::vector<T> & v, size_t first, size_t last)
+  {
+    emp_assert(first <= last);
+    emp_assert(last <= v.size());
+    for (size_t i = first; i < last; i++) {
+      const size_t pos = random.GetUInt(i, last);
+      if (pos == i) continue;
+      std::swap(v[i], v[pos]);
+    }
+  }
 
   /// Return an emp::vector<int> numbered 0 through size-1 in a random order.
 

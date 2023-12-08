@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2017
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
- *
- *  @file NK-const.hpp
+ *  @file
  *  @brief This file provides code to build NK landscapes, setup at compile time..
  *
  *  Knowing the size of N and K at compile time allow for slightly more optimized code, at the
@@ -14,6 +15,7 @@
 #define EMP_EVOLVE_NK_CONST_HPP_INCLUDE
 
 #include <array>
+#include <stddef.h>
 
 #include "../base/assert.hpp"
 #include "../bits/BitSet.hpp"
@@ -92,7 +94,7 @@ namespace evo {
     /// Get the fitness of a whole  bitstring
     double GetFitness(const BitSet<N> & genome) const {
       // Create a double-length genome to easily handle wrap-around.
-      BitSet<N*2> genome2( genome.template Export<N*2>() );
+      BitSet<N*2> genome2( genome.template ExportArray<N*2>() );
       genome2 |= (genome2 << N);
 
       double total = 0.0;

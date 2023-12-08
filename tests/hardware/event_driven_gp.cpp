@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file event_driven_gp.cpp
+ *  @file
  */
 
 #include <iostream>
@@ -164,7 +165,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 
   // New Random
   gp.NewRandom(150);
-  (gp.GetRandom().GetSeed() == 150);
+  REQUIRE(gp.GetRandom().GetSeed() == 150);
 
   // Events
   emp::EventDrivenGP::Event ev(0); // event 0 in event lib is message
@@ -540,7 +541,9 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[har
   std::unordered_set<uint32_t> uset; // Will be used to double-check uniqueness.
 
   // Generate a bunch of big random tags. No uniqueness guarantees.
-  for (size_t i = 0; i < 100; ++i) auto tag = emp::GenRandSignalGPTag<1024>(random);
+  for (size_t i = 0; i < 100; ++i) {
+    [[maybe_unused]] auto tag = emp::GenRandSignalGPTag<1024>(random);
+  }
 
   // Enumerate all 2-bit tags
   emp::vector<emp::BitSet<2>> tags2;
@@ -885,8 +888,8 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGPMutator struct", "
   // Check parameter adding.
   size_t default_param_cnt = mutator.GetParamCnt();
   size_t param1_id = mutator.AddParam("test1", 1.0, "Test parameter one!");
-  size_t param2_id = mutator.AddParam("test2", 2.0, "Test parameter two!");
-  size_t param3_id = mutator.AddParam("test3", 3.0, "Test parameter three!");
+  [[maybe_unused]] size_t param2_id = mutator.AddParam("test2", 2.0, "Test parameter two!");
+  [[maybe_unused]] size_t param3_id = mutator.AddParam("test3", 3.0, "Test parameter three!");
   REQUIRE(mutator.GetParamCnt() == default_param_cnt+3);
   REQUIRE(mutator.GetParam(param1_id) == 1.0);
   REQUIRE(mutator.GetParam(param1_id) == mutator.GetParam("test1"));

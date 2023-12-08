@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2016-2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
- *
- *  @file TypeTracker.hpp
+ *  @file
  *  @brief Track class types abstractly to dynamically call correct function overloads.
  *  @note Status: BETA
  *
@@ -21,6 +22,7 @@
 #ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
 #define EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
 
+#include <stddef.h>
 #include <unordered_map>
 
 #include "../base/array.hpp"

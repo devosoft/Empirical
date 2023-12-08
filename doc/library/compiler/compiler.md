@@ -1,41 +1,12 @@
 # Compiler
 
-## Deterministic Finite Automata
+## API
 
+<!-- API TOC -->
+<!-- The above comment tells the API generator that this file has API docs. Don't remove it. -->
 ```{eval-rst}
-.. doxygenfile:: emp/compiler/DFA.hpp
-  :project: Empirical
-  :no-link:
-```
+.. toctree::
+   :glob:
 
-## Lexer Utilities
-
-```{eval-rst}
-.. doxygenfile:: emp/compiler/lexer_utils.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## Lexer
-
-```{eval-rst}
-.. doxygenfile:: emp/compiler/Lexer.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## NonDeterministic Finite Automata
-
-```{eval-rst}
-.. doxygenfile:: emp/compiler/NFA.hpp
-  :project: Empirical
-  :no-link:
-```
-
-## Regular Expressions
-
-```{eval-rst}
-.. doxygenfile:: emp/compiler/RegEx.hpp
-  :project: Empirical
-  :no-link:
+   api/*
 ```

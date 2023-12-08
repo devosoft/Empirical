@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2021
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2021
- *
- *  @file d3_init.hpp
+ *  @file
  *  @brief TODO.
  */
 
@@ -131,8 +132,8 @@ namespace D3 {
     ///
     /// Example:
     ///
-    ///
-    /// `D3::FormatFunction rounded = D3::FormatFunction(".2f");
+    /// @code
+    ///  D3::FormatFunction rounded = D3::FormatFunction(".2f");
     ///
     ///  std::function<double, int, int)> tooltip_display =
     ///    [this](double d, int i, int k) {return "Data: " + to_string(rounded(d));}
@@ -141,8 +142,8 @@ namespace D3 {
     ///
     ///  D3::Selection example_selection = D3::SelectAll("circle");
     ///
-    ///  example_selection.SetupToolTip(tip);'
-    ///
+    ///  example_selection.SetupToolTip(tip);
+    /// @endcode
     ///
     /// Mousing over a circle in the example selection will display
     /// "Data: " followed by the value of d, rounded to two decimal points.

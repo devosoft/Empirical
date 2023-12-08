@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2019
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
- *
- *  @file ContiguousStream.hpp
+ *  @file
  *  @brief Useful for streaming data to contiguous memory.
  *  @note Status: RELEASE
  */
@@ -12,6 +13,7 @@
 #define EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
 
 #include <iostream>
+#include <stddef.h>
 
 #include "../base/vector.hpp"
 

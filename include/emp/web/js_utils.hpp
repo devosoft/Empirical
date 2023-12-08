@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2015-2022
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
- *
- *  @file js_utils.hpp
+ *  @file
  *  @brief Tools for passing data between C++ and Javascript.
  */
 
@@ -11,6 +12,7 @@
 #define EMP_WEB_JS_UTILS_HPP_INCLUDE
 
 #include <map>
+#include <stddef.h>
 #include <string>
 #include <typeinfo>
 
@@ -29,14 +31,18 @@ namespace emp {
   /// getValue() from within MAIN_THREAD_EM_ASM macros.
   ///
   ///  For example, say we have a templated function that takes a pointer to type
-  /// T. We find out the appropriate string for type T:
+  /// T. We find out the appropriate string for type T :
+  /// @code
   /// std::map<const char*, std::string> type_map = GetTypeToStringMap();
   /// std::string type_string = type_map[typeid(T).name()];
+  /// @endcode
   ///
   /// Now we can pass type_string.c_str() into MAIN_THREAD_EM_ASM:
-  /// `MAIN_THREAD_EM_ASM({
+  /// @code
+  /// MAIN_THREAD_EM_ASM({
   ///    var value = getValue($0, $1);
-  /// }, pointer, type_string.c_str();`
+  ///  }, pointer, type_string.c_str();
+  /// @endcode
 
   std::map<std::string, std::string> get_type_to_string_map() {
     // Using typeid().name() could create problems because it varies by
@@ -298,6 +304,7 @@ namespace emp {
   #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE, typename T>
   void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {
+    (void) recurse; // Unused?
 
     //Figure out type stuff
     std::map<std::string, std::string> map_type_names = get_type_to_string_map();
@@ -340,6 +347,7 @@ namespace emp {
   #ifdef __EMSCRIPTEN__
   template <typename T>
   void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
+    (void) recurse; // Unused?
 
     // Figure out type stuff
     std::map<std::string, std::string> map_type_names = get_type_to_string_map();
@@ -412,6 +420,7 @@ namespace emp {
   #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE>
   void pass_array_to_cpp(emp::array<char, SIZE> & arr, bool recurse = false) {
+    (void) recurse; // Unused?
 
     emp_assert(arr.size() == MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
 
@@ -443,6 +452,7 @@ namespace emp {
   // as strings in Javascript we can pass them out to a C++ array
   #ifdef __EMSCRIPTEN__
   void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) {
+    (void) recurse; // Unused?
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
       // Since we're treating each char as it's own string, each one
@@ -470,6 +480,7 @@ namespace emp {
   #ifdef __EMSCRIPTEN__
   template <std::size_t SIZE>
   void pass_array_to_cpp(emp::array<std::string, SIZE> & arr, bool recurse = false) {
+    (void) recurse; // Unused?
 
     emp_assert(arr.size() == MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
 
@@ -512,6 +523,7 @@ namespace emp {
   // We can handle strings in a similar way
   #ifdef __EMSCRIPTEN__
   void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) {
+    (void) recurse; // Unused?
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
       // Figure how much memory to allocate
@@ -605,7 +617,7 @@ namespace emp {
       while ((int)arr.size() <= i) {
         arr.push_back(emp::vector<T>());
       }
-      pass_vector_to_cpp(arr[i], true);
+      pass_vector_to_cpp(arr[(size_t) i], true);
     }
 
     // Clear temp array

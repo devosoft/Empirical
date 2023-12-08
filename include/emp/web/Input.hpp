@@ -1,9 +1,10 @@
+/*
+ *  This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  date: 2018
+*/
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
- *
- *  @file Input.hpp
+ *  @file
  *  @brief Create/control an HTML input and call a specified function when it receives input.
  *
  *  Use example:
@@ -30,6 +31,7 @@
 #ifndef EMP_WEB_INPUT_HPP_INCLUDE
 #define EMP_WEB_INPUT_HPP_INCLUDE
 
+#include <cstdint>
 
 #include "Widget.hpp"
 
@@ -63,7 +65,7 @@ namespace web {
 
       InputInfo(const std::string & in_id="")
       : internal::WidgetInfo(in_id)
-      , checker([](std::string in){ return true; })
+      , checker([](std::string /*in*/){ return true; })
       { ; }
       InputInfo(const InputInfo &) = delete;               // No copies of INFO allowed
       InputInfo & operator=(const InputInfo &) = delete;   // No copies of INFO allowed
